@@ -2,21 +2,22 @@ from gallicaHunter import GallicaHunter
 import sys
 
 def main():
-	hunter = GallicaHunter()
 	if len(sys.argv) == 2:
 		try:
-			hunter.huntBigSix(sys.argv[1])
+			allPaperHunter = GallicaHunter(sys.argv[1])
+			allPaperHunter.hunt()
 		# Change this eventually
 		except:
 			print("Usage: python gallicaMainDriver searchTerm **for shotgun hunt**")
 			raise
-		
+
 	else:
 		try:
-			hunter.hunt(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+			onePaperHunter = GallicaHunter(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
+			onePaperHunter.hunt()
 		# Change this eventually
 		except:
-			print("Usage: python gallicaMainDriver searchTerm recordNumber newspaperKey")
+			print("Usage: python gallicaMainDriver searchTerm recordNumber newspaper")
 			raise
 main()
 

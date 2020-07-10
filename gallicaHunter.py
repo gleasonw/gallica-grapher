@@ -1,94 +1,91 @@
 import requests
 import pathlib
-import os
+import re
 from lxml import etree
+from gallicaPackager import GallicaPackager
+
 """
 tags for newspapers
 petit journal = cb32895690j_date
 """
 
 class GallicaHunter:
-	newspaperDict = {
-		"lepetitjournal": "cb32895690j_date",
-		"lefigaro" : "cb34355551z_date",
-		"letemps" : "cb34431794k_date",
-		"journaldesdebats" : "cb39294634r_date",
-		"lexixesiecle" : "cb32757974m_date",
-		"lepetitparisien" : "cb34419111x_date"
-		}
-	def __init__(self, searchTerm, recordNumber, newspaper):
-		self.searchTerm = searchTerm
-		self.recordNumber = recordNumber
-		self.journalDateIdentifierResults = []
-		self.newspaperDictionary = establishNewspaperDictionary(newspaper)
+    newspaperDict = {
+        "lepetitjournal": "cb32895690j_date",
+        "lefigaro" : "cb34355551z_date",
+        "letemps" : "cb34431794k_date",
+        "journaldesdebats" : "cb39294634r_date",
+        "lexixesiecle" : "cb32757974m_date",
+        "lepetitparisien" : "cb34419111x_date"
+    }
+    def __init__(self, searchTerm, recordNumber, newspaper, yearRange):
+        self.searchTerm = searchTerm
+        self.recordNumber = recordNumber
+        self.journalDateIdentifierResults = []
+        self.newspaper = ''
+        self.yearRange = []
+        self.numberQueriesToGallica = 10
+        self.establishNewspaperDictionary(newspaper)
+        self.establishYearRange(yearRange)
+        self.establishNumberQueries(recordNumber)
 
-	"""
-	params:
 
-	searchTerm = the term you're retrieving from Gallica
-	recordNumber = the number of records you desire
-	newspaperKey = the gallica key of the newspaper you desire
+    """
+    params:
 
-	"""
-	def hunt(self):
-		#Add something to restrict year range if wanted
-		for newspaper in newspaperDictionary:
-			newspaperKey = newspaperDictionary[newspaper]
-			startRecord = 0
-			numberQueriesToGallica = 10
+    searchTerm = the term you're retrieving from Gallica
+    recordNumber = the number of records you desire
+    newspaperKey = the gallica key of the newspaper you desire
 
-			for j in range(numberQueriesToGallica):
-				parameters = {"version": 1.2, "operation": "searchRetrieve", "query" :'arkPress all "%s" and (gallica all "%s") sortby dc.date/sort.ascending' % (newspaperKey, self.searchTerm), "startRecord" : startRecord, "maximumRecords" : 50, "collapsing" : "disabled"}
-				response = requests.get("https://gallica.bnf.fr/SRU",params=parameters)
-				root = etree.fromstring(response.content)
+    """
+    def hunt(self):
+        #Add something to restrict year range if wanted
+        for newspaper in self.newspaperDictionary:
+            newspaperKey = self.newspaperDictionary[newspaper]
+            startRecord = 0
 
-				# Format everything for eventual csv copy
-				startOfResultsList = len(self.journalDateIdentifierResults)
+            for j in range(self.numberQueriesToGallica):
+                parameters = {"version": 1.2, "operation": "searchRetrieve", "query" :'arkPress all "%s" and (gallica all "%s") sortby dc.date/sort.ascending' % (newspaperKey, self.searchTerm), "startRecord" : startRecord, "maximumRecords" : 50, "collapsing" : "disabled"}
+                response = requests.get("https://gallica.bnf.fr/SRU",params=parameters)
+                root = etree.fromstring(response.content)
 
-				# Go through XML, add all journal titles (all entries). Then go through dates, adding to index incrementally (date in same order as title). Ditto for identifier.
-				for child in root.iter("{http://purl.org/dc/elements/1.1/}title"):
-					journalTitle = child.text
-					self.journalDateIdentifierResults.append(journalTitle)
-				i = startOfResultsList
-				for child in root.iter("{http://purl.org/dc/elements/1.1/}date"):
-					journalDate = child.text
-					journalTitle = self.journalDateIdentifierResults[i]
-					journalTitleDate = "{0}, {1}".format(journalTitle, journalDate)
-					self.journalDateIdentifierResults[i] = journalTitleDate
-					i = i + 1
-				i = startOfResultsList
-				for child in root.iter("{http://purl.org/dc/elements/1.1/}identifier"):
-					journalTitleDate = self.journalDateIdentifierResults[i]
-					journalIdentifier = child.text
-					journalTitleDateIdentifier = "{0}, {1}".format(journalTitleDate, journalIdentifier)
-					self.journalDateIdentifierResults[i] = journalTitleDateIdentifier
-					i = i + 1
-				startRecord = startRecord + 51
+                # Format everything for eventual csv copy
+                startOfResultsList = len(self.journalDateIdentifierResults)
 
-		makeCSVFile()
+                # Go through XML, add all journal titles (all entries). Then go through dates, adding to index incrementally (date in same order as title). Ditto for identifier.
+                for child in root.iter("{http://purl.org/dc/elements/1.1/}title"):
+                    journalTitle = child.text
+                    self.journalDateIdentifierResults.append(journalTitle)
+                i = startOfResultsList
+                for child in root.iter("{http://purl.org/dc/elements/1.1/}date"):
+                    journalDate = child.text
+                    journalTitle = self.journalDateIdentifierResults[i]
+                    journalTitleDate = "{0}, {1}".format(journalTitle, journalDate)
+                    self.journalDateIdentifierResults[i] = journalTitleDate
+                    i = i + 1
+                i = startOfResultsList
+                for child in root.iter("{http://purl.org/dc/elements/1.1/}identifier"):
+                    journalTitleDate = self.journalDateIdentifierResults[i]
+                    journalIdentifier = child.text
+                    journalTitleDateIdentifier = "{0}, {1}".format(journalTitleDate, journalIdentifier)
+                    self.journalDateIdentifierResults[i] = journalTitleDateIdentifier
+                    i = i + 1
+                startRecord = startRecord + 51
 
-	def establishNewspaperDictionary(self,newspaper):
-		fullNewspaperDictionary = GallicaHunter.newspaperDict
-		if newspaper is None:
-			return(fullNewspaperDictionary)
-		else:
-			trimmedDictionary = {newspaper : fullNewspaperDictionary[newspaper]}
-			return(trimmedDictionary)
+        filePacker = GallicaPackager(self.searchTerm, self.newspaper, self.journalDateIdentifierResults)
+        filePacker.makeCSVFile()
 
-	def makeCSVFile(self):
-		fileName = determineFileName()
-		outFile = open(fileName, "w")
-		outFile.write("journal,date,url\n")
-		for csvEntry in self.journalDateIdentifierResults:
-			outFile.write(csvEntry + "\n")
-		outFile.close()
+    def establishNewspaperDictionary(self,newspaper):
+        fullNewspaperDictionary = GallicaHunter.newspaperDict
+        if newspaper is None:
+            self.newspaperDictionary = fullNewspaperDictionary
+        else:
+            trimmedDictionary = {newspaper : fullNewspaperDictionary[newspaper]}
+            self.newspaperDictionary = trimmedDictionary
 
-	def determineFileName(self):
-		if self.newspaper is None:
-			nameOfFile = "AllNewspapers--"
-		else:
-			nameOfFile = self.newspaper + "--"
-		wordsInQuery = self.searchTerm.split(" ")
-		for word in wordsInQuery:
-			nameOfFile = nameOfFile + word
-		return(nameOfFile)
+    def establishYearRange(self, yearRange):
+        self.yearRange = re.split(r'[;,\-\s*]', yearRange)
+
+    def establishNumberQueries(self, recordNumber):
+        if recordNumber is not None:
+            self.numberQueriesToGallica = recordNumber // 50
