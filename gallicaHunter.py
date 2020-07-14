@@ -82,8 +82,9 @@ class GallicaHunter:
 
     def establishQuery(self):
         if(len(self.yearRange) == 0):
-            self.query = 'arkPress all "{{newsKey}}" and (gallica all "{searchWord}") sortby dc.date/sort.ascending'.format(searchWord = self.searchTerm)
+            self.query = 'arkPress all "{{newsKey}}" and (gallica adj "{searchWord}") sortby dc.date/sort.ascending'.format(searchWord = self.searchTerm)
         else:
+            print("you gave me a year range!")
             lowerYear = self.yearRange[0]
             higherYear = self.yearRange[1]
             self.query = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and ((arkPress all "{{newsKey}}") and (gallica adj "{searchWord}")) sortby dc.date/sort.ascending'.format(firstYear = lowerYear, secondYear = higherYear, searchWord = self.searchTerm)

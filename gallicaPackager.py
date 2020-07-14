@@ -55,8 +55,7 @@ class GallicaPackager:
             ggplot2.aes_string(x=nameOcc[0]) + \
             ggplot2.geom_bar(colour='black') + \
             zoo.scale_x_yearmon() + \
-            ggplot2.ylab(self.searchTerm) + \
-            ggplot2.xlab("Year/month")
+            ggplot2.labs(title = self.querySearchTerm + " occurences by year/month", x="Year/month", y="occurence count")
         graphOfHits.plot()
 
         grdevices.dev_off()
