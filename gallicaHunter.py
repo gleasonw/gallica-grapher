@@ -57,10 +57,12 @@ class GallicaHunter:
                     currentResults = self.dateJournalIdentifierResults
                     currentResults.append(fullResult)
                 startRecord = startRecord + 51
-            #run same but don't check the range each time
 
         filePacker = GallicaPackager(self.searchTerm, self.newspaper, self.dateJournalIdentifierResults, self.yearRange)
+
+        #move to master class
         filePacker.makeCSVFile()
+        filePacker.makeGraph()
 
     def establishNewspaperDictionary(self,newspaper):
         fullNewspaperDictionary = GallicaHunter.newspaperDict
@@ -84,4 +86,4 @@ class GallicaHunter:
         else:
             lowerYear = self.yearRange[0]
             higherYear = self.yearRange[1]
-            self.query = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and ((arkPress all "{{newsKey}}") and (gallica all "{searchWord}")) sortby dc.date/sort.ascending'.format(firstYear = lowerYear, secondYear = higherYear, searchWord = self.searchTerm)
+            self.query = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and ((arkPress all "{{newsKey}}") and (gallica adj "{searchWord}")) sortby dc.date/sort.ascending'.format(firstYear = lowerYear, secondYear = higherYear, searchWord = self.searchTerm)

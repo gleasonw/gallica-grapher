@@ -8,7 +8,7 @@ def main():
 			allPaperHunter.hunt()
 		# Change this eventually
 		except:
-			print("Usage: python gallicaMainDriver searchTerm **for shotgun hunt**")
+			print("Usage: python gallicaMainDriver searchTerm yearRange **for shotgun hunt**")
 			raise
 
 	else:
@@ -17,7 +17,7 @@ def main():
 			onePaperHunter.hunt()
 		# Change this eventually
 		except:
-			print("Usage: python gallicaMainDriver searchTerm recordNumber newspaper")
+			print("Usage: python gallicaMainDriver searchTerm recordNumber newspaper yearRange")
 			raise
 main()
 
