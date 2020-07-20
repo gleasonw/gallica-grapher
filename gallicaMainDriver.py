@@ -2,7 +2,9 @@ from gallicaHunter import GallicaHunter
 import sys
 
 def main():
-	if len(sys.argv) == 2:
+	if len(sys.argv) == 0:
+		findPapersOnGallica()
+	elif len(sys.argv) == 2:
 		try:
 			allPaperHunter = GallicaHunter(sys.argv[1])
 			allPaperHunter.hunt()
@@ -10,7 +12,6 @@ def main():
 		except:
 			print("Usage: python gallicaMainDriver searchTerm yearRange **for shotgun hunt**")
 			raise
-
 	else:
 		try:
 			onePaperHunter = GallicaHunter(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
@@ -19,6 +20,8 @@ def main():
 		except:
 			print("Usage: python gallicaMainDriver searchTerm recordNumber newspaper yearRange")
 			raise
+def findPapersOnGallica():
+
 main()
 
 """
