@@ -45,6 +45,9 @@ class GallicaPaperFinder:
         for queryHit in targetXMLroot.iter("{http://www.loc.gov/zing/srw/}record"):
 
             self.queryHitNumber = self.queryHitNumber + 1
+            if self.queryHitNumber > self.totalHits:
+                abortCheck = True
+                return(abortCheck)
 
             extraDataForOCRquality = queryHit[5]
             likelihoodOfTextMode = extraDataForOCRquality[3].text
@@ -52,25 +55,24 @@ class GallicaPaperFinder:
                 continue
 
             data = queryHit[2][0]
-            journalOfHit = '"' + data.find('{http://purl.org/dc/elements/1.1/}title').text + '"'
-            identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
-            publishDate = data.find('{http://purl.org/dc/elements/1.1/}date').text
-
-            nineDigitCode = identifierOfHit[len(identifierOfHit)-16:len(identifierOfHit)-5]
-            newspaperCode = nineDigitCode + "_date"
-
+            try:
+                journalOfHit = '"' + data.find('{http://purl.org/dc/elements/1.1/}title').text + '"'
+                identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
+                publishDate = data.find('{http://purl.org/dc/elements/1.1/}date').text
+                nineDigitCode = identifierOfHit[len(identifierOfHit)-16:len(identifierOfHit)-5]
+                newspaperCode = nineDigitCode + "_date"
+            except AttributeError:
+                print("that's a funky result.\n")
+                etree.dump(targetXMLroot)
+                continue
             try:
                 fullResult = journalOfHit + ", " + publishDate + ", " + likelihoodOfTextMode + ", " + identifierOfHit + ", " + newspaperCode
             except TypeError:
-                raise
+                print("****AHHHHHHH type error ****\n")
                 print(journalOfHit, identifierOfHit, publishDate)
                 continue
 
             self.journalIdentifierResults.append(fullResult)
-
-            if self.queryHitNumber == self.totalHits:
-                abortCheck = True
-                return(abortCheck)
 
         return(abortCheck)
 
@@ -102,7 +104,6 @@ class GallicaPaperFinder:
                 print(response.url)
                 counterToEnsureSuccess = counterToEnsureSuccess + 1
                 continue
-
         self.totalHits = int(root[2].text)
 
     def determineQuery(self):
