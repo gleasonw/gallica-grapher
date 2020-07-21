@@ -4,30 +4,18 @@ import re
 from lxml import etree
 from gallicaPackager import GallicaPackager
 
-"""
-tags for newspapers
-petit journal = cb32895690j_date
-"""
-
 class GallicaHunter:
-    newspaperDict = {
-        "lepetitjournal": "cb32895690j_date",
-        "lefigaro" : "cb34355551z_date",
-        "letemps" : "cb34431794k_date",
-        "journaldesdebats" : "cb39294634r_date",
-        "lexixesiecle" : "cb32757974m_date",
-        "lepetitparisien" : "cb34419111x_date"
-    }
+
     def __init__(self, searchTerm, recordNumber, newspaper, yearRange):
         self.searchTerm = searchTerm
         self.recordNumber = recordNumber
         self.dateJournalIdentifierResults = []
-        self.newspaper = ''
+        self.newspaper = newspaper
         self.yearRange = []
         self.numberQueriesToGallica = 10
         self.query = ''
-        self.establishNewspaperDictionary(newspaper)
         self.establishYearRange(yearRange)
+        self.establishNewspaperDictionary()
         self.establishNumberQueries(recordNumber)
         self.establishQuery()
 
@@ -39,39 +27,76 @@ class GallicaHunter:
     newspaperKey = the gallica key of the newspaper you desire
 
     """
-    def hunt(self):
-        for newspaper in self.newspaperDictionary:
-            newspaperKey = self.newspaperDictionary[newspaper]
-            startRecord = 0
-            for j in range(self.numberQueriesToGallica):
-                queryWithProperPaper = self.query.format(newsKey = newspaperKey)
-                parameters = {"version": 1.2, "operation": "searchRetrieve", "query" : queryWithProperPaper, "startRecord" : startRecord, "maximumRecords" : 50, "collapsing" : "disabled"}
-                response = requests.get("https://gallica.bnf.fr/SRU",params=parameters)
-                root = etree.fromstring(response.content)
-                for queryHit in root.iter("{http://www.loc.gov/zing/srw/}record"):
-                    data = queryHit[2][0]
-                    dateOfHit = data.find('{http://purl.org/dc/elements/1.1/}date').text
-                    journalOfHit = data.find('{http://purl.org/dc/elements/1.1/}title').text
-                    identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
-                    fullResult = dateOfHit + ", " + journalOfHit + ", " + identifierOfHit
-                    currentResults = self.dateJournalIdentifierResults
-                    currentResults.append(fullResult)
-                startRecord = startRecord + 51
-
-        filePacker = GallicaPackager(self.searchTerm, self.newspaper, self.dateJournalIdentifierResults, self.yearRange)
+    def initiateQuery(self):
+        if self.newspaper == "all":
+            self.hunt()
+        else:
+            self.huntSomePapers()
 
         #move to master class
+        filePacker = GallicaPackager(self.searchTerm, self.newspaper, self.dateJournalIdentifierResults, self.yearRange)
         filePacker.makeCSVFile()
         filePacker.makeGraph()
 
-    def establishNewspaperDictionary(self,newspaper):
-        fullNewspaperDictionary = GallicaHunter.newspaperDict
-        if (newspaper is None) or (newspaper == "all"):
+    def huntSomePapers(self):
+        for newspaper in self.newspaperDictionary:
+            newspaperKey = self.newspaperDictionary[newspaper]
+            self.query = self.query.format(newsKey = newspaperKey)
+            self.hunt()
+
+    def hunt(self):
+        startRecord = 0
+        for j in range(self.numberQueriesToGallica):
+
+            #make this a master class function
+            progress = str(int((startRecord / (numberQueriesToGallica * 50)) * 100)) + "% complete"
+            print(progress)
+            
+            parameters = {"version": 1.2, "operation": "searchRetrieve", "collapsing":"false","query" : self.query, "startRecord" : startRecord, "maximumRecords" : 50}
+            response = requests.get("https://gallica.bnf.fr/SRU",params=parameters)
+            try:
+                root = etree.fromstring(response.content)
+            except etree.XMLSyntaxError as e:
+                print("\n\n ****Gallica spat at you!**** \n")
+                print(response.url)
+                self.numberQueriesToGallica = self.numberQueriesToGallica + 1
+                continue
+            for queryHit in root.iter("{http://www.loc.gov/zing/srw/}record"):
+                data = queryHit[2][0]
+                dateOfHit = data.find('{http://purl.org/dc/elements/1.1/}date').text
+                dateOfHit = self.standardizeDate(dateOfHit)
+                journalOfHit = data.find('{http://purl.org/dc/elements/1.1/}title').text
+                journalOfHit = re.sub(',', '', journalOfHit)
+                identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
+                try:
+                    fullResult = dateOfHit + ", " + journalOfHit + ", " + identifierOfHit
+                except TypeError:
+                    print("****Something's up with this result.****")
+                    print(dateOfHit, journalOfHit, identifierOfHit)
+                    if dateOfHit is None:
+                        dateOfHit = "NA"
+                        try:
+                            fullResult = dateOfHit + ", " + journalOfHit + ", " + identifierOfHit
+                        except TypeError:
+                            continue
+                    else:
+                        continue
+                currentResults = self.dateJournalIdentifierResults
+                currentResults.append(fullResult)
+
+            startRecord = startRecord + 51
+
+        print("\n ****Last record: " + str(startRecord) + "****\n")
+
+    def establishNewspaperDictionary(self):
+        if self.newspaper == "all":
+            return
+        elif self.newspaper == "bigsix":
+
             self.newspaperDictionary = fullNewspaperDictionary
         else:
-            trimmedDictionary = {newspaper : fullNewspaperDictionary[newspaper]}
+            trimmedDictionary = {self.newspaper : fullNewspaperDictionary[self.newspaper]}
             self.newspaperDictionary = trimmedDictionary
-            self.newspaper = newspaper
 
     def establishYearRange(self, yearRange):
         self.yearRange = re.split(r'[;,\-\s*]', yearRange)
@@ -82,9 +107,31 @@ class GallicaHunter:
 
     def establishQuery(self):
         if(len(self.yearRange) == 0):
-            self.query = 'arkPress all "{{newsKey}}" and (gallica adj "{searchWord}") sortby dc.date/sort.ascending'.format(searchWord = self.searchTerm)
+            if self.newspaper == "all":
+                self.query = '(gallica adj "{searchWord}") and (dc.type all "fascicule") sortby dc.date/sort.ascending'.format(searchWord = self.searchTerm)
+            else:
+                self.query = 'arkPress all "{{newsKey}}" and (gallica adj "{searchWord}") sortby dc.date/sort.ascending'.format(searchWord = self.searchTerm)
         else:
-            print("you gave me a year range!")
             lowerYear = self.yearRange[0]
             higherYear = self.yearRange[1]
-            self.query = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and ((arkPress all "{{newsKey}}") and (gallica adj "{searchWord}")) sortby dc.date/sort.ascending'.format(firstYear = lowerYear, secondYear = higherYear, searchWord = self.searchTerm)
+            if self.newspaper == "all":
+                self.query = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and (gallica adj "{searchWord}") and (dc.type all "fascicule") sortby dc.date/sort.ascending'
+            else:
+                self.query = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and ((arkPress all "{{newsKey}}") and (gallica adj "{searchWord}")) sortby dc.date/sort.ascending'
+            self.query = self.query.format(firstYear = lowerYear, secondYear = higherYear, searchWord = self.searchTerm)
+
+    def standardizeDate(self, dateToStandardize):
+        lengthOfDate = len(dateToStandardize)
+        if lengthOfDate != 10:
+            if lengthOfDate == 4:
+                return(dateToStandardize + "-01-01")
+            elif lengthOfDate == 7:
+                return(dateToStandardize + "-01")
+            elif lengthOfDate == 9:
+                dates = dateToStandardize.split("-")
+                lowerDate = int(dates[0])
+                higherDate = int(dates[1])
+                newDate = (lowerDate + higherDate) // 2
+                return(str(newDate) + "-01-01")
+        else:
+            return(dateToStandardize)

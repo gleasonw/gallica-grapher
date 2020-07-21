@@ -1,26 +1,20 @@
 from gallicaHunter import GallicaHunter
+from GallicaPaperFinder import GallicaPaperFinder
 import sys
 
 def main():
-	if len(sys.argv) == 0:
-		findPapersOnGallica()
-	elif len(sys.argv) == 2:
-		try:
-			allPaperHunter = GallicaHunter(sys.argv[1])
-			allPaperHunter.hunt()
-		# Change this eventually
-		except:
-			print("Usage: python gallicaMainDriver searchTerm yearRange **for shotgun hunt**")
-			raise
+	#Put this into another method eventually
+	if len(sys.argv) == 1:
+		paperFinder = GallicaPaperFinder("1777-1950")
+		paperFinder.findPapersOnGallica()
 	else:
 		try:
-			onePaperHunter = GallicaHunter(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
-			onePaperHunter.hunt()
+			somePaperHunter = GallicaHunter(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
+			somePaperHunter.initiateQuery()
 		# Change this eventually
 		except:
 			print("Usage: python gallicaMainDriver searchTerm recordNumber newspaper yearRange")
 			raise
-def findPapersOnGallica():
 
 main()
 
@@ -30,6 +24,5 @@ cb34431794k_date
 cb32858360p_date
 cb39294634r_date
 cb32895690j_date
-
 
 """

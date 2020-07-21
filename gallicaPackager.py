@@ -14,22 +14,20 @@ class GallicaPackager:
         self.graphFileName = ''
 
     def makeCSVFile(self):
-        outFile = open(self.fileName, "w")
-        outFile.write("journal,date,url\n")
+        outFile = open(self.fileName, "w", encoding="utf8")
+        outFile.write("date,journal,url\n")
         for csvEntry in self.querycsvEntries:
             outFile.write(csvEntry + "\n")
         outFile.close()
 
     def determineFileName(self):
-        if (self.queryNewspaper is None) or (self.queryNewspaper == "all"):
-            nameOfFile = "AllNewspapers--"
+        if self.queryNewspaper == "all":
+            nameOfFile = "AllNewspapers--" + self.querySearchTerm + "--"
         else:
-             nameOfFile = self.queryNewspaper + "--"
-             wordsInQuery = self.querySearchTerm.split(" ")
-
-        for word in wordsInQuery:
-            nameOfFile = nameOfFile + word
-
+            nameOfFile = self.queryNewspaper + "--"
+            wordsInQuery = self.querySearchTerm.split(" ")
+            for word in wordsInQuery:
+                nameOfFile = nameOfFile + word
         if len(self.queryYearRange) != 0:
             lowerYear = self.queryYearRange[0]
             higherYear = self.queryYearRange[1]
