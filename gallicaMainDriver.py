@@ -1,5 +1,7 @@
 from gallicaHunter import GallicaHunter
-from GallicaPaperFinder import GallicaPaperFinder
+from gallicaPaperFinder import GallicaPaperFinder
+from huntOverseer import HuntOverseer
+
 import sys
 
 def main():
@@ -9,11 +11,9 @@ def main():
 		paperFinder.findPapersOnGallica()
 	else:
 		try:
-			somePaperHunter = GallicaHunter(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4])
-			somePaperHunter.initiateQuery()
-		# Change this eventually
+			requestToRun = HuntOverseer(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
 		except:
-			print("Usage: python gallicaMainDriver searchTerm recordNumber newspaper yearRange")
+			print("***Usage: python gallicaMainDriver searchTerm recordNumber newspaper yearRange***")
 			raise
 
 main()

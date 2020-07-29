@@ -1,5 +1,6 @@
 import os.path
 import math, datetime
+import csv
 import rpy2.robjects.lib.ggplot2 as ggplot2
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
@@ -14,11 +15,11 @@ class GallicaPackager:
         self.graphFileName = ''
 
     def makeCSVFile(self):
-        outFile = open(self.fileName, "w", encoding="utf8")
-        outFile.write("date,journal,url\n")
-        for csvEntry in self.querycsvEntries:
-            outFile.write(csvEntry + "\n")
-        outFile.close()
+        with open(self.fileName, "w", encoding="utf8") as outFile:
+            writer = csv.writer(outFile)
+            writer.writerow(["date", "journal", "url"])
+            for csvEntry in self.querycsvEntries:
+                writer.writerow(csvEntry)
 
     def determineFileName(self):
         if self.queryNewspaper == "all":
@@ -28,22 +29,21 @@ class GallicaPackager:
             wordsInQuery = self.querySearchTerm.split(" ")
             for word in wordsInQuery:
                 nameOfFile = nameOfFile + word
-        if len(self.queryYearRange) != 0:
+        if self.queryYearRange:
             lowerYear = self.queryYearRange[0]
             higherYear = self.queryYearRange[1]
-            nameOfFile = nameOfFile + " " + lowerYear + "-" + higherYear
+            nameOfFile = nameOfFile + " " + str(lowerYear) + "-" + str(higherYear)
         nameOfFile = nameOfFile + ".csv"
-        return(nameOfFile)
+        return nameOfFile
 
     def makeGraph(self):
         self.makeGraphFileName()
-
+        print(self.fileName)
         grdevices = importr('grDevices')
         base = importr('base')
         zoo = importr('zoo')
         utils = importr('utils')
-
-        nameOcc = robjects.DataFrame.from_csvfile(self.fileName)
+        nameOcc = utils.read_csv(self.fileName)
         datesAsYearMonth = zoo.as_yearmon(nameOcc[0])
         nameOcc[0] = datesAsYearMonth
 
