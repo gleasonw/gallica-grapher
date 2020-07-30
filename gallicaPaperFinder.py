@@ -4,8 +4,8 @@ import re
 import csv
 from lxml import etree
 
-
-class GallicaPaperFinder:
+#Consider making a subclass of GallicaHunter
+class GallicaPaperFinder():
     def __init__(self, yearRange):
         self.yearRange = []
         self.query = ''
@@ -16,30 +16,28 @@ class GallicaPaperFinder:
         self.determineYearRange(yearRange)
         self.determineQuery()
         self.determineTotalHits()
+		self.fileName = None
+		
 
     def findPapersOnGallica(self):
         startRecord = 0
-        numberQueriesToGallica = 200
-        for j in range(numberQueriesToGallica):
+        while self.queryHitNumber < self.totalHits:
 
             self.progressReporter()
 
             parameters = {"version": 1.2, "operation": "searchRetrieve","collapsing": "true", "exactSearch": "false", "query" : self.query, "startRecord" : startRecord, "maximumRecords" : 50}
             response = requests.get("https://gallica.bnf.fr/SRU",params=parameters)
-
-            try:
-                root = etree.fromstring(response.content)
-            except etree.XMLSyntaxError as e:
-                print("\n\n ****Gallica spat at you!**** \n")
-                print(response.url)
-                numberQueriesToGallica = numberQueriesToGallica + 1
-                continue
+			
+			success = False
+			while not success:
+				try:
+					root = etree.fromstring(response.content)
+					success = True
+				except etree.XMLSyntaxError as e:
+					print("\n\n ****Gallica spat at you!**** \n")
+					print(response.url)
 
             self.paperListCreator(root)
-            if self.reachEndOfResults:
-                break
-            else:
-                startRecord = startRecord + 51
 
         self.makeCSVofJournals()
         self.makeCSVwithCleanDates()
@@ -48,9 +46,6 @@ class GallicaPaperFinder:
         for queryHit in targetXMLroot.iter("{http://www.loc.gov/zing/srw/}record"):
 
             self.queryHitNumber = self.queryHitNumber + 1
-            if self.queryHitNumber > self.totalHits:
-                self.reachEndOfResults = True
-                return
 
             extraDataForOCRquality = queryHit[5]
             likelihoodOfTextMode = extraDataForOCRquality[3].text
@@ -59,7 +54,7 @@ class GallicaPaperFinder:
 
             data = queryHit[2][0]
             try:
-                journalOfHit = '"' + data.find('{http://purl.org/dc/elements/1.1/}title').text + '"'
+                journalOfHit = data.find('{http://purl.org/dc/elements/1.1/}title').text
                 identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
                 publishDate = data.find('{http://purl.org/dc/elements/1.1/}date').text
                 nineDigitCode = identifierOfHit[len(identifierOfHit) - 16:len(identifierOfHit) - 5]
@@ -68,34 +63,28 @@ class GallicaPaperFinder:
                 print("that's a funky result.\n")
                 etree.dump(targetXMLroot)
                 continue
-            try:
-                fullResult = journalOfHit + ", " + publishDate + ", " + likelihoodOfTextMode + ", " + identifierOfHit + ", " + newspaperCode
-            except TypeError:
-                print("****AHHHHHHH type error ****\n")
-                print(journalOfHit, identifierOfHit, publishDate)
-                continue
+			fullResult = [journalOfHit, publishDate, likelihoodOfTextMode, identifierOfHit, newspaperCode]
 
             self.journalIdentifierResults.append(fullResult)
 
-    # Change to csv python
     def makeCSVofJournals(self):
         lowerYear = self.yearRange[0]
         higherYear = self.yearRange[1]
-        fileName = "Journals " + lowerYear + "-" + higherYear + ".csv"
-        outFile = open(fileName, "w", encoding="utf8")
-        outFile.write("journal,publishDate,textQuality,url,code \n")
-        for csvEntry in self.journalIdentifierResults:
-            outFile.write(csvEntry + "\n")
-        outFile.close()
+        self.fileName = "Journals " + lowerYear + "-" + higherYear + ".csv"
+        with open(self.fileName, "w", encoding="utf8") as outFile:
+			writer = csv.writer(outFile)
+			writer.write(["journal","publishDate","textQuality","url","code"])
+			for csvEntry in self.journalIdentifierResults:
+				writer.write(csvEntry)
 
     def makeCSVwithCleanDates(self):
         lowerYear = self.yearRange[0]
         higherYear = self.yearRange[1]
-        fileName = "CleanDates Journals " + higherYear + "-" + lowerYear + ".csv"
-        with open("Journals 1777-1950.csv", "r", encoding="utf8") as inFile:
+        cleanFileName = "CleanDates Journals " + higherYear + "-" + lowerYear + ".csv"
+        with open(self.fileName, "r", encoding="utf8") as inFile:
             reader = csv.reader(inFile)
             next(reader)
-            with open(fileName, "w", encoding="utf8") as outFile:
+            with open(cleanFileName, "w", encoding="utf8") as outFile:
                 writer = csv.writer(outFile)
                 writer.writerow(["journal", "publishDate", "textQuality", "url", "code"])
                 for newsData in reader:
@@ -106,8 +95,6 @@ class GallicaPaperFinder:
                     else:
                         newsData[1] = standardizedRange
                         writer.writerow(newsData)
-        outFile.close()
-        inFile.close()
 
     def standardizeDateRange(self, dateRangeToStandardize):
         splitDates = dateRangeToStandardize.split("-")

@@ -1,22 +1,17 @@
 import re
-
 import requests
 from lxml import etree
 
 
 class GallicaHunter:
 
-    def __init__(self, query, isYearRange, recordNumber, startRecord):
+    def __init__(self, query, startRecord):
         self.dateJournalIdentifierResults = []
         self.isYearRange = isYearRange
         self.query = query
         self.queryHitNumber = 0
         self.reachEndOfResults = False
-        self.recordNumber = recordNumber
         self.startRecord = startRecord
-
-    def huntSomePapers(self):
-        pass
 
     def hunt(self):
         parameters = {"version": 1.2, "operation": "searchRetrieve", "collapsing": "false", "query": self.query,
@@ -40,7 +35,6 @@ class GallicaHunter:
             dateOfHit = data.find('{http://purl.org/dc/elements/1.1/}date').text
             dateOfHit = self.standardizeSingleDate(dateOfHit)
             journalOfHit = data.find('{http://purl.org/dc/elements/1.1/}title').text
-            journalOfHit = re.sub(',', '', journalOfHit)
             identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
             fullResult = [dateOfHit, journalOfHit, identifierOfHit]
             self.dateJournalIdentifierResults.append(fullResult)
@@ -79,7 +73,4 @@ class GallicaHunter:
                 continue
         return int(root[2].text)
 
-    def progressReporter(self):
-        progress = str(((self.queryHitNumber / self.totalHits) * 100))
-        return progress
 
