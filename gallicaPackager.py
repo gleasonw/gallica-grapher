@@ -1,12 +1,11 @@
-import os.path
-import math, datetime
 import csv
-import rpy2.robjects.lib.ggplot2 as ggplot2
-import rpy2.robjects as robjects
+
+from rpy2.robjects.lib.ggplot2 import (ggplot, aes_string,labs,geom_bar)
 from rpy2.robjects.packages import importr
 
+
 class GallicaPackager:
-    def __init__(self, searchTerm, newspaper, csvEntries, yearRange):
+    def __init__(self, newspaper, searchTerm, csvEntries, yearRange):
         self.querySearchTerm = searchTerm
         self.querycsvEntries = csvEntries
         self.queryNewspaper = newspaper
@@ -18,6 +17,7 @@ class GallicaPackager:
         with open(self.fileName, "w", encoding="utf8") as outFile:
             writer = csv.writer(outFile)
             writer.writerow(["date", "journal", "url"])
+            #SORT THAT GUY
             for csvEntry in self.querycsvEntries:
                 writer.writerow(csvEntry)
 
@@ -38,22 +38,23 @@ class GallicaPackager:
 
     def makeGraph(self):
         self.makeGraphFileName()
-        print(self.fileName)
+
         grdevices = importr('grDevices')
-        base = importr('base')
         zoo = importr('zoo')
         utils = importr('utils')
-        nameOcc = utils.read_csv(self.fileName)
+
+        nameOcc = utils.read_csv(self.fileName,encoding="UTF-8", stringsAsFactors=False, header=True)
+
         datesAsYearMonth = zoo.as_yearmon(nameOcc[0])
         nameOcc[0] = datesAsYearMonth
 
         grdevices.png(file=self.graphFileName, width=1024, height=768)
 
-        graphOfHits = ggplot2.ggplot(nameOcc) + \
-            ggplot2.aes_string(x=nameOcc[0]) + \
-            ggplot2.geom_bar(colour='black') + \
+        graphOfHits = ggplot(nameOcc) + \
+            aes_string(x=nameOcc[0]) + \
+            geom_bar(colour='black') + \
             zoo.scale_x_yearmon() + \
-            ggplot2.labs(title = self.querySearchTerm + " occurences by year/month", x="Year/month", y="occurence count")
+            labs(title=self.querySearchTerm + " occurences by year/month", x="Year/month", y="occurence count")
         graphOfHits.plot()
 
         grdevices.dev_off()

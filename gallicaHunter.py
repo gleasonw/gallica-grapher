@@ -1,5 +1,6 @@
 import re
 import requests
+import re
 from lxml import etree
 
 
@@ -7,19 +8,62 @@ class GallicaHunter:
 
     def __init__(self, query, startRecord):
         self.dateJournalIdentifierResults = []
-        self.isYearRange = isYearRange
         self.query = query
         self.queryHitNumber = 0
-        self.reachEndOfResults = False
         self.startRecord = startRecord
+        self.numPurgedResults = 0
+
+    @staticmethod
+    def establishTotalHits(query, collapseResults):
+        if collapseResults:
+            collapseSetting = "true"
+        else:
+            collapseSetting = "disabled"
+        success = False
+        while not success:
+            parameters = dict(version=1.2, operation="searchRetrieve", collapsing=collapseSetting, exactSearch="false",
+                              query=query, startRecord=0, maximumRecords=1)
+            response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
+            try:
+                root = etree.fromstring(response.content)
+                success = True
+            except etree.XMLSyntaxError as e:
+                print("\n\n ****Gallica spat at you!**** \n")
+        return int(root[2].text)
+
+    @staticmethod
+    def standardizeSingleDate(dateToStandardize):
+        lengthOfDate = len(dateToStandardize)
+        yearMonDay = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+        twoYears = re.compile(r"^\d{4}-\d{4}$")
+        oneYear = re.compile(r"^\d{4}$")
+        oneYearOneMon = re.compile(r"^\d{4}-\d{2}$")
+        if not yearMonDay.match(dateToStandardize):
+            if oneYear.match(dateToStandardize):
+                return dateToStandardize + "-01-01"
+            elif oneYearOneMon.match(dateToStandardize):
+                return dateToStandardize + "-01"
+            elif twoYears.match(dateToStandardize):
+                dates = dateToStandardize.split("-")
+                lowerDate = int(dates[0])
+                higherDate = int(dates[1])
+                if higherDate - lowerDate <= 10:
+                    newDate = (lowerDate + higherDate) // 2
+                    return str(newDate) + "-01-01"
+                else:
+                    return None
+            else:
+                return None
+        else:
+            return dateToStandardize
 
     def hunt(self):
-        parameters = {"version": 1.2, "operation": "searchRetrieve", "collapsing": "false", "query": self.query,
-                      "startRecord": self.startRecord, "maximumRecords": 50}
-        response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
+        parameters = {"version": 1.2, "operation": "searchRetrieve", "query": self.query,
+                      "startRecord": self.startRecord, "maximumRecords": 50, "collapsing": "disabled"}
         success = False
         while not success:
             try:
+                response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
                 root = etree.fromstring(response.content)
                 success = True
             except etree.XMLSyntaxError as e:
@@ -29,48 +73,32 @@ class GallicaHunter:
         self.hitListCreator(root)
 
     def hitListCreator(self, targetXMLroot):
+        priorJournal = ''
+        priorDate = ''
         for queryHit in targetXMLroot.iter("{http://www.loc.gov/zing/srw/}record"):
             self.queryHitNumber = self.queryHitNumber + 1
             data = queryHit[2][0]
             dateOfHit = data.find('{http://purl.org/dc/elements/1.1/}date').text
-            dateOfHit = self.standardizeSingleDate(dateOfHit)
-            journalOfHit = data.find('{http://purl.org/dc/elements/1.1/}title').text
-            identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
-            fullResult = [dateOfHit, journalOfHit, identifierOfHit]
-            self.dateJournalIdentifierResults.append(fullResult)
+            dateOfHit = GallicaHunter.standardizeSingleDate(dateOfHit)
+            if dateOfHit is not None:
+                journalOfHit = data.find('{http://purl.org/dc/elements/1.1/}title').text
+                if dateOfHit == priorDate and journalOfHit == priorJournal:
+                    self.numPurgedResults = self.numPurgedResults + 1
+                    continue
+                else:
+                    identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
+                    fullResult = [dateOfHit, journalOfHit, identifierOfHit]
+                    self.dateJournalIdentifierResults.append(fullResult)
+                    priorJournal = journalOfHit
+                    priorDate = dateOfHit
+            else:
+                self.numPurgedResults = self.numPurgedResults + 1
+                continue
+
+    def getNumberPurgedResults(self):
+        return self.numPurgedResults
 
     def getResultList(self):
         return self.dateJournalIdentifierResults
-
-    def standardizeSingleDate(self, dateToStandardize):
-        lengthOfDate = len(dateToStandardize)
-        if lengthOfDate != 10:
-            if lengthOfDate == 4:
-                return (dateToStandardize + "-01-01")
-            elif lengthOfDate == 7:
-                return (dateToStandardize + "-01")
-            elif lengthOfDate == 9:
-                dates = dateToStandardize.split("-")
-                lowerDate = int(dates[0])
-                higherDate = int(dates[1])
-                newDate = (lowerDate + higherDate) // 2
-                return (str(newDate) + "-01-01")
-        else:
-            return (dateToStandardize)
-
-    def establishTotalHits(self):
-        counterToEnsureSuccess = 1
-        for j in range(counterToEnsureSuccess):
-            parameters = dict(version=1.2, operation="searchRetrieve", collapsing="true", exactSearch="false",
-                              query=self.query, startRecord=0, maximumRecords=1)
-            response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
-            try:
-                root = etree.fromstring(response.content)
-            except etree.XMLSyntaxError as e:
-                print("\n\n ****Gallica spat at you!**** \n")
-                print(response.url)
-                counterToEnsureSuccess = counterToEnsureSuccess + 1
-                continue
-        return int(root[2].text)
 
 

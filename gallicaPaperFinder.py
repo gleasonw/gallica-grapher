@@ -3,6 +3,7 @@ import pathlib
 import re
 import csv
 from lxml import etree
+from gallicaHunter import GallicaHunter
 
 #Consider making a subclass of GallicaHunter
 class GallicaPaperFinder():
@@ -15,9 +16,9 @@ class GallicaPaperFinder():
         self.reachEndOfResults = False
         self.determineYearRange(yearRange)
         self.determineQuery()
-        self.determineTotalHits()
-		self.fileName = None
-		
+        self.fileName = None
+        self.totalHits = GallicaHunter.establishTotalHits(self.query)
+
 
     def findPapersOnGallica(self):
         startRecord = 0
@@ -26,16 +27,15 @@ class GallicaPaperFinder():
             self.progressReporter()
 
             parameters = {"version": 1.2, "operation": "searchRetrieve","collapsing": "true", "exactSearch": "false", "query" : self.query, "startRecord" : startRecord, "maximumRecords" : 50}
-            response = requests.get("https://gallica.bnf.fr/SRU",params=parameters)
-			
-			success = False
-			while not success:
-				try:
-					root = etree.fromstring(response.content)
-					success = True
-				except etree.XMLSyntaxError as e:
-					print("\n\n ****Gallica spat at you!**** \n")
-					print(response.url)
+            success = False
+            while not success:
+                try:
+                    response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
+                    root = etree.fromstring(response.content)
+                    success = True
+                except etree.XMLSyntaxError as e:
+                    print("\n\n ****Gallica spat at you!**** \n")
+                    print(response.url)
 
             self.paperListCreator(root)
 
@@ -63,7 +63,7 @@ class GallicaPaperFinder():
                 print("that's a funky result.\n")
                 etree.dump(targetXMLroot)
                 continue
-			fullResult = [journalOfHit, publishDate, likelihoodOfTextMode, identifierOfHit, newspaperCode]
+            fullResult = [journalOfHit, publishDate, likelihoodOfTextMode, identifierOfHit, newspaperCode]
 
             self.journalIdentifierResults.append(fullResult)
 
@@ -72,10 +72,10 @@ class GallicaPaperFinder():
         higherYear = self.yearRange[1]
         self.fileName = "Journals " + lowerYear + "-" + higherYear + ".csv"
         with open(self.fileName, "w", encoding="utf8") as outFile:
-			writer = csv.writer(outFile)
-			writer.write(["journal","publishDate","textQuality","url","code"])
-			for csvEntry in self.journalIdentifierResults:
-				writer.write(csvEntry)
+            writer = csv.writer(outFile)
+            writer.write(["journal","publishDate","textQuality","url","code"])
+            for csvEntry in self.journalIdentifierResults:
+                writer.write(csvEntry)
 
     def makeCSVwithCleanDates(self):
         lowerYear = self.yearRange[0]
@@ -139,18 +139,3 @@ class GallicaPaperFinder():
         progress = str(((self.queryHitNumber / self.totalHits) * 100))
         progressWith4Digits = progress[0:4]
         print(progressWith4Digits + "% complete | ", self.queryHitNumber)
-
-    def determineTotalHits(self):
-        counterToEnsureSuccess = 1
-        for j in range(counterToEnsureSuccess):
-            parameters = dict(version=1.2, operation="searchRetrieve", collapsing="true", exactSearch="false",
-                              query=self.query, startRecord=0, maximumRecords=1)
-            response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
-            try:
-                root = etree.fromstring(response.content)
-            except etree.XMLSyntaxError as e:
-                print("\n\n ****Gallica spat at you!**** \n")
-                print(response.url)
-                counterToEnsureSuccess = counterToEnsureSuccess + 1
-                continue
-        self.totalHits = int(root[2].text)
