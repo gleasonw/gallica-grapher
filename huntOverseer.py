@@ -22,6 +22,7 @@ class HuntOverseer:
         self.collectedQueries = []
         self.searchTerm = args[0]
         self.topPapers = []
+        self.topTenPapers = []
         self.numResultsForEachPaper = {}
 
         #indicates another class would be helpful for overseeing newspaper-wide queries
@@ -234,7 +235,7 @@ class HuntOverseer:
 
     def packageQuery(self):
         filePacker = GallicaPackager(self.searchTerm, self.newspaper, self.collectedQueries,
-                                     [self.lowYear, self.highYear])
+                                     [self.lowYear, self.highYear], self.topTenPapers)
         filePacker.makeCSVFile()
         filePacker.makeGraph()
 
@@ -250,9 +251,10 @@ class HuntOverseer:
         print()
         for i in range(10):
             newspaper = self.topPapers[i][0]
+            self.topTenPapers.append(newspaper)
             count = self.topPapers[i][1]
             place = i + 1
-            line = "{place}. {newspaper}, {count}".format(place=place, newspaper=newspaper, count=count)
+            line = "{place}. {newspaper} ({count})".format(place=place, newspaper=newspaper, count=count)
             print(line)
 
 
