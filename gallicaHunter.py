@@ -23,8 +23,8 @@ class GallicaHunter:
         while not success:
             parameters = dict(version=1.2, operation="searchRetrieve", collapsing=collapseSetting, exactSearch="false",
                               query=query, startRecord=0, maximumRecords=1)
-            response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
             try:
+                response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
                 root = etree.fromstring(response.content)
                 success = True
             except etree.XMLSyntaxError as e:

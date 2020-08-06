@@ -51,39 +51,48 @@ class GallicaPackager:
         utils = importr('utils')
         dplyr = importr('dplyr')
         stringr = importr('stringr')
+        scales = importr('scales')
+        lubridate = importr('lubridate')
+        tibble = importr('tibble')
 
         nameOcc = utils.read_csv(os.path.join("./CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
-        nameOcc = dplyr.mutate(nameOcc, date=zoo.as_yearmon(nameOcc[0]))
-        nameOcc = self.createColumnForFill(nameOcc)
+        nameOcc = self.readyColumnsForGraphing(nameOcc)
+        print(nameOcc)
 
         robjects.r('''
         createGraph <- function(dataToGraph, title){
-            png(file="TESTING.png", width=1920, height=1080)
-    
-            graphOfHits <- ggplot(dataToGraph, aes(date, fill=fillPaper)) +\
-                geom_bar(position="stack", stat="count", width=4) + \
+            graphOfHits <- ggplot(dataToGraph, aes(x=yearmon, y=total, fill=fillPaper)) +\
+                geom_col() + \
                 scale_x_yearmon() + \
-                labs(title=title, x="Year/month", y="occurrence count")
+                labs(title=title, x="Year/month", y="occurrence count") +\
+                theme(axis.text = element_text(size=12), axis.text.x = element_text(angle = 45, hjust = 1))
             plot(graphOfHits)
-    
         }
         ''')
-        dataGrapher = robjects.globalenv['createGraph']
         graphTitle = "{0} paper mentions by year/mon".format(self.querySearchTerm)
-        dataGrapher(nameOcc, graphTitle)
-        shutil.move(os.path.join("./", self.graphFileName),os.path.join("./CSVdata", self.graphFileName))
 
-    def createColumnForFill(self, csvResults):
+        grdevices.png(file=self.graphFileName, width=1920, height=1080)
+        dataGrapher = robjects.globalenv['createGraph']
+        dataGrapher(nameOcc, graphTitle)
+        grdevices.dev_off()
+        shutil.move(os.path.join("./", self.graphFileName), os.path.join("./Graphs", self.graphFileName))
+
+
+    def readyColumnsForGraphing(self, csvResults):
         newspaperVector = robjects.StrVector(self.tenMostPapers)
         robjects.r('''
             nameOccMutateForFill <- function(csvResults, paperVector){ 
+                csvResults <- csvResults %>% mutate(date=as.yearmon(date))
                 csvResults <- csvResults %>% mutate(fillPaper=ifelse(csvResults$journal %in% paperVector, csvResults$journal, 'Other')) 
-                csvResults <- csvResults %>% mutate(fillPaper=str_replace_all(csvResults$fillPaper, fixed(" "), ""))
-                return(csvResults)
+                yearMonthCounts <- tibble(yearmon=csvResults$date,fillPaper=csvResults$fillPaper,count=1)\
+                                %>% group_by(yearmon, fillPaper)\
+                                %>% summarise(total = sum(count))
+                return(yearMonthCounts)
                 }
             ''')
         mutateFunction = robjects.globalenv['nameOccMutateForFill']
         return mutateFunction(csvResults, newspaperVector)
+
 
     def makeGraphFileName(self):
         self.graphFileName = self.fileName[0:len(self.fileName)-4]

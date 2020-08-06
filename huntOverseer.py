@@ -199,7 +199,8 @@ class HuntOverseer:
                     reachedLimit = True
                     break
                 HuntOverseer.reportProgress(len(self.collectedQueries), self.recordNumber, "retrieving results")
-
+            if self.currentNumValidResults > 0:
+                self.topPapers.append([newspaper, self.currentNumValidResults])
             if reachedLimit:
                 break
 
