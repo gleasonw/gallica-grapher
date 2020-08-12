@@ -6,12 +6,13 @@ from lxml import etree
 
 class GallicaHunter:
 
-    def __init__(self, query, startRecord):
+    def __init__(self, query, startRecord, numRecords):
         self.dateJournalIdentifierResults = []
         self.query = query
         self.queryHitNumber = 0
         self.startRecord = startRecord
         self.numPurgedResults = 0
+        self.numRecords = numRecords
 
     @staticmethod
     def establishTotalHits(query, collapseResults):
@@ -59,7 +60,7 @@ class GallicaHunter:
 
     def hunt(self):
         parameters = {"version": 1.2, "operation": "searchRetrieve", "query": self.query,
-                      "startRecord": self.startRecord, "maximumRecords": 50, "collapsing": "disabled"}
+                      "startRecord": self.startRecord, "maximumRecords": self.numRecords, "collapsing": "disabled"}
         success = False
         while not success:
             try:
@@ -100,5 +101,6 @@ class GallicaHunter:
 
     def getResultList(self):
         return self.dateJournalIdentifierResults
+
 
 

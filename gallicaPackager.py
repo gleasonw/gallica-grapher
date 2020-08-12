@@ -9,38 +9,22 @@ from rpy2.robjects.packages import importr
 
 
 class GallicaPackager:
-    def __init__(self, newspaper, searchTerm, csvEntries, yearRange, tenMostPapers):
-        self.querySearchTerm = searchTerm
-        self.querycsvEntries = csvEntries
-        self.queryNewspaper = newspaper
-        self.queryYearRange = yearRange
-        self.fileName = self.determineFileName()
+    def __init__(self, csvFile, tenMostPapers):
+        self.fileName = csvFile
         self.graphFileName = ''
-        self.tenMostPapers = tenMostPapers
+        self.tenMostPapers = []
+        self.establishTopPapers(tenMostPapers)
 
-    def makeCSVFile(self):
-        with open(self.fileName, "w", encoding="utf8") as outFile:
-            writer = csv.writer(outFile)
-            writer.writerow(["date", "journal", "url"])
-            #SORT THAT GUY
-            for csvEntry in self.querycsvEntries:
-                writer.writerow(csvEntry)
-        shutil.move(os.path.join("./", self.fileName),os.path.join("./CSVdata", self.fileName))
 
-    def determineFileName(self):
-        if self.queryNewspaper == "all":
-            nameOfFile = "AllNewspapers--" + self.querySearchTerm + "--"
+    def establishTopPapers(self, tenMostPapers):
+        if tenMostPapers is None:
+            dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
+            with open(os.path.join("./CSVdata", dictionaryFile)) as inFile:
+                reader = csv.reader(inFile)
+                for newspaper in reader:
+                    self.tenMostPapers.append(newspaper)
         else:
-            nameOfFile = self.queryNewspaper + "--"
-            wordsInQuery = self.querySearchTerm.split(" ")
-            for word in wordsInQuery:
-                nameOfFile = nameOfFile + word
-        if self.queryYearRange:
-            lowerYear = self.queryYearRange[0]
-            higherYear = self.queryYearRange[1]
-            nameOfFile = nameOfFile + " " + str(lowerYear) + "-" + str(higherYear)
-        nameOfFile = nameOfFile + ".csv"
-        return nameOfFile
+            self.tenMostPapers = tenMostPapers
 
     def makeGraph(self):
         self.makeGraphFileName()
@@ -69,7 +53,9 @@ class GallicaPackager:
             plot(graphOfHits)
         }
         ''')
-        graphTitle = "{0} paper mentions by year/mon".format(self.querySearchTerm)
+        titleSplit = self.fileName.split("--")
+        searchTermProbably = titleSplit[0]
+        graphTitle = "{0} usage by year/mon".format(searchTermProbably)
 
         grdevices.png(file=self.graphFileName, width=1920, height=1080)
         dataGrapher = robjects.globalenv['createGraph']
@@ -79,9 +65,9 @@ class GallicaPackager:
 
 
     def readyColumnsForGraphing(self, csvResults):
-        newspaperVector = robjects.StrVector(self.tenMostPapers)
         robjects.r('''
-            nameOccMutateForFill <- function(csvResults, paperVector){ 
+            nameOccMutateForFill <- function(csvResults, topTenPapers){ 
+                paperVector <- unlist(topTenPapers,recursive=TRUE)
                 csvResults <- csvResults %>% mutate(date=as.yearmon(date))
                 csvResults <- csvResults %>% mutate(fillPaper=ifelse(csvResults$journal %in% paperVector, csvResults$journal, 'Other')) 
                 yearMonthCounts <- tibble(yearmon=csvResults$date,fillPaper=csvResults$fillPaper,count=1)\
@@ -91,7 +77,7 @@ class GallicaPackager:
                 }
             ''')
         mutateFunction = robjects.globalenv['nameOccMutateForFill']
-        return mutateFunction(csvResults, newspaperVector)
+        return mutateFunction(csvResults, self.tenMostPapers)
 
 
     def makeGraphFileName(self):

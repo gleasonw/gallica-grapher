@@ -1,9 +1,15 @@
 import csv
+import math
 import re
 import sys
+import shutil
+import os
+
 from gallicaHunter import GallicaHunter
 
 from gallicaPackager import GallicaPackager
+from unlimitedOverseerofNewspaperHunt import UnlimitedOverseerOfNewspaperHunt
+from limitedOverseerofNewspaperHunt import LimitedOverseerOfNewspaperHunt
 
 
 class HuntOverseer:
@@ -24,23 +30,26 @@ class HuntOverseer:
         self.topPapers = []
         self.topTenPapers = []
         self.numResultsForEachPaper = {}
-
-        #indicates another class would be helpful for overseeing newspaper-wide queries
-        self.currentProcessedResults = 0
-        self.startRecordForGallicaQuery = 1
-        self.currentNumValidResults = 0
-        self.currentNumPurgedResults = None
+        self.fileName = ''
 
         self.establishRecordNumber(args)
         self.establishStrictness(args[3])
         self.establishYearRange(args[2])
         self.parseNewspaperDictionary()
         self.buildQuery()
+
+    def runQuery(self):
         self.initiateQuery()
 
     def establishRecordNumber(self, argList):
         if len(argList) == 5:
             self.recordNumber = int(argList[4])
+
+    @staticmethod
+    def sendQuery(queryToSend, startRecord, numRecords):
+        hunter = GallicaHunter(queryToSend, startRecord, numRecords)
+        hunter.hunt()
+        return hunter
 
 
     # Good time to parse errors in formatting too
@@ -160,104 +169,85 @@ class HuntOverseer:
                 self.runUnlimitednoDictSearch()
         else:
             if self.recordNumber is not None:
+                self.findTotalResultsForUnlimitedNewspaperSearch()
                 self.runLimitedSearchOnDictionary()
             else:
+                self.findTotalResultsForUnlimitedNewspaperSearch()
                 self.runUnlimitedSearchOnDictionary()
-                self.printTopTenPapers()
         self.packageQuery()
 
     def runUnlimitedSearchOnDictionary(self):
-        self.findTotalResultsForUnlimitedNewspaperSearch()
+        progress = 0
         for newspaper in self.newspaperDictionary:
-            self.currentNumPurgedResults = 0
-            self.startRecordForGallicaQuery = 1
-            self.currentProcessedResults = 0
-            self.currentNumValidResults = 0
-            numberResultsForNewspaper = self.numResultsForEachPaper[newspaper]
+            numberResultsInPaper = self.numResultsForEachPaper[newspaper]
             newspaperCode = self.newspaperDictionary[newspaper]
             newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-            while numberResultsForNewspaper > self.currentProcessedResults:
-                self.sendQuery(newspaperQuery)
-                HuntOverseer.reportProgress(len(self.collectedQueries), self.totalResults, "retrieving results")
-            if self.currentNumValidResults > 0:
-                self.topPapers.append([newspaper, self.currentNumValidResults])
+            newspaperHuntOverseer = UnlimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper)
+            newspaperHuntOverseer.scourPaper()
+            self.collectedQueries = self.collectedQueries + newspaperHuntOverseer.getResultList()
+            HuntOverseer.reportProgress(progress + numberResultsInPaper, self.totalResults, "retrieving results")
+            self.numResultsForEachPaper.update({newspaper: newspaperHuntOverseer.getNumberValidResults()})
 
     def runLimitedSearchOnDictionary(self):
-        reachedLimit = False
+        totalNumberValidResults = 0
+        resultsLeftToGet = self.recordNumber
         for newspaper in self.newspaperDictionary:
-            self.currentNumPurgedResults = 0
-            self.startRecordForGallicaQuery = 1
-            self.currentProcessedResults = 0
-            self.currentNumValidResults = 0
+            numberResultsInPaper = self.numResultsForEachPaper[newspaper]
             newspaperCode = self.newspaperDictionary[newspaper]
             newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-            hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, self.startRecordForGallicaQuery)
-            numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
-            while numberResultsForNewspaper > self.currentProcessedResults:
-                self.sendQuery(newspaperQuery)
-                if len(self.collectedQueries) >= self.recordNumber:
-                    reachedLimit = True
-                    break
-                HuntOverseer.reportProgress(len(self.collectedQueries), self.recordNumber, "retrieving results")
-            if self.currentNumValidResults > 0:
-                self.topPapers.append([newspaper, self.currentNumValidResults])
-            if reachedLimit:
+            numberResultsWanted = min(resultsLeftToGet, numberResultsInPaper)
+            newspaperHuntOverseer = LimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper, numberResultsWanted)
+            newspaperHuntOverseer.scourPaper()
+            currentNumberValidResults = newspaperHuntOverseer.getNumberValidResults()
+            #probably redundant
+            if newspaperHuntOverseer.getNumberValidResults() == 0:
                 break
+            else:
+                totalNumberValidResults = totalNumberValidResults + currentNumberValidResults
+                if totalNumberValidResults > self.recordNumber:
+                    break
+            self.collectedQueries = self.collectedQueries + newspaperHuntOverseer.getResultList()
+            resultsLeftToGet = resultsLeftToGet - currentNumberValidResults
+            if resultsLeftToGet == 0:
+                break
+
 
 
     def runLimitednoDictSearch(self):
         theBigQuery = self.baseQuery
-        reachedLimit = False
-        hunterForTotalNumberOfQueryResults = GallicaHunter(theBigQuery, self.startRecordForGallicaQuery)
+        hunterForTotalNumberOfQueryResults = GallicaHunter(theBigQuery, 1, 1)
         numberResultsForQuery = hunterForTotalNumberOfQueryResults.establishTotalHits(theBigQuery, False)
-        while (numberResultsForQuery > self.currentProcessedResults) and not reachedLimit:
-            self.sendQuery(theBigQuery)
-            if len(self.collectedQueries) >= self.recordNumber:
-                reachedLimit = True
+        numProcessedResults = 0
+        startRecord = 1
+        maximumResults = min(numberResultsForQuery, self.recordNumber)
+        while maximumResults > numProcessedResults:
+            amountRemaining = self.recordNumber - numProcessedResults
+            if amountRemaining >= 50:
+                numRecords = 50
+            else:
+                numRecords = amountRemaining
+            batchHunter = self.sendQuery(theBigQuery, startRecord, numRecords)
+            startRecord = startRecord + 50
+            results = batchHunter.getResultList()
+            numPurged = batchHunter.getNumberPurgedResults()
+            self.collectedQueries = self.collectedQueries + results
+            numProcessedResults = numProcessedResults + len(results) + numPurged
 
     def runUnlimitednoDictSearch(self):
         theBigQuery = self.baseQuery
-        hunterForTotalNumberOfQueryResults = GallicaHunter(theBigQuery, self.startRecordForGallicaQuery)
+        hunterForTotalNumberOfQueryResults = GallicaHunter(theBigQuery, 1, 1)
         numberResultsForQuery = hunterForTotalNumberOfQueryResults.establishTotalHits(theBigQuery, False)
-        while numberResultsForQuery > self.currentProcessedResults:
-            self.sendQuery(theBigQuery)
+        numProcessedResults = 0
+        startRecord = 1
+        while numberResultsForQuery > numProcessedResults:
+            batchHunter = self.sendQuery(theBigQuery, startRecord, 50)
+            startRecord = startRecord + 50
+            results = batchHunter.getResultList()
+            numPurged = batchHunter.getNumberPurgedResults()
+            self.collectedQueries = self.collectedQueries + results
+            numProcessedResults = numProcessedResults + len(results) + numPurged
 
-
-    def sendQuery(self, queryToSend):
-        hunter = GallicaHunter(queryToSend, self.startRecordForGallicaQuery)
-        hunter.hunt()
-        results = hunter.getResultList()
-        self.currentNumPurgedResults = hunter.getNumberPurgedResults()
-        self.currentProcessedResults = self.currentProcessedResults + len(results) + self.currentNumPurgedResults
-        self.currentNumValidResults = self.currentProcessedResults - self.currentNumPurgedResults
-        self.collectedQueries = self.collectedQueries + results
-        self.startRecordForGallicaQuery = self.startRecordForGallicaQuery + 50
-
-
-    def packageQuery(self):
-        filePacker = GallicaPackager(self.searchTerm, self.newspaper, self.collectedQueries,
-                                     [self.lowYear, self.highYear], self.topTenPapers)
-        filePacker.makeCSVFile()
-        filePacker.makeGraph()
-
-    def establishNumberQueries(self):
-        if type(self.recordNumber) is int:
-            self.numberQueriesToGallica = self.recordNumber // 50
-
-    def printTopTenPapers(self):
-        def newsCountSort(theList):
-            return theList[1]
-
-        self.topPapers.sort(key=newsCountSort, reverse=True)
-        print()
-        for i in range(10):
-            newspaper = self.topPapers[i][0]
-            self.topTenPapers.append(newspaper)
-            count = self.topPapers[i][1]
-            place = i + 1
-            line = "{place}. {newspaper} ({count})".format(place=place, newspaper=newspaper, count=count)
-            print(line)
-
+    #make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
 
     def findTotalResultsForUnlimitedNewspaperSearch(self):
         toBeDeleted = []
@@ -267,15 +257,94 @@ class HuntOverseer:
             HuntOverseer.reportProgress(progressMeter, len(self.newspaperDictionary), "finding total results")
             newspaperCode = self.newspaperDictionary[newspaper]
             newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-            hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, self.startRecordForGallicaQuery)
+            hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1)
             numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
             if numberResultsForNewspaper == 0:
                 toBeDeleted.append(newspaper)
             else:
-                self.numResultsForEachPaper.update({newspaper : numberResultsForNewspaper})
-                self.totalResults = self.totalResults + numberResultsForNewspaper
+                self.numResultsForEachPaper.update({newspaper: numberResultsForNewspaper})
         for uselessPaper in toBeDeleted:
             self.newspaperDictionary.pop(uselessPaper)
+
+    def findTotalResultsForLimitedNewspaperSearch(self):
+        toBeSaved = []
+        progressMeter = 0
+        numberResultsFound = 0
+        for newspaper in self.newspaperDictionary:
+            progressMeter = progressMeter + 1
+            HuntOverseer.reportProgress(progressMeter, len(self.newspaperDictionary), "finding total results")
+            newspaperCode = self.newspaperDictionary[newspaper]
+            newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
+            hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1)
+            numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
+            numberResultsFound = numberResultsFound + numberResultsForNewspaper
+            if numberResultsFound >= self.recordNumber:
+                break
+            elif numberResultsForNewspaper != 0:
+                self.numResultsForEachPaper.update({newspaper: numberResultsForNewspaper})
+        for newspaper in self.newspaperDictionary:
+            if newspaper not in toBeSaved:
+                uselessPaper = newspaper
+                self.newspaperDictionary.pop(uselessPaper)
+
+    def packageQuery(self):
+        self.makeCSVFile()
+        self.printTopTenPapers()
+        filePacker = GallicaPackager(self.fileName, self.topTenPapers)
+        filePacker.makeGraph()
+
+    def establishNumberQueries(self):
+        if type(self.recordNumber) is int:
+            self.numberQueriesToGallica = self.recordNumber // 50
+
+
+    def printTopTenPapers(self):
+        def newsCountSort(theList):
+            return theList[1]
+
+        for newspaper in self.newspaperDictionary:
+            numResults = self.newspaperDictionary[newspaper]
+            self.topPapers.append([newspaper, numResults])
+
+        self.topPapers.sort(key=newsCountSort, reverse=True)
+        print()
+
+        for i in range(10):
+            newspaper = self.topPapers[i][0]
+            self.topTenPapers.append(newspaper)
+            count = self.topPapers[i][1]
+            place = i + 1
+            line = "{place}. {newspaper} ({count})".format(place=place, newspaper=newspaper, count=count)
+            print(line)
+
+        dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
+
+        with open(os.path.join("./CSVdata", dictionaryFile)) as outFile:
+            writer = csv.writer(outFile)
+            for newspaper in self.topTenPapers:
+                writer.writerow(newspaper)
+
+    def makeCSVFile(self):
+        self.fileName = self.determineFileName()
+        with open(self.fileName, "w", encoding="utf8") as outFile:
+            writer = csv.writer(outFile)
+            writer.writerow(["date", "journal", "url"])
+            for csvEntry in self.collectedQueries:
+                writer.writerow(csvEntry)
+        shutil.move(os.path.join("./", self.fileName),os.path.join("./CSVdata", self.fileName))
+
+    def determineFileName(self):
+        if self.newspaper == "all":
+            nameOfFile = "AllNewspapers--" + self.searchTerm + "--"
+        else:
+            nameOfFile = self.newspaper + "--"
+            wordsInQuery = self.searchTerm.split(" ")
+            for word in wordsInQuery:
+                nameOfFile = nameOfFile + word
+        if self.isYearRange:
+            nameOfFile = nameOfFile + " " + str(self.lowYear) + "-" + str(self.highYear)
+        nameOfFile = nameOfFile + ".csv"
+        return nameOfFile
 
     @staticmethod
     def reportProgress(iteration, total, part):
