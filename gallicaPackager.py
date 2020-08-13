@@ -22,7 +22,8 @@ class GallicaPackager:
             with open(os.path.join("./CSVdata", dictionaryFile)) as inFile:
                 reader = csv.reader(inFile)
                 for newspaper in reader:
-                    self.tenMostPapers.append(newspaper)
+                    thePaper = newspaper[0]
+                    self.tenMostPapers.append(thePaper)
         else:
             self.tenMostPapers = tenMostPapers
 
@@ -41,13 +42,12 @@ class GallicaPackager:
 
         nameOcc = utils.read_csv(os.path.join("./CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
         nameOcc = self.readyColumnsForGraphing(nameOcc)
-        print(nameOcc)
 
         robjects.r('''
         createGraph <- function(dataToGraph, title){
-            graphOfHits <- ggplot(dataToGraph, aes(x=yearmon, y=total, fill=fillPaper)) +\
+            graphOfHits <- ggplot(dataToGraph, aes(x=yearmonth, y=total, fill=fillPaper)) +\
                 geom_col() + \
-                scale_x_yearmon(breaks=date_breaks("months")) + \
+                scale_x_date(date_breaks="months", date_labels="months") + \
                 labs(title=title, x="Year/month", y="occurrence count") +\
                 theme(axis.text = element_text(size=12), axis.text.x = element_text(angle = 45, hjust = 1))
             plot(graphOfHits)
@@ -68,12 +68,10 @@ class GallicaPackager:
         robjects.r('''
             nameOccMutateForFill <- function(csvResults, topTenPapers){ 
                 paperVector <- unlist(topTenPapers,recursive=TRUE)
-                csvResults <- csvResults %>% mutate(date=as.yearmon(date))
+                csvResults <- csvResults %>% mutate(date=ymd(date), count=1)
+                csvResults <- csvResults %>% group_by(yearmonth=floor_date(date, "month")) %>% summarize(total=sum(count))
                 csvResults <- csvResults %>% mutate(fillPaper=ifelse(csvResults$journal %in% paperVector, csvResults$journal, 'Other')) 
-                yearMonthCounts <- tibble(yearmon=csvResults$date,fillPaper=csvResults$fillPaper,count=1)\
-                                %>% group_by(yearmon, fillPaper)\
-                                %>% summarise(total = sum(count))
-                return(yearMonthCounts)
+                return(csvResults)
                 }
             ''')
         mutateFunction = robjects.globalenv['nameOccMutateForFill']

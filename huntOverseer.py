@@ -178,6 +178,7 @@ class HuntOverseer:
 
     def runUnlimitedSearchOnDictionary(self):
         progress = 0
+        betterPaperNames = []
         for newspaper in self.newspaperDictionary:
             numberResultsInPaper = self.numResultsForEachPaper[newspaper]
             newspaperCode = self.newspaperDictionary[newspaper]
@@ -188,6 +189,16 @@ class HuntOverseer:
             progress = progress + numberResultsInPaper
             HuntOverseer.reportProgress(progress, self.totalResults, "retrieving results")
             self.numResultsForEachPaper.update({newspaper: newspaperHuntOverseer.getNumberValidResults()})
+            betterPaperName = self.collectedQueries[len(self.collectedQueries)-1][1]
+            self.numResultsForEachPaper[betterPaperName] = self.numResultsForEachPaper.pop(newspaper)
+            betterPaperNames.append([newspaper,betterPaperName])
+        self.resolvePaperNameDifferences(betterPaperNames)
+
+    def resolvePaperNameDifferences(self, pair):
+        for namePair in pair:
+            betterName = namePair[1]
+            oldName = namePair[0]
+            self.newspaperDictionary[betterName] = self.newspaperDictionary.pop(oldName)
 
     def runLimitedSearchOnDictionary(self):
         totalNumberValidResults = 0
@@ -302,7 +313,7 @@ class HuntOverseer:
             return theList[1]
 
         for newspaper in self.newspaperDictionary:
-            numResults = self.newspaperDictionary[newspaper]
+            numResults = self.numResultsForEachPaper[newspaper]
             self.topPapers.append([newspaper, numResults])
 
         self.topPapers.sort(key=newsCountSort, reverse=True)
@@ -321,7 +332,7 @@ class HuntOverseer:
         with open(os.path.join("./CSVdata", dictionaryFile), "w", encoding="utf8") as outFile:
             writer = csv.writer(outFile)
             for newspaper in self.topTenPapers:
-                writer.writerow(newspaper)
+                writer.writerow([newspaper])
 
     def makeCSVFile(self):
         self.fileName = self.determineFileName()

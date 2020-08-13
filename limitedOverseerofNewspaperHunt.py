@@ -14,12 +14,8 @@ class LimitedOverseerOfNewspaperHunt(OverseerOfNewspaperHunt):
 			else:
 				numRecords = amountRemaining
 			batchHunter = OverseerOfNewspaperHunt.sendQuery(self.query, self.startRecordForGallicaQuery, numRecords)
-			numPurgedResults = batchHunter.getNumberPurgedResults()
-			self.results = self.results + batchHunter.getResultList()
-			self.currentProcessedResults = self.currentProcessedResults + len(
-				self.results) + numPurgedResults
-			self.currentNumValidResults = self.currentProcessedResults - numPurgedResults
-			self.startRecordForGallicaQuery = self.startRecordForGallicaQuery + 50
+			self.resultGetterCounter(batchHunter)
+
 
 
 
