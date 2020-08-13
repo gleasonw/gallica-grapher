@@ -9,7 +9,7 @@ class UnlimitedOverseerOfNewspaperHunt(OverseerOfNewspaperHunt):
 		while self.numberResults > self.currentProcessedResults:
 			batchHunter = OverseerOfNewspaperHunt.sendQuery(self.query, self.startRecordForGallicaQuery, 50)
 			numPurgedResults = batchHunter.getNumberPurgedResults()
-			self.results = batchHunter.getResultList()
+			self.results = self.results + batchHunter.getResultList()
 			self.currentProcessedResults = self.currentProcessedResults + len(
 				self.results) + numPurgedResults
 			self.currentNumValidResults = self.currentProcessedResults - numPurgedResults

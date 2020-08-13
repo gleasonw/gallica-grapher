@@ -6,7 +6,7 @@ from gallicaPackager import GallicaPackager
 import sys
 
 def main():
-    #Put this into another method eventually
+    #Put this into another method eventually and get rid of confusing references to sys.argv
     searchItem = sys.argv[1]
     if len(sys.argv) == 1:
         paperFinder = GallicaPaperFinder("1777-1950")
@@ -32,11 +32,3 @@ def main():
             raise
 main()
 
-"""
-cb32757974m_date
-cb34431794k_date
-cb32858360p_date
-cb39294634r_date
-cb32895690j_date
-
-"""

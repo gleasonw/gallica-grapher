@@ -47,7 +47,7 @@ class GallicaPackager:
         createGraph <- function(dataToGraph, title){
             graphOfHits <- ggplot(dataToGraph, aes(x=yearmon, y=total, fill=fillPaper)) +\
                 geom_col() + \
-                scale_x_yearmon() + \
+                scale_x_yearmon(breaks=date_breaks("months")) + \
                 labs(title=title, x="Year/month", y="occurrence count") +\
                 theme(axis.text = element_text(size=12), axis.text.x = element_text(angle = 45, hjust = 1))
             plot(graphOfHits)

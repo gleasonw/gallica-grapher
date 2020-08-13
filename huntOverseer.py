@@ -185,7 +185,8 @@ class HuntOverseer:
             newspaperHuntOverseer = UnlimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper)
             newspaperHuntOverseer.scourPaper()
             self.collectedQueries = self.collectedQueries + newspaperHuntOverseer.getResultList()
-            HuntOverseer.reportProgress(progress + numberResultsInPaper, self.totalResults, "retrieving results")
+            progress = progress + numberResultsInPaper
+            HuntOverseer.reportProgress(progress, self.totalResults, "retrieving results")
             self.numResultsForEachPaper.update({newspaper: newspaperHuntOverseer.getNumberValidResults()})
 
     def runLimitedSearchOnDictionary(self):
@@ -210,8 +211,6 @@ class HuntOverseer:
             resultsLeftToGet = resultsLeftToGet - currentNumberValidResults
             if resultsLeftToGet == 0:
                 break
-
-
 
     def runLimitednoDictSearch(self):
         theBigQuery = self.baseQuery
@@ -259,6 +258,7 @@ class HuntOverseer:
             newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
             hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1)
             numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
+            self.totalResults = self.totalResults + numberResultsForNewspaper
             if numberResultsForNewspaper == 0:
                 toBeDeleted.append(newspaper)
             else:
@@ -269,7 +269,6 @@ class HuntOverseer:
     def findTotalResultsForLimitedNewspaperSearch(self):
         toBeSaved = []
         progressMeter = 0
-        numberResultsFound = 0
         for newspaper in self.newspaperDictionary:
             progressMeter = progressMeter + 1
             HuntOverseer.reportProgress(progressMeter, len(self.newspaperDictionary), "finding total results")
@@ -277,8 +276,8 @@ class HuntOverseer:
             newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
             hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1)
             numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
-            numberResultsFound = numberResultsFound + numberResultsForNewspaper
-            if numberResultsFound >= self.recordNumber:
+            self.totalResults = self.totalResults + numberResultsForNewspaper
+            if self.totalResults >= self.recordNumber:
                 break
             elif numberResultsForNewspaper != 0:
                 self.numResultsForEachPaper.update({newspaper: numberResultsForNewspaper})
@@ -319,7 +318,7 @@ class HuntOverseer:
 
         dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
 
-        with open(os.path.join("./CSVdata", dictionaryFile)) as outFile:
+        with open(os.path.join("./CSVdata", dictionaryFile), "w", encoding="utf8") as outFile:
             writer = csv.writer(outFile)
             for newspaper in self.topTenPapers:
                 writer.writerow(newspaper)
@@ -335,14 +334,14 @@ class HuntOverseer:
 
     def determineFileName(self):
         if self.newspaper == "all":
-            nameOfFile = "AllNewspapers--" + self.searchTerm + "--"
+            nameOfFile = self.searchTerm + "-all-"
         else:
-            nameOfFile = self.newspaper + "--"
+            nameOfFile = self.newspaper + "-"
             wordsInQuery = self.searchTerm.split(" ")
             for word in wordsInQuery:
                 nameOfFile = nameOfFile + word
         if self.isYearRange:
-            nameOfFile = nameOfFile + " " + str(self.lowYear) + "-" + str(self.highYear)
+            nameOfFile = nameOfFile + str(self.lowYear) + "." + str(self.highYear)
         nameOfFile = nameOfFile + ".csv"
         return nameOfFile
 

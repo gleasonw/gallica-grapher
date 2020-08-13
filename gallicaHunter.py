@@ -66,12 +66,11 @@ class GallicaHunter:
             try:
                 response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
                 root = etree.fromstring(response.content)
+                self.hitListCreator(root)
                 success = True
             except etree.XMLSyntaxError as e:
                 print("\n\n ****Gallica spat at you!**** \n")
-                print(response.url)
 
-        self.hitListCreator(root)
 
     def hitListCreator(self, targetXMLroot):
         priorJournal = ''
