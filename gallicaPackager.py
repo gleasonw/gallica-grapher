@@ -47,7 +47,7 @@ class GallicaPackager:
         createGraph <- function(dataToGraph, title){
             graphOfHits <- ggplot(dataToGraph, aes(x=yearmonth, y=total, fill=fillPaper)) +\
                 geom_col() + \
-                scale_x_date(date_breaks="months", date_labels="months") + \
+                scale_x_date(date_breaks="years", date_minor_breaks="months", date_labels="%b %Y") + \
                 labs(title=title, x="Year/month", y="occurrence count") +\
                 theme(axis.text = element_text(size=12), axis.text.x = element_text(angle = 45, hjust = 1))
             plot(graphOfHits)
@@ -69,8 +69,8 @@ class GallicaPackager:
             nameOccMutateForFill <- function(csvResults, topTenPapers){ 
                 paperVector <- unlist(topTenPapers,recursive=TRUE)
                 csvResults <- csvResults %>% mutate(date=ymd(date), count=1)
-                csvResults <- csvResults %>% group_by(yearmonth=floor_date(date, "month")) %>% summarize(total=sum(count))
-                csvResults <- csvResults %>% mutate(fillPaper=ifelse(csvResults$journal %in% paperVector, csvResults$journal, 'Other')) 
+                csvResults <- csvResults %>% group_by(yearmonth=floor_date(date, "month"), journal=journal) %>% summarize(total=sum(count))
+                csvResults <- csvResults %>% mutate(fillPaper=ifelse(journal %in% paperVector, journal, 'Other')) 
                 return(csvResults)
                 }
             ''')
