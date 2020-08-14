@@ -7,13 +7,13 @@ import os
 
 from gallicaHunter import GallicaHunter
 
-from gallicaPackager import GallicaPackager
+from gallicaGrapher import GallicaGrapher
 from unlimitedOverseerofNewspaperHunt import UnlimitedOverseerOfNewspaperHunt
 from limitedOverseerofNewspaperHunt import LimitedOverseerOfNewspaperHunt
 
 
 class HuntOverseer:
-    def __init__(self, *args):
+    def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, **kwargs):
         self.lowYear = None
         self.highYear = None
         self.isYearRange = None
@@ -23,27 +23,33 @@ class HuntOverseer:
         self.strictYearRange = None
         self.recordNumber = None
         self.totalResults = 0
-        self.newspaper = args[1]
+        self.newspaper = newspaper
         self.newspaperDictionary = {}
         self.collectedQueries = []
-        self.searchTerm = args[0]
+        self.searchTerm = searchTerm
         self.topPapers = []
         self.topTenPapers = []
         self.numResultsForEachPaper = {}
         self.fileName = ''
 
-        self.establishRecordNumber(args)
-        self.establishStrictness(args[3])
-        self.establishYearRange(args[2])
+        self.establishRecordNumber(kwargs)
+        self.establishStrictness(strictYearRange)
+        self.establishYearRange(yearRange)
         self.parseNewspaperDictionary()
         self.buildQuery()
 
     def runQuery(self):
         self.initiateQuery()
 
-    def establishRecordNumber(self, argList):
-        if len(argList) == 5:
-            self.recordNumber = int(argList[4])
+    def establishRecordNumber(self, kwargs):
+        if kwargs["recordNumber"] is not None:
+            self.recordNumber = kwargs["recordNumber"]
+
+    def getTopTenPapers(self):
+        return self.topTenPapers
+
+    def getFileName(self):
+        return self.fileName
 
     @staticmethod
     def sendQuery(queryToSend, startRecord, numRecords):
@@ -174,7 +180,6 @@ class HuntOverseer:
             else:
                 self.findTotalResultsForUnlimitedNewspaperSearch()
                 self.runUnlimitedSearchOnDictionary()
-        self.packageQuery()
 
     def runUnlimitedSearchOnDictionary(self):
         progress = 0
@@ -299,16 +304,13 @@ class HuntOverseer:
 
     def packageQuery(self):
         self.makeCSVFile()
-        self.printTopTenPapers()
-        filePacker = GallicaPackager(self.fileName, self.topTenPapers)
-        filePacker.makeGraph()
+        self.generateTopTenPapers()
 
     def establishNumberQueries(self):
         if type(self.recordNumber) is int:
             self.numberQueriesToGallica = self.recordNumber // 50
 
-
-    def printTopTenPapers(self):
+    def generateTopTenPapers(self):
         def newsCountSort(theList):
             return theList[1]
 
@@ -317,15 +319,12 @@ class HuntOverseer:
             self.topPapers.append([newspaper, numResults])
 
         self.topPapers.sort(key=newsCountSort, reverse=True)
-        print()
 
         for i in range(10):
             newspaper = self.topPapers[i][0]
             self.topTenPapers.append(newspaper)
             count = self.topPapers[i][1]
             place = i + 1
-            line = "{place}. {newspaper} ({count})".format(place=place, newspaper=newspaper, count=count)
-            print(line)
 
         dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
 
