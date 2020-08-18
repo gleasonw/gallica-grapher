@@ -13,7 +13,7 @@ from limitedOverseerofNewspaperHunt import LimitedOverseerOfNewspaperHunt
 
 
 class HuntOverseer:
-    def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, **kwargs):
+    def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, recordNumber):
         self.lowYear = None
         self.highYear = None
         self.isYearRange = None
@@ -32,7 +32,7 @@ class HuntOverseer:
         self.numResultsForEachPaper = {}
         self.fileName = ''
 
-        self.establishRecordNumber(kwargs)
+        self.establishRecordNumber(recordNumber)
         self.establishStrictness(strictYearRange)
         self.establishYearRange(yearRange)
         self.parseNewspaperDictionary()
@@ -41,9 +41,9 @@ class HuntOverseer:
     def runQuery(self):
         self.initiateQuery()
 
-    def establishRecordNumber(self, kwargs):
-        if kwargs["recordNumber"] is not None:
-            self.recordNumber = kwargs["recordNumber"]
+    def establishRecordNumber(self, recordNumber):
+        if recordNumber != 0 and recordNumber is not None:
+            self.recordNumber = recordNumber
 
     def getTopTenPapers(self):
         return self.topTenPapers
@@ -192,7 +192,7 @@ class HuntOverseer:
             newspaperHuntOverseer.scourPaper()
             self.collectedQueries = self.collectedQueries + newspaperHuntOverseer.getResultList()
             progress = progress + numberResultsInPaper
-            HuntOverseer.reportProgress(progress, self.totalResults, "retrieving results")
+            HuntOverseer.reportProgress(progress, self.totalResults, "retrieving results for '{0}'".format(self.searchTerm))
             self.numResultsForEachPaper.update({newspaper: newspaperHuntOverseer.getNumberValidResults()})
             betterPaperName = self.collectedQueries[len(self.collectedQueries)-1][1]
             self.numResultsForEachPaper[betterPaperName] = self.numResultsForEachPaper.pop(newspaper)

@@ -12,108 +12,206 @@ class GallicaGrapher:
     def __init__(self, csvFile, tenMostPapers, graphSettings):
         self.fileName = csvFile
         self.graphFileName = ''
-        self.tenMostPapers = []
+        self.tenMostPapers = tenMostPapers
         self.settings = graphSettings
-        self.establishTopPapers(tenMostPapers)
-        self.parseGraphSettings()
+        self.theCSVforR = None
+        self.ggplotForR = None
+        self.breakLength = 360
 
-    def parseGraphSettings(self, settings):
-        if self.settings["stackedBar"]:
+    def parseGraphSettings(self):
+        self.makeGraphFileName()
+        self.readCSVtoR()
+        if self.settings["graphType"] == "stackedBar":
+            self.establishTopPapers()
+            self.tenMostPapers = self.transformTopTenPapersToRVector()
             self.makeStackedBarGraph()
-        elif self.settings["bar"]:
-            if self.settings["AllInOne"]:
-                self.makeAllInOneBarGraph()
-            else:
-                self.makeBarGraph()
-        elif self.settings["freqPoly"]:
-            if self.settings["AllInOne"]:
-                self.makeAllInOneFreqPoly()
-            else:
-                self.makeFreqPoly()
+        elif self.settings["graphType"] == "bar":
+            self.makeBarGraph()
+        elif self.settings["graphType"] == "percentBar":
+            self.establishTopPapers()
+            self.tenMostPapers = self.transformTopTenPapersToRVector()
+            self.makePercentBar()
+        elif self.settings["graphType"] == "freqPoly":
+            self.makeFreqPoly()
+        elif self.settings["graphType"] == "multiFreqPoly":
+            self.makeMultiFreqPoly()
         else:
             pass
 
 
-    def establishTopPapers(self, tenMostPapers):
-        if tenMostPapers is None:
+    def establishTopPapers(self):
+        if self.tenMostPapers is None:
+            self.tenMostPapers = []
             dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
             with open(os.path.join("./CSVdata", dictionaryFile)) as inFile:
                 reader = csv.reader(inFile)
                 for newspaper in reader:
                     thePaper = newspaper[0]
                     self.tenMostPapers.append(thePaper)
-        else:
-            self.tenMostPapers = tenMostPapers
 
-    def makeStackedBarGraph(self):
-        self.makeGraphFileName()
-
-        grdevices = importr('grDevices')
+    def readCSVtoR(self):
         zoo = importr('zoo')
         base = importr('base')
-        utils = importr('utils')
         dplyr = importr('dplyr')
         stringr = importr('stringr')
         scales = importr('scales')
         lubridate = importr('lubridate')
         tibble = importr('tibble')
+        utils = importr('utils')
+        self.theCSVforR = utils.read_csv(os.path.join("./CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
+        self.theCSVforR = self.parseDateForRCSV()
 
-        nameOcc = utils.read_csv(os.path.join("./CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
-
-
-
-
-        nameOcc = self.readyColumnsForGraphing(nameOcc)
+    def makeStackedBarGraph(self):
+        self.theCSVforR = self.createFillColumnForRCSV()
 
         robjects.r('''
-        createGraph <- function(dataToGraph, title){
-            graphOfHits <- ggplot(dataToGraph, aes(x=yearmonth, y=total, fill=fillPaper)) +\
-                geom_col() + \
-                scale_x_date(date_breaks="years", date_minor_breaks="months", date_labels="%b %Y") + \
-                labs(title=title, x="Year/month", y="occurrence count") +\
-                theme(axis.text = element_text(size=12), axis.text.x = element_text(angle = 45, hjust = 1))
-            plot(graphOfHits)
+        initiateStackedBarGGplot <- function(dataToGraph){
+            graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count.., fill=fillPaper)) +
+                geom_histogram(binwidth=30)
+            return(graphOfHits)
         }
         ''')
-        titleSplit = self.fileName.split("--")
-        searchTermProbably = titleSplit[0]
-        graphTitle = "{0} usage by year/mon".format(searchTermProbably)
 
-        grdevices.png(file=self.graphFileName, width=1920, height=1080)
-        dataGrapher = robjects.globalenv['createGraph']
-        dataGrapher(nameOcc, graphTitle)
-        grdevices.dev_off()
-        shutil.move(os.path.join("./", self.graphFileName), os.path.join("./Graphs", self.graphFileName))
-
-    def makeAllInOneFreqPoly(self):
-        pass
+        ggplotInitiate = robjects.globalenv['initiateStackedBarGGplot']
+        self.ggplotForR = ggplotInitiate(self.theCSVforR)
+        graphTitle = self.makeSingleGraphTitle()
+        self.ggplotForR = self.addLabelsToGGplot(graphTitle)
 
     def makeFreqPoly(self):
-        pass
+
+        robjects.r('''
+        initiateFreqPolyGGplot <- function(dataToGraph){
+            graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count..)) +
+                geom_freqpoly(binwidth=30)
+            return(graphOfHits)
+        }
+        ''')
+
+        freqPolyInitiate = robjects.globalenv['initiateFreqPolyGGplot']
+        self.ggplotForR = freqPolyInitiate(self.theCSVforR)
+        graphTitle = self.makeSingleGraphTitle()
+        self.ggplotForR = self.addLabelsToGGplot(graphTitle)
+
+    def makeMultiFreqPoly(self):
+        robjects.r('''
+        initiateManyFreqPolyGGplot <- function(dataToGraph){
+            graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, colour=term)) +
+                geom_freqpoly(binwidth=30)
+            return(graphOfHits)
+        }
+        ''')
+
+        initiateManyFreqPoly = robjects.globalenv['initiateManyFreqPolyGGplot']
+
+        self.ggplotForR = initiateManyFreqPoly(self.theCSVforR)
+        graphTitle = "massive" #Change this you fool
+        self.ggplotForR = self.addLabelsToGGplot(graphTitle)
 
     def makeBarGraph(self):
-        pass
 
-    def makeAllInOneBarGraph(self):
-        pass
-
-    def readyColumnsForGraphing(self, csvResults):
         robjects.r('''
-            nameOccMutateForFill <- function(csvResults, topTenPapers){ 
-                paperVector <- unlist(topTenPapers,recursive=TRUE)
-                csvResults <- csvResults %>% mutate(date=ymd(date), count=1)
-                csvResults <- csvResults %>% group_by(yearmonth=floor_date(date, "month"), journal=journal) %>% summarize(total=sum(count))
-                csvResults <- csvResults %>% mutate(fillPaper=ifelse(journal %in% paperVector, journal, 'Other')) 
+        initiateBarGGplot <- function(dataToGraph){
+            graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count..)) +
+                geom_histogram(binwidth=30, colour="white")
+            return(graphOfHits)
+        }
+        ''')
+
+        initiateBar = robjects.globalenv['initiateBarGGplot']
+        self.ggplotForR = initiateBar(self.theCSVforR)
+        graphTitle = self.makeSingleGraphTitle()
+        self.ggplotForR = self.addLabelsToGGplot(graphTitle)
+
+    def makePercentBar(self):
+        self.theCSVforR = self.createFillColumnForRCSV()
+        robjects.r('''
+        initiatePercentGGplot <- function(dataToGraph){
+            graphOfHits <- ggplot(dataToGraph, aes(x=numericDate,..count.., fill=fillPaper)) +
+                        geom_histogram(binwidth=30, position="fill")
+            return(graphOfHits)
+        }
+        ''')
+
+        initiateBar = robjects.globalenv['initiatePercentGGplot']
+        self.ggplotForR = initiateBar(self.theCSVforR)
+        graphTitle = self.makeSingleGraphTitle()
+        self.ggplotForR = self.addLabelsToGGplot(graphTitle)
+
+    def addLabelsToGGplot(self, title):
+        robjects.r('''
+            labelAdder <- function(theGGplot, title, csvResults, breakLength){
+                seqForLabels <- seq(min(csvResults$num)-15,max(csvResults$num),breakLength)
+                seqForLabels <- as_date(seqForLabels)
+                seqForLabels <- format(seqForLabels, "%b %Y")
+                theGGplot <- theGGplot + scale_x_continuous(breaks = seq(min(csvResults$numericDate)-15,max(csvResults$numericDate),breakLength),
+                                            minor_breaks = seq(min(csvResults$num)-15,max(csvResults$num),30),
+                                            labels = seqForLabels)
+                theGGplot <- theGGplot + labs(title=title, x="Year/month", y="occurrence count")
+                theGGplot <- theGGplot + theme(axis.text = element_text(size=12), axis.text.x = element_text(angle = 45, hjust = 1))
+            }
+        ''')
+        labelAdder = robjects.globalenv['labelAdder']
+        return labelAdder(self.ggplotForR, title, self.theCSVforR, self.breakLength)
+
+    def parseDateForRCSV(self):
+        robjects.r('''
+            parseDate <- function(csvResults){ 
+                csvResults <- csvResults %>% mutate(date=ymd(date))
+                csvResults <- csvResults %>% mutate(date=floor_date(date, "months"))
+                csvResults <- csvResults %>% mutate(numericDate = as.numeric(date))
                 return(csvResults)
                 }
             ''')
-        mutateFunction = robjects.globalenv['nameOccMutateForFill']
-        return mutateFunction(csvResults, self.tenMostPapers)
+        mutateFunction = robjects.globalenv['parseDate']
+        return mutateFunction(self.theCSVforR)
+
+
+    def createFillColumnForRCSV(self):
+        robjects.r('''
+            createFillColumn <- function(csvResults, paperVector){
+                csvResults <- csvResults %>% mutate(fillPaper=ifelse(journal %in% paperVector, journal, 'Other')) 
+            }
+        ''')
+        createFillColumn = robjects.globalenv['createFillColumn']
+        return createFillColumn(self.theCSVforR, self.tenMostPapers)
+
+    def transformTopTenPapersToRVector(self):
+        robjects.r('''
+            ListToVector <- function(listOfPapers){
+                paperVector <- unlist(listOfPapers,recursive=TRUE)
+                return(paperVector)
+            }
+        ''')
+        vectorTransform = robjects.globalenv['ListToVector']
+        return vectorTransform(self.tenMostPapers)
+
+    def plotGraphAndMakePNG(self):
+        grdevices = importr('grDevices')
+        grdevices.png(file=self.graphFileName, width=1920, height=1080)
+        robjects.r('''
+            graphThatGGplot <- function(theGraph){
+                plot(theGraph)
+            }
+            '''
+        )
+        dataGrapher = robjects.globalenv['graphThatGGplot']
+        dataGrapher(self.ggplotForR)
+        grdevices.dev_off()
+        shutil.move(os.path.join("./", self.graphFileName), os.path.join("./Graphs", self.graphFileName))
 
 
     def makeGraphFileName(self):
         self.graphFileName = self.fileName[0:len(self.fileName)-4]
+        self.graphFileName = "{0}-{1}".format(self.graphFileName, self.settings["graphType"])
         self.graphFileName = self.graphFileName + ".png"
+
+    def makeSingleGraphTitle(self):
+        titleSplit = self.fileName.split("--")
+        searchTermProbably = titleSplit[0]
+        graphTitle = "{0} usage by year/mon".format(searchTermProbably)
+        return graphTitle
+
+
 
 
 
