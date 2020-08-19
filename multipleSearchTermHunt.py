@@ -15,6 +15,8 @@ class MultipleSearchTermHunt:
 		self.strictYearRange = strictYearRange
 		self.searchTermResultList = []
 		self.theKwargsForGraphingAndRecordNumber = kwargs
+		self.listOfGraphers = []
+		self.bigFileName = ''
 
 	def runMultiTermQuery(self):
 		for searchTerm in self.searchTermList:
@@ -23,10 +25,6 @@ class MultipleSearchTermHunt:
 			resultGetterForTerm.runQuery()
 			self.searchTermResultList.append(resultGetterForTerm)
 		self.initiateGraphing()
-
-	def putTheResultsInFiles(self):
-		for resultBundle in self.searchTermResultList:
-			resultBundle.packageQuery()
 
 	def initiateGraphing(self):
 		if self.theKwargsForGraphingAndRecordNumber['uniqueGraphs'].lower() in ["true", "yup"]:
@@ -37,13 +35,17 @@ class MultipleSearchTermHunt:
 		else:
 			self.initiateSingleGraphManyData()
 
-	def initiateSingleGraphPerPage(self):
-		self.putTheResultsInFiles(self)
-		for resultBundle in self.searchTermList:
+	def createGGplotsForBundles(self):
+		for resultBundle in self.searchTermResultList:
 			fileName = resultBundle.getFileName()
 			topTenPapers = resultBundle.getTopTenPapers()
 			grapher = GallicaGrapher(fileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber)
 			grapher.parseGraphSettings()
+			self.listOfGraphers.append(grapher)
+
+	def initiateSingleGraphPerPage(self):
+		self.createGGplotsForBundles()
+		for grapher in self.listOfGraphers:
 			grapher.plotGraphAndMakePNG()
 
 	def initiateSingleGraphManyData(self):
@@ -54,7 +56,12 @@ class MultipleSearchTermHunt:
 		grapher.plotGraphAndMakePNG()
 
 	def initiateSinglePageManyGraphs(self):
-		self.createMassiveCSV()
+		self.createGGplotsForBundles()
+		self.makeMultiTermFileName()
+		ggPlotList = []
+		for grapher in self.listOfGraphers:
+			ggPlotList.append(grapher.getGGplot())
+		GallicaGrapher.arrangeGGplotsAndPlot(ggPlotList, self.bigFileName)
 
 	def runMultiTermQueryWithDiffPapers(self):
 		pass
@@ -68,3 +75,10 @@ class MultipleSearchTermHunt:
 					searchTermOfResultBundle = resultBundle.searchTerm
 					writer.writerow(csvEntry + [searchTermOfResultBundle])
 		shutil.move("massive.csv", os.path.join("./CSVdata", "massive.csv"))
+
+	def makeMultiTermFileName(self):
+		for resultBundle in self.searchTermResultList:
+			self.bigFileName = self.bigFileName + resultBundle.getSearchTerm() + "~"
+		randomBundleForYearRange = self.searchTermResultList[0]
+		self.bigFileName = self.bigFileName + randomBundleForYearRange.getYearRange()
+		self.bigFileName = self.bigFileName + ".png"

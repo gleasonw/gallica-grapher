@@ -2,6 +2,7 @@ import re
 import requests
 import re
 from lxml import etree
+import csv
 
 
 class GallicaHunter:
@@ -13,6 +14,25 @@ class GallicaHunter:
         self.startRecord = startRecord
         self.numPurgedResults = 0
         self.numRecords = numRecords
+
+    @staticmethod
+    def establishName(query):
+        success = False
+        journalName = ''
+        while not success:
+            parameters = dict(version=1.2, operation="searchRetrieve", collapsing=False, exactSearch="false",
+                              query=query, startRecord=0, maximumRecords=1)
+            try:
+                response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
+                root = etree.fromstring(response.content)
+                for queryHit in root.iter("{http://www.loc.gov/zing/srw/}record"):
+                    data = queryHit[2][0]
+                    journalName = data.find('{http://purl.org/dc/elements/1.1/}title').text
+                success = True
+            except etree.XMLSyntaxError as e:
+                print("\n\n ****Gallica spat at you!**** \n")
+        return journalName
+
 
     @staticmethod
     def establishTotalHits(query, collapseResults):

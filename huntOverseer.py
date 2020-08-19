@@ -6,6 +6,7 @@ import shutil
 import os
 
 from gallicaHunter import GallicaHunter
+from multiprocessing import Pool, Manager, Array
 
 from gallicaGrapher import GallicaGrapher
 from unlimitedOverseerofNewspaperHunt import UnlimitedOverseerOfNewspaperHunt
@@ -13,6 +14,7 @@ from limitedOverseerofNewspaperHunt import LimitedOverseerOfNewspaperHunt
 
 
 class HuntOverseer:
+
     def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, recordNumber):
         self.lowYear = None
         self.highYear = None
@@ -20,8 +22,9 @@ class HuntOverseer:
         self.baseQuery = None
         self.numberQueriesToGallica = None
         self.isNoDictSearch = None
-        self.strictYearRange = None
-        self.recordNumber = None
+        self.progress = 0
+        self.strictYearRange = strictYearRange
+        self.recordNumber = recordNumber
         self.totalResults = 0
         self.newspaper = newspaper
         self.newspaperDictionary = {}
@@ -30,26 +33,38 @@ class HuntOverseer:
         self.topPapers = []
         self.topTenPapers = []
         self.numResultsForEachPaper = {}
-        self.fileName = ''
-
-        self.establishRecordNumber(recordNumber)
-        self.establishStrictness(strictYearRange)
         self.establishYearRange(yearRange)
-        self.parseNewspaperDictionary()
-        self.buildQuery()
+
+        self.fileName = self.determineFileName()
+
+    def checkIfFileAlreadyInDirectory(self):
+        return os.path.isfile(os.path.join("./CSVdata", self.fileName))
 
     def runQuery(self):
-        self.initiateQuery()
+        if self.checkIfFileAlreadyInDirectory():
+            print("File exists in directory, skipping.")
+        else:
+            self.establishRecordNumber()
+            self.establishStrictness()
+            self.parseNewspaperDictionary()
+            self.buildQuery()
+            self.initiateQuery()
 
-    def establishRecordNumber(self, recordNumber):
-        if recordNumber != 0 and recordNumber is not None:
-            self.recordNumber = recordNumber
+    def establishRecordNumber(self):
+        if self.recordNumber == 0:
+            self.recordNumber = None
 
     def getTopTenPapers(self):
         return self.topTenPapers
 
     def getFileName(self):
         return self.fileName
+
+    def getSearchTerm(self):
+        return self.searchTerm
+
+    def getYearRange(self):
+        return "{0}-{1}".format(self.lowYear, self.highYear)
 
     @staticmethod
     def sendQuery(queryToSend, startRecord, numRecords):
@@ -59,8 +74,8 @@ class HuntOverseer:
 
 
     # Good time to parse errors in formatting too
-    def establishStrictness(self, strictSetting):
-        if strictSetting in ["ya", "True", "true", "yes", "absolutely"]:
+    def establishStrictness(self):
+        if self.strictYearRange in ["ya", "True", "true", "yes", "absolutely"]:
             self.strictYearRange = True
         else:
             self.strictYearRange = False
@@ -180,30 +195,23 @@ class HuntOverseer:
             else:
                 self.findTotalResultsForUnlimitedNewspaperSearch()
                 self.runUnlimitedSearchOnDictionary()
+        self.packageQuery()
 
     def runUnlimitedSearchOnDictionary(self):
-        progress = 0
-        betterPaperNames = []
-        for newspaper in self.newspaperDictionary:
-            numberResultsInPaper = self.numResultsForEachPaper[newspaper]
-            newspaperCode = self.newspaperDictionary[newspaper]
-            newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-            newspaperHuntOverseer = UnlimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper)
-            newspaperHuntOverseer.scourPaper()
-            self.collectedQueries = self.collectedQueries + newspaperHuntOverseer.getResultList()
-            progress = progress + numberResultsInPaper
-            HuntOverseer.reportProgress(progress, self.totalResults, "retrieving results for '{0}'".format(self.searchTerm))
-            self.numResultsForEachPaper.update({newspaper: newspaperHuntOverseer.getNumberValidResults()})
-            betterPaperName = self.collectedQueries[len(self.collectedQueries)-1][1]
-            self.numResultsForEachPaper[betterPaperName] = self.numResultsForEachPaper.pop(newspaper)
-            betterPaperNames.append([newspaper,betterPaperName])
-        self.resolvePaperNameDifferences(betterPaperNames)
+        with Pool(4) as pool:
+            pool.map(self.getDataFromPaper, self.newspaperDictionary)
 
-    def resolvePaperNameDifferences(self, pair):
-        for namePair in pair:
-            betterName = namePair[1]
-            oldName = namePair[0]
-            self.newspaperDictionary[betterName] = self.newspaperDictionary.pop(oldName)
+    def getDataFromPaper(self, newspaper):
+        print("I'm going!")
+        numberResultsInPaper = self.numResultsForEachPaper[newspaper]
+        newspaperCode = self.newspaperDictionary[newspaper]
+        newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
+        newspaperHuntOverseer = UnlimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper)
+        newspaperHuntOverseer.scourPaper()
+        self.collectedQueries = self.collectedQueries + newspaperHuntOverseer.getResultList()
+        self.progress = self.progress + numberResultsInPaper
+        HuntOverseer.reportProgress(self.progress, self.totalResults, "retrieving results for '{0}'".format(self.searchTerm))
+        self.numResultsForEachPaper.update({newspaper: newspaperHuntOverseer.getNumberValidResults()})
 
     def runLimitedSearchOnDictionary(self):
         totalNumberValidResults = 0
@@ -334,7 +342,7 @@ class HuntOverseer:
                 writer.writerow([newspaper])
 
     def makeCSVFile(self):
-        self.fileName = self.determineFileName()
+
         with open(self.fileName, "w", encoding="utf8") as outFile:
             writer = csv.writer(outFile)
             writer.writerow(["date", "journal", "url"])
@@ -362,6 +370,7 @@ class HuntOverseer:
         sys.stdout.flush()
         if iteration == total:
             print()
+
 
 
 

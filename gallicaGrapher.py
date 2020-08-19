@@ -18,6 +18,27 @@ class GallicaGrapher:
         self.ggplotForR = None
         self.breakLength = 360
 
+    @staticmethod
+    def arrangeGGplotsAndPlot(listOfGGplots, fileName):
+        grdevices = importr('grDevices')
+        grdevices.png(file=fileName, width=1920, height=1080)
+        robjects.r('''
+        graphMulti <- function(listOfGGplots){
+            numberPlots <- length(listOfGGplots)
+            nrows <- floor(sqrt(numberPlots))
+            do.call("grid.arrange", c(listOfGGplots, nrow=nrows))
+        }
+        ''')
+        multiGraph = robjects.globalenv["graphMulti"]
+        multiGraph(listOfGGplots)
+        grdevices.dev_off()
+        shutil.move(os.path.join("./", fileName), os.path.join("./Graphs", fileName))
+
+
+    def getGGplot(self):
+        return self.ggplotForR
+
+
     def parseGraphSettings(self):
         self.makeGraphFileName()
         self.readCSVtoR()
@@ -57,6 +78,7 @@ class GallicaGrapher:
         scales = importr('scales')
         lubridate = importr('lubridate')
         tibble = importr('tibble')
+        grids = importr('gridExtra')
         utils = importr('utils')
         self.theCSVforR = utils.read_csv(os.path.join("./CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
         self.theCSVforR = self.parseDateForRCSV()
@@ -96,7 +118,7 @@ class GallicaGrapher:
         robjects.r('''
         initiateManyFreqPolyGGplot <- function(dataToGraph){
             graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, colour=term)) +
-                geom_freqpoly(binwidth=30)
+                geom_freqpoly(binwidth=120)
             return(graphOfHits)
         }
         ''')
