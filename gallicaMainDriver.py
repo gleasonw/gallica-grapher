@@ -1,6 +1,5 @@
-from gallicaHunter import GallicaHunter
+
 from gallicaPaperFinder import GallicaPaperFinder
-from huntOverseer import HuntOverseer
 from gallicaGrapher import GallicaGrapher
 from multipleSearchTermHunt import MultipleSearchTermHunt
 

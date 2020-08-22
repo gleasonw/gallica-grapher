@@ -1,4 +1,4 @@
-from huntOverseer import HuntOverseer
+from gallicaSearch import *
 from gallicaGrapher import GallicaGrapher
 import csv
 import shutil
@@ -20,8 +20,26 @@ class MultipleSearchTermHunt:
 
 	def runMultiTermQuery(self):
 		for searchTerm in self.searchTermList:
-			resultGetterForTerm = HuntOverseer(searchTerm, self.newspaper, self.yearRange, self.strictYearRange,
-											   self.theKwargsForGraphingAndRecordNumber["recordNumber"])
+			if self.newspaper == "noDict":
+				if self.theKwargsForGraphingAndRecordNumber["recordNumber"] != 0:
+					resultGetterForTerm = RecordLimitedSearchNoDictionary(searchTerm, self.newspaper, self.yearRange, self.strictYearRange,
+													   self.theKwargsForGraphingAndRecordNumber["recordNumber"])
+				else:
+					resultGetterForTerm = FullSearchNoDictionary(searchTerm, self.newspaper, self.yearRange,
+																		  self.strictYearRange)
+			else:
+				if self.theKwargsForGraphingAndRecordNumber["recordNumber"] != 0:
+					resultGetterForTerm = RecordLimitedSearchWithinDictionary(searchTerm, self.newspaper, self.yearRange,
+																		  self.strictYearRange,
+																		  self.theKwargsForGraphingAndRecordNumber[
+																			  "recordNumber"])
+					resultGetterForTerm.findTotalResults()
+
+				else:
+					resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
+																			  self.yearRange,
+																			  self.strictYearRange)
+					resultGetterForTerm.findTotalResults()
 			resultGetterForTerm.runQuery()
 			self.searchTermResultList.append(resultGetterForTerm)
 		self.initiateGraphing()
@@ -71,7 +89,7 @@ class MultipleSearchTermHunt:
 			writer = csv.writer(outFile)
 			writer.writerow(['date','journal','url','term'])
 			for resultBundle in self.searchTermResultList:
-				for csvEntry in resultBundle.collectedQueries:
+				for csvEntry in resultBundle.getCollectedQueries():
 					searchTermOfResultBundle = resultBundle.searchTerm
 					writer.writerow(csvEntry + [searchTermOfResultBundle])
 		shutil.move("massive.csv", os.path.join("./CSVdata", "massive.csv"))

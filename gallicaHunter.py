@@ -16,9 +16,9 @@ class GallicaHunter:
         self.numRecords = numRecords
 
     @staticmethod
-    def establishName(query):
+    def establishName(query, priorName):
         success = False
-        journalName = ''
+        journalName = priorName
         while not success:
             parameters = dict(version=1.2, operation="searchRetrieve", collapsing=False, exactSearch="false",
                               query=query, startRecord=0, maximumRecords=1)
