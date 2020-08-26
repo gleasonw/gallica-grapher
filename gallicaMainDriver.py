@@ -2,12 +2,14 @@
 from gallicaPaperFinder import GallicaPaperFinder
 from gallicaGrapher import GallicaGrapher
 from multipleSearchTermHunt import MultipleSearchTermHunt
+import time
 
 import sys
 
 
 def main():
 	# Put this into another method eventually and get rid of confusing references to sys.argv
+	tic = time.perf_counter()
 	if len(sys.argv) == 1:
 		paperFinder = GallicaPaperFinder("1777-1950")
 		paperFinder.findPapersOnGallica()
@@ -42,6 +44,8 @@ def main():
 												  uniqueGraphs=uniqueGraphs,
 												  samePage=samePage)
 			requestToRun.runMultiTermQuery()
+	toc = time.perf_counter()
+	print(toc-tic)
 
 
 main()

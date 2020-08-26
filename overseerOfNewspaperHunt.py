@@ -1,41 +1,24 @@
-from typing import List, Any
-
 from gallicaHunter import GallicaHunter
 from math import ceil
-from multiprocessing import Pool, Manager, Lock
+from multiprocessing import Pool, cpu_count
 
 
-class OverseerOfNewspaperHunt():
-	allResults: List[Any]
+class OverseerOfNewspaperHunt:
 
 	def __init__(self, query, numberResults):
+		self.numPurgedResults = 0
 		self.currentProcessedResults = 0
 		self.startRecordForGallicaQuery = 1
-		self.currentNumValidResults = 0
 		self.query = query
 		self.numberResults = numberResults
-		self.allResults = Manager().list()
-		self.currentAndProcessedLock = Lock()
+		self.allResults = []
+		self.queryList = []
 
 	def scourPaper(self):
 		pass
 
 	def getResultList(self):
-		return self.allResults[0]
-
-	def getNumberValidResults(self):
-		return self.currentNumValidResults
-
-	def resultCounter(self, queryGetObject):
-		numPurgedResults = queryGetObject.getNumberPurgedResults()
-		queryResults = queryGetObject.getResultList()
-		self.iterateProcessedAndValid(len(queryResults), numPurgedResults)
-
-	def iterateProcessedAndValid(self, numRetrieved, numPurged):
-		self.currentAndProcessedLock.acquire()
-		self.currentProcessedResults = self.currentProcessedResults + numRetrieved + numPurged
-		self.currentNumValidResults = self.currentProcessedResults - numPurged
-		self.currentAndProcessedLock.release()
+		return self.allResults
 
 	@staticmethod
 	def sendQuery(queryToSend, startRecord, numRecords):
@@ -43,12 +26,19 @@ class OverseerOfNewspaperHunt():
 		hunter.hunt()
 		return hunter
 
+	def getNumValidResults(self):
+		return len(self.allResults)
+
+	def getNumProcessedResults(self):
+		return len(self.allResults) + self.numPurgedResults
+
 
 class LimitedOverseerOfNewspaperHunt(OverseerOfNewspaperHunt):
 	def __init__(self, query, numberResults, maxResults):
 		super().__init__(query, numberResults)
 		self.maxResults = maxResults
 
+	# Something is wrong here...
 	def scourPaper(self):
 
 		while self.maxResults > self.currentProcessedResults:
@@ -58,7 +48,6 @@ class LimitedOverseerOfNewspaperHunt(OverseerOfNewspaperHunt):
 			else:
 				numRecords = amountRemaining
 			batchHunter = OverseerOfNewspaperHunt.sendQuery(self.query, self.startRecordForGallicaQuery, numRecords)
-			self.resultCounter(batchHunter)
 
 
 class UnlimitedOverseerOfNewspaperHunt(OverseerOfNewspaperHunt):
@@ -67,12 +56,27 @@ class UnlimitedOverseerOfNewspaperHunt(OverseerOfNewspaperHunt):
 
 	def scourPaper(self):
 		numberQueriesToSend = ceil(self.numberResults / 50)
-		with Pool(10) as pool:
-			self.allResults.append(pool.map(self.createGallicaHunters, range(numberQueriesToSend)))
+		for i in range(numberQueriesToSend):
+			result = self.createGallicaHunters(i)
+			queryResults = result[0]
+			numPurged = result[1]
+			self.numPurgedResults = self.numPurgedResults + numPurged
+			self.allResults = self.allResults + queryResults
+
+	# Based on some not-so-rigorous testing threading the requests themselves, rather than the papers, is slower.
+
+	# numCpus = cpu_count()
+	# processes = min(numCpus, numberQueriesToSend)
+	# with Pool(processes) as pool:
+	# 	chunkSize = ceil(numberQueriesToSend / processes)
+	# 	for result in pool.imap(self.createGallicaHunters, range(numberQueriesToSend), chunksize=chunkSize):
+	# 		queryResults = result[0]
+	# 		numPurged = result[1]
+	# 		self.numPurgedResults = self.numPurgedResults + numPurged
+	# 		self.allResults = self.allResults + queryResults
 
 	def createGallicaHunters(self, iterationNumber):
 		startRecord = iterationNumber * 50
 		startRecord = startRecord + 1
-		batchHunter = OverseerOfNewspaperHunt.sendQuery(self.query, startRecord, 50)
-		self.resultCounter(batchHunter)
-		return batchHunter.getResultList()
+		batchHunter = OverseerOfNewspaperHunt.sendQuery(self.query, startRecord=startRecord, numRecords=50)
+		return [batchHunter.getResultList(), batchHunter.getNumberPurgedResults()]

@@ -3,10 +3,8 @@ import re
 import sys
 import shutil
 import os
-
 from gallicaHunter import GallicaHunter
-from multiprocessing import Pool, Manager, Lock
-
+from multiprocessing import Pool, Manager, Lock, cpu_count
 from overseerOfNewspaperHunt import *
 
 
@@ -31,11 +29,12 @@ class GallicaSearch:
 		self.topTenPapers = []
 		self.numResultsForEachPaper = {}
 		self.establishYearRange(yearRange)
-		self.progressLock = Lock()
-		self.resultCountLock = Lock()
 		self.establishRecordNumber(kwargs)
+		self.parseNewspaperDictionary()
+		self.establishStrictness()
+		self.buildQuery()
 
-		self.papersToBeDeleted = Manager().list()
+		self.paperNameCounts = []
 
 		self.fileName = self.determineFileName()
 
@@ -46,9 +45,7 @@ class GallicaSearch:
 		if self.checkIfFileAlreadyInDirectory():
 			print("File exists in directory, skipping.")
 		else:
-			self.establishStrictness()
-			self.parseNewspaperDictionary()
-			self.buildQuery()
+			self.findTotalResults()
 			self.runSearch()
 
 	def establishRecordNumber(self, kwargs):
@@ -71,20 +68,18 @@ class GallicaSearch:
 		return self.collectedQueries
 
 	@staticmethod
-	def sendQuery(queryToSend, startRecord, numRecords):
+	def sendQuery(queryToSend, **kwargs):
+		if kwargs['startRecord'] is None:
+			startRecord = 1
+		else:
+			startRecord = kwargs['startRecord']
+		if kwargs['numRecords'] is None:
+			numRecords = 50
+		else:
+			numRecords = kwargs['numRecords']
 		hunter = GallicaHunter(queryToSend, startRecord, numRecords)
 		hunter.hunt()
 		return hunter
-
-	def iterateFindingTotalResultsProgress(self):
-		self.progressLock.acquire()
-		self.progress = self.progress + 1
-		self.progressLock.release()
-
-	def iterateNumberResults(self):
-		self.resultCountLock.acquire()
-		self.totalResults = self.totalResults + 1
-		self.resultCountLock.release()
 
 	def packageQuery(self):
 		self.makeCSVFile()
@@ -262,43 +257,74 @@ class GallicaSearch:
 	def findTotalResults(self):
 		pass
 
+	def updateDictionaries(self):
+		self.newspaperDictionary.clear()
+		for nameCountCode in self.paperNameCounts:
+			paperName = nameCountCode[0]
+			paperCount = nameCountCode[1]
+			paperCode = nameCountCode[2]
+			self.newspaperDictionary.update({paperName : paperCode})
+			self.numResultsForEachPaper.update({paperName : paperCount})
+			self.sumUpTotalResults(paperCount)
+
+	def sumUpTotalResults(self, toAdd):
+		self.totalResults = self.totalResults + toAdd
+
+
 
 class FullSearchWithinDictionary(GallicaSearch):
 	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange):
 		super().__init__(searchTerm, newspaper, yearRange, strictYearRange)
 
 	def runSearch(self):
-		self.progress = 0
-		for newspaper in self.newspaperDictionary:
-			numberResultsInPaper = self.numResultsForEachPaper[newspaper]
-			newspaperCode = self.newspaperDictionary[newspaper]
-			newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-			newspaperHuntOverseer = UnlimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper)
-			newspaperHuntOverseer.scourPaper()
-			self.collectedQueries = self.collectedQueries + newspaperHuntOverseer.getResultList()
-			self.progress = self.progress + numberResultsInPaper
-			GallicaSearch.reportProgress(self.progress, self.totalResults,
-										 "retrieving results for '{0}'".format(self.searchTerm))
-			self.numResultsForEachPaper.update({newspaper: newspaperHuntOverseer.getNumberValidResults()})
+		self.createWorkersForSearch()
+
+	def createWorkersForSearch(self):
+		processes = cpu_count()
+		with Pool(processes) as pool:
+			chunkSize = ceil(len(self.newspaperDictionary) / processes)
+			for result in pool.imap_unordered(self.sendWorkersToSearch, self.newspaperDictionary, chunksize=chunkSize):
+				paperName = result[0]
+				resultList = result[1]
+				numberResultsForEntirePaper = result[2]
+				self.collectedQueries = self.collectedQueries + resultList
+				self.progress = self.progress + numberResultsForEntirePaper
+				GallicaSearch.reportProgress(self.progress, self.totalResults,
+											 "retrieving results for '{0}'".format(self.searchTerm))
+				self.numResultsForEachPaper.update({paperName: numberResultsForEntirePaper})
+		print(self.totalResults)
+		print(len(self.collectedQueries))
+
+	def sendWorkersToSearch(self, newspaper):
+		numberResultsInPaper = self.numResultsForEachPaper[newspaper]
+		newspaperCode = self.newspaperDictionary[newspaper]
+		newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
+		newspaperHuntOverseer = UnlimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper)
+		newspaperHuntOverseer.scourPaper()
+		return [newspaper, newspaperHuntOverseer.getResultList(), newspaperHuntOverseer.getNumValidResults()]
 
 	def findTotalResults(self):
-		totalNumberOfPapers = len(self.newspaperDictionary)
-		with Pool(10) as pool:
-			self.papersToBeDeleted.append(
-				pool.map(self.findNumberResults, self.newspaperDictionary, totalNumberOfPapers))
-		for uselessPaper in self.papersToBeDeleted[0]:
-			self.newspaperDictionary.pop(uselessPaper)
+		self.createWorkersForFindingTotalResults()
 
-	def findNumberResults(self, newspaper, totalPaperNumber):
-		self.iterateFindingTotalResultsProgress()
-		GallicaSearch.reportProgress(self.progress, totalPaperNumber, "finding total results")
+	def createWorkersForFindingTotalResults(self):
+		processes = cpu_count()
+		pool = Pool(processes)
+		for i, result in enumerate(pool.imap_unordered(self.findNumberResults, self.newspaperDictionary, chunksize=20),1):
+			GallicaSearch.reportProgress(i, len(self.newspaperDictionary), "finding total results")
+			numResults = result[1]
+			if numResults != 0:
+				self.paperNameCounts.append(result)
+		pool.close()
+		pool.join()
+		self.updateDictionaries()
+
+	def findNumberResults(self, newspaper):
 		newspaperCode = self.newspaperDictionary[newspaper]
 		newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
 		hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1)
 		numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
-		self.iterateNumberResults()
-		if numberResultsForNewspaper == 0:
-			return newspaper
+		return [newspaper, numberResultsForNewspaper, newspaperCode]
+
 
 
 class RecordLimitedSearchWithinDictionary(GallicaSearch):
@@ -351,29 +377,33 @@ class RecordLimitedSearchWithinDictionary(GallicaSearch):
 				self.newspaperDictionary.pop(uselessPaper)
 
 
+
 class RecordLimitedSearchNoDictionary(GallicaSearch):
 	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, recordNumber):
 		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, recordNumber=recordNumber)
 
 	def runSearch(self):
 		theBigQuery = self.baseQuery
-		hunterForTotalNumberOfQueryResults = GallicaHunter(theBigQuery, 1, 1)
-		numberResultsForQuery = hunterForTotalNumberOfQueryResults.establishTotalHits(theBigQuery, False)
 		numProcessedResults = 0
 		startRecord = 1
-		maximumResults = min(numberResultsForQuery, self.recordNumber)
+		maximumResults = min(self.totalResults, self.recordNumber)
 		while maximumResults > numProcessedResults:
 			amountRemaining = self.recordNumber - numProcessedResults
 			if amountRemaining >= 50:
 				numRecords = 50
 			else:
 				numRecords = amountRemaining
-			batchHunter = self.sendQuery(theBigQuery, startRecord, numRecords)
+			batchHunter = self.sendQuery(theBigQuery, startRecord=startRecord, numRecords=numRecords)
 			startRecord = startRecord + 50
 			results = batchHunter.getResultList()
 			numPurged = batchHunter.getNumberPurgedResults()
 			self.collectedQueries = self.collectedQueries + results
 			numProcessedResults = numProcessedResults + len(results) + numPurged
+
+	def findTotalResults(self):
+		hunterForTotalNumberOfQueryResults = GallicaHunter(self.baseQuery, 1, 1)
+		self.totalResults = hunterForTotalNumberOfQueryResults.establishTotalHits(self.baseQuery, False)
+
 
 
 class FullSearchNoDictionary(GallicaSearch):
@@ -382,16 +412,18 @@ class FullSearchNoDictionary(GallicaSearch):
 
 	def runSearch(self):
 		theBigQuery = self.baseQuery
-		hunterForTotalNumberOfQueryResults = GallicaHunter(theBigQuery, 1, 1)
-		numberResultsForQuery = hunterForTotalNumberOfQueryResults.establishTotalHits(theBigQuery, False)
 		numProcessedResults = 0
 		startRecord = 1
-		while numberResultsForQuery > numProcessedResults:
-			batchHunter = self.sendQuery(theBigQuery, startRecord, 50)
+		while self.totalResults > numProcessedResults:
+			batchHunter = self.sendQuery(theBigQuery, startRecord=startRecord, numRecords=50)
 			startRecord = startRecord + 50
 			results = batchHunter.getResultList()
 			numPurged = batchHunter.getNumberPurgedResults()
 			self.collectedQueries = self.collectedQueries + results
 			numProcessedResults = numProcessedResults + len(results) + numPurged
+
+	def findTotalResults(self):
+		hunterForTotalNumberOfQueryResults = GallicaHunter(self.baseQuery, 1, 1)
+		self.totalResults = hunterForTotalNumberOfQueryResults.establishTotalHits(self.baseQuery, False)
 
 	# make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)

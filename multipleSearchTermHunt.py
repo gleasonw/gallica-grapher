@@ -33,13 +33,11 @@ class MultipleSearchTermHunt:
 																		  self.strictYearRange,
 																		  self.theKwargsForGraphingAndRecordNumber[
 																			  "recordNumber"])
-					resultGetterForTerm.findTotalResults()
 
 				else:
 					resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
 																			  self.yearRange,
 																			  self.strictYearRange)
-					resultGetterForTerm.findTotalResults()
 			resultGetterForTerm.runQuery()
 			self.searchTermResultList.append(resultGetterForTerm)
 		self.initiateGraphing()
@@ -61,7 +59,12 @@ class MultipleSearchTermHunt:
 			grapher.parseGraphSettings()
 			self.listOfGraphers.append(grapher)
 
+	def createFilesForResultBundles(self):
+		for resultBundle in self.searchTermResultList:
+			resultBundle.packageQuery()
+
 	def initiateSingleGraphPerPage(self):
+		self.createFilesForResultBundles()
 		self.createGGplotsForBundles()
 		for grapher in self.listOfGraphers:
 			grapher.plotGraphAndMakePNG()
@@ -74,6 +77,7 @@ class MultipleSearchTermHunt:
 		grapher.plotGraphAndMakePNG()
 
 	def initiateSinglePageManyGraphs(self):
+		self.createFilesForResultBundles()
 		self.createGGplotsForBundles()
 		self.makeMultiTermFileName()
 		ggPlotList = []

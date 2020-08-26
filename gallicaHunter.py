@@ -1,8 +1,6 @@
-import re
 import requests
 import re
 from lxml import etree
-import csv
 
 
 class GallicaHunter:
@@ -54,7 +52,6 @@ class GallicaHunter:
 
     @staticmethod
     def standardizeSingleDate(dateToStandardize):
-        lengthOfDate = len(dateToStandardize)
         yearMonDay = re.compile(r"^\d{4}-\d{2}-\d{2}$")
         twoYears = re.compile(r"^\d{4}-\d{4}$")
         oneYear = re.compile(r"^\d{4}$")
