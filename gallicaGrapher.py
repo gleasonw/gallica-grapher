@@ -104,7 +104,8 @@ class GallicaGrapher:
         robjects.r('''
         initiateFreqPolyGGplot <- function(dataToGraph){
             graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count..)) +
-                geom_freqpoly(binwidth=30)
+                geom_freqpoly(binwidth=30) +
+                scale_y_continuous(trans="log10")
             return(graphOfHits)
         }
         ''')
@@ -126,7 +127,7 @@ class GallicaGrapher:
         initiateManyFreqPoly = robjects.globalenv['initiateManyFreqPolyGGplot']
 
         self.ggplotForR = initiateManyFreqPoly(self.theCSVforR)
-        graphTitle = "massive" #Change this you fool
+        graphTitle = self.graphFileName
         self.ggplotForR = self.addLabelsToGGplot(graphTitle)
 
     def makeBarGraph(self):
@@ -134,7 +135,8 @@ class GallicaGrapher:
         robjects.r('''
         initiateBarGGplot <- function(dataToGraph){
             graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count..)) +
-                geom_histogram(binwidth=30, colour="white")
+                geom_histogram(binwidth=30, colour="white") +
+                scale_y_continuous(trans="log10")
             return(graphOfHits)
         }
         ''')

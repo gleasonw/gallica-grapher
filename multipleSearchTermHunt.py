@@ -70,9 +70,11 @@ class MultipleSearchTermHunt:
 			grapher.plotGraphAndMakePNG()
 
 	def initiateSingleGraphManyData(self):
+		self.createFilesForResultBundles()
+		self.makeMultiTermFileName()
 		self.createMassiveCSV()
 		topTenPapers = []
-		grapher = GallicaGrapher('massive.csv', topTenPapers, self.theKwargsForGraphingAndRecordNumber)
+		grapher = GallicaGrapher(self.bigFileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber)
 		grapher.parseGraphSettings()
 		grapher.plotGraphAndMakePNG()
 
@@ -89,14 +91,14 @@ class MultipleSearchTermHunt:
 		pass
 
 	def createMassiveCSV(self):
-		with open("massive.csv", "w", encoding="utf8") as outFile:
+		with open(self.bigFileName, "w", encoding="utf8") as outFile:
 			writer = csv.writer(outFile)
 			writer.writerow(['date','journal','url','term'])
 			for resultBundle in self.searchTermResultList:
 				for csvEntry in resultBundle.getCollectedQueries():
 					searchTermOfResultBundle = resultBundle.searchTerm
 					writer.writerow(csvEntry + [searchTermOfResultBundle])
-		shutil.move("massive.csv", os.path.join("./CSVdata", "massive.csv"))
+		shutil.move(self.bigFileName, os.path.join("./CSVdata", self.bigFileName))
 
 	def makeMultiTermFileName(self):
 		for resultBundle in self.searchTermResultList:

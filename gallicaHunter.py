@@ -4,7 +4,7 @@ from lxml import etree
 
 
 class GallicaHunter:
-
+    # Need to rework with backoff timeouts for requests and remove duplicate code
     def __init__(self, query, startRecord, numRecords):
         self.dateJournalIdentifierResults = []
         self.query = query

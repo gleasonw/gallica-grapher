@@ -82,8 +82,11 @@ class GallicaSearch:
 		return hunter
 
 	def packageQuery(self):
-		self.makeCSVFile()
-		self.generateTopTenPapers()
+		if len(self.collectedQueries) != 0:
+			self.generateTopTenPapers()
+			self.makeCSVFile()
+		else:
+			pass
 
 	def establishNumberQueries(self):
 		if type(self.recordNumber) is int:
@@ -292,8 +295,6 @@ class FullSearchWithinDictionary(GallicaSearch):
 				GallicaSearch.reportProgress(self.progress, self.totalResults,
 											 "retrieving results for '{0}'".format(self.searchTerm))
 				self.numResultsForEachPaper.update({paperName: numberResultsForEntirePaper})
-		print(self.totalResults)
-		print(len(self.collectedQueries))
 
 	def sendWorkersToSearch(self, newspaper):
 		numberResultsInPaper = self.numResultsForEachPaper[newspaper]
