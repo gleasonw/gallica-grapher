@@ -61,14 +61,14 @@ class GallicaGrapher:
 
 
     def establishTopPapers(self):
-        if self.tenMostPapers is None:
-            self.tenMostPapers = []
+        if len(self.tenMostPapers) == 0:
             dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
             with open(os.path.join("./CSVdata", dictionaryFile)) as inFile:
                 reader = csv.reader(inFile)
                 for newspaper in reader:
                     thePaper = newspaper[0]
                     self.tenMostPapers.append(thePaper)
+            print(dictionaryFile)
 
     def readCSVtoR(self):
         zoo = importr('zoo')
@@ -89,7 +89,9 @@ class GallicaGrapher:
         robjects.r('''
         initiateStackedBarGGplot <- function(dataToGraph){
             graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count.., fill=fillPaper)) +
-                geom_histogram(binwidth=30)
+                geom_histogram(binwidth=120)
+                colors = c("#e6beff", "#9a6324", "#fffac8", "#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075", "#808080", "#ffffff", "#000000")
+                scale_fill_manual(values = colors)
             return(graphOfHits)
         }
         ''')
@@ -135,8 +137,7 @@ class GallicaGrapher:
         robjects.r('''
         initiateBarGGplot <- function(dataToGraph){
             graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count..)) +
-                geom_histogram(binwidth=30, colour="white") +
-                scale_y_continuous(trans="log10")
+                geom_histogram(binwidth=30)
             return(graphOfHits)
         }
         ''')
@@ -197,6 +198,7 @@ class GallicaGrapher:
             }
         ''')
         createFillColumn = robjects.globalenv['createFillColumn']
+        print(self.tenMostPapers)
         return createFillColumn(self.theCSVforR, self.tenMostPapers)
 
     def transformTopTenPapersToRVector(self):

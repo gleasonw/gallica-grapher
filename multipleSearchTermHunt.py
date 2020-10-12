@@ -95,14 +95,27 @@ class MultipleSearchTermHunt:
 			writer = csv.writer(outFile)
 			writer.writerow(['date','journal','url','term'])
 			for resultBundle in self.searchTermResultList:
-				for csvEntry in resultBundle.getCollectedQueries():
-					searchTermOfResultBundle = resultBundle.searchTerm
-					writer.writerow(csvEntry + [searchTermOfResultBundle])
+				resultList = resultBundle.getCollectedQueries()
+				if len(resultList) == 0:
+					termDataFileName = resultBundle.getFileName()
+					term = resultBundle.getSearchTerm()
+					filePath = os.path.join("./CSVdata", termDataFileName)
+					with open(filePath, "r", encoding="utf8") as inFile:
+						reader = csv.reader(inFile)
+						next(reader)
+						for result in reader:
+							writer.writerow(result + [term])
+				else:
+					for csvEntry in resultBundle.getCollectedQueries():
+						searchTermOfResultBundle = resultBundle.searchTerm
+						writer.writerow(csvEntry + [searchTermOfResultBundle])
 		shutil.move(self.bigFileName, os.path.join("./CSVdata", self.bigFileName))
+
+
 
 	def makeMultiTermFileName(self):
 		for resultBundle in self.searchTermResultList:
 			self.bigFileName = self.bigFileName + resultBundle.getSearchTerm() + "~"
 		randomBundleForYearRange = self.searchTermResultList[0]
 		self.bigFileName = self.bigFileName + randomBundleForYearRange.getYearRange()
-		self.bigFileName = self.bigFileName + ".png"
+		self.bigFileName = self.bigFileName + ".csv"
