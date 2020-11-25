@@ -3,10 +3,6 @@ import re
 import sys
 import shutil
 import os
-from requests_toolbelt import sessions
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
-from gallicaHunter import GallicaHunter
 from multiprocessing import Pool, Manager, Lock, cpu_count
 from overseerOfNewspaperHunt import *
 
@@ -27,6 +23,7 @@ class GallicaSearch:
 		self.totalResults = 0
 		self.newspaper = newspaper
 		self.newspaperDictionary = {}
+		self.chunkedNewspaperDictionary = {}
 		self.collectedQueries = []
 		self.searchTerm = searchTerm
 		self.topPapers = []
@@ -36,6 +33,9 @@ class GallicaSearch:
 		self.establishRecordNumber(kwargs)
 		self.parseNewspaperDictionary()
 		self.establishStrictness()
+		abspath = os.path.abspath(__file__)
+		dname = os.path.dirname(abspath)
+		os.chdir(dname)
 		self.buildQuery()
 
 		self.paperNameCounts = []
@@ -43,7 +43,8 @@ class GallicaSearch:
 		self.fileName = self.determineFileName()
 
 	def checkIfFileAlreadyInDirectory(self):
-		return os.path.isfile(os.path.join("./CSVdata", self.fileName))
+		subDirectory = os.path.join(self.directory, "/CSVdata")
+		return os.path.isfile(os.path.join(subDirectory, self.fileName))
 
 	def runQuery(self):
 		if self.checkIfFileAlreadyInDirectory():
@@ -113,20 +114,21 @@ class GallicaSearch:
 			place = i + 1
 
 		dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
-
-		with open(os.path.join("./CSVdata", dictionaryFile), "w", encoding="utf8") as outFile:
+		subDirectory = os.path.join(self.directory, "/CSVdata")
+		print(subDirectory)
+		with open(os.path.join(subDirectory, dictionaryFile), "w", encoding="utf8") as outFile:
 			writer = csv.writer(outFile)
 			for newspaper in self.topTenPapers:
 				writer.writerow([newspaper])
 
 	def makeCSVFile(self):
-
-		with open(self.fileName, "w", encoding="utf8") as outFile:
+		subDirectory = os.path.join(self.directory, "/CSVdata")
+		with open(os.path.join(subDirectory,self.fileName), "w", encoding="utf8") as outFile:
 			writer = csv.writer(outFile)
 			writer.writerow(["date", "journal", "url"])
 			for csvEntry in self.collectedQueries:
 				writer.writerow(csvEntry)
-		shutil.move(os.path.join("./", self.fileName), os.path.join("./CSVdata", self.fileName))
+		shutil.move(os.path.join(self.directory, self.fileName), os.path.join(subDirectory, self.fileName))
 
 	def determineFileName(self):
 		if self.newspaper == "all":
@@ -167,8 +169,7 @@ class GallicaSearch:
 
 	# What if list of papers?
 	def parseNewspaperDictionary(self):
-		here = os.path.dirname(os.path.abspath(__file__))
-		self.defaultPaperDictionary = os.path.join(here, "AvailableJournals 1777-1950.csv")
+		self.defaultPaperDictionary = os.path.join(self.directory, "AvailableJournals 1777-1950.csv")
 		if self.newspaper == "noDict":
 			self.isNoDictSearch = True
 		else:
@@ -279,6 +280,27 @@ class GallicaSearch:
 	def sumUpTotalResults(self, toAdd):
 		self.totalResults = self.totalResults + toAdd
 
+	def makeChunkedDictionary(self):
+		listOfSubDicts = []
+		initialList = []
+		for paper in self.newspaperDictionary:
+			initialList.append(paper)
+		chunkSize = 20
+		currentIndex = 0
+		for i in range((len(self.newspaperDictionary) // 20) - 1):
+			subDict = {}
+			subList = initialList[currentIndex:currentIndex+chunkSize]
+			currentIndex = currentIndex + chunkSize
+			for paper in subList:
+				subDict[paper] = self.newspaperDictionary[paper]
+			listOfSubDicts.append(subDict)
+		subDict = {}
+		subList = initialList[currentIndex:]
+		for paper in subList:
+			subDict[paper] = self.newspaperDictionary[paper]
+		listOfSubDicts.append(subDict)
+		self.chunkedNewspaperDictionary = listOfSubDicts
+
 
 
 class FullSearchWithinDictionary(GallicaSearch):
@@ -316,12 +338,12 @@ class FullSearchWithinDictionary(GallicaSearch):
 	def createWorkersForFindingTotalResults(self):
 		processes = cpu_count()
 		pool = Pool(processes)
-		self.makeChunkedDictionarys()
-		for i, result in enumerate(pool.map(self.findNumberResults, self.chunkedNewspaperDictionary),1):
-			GallicaSearch.reportProgress(i, len(self.newspaperDictionary), "finding total results")
-			numResults = result[1]
-			if numResults != 0:
-				self.paperNameCounts.append(result)
+		self.makeChunkedDictionary()
+		totalIterations = len(self.newspaperDictionary) // 20
+		for i, result in enumerate(pool.imap_unordered(self.findNumberResults, self.chunkedNewspaperDictionary), 1):
+			GallicaSearch.reportProgress(i, totalIterations,
+										 "establishing total results for '{0}'".format(self.searchTerm))
+			self.paperNameCounts = self.paperNameCounts + result
 		pool.close()
 		pool.join()
 		self.updateDictionaries()
@@ -333,14 +355,15 @@ class FullSearchWithinDictionary(GallicaSearch):
 		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
 		gallicaHttpSession.mount("https://", adapter)
 		gallicaHttpSession.mount("http://", adapter)
-		paperCount = []
+		paperCounts = []
 		for newspaper in newspapers:
-			newspaperCode = self.newspaperDictionary[newspaper]
+			newspaperCode = newspapers[newspaper]
 			newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
 			hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1, gallicaHttpSession)
 			numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
-			paperCount.append([newspaper, numberResultsForNewspaper])
-		return paperCount
+			if numberResultsForNewspaper != 0:
+				paperCounts.append([newspaper, numberResultsForNewspaper, newspaperCode])
+		return paperCounts
 
 
 
@@ -446,25 +469,4 @@ class FullSearchNoDictionary(GallicaSearch):
 	# make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
 
 
-DEFAULT_TIMEOUT = 5  # seconds
 
-
-class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
-	def __init__(self, *args, **kwargs):
-		retryStrategy = Retry(
-			total=3,
-			status_forcelist=[429, 500, 502, 503, 504],
-			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
-			backoff_factor=1
-		)
-		self.timeout = DEFAULT_TIMEOUT
-		if "timeout" in kwargs:
-			self.timeout = kwargs["timeout"]
-			del kwargs["timeout"]
-		super().__init__(*args, **kwargs, max_retries=retryStrategy)
-
-	def send(self, request, **kwargs):
-		timeout = kwargs.get("timeout")
-		if timeout is None:
-			kwargs["timeout"] = self.timeout
-		return super().send(request, **kwargs)

@@ -17,6 +17,7 @@ class GallicaGrapher:
         self.theCSVforR = None
         self.ggplotForR = None
         self.breakLength = 360
+        self.directory = os.path.dirname(os.path.abspath(__file__))
 
     @staticmethod
     def arrangeGGplotsAndPlot(listOfGGplots, fileName):
@@ -32,7 +33,9 @@ class GallicaGrapher:
         multiGraph = robjects.globalenv["graphMulti"]
         multiGraph(listOfGGplots)
         grdevices.dev_off()
-        shutil.move(os.path.join("./", fileName), os.path.join("./Graphs", fileName))
+        directory = os.path.dirname(os.path.abspath(__file__))
+        subDirectory = os.path.join(directory, "/Graphs")
+        shutil.move(os.path.join(directory, fileName), os.path.join(subDirectory, fileName))
 
 
     def getGGplot(self):
@@ -62,13 +65,13 @@ class GallicaGrapher:
 
     def establishTopPapers(self):
         if len(self.tenMostPapers) == 0:
+            subDirectory = os.path.join(self.directory, "/CSVdata")
             dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
-            with open(os.path.join("./CSVdata", dictionaryFile)) as inFile:
+            with open(os.path.join(subDirectory, dictionaryFile)) as inFile:
                 reader = csv.reader(inFile)
                 for newspaper in reader:
                     thePaper = newspaper[0]
                     self.tenMostPapers.append(thePaper)
-            print(dictionaryFile)
 
     def readCSVtoR(self):
         zoo = importr('zoo')
@@ -80,7 +83,8 @@ class GallicaGrapher:
         tibble = importr('tibble')
         grids = importr('gridExtra')
         utils = importr('utils')
-        self.theCSVforR = utils.read_csv(os.path.join("./CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
+        subDirectory = os.path.join(self.directory, "/CSVdata")
+        self.theCSVforR = utils.read_csv(os.path.join(subDirectory, self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
         self.theCSVforR = self.parseDateForRCSV()
 
     def makeStackedBarGraph(self):
@@ -102,7 +106,6 @@ class GallicaGrapher:
         self.ggplotForR = self.addLabelsToGGplot(graphTitle)
 
     def makeFreqPoly(self):
-
         robjects.r('''
         initiateFreqPolyGGplot <- function(dataToGraph){
             graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count..)) +
@@ -115,6 +118,7 @@ class GallicaGrapher:
         freqPolyInitiate = robjects.globalenv['initiateFreqPolyGGplot']
         self.ggplotForR = freqPolyInitiate(self.theCSVforR)
         graphTitle = self.makeSingleGraphTitle()
+        print(graphTitle)
         self.ggplotForR = self.addLabelsToGGplot(graphTitle)
 
     def makeMultiFreqPoly(self):
@@ -213,7 +217,7 @@ class GallicaGrapher:
 
     def plotGraphAndMakePNG(self):
         grdevices = importr('grDevices')
-        grdevices.png(file=self.graphFileName, width=1920, height=1080)
+        grdevices.png(file=os.path.join(self.directory, self.graphFileName), width=1920, height=1080)
         robjects.r('''
             graphThatGGplot <- function(theGraph){
                 plot(theGraph)
@@ -223,7 +227,9 @@ class GallicaGrapher:
         dataGrapher = robjects.globalenv['graphThatGGplot']
         dataGrapher(self.ggplotForR)
         grdevices.dev_off()
-        shutil.move(os.path.join("./", self.graphFileName), os.path.join("./Graphs", self.graphFileName))
+        print(self.ggplotForR)
+        subDirectory = os.path.join(self.directory, "/Graphs")
+        shutil.move(os.path.join(self.directory, self.graphFileName), os.path.join(subDirectory, self.graphFileName))
 
 
     def makeGraphFileName(self):

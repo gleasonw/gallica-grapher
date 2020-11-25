@@ -1,6 +1,8 @@
 from gallicaHunter import GallicaHunter
 from math import ceil
-from multiprocessing import Pool, cpu_count
+from requests_toolbelt import sessions
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 
 class OverseerOfNewspaperHunt:
@@ -13,6 +15,16 @@ class OverseerOfNewspaperHunt:
 		self.numberResults = numberResults
 		self.allResults = []
 		self.queryList = []
+		self.gallicaHttpSession = None
+		self.buildHttpSession()
+
+	def buildHttpSession(self):
+		self.gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
+		assert_status_hook = lambda response, *args, **kwargs: response.raise_for_status()
+		self.gallicaHttpSession.hooks["response"] = assert_status_hook
+		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
+		self.gallicaHttpSession.mount("https://", adapter)
+		self.gallicaHttpSession.mount("http://", adapter)
 
 	def scourPaper(self):
 		pass
@@ -20,9 +32,8 @@ class OverseerOfNewspaperHunt:
 	def getResultList(self):
 		return self.allResults
 
-	@staticmethod
-	def sendQuery(queryToSend, startRecord, numRecords):
-		hunter = GallicaHunter(queryToSend, startRecord, numRecords)
+	def sendQuery(self, startRecord, numRecords):
+		hunter = GallicaHunter(self.query, startRecord, numRecords, self.gallicaHttpSession)
 		hunter.hunt()
 		return hunter
 
@@ -78,5 +89,28 @@ class UnlimitedOverseerOfNewspaperHunt(OverseerOfNewspaperHunt):
 	def createGallicaHunters(self, iterationNumber):
 		startRecord = iterationNumber * 50
 		startRecord = startRecord + 1
-		batchHunter = OverseerOfNewspaperHunt.sendQuery(self.query, startRecord=startRecord, numRecords=50)
+		batchHunter = self.sendQuery(startRecord, 50)
 		return [batchHunter.getResultList(), batchHunter.getNumberPurgedResults()]
+
+DEFAULT_TIMEOUT = 5  # seconds
+
+
+class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
+	def __init__(self, *args, **kwargs):
+		retryStrategy = Retry(
+			total=3,
+			status_forcelist=[429, 500, 502, 503, 504],
+			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
+			backoff_factor=1
+		)
+		self.timeout = DEFAULT_TIMEOUT
+		if "timeout" in kwargs:
+			self.timeout = kwargs["timeout"]
+			del kwargs["timeout"]
+		super().__init__(*args, **kwargs, max_retries=retryStrategy)
+
+	def send(self, request, **kwargs):
+		timeout = kwargs.get("timeout")
+		if timeout is None:
+			kwargs["timeout"] = self.timeout
+		return super().send(request, **kwargs)

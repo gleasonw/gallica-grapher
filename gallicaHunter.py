@@ -5,13 +5,14 @@ from lxml import etree
 
 class GallicaHunter:
     # Need to rework with backoff timeouts for requests and remove duplicate code
-    def __init__(self, query, startRecord, numRecords):
+    def __init__(self, query, startRecord, numRecords, session):
         self.dateJournalIdentifierResults = []
         self.query = query
         self.queryHitNumber = 0
         self.startRecord = startRecord
         self.numPurgedResults = 0
         self.numRecords = numRecords
+        self.session = session
 
     @staticmethod
     def establishName(query, priorName):
@@ -32,22 +33,15 @@ class GallicaHunter:
         return journalName
 
 
-    @staticmethod
-    def establishTotalHits(query, collapseResults):
+    def establishTotalHits(self, query, collapseResults):
         if collapseResults:
             collapseSetting = "true"
         else:
             collapseSetting = "disabled"
-        success = False
-        while not success:
-            parameters = dict(version=1.2, operation="searchRetrieve", collapsing=collapseSetting, exactSearch="false",
-                              query=query, startRecord=0, maximumRecords=1)
-            try:
-                response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
-                root = etree.fromstring(response.content)
-                success = True
-            except etree.XMLSyntaxError as e:
-                print("\n\n ****Gallica spat at you!**** \n")
+        parameters = dict(version=1.2, operation="searchRetrieve", collapsing=collapseSetting, exactSearch="false",
+                          query=query, startRecord=0, maximumRecords=1)
+        response = self.session.get("", params=parameters)
+        root = etree.fromstring(response.content)
         return int(root[2].text)
 
     @staticmethod
