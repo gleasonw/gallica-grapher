@@ -47,5 +47,5 @@ def main():
 	toc = time.perf_counter()
 	print(toc-tic)
 
-
-main()
+if __name__ == "__main__":
+	main()

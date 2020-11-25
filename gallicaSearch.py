@@ -18,6 +18,7 @@ class GallicaSearch:
 		self.recordNumber = None
 		self.numberQueriesToGallica = None
 		self.isNoDictSearch = None
+		self.defaultPaperDictionary = None
 		self.progress = 0
 		self.strictYearRange = strictYearRange
 		self.totalResults = 0
@@ -163,6 +164,8 @@ class GallicaSearch:
 
 	# What if list of papers?
 	def parseNewspaperDictionary(self):
+		here = os.path.dirname(os.path.abspath(__file__))
+		self.defaultPaperDictionary = os.path.join(here, "AvailableJournals 1777-1950.csv")
 		if self.newspaper == "noDict":
 			self.isNoDictSearch = True
 		else:
@@ -179,7 +182,7 @@ class GallicaSearch:
 					self.establishLooseTrimmedNewspaperDictionary()
 
 	def establishStrictNewspaperDictionary(self):
-		with open("AvailableJournals 1777-1950.csv", "r", encoding="utf8") as inFile:
+		with open(self.defaultPaperDictionary, "r", encoding="utf8") as inFile:
 			reader = csv.reader(inFile)
 			next(reader)
 			for newspaperHit in reader:
@@ -192,7 +195,7 @@ class GallicaSearch:
 					self.newspaperDictionary.update({newspaperName: gallicaCode})
 
 	def establishLooseNewspaperDictionary(self):
-		with open("AvailableJournals 1777-1950.csv", "r", encoding="utf8") as inFile:
+		with open(self.defaultPaperDictionary, "r", encoding="utf8") as inFile:
 			reader = csv.reader(inFile)
 			next(reader)
 			for newspaperHit in reader:
@@ -203,7 +206,7 @@ class GallicaSearch:
 	def establishStrictTrimmedNewspaperDictionary(self):
 		# Gonna have to fix this eventually. Need better capability to find the right newspapers in the CSV. Database
 		# time?
-		with open("AvailableJournals 1777-1950.csv", "r", encoding="utf8") as inFile:
+		with open(self.defaultPaperDictionary, "r", encoding="utf8") as inFile:
 			reader = csv.reader(inFile)
 			next(reader)
 			for newspaperHit in reader:
@@ -218,7 +221,7 @@ class GallicaSearch:
 	def establishLooseTrimmedNewspaperDictionary(self):
 		# Gonna have to fix this eventually. Need better capability to find the right newspapers in the CSV. Database
 		# time?
-		with open("AvailableJournals 1777-1950.csv", "r", encoding="utf8") as inFile:
+		with open(self.defaultPaperDictionary, "r", encoding="utf8") as inFile:
 			reader = csv.reader(inFile)
 			next(reader)
 			for newspaperHit in reader:
