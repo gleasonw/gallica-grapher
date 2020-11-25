@@ -3,6 +3,9 @@ import re
 import sys
 import shutil
 import os
+from requests_toolbelt import sessions
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from gallicaHunter import GallicaHunter
 from multiprocessing import Pool, Manager, Lock, cpu_count
 from overseerOfNewspaperHunt import *
@@ -313,7 +316,8 @@ class FullSearchWithinDictionary(GallicaSearch):
 	def createWorkersForFindingTotalResults(self):
 		processes = cpu_count()
 		pool = Pool(processes)
-		for i, result in enumerate(pool.imap_unordered(self.findNumberResults, self.newspaperDictionary, chunksize=20),1):
+		self.makeChunkedDictionarys()
+		for i, result in enumerate(pool.map(self.findNumberResults, self.chunkedNewspaperDictionary),1):
 			GallicaSearch.reportProgress(i, len(self.newspaperDictionary), "finding total results")
 			numResults = result[1]
 			if numResults != 0:
@@ -322,12 +326,21 @@ class FullSearchWithinDictionary(GallicaSearch):
 		pool.join()
 		self.updateDictionaries()
 
-	def findNumberResults(self, newspaper):
-		newspaperCode = self.newspaperDictionary[newspaper]
-		newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-		hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1)
-		numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
-		return [newspaper, numberResultsForNewspaper, newspaperCode]
+	def findNumberResults(self, newspapers):
+		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
+		assert_status_hook = lambda response, *args, **kwargs: response.raise_for_status()
+		gallicaHttpSession.hooks["response"] = assert_status_hook
+		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
+		gallicaHttpSession.mount("https://", adapter)
+		gallicaHttpSession.mount("http://", adapter)
+		paperCount = []
+		for newspaper in newspapers:
+			newspaperCode = self.newspaperDictionary[newspaper]
+			newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
+			hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1, gallicaHttpSession)
+			numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
+			paperCount.append([newspaper, numberResultsForNewspaper])
+		return paperCount
 
 
 
@@ -431,3 +444,27 @@ class FullSearchNoDictionary(GallicaSearch):
 		self.totalResults = hunterForTotalNumberOfQueryResults.establishTotalHits(self.baseQuery, False)
 
 	# make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
+
+
+DEFAULT_TIMEOUT = 5  # seconds
+
+
+class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
+	def __init__(self, *args, **kwargs):
+		retryStrategy = Retry(
+			total=3,
+			status_forcelist=[429, 500, 502, 503, 504],
+			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
+			backoff_factor=1
+		)
+		self.timeout = DEFAULT_TIMEOUT
+		if "timeout" in kwargs:
+			self.timeout = kwargs["timeout"]
+			del kwargs["timeout"]
+		super().__init__(*args, **kwargs, max_retries=retryStrategy)
+
+	def send(self, request, **kwargs):
+		timeout = kwargs.get("timeout")
+		if timeout is None:
+			kwargs["timeout"] = self.timeout
+		return super().send(request, **kwargs)
