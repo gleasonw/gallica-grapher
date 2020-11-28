@@ -20,7 +20,7 @@ class GallicaPackager:
     def establishTopPapers(self, tenMostPapers):
         if tenMostPapers is None:
             dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
-            subDirectory = os.path.join(self.directory, "../../CSVdata")
+            subDirectory = os.path.join(self.directory, "../CSVdata")
             with open(os.path.join(subDirectory, dictionaryFile)) as inFile:
                 reader = csv.reader(inFile)
                 for newspaper in reader:
@@ -42,7 +42,7 @@ class GallicaPackager:
         lubridate = importr('lubridate')
         tibble = importr('tibble')
 
-        subDirectory = os.path.join(self.directory, "../../CSVdata")
+        subDirectory = os.path.join(self.directory, "../CSVdata")
         nameOcc = utils.read_csv(os.path.join(subDirectory, self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
         nameOcc = self.readyColumnsForGraphing(nameOcc)
 
@@ -64,7 +64,7 @@ class GallicaPackager:
         dataGrapher = robjects.globalenv['createGraph']
         dataGrapher(nameOcc, graphTitle)
         grdevices.dev_off()
-        subDirectory = os.path.join(self.directory, "../../Graphs")
+        subDirectory = os.path.join(self.directory, "../Graphs")
         shutil.move(os.path.join(self.directory, self.graphFileName), os.path.join(subDirectory, self.graphFileName))
 
 

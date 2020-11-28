@@ -99,7 +99,7 @@ class MultipleSearchTermHunt:
 				if len(resultList) == 0:
 					termDataFileName = resultBundle.getFileName()
 					term = resultBundle.getSearchTerm()
-					filePath = os.path.join("../../CSVdata", termDataFileName)
+					filePath = os.path.join("../CSVdata", termDataFileName)
 					with open(filePath, "r", encoding="utf8") as inFile:
 						reader = csv.reader(inFile)
 						next(reader)
@@ -109,7 +109,7 @@ class MultipleSearchTermHunt:
 					for csvEntry in resultBundle.getCollectedQueries():
 						searchTermOfResultBundle = resultBundle.searchTerm
 						writer.writerow(csvEntry + [searchTermOfResultBundle])
-		shutil.move(self.bigFileName, os.path.join("../../CSVdata", self.bigFileName))
+		shutil.move(self.bigFileName, os.path.join("../CSVdata", self.bigFileName))
 
 
 

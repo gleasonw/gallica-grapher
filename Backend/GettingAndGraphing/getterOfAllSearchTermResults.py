@@ -45,7 +45,7 @@ class GallicaSearch:
 		self.fileName = self.determineFileName()
 
 	def checkIfFileAlreadyInDirectory(self):
-		return os.path.isfile(os.path.join("../../CSVdata", self.fileName))
+		return os.path.isfile(os.path.join("../CSVdata", self.fileName))
 
 	def runQuery(self):
 		if self.checkIfFileAlreadyInDirectory():
@@ -115,7 +115,7 @@ class GallicaSearch:
 			print(count)
 
 		dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
-		with open(os.path.join("../../CSVdata", dictionaryFile), "w", encoding="utf8") as outFile:
+		with open(os.path.join("../CSVdata", dictionaryFile), "w", encoding="utf8") as outFile:
 			writer = csv.writer(outFile)
 			for newspaper in self.topTenPapers:
 				writer.writerow([newspaper])
@@ -126,7 +126,7 @@ class GallicaSearch:
 			writer.writerow(["date", "journal", "url"])
 			for csvEntry in self.collectedQueries:
 				writer.writerow(csvEntry)
-		shutil.move(self.fileName, os.path.join("../../CSVdata", self.fileName))
+		shutil.move(self.fileName, os.path.join("../CSVdata", self.fileName))
 
 	def determineFileName(self):
 		nameOfFile = ''
