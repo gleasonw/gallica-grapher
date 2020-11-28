@@ -1,4 +1,4 @@
-from Backend.gallica50BatchGetter import GallicaHunter
+from Backend.GettingAndGraphing.gallica50BatchGetter import GallicaHunter
 from math import ceil
 from requests_toolbelt import sessions
 from requests.adapters import HTTPAdapter

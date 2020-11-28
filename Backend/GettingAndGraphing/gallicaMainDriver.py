@@ -1,7 +1,7 @@
 
-from Backend.gallicaPaperFinder import GallicaPaperFinder
-from Backend.makerOfRGraphs import GallicaGrapher
-from Backend.searchMasterRunner import MultipleSearchTermHunt
+from Backend.GettingAndGraphing.gallicaPaperFinder import GallicaPaperFinder
+from Backend.GettingAndGraphing.makerOfRGraphs import GallicaGrapher
+from Backend.GettingAndGraphing.searchMasterRunner import MultipleSearchTermHunt
 import time
 
 import sys

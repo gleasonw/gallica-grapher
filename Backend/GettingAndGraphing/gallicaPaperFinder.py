@@ -2,7 +2,7 @@ import requests
 import re
 import csv
 from lxml import etree
-from Backend.gallica50BatchGetter import GallicaHunter
+from Backend.GettingAndGraphing.gallica50BatchGetter import GallicaHunter
 
 #Consider making a subclass of GallicaHunter
 class GallicaPaperFinder():

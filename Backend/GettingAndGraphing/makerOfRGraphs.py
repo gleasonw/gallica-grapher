@@ -36,7 +36,7 @@ class GallicaGrapher:
         multiGraph(listOfGGplots)
         grdevices.dev_off()
         directory = os.path.dirname(os.path.abspath(__file__))
-        shutil.move(fileName, os.path.join("../Graphs", fileName))
+        shutil.move(fileName, os.path.join("../../Graphs", fileName))
 
 
     def getGGplot(self):
@@ -67,7 +67,7 @@ class GallicaGrapher:
     def establishTopPapers(self):
         if len(self.tenMostPapers) == 0:
             dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
-            with open(os.path.join("../CSVdata", dictionaryFile)) as inFile:
+            with open(os.path.join("../../CSVdata", dictionaryFile)) as inFile:
                 reader = csv.reader(inFile)
                 for newspaper in reader:
                     thePaper = newspaper[0]
@@ -84,7 +84,7 @@ class GallicaGrapher:
         grids = importr('gridExtra')
         ggplot2 = importr('ggplot2')
         utils = importr('utils')
-        self.theCSVforR = utils.read_csv(os.path.join("../CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
+        self.theCSVforR = utils.read_csv(os.path.join("../../CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
         self.theCSVforR = self.parseDateForRCSV()
 
     def makeStackedBarGraph(self):
@@ -226,7 +226,7 @@ class GallicaGrapher:
         dataGrapher = robjects.globalenv['graphThatGGplot']
         dataGrapher(self.ggplotForR)
         grdevices.dev_off()
-        shutil.move(self.graphFileName, os.path.join("../Graphs", self.graphFileName))
+        shutil.move(self.graphFileName, os.path.join("../../Graphs", self.graphFileName))
 
 
     def makeGraphFileName(self):
