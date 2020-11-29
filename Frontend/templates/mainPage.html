@@ -1,10 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+    <meta charset="UTF-8">
+    <title>The Gallica Grapher</title>
 </head>
 <body>
-$END$
+    <div class="topnav">
+        <a class="active" href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+    </div>
+    <div class = mainElements>
+        <div class="mainTitle">
+            <p> The Gallica Grapher</p>
+        </div>
+        <div class="mainSearch">
+              <div class="search">
+                <form onsubmit="event.preventDefault();" role="search">
+                  <label for="search">Search for stuff</label>
+                  <input id="search" type="search" placeholder="Search..." autofocus required />
+                  <button type="submit">Go</button>
+                </form>
+              </div>
+        </div>
+    </div>
 </body>
 </html>

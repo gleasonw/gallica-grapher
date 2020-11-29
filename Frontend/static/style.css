@@ -1,0 +1,135 @@
+/* Add a black background color to the top navigation bar */
+.topnav {
+  overflow: hidden;
+  background-color: gray;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: gray;
+  color: black;
+}
+
+/* Style the "active" element to highlight the current page */
+.topnav a.active {
+  background-color: cadetblue;
+  color: white;
+}
+
+html, body {
+  margin: 0px;
+  height: 100%;
+}
+
+.mainElements{
+  height: 100%;
+}
+/* Style the search box inside the navigation bar */
+
+.mainTitle {
+  margin: auto;
+  width: 100%;
+  border: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 25%;
+  font-size: 64px;
+}
+
+.mainSearch {
+  margin: auto;
+  width: 75%;
+  border: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+}
+
+.search {
+    margin: auto;
+    width: 75%;
+}
+
+:root {
+  --rad: .7rem;
+  --dur: .3s;
+  --color-dark: black;
+  --color-light: white;
+  --color-brand: lightgray;
+  --font-fam: 'Times New Roman', sans-serif;
+  --height: 50px;
+  --btn-width: 10%;
+  --bez: cubic-bezier(0, 0, 0.43, 1.49);
+}
+
+form {
+    margin: auto;
+    width: 100%;
+    background: var(--color-brand);
+    border-radius: var(--rad);
+}
+input, button {
+  height: var(--height);
+  font-family: var(--font-fam);
+  border: 0;
+  color: var(--color-dark);
+  font-size: 1.8rem;
+}
+input[type="search"] {
+    float:left;
+    width:90%;
+    background: var(--color-light);
+    padding: 0 1.6rem;
+    border-radius: var(--rad);
+    appearance: none; //for iOS input[type="search"] roundedness issue. border-radius alone doesn't work
+    transition: all var(--dur) var(--bez);
+    transition-property: width, border-radius;
+    z-index: 1;
+    position: relative;
+    box-shadow: 0 0 3pt 2pt gray;
+}
+button {
+    text-align: center;
+    top: 0;
+    right: 0;
+    width: var(--btn-width);
+    font-weight: bold;
+    background: var(--color-brand);
+    border-radius: 0 var(--rad) var(--rad) 0;
+}
+
+label {
+  position: absolute;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  border: 0;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+}
+
+
+/* When the screen is less than 600px wide, stack the links and the search field vertically instead of horizontally */
+@media screen and (max-width: 600px) {
+  .topnav a {
+    float: none;
+    display: block;
+    text-align: left;
+    width: 100%;
+    margin: 0;
+    padding: 14px;
+  }
+}
