@@ -72,15 +72,9 @@ class GallicaHunter:
     def hunt(self):
         parameters = {"version": 1.2, "operation": "searchRetrieve", "query": self.query,
                       "startRecord": self.startRecord, "maximumRecords": self.numRecords, "collapsing": "disabled"}
-        success = False
-        while not success:
-            try:
-                response = requests.get("https://gallica.bnf.fr/SRU", params=parameters)
-                root = etree.fromstring(response.content)
-                self.hitListCreator(root)
-                success = True
-            except etree.XMLSyntaxError as e:
-                print("\n\n ****Gallica spat at you!**** \n")
+        response = self.session.get("", params=parameters)
+        root = etree.fromstring(response.content)
+        self.hitListCreator(root)
 
 
     def hitListCreator(self, targetXMLroot):

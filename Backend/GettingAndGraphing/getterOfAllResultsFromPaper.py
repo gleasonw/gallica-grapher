@@ -74,18 +74,6 @@ class UnlimitedOverseerOfNewspaperHunt(OverseerOfNewspaperHunt):
 			self.numPurgedResults = self.numPurgedResults + numPurged
 			self.allResults = self.allResults + queryResults
 
-	# Based on some not-so-rigorous testing threading the requests themselves, rather than the papers, is slower.
-
-	# numCpus = cpu_count()
-	# processes = min(numCpus, numberQueriesToSend)
-	# with Pool(processes) as pool:
-	# 	chunkSize = ceil(numberQueriesToSend / processes)
-	# 	for result in pool.imap(self.createGallicaHunters, range(numberQueriesToSend), chunksize=chunkSize):
-	# 		queryResults = result[0]
-	# 		numPurged = result[1]
-	# 		self.numPurgedResults = self.numPurgedResults + numPurged
-	# 		self.allResults = self.allResults + queryResults
-
 	def createGallicaHunters(self, iterationNumber):
 		startRecord = iterationNumber * 50
 		startRecord = startRecord + 1
