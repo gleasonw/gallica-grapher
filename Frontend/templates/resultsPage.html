@@ -1,10 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="../js/myscripts.js"></script>
+    <title>The Gallica Grapher</title>
 </head>
 <body>
-$END$
+    <div class="topnav">
+        <a class="active" href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+    </div>
+    <div class = "resultElements">
+        <div class = "mainTitle">
+            <p>Word Frequency Graph of Putain</p>
+        </div>
+        <div class = "topBar">
+            <div class = "graph">
+                <img id = "Graph" src="../static/graph.png" alt="graph of word frequency data">
+            </div>
+            <div class = "downloadAndTopPapers">
+                <div id = download>
+                    <p> Download CSV || Download Graph(s). </p>
+                </div>
+                <div id = TopPapers>
+                    <table id = TopPapersTable>
+                          <tr>
+                            <th>Paper</th>
+                            <th>Count</th>
+                            <th>Gallica Link</th>
+                          </tr>
+                          <tr>
+                            <td>Le Matin</td>
+                            <td>50</td>
+                            <td>www.google.com</td>
+                          </tr>
+                          <tr>
+                            <td>La Presse</td>
+                            <td>60</td>
+                            <td>www.google.com</td>
+                          </tr>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+        <div class = bottomBar>
+            <form id = "graphSettingStuff">
+                <div class ="form-group">
+                    <label class = "settingLabel" for="graphType">Select a new graph type </label>
+                    <select name = "graphType" id="graphType">
+                        <option value="freqPoly">Frequency Polygraph</option>
+                        <option value="stackedBar">Stacked Bar Graph</option>
+                        <option value="bar">Bar Graph</option>
+                        <option value="percentage">Percentage Graph</option>
+                    </select>
+                </div>
+                <div id="hidden-form-group">
+                    <label class = "settingLabel" for="binSize">Histogram bin size in months:</label>
+                    <input type="text" id="binSize" name="binSize" /><br />
+                </div>
+                <div class = "form-group">
+                    <label class="settingLabel" for = "SeparateGraphs">Separate graphs for each search term?</label>
+                    <input type="checkbox" id="SeparateGraphs"/>
+                </div>
+                <div class = "submit-group">
+                    <input id = "submitter" type="submit" value="Refresh"/>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

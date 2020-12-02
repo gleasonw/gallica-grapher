@@ -1,10 +1,13 @@
-function showDiv(divId, element) {
-    if (element === "freqPoly") {
-        document.getElementById(divId).style.display = element.value === 1 ? 'block' : 'none';
-    } else {
-        document.getElementById(divId).style.display = "none";
-    }
-}
+$(function() {
+    $('#hidden-form-group').show();
+    $('#graphType').change(function(){
+        if(['freqPoly','stackedBar','bar'].indexOf($('#graphType').val()) >= 0) {
+            $('#hidden-form-group').show();
+        } else {
+            $('#hidden-form-group').hide();
+        }
+    });
+});
 
 let i = 0;
 

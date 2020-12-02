@@ -12,7 +12,7 @@
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
-  font-size: 17px;
+  font-size: large;
 }
 
 /* Change the color of links on hover */
@@ -28,7 +28,7 @@
 }
 
 html, body {
-  margin: 0px;
+  margin: 0;
   height: 100%;
 }
 
@@ -45,17 +45,19 @@ html, body {
   justify-content: center;
   align-items: center;
   height: 25%;
-  font-size: 64px;
+  font-size: xx-large;
 }
 
 .mainSearch {
   margin: auto;
   width: 75%;
   border: 1px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50%;
+  height: 75%;
+}
+
+.mainText{
+    margin: auto;
+    width: 50%;
 }
 
 .search {
@@ -63,62 +65,62 @@ html, body {
     width: 75%;
 }
 
+input[type=text]:focus {
+    outline:none;
+    border: 1px solid #000;
+}
+
 :root {
   --rad: .7rem;
   --dur: .3s;
   --color-dark: black;
   --color-light: white;
-  --color-brand: lightgray;
   --font-fam: 'Times New Roman', sans-serif;
-  --height: 50px;
-  --btn-width: 10%;
+  --height: 50%;
   --bez: cubic-bezier(0, 0, 0.43, 1.49);
 }
 
 form {
     margin: auto;
     width: 100%;
-    background: var(--color-brand);
     border-radius: var(--rad);
 }
-input, button {
-  height: var(--height);
-  font-family: var(--font-fam);
-  border: 0;
-  color: var(--color-dark);
-  font-size: 1.8rem;
-}
-input[type="search"] {
-    float:left;
-    width:90%;
-    background: var(--color-light);
-    padding: 0 1.6rem;
+
+input[type="submit"]{
+    width: 50%;
+    height: 100%;
+    font-family: var(--font-fam);
+    padding: 12px 20px;
+    margin: 15px 0;
+    outline: none;
     border-radius: var(--rad);
-    appearance: none; //for iOS input[type="search"] roundedness issue. border-radius alone doesn't work
+    appearance: none;
     transition: all var(--dur) var(--bez);
     transition-property: width, border-radius;
     z-index: 1;
     position: relative;
     box-shadow: 0 0 3pt 2pt gray;
-}
-button {
-    text-align: center;
-    top: 0;
-    right: 0;
-    width: var(--btn-width);
-    font-weight: bold;
-    background: var(--color-brand);
-    border-radius: 0 var(--rad) var(--rad) 0;
+    font-size: x-large;
 }
 
-label {
-  position: absolute;
-  clip: rect(1px, 1px, 1px, 1px);
-  padding: 0;
-  border: 0;
-  height: 1px;
-  width: 1px;
-  overflow: hidden;
+input[type="text"],input[type="search"],input#papers,input#searchTerm,input#yearRange {
+    height: var(--height);
+    font-family: var(--font-fam);
+    border: 0;
+    color: var(--color-dark);
+    font-size: large;
+    width: 100%;
+    padding: 12px 20px;
+    margin: 15px 0;
+    display: inline-block;
+    outline: none;
+    border-radius: var(--rad);
+    appearance: none;
+    transition: all var(--dur) var(--bez);
+    transition-property: width, border-radius;
+    z-index: 1;
+    position: relative;
+    box-shadow: 0 0 3pt 2pt gray;
 }
 
 
@@ -132,4 +134,96 @@ label {
     margin: 0;
     padding: 14px;
   }
+}
+
+.searchLabel{
+    font-size: large;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#hidden-form-group{
+    display: none;
+}
+
+.submit-group{
+    width: 100%;
+    margin-top: 40px;
+}
+
+.settingLabel{
+    font-size: medium;
+    float: left;
+    width: 20em;
+    margin-right: 15px;
+}
+
+.resultElements{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: auto;
+    width: 75%;
+}
+
+.bottomBar{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.graph{
+    float: right;
+    width: 75%;
+}
+
+.graph #Graph{
+    width: 100%;
+    height: auto;
+
+}
+
+.downloadAndTopPapers{
+    width: 25%;
+    float: left;
+}
+
+.loadingElements{
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loadingBar {
+    width: 50%;
+    background-color: lightgray;
+}
+
+.twoBars{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    flex-direction: column;
+}
+
+.findingResultsBar {
+  width: 1%;
+  height: 30px;
+  background-color: cadetblue;
+}
+
+.establishResultsBar {
+  width: 1%;
+  height: 30px;
+  background-color: cadetblue;
 }

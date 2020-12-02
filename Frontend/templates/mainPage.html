@@ -16,13 +16,24 @@
             <p> The Gallica Grapher</p>
         </div>
         <div class="mainSearch">
-              <div class="search">
-                <form onsubmit="event.preventDefault();" role="search">
-                  <label for="search">Search for stuff</label>
-                  <input id="search" type="search" placeholder="Search..." autofocus required />
-                  <button type="submit">Go</button>
-                </form>
-              </div>
+            {% from "_formHelper.html" import render_field %}
+            <form method=post id="searchStuff">
+                <div class = "form-group">
+                    {{ render_field(form.searchTerm) }}
+                </div>
+                <div class = "form-group">
+                    {{ render_field(form.papers) }}
+                </div>
+                <div class = "form-group">
+                    {{ render_field(form.yearRange) }}
+                </div>
+                <div class = "form-group">
+                    {{ render_field(form.strictYearRange) }}
+                </div>
+                <div class = "form-group">
+                    <input type=submit value=Go>
+                </div>
+            </form>
         </div>
     </div>
 </body>
