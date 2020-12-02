@@ -17,11 +17,12 @@ def contact():
 def home():
 	form = SearchForm(request.form)
 	if request.method == 'POST' and form.validate():
-		searchTerm = form.searchTerm
-		papers = form.papers
-		yearRange = form.yearRange
+		searchTerm = form.searchTerm.data
+		papers = form.papers.data
+		yearRange = form.yearRange.data
 		strictness = form.strictYearRange
 		print(searchTerm, papers, yearRange, strictness)
+		return(redirect(url_for('loadingResults')))
 	return render_template("mainPage.html", form=form)
 
 @app.route('/results')
