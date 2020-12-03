@@ -29,6 +29,8 @@ $(function strictnessChecker(){
 
 
 
+
+
 // let i = 0;
 //
 // function move() {
