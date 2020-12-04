@@ -27,6 +27,21 @@ $(function strictnessChecker(){
 });
 
 
+$(function updateProgress(){
+    var url = $(location).attr('href'),
+        parts = url.split("/"),
+        task_id = parts[parts.length-1]
+    function worker(){
+        $.get('progress/' + task_id, function(data){
+            if (progress < 100){
+                $('#progressBar').progressbar({value:progress})
+                setTimeout(worker,1000)
+            }
+        })
+    }
+});
+
+
 
 
 
