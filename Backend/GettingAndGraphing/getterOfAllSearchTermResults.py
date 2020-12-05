@@ -204,6 +204,8 @@ class GallicaSearch:
 		with open(os.path.join("../CSVdata", dictionaryFile), "w", encoding="utf8") as outFile:
 			writer = csv.writer(outFile)
 			for newspaper in self.topTenPapers:
+				print(newspaper)
+				newspaper[0] = newspaper[0].replace('"','')
 				writer.writerow(newspaper)
 
 	def sumUpTotalResults(self, toAdd):
