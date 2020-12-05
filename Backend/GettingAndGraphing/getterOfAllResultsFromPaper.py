@@ -86,7 +86,7 @@ DEFAULT_TIMEOUT = 5  # seconds
 class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
 	def __init__(self, *args, **kwargs):
 		retryStrategy = Retry(
-			total=3,
+			total=5,
 			status_forcelist=[429, 500, 502, 503, 504],
 			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
 			backoff_factor=1

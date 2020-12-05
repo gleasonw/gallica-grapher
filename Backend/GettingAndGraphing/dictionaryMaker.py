@@ -53,7 +53,7 @@ class DictionaryMaker():
 			SELECT paperName, paperCode
 				FROM papers
 					WHERE 
-						startYear > (%s) and endYear < (%s)
+						startYear < (%s) and endYear > (%s)
 			;
 			"""
 		yearTuple = (self.yearRange[0], self.yearRange[1])

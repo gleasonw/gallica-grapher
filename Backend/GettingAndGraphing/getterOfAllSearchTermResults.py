@@ -3,7 +3,7 @@ import re
 import sys
 import shutil
 import os
-from multiprocessing import Pool, cpu_count
+import concurrent.futures
 
 from Backend.GettingAndGraphing.dictionaryMaker import DictionaryMaker
 from Backend.GettingAndGraphing.getterOfAllResultsFromPaper import *
@@ -23,9 +23,10 @@ class GallicaSearch:
 		self.numberQueriesToGallica = None
 		self.isNoDictSearch = None
 		self.defaultPaperDictionary = None
-		self.progress = 0
 		self.strictYearRange = strictYearRange
 		self.totalResults = 0
+		self.progressPercent = 0
+		self.progressIterations = 0
 		self.newspaper = newspaper
 		self.newspaperDictionary = {}
 		self.chunkedNewspaperDictionary = {}
@@ -73,6 +74,9 @@ class GallicaSearch:
 	def getCollectedQueries(self):
 		return self.collectedQueries
 
+	def getPercentProgress(self):
+		return self.progressPercent
+
 	@staticmethod
 	def sendQuery(queryToSend, **kwargs):
 		if kwargs['startRecord'] is None:
@@ -98,8 +102,6 @@ class GallicaSearch:
 		if type(self.recordNumber) is int:
 			self.numberQueriesToGallica = self.recordNumber // 50
 
-
-
 	def makeCSVFile(self):
 		with open(self.fileName, "w", encoding="utf8") as outFile:
 			writer = csv.writer(outFile)
@@ -124,14 +126,6 @@ class GallicaSearch:
 		nameOfFile = nameOfFile + ".csv"
 		return nameOfFile
 
-	@staticmethod
-	def reportProgress(iteration, total, part):
-		progress = str(((iteration / total) * 100))
-		print("{0}% complete {1}          ".format(progress[0:5], part), end="\r")
-		sys.stdout.flush()
-		if iteration == total:
-			print()
-
 	# Good time to parse errors in formatting too
 	def establishStrictness(self):
 		if self.strictYearRange in ["ya", "True", "true", "yes", "absolutely"]:
@@ -154,7 +148,6 @@ class GallicaSearch:
 		self.newspaperDictionary = dicParser.getDictionary()
 
 	def establishYearRange(self, yearRange):
-		yearRange = re.split(r'[;,\-\s*]', yearRange)
 		if len(yearRange) == 2:
 			self.lowYear = int(yearRange[0])
 			self.highYear = int(yearRange[1])
@@ -195,6 +188,7 @@ class GallicaSearch:
 			self.updateTopTenPapers(paperName, paperCount)
 			self.newspaperDictionary.update({paperName : paperCode})
 			self.numResultsForEachPaper.update({paperName : paperCount})
+			#A little weird to calculate total results here
 			self.sumUpTotalResults(paperCount)
 
 	def updateTopTenPapers(self, name, count):
@@ -210,7 +204,7 @@ class GallicaSearch:
 		with open(os.path.join("../CSVdata", dictionaryFile), "w", encoding="utf8") as outFile:
 			writer = csv.writer(outFile)
 			for newspaper in self.topTenPapers:
-				writer.writerow([newspaper])
+				writer.writerow(newspaper)
 
 	def sumUpTotalResults(self, toAdd):
 		self.totalResults = self.totalResults + toAdd
@@ -235,6 +229,15 @@ class GallicaSearch:
 		listOfSubDicts.append(subDict)
 		self.chunkedNewspaperDictionary = listOfSubDicts
 
+	def updateProgressPercent(self,iteration, total):
+		self.progressPercent = int((iteration / total) * 100)
+		print(self.progressPercent)
+
+	def resetProgressIterations(self):
+		self.progressIterations = 0
+
+
+
 
 
 class FullSearchWithinDictionary(GallicaSearch):
@@ -242,19 +245,19 @@ class FullSearchWithinDictionary(GallicaSearch):
 		super().__init__(searchTerm, newspaper, yearRange, strictYearRange)
 
 	def runSearch(self):
+		self.resetProgressIterations()
 		self.createWorkersForSearch()
 
 	def createWorkersForSearch(self):
-		processes = cpu_count()
-		with Pool(processes) as pool:
-			for result in pool.imap_unordered(self.sendWorkersToSearch, self.newspaperDictionary):
+		progress = 0
+		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+			for result in executor.map(self.sendWorkersToSearch, self.newspaperDictionary):
 				paperName = result[0]
 				resultList = result[1]
 				numberResultsForEntirePaper = result[2]
-				self.collectedQueries = self.collectedQueries + resultList
-				self.progress = self.progress + numberResultsForEntirePaper
-				GallicaSearch.reportProgress(self.progress, self.totalResults,
-											 "retrieving results for '{0}'".format(self.searchTerm))
+				self.collectedQueries.extend(resultList)
+				progress = progress + numberResultsForEntirePaper
+				self.updateProgressPercent(progress, self.totalResults)
 				self.numResultsForEachPaper.update({paperName: numberResultsForEntirePaper})
 
 	def sendWorkersToSearch(self, newspaper):
@@ -269,36 +272,32 @@ class FullSearchWithinDictionary(GallicaSearch):
 		self.createWorkersForFindingTotalResults()
 
 	def createWorkersForFindingTotalResults(self):
-		processes = cpu_count()
-		pool = Pool(processes)
-		chunkSize = 30
-		self.makeChunkedDictionary(chunkSize)
-		totalIterations = ceil(len(self.newspaperDictionary) / chunkSize)
+		# chunkSize = 30
+		# self.makeChunkedDictionary(chunkSize)
+		# totalIterations = ceil(len(self.newspaperDictionary) / chunkSize)
 		try:
-			for i, result in enumerate(pool.imap_unordered(self.findNumberResults, self.chunkedNewspaperDictionary), 1):
-				GallicaSearch.reportProgress(i, totalIterations,
-											 "establishing total results for '{0}'".format(self.searchTerm))
-				self.paperNameCounts = self.paperNameCounts + result
-			pool.close()
-			pool.join()
+			with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+				for i, result in enumerate(executor.map(self.findNumberResults, self.newspaperDictionary), 1):
+					self.paperNameCounts = self.paperNameCounts + result
+					self.updateProgressPercent(i, len(self.newspaperDictionary))
 			self.updateDictionaries()
 		except Exception as error:
 			print(error)
 			raise
 
-	def findNumberResults(self, newspapers):
+	def findNumberResults(self, newspaper):
+		#I really want to make these TCP sessions more condensed...
 		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
 		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
 		gallicaHttpSession.mount("https://", adapter)
 		gallicaHttpSession.mount("http://", adapter)
 		paperCounts = []
-		for newspaper in newspapers:
-			newspaperCode = newspapers[newspaper]
-			newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-			hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1, gallicaHttpSession)
-			numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
-			if numberResultsForNewspaper != 0:
-				paperCounts.append([newspaper, numberResultsForNewspaper, newspaperCode])
+		newspaperCode = self.newspaperDictionary[newspaper]
+		newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
+		hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1, gallicaHttpSession)
+		numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
+		if numberResultsForNewspaper != 0:
+			paperCounts.append([newspaper, numberResultsForNewspaper, newspaperCode])
 		return paperCounts
 
 
@@ -316,7 +315,7 @@ class FullSearchNoDictionary(GallicaSearch):
 			startRecord = startRecord + 50
 			results = batchHunter.getResultList()
 			numPurged = batchHunter.getNumberPurgedResults()
-			self.collectedQueries = self.collectedQueries + results
+			self.collectedQueries.extend(results)
 			numProcessedResults = numProcessedResults + len(results) + numPurged
 
 	def findTotalResults(self):

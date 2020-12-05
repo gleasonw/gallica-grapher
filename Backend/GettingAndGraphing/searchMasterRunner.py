@@ -1,5 +1,6 @@
 from Backend.GettingAndGraphing.getterOfAllSearchTermResults import *
 from Backend.GettingAndGraphing.makerOfRGraphs import GallicaGrapher
+
 import csv
 import shutil
 import os
@@ -18,33 +19,26 @@ class MultipleSearchTermHunt:
 		self.listOfGraphers = []
 		self.bigFileName = ''
 
+	def getAllResultBundlers(self):
+		return self.searchTermResultList
+
 	def runMultiTermQuery(self):
 		for searchTerm in self.searchTermList:
 			if self.newspaper == "noDict":
-				if self.theKwargsForGraphingAndRecordNumber["recordNumber"] != 0:
-					resultGetterForTerm = RecordLimitedSearchNoDictionary(searchTerm, self.newspaper, self.yearRange, self.strictYearRange,
-													   self.theKwargsForGraphingAndRecordNumber["recordNumber"])
-				else:
-					resultGetterForTerm = FullSearchNoDictionary(searchTerm, self.newspaper, self.yearRange,
+				resultGetterForTerm = FullSearchNoDictionary(searchTerm, self.newspaper, self.yearRange,
 																		  self.strictYearRange)
 			else:
-				if self.theKwargsForGraphingAndRecordNumber["recordNumber"] != 0:
-					resultGetterForTerm = RecordLimitedSearchWithinDictionary(searchTerm, self.newspaper, self.yearRange,
-																		  self.strictYearRange,
-																		  self.theKwargsForGraphingAndRecordNumber[
-																			  "recordNumber"])
-
-				else:
-					resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
+				resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
 																			  self.yearRange,
 																			  self.strictYearRange)
-			resultGetterForTerm.runQuery()
 			self.searchTermResultList.append(resultGetterForTerm)
+			resultGetterForTerm.runQuery()
+		self.createFilesForResultBundles()
 		self.initiateGraphing()
 
 	def initiateGraphing(self):
-		if self.theKwargsForGraphingAndRecordNumber['uniqueGraphs'].lower() in ["true", "yup"]:
-			if self.theKwargsForGraphingAndRecordNumber['samePage'].lower() in ["true", "yup"]:
+		if self.theKwargsForGraphingAndRecordNumber['uniqueGraphs']:
+			if self.theKwargsForGraphingAndRecordNumber['samePage']:
 				self.initiateSinglePageManyGraphs()
 			else:
 				self.initiateSingleGraphPerPage()
@@ -64,13 +58,11 @@ class MultipleSearchTermHunt:
 			resultBundle.packageQuery()
 
 	def initiateSingleGraphPerPage(self):
-		self.createFilesForResultBundles()
 		self.createGGplotsForBundles()
 		for grapher in self.listOfGraphers:
 			grapher.plotGraphAndMakePNG()
 
 	def initiateSingleGraphManyData(self):
-		self.createFilesForResultBundles()
 		self.makeMultiTermFileName()
 		self.createMassiveCSV()
 		topTenPapers = []
@@ -79,7 +71,6 @@ class MultipleSearchTermHunt:
 		grapher.plotGraphAndMakePNG()
 
 	def initiateSinglePageManyGraphs(self):
-		self.createFilesForResultBundles()
 		self.createGGplotsForBundles()
 		self.makeMultiTermFileName()
 		ggPlotList = []

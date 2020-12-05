@@ -110,7 +110,7 @@ class GallicaGrapher:
         initiateFreqPolyGGplot <- function(dataToGraph){
             graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count..)) +
                 geom_freqpoly(binwidth=30) +
-                scale_y_continuous(trans="log10")
+                scale_y_continuous()
             return(graphOfHits)
         }
         ''')
