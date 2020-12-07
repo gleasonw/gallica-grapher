@@ -30,12 +30,7 @@ def main():
 		graphType = sys.argv[5]
 		uniqueGraphs = sys.argv[6]
 		samePage = sys.argv[7]
-		if len(sys.argv) == 9:
-			recordNumber = sys.argv[8]
-		else:
-			recordNumber = 0
 		requestToRun = MultipleSearchTermHunt(searchItems, paperChoices, yearRange, strictYearRange,
-											  recordNumber=recordNumber,
 											  graphType=graphType,
 											  uniqueGraphs=uniqueGraphs,
 											  samePage=samePage)

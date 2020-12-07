@@ -60,6 +60,8 @@ class GallicaGrapher:
             self.makeFreqPoly()
         elif self.settings["graphType"] == "multiFreqPoly":
             self.makeMultiFreqPoly()
+        elif self.settings["graphType"] == "density":
+            self.makeDensityGraph()
         else:
             pass
 
@@ -105,6 +107,23 @@ class GallicaGrapher:
         graphTitle = self.makeSingleGraphTitle()
         self.ggplotForR = self.addLabelsToGGplot(graphTitle)
 
+    def makeDensityGraph(self):
+        self.theCSVforR = self.createFillColumnForRCSV()
+        robjects.r('''
+        initiateDensityGGplot <- function(dataToGraph){
+            graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count.., fill=fillPaper)) +
+                geom_density(position="stack")
+                colors = c("#e6beff", "#9a6324", "#fffac8", "#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075", "#808080", "#ffffff", "#000000")
+                scale_fill_manual(values = colors)
+            return(graphOfHits)
+        }
+        ''')
+
+        ggplotInitiate = robjects.globalenv['initiateDensityGGplot']
+        self.ggplotForR = ggplotInitiate(self.theCSVforR)
+        graphTitle = self.makeSingleGraphTitle()
+        self.ggplotForR = self.addLabelsToGGplot(graphTitle)
+
     def makeFreqPoly(self):
         robjects.r('''
         initiateFreqPolyGGplot <- function(dataToGraph){
@@ -118,7 +137,6 @@ class GallicaGrapher:
         freqPolyInitiate = robjects.globalenv['initiateFreqPolyGGplot']
         self.ggplotForR = freqPolyInitiate(self.theCSVforR)
         graphTitle = self.makeSingleGraphTitle()
-        print(graphTitle)
         self.ggplotForR = self.addLabelsToGGplot(graphTitle)
 
     def makeMultiFreqPoly(self):

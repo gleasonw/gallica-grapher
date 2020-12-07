@@ -24,7 +24,7 @@ class MultipleSearchTermHunt:
 
 	def runMultiTermQuery(self):
 		for searchTerm in self.searchTermList:
-			if self.newspaper == "noDict":
+			if self.newspaper[0] == "noDict":
 				resultGetterForTerm = FullSearchNoDictionary(searchTerm, self.newspaper, self.yearRange,
 																		  self.strictYearRange)
 			else:

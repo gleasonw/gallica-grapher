@@ -19,10 +19,6 @@ class GallicaSearch:
 		self.highYear = None
 		self.isYearRange = None
 		self.baseQuery = None
-		self.recordNumber = None
-		self.numberQueriesToGallica = None
-		self.isNoDictSearch = None
-		self.defaultPaperDictionary = None
 		self.strictYearRange = strictYearRange
 		self.totalResults = 0
 		self.progressPercent = 0
@@ -36,7 +32,6 @@ class GallicaSearch:
 		self.topTenPapers = []
 		self.numResultsForEachPaper = {}
 		self.establishYearRange(yearRange)
-		self.establishRecordNumber(kwargs)
 		self.parseNewspaperDictionary()
 		self.establishStrictness()
 		self.buildQuery()
@@ -54,10 +49,6 @@ class GallicaSearch:
 		else:
 			self.findTotalResults()
 			self.runSearch()
-
-	def establishRecordNumber(self, kwargs):
-		if "recordNumber" in kwargs:
-			self.recordNumber = kwargs["recordNumber"]
 
 	def getTopTenPapers(self):
 		return self.topTenPapers
@@ -78,7 +69,16 @@ class GallicaSearch:
 		return self.progressPercent
 
 	@staticmethod
+	def makeSession():
+		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
+		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
+		gallicaHttpSession.mount("https://", adapter)
+		gallicaHttpSession.mount("http://", adapter)
+		return gallicaHttpSession
+
+	@staticmethod
 	def sendQuery(queryToSend, **kwargs):
+		session = GallicaSearch.makeSession()
 		if kwargs['startRecord'] is None:
 			startRecord = 1
 		else:
@@ -87,7 +87,7 @@ class GallicaSearch:
 			numRecords = 50
 		else:
 			numRecords = kwargs['numRecords']
-		hunter = GallicaHunter(queryToSend, startRecord, numRecords)
+		hunter = GallicaHunter(queryToSend, startRecord, numRecords, session)
 		hunter.hunt()
 		return hunter
 
@@ -97,10 +97,6 @@ class GallicaSearch:
 			self.makeCSVFile()
 		else:
 			pass
-
-	def establishNumberQueries(self):
-		if type(self.recordNumber) is int:
-			self.numberQueriesToGallica = self.recordNumber // 50
 
 	def makeCSVFile(self):
 		with open(self.fileName, "w", encoding="utf8") as outFile:
@@ -157,15 +153,15 @@ class GallicaSearch:
 
 	def buildQuery(self):
 		if self.isYearRange:
-			if self.newspaper == "noDict":
+			if self.newspaper[0] == "noDict":
 				self.baseQuery = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and (gallica adj "{' \
-								 '{searchWord}}") and (dc.type all "fascicule") sortby dc.date/sort.ascending '
+								 '{searchWord}}") sortby dc.date/sort.ascending '
 			else:
 				self.baseQuery = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and ((arkPress all "{{{{' \
 								 'newsKey}}}}") and (gallica adj "{{searchWord}}")) sortby dc.date/sort.ascending '
 			self.baseQuery = self.baseQuery.format(firstYear=str(self.lowYear), secondYear=str(self.highYear))
 		else:
-			if self.newspaper == "noDict":
+			if self.newspaper[0] == "noDict":
 				self.baseQuery = '(gallica adj "{searchWord}") and (dc.type all "fascicule") sortby dc.date/sort.ascending'
 			else:
 				self.baseQuery = 'arkPress all "{{newsKey}}" and (gallica adj "{searchWord}") sortby dc.date/sort.ascending'
@@ -253,7 +249,7 @@ class FullSearchWithinDictionary(GallicaSearch):
 	def createWorkersForSearch(self):
 		progress = 0
 		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-			for result in executor.map(self.sendWorkersToSearch, self.newspaperDictionary):
+			for result in executor.map(self.sendWorkersToSearch, self.chunkedNewspaperDictionary):
 				paperName = result[0]
 				resultList = result[1]
 				numberResultsForEntirePaper = result[2]
@@ -274,9 +270,8 @@ class FullSearchWithinDictionary(GallicaSearch):
 		self.createWorkersForFindingTotalResults()
 
 	def createWorkersForFindingTotalResults(self):
-		# chunkSize = 30
-		# self.makeChunkedDictionary(chunkSize)
-		# totalIterations = ceil(len(self.newspaperDictionary) / chunkSize)
+		chunkSize = 30
+		self.makeChunkedDictionary(chunkSize)
 		try:
 			with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
 				for i, result in enumerate(executor.map(self.findNumberResults, self.newspaperDictionary), 1):
@@ -288,15 +283,11 @@ class FullSearchWithinDictionary(GallicaSearch):
 			raise
 
 	def findNumberResults(self, newspaper):
-		#I really want to make these TCP sessions more condensed...
-		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
-		gallicaHttpSession.mount("https://", adapter)
-		gallicaHttpSession.mount("http://", adapter)
+		session = GallicaSearch.makeSession()
 		paperCounts = []
 		newspaperCode = self.newspaperDictionary[newspaper]
 		newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-		hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1, gallicaHttpSession)
+		hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1, session)
 		numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
 		if numberResultsForNewspaper != 0:
 			paperCounts.append([newspaper, numberResultsForNewspaper, newspaperCode])
@@ -305,23 +296,27 @@ class FullSearchWithinDictionary(GallicaSearch):
 
 
 class FullSearchNoDictionary(GallicaSearch):
-	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, recordNumber):
-		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, recordNumber)
+	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange):
+		super().__init__(searchTerm, newspaper, yearRange, strictYearRange)
 
 	def runSearch(self):
-		theBigQuery = self.baseQuery
-		numProcessedResults = 0
-		startRecord = 1
-		while self.totalResults > numProcessedResults:
-			batchHunter = self.sendQuery(theBigQuery, startRecord=startRecord, numRecords=50)
-			startRecord = startRecord + 50
-			results = batchHunter.getResultList()
-			numPurged = batchHunter.getNumberPurgedResults()
-			self.collectedQueries.extend(results)
-			numProcessedResults = numProcessedResults + len(results) + numPurged
+		iterations = ceil(self.totalResults / 50)
+		startRecordList = []
+		for i in range(iterations):
+			startRecordList.append((i * 50) + 1)
+		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+			for i, result in enumerate(executor.map(self.sendWorkersToSearch, startRecordList), 1):
+				self.updateProgressPercent(i, iterations)
+				self.collectedQueries.extend(result)
+
+
+	def sendWorkersToSearch(self, startRecord):
+		batchHunter = self.sendQuery(self.baseQuery, startRecord=startRecord, numRecords=50)
+		results = batchHunter.getResultList()
+		return results
 
 	def findTotalResults(self):
-		hunterForTotalNumberOfQueryResults = GallicaHunter(self.baseQuery, 1, 1)
+		hunterForTotalNumberOfQueryResults = GallicaSearch.sendQuery(self.baseQuery, numRecords=1, startRecord =1)
 		self.totalResults = hunterForTotalNumberOfQueryResults.establishTotalHits(self.baseQuery, False)
 
 	# make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
