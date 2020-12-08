@@ -20,32 +20,19 @@ class ProgressTrackerThread(threading.Thread):
 		super().__init__()
 
 	def run(self):
-		requestToRun = MultipleSearchTermHunt(self.searchItems, self.paperChoices, self.yearRange, self.strictness, graphType="freqPoly",
+		requestToRun = MultipleSearchTermHunt(self.searchItems, self.paperChoices, self.yearRange, self.strictness,self, graphType="freqPoly",
 											  uniqueGraphs=True, samePage=False)
-		threadToBeTracked = RetrieverThread(requestToRun)
-		threadToBeTracked.start()
-		time.sleep(2)
-		resultBundles = requestToRun.getAllResultBundlers()
-		while threadToBeTracked.is_alive():
-			for resultBundle in resultBundles:
-				self.currentTerm = resultBundle.getSearchTerm()
-				while not resultBundle.getFinishedStatus():
-					time.sleep(1)
-					self.progress = resultBundle.getPercentProgress()
-					print(self.progress)
+		requestToRun.runMultiTermQuery()
 
+	def updateProgress(self, amount):
+		self.progress = amount
 
-class RetrieverThread(threading.Thread):
-	def __init__(self, requestBundle):
-		self.request = requestBundle
-		super().__init__()
-
-	def run(self):
-		self.request.runMultiTermQuery()
-
+	def resetProgress(self):
+		self.progress = 0
 
 retrievingThreads = {}
 app = Flask(__name__)
+app.debug = True
 app.secret_key = b'will be made more secret later'
 
 
@@ -72,15 +59,12 @@ def home():
 		else:
 			papers = form.papers.data
 		yearRange = form.yearRange.data
-		if form.strictYearRange.data == "y":
-			strictness = True
-		else:
-			strictness = False
+		strictness = form.yearRange.data
 		print(searchTerm, papers, yearRange, strictness)
 		retrievingThreads[threadId] = ProgressTrackerThread(searchTerm,papers,yearRange,strictness)
 		retrievingThreads[threadId].start()
 
-		return render_template("preparingResults.html")
+		return redirect(url_for('loadingResults',threadId=threadId))
 	return render_template("mainPage.html", form=form)
 
 
@@ -91,9 +75,14 @@ def results(resultList):
 
 @app.route('/loadingResults/<int:threadId>')
 def loadingResults(threadId):
-	global retrievingThreads
-	return str(retrievingThreads[threadId].progress)
+	if request.method == 'GET':
+		return render_template('preparingResults.html')
 
+@app.route('/loadingResults/getProgress/<int:threadId>')
+def getProgress(threadId):
+	global retrievingThreads
+	progress = str(retrievingThreads[threadId].progress)
+	return progress
 
 
 if __name__ == "__main__":

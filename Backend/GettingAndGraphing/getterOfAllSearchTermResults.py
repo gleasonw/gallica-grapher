@@ -14,11 +14,12 @@ os.chdir(dname)
 
 class GallicaSearch:
 
-	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, **kwargs):
+	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange,progressTracker, **kwargs):
 		self.lowYear = None
 		self.highYear = None
 		self.isYearRange = None
 		self.baseQuery = None
+		self.progressTracker = progressTracker
 		self.strictYearRange = strictYearRange
 		self.totalResults = 0
 		self.progressPercent = 0
@@ -229,27 +230,21 @@ class GallicaSearch:
 
 	def updateProgressPercent(self,iteration, total):
 		self.progressPercent = int((iteration / total) * 100)
-		print(self.progressPercent)
-
-	def resetProgressIterations(self):
-		self.progressIterations = 0
-
-
+		self.progressTracker.updateProgress(self.progressPercent)
 
 
 
 class FullSearchWithinDictionary(GallicaSearch):
-	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange):
-		super().__init__(searchTerm, newspaper, yearRange, strictYearRange)
+	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, progressTracker):
+		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, progressTracker)
 
 	def runSearch(self):
-		self.resetProgressIterations()
 		self.createWorkersForSearch()
 
 	def createWorkersForSearch(self):
 		progress = 0
 		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-			for result in executor.map(self.sendWorkersToSearch, self.chunkedNewspaperDictionary):
+			for result in executor.map(self.sendWorkersToSearch, self.newspaperDictionary):
 				paperName = result[0]
 				resultList = result[1]
 				numberResultsForEntirePaper = result[2]
@@ -270,8 +265,6 @@ class FullSearchWithinDictionary(GallicaSearch):
 		self.createWorkersForFindingTotalResults()
 
 	def createWorkersForFindingTotalResults(self):
-		chunkSize = 30
-		self.makeChunkedDictionary(chunkSize)
 		try:
 			with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
 				for i, result in enumerate(executor.map(self.findNumberResults, self.newspaperDictionary), 1):
@@ -296,8 +289,8 @@ class FullSearchWithinDictionary(GallicaSearch):
 
 
 class FullSearchNoDictionary(GallicaSearch):
-	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange):
-		super().__init__(searchTerm, newspaper, yearRange, strictYearRange)
+	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, progressTracker):
+		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, progressTracker)
 
 	def runSearch(self):
 		iterations = ceil(self.totalResults / 50)

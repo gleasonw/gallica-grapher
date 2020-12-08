@@ -1,15 +1,16 @@
 from Backend.GettingAndGraphing.getterOfAllSearchTermResults import *
 from Backend.GettingAndGraphing.makerOfRGraphs import GallicaGrapher
 
+
 import csv
 import shutil
 import os
 
 
-# Different papers for each term? Oohhhh... only unlimited. Thank you.
+
 class MultipleSearchTermHunt:
 
-	def __init__(self, searchList, newspaper, yearRange, strictYearRange, **kwargs):
+	def __init__(self, searchList, newspaper, yearRange, strictYearRange,progressTracker, **kwargs):
 		self.searchTermList = searchList
 		self.newspaper = newspaper
 		self.yearRange = yearRange
@@ -18,6 +19,7 @@ class MultipleSearchTermHunt:
 		self.theKwargsForGraphingAndRecordNumber = kwargs
 		self.listOfGraphers = []
 		self.bigFileName = ''
+		self.progressTracker = progressTracker
 
 	def getAllResultBundlers(self):
 		return self.searchTermResultList
@@ -26,13 +28,14 @@ class MultipleSearchTermHunt:
 		for searchTerm in self.searchTermList:
 			if self.newspaper[0] == "noDict":
 				resultGetterForTerm = FullSearchNoDictionary(searchTerm, self.newspaper, self.yearRange,
-																		  self.strictYearRange)
+																		  self.strictYearRange, self.progressTracker)
 			else:
 				resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
 																			  self.yearRange,
-																			  self.strictYearRange)
+																			  self.strictYearRange, self.progressTracker)
 			self.searchTermResultList.append(resultGetterForTerm)
 			resultGetterForTerm.runQuery()
+			self.progressTracker.resetProgress()
 		self.createFilesForResultBundles()
 		self.initiateGraphing()
 

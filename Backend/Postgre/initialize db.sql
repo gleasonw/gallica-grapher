@@ -4,13 +4,12 @@ CREATE TABLE papers (
      paperName text,
      startYear text,
      endYear text,
-     digitalQuality FLOAT,
      url varChar(50),
      PRIMARY KEY(paperCode)
     );
 
-COPY papers(paperName, startYear, endYear, digitalQuality, url, paperCode)
-FROM '/Users/thefam/PycharmProjects/Gallica-Grapher/Backend/Postgre/Journals 1777-1950.csv'
+COPY papers(paperName, startYear, endYear, url, paperCode)
+FROM '/Users/thefam/PycharmProjects/Gallica-Grapher/Backend/Postgre/paperDictionaryGoodDatesGoodNames.csv'
 DELIMITER ','
 CSV HEADER;
 
@@ -24,4 +23,3 @@ CREATE INDEX ON papers
     startYear,
     endYear
     );
-
