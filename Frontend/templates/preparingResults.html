@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="../static/style.css">
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="../static/progress.js"></script>
-    <script src="//code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+    rel = "stylesheet">
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <title>The Gallica Grapher</title>
+    <script>
+    $(function(){
+        $("#progressBar").progressbar({
+            value: 0
+        });
+    });
+    </script>
 </head>
 <body>
     <div class="topnav">
@@ -17,12 +25,11 @@
         <a href="{{ url_for('contact')}}">Contact</a>
     </div>
     <div class = "mainElements">
-        <div class = "loadingElements">
-            <label for="progressBar">Retrieving results...</label>
+        <p id="progressDescription">Retrieving results...</p>
+        <div class = "progressBox">
             <div id = "progressBar">
-            </div>
         </div>
-
+        </div>
     </div>
 </body>
 </html>
