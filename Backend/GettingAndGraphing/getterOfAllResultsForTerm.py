@@ -1,9 +1,9 @@
 import csv
-import re
-import sys
 import shutil
 import os
 import concurrent.futures
+
+from requests import sessions
 
 from Backend.GettingAndGraphing.dictionaryMaker import DictionaryMaker
 from Backend.GettingAndGraphing.getterOfAllResultsFromPaper import *
@@ -12,14 +12,15 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
+
 class GallicaSearch:
 
-	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange,progressTracker, **kwargs):
+	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, progressTrackerThread, **kwargs):
 		self.lowYear = None
 		self.highYear = None
 		self.isYearRange = None
 		self.baseQuery = None
-		self.progressTracker = progressTracker
+		self.progressTrackerThread = progressTrackerThread
 		self.strictYearRange = strictYearRange
 		self.totalResults = 0
 		self.progressPercent = 0
@@ -114,7 +115,7 @@ class GallicaSearch:
 		else:
 			for paper in self.newspaper:
 				nameOfFile = paper + "-"
-			nameOfFile = nameOfFile[0:len(nameOfFile)-1]
+			nameOfFile = nameOfFile[0:len(nameOfFile) - 1]
 			wordsInQuery = self.searchTerm.split(" ")
 			for word in wordsInQuery:
 				nameOfFile = nameOfFile + word
@@ -177,15 +178,15 @@ class GallicaSearch:
 	def updateDictionaries(self):
 		self.newspaperDictionary.clear()
 		for i in range(10):
-			self.topTenPapers.append(["",0])
+			self.topTenPapers.append(["", 0])
 		for nameCountCode in self.paperNameCounts:
 			paperName = nameCountCode[0]
 			paperCount = nameCountCode[1]
 			paperCode = nameCountCode[2]
 			self.updateTopTenPapers(paperName, paperCount)
-			self.newspaperDictionary.update({paperName : paperCode})
-			self.numResultsForEachPaper.update({paperName : paperCount})
-			#A little weird to calculate total results here
+			self.newspaperDictionary.update({paperName: paperCode})
+			self.numResultsForEachPaper.update({paperName: paperCount})
+			# A little weird to calculate total results here
 			self.sumUpTotalResults(paperCount)
 
 	def updateTopTenPapers(self, name, count):
@@ -193,7 +194,7 @@ class GallicaSearch:
 			currentIndexCount = self.topTenPapers[i][1]
 			if count > currentIndexCount:
 				self.topTenPapers.insert(i, [name, count])
-				del(self.topTenPapers[10:])
+				del (self.topTenPapers[10:])
 				break
 
 	def generateTopTenPapers(self):
@@ -202,7 +203,7 @@ class GallicaSearch:
 			writer = csv.writer(outFile)
 			for newspaper in self.topTenPapers:
 				print(newspaper)
-				newspaper[0] = newspaper[0].replace('"','')
+				newspaper[0] = newspaper[0].replace('"', '')
 				writer.writerow(newspaper)
 
 	def sumUpTotalResults(self, toAdd):
@@ -216,7 +217,7 @@ class GallicaSearch:
 		currentIndex = 0
 		for i in range(ceil((len(self.newspaperDictionary) / chunkSize)) - 1):
 			subDict = {}
-			subList = initialList[currentIndex:currentIndex+chunkSize]
+			subList = initialList[currentIndex:currentIndex + chunkSize]
 			currentIndex = currentIndex + chunkSize
 			for paper in subList:
 				subDict[paper] = self.newspaperDictionary[paper]
@@ -228,10 +229,13 @@ class GallicaSearch:
 		listOfSubDicts.append(subDict)
 		self.chunkedNewspaperDictionary = listOfSubDicts
 
-	def updateProgressPercent(self,iteration, total):
+	def updateDiscoveryProgressPercent(self, iteration, total):
 		self.progressPercent = int((iteration / total) * 100)
-		self.progressTracker.updateProgress(self.progressPercent)
+		self.progressTrackerThread.updateDiscoveryProgress(self.progressPercent)
 
+	def updateRetrievalProgressPercent(self, iteration, total):
+		self.progressPercent = int((iteration / total) * 100)
+		self.progressTrackerThread.updateRetrievalProgress(self.progressPercent)
 
 
 class FullSearchWithinDictionary(GallicaSearch):
@@ -250,7 +254,7 @@ class FullSearchWithinDictionary(GallicaSearch):
 				numberResultsForEntirePaper = result[2]
 				self.collectedQueries.extend(resultList)
 				progress = progress + numberResultsForEntirePaper
-				self.updateProgressPercent(progress, self.totalResults)
+				self.updateRetrievalProgressPercent(progress, self.totalResults)
 				self.numResultsForEachPaper.update({paperName: numberResultsForEntirePaper})
 
 	def sendWorkersToSearch(self, newspaper):
@@ -269,7 +273,7 @@ class FullSearchWithinDictionary(GallicaSearch):
 			with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
 				for i, result in enumerate(executor.map(self.findNumberResults, self.newspaperDictionary), 1):
 					self.paperNameCounts = self.paperNameCounts + result
-					self.updateProgressPercent(i, len(self.newspaperDictionary))
+					self.updateDiscoveryProgressPercent(i, len(self.newspaperDictionary))
 			self.updateDictionaries()
 		except Exception as error:
 			print(error)
@@ -287,7 +291,6 @@ class FullSearchWithinDictionary(GallicaSearch):
 		return paperCounts
 
 
-
 class FullSearchNoDictionary(GallicaSearch):
 	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, progressTracker):
 		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, progressTracker)
@@ -299,9 +302,8 @@ class FullSearchNoDictionary(GallicaSearch):
 			startRecordList.append((i * 50) + 1)
 		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
 			for i, result in enumerate(executor.map(self.sendWorkersToSearch, startRecordList), 1):
-				self.updateProgressPercent(i, iterations)
+				self.updateRetrievalProgressPercent(i, iterations)
 				self.collectedQueries.extend(result)
-
 
 	def sendWorkersToSearch(self, startRecord):
 		batchHunter = self.sendQuery(self.baseQuery, startRecord=startRecord, numRecords=50)
@@ -309,10 +311,7 @@ class FullSearchNoDictionary(GallicaSearch):
 		return results
 
 	def findTotalResults(self):
-		hunterForTotalNumberOfQueryResults = GallicaSearch.sendQuery(self.baseQuery, numRecords=1, startRecord =1)
+		hunterForTotalNumberOfQueryResults = GallicaSearch.sendQuery(self.baseQuery, numRecords=1, startRecord=1)
 		self.totalResults = hunterForTotalNumberOfQueryResults.establishTotalHits(self.baseQuery, False)
 
-	# make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
-
-
-
+# make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)

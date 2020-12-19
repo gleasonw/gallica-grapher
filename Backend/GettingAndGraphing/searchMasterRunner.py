@@ -1,4 +1,4 @@
-from Backend.GettingAndGraphing.getterOfAllSearchTermResults import *
+from Backend.GettingAndGraphing.getterOfAllResultsForTerm import *
 from Backend.GettingAndGraphing.makerOfRGraphs import GallicaGrapher
 
 
@@ -10,7 +10,7 @@ import os
 
 class MultipleSearchTermHunt:
 
-	def __init__(self, searchList, newspaper, yearRange, strictYearRange,progressTracker, **kwargs):
+	def __init__(self, searchList, newspaper, yearRange, strictYearRange, progressTrackerThread, **kwargs):
 		self.searchTermList = searchList
 		self.newspaper = newspaper
 		self.yearRange = yearRange
@@ -19,7 +19,7 @@ class MultipleSearchTermHunt:
 		self.theKwargsForGraphingAndRecordNumber = kwargs
 		self.listOfGraphers = []
 		self.bigFileName = ''
-		self.progressTracker = progressTracker
+		self.progressTrackerThread = progressTrackerThread
 
 	def getAllResultBundlers(self):
 		return self.searchTermResultList
@@ -28,14 +28,15 @@ class MultipleSearchTermHunt:
 		for searchTerm in self.searchTermList:
 			if self.newspaper[0] == "noDict":
 				resultGetterForTerm = FullSearchNoDictionary(searchTerm, self.newspaper, self.yearRange,
-																		  self.strictYearRange, self.progressTracker)
+															 self.strictYearRange, self.progressTrackerThread)
 			else:
 				resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
-																			  self.yearRange,
-																			  self.strictYearRange, self.progressTracker)
+																 self.yearRange,
+																 self.strictYearRange, self.progressTrackerThread)
 			self.searchTermResultList.append(resultGetterForTerm)
 			resultGetterForTerm.runQuery()
-			self.progressTracker.resetProgress()
+			self.progressTrackerThread.setRetrievalProgress(0)
+			self.progressTrackerThread.setDiscoveryProgress(0)
 		self.createFilesForResultBundles()
 		self.initiateGraphing()
 

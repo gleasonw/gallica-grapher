@@ -13,7 +13,8 @@ class ProgressTrackerThread(threading.Thread):
 		self.paperChoices = re.findall(splitter, papers)
 		self.yearRange = re.findall(splitter, yearRange)
 		self.strictness = strictness
-		self.progress = 0
+		self.discoveryProgress = 0
+		self.retrievalProgress = 0
 		self.currentTerm = ""
 		print(self.searchItems, self.paperChoices, self.yearRange, self.strictness)
 
@@ -24,11 +25,17 @@ class ProgressTrackerThread(threading.Thread):
 											  uniqueGraphs=True, samePage=False)
 		requestToRun.runMultiTermQuery()
 
-	def updateProgress(self, amount):
-		self.progress = amount
+	def setRetrievalProgress(self, amount):
+		self.retrievalProgress = amount
 
-	def resetProgress(self):
-		self.progress = 0
+	def setDiscoveryProgress(self, amount):
+		self.discoveryProgress = amount
+
+	def getRetrievalProgress(self):
+		return self.retrievalProgress
+
+	def getDiscoveryProgress(self):
+		return self.discoveryProgress
 
 retrievingThreads = {}
 app = Flask(__name__)
@@ -78,10 +85,16 @@ def loadingResults(threadId):
 	if request.method == 'GET':
 		return render_template('preparingResults.html')
 
-@app.route('/loadingResults/getProgress/<int:threadId>')
+@app.route('/loadingResults/getDiscoveryProgress/<int:threadId>')
 def getProgress(threadId):
 	global retrievingThreads
-	progress = str(retrievingThreads[threadId].progress)
+	progress = str(retrievingThreads[threadId].getDiscoveryProgress())
+	return progress
+
+@app.route('/loadingResults/getRetrievalProgress/<int:threadId>')
+def getProgress(threadId):
+	global retrievingThreads
+	progress = str(retrievingThreads[threadId].getRetrievalProgress())
 	return progress
 
 
