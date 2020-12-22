@@ -23,7 +23,8 @@ class GallicaSearch:
 		self.progressTrackerThread = progressTrackerThread
 		self.strictYearRange = strictYearRange
 		self.totalResults = 0
-		self.progressPercent = 0
+		self.discoveryProgressPercent = 0
+		self.retrievalProgressPercent = 0
 		self.progressIterations = 0
 		self.newspaper = newspaper
 		self.newspaperDictionary = {}
@@ -46,11 +47,8 @@ class GallicaSearch:
 		return os.path.isfile(os.path.join("../CSVdata", self.fileName))
 
 	def runQuery(self):
-		if self.checkIfFileAlreadyInDirectory():
-			print("File exists in directory, skipping.")
-		else:
-			self.findTotalResults()
-			self.runSearch()
+		self.findTotalResults()
+		self.runSearch()
 
 	def getTopTenPapers(self):
 		return self.topTenPapers
@@ -67,8 +65,11 @@ class GallicaSearch:
 	def getCollectedQueries(self):
 		return self.collectedQueries
 
-	def getPercentProgress(self):
-		return self.progressPercent
+	def getDiscoveryProgressPercent(self):
+		return self.discoveryProgressPercent
+
+	def getRetrievalProgressPercent(self):
+		return self.retrievalProgressPercent
 
 	@staticmethod
 	def makeSession():
@@ -230,12 +231,12 @@ class GallicaSearch:
 		self.chunkedNewspaperDictionary = listOfSubDicts
 
 	def updateDiscoveryProgressPercent(self, iteration, total):
-		self.progressPercent = int((iteration / total) * 100)
-		self.progressTrackerThread.updateDiscoveryProgress(self.progressPercent)
+		self.discoveryProgressPercent = int((iteration / total) * 100)
+		self.progressTrackerThread.setDiscoveryProgress(self.discoveryProgressPercent)
 
 	def updateRetrievalProgressPercent(self, iteration, total):
-		self.progressPercent = int((iteration / total) * 100)
-		self.progressTrackerThread.updateRetrievalProgress(self.progressPercent)
+		self.retrievalProgressPercent = int((iteration / total) * 100)
+		self.progressTrackerThread.setRetrievalProgress(self.retrievalProgressPercent)
 
 
 class FullSearchWithinDictionary(GallicaSearch):
@@ -256,6 +257,7 @@ class FullSearchWithinDictionary(GallicaSearch):
 				progress = progress + numberResultsForEntirePaper
 				self.updateRetrievalProgressPercent(progress, self.totalResults)
 				self.numResultsForEachPaper.update({paperName: numberResultsForEntirePaper})
+			self.updateRetrievalProgressPercent(100, 100)
 
 	def sendWorkersToSearch(self, newspaper):
 		numberResultsInPaper = self.numResultsForEachPaper[newspaper]
@@ -304,6 +306,7 @@ class FullSearchNoDictionary(GallicaSearch):
 			for i, result in enumerate(executor.map(self.sendWorkersToSearch, startRecordList), 1):
 				self.updateRetrievalProgressPercent(i, iterations)
 				self.collectedQueries.extend(result)
+		self.updateRetrievalProgressPercent(100, 100)
 
 	def sendWorkersToSearch(self, startRecord):
 		batchHunter = self.sendQuery(self.baseQuery, startRecord=startRecord, numRecords=50)

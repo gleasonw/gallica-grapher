@@ -10,13 +10,6 @@
     <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
     <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <title>The Gallica Grapher</title>
-    <script>
-    $(function(){
-        $("#progressBar").progressbar({
-            value: 0
-        });
-    });
-    </script>
 </head>
 <body>
     <div class="topnav">
@@ -26,10 +19,10 @@
     </div>
     <div class = "mainElements">
         <div class = "progressBox">
-            <p id="discoveryDescription">Discovering total results...</p>
-            <div id = "discoveryBar"></div>
-            <p id="retrievalDescription">Retrieving results...</p>
-            <div id = "retrievalBar"></div>
+            <p class="progressDescription">Discovering total results...</p>
+            <div class= "progressBars" id = "discoveryBar"></div>
+            <p class="progressDescription">Retrieving results...</p>
+            <div class= "progressBars" id = "retrievalBar"></div>
         </div>
     </div>
 </body>

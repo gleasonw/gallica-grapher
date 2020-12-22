@@ -35,8 +35,6 @@ class MultipleSearchTermHunt:
 																 self.strictYearRange, self.progressTrackerThread)
 			self.searchTermResultList.append(resultGetterForTerm)
 			resultGetterForTerm.runQuery()
-			self.progressTrackerThread.setRetrievalProgress(0)
-			self.progressTrackerThread.setDiscoveryProgress(0)
 		self.createFilesForResultBundles()
 		self.initiateGraphing()
 
@@ -70,7 +68,8 @@ class MultipleSearchTermHunt:
 		self.makeMultiTermFileName()
 		self.createMassiveCSV()
 		topTenPapers = []
-		grapher = GallicaGrapher(self.bigFileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber)
+		requestId = self.progressTrackerThread.getId()
+		grapher = GallicaGrapher(self.bigFileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber, requestId)
 		grapher.parseGraphSettings()
 		grapher.plotGraphAndMakePNG()
 

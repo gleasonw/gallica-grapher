@@ -39,11 +39,11 @@ html, body {
     justify-content:center;
 }
 
-#progressDescription{
+.progressDescription{
     text-align: center;
 }
 
-#progressBar{
+.progressBars{
     margin: auto;
     width: 50%;
     height: 50px;

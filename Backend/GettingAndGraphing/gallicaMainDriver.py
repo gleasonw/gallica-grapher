@@ -1,6 +1,6 @@
 
 from Backend.GettingAndGraphing.makerOfRGraphs import GallicaGrapher
-from Backend.GettingAndGraphing.searchMasterRunner import MultipleSearchTermHunt
+from Backend.GettingAndGraphing.mainSearchSupervisor import MultipleSearchTermHunt
 import time
 
 import sys

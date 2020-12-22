@@ -1,4 +1,6 @@
 import csv
+from os.path import dirname
+
 import rpy2.robjects as robjects
 import shutil
 import os
@@ -10,7 +12,7 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 class GallicaGrapher:
-    def __init__(self, csvFile, tenMostPapers, graphSettings):
+    def __init__(self, csvFile, tenMostPapers, graphSettings, requestId):
         self.fileName = csvFile
         self.graphFileName = ''
         self.tenMostPapers = tenMostPapers
@@ -19,6 +21,7 @@ class GallicaGrapher:
         self.ggplotForR = None
         self.breakLength = 360
         self.directory = os.path.dirname(os.path.abspath(__file__))
+        self.requestId = requestId
 
     @staticmethod
     def arrangeGGplotsAndPlot(listOfGGplots, fileName):
@@ -35,8 +38,10 @@ class GallicaGrapher:
         multiGraph = robjects.globalenv["graphMulti"]
         multiGraph(listOfGGplots)
         grdevices.dev_off()
-        directory = os.path.dirname(os.path.abspath(__file__))
-        shutil.move(fileName, os.path.join("../Graphs", fileName))
+        pathToStaticFolder = dirname("..")
+        pathToStaticFolder = os.path.join(pathToStaticFolder, '/Frontend')
+        pathToStaticFolder = os.path.join(pathToStaticFolder, '/static')
+        shutil.move(fileName, os.path.join(pathToStaticFolder, fileName))
 
 
     def getGGplot(self):
@@ -249,7 +254,7 @@ class GallicaGrapher:
 
     def makeGraphFileName(self):
         self.graphFileName = self.fileName[0:len(self.fileName)-4]
-        self.graphFileName = "{0}-{1}".format(self.graphFileName, self.settings["graphType"])
+        self.graphFileName = "{0}-{1}-{2}".format(self.graphFileName, self.settings["graphType"], self.requestId)
         self.graphFileName = self.graphFileName + ".png"
 
     def makeSingleGraphTitle(self):
