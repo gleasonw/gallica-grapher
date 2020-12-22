@@ -48,10 +48,11 @@ class MultipleSearchTermHunt:
 			self.initiateSingleGraphManyData()
 
 	def createGGplotsForBundles(self):
+		requestId = self.progressTrackerThread.getId()
 		for resultBundle in self.searchTermResultList:
 			fileName = resultBundle.getFileName()
 			topTenPapers = resultBundle.getTopTenPapers()
-			grapher = GallicaGrapher(fileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber)
+			grapher = GallicaGrapher(fileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber, requestId)
 			grapher.parseGraphSettings()
 			self.listOfGraphers.append(grapher)
 
@@ -79,7 +80,7 @@ class MultipleSearchTermHunt:
 		ggPlotList = []
 		for grapher in self.listOfGraphers:
 			ggPlotList.append(grapher.getGGplot())
-		GallicaGrapher.arrangeGGplotsAndPlot(ggPlotList, self.bigFileName)
+		ggPlotList[0].arrangeGGplotsAndPlot(ggPlotList)
 
 	def runMultiTermQueryWithDiffPapers(self):
 		pass

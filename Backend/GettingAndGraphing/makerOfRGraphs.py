@@ -23,11 +23,9 @@ class GallicaGrapher:
         self.directory = os.path.dirname(os.path.abspath(__file__))
         self.requestId = requestId
 
-    @staticmethod
-    def arrangeGGplotsAndPlot(listOfGGplots, fileName):
-        fileName = fileName.replace(".csv",".png")
+    def arrangeGGplotsAndPlot(self, listOfGGplots):
         grdevices = importr('grDevices')
-        grdevices.png(file=fileName, width=1920, height=1080)
+        grdevices.png(file=self.graphFileName, width=1920, height=1080)
         robjects.r('''
         graphMulti <- function(listOfGGplots){
             numberPlots <- length(listOfGGplots)
@@ -38,14 +36,14 @@ class GallicaGrapher:
         multiGraph = robjects.globalenv["graphMulti"]
         multiGraph(listOfGGplots)
         grdevices.dev_off()
-        pathToStaticFolder = dirname("..")
-        pathToStaticFolder = os.path.join(pathToStaticFolder, '/Frontend')
-        pathToStaticFolder = os.path.join(pathToStaticFolder, '/static')
-        shutil.move(fileName, os.path.join(pathToStaticFolder, fileName))
+        self.moveThatFile()
 
 
     def getGGplot(self):
         return self.ggplotForR
+
+    def getFileName(self):
+        return self.graphFileName
 
 
     def parseGraphSettings(self):
@@ -249,8 +247,12 @@ class GallicaGrapher:
         dataGrapher = robjects.globalenv['graphThatGGplot']
         dataGrapher(self.ggplotForR)
         grdevices.dev_off()
-        shutil.move(self.graphFileName, os.path.join("../Graphs", self.graphFileName))
+        self.moveThatFile()
 
+    def moveThatFile(self):
+        pathToStaticFolder = dirname(dirname(dirname(os.path.realpath(__file__))))
+        pathToStaticFolder = os.path.join(pathToStaticFolder, 'Frontend/static')
+        shutil.move(self.graphFileName, os.path.join(pathToStaticFolder, self.graphFileName))
 
     def makeGraphFileName(self):
         self.graphFileName = self.fileName[0:len(self.fileName)-4]

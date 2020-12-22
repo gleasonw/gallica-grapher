@@ -21,6 +21,7 @@ class ProgressTrackerThread(threading.Thread):
 		self.retrievalProgress = 0
 		self.currentTerm = ""
 		self.threadId = id
+		self.imageRef = ''
 		print(self.searchItems, self.paperChoices, self.yearRange, self.strictness)
 
 		super().__init__()
@@ -48,6 +49,12 @@ class ProgressTrackerThread(threading.Thread):
 
 	def getId(self):
 		return self.threadId
+
+	def setImageRef(self, ref):
+		self.imageRef = ref
+
+	def getImageRef(self):
+		return self.imageRef
 
 
 retrievingThreads = {}
@@ -92,7 +99,9 @@ def home():
 
 @app.route('/results/<int:threadId>')
 def results(threadId):
-	return render_template('resultsPage.html')
+	global retrievingThreads
+	imageRef = retrievingThreads[threadId].getImageRef()
+	return render_template('resultsPage.html',imageRef=imageRef)
 
 
 @app.route('/loadingResults/<int:threadId>')
