@@ -96,8 +96,9 @@ class GallicaSearch:
 
 	def packageQuery(self):
 		if len(self.collectedQueries) != 0:
-			self.generateTopTenPapers()
 			self.makeCSVFile()
+			self.generateTopTenPapers()
+
 		else:
 			pass
 

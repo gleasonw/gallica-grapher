@@ -7,14 +7,14 @@ from flask import Flask, url_for, render_template, request, redirect
 from requests import ReadTimeout
 
 from Backend.GettingAndGraphing.mainSearchSupervisor import MultipleSearchTermHunt
-from .requestForm import SearchForm
+from Frontend.requestForm import SearchForm
 
 
 class ProgressTrackerThread(threading.Thread):
 	def __init__(self, searchTerm, papers, yearRange, strictness, id):
 		splitter = re.compile("[\w']+")
 		self.searchItems = re.findall(splitter, searchTerm)
-		self.paperChoices = re.findall(splitter, papers)
+		self.paperChoices = papers.split(',')
 		self.yearRange = re.findall(splitter, yearRange)
 		self.strictness = strictness
 		self.discoveryProgress = 0
@@ -129,4 +129,4 @@ def gallicaError():
 
 
 if __name__ == "__main__":
-	app.run()
+	app.run(debug=False)

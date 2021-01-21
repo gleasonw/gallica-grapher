@@ -26,7 +26,8 @@ class DictionaryMaker():
 			conn = psycopg2.connect(
 				host="localhost",
 				database="postgres",
-				user="postgres"
+				user="postgres",
+				password="2Got_Milk3"
 			)
 			cursor = conn.cursor()
 			firstPaper = self.newspaperSetting[0]
