@@ -9,7 +9,7 @@ CREATE TABLE papers (
     );
 
 COPY papers(paperName, startYear, endYear, url, paperCode)
-FROM '/home/will/Brazza/brazza-work/Backend/Postgre/paperDictionaryGoodDatesGoodNames.csv'
+FROM 'C:\Users\Public\paperDictionaryGoodDatesGoodNames.csv'
 DELIMITER ','
 CSV HEADER;
 

@@ -103,7 +103,7 @@ class GallicaSearch:
 			pass
 
 	def makeCSVFile(self):
-		with open(self.fileName, "w", encoding="utf8") as outFile:
+		with open(self.fileName, "w", encoding="utf8", newline='') as outFile:
 			writer = csv.writer(outFile)
 			writer.writerow(["date", "journal", "url"])
 			for csvEntry in self.collectedQueries:
@@ -116,8 +116,9 @@ class GallicaSearch:
 			nameOfFile = self.searchTerm + "-all-"
 		else:
 			for paper in self.newspaper:
-				nameOfFile = paper + "-"
-			nameOfFile = nameOfFile[0:len(nameOfFile) - 1]
+				paper = paper[0:5]
+				nameOfFile = nameOfFile + paper + "-"
+			nameOfFile = nameOfFile[0:len(nameOfFile) - 2]
 			wordsInQuery = self.searchTerm.split(" ")
 			for word in wordsInQuery:
 				nameOfFile = nameOfFile + word
@@ -192,6 +193,8 @@ class GallicaSearch:
 			self.sumUpTotalResults(paperCount)
 
 	def updateTopTenPapers(self, name, count):
+		# Makes the stackedbar not pick up fills, even if it makes the graph prettier
+		# name = name[0:17]
 		for i in range(10):
 			currentIndexCount = self.topTenPapers[i][1]
 			if count > currentIndexCount:
@@ -201,7 +204,7 @@ class GallicaSearch:
 
 	def generateTopTenPapers(self):
 		dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
-		with open(os.path.join("../CSVdata", dictionaryFile), "w", encoding="utf8") as outFile:
+		with open(os.path.join("../CSVdata", dictionaryFile), "w", encoding="utf8", newline='') as outFile:
 			writer = csv.writer(outFile)
 			for newspaper in self.topTenPapers:
 				print(newspaper)

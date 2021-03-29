@@ -27,7 +27,7 @@ class DictionaryMaker():
 				host="localhost",
 				database="postgres",
 				user="postgres",
-				password="2Got_Milk3"
+				password="ilike2play"
 			)
 			cursor = conn.cursor()
 			firstPaper = self.newspaperSetting[0]
@@ -76,16 +76,18 @@ class DictionaryMaker():
 		self.parseTuplesIntoDictionary()
 
 	def establishNewspaperDictionaryOfSpecificNewspapers(self, cursor):
-		SQL = """
-			SELECT paperName, paperCode
-				FROM papers
-					WHERE 
-						paperName IN %s
-			;
-			"""
-		cursor.execute(SQL, (tuple(self.newspaperSetting),))
-		self.tupleEntryList = cursor.fetchall()
-		self.parseTuplesIntoDictionary()
+		for paper in self.newspaperSetting:
+			SQL = """
+				SELECT paperName, paperCode
+					FROM papers
+						WHERE 
+							paperName = %s
+				;
+				"""
+			# noinspection PyRedundantParentheses
+			cursor.execute(SQL, (paper,))
+			self.tupleEntryList = cursor.fetchall()
+			self.parseTuplesIntoDictionary()
 
 	def parseTuplesIntoDictionary(self):
 		for tupleEntry in self.tupleEntryList:

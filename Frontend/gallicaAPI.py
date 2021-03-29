@@ -15,6 +15,7 @@ class ProgressTrackerThread(threading.Thread):
 		splitter = re.compile("[\w']+")
 		self.searchItems = re.findall(splitter, searchTerm)
 		self.paperChoices = papers.split(',')
+		self.cleanPaperChoices()
 		self.yearRange = re.findall(splitter, yearRange)
 		self.strictness = strictness
 		self.discoveryProgress = 0
@@ -28,12 +29,18 @@ class ProgressTrackerThread(threading.Thread):
 
 	def run(self):
 		requestToRun = MultipleSearchTermHunt(self.searchItems, self.paperChoices, self.yearRange, self.strictness,
-											  self, graphType="freqPoly",
-											  uniqueGraphs=True, samePage=False)
+											  self, graphType="multiFreqPoly",
+											  uniqueGraphs=False, samePage=True)
 		try:
 			requestToRun.runMultiTermQuery()
 		except ReadTimeout:
 			gallicaError()
+
+	def cleanPaperChoices(self):
+		for i in range(len(self.paperChoices)):
+			paper = self.paperChoices[i]
+			self.paperChoices[i] = paper.strip()
+
 
 	def setRetrievalProgress(self, amount):
 		self.retrievalProgress = amount
@@ -88,7 +95,7 @@ def home():
 		else:
 			papers = form.papers.data
 		yearRange = form.yearRange.data
-		strictness = form.yearRange.data
+		strictness = form.strictYearRange.data
 		print(searchTerm, papers, yearRange, strictness)
 		retrievingThreads[threadId] = ProgressTrackerThread(searchTerm, papers, yearRange, strictness,threadId)
 		retrievingThreads[threadId].start()

@@ -2,7 +2,6 @@ import concurrent.futures
 from requests_toolbelt import sessions
 from math import ceil
 import csv
-import re
 from lxml import etree
 from Backend.GettingAndGraphing.getterOfAllResultsFromPaper import TimeoutAndRetryHTTPAdapter
 
@@ -119,35 +118,41 @@ class paperGetter:
 				next(reader)
 				with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
 					for result in executor.map(self.getTheNames, reader):
-						writer.writerow(result)
+						if result:
+							writer.writerow(result)
 
 
 	def getTheNames(self, newspaper):
-		query = 'arkPress all "{0}" sortby dc.date/sort.ascending '
-		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
-		gallicaHttpSession.mount("https://", adapter)
-		gallicaHttpSession.mount("http://", adapter)
-		newspaperCode = newspaper[4]
-		newspaperQuery = query.format(newspaperCode)
-		parameters = dict(version=1.2, operation="searchRetrieve", exactSearch=False, collapsing=False,
-						  query=newspaperQuery, startRecord=0, maximumRecords=1)
-		response = gallicaHttpSession.get("",params=parameters)
-		root = etree.fromstring(response.content)
-		queryHit = root[4][0]
-		# queryHit = root.find("{http://www.loc.gov/zing/srw/}record")
-		data = queryHit[2][0]
-		journalName = data.find('{http://purl.org/dc/elements/1.1/}title').text
-		print([journalName, newspaper[1], newspaper[2], newspaper[3], newspaper[4]])
-		return [journalName, newspaper[1], newspaper[2], newspaper[3], newspaper[4]]
+		if newspaper:
+			query = 'arkPress all "{0}" sortby dc.date/sort.ascending '
+			gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
+			adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
+			gallicaHttpSession.mount("https://", adapter)
+			gallicaHttpSession.mount("http://", adapter)
+			newspaperCode = newspaper[4]
+			newspaperQuery = query.format(newspaperCode)
+			parameters = dict(version=1.2, operation="searchRetrieve", exactSearch=False, collapsing=False,
+							  query=newspaperQuery, startRecord=0, maximumRecords=1)
+			response = gallicaHttpSession.get("",params=parameters)
+			root = etree.fromstring(response.content)
+			try:
+				queryHit = root[4][0]
+				data = queryHit[2][0]
+				journalName = data.find('{http://purl.org/dc/elements/1.1/}title').text
+				print([journalName, newspaper[1], newspaper[2], newspaper[3], newspaper[4]])
+				return [journalName, newspaper[1], newspaper[2], newspaper[3], newspaper[4]]
+			except IndexError:
+				return
+			# queryHit = root.find("{http://www.loc.gov/zing/srw/}record")
+
+		else:
+			return
 
 
-def main():
+if __name__ == "__main__":
 	gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
 	adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
 	gallicaHttpSession.mount("https://", adapter)
 	gallicaHttpSession.mount("http://", adapter)
 	paperEditor = paperGetter("neat", gallicaHttpSession)
 	paperEditor.renamePapersToTheNameThatShowsUpInResult()
-
-main()

@@ -69,7 +69,7 @@ class SearchForm(Form):
 	papersRe = re.compile("(((\w+)\s*)*(,\s*((\w+)\s*)*)*){0,1}")
 	yearsRe = re.compile("(\d{4}[-,.]*(\d{4}){0,1}){0,1}")
 	searchTerm = StringField("What word do you want to graph?", [validators.InputRequired(), Regexp(termRe,message="Separate search terms with commas (e.g. 'chapeau, bonbon').")])
-	papers = StringField("Do you want a specific paper or papers?", [Regexp(papersRe, message="Separate desired papers with commas (e.g. 'Le Matin, Le Petit journal').")])
+	papers = StringField("Do you want a specific paper or papers?")
 	yearRange = StringField("Do you want a specific year range?", [Regexp(yearsRe,message="Acceptable example ranges: '1870-1890', '1840.1860', '1920,1940'"),
 																   validateYearRange])
 	strictYearRange = BooleanField("Restrict to papers publishing within year range?")

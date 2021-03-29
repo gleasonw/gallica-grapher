@@ -3,7 +3,6 @@ import rpy2.robjects as robjects
 import shutil
 import os
 
-from rpy2.robjects.lib.ggplot2 import (ggplot, aes,labs,geom_bar)
 from rpy2.robjects.packages import importr
 
 

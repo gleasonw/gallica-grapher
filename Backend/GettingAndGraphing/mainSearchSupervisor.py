@@ -1,11 +1,9 @@
 from Backend.GettingAndGraphing.getterOfAllResultsForTerm import *
-from Backend.GettingAndGraphing.makerOfRGraphs import GallicaGrapher
-
+from Backend.GettingAndGraphing.gallicaGrapher import GallicaGrapher
 
 import csv
 import shutil
 import os
-
 
 
 class MultipleSearchTermHunt:
@@ -52,7 +50,9 @@ class MultipleSearchTermHunt:
 		for resultBundle in self.searchTermResultList:
 			fileName = resultBundle.getFileName()
 			topTenPapers = resultBundle.getTopTenPapers()
-			grapher = GallicaGrapher(fileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber, requestId)
+			searchTerm = resultBundle.getSearchTerm()
+			grapher = GallicaGrapher(fileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber, requestId,
+									 searchTerm)
 			grapher.parseGraphSettings()
 			self.listOfGraphers.append(grapher)
 
@@ -70,7 +70,8 @@ class MultipleSearchTermHunt:
 		self.createMassiveCSV()
 		topTenPapers = []
 		requestId = self.progressTrackerThread.getId()
-		grapher = GallicaGrapher(self.bigFileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber, requestId)
+		grapher = GallicaGrapher(self.bigFileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber, requestId,
+								 self.searchTermList)
 		grapher.parseGraphSettings()
 		grapher.plotGraphAndMakePNG()
 
@@ -86,9 +87,9 @@ class MultipleSearchTermHunt:
 		pass
 
 	def createMassiveCSV(self):
-		with open(self.bigFileName, "w", encoding="utf8") as outFile:
+		with open(self.bigFileName, "w", encoding="utf8", newline='') as outFile:
 			writer = csv.writer(outFile)
-			writer.writerow(['date','journal','url','term'])
+			writer.writerow(['date', 'journal', 'url', 'term'])
 			for resultBundle in self.searchTermResultList:
 				resultList = resultBundle.getCollectedQueries()
 				if len(resultList) == 0:
@@ -105,8 +106,6 @@ class MultipleSearchTermHunt:
 						searchTermOfResultBundle = resultBundle.searchTerm
 						writer.writerow(csvEntry + [searchTermOfResultBundle])
 		shutil.move(self.bigFileName, os.path.join("../CSVdata", self.bigFileName))
-
-
 
 	def makeMultiTermFileName(self):
 		for resultBundle in self.searchTermResultList:
