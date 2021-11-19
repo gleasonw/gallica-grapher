@@ -98,9 +98,9 @@ def home():
 	form = SearchForm(request.form)
 	if request.method == 'POST' and form.validate():
 
-		threadId = random.randint(0, 10000) # What if there is a collision?
-
+		threadId = str(random.randint(0, 10000)) # What if there is a collision?
 		searchTerm = form.searchTerm.data
+		threadId = "{keyword}{int}".format(keyword=searchTerm,int=threadId)
 		if form.papers.data == "":
 			papers = "all"
 		else:
@@ -115,7 +115,7 @@ def home():
 	return render_template("mainPage.html", form=form)
 
 
-@app.route('/results/<int:threadId>')
+@app.route('/results/<threadId>')
 def results(threadId):
 	global retrievingThreads
 	#Clunky. Better way to coordinate between threads?
@@ -126,25 +126,25 @@ def results(threadId):
 	return render_template('resultsPage.html',imageRef=imageRef)
 
 
-@app.route('/loadingResults/<int:threadId>')
+@app.route('/loadingResults/<threadId>')
 def loadingResults(threadId):
 	return render_template('preparingResults.html')
 
 
-@app.route('/loadingResults/getDiscoveryProgress/<int:threadId>')
+@app.route('/loadingResults/getDiscoveryProgress/<threadId>')
 def getDiscoveryProgress(threadId):
 	global retrievingThreads
 	progress = str(retrievingThreads[threadId].getDiscoveryProgress())
 	return progress
 
 
-@app.route('/loadingResults/getRetrievalProgress/<int:threadId>')
+@app.route('/loadingResults/getRetrievalProgress/<threadId>')
 def getRetrievalProgress(threadId):
 	global retrievingThreads
 	progress = str(retrievingThreads[threadId].getRetrievalProgress())
 	return progress
 
-@app.route('/loadingResults/getDiscoveredResults/<int:threadId>')
+@app.route('/loadingResults/getDiscoveredResults/<threadId>')
 def getTotalDiscovered(threadId):
 	global retrievingThreads
 	totalDiscovered = str(retrievingThreads[threadId].getDiscoveredResults())

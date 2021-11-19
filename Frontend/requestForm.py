@@ -72,7 +72,7 @@ class SearchForm(Form):
 	papers = StringField("Do you want a specific paper or papers?")
 	yearRange = StringField("Do you want a specific year range?", [Regexp(yearsRe,message="Acceptable example ranges: '1870-1890', '1840.1860', '1920,1940'"),
 																   validateYearRange])
-	strictYearRange = BooleanField("Restrict to papers publishing within year range?")
+	strictYearRange = BooleanField("Restrict to papers that published continuously over this year range?")
 
 	def fullMatchValidator(self, form, field):
 		match = re.fullmatch()

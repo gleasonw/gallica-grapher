@@ -3,7 +3,6 @@ from lxml import etree
 
 
 class GallicaHunter:
-	# Need to rework with backoff timeouts for requests and remove duplicate code
 	def __init__(self, query, startRecord, numRecords, session):
 		self.dateJournalIdentifierResults = []
 		self.query = query
@@ -21,6 +20,7 @@ class GallicaHunter:
 		parameters = dict(version=1.2, operation="searchRetrieve", collapsing=collapseSetting, exactSearch="false",
 						  query=query, startRecord=0, maximumRecords=1)
 		response = self.session.get("", params=parameters)
+		print(response.status_code)
 		root = etree.fromstring(response.content)
 		numResults = int(root[2].text)
 		return numResults
@@ -54,6 +54,7 @@ class GallicaHunter:
 		parameters = {"version": 1.2, "operation": "searchRetrieve", "query": self.query,
 					  "startRecord": self.startRecord, "maximumRecords": self.numRecords, "collapsing": "disabled"}
 		response = self.session.get("", params=parameters)
+		print(response.status_code)
 		root = etree.fromstring(response.content)
 		self.hitListCreator(root)
 

@@ -4,7 +4,9 @@ import os
 import concurrent.futures
 from math import ceil
 
-from requests import sessions
+from requests_toolbelt import sessions
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 from Backend.GettingAndGraphing.batchGetter import GallicaHunter
 from Backend.GettingAndGraphing.dictionaryMaker import DictionaryMaker
@@ -253,31 +255,36 @@ class FullSearchWithinDictionary(GallicaSearch):
 		self.createWorkersForSearch()
 
 	def createQueryStringList(self):
+		for newspaper in self.newspaperDictionary:
+			hitsInNewspaper = self.numResultsForEachPaper[newspaper]
+			newspaperKey = self.newspaperDictionary[newspaper]
+			numberOfQueriesToSend = ceil(hitsInNewspaper / 50)
+			queryFormatForPaper = self.baseQuery.format(newsKey=newspaperKey)
+			startRecord = 1
+			for i in range(numberOfQueriesToSend):
+				queryRecordPair = [queryFormatForPaper, startRecord]
+				self.listOfAllQueryStrings.append(queryRecordPair)
+				startRecord += 50
 
-
+	#Might need to replace the updating of the newspaper result counts? Currently deleted and no change, final list might be inaccurate.
 	def createWorkersForSearch(self):
 		progress = 0
 		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-			for result in executor.map(self.sendWorkersToSearch, self.newspaperDictionary): #CHANGE TO BIG OL LIST OF QUERIES
-				paperName = result[0]
-				resultList = result[1]
-				numberResultsForEntirePaper = result[2]
-				self.collectedQueries.extend(resultList)
-				progress = progress + numberResultsForEntirePaper
+			for result in executor.map(self.sendWorkersToSearch, self.listOfAllQueryStrings):
+				numberResultsInBatch = len(result)
+				self.collectedQueries.extend(result)
+				progress = progress + numberResultsInBatch
 				self.updateRetrievalProgressPercent(progress, self.totalResults)
-				self.numResultsForEachPaper.update({paperName: numberResultsForEntirePaper})
 			self.updateRetrievalProgressPercent(100, 100)
 
-	def sendWorkersToSearch(self, newspaper):
-		numberResultsInPaper = self.numResultsForEachPaper[newspaper]
-		newspaperCode = self.newspaperDictionary[newspaper]
-
-		#TO CHANGE TO BIG OL LIST OF QUERIES
-		newspaperHuntOverseer = UnlimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper)
-		newspaperHuntOverseer.scourPaper()
-
-
-		return [newspaper, newspaperHuntOverseer.getResultList(), newspaperHuntOverseer.getNumValidResults()]
+	def sendWorkersToSearch(self, queryAndRecordStart):
+		query = queryAndRecordStart[0]
+		recordStart = queryAndRecordStart[1]
+		session = GallicaSearch.makeSession()
+		hunterForQuery = GallicaHunter(query, recordStart, 50, session)
+		hunterForQuery.hunt()
+		results = hunterForQuery.getResultList()
+		return results
 
 	def findTotalResults(self):
 		self.createWorkersForFindingTotalResults()
@@ -285,7 +292,7 @@ class FullSearchWithinDictionary(GallicaSearch):
 
 	def createWorkersForFindingTotalResults(self):
 		try:
-			with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+			with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
 				for i, result in enumerate(executor.map(self.findNumberResults, self.newspaperDictionary), 1):
 					self.paperNameCounts = self.paperNameCounts + result
 					self.updateDiscoveryProgressPercent(i, len(self.newspaperDictionary))
@@ -333,13 +340,13 @@ class FullSearchNoDictionary(GallicaSearch):
 # make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
 
 
-DEFAULT_TIMEOUT = 5  # seconds
+DEFAULT_TIMEOUT = 1  # seconds
 
 
 class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
 	def __init__(self, *args, **kwargs):
 		retryStrategy = Retry(
-			total=5,
+			total=10,
 			status_forcelist=[429, 500, 502, 503, 504],
 			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
 			backoff_factor=1
