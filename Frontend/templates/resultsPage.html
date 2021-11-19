@@ -14,17 +14,25 @@
         <a href="{{ url_for('contact')}}">Contact</a>
     </div>
     <div class = "resultElements">
-        <div class = "mainTitle">
-            <p>Word Frequency Graph of Putain</p>
-        </div>
-        <div class = "topBar">
-            <div class = "graph">
-                <img id = "Graph" src={{imageRef}} alt="graph of word frequency data">
-            </div>
-            <div class = "downloadAndTopPapers">
-                <div id = download>
-                    <p> Download CSV || Download Graph(s). </p>
-                </div>
+        <table class="resultTable">
+            <tr>
+                <td>
+                    <div class = "mainTitle">
+                        <p>Word Frequency Graph of Putain</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                     <div class = "topBar">
+                        <div class = "graph">
+                            <img id = "Graph" src={{imageRef}} alt="graph of word frequency data">
+                        </div>
+                     </div>
+                </td>
+            </tr>
+            <td>
+                <div class = "downloadAndTopPapers">
                 <div id = TopPapers>
                     <table id = TopPapersTable>
                           <tr>
@@ -45,9 +53,14 @@
                     </table>
 
                 </div>
+                <div id = download>
+                    <p> Download CSV || Download Graph(s). </p>
+                </div>
             </div>
-        </div>
-        <div class = bottomBar>
+            </td>
+        <tr>
+            <td>
+                <div class = bottomBar>
             <form id = "graphSettingStuff">
                 <div class ="form-group">
                     <label class = "settingLabel" for="graphType">Select a new graph type </label>
@@ -71,6 +84,11 @@
                 </div>
             </form>
         </div>
+            </td>
+        </tr>
+        </table>
+
+
     </div>
 </body>
 </html>

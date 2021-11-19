@@ -1,6 +1,6 @@
 import psycopg2
 
-
+#What if paper doesn't exist? I suppose that will be avoided
 class DictionaryMaker():
 	def __init__(self, newspaperSetting, yearRange, eliminateEdgePapers):
 		self.newspaperSetting = newspaperSetting
@@ -25,8 +25,8 @@ class DictionaryMaker():
 		try:
 			conn = psycopg2.connect(
 				host="localhost",
-				database="postgres",
-				user="postgres",
+				database="gallica",
+				user="wglea",
 				password="ilike2play"
 			)
 			cursor = conn.cursor()

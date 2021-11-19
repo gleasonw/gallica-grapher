@@ -162,9 +162,8 @@ class GallicaGrapher:
 
         robjects.r('''
         initiateBarGGplot <- function(dataToGraph){
-            graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..density..)) +
-                geom_histogram(binwidth=30) + 
-                geom_density(color = "black", size = 1)
+            graphOfHits <- ggplot(dataToGraph, aes(x=numericDate, ..count..)) +
+                geom_histogram(binwidth=30)
             return(graphOfHits)
         }
         ''')
@@ -264,6 +263,8 @@ class GallicaGrapher:
         self.graphFileName = self.fileName[0:len(self.fileName)-4]
         self.graphFileName = "{0}-{1}-{2}".format(self.graphFileName, self.settings["graphType"], self.requestId)
         self.graphFileName = self.graphFileName + ".png"
+
+
 
     def makeSingleGraphTitle(self):
         paperNames = ''

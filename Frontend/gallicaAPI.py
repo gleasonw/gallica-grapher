@@ -2,6 +2,7 @@ import queue
 import random
 import re
 import threading
+import time
 
 from flask import Flask, url_for, render_template, request, redirect
 from requests import ReadTimeout
@@ -22,14 +23,14 @@ class ProgressTrackerThread(threading.Thread):
 		self.retrievalProgress = 0
 		self.currentTerm = ""
 		self.threadId = id
-		self.imageRef = ''
-		print(self.searchItems, self.paperChoices, self.yearRange, self.strictness)
+		self.imageRef = None
+		self.totalResultsForQuery = 0
 
 		super().__init__()
 
 	def run(self):
 		requestToRun = MultipleSearchTermHunt(self.searchItems, self.paperChoices, self.yearRange, self.strictness,
-											  self, graphType="multiFreqPoly",
+											  self, graphType="bar",
 											  uniqueGraphs=False, samePage=True)
 		try:
 			requestToRun.runMultiTermQuery()
@@ -63,6 +64,14 @@ class ProgressTrackerThread(threading.Thread):
 	def getImageRef(self):
 		return self.imageRef
 
+	def setDiscoveredResults(self, total):
+		self.totalResultsForQuery = total
+
+	def getDiscoveredResults(self):
+		return self.totalResultsForQuery
+
+
+
 
 retrievingThreads = {}
 exceptionBucket = queue.Queue()
@@ -88,7 +97,9 @@ def home():
 	global exceptionBucket
 	form = SearchForm(request.form)
 	if request.method == 'POST' and form.validate():
-		threadId = random.randint(0, 10000)
+
+		threadId = random.randint(0, 10000) # What if there is a collision?
+
 		searchTerm = form.searchTerm.data
 		if form.papers.data == "":
 			papers = "all"
@@ -107,7 +118,11 @@ def home():
 @app.route('/results/<int:threadId>')
 def results(threadId):
 	global retrievingThreads
+	#Clunky. Better way to coordinate between threads?
 	imageRef = retrievingThreads[threadId].getImageRef()
+	while not imageRef:
+		time.sleep(1)
+		imageRef = retrievingThreads[threadId].getImageRef()
 	return render_template('resultsPage.html',imageRef=imageRef)
 
 
@@ -128,6 +143,13 @@ def getRetrievalProgress(threadId):
 	global retrievingThreads
 	progress = str(retrievingThreads[threadId].getRetrievalProgress())
 	return progress
+
+@app.route('/loadingResults/getDiscoveredResults/<int:threadId>')
+def getTotalDiscovered(threadId):
+	global retrievingThreads
+	totalDiscovered = str(retrievingThreads[threadId].getDiscoveredResults())
+	return totalDiscovered
+
 
 
 @app.route('/gallicaError')

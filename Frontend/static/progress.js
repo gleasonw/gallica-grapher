@@ -9,6 +9,7 @@ $(function(){
     $("#discoveryBar").progressbar({
         value: 0,
         complete: function(event, ui){
+            getDiscovered()
             worker('getRetrievalProgress/', '#retrievalBar')
         }
     });
@@ -21,7 +22,6 @@ $(function updateDiscoveryProgress(threadId){
 function worker(url, progressBarID) {
     $.get(url + threadId,function (data) {
         var progress = Number(data);
-        console.log(progress)
         if(progress <= 100){
             $(progressBarID).progressbar( "value", progress );
             if(progress !== 100){
@@ -39,4 +39,11 @@ function getThreadId(){
     let url = $(location).attr('href'),
         parts = url.split("/");
     return parts[parts.length - 1];
+}
+
+function getDiscovered(){
+    $.get('getDiscoveredResults/' + threadId, function(data){
+        console.log(data)
+        document.getElementById("numberDiscovered").innerHTML = "Discovering... "+data+" results found.";
+    });
 }

@@ -1,5 +1,5 @@
-from Backend.GettingAndGraphing.getterOfAllResultsForTerm import *
-from Backend.GettingAndGraphing.gallicaGrapher import GallicaGrapher
+from Backend.GettingAndGraphing.termSearch import *
+from Backend.GettingAndGraphing.rGrapher import GallicaGrapher
 
 import csv
 import shutil
@@ -74,6 +74,10 @@ class MultipleSearchTermHunt:
 								 self.searchTermList)
 		grapher.parseGraphSettings()
 		grapher.plotGraphAndMakePNG()
+		graphFileName = grapher.getFileName()
+		graphFileName = "/static/{filename}".format(filename=graphFileName)
+		self.progressTrackerThread.setImageRef(graphFileName)
+
 
 	def initiateSinglePageManyGraphs(self):
 		self.createGGplotsForBundles()
@@ -95,7 +99,7 @@ class MultipleSearchTermHunt:
 				if len(resultList) == 0:
 					termDataFileName = resultBundle.getFileName()
 					term = resultBundle.getSearchTerm()
-					filePath = os.path.join("../CSVdata", termDataFileName)
+					filePath = os.path.join("/", termDataFileName)
 					with open(filePath, "r", encoding="utf8") as inFile:
 						reader = csv.reader(inFile)
 						next(reader)

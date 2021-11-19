@@ -1,5 +1,5 @@
 
-from Backend.GettingAndGraphing.gallicaGrapher import GallicaGrapher
+from Backend.GettingAndGraphing.rGrapher import GallicaGrapher
 from Backend.GettingAndGraphing.mainSearchSupervisor import MultipleSearchTermHunt
 import time
 

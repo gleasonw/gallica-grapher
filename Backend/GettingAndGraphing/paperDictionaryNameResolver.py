@@ -3,7 +3,7 @@ from requests_toolbelt import sessions
 from math import ceil
 import csv
 from lxml import etree
-from Backend.GettingAndGraphing.getterOfAllResultsFromPaper import TimeoutAndRetryHTTPAdapter
+from Backend.GettingAndGraphing.termSearch import TimeoutAndRetryHTTPAdapter
 
 
 def standardizeDateRange(dateRangeToStandardize):

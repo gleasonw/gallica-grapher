@@ -1,0 +1,4 @@
+1. Clean up storage.
+2. Clean up retrieval.
+3. Show how many results were discovered in the progress bar section.
+4. Rework requests to create a list of queries to send, and then thread that.

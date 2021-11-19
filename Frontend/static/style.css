@@ -192,8 +192,8 @@ input[type="text"],input[type="search"],input#papers,input#searchTerm,input#year
 }
 
 .graph{
-    float: right;
-    width: 75%;
+    width: 100%;
+    margin: auto;
 }
 
 .graph #Graph{

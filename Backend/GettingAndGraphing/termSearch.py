@@ -2,11 +2,12 @@ import csv
 import shutil
 import os
 import concurrent.futures
+from math import ceil
 
 from requests import sessions
 
+from Backend.GettingAndGraphing.batchGetter import GallicaHunter
 from Backend.GettingAndGraphing.dictionaryMaker import DictionaryMaker
-from Backend.GettingAndGraphing.getterOfAllResultsFromPaper import *
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -38,6 +39,7 @@ class GallicaSearch:
 		self.parseNewspaperDictionary()
 		self.establishStrictness()
 		self.buildQuery()
+		self.listOfAllQueryStrings = []
 
 		self.paperNameCounts = []
 
@@ -98,7 +100,6 @@ class GallicaSearch:
 		if len(self.collectedQueries) != 0:
 			self.makeCSVFile()
 			self.generateTopTenPapers()
-
 		else:
 			pass
 
@@ -248,12 +249,16 @@ class FullSearchWithinDictionary(GallicaSearch):
 		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, progressTracker)
 
 	def runSearch(self):
+		self.createQueryStringList()
 		self.createWorkersForSearch()
+
+	def createQueryStringList(self):
+
 
 	def createWorkersForSearch(self):
 		progress = 0
 		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-			for result in executor.map(self.sendWorkersToSearch, self.newspaperDictionary):
+			for result in executor.map(self.sendWorkersToSearch, self.newspaperDictionary): #CHANGE TO BIG OL LIST OF QUERIES
 				paperName = result[0]
 				resultList = result[1]
 				numberResultsForEntirePaper = result[2]
@@ -266,13 +271,17 @@ class FullSearchWithinDictionary(GallicaSearch):
 	def sendWorkersToSearch(self, newspaper):
 		numberResultsInPaper = self.numResultsForEachPaper[newspaper]
 		newspaperCode = self.newspaperDictionary[newspaper]
-		newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
+
+		#TO CHANGE TO BIG OL LIST OF QUERIES
 		newspaperHuntOverseer = UnlimitedOverseerOfNewspaperHunt(newspaperQuery, numberResultsInPaper)
 		newspaperHuntOverseer.scourPaper()
+
+
 		return [newspaper, newspaperHuntOverseer.getResultList(), newspaperHuntOverseer.getNumValidResults()]
 
 	def findTotalResults(self):
 		self.createWorkersForFindingTotalResults()
+		self.progressTrackerThread.setDiscoveredResults(self.totalResults)
 
 	def createWorkersForFindingTotalResults(self):
 		try:
@@ -322,3 +331,27 @@ class FullSearchNoDictionary(GallicaSearch):
 		self.totalResults = hunterForTotalNumberOfQueryResults.establishTotalHits(self.baseQuery, False)
 
 # make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
+
+
+DEFAULT_TIMEOUT = 5  # seconds
+
+
+class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
+	def __init__(self, *args, **kwargs):
+		retryStrategy = Retry(
+			total=5,
+			status_forcelist=[429, 500, 502, 503, 504],
+			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
+			backoff_factor=1
+		)
+		self.timeout = DEFAULT_TIMEOUT
+		if "timeout" in kwargs:
+			self.timeout = kwargs["timeout"]
+			del kwargs["timeout"]
+		super().__init__(*args, **kwargs, max_retries=retryStrategy)
+
+	def send(self, request, **kwargs):
+		timeout = kwargs.get("timeout")
+		if timeout is None:
+			kwargs["timeout"] = self.timeout
+		return super().send(request, **kwargs)
