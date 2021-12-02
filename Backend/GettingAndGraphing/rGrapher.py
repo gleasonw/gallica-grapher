@@ -11,6 +11,7 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
+#REWRITE TO MAKE DATA TRANSFORMATIONS USING SQL, PLOT ONLY IN R
 class GallicaGrapher:
     def __init__(self, csvFile, tenMostPapers, graphSettings, requestId, searchTerms):
         self.fileName = csvFile
@@ -52,13 +53,11 @@ class GallicaGrapher:
         self.makeGraphFileName()
         self.readCSVtoR()
         if self.settings["graphType"] == "stackedBar":
-            self.establishTopPapers()
             self.tenMostPapers = self.transformTopTenPapersToRVector()
             self.makeStackedBarGraph()
         elif self.settings["graphType"] == "bar":
             self.makeBarGraph()
         elif self.settings["graphType"] == "percentBar":
-            self.establishTopPapers()
             self.tenMostPapers = self.transformTopTenPapersToRVector()
             self.makePercentBar()
         elif self.settings["graphType"] == "freqPoly":
@@ -69,16 +68,6 @@ class GallicaGrapher:
             self.makeDensityGraph()
         else:
             pass
-
-
-    def establishTopPapers(self):
-        if len(self.tenMostPapers) == 0:
-            dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
-            with open(os.path.join("../CSVdata", dictionaryFile)) as inFile:
-                reader = csv.reader(inFile)
-                for newspaper in reader:
-                    thePaper = newspaper[0]
-                    self.tenMostPapers.append(thePaper)
 
     def readCSVtoR(self):
         zoo = importr('zoo')
@@ -188,6 +177,7 @@ class GallicaGrapher:
         graphTitle = self.makeSingleGraphTitle()
         self.ggplotForR = self.addLabelsToGGplot(graphTitle)
 
+    #This feels slow
     def addLabelsToGGplot(self, title):
         #Removed the title for presentation purposes
         robjects.r('''
@@ -208,6 +198,7 @@ class GallicaGrapher:
         labelAdder = robjects.globalenv['labelAdder']
         return labelAdder(self.ggplotForR, title, self.theCSVforR, self.breakLength)
 
+    #This feels slow
     def parseDateForRCSV(self):
         robjects.r('''
             parseDate <- function(csvResults){ 
@@ -220,7 +211,7 @@ class GallicaGrapher:
         mutateFunction = robjects.globalenv['parseDate']
         return mutateFunction(self.theCSVforR)
 
-
+    #This feels slow
     def createFillColumnForRCSV(self):
         robjects.r('''
             createFillColumn <- function(csvResults, paperVector){

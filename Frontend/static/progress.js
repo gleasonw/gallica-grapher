@@ -1,7 +1,7 @@
 threadId = getThreadId()
 $(function(){
     $("#retrievalBar").progressbar({
-        value: 0
+        value: 0,
     });
 });
 
@@ -28,6 +28,7 @@ function worker(url, progressBarID) {
                 setTimeout(function() {worker(url, progressBarID)}, 1000);
             }else{
                 if(url === 'getRetrievalProgress/'){
+                    getRetrieved()
                     window.location.replace('/results/'+threadId)
                 }
             }
@@ -43,7 +44,13 @@ function getThreadId(){
 
 function getDiscovered(){
     $.get('getDiscoveredResults/' + threadId, function(data){
-        console.log(data)
         document.getElementById("numberDiscovered").innerHTML = "Discovering... "+data+" results found.";
+    });
+}
+
+function getRetrieved(){
+    $.get('getNumberRetrievedResults/' + threadId, function(data){
+        console.log(data)
+        document.getElementById("numberRetrieved").innerHTML = "Retrieved "+data+" non-duplicate results. Generating graph...";
     });
 }

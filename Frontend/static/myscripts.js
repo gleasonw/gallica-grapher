@@ -25,6 +25,41 @@ $(function strictnessChecker(){
         }
     })
 });
+//Stop requesting the papers after the initialization
+$("input#papers").on('click', function(){
+    const displayData = async () => {
+        const fetchedPapers = await getPapers()
+        var papers = Object.values(fetchedPapers)
+        console.log(papers)
+        $("input#papers").keyup(function(){
+            let searchData = $(this).val().toLowerCase();
+            const match = papers.filter(paper => {
+                return paper.paperName.toLowerCase().includes(searchData)
+            })
+            let matchedPapers = Object.values(match);
+            $(".dropdown").empty();
+            for (var i = 0; i < matchedPapers.length; i++){
+                $("<div class='paperOptionDrop' id=paper{0}>{1}</div>".format(i, matchedPapers[i].paperName)).appendTo('.dropdown')
+            }
+        });
+    };
+    displayData();
+});
+
+const getPapers = async () => {
+    const papersResponse = await fetch('/papers');
+    return await papersResponse.json()
+};
+
+String.prototype.format = String.prototype.f = function() {
+    var s = this,
+        i = arguments.length;
+
+    while (i--) {
+        s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), arguments[i]);
+    }
+    return s;
+};
 
 
 
@@ -33,25 +68,3 @@ $(function strictnessChecker(){
 
 
 
-
-
-
-// let i = 0;
-//
-// function move() {
-//   if (i === 0) {
-//     i = 1;
-//     var elem = document.getElementById("establishResultsBar");
-//     var width = 1;
-//     var id = setInterval(frame, 10);
-//     function frame() {
-//       if (width >= 100) {
-//         clearInterval(id);
-//         i = 0;
-//       } else {
-//         width++;
-//         elem.style.width = width + "%";
-//       }
-//     }
-//   }
-// }

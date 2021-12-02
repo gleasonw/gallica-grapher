@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="../static/style.css">
-    <meta charset="UTF-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="../static/myscripts.js"></script>
     <title>The Gallica Grapher</title>
 </head>
 <body>
@@ -24,7 +23,10 @@
                     {{ render_field(form.searchTerm) }}
                 </div>
                 <div class = "form-group">
-                    {{ render_field(form.papers) }}
+                    {{ render_field(form.papers, autocomplete="off") }}
+                    <div class = "dropdown">
+
+                    </div>
                 </div>
                 <div class = "form-group">
                     {{ render_field(form.yearRange) }}
@@ -38,5 +40,7 @@
             </form>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="../static/myscripts.js"></script>
 </body>
 </html>

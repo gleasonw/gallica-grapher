@@ -33,8 +33,14 @@ class MultipleSearchTermHunt:
 																 self.strictYearRange, self.progressTrackerThread)
 			self.searchTermResultList.append(resultGetterForTerm)
 			resultGetterForTerm.runQuery()
-		self.createFilesForResultBundles()
+		self.giveTopPapersToThread()
 		self.initiateGraphing()
+
+	def giveTopPapersToThread(self):
+		for bundle in self.searchTermResultList:
+			topTenPapers = bundle.getTopTenPapers()
+			self.progressTrackerThread.addTopPapers(topTenPapers)
+
 
 	def initiateGraphing(self):
 		if self.theKwargsForGraphingAndRecordNumber['uniqueGraphs']:
@@ -56,15 +62,12 @@ class MultipleSearchTermHunt:
 			grapher.parseGraphSettings()
 			self.listOfGraphers.append(grapher)
 
-	def createFilesForResultBundles(self):
-		for resultBundle in self.searchTermResultList:
-			resultBundle.packageQuery()
-
 	def initiateSingleGraphPerPage(self):
 		self.createGGplotsForBundles()
 		for grapher in self.listOfGraphers:
 			grapher.plotGraphAndMakePNG()
 
+	# What exactly does a top ten dictionary mean in this context of multiple terms?
 	def initiateSingleGraphManyData(self):
 		self.makeMultiTermFileName()
 		self.createMassiveCSV()
@@ -77,7 +80,6 @@ class MultipleSearchTermHunt:
 		graphFileName = grapher.getFileName()
 		graphFileName = "/static/{filename}".format(filename=graphFileName)
 		self.progressTrackerThread.setImageRef(graphFileName)
-
 
 	def initiateSinglePageManyGraphs(self):
 		self.createGGplotsForBundles()

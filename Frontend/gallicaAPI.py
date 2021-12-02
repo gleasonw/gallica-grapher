@@ -4,10 +4,12 @@ import re
 import threading
 import time
 
-from flask import Flask, url_for, render_template, request, redirect
+import flask
+from flask import Flask, url_for, render_template, request, redirect, jsonify
 from requests import ReadTimeout
 
 from Backend.GettingAndGraphing.mainSearchSupervisor import MultipleSearchTermHunt
+from Backend.GettingAndGraphing.paperGetter import PaperGetter
 from Frontend.requestForm import SearchForm
 
 
@@ -25,6 +27,8 @@ class ProgressTrackerThread(threading.Thread):
 		self.threadId = id
 		self.imageRef = None
 		self.totalResultsForQuery = 0
+		self.numberRetrievedResults = 0
+		self.listOfTopPapersForTerms = []
 
 		super().__init__()
 
@@ -70,6 +74,24 @@ class ProgressTrackerThread(threading.Thread):
 	def getDiscoveredResults(self):
 		return self.totalResultsForQuery
 
+	def setNumberRetrievedResults(self, count):
+		self.numberRetrievedResults = count
+
+	def getNumberRetrievedResults(self):
+		return self.numberRetrievedResults
+
+	def getSearchItems(self):
+		return self.searchItems
+
+	def getDateRange(self):
+		return self.yearRange
+
+	def addTopPapers(self, papers):
+		self.listOfTopPapersForTerms.append(papers)
+
+	def getTopPapers(self):
+		return self.listOfTopPapersForTerms
+
 
 
 
@@ -96,9 +118,10 @@ def home():
 	global retrievingThreads
 	global exceptionBucket
 	form = SearchForm(request.form)
+	#CHANGE TO SESSION
 	if request.method == 'POST' and form.validate():
 
-		threadId = str(random.randint(0, 10000)) # What if there is a collision?
+		threadId = str(random.randint(0, 10000)) # What if there is a collision? Impossible?
 		searchTerm = form.searchTerm.data
 		threadId = "{keyword}{int}".format(keyword=searchTerm,int=threadId)
 		if form.papers.data == "":
@@ -108,22 +131,37 @@ def home():
 		yearRange = form.yearRange.data
 		strictness = form.strictYearRange.data
 		print(searchTerm, papers, yearRange, strictness)
-		retrievingThreads[threadId] = ProgressTrackerThread(searchTerm, papers, yearRange, strictness,threadId)
+
+		retrievingThreads[threadId] = ProgressTrackerThread(searchTerm, yearRange, strictness,threadId)
 		retrievingThreads[threadId].start()
 
 		return redirect(url_for('loadingResults', threadId=threadId))
 	return render_template("mainPage.html", form=form)
 
+@app.route('/papers')
+def papers():
+	getter = PaperGetter()
+	availablePapers = getter.getPapers()
+	return availablePapers
 
 @app.route('/results/<threadId>')
 def results(threadId):
 	global retrievingThreads
-	#Clunky. Better way to coordinate between threads?
-	imageRef = retrievingThreads[threadId].getImageRef()
+	request = retrievingThreads[threadId]
+	#Clunky. Is there a better way to coordinate waiting for the graph to finish?
+	imageRef = request.getImageRef()
+
+
 	while not imageRef:
 		time.sleep(1)
 		imageRef = retrievingThreads[threadId].getImageRef()
-	return render_template('resultsPage.html',imageRef=imageRef)
+
+	# This will need to be changed for multiple terms, multiple dictionaries.
+	searchTerms = request.getSearchItems()
+	dateRange = request.getDateRange()
+	paperDictionarys = request.getTopPapers()
+	singleDictionaryForSingleTerm = paperDictionarys[0]
+	return render_template('resultsPage.html',imageRef=imageRef, topPapers=singleDictionaryForSingleTerm,dateRange=dateRange,term=searchTerms)
 
 
 @app.route('/loadingResults/<threadId>')
@@ -149,6 +187,12 @@ def getTotalDiscovered(threadId):
 	global retrievingThreads
 	totalDiscovered = str(retrievingThreads[threadId].getDiscoveredResults())
 	return totalDiscovered
+
+@app.route('/loadingResults/getNumberRetrievedResults/<threadId>')
+def getTotalRetrieved(threadId):
+	global retrievingThreads
+	totalRetrieved = str(retrievingThreads[threadId].getNumberRetrievedResults())
+	return totalRetrieved
 
 
 

@@ -34,7 +34,6 @@ class GallicaSearch:
 		self.chunkedNewspaperDictionary = {}
 		self.collectedQueries = []
 		self.searchTerm = searchTerm
-		self.topPapers = []
 		self.topTenPapers = []
 		self.numResultsForEachPaper = {}
 		self.establishYearRange(yearRange)
@@ -78,7 +77,7 @@ class GallicaSearch:
 	@staticmethod
 	def makeSession():
 		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
+		adapter = TimeoutAndRetryHTTPAdapter(timeout=5)
 		gallicaHttpSession.mount("https://", adapter)
 		gallicaHttpSession.mount("http://", adapter)
 		return gallicaHttpSession
@@ -101,7 +100,6 @@ class GallicaSearch:
 	def packageQuery(self):
 		if len(self.collectedQueries) != 0:
 			self.makeCSVFile()
-			self.generateTopTenPapers()
 		else:
 			pass
 
@@ -181,61 +179,45 @@ class GallicaSearch:
 	def findTotalResults(self):
 		pass
 
-	def updateDictionaries(self):
+	def generateNewspaperDictionary(self):
 		self.newspaperDictionary.clear()
-		for i in range(10):
-			self.topTenPapers.append(["", 0])
 		for nameCountCode in self.paperNameCounts:
 			paperName = nameCountCode[0]
 			paperCount = nameCountCode[1]
 			paperCode = nameCountCode[2]
-			self.updateTopTenPapers(paperName, paperCount)
 			self.newspaperDictionary.update({paperName: paperCode})
 			self.numResultsForEachPaper.update({paperName: paperCount})
 			# A little weird to calculate total results here
 			self.sumUpTotalResults(paperCount)
+	#Might be a little slow
+	def updateNewspaperCountDictionary(self):
+		currentCount = 0
+		for newspaper in self.newspaperDictionary:
+			for result in self.collectedQueries:
+				paperName = result[1]
+				if paperName == newspaper:
+					currentCount += 1
+			self.updateTopTenPapers(newspaper, currentCount)
+			self.numResultsForEachPaper.update({newspaper: currentCount})
+			currentCount = 0
 
 	def updateTopTenPapers(self, name, count):
-		# Makes the stackedbar not pick up fills, even if it makes the graph prettier
-		# name = name[0:17]
-		for i in range(10):
+		if not self.topTenPapers:
+			self.topTenPapers.append([name, count])
+			return
+		elif len(self.topTenPapers) < 10:
+			iterations = len(self.topTenPapers)
+		else:
+			iterations = 10
+		for i in range(iterations):
 			currentIndexCount = self.topTenPapers[i][1]
 			if count > currentIndexCount:
 				self.topTenPapers.insert(i, [name, count])
 				del (self.topTenPapers[10:])
-				break
-
-	def generateTopTenPapers(self):
-		dictionaryFile = "{0}-{1}".format("TopPaperDict", self.fileName)
-		with open(os.path.join("../CSVdata", dictionaryFile), "w", encoding="utf8", newline='') as outFile:
-			writer = csv.writer(outFile)
-			for newspaper in self.topTenPapers:
-				print(newspaper)
-				newspaper[0] = newspaper[0].replace('"', '')
-				writer.writerow(newspaper)
+				return
 
 	def sumUpTotalResults(self, toAdd):
 		self.totalResults = self.totalResults + toAdd
-
-	def makeChunkedDictionary(self, chunkSize):
-		listOfSubDicts = []
-		initialList = []
-		for paper in self.newspaperDictionary:
-			initialList.append(paper)
-		currentIndex = 0
-		for i in range(ceil((len(self.newspaperDictionary) / chunkSize)) - 1):
-			subDict = {}
-			subList = initialList[currentIndex:currentIndex + chunkSize]
-			currentIndex = currentIndex + chunkSize
-			for paper in subList:
-				subDict[paper] = self.newspaperDictionary[paper]
-			listOfSubDicts.append(subDict)
-		subDict = {}
-		subList = initialList[currentIndex:]
-		for paper in subList:
-			subDict[paper] = self.newspaperDictionary[paper]
-		listOfSubDicts.append(subDict)
-		self.chunkedNewspaperDictionary = listOfSubDicts
 
 	def updateDiscoveryProgressPercent(self, iteration, total):
 		self.discoveryProgressPercent = int((iteration / total) * 100)
@@ -253,6 +235,9 @@ class FullSearchWithinDictionary(GallicaSearch):
 	def runSearch(self):
 		self.createQueryStringList()
 		self.createWorkersForSearch()
+		self.updateNewspaperCountDictionary()
+		self.progressTrackerThread.setNumberRetrievedResults(len(self.collectedQueries))
+		self.packageQuery()
 
 	def createQueryStringList(self):
 		for newspaper in self.newspaperDictionary:
@@ -266,7 +251,6 @@ class FullSearchWithinDictionary(GallicaSearch):
 				self.listOfAllQueryStrings.append(queryRecordPair)
 				startRecord += 50
 
-	#Might need to replace the updating of the newspaper result counts? Currently deleted and no change, final list might be inaccurate.
 	def createWorkersForSearch(self):
 		progress = 0
 		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
@@ -294,9 +278,12 @@ class FullSearchWithinDictionary(GallicaSearch):
 		try:
 			with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
 				for i, result in enumerate(executor.map(self.findNumberResults, self.newspaperDictionary), 1):
-					self.paperNameCounts = self.paperNameCounts + result
+					if result:
+						self.paperNameCounts = self.paperNameCounts + result
+					else:
+						print("WORTHLESS")
 					self.updateDiscoveryProgressPercent(i, len(self.newspaperDictionary))
-			self.updateDictionaries()
+			self.generateNewspaperDictionary()
 		except Exception as error:
 			print(error)
 			raise
@@ -308,11 +295,31 @@ class FullSearchWithinDictionary(GallicaSearch):
 		newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
 		hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1, session)
 		numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
-		if numberResultsForNewspaper != 0:
+		if numberResultsForNewspaper > 0:
 			paperCounts.append([newspaper, numberResultsForNewspaper, newspaperCode])
 		return paperCounts
 
+	def makeChunkedDictionary(self, chunkSize):
+		listOfSubDicts = []
+		initialList = []
+		for paper in self.newspaperDictionary:
+			initialList.append(paper)
+		currentIndex = 0
+		for i in range(ceil((len(self.newspaperDictionary) / chunkSize)) - 1):
+			subDict = {}
+			subList = initialList[currentIndex:currentIndex+chunkSize]
+			currentIndex = currentIndex + chunkSize
+			for paper in subList:
+				subDict[paper] = self.newspaperDictionary[paper]
+			listOfSubDicts.append(subDict)
+		subDict = {}
+		subList = initialList[currentIndex:]
+		for paper in subList:
+			subDict[paper] = self.newspaperDictionary[paper]
+		listOfSubDicts.append(subDict)
+		self.chunkedNewspaperDictionary = listOfSubDicts
 
+#Needs some work, likely broken in some way, haven't looked at it in a while.
 class FullSearchNoDictionary(GallicaSearch):
 	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, progressTracker):
 		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, progressTracker)
@@ -327,6 +334,7 @@ class FullSearchNoDictionary(GallicaSearch):
 				self.updateRetrievalProgressPercent(i, iterations)
 				self.collectedQueries.extend(result)
 		self.updateRetrievalProgressPercent(100, 100)
+		self.packageQuery()
 
 	def sendWorkersToSearch(self, startRecord):
 		batchHunter = self.sendQuery(self.baseQuery, startRecord=startRecord, numRecords=50)
@@ -336,6 +344,7 @@ class FullSearchNoDictionary(GallicaSearch):
 	def findTotalResults(self):
 		hunterForTotalNumberOfQueryResults = GallicaSearch.sendQuery(self.baseQuery, numRecords=1, startRecord=1)
 		self.totalResults = hunterForTotalNumberOfQueryResults.establishTotalHits(self.baseQuery, False)
+
 
 # make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
 
@@ -347,7 +356,7 @@ class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
 	def __init__(self, *args, **kwargs):
 		retryStrategy = Retry(
 			total=10,
-			status_forcelist=[429, 500, 502, 503, 504],
+			status_forcelist=[500, 502, 503, 504],
 			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
 			backoff_factor=1
 		)

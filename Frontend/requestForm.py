@@ -1,4 +1,4 @@
-from wtforms import ValidationError, Form, BooleanField, StringField, PasswordField, validators
+from wtforms import ValidationError, Form, TextAreaField, BooleanField, StringField, validators
 import re
 
 class Regexp(object):
@@ -66,14 +66,11 @@ def validateYearRange(form, field):
 
 class SearchForm(Form):
 	termRe = re.compile("(\w+)(,\s*\w+)*")
-	papersRe = re.compile("(((\w+)\s*)*(,\s*((\w+)\s*)*)*){0,1}")
 	yearsRe = re.compile("(\d{4}[-,.]*(\d{4}){0,1}){0,1}")
-	searchTerm = StringField("What word do you want to graph?", [validators.InputRequired(), Regexp(termRe,message="Separate search terms with commas (e.g. 'chapeau, bonbon').")])
 	papers = StringField("Do you want a specific paper or papers?")
+	searchTerm = StringField("What word do you want to graph?", [validators.InputRequired(), Regexp(termRe,message="Separate search terms with commas (e.g. 'chapeau, bonbon').")])
 	yearRange = StringField("Do you want a specific year range?", [Regexp(yearsRe,message="Acceptable example ranges: '1870-1890', '1840.1860', '1920,1940'"),
 																   validateYearRange])
 	strictYearRange = BooleanField("Restrict to papers that published continuously over this year range?")
 
-	def fullMatchValidator(self, form, field):
-		match = re.fullmatch()
 

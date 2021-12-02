@@ -32,12 +32,7 @@ html, body {
   height: 100%;
 }
 
-.mainElements{
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content:center;
-}
+
 
 .progressDescription{
     text-align: center;
@@ -49,7 +44,11 @@ html, body {
     height: 50px;
 }
 /* Style the search box inside the navigation bar */
-
+.progressBox{
+    margin-top: 10vw;
+    margin-left: auto;
+    margin-right: auto;
+}
 .mainTitle {
   margin: auto;
   width: 100%;
@@ -59,6 +58,10 @@ html, body {
   align-items: center;
   height: 25%;
   font-size: xx-large;
+}
+
+.mainElements{
+    font-family: "Palatino Linotype", Palatino, "Gentium Plus", serif;
 }
 
 .mainSearch {
@@ -146,6 +149,7 @@ input[type="text"],input[type="search"],input#papers,input#searchTerm,input#year
     width: 100%;
     margin: 0;
     padding: 14px;
+    font-family: "Palatino Linotype", Palatino, "Gentium Plus", serif;
   }
 }
 
@@ -176,13 +180,33 @@ input[type="text"],input[type="search"],input#papers,input#searchTerm,input#year
     width: 20em;
     margin-right: 15px;
 }
-
-.resultElements{
+@media screen and (max-width: 600px) {
+    .resultElements{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     margin: auto;
-    width: 75%;
+    width: 80%;
+}
+}
+
+.dropdown {
+    max-height: 25vw;
+    overflow: auto;
+}
+
+.dropdown > *:hover{
+    background-color: black;
+    color: white;
+}
+
+.form-group #paperPicker{
+    max-width: 500px;
+    margin: 80px auto;
+}
+
+.form-group #paperPicker button{
+    background-color: red !important;
 }
 
 .bottomBar{
@@ -199,14 +223,14 @@ input[type="text"],input[type="search"],input#papers,input#searchTerm,input#year
 .graph #Graph{
     width: 100%;
     height: auto;
-
 }
-
-.downloadAndTopPapers{
-    width: 25%;
-    float: left;
+.graphTitle{
+    font-size: x-large;
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
-
 .loadingElements{
     height: 50%;
     display: flex;
@@ -240,4 +264,5 @@ input[type="text"],input[type="search"],input#papers,input#searchTerm,input#year
   height: 30px;
   background-color: cadetblue;
 }
+
 
