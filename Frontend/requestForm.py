@@ -67,10 +67,10 @@ def validateYearRange(form, field):
 class SearchForm(Form):
 	termRe = re.compile("(\w+)(,\s*\w+)*")
 	yearsRe = re.compile("(\d{4}[-,.]*(\d{4}){0,1}){0,1}")
-	papers = StringField("Do you want a specific paper or papers?")
-	searchTerm = StringField("What word do you want to graph?", [validators.InputRequired(), Regexp(termRe,message="Separate search terms with commas (e.g. 'chapeau, bonbon').")])
+	papers = StringField(render_kw={"placeholder": "Leave blank to search the entire dictionary"})
+	searchTerm = StringField("What word do you want to graph?", [validators.InputRequired(), Regexp(termRe,message="Separate search terms with commas (e.g. 'chapeau, bonbon').")],render_kw={"placeholder": "Pomme"})
 	yearRange = StringField("Do you want a specific year range?", [Regexp(yearsRe,message="Acceptable example ranges: '1870-1890', '1840.1860', '1920,1940'"),
-																   validateYearRange])
+																   validateYearRange], render_kw={"placeholder": "1900-1930"})
 	strictYearRange = BooleanField("Restrict to papers that published continuously over this year range?")
 
 

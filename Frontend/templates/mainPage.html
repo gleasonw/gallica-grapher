@@ -23,9 +23,15 @@
                     {{ render_field(form.searchTerm) }}
                 </div>
                 <div class = "form-group">
-                    {{ render_field(form.papers, autocomplete="off") }}
+                    <label class="inputTitle">
+                        Do you want a specific paper or papers?
+                    </label>
+                    <div class = "inputContainer">
+                        <div class = 'paperBubblesContainer'>
+                        </div>
+                        {{ render_field(form.papers, autocomplete="off") }}
+                    </div>
                     <div class = "dropdown">
-
                     </div>
                 </div>
                 <div class = "form-group">

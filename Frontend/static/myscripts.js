@@ -25,25 +25,50 @@ $(function strictnessChecker(){
         }
     })
 });
-//Stop requesting the papers after the initialization
-$("input#papers").on('click', function(){
+
+var $inputpapers = $("input#papers");
+var $paperBubblesContainer = $('.paperBubblesContainer');
+var papers;
+
+$inputpapers.one('click', function(){
     const displayData = async () => {
         const fetchedPapers = await getPapers()
-        var papers = Object.values(fetchedPapers)
+        papers = Object.values(fetchedPapers)
         console.log(papers)
-        $("input#papers").keyup(function(){
-            let searchData = $(this).val().toLowerCase();
-            const match = papers.filter(paper => {
-                return paper.paperName.toLowerCase().includes(searchData)
-            })
-            let matchedPapers = Object.values(match);
-            $(".dropdown").empty();
-            for (var i = 0; i < matchedPapers.length; i++){
-                $("<div class='paperOptionDrop' id=paper{0}>{1}</div>".format(i, matchedPapers[i].paperName)).appendTo('.dropdown')
-            }
-        });
     };
     displayData();
+});
+
+$inputpapers.keyup(function(){
+    let searchData = $(this).val().toLowerCase();
+    const match = papers.filter(paper => {
+        return paper.paperName.toLowerCase().includes(searchData)
+    })
+    let matchedPapers = Object.values(match);
+    $(".dropdown").empty();
+    for (var i = 0; i < matchedPapers.length; i++){
+        $("<div class='paperOptionDrop' id=paper{0}>{1}</div>".format(i, matchedPapers[i].paperName)).appendTo('.dropdown')
+    }
+});
+
+$inputpapers.keydown(function(e) {
+    if(!$inputpapers.val()){
+        var key = e.keyCode;
+        console.log(key)
+        if(key === 8){
+           $paperBubblesContainer.children().last().remove()
+        }
+    }
+})
+
+$(document).on('click','.paperOptionDrop',function () {
+    var thePaper = $(this).text()
+    var bubbleDiv = "<div class= 'bubblePaper' id='{0}'>{1}</div>".format(thePaper, thePaper)
+    $paperBubblesContainer.append($(bubbleDiv))
+});
+
+$(document).on('click','.bubblePaper',function () {
+    $(this).remove()
 });
 
 const getPapers = async () => {

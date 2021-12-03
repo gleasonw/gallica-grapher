@@ -119,7 +119,7 @@ input[type="submit"]{
     font-size: x-large;
 }
 
-input[type="text"],input[type="search"],input#papers,input#searchTerm,input#yearRange {
+input#searchTerm,input#yearRange,.inputContainer {
     height: var(--height);
     font-family: var(--font-fam);
     border: 0;
@@ -137,6 +137,50 @@ input[type="text"],input[type="search"],input#papers,input#searchTerm,input#year
     z-index: 1;
     position: relative;
     box-shadow: 0 0 3pt 2pt gray;
+}
+
+.inputContainer{
+    display: flex;
+}
+
+input#papers{
+    height: 100%;
+    font-family: var(--font-fam);
+    border: 0;
+    font-size: large;
+    width: 100%;
+    float: right;
+}
+
+label[for="papers"]{
+    display: none;
+}
+
+.inputTitle{
+    font-size: large;
+}
+
+.paperBubblesContainer{
+    display: flex;
+    float: left;
+    height: auto;
+    flex-wrap: wrap;
+}
+
+.bubblePaper{
+    margin: 5px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: gray;
+    color: white;
+    max-height: 30px;
+    min-width: 100px;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: medium;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 
@@ -191,8 +235,12 @@ input[type="text"],input[type="search"],input#papers,input#searchTerm,input#year
 }
 
 .dropdown {
-    max-height: 25vw;
+    max-height: 20vw;
     overflow: auto;
+}
+
+.dropdown > *{
+    cursor: pointer;
 }
 
 .dropdown > *:hover{
