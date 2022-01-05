@@ -51,6 +51,7 @@ html, body {
 }
 .mainTitle {
   margin: auto;
+    padding: 15px;
   width: 100%;
   border: 1px;
   display: flex;
@@ -66,9 +67,9 @@ html, body {
 
 .mainSearch {
   margin: auto;
-  width: 75%;
+  width: 70%;
   border: 1px;
-  height: 75%;
+  height: 70%;
 }
 
 .mainText{
@@ -147,6 +148,7 @@ input#papers{
     height: 100%;
     font-family: var(--font-fam);
     border: 0;
+    border-bottom: solid 1px;
     font-size: large;
     width: 100%;
     float: right;
@@ -168,19 +170,29 @@ label[for="papers"]{
 }
 
 .bubblePaper{
-    margin: 5px;
-    padding: 10px;
+    margin: 2px;
     border-radius: 10px;
     background-color: gray;
     color: white;
     max-height: 30px;
-    min-width: 100px;
     max-width: 250px;
+    cursor: pointer;
+    display: flex;
+}
+
+.selectedPaper{
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: medium;
-    cursor: pointer;
+    font-size: small;
+    margin: auto;
+    text-align: center;
     white-space: nowrap;
+}
+
+.delete{
+    margin: 2px;
+    font-size: medium;
+    font-family: "Palatino Linotype", Palatino, "Gentium Plus", sans-serif;
 }
 
 
@@ -311,6 +323,10 @@ label[for="papers"]{
   width: 1%;
   height: 30px;
   background-color: cadetblue;
+}
+
+.footer{
+    height: 5%;
 }
 
 
