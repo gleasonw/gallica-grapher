@@ -8,7 +8,7 @@ class RequestThread(threading.Thread):
 	def __init__(self, searchTerm, papers, yearRange, strictness):
 		splitter = re.compile("[\w']+")
 		self.searchItems = re.findall(splitter, searchTerm)
-		self.paperChoices = papers.split(',')
+		self.paperChoices = papers
 		self.cleanPaperChoices()
 		self.yearRange = re.findall(splitter, yearRange)
 		self.strictness = strictness

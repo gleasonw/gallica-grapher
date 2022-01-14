@@ -45,20 +45,17 @@ html, body {
 }
 /* Style the search box inside the navigation bar */
 .progressBox{
-    margin-top: 10vw;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
 }
 .mainTitle {
-  margin: auto;
-    padding: 15px;
-  width: 100%;
-  border: 1px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 25%;
-  font-size: xx-large;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    border: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: xx-large;
 }
 
 .mainElements{
@@ -126,7 +123,7 @@ input#searchTerm,input#yearRange,.inputContainer {
     border: 0;
     color: var(--color-dark);
     font-size: large;
-    width: 100%;
+    width: auto;
     padding: 12px 20px;
     margin: 15px 0;
     display: inline-block;
@@ -148,7 +145,7 @@ input#papers{
     height: 100%;
     font-family: var(--font-fam);
     border: 0;
-    border-bottom: solid 1px;
+    border-bottom: solid 1px slategray;
     font-size: large;
     width: 100%;
     float: right;
@@ -247,8 +244,18 @@ label[for="papers"]{
 }
 
 .dropdown {
-    max-height: 20vw;
-    overflow: auto;
+    top: 100%;
+    left: 0;
+    max-height: 100px;
+    overflow-y: scroll;
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid;
+    list-style-type: none;
+    -webkit-padding-start: 0;
+    padding-inline-start: 0;
+    padding-left: 0;
 }
 
 .dropdown > *{
@@ -258,15 +265,6 @@ label[for="papers"]{
 .dropdown > *:hover{
     background-color: black;
     color: white;
-}
-
-.form-group #paperPicker{
-    max-width: 500px;
-    margin: 80px auto;
-}
-
-.form-group #paperPicker button{
-    background-color: red !important;
 }
 
 .bottomBar{

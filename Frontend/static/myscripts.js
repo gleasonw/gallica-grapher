@@ -1,3 +1,6 @@
+var $inputpapers = $("input#papers");
+var $paperBubblesContainer = $('.paperBubblesContainer');
+var papers;
 
 $(function() {
     $('#hidden-form-group').show();
@@ -13,9 +16,9 @@ $(function() {
 $(function strictnessChecker(){
     $('.form-group#strictness').hide();
     $("input#yearRange,input#papers").on("keyup", function(){
-        if ($("input#yearRange").val() !== "") {
+        if ($("input#yearRange").val() !== "" && !$paperBubblesContainer.children()){
             let paper = $("input#papers").val();
-            if (paper === "" || paper === "all") {
+            if (paper === "") {
                 $('.form-group#strictness').show();
             } else {
                 $('.form-group#strictness').hide();
@@ -26,19 +29,17 @@ $(function strictnessChecker(){
     })
 });
 //Now just modify flask to accept the paperBubblesContainer text instead of the input text on a post
-var $inputpapers = $("input#papers");
-var $paperBubblesContainer = $('.paperBubblesContainer');
-var papers;
+
 
 $("form#searchStuff").submit(function(event) {
     event.preventDefault()
-    let paperChoice = [];
+    let paperChoices = '';
     $('.bubblePaper').each(function() {
         let currentPaper = "{0}%8395%".format($(this).children('.selectedPaper').text());
-        paperChoice.push(currentPaper);
+        paperChoices += currentPaper;
     })
     let userInputs = new FormData();
-    userInputs.set('chosenPapers', paperChoice)
+    userInputs.set('chosenPapers', paperChoices)
     userInputs.set('searchTerm', $("input#searchTerm").val())
     userInputs.set('yearRange', $("input#yearRange").val())
     userInputs.set('strictness', $("input#strictYearRange").val())
@@ -48,6 +49,9 @@ $("form#searchStuff").submit(function(event) {
         processData: false,
         contentType: false,
         data: userInputs,
+        success: function (data, status, request) {
+            window.location.replace(request.getResponseHeader('Location'));
+        }
     });
 });
 
@@ -55,21 +59,24 @@ $inputpapers.one('focus', function(){
     const displayData = async () => {
         const fetchedPapers = await getPapers()
         papers = Object.values(fetchedPapers)
+        $inputpapers.trigger('keyup')
     };
     displayData();
 });
 
-$inputpapers.keyup(function(){
-    let searchData = $(this).val().toLowerCase();
-    const match = papers.filter(paper => {
-        return paper.paperName.toLowerCase().includes(searchData)
-    })
-    let matchedPapers = Object.values(match);
-    $(".dropdown").empty();
-    for (var i = 0; i < matchedPapers.length; i++){
-        $("<div class='paperOptionDrop' id=paper{0}>{1}</div>".format(i, matchedPapers[i].paperName)).appendTo('.dropdown')
+$inputpapers.on('keyup', (function(){
+    if (papers){
+        let searchData = $(this).val().toLowerCase();
+        const match = papers.filter(paper => {
+            return paper.paperName.toLowerCase().includes(searchData)
+        })
+        let matchedPapers = Object.values(match);
+        $(".dropdown").empty();
+        for (var i = 0; i < matchedPapers.length; i++){
+            $("<div class='paperOptionDrop' id=paper{0}>{1}</div>".format(i, matchedPapers[i].paperName)).appendTo('.dropdown')
+        }
     }
-});
+}));
 
 $inputpapers.keydown(function(e) {
     if(!$inputpapers.val()){
@@ -86,7 +93,6 @@ $(document).on('click','.paperOptionDrop',function () {
     var duplicate = false
     $('.bubblePaper').each(function() {
         var currentPaper = $(this).children('.selectedPaper').text();
-        console.log(currentPaper)
         if(currentPaper === thePaper){
             duplicate = true
         }
@@ -99,7 +105,7 @@ $(document).on('click','.paperOptionDrop',function () {
         bubbleDiv = bubbleDiv.format(thePaper, thePaper)
         $paperBubblesContainer.append($(bubbleDiv))
     }
-
+    $inputpapers.focus()
 });
 
 $(document).on('click','.bubblePaper',function () {

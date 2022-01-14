@@ -20,7 +20,6 @@ class GallicaHunter:
 		parameters = dict(version=1.2, operation="searchRetrieve", collapsing=collapseSetting, exactSearch="false",
 						  query=query, startRecord=0, maximumRecords=1)
 		response = self.session.get("", params=parameters)
-		print(response.status_code)
 		root = etree.fromstring(response.content)
 		numResults = int(root[2].text)
 		return numResults

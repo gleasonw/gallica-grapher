@@ -79,8 +79,8 @@ class GallicaGrapher:
         tibble = importr('tibble')
         grids = importr('gridExtra')
         ggplot2 = importr('ggplot2')
-        utils = importr('utils')
-        self.theCSVforR = utils.read_csv(os.path.join("../CSVdata", self.fileName), encoding="UTF-8", stringsAsFactors=False, header=True)
+        dtable = importr('data.table')
+        self.theCSVforR = dtable.fread(os.path.join("../CSVdata", self.fileName), encoding="UTF-8", header=True, sep=",")
         self.theCSVforR = self.parseDateForRCSV()
 
     def makeStackedBarGraph(self):
