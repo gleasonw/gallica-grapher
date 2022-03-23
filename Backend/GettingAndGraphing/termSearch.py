@@ -1,5 +1,4 @@
-import csv
-import shutil
+import psycopg2
 import os
 import concurrent.futures
 from math import ceil
@@ -8,7 +7,7 @@ from requests_toolbelt import sessions
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-from Backend.GettingAndGraphing.batchGetter import GallicaHunter
+from Backend.GettingAndGraphing.batchGetter import BatchGetter
 from Backend.GettingAndGraphing.dictionaryMaker import DictionaryMaker
 
 abspath = os.path.abspath(__file__)
@@ -16,7 +15,7 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 
-class GallicaSearch:
+class TermSearch:
 
 	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, progressTrackerThread, **kwargs):
 		self.lowYear = None
@@ -24,6 +23,7 @@ class GallicaSearch:
 		self.isYearRange = None
 		self.baseQuery = None
 		self.progressTrackerThread = progressTrackerThread
+		self.requestID = progressTrackerThread.getRequestID()
 		self.strictYearRange = strictYearRange
 		self.totalResults = 0
 		self.discoveryProgressPercent = 0
@@ -40,24 +40,12 @@ class GallicaSearch:
 		self.parseNewspaperDictionary()
 		self.establishStrictness()
 		self.buildQuery()
-		self.listOfAllQueryStrings = []
+		self.listOfAllRequestStrings = []
 
 		self.paperNameCounts = []
 
-		self.fileName = self.determineFileName()
-
-	def checkIfFileAlreadyInDirectory(self):
-		return os.path.isfile(os.path.join("../CSVdata", self.fileName))
-
-	def runQuery(self):
-		self.findTotalResults()
-		self.runSearch()
-
 	def getTopTenPapers(self):
 		return self.topTenPapers
-
-	def getFileName(self):
-		return self.fileName
 
 	def getSearchTerm(self):
 		return self.searchTerm
@@ -84,7 +72,7 @@ class GallicaSearch:
 
 	@staticmethod
 	def sendQuery(queryToSend, **kwargs):
-		session = GallicaSearch.makeSession()
+		session = TermSearch.makeSession()
 		if kwargs['startRecord'] is None:
 			startRecord = 1
 		else:
@@ -93,40 +81,55 @@ class GallicaSearch:
 			numRecords = 50
 		else:
 			numRecords = kwargs['numRecords']
-		hunter = GallicaHunter(queryToSend, startRecord, numRecords, session)
+		hunter = BatchGetter(queryToSend, startRecord, numRecords, session)
 		hunter.hunt()
 		return hunter
 
 	def packageQuery(self):
 		if len(self.collectedQueries) != 0:
-			self.makeCSVFile()
+			self.postResultsToDB()
 		else:
 			pass
 
-	def makeCSVFile(self):
-		with open(self.fileName, "w", encoding="utf8", newline='') as outFile:
-			writer = csv.writer(outFile)
-			writer.writerow(["date", "journal", "url"])
-			for csvEntry in self.collectedQueries:
-				writer.writerow(csvEntry)
-		shutil.move(self.fileName, os.path.join("../CSVdata", self.fileName))
+	def postResultsToDB(self):
+			conn = None
+			try:
+				conn = psycopg2.connect(
+					host="localhost",
+					database="postgres",
+					user="wglea",
+					password="ilike2play"
+				)
+				cursor = conn.cursor()
+				for entry in self.collectedQueries:
+					entryDateBits = entry.get('date').split('-')
+					entryMonth = entryDateBits[1]
+					entryYear = entryDateBits[0]
+					entryDay = entryDateBits[2]
+					cursor.execute("""
+					INSERT INTO results (identifier, day, month, year, searchterm, paperID, requestid)
+					VALUES (%s, %s, %s, %s, %s, %s, %s);
+					""",
+					(entry.get('identifier'), entryDay, entryMonth, entryYear, self.searchTerm, entry.get('code'), self.requestID))
+					conn.commit()
+				for i in range(len(self.topTenPapers)):
+					paperPosition = i + 1
+					paperNameCount = self.topTenPapers[i]
+					paperName = paperNameCount[0]
+					paperCount = paperNameCount[1]
+					cursor.execute("""
+										INSERT INTO toppapers (papername, position, requestid, count)
+										VALUES (%s, %s, %s, %s);
+										""",
+								   (paperName, paperPosition, self.requestID, paperCount))
+					conn.commit()
 
-	def determineFileName(self):
-		nameOfFile = ''
-		if self.newspaper == "all":
-			nameOfFile = self.searchTerm + "-all-"
-		else:
-			for paper in self.newspaper:
-				paper = paper[0:5]
-				nameOfFile = nameOfFile + paper + "-"
-			nameOfFile = nameOfFile[0:len(nameOfFile) - 2]
-			wordsInQuery = self.searchTerm.split(" ")
-			for word in wordsInQuery:
-				nameOfFile = nameOfFile + word
-		if self.isYearRange:
-			nameOfFile = nameOfFile + str(self.lowYear) + "." + str(self.highYear)
-		nameOfFile = nameOfFile + ".csv"
-		return nameOfFile
+			except (Exception, psycopg2.DatabaseError) as error:
+				print(error)
+				raise
+			finally:
+				if conn is not None:
+					conn.close()
 
 	# Good time to parse errors in formatting too
 	def establishStrictness(self):
@@ -148,6 +151,7 @@ class GallicaSearch:
 	def parseNewspaperDictionary(self):
 		dicParser = DictionaryMaker(self.newspaper, [self.lowYear, self.highYear], self.strictYearRange)
 		self.newspaperDictionary = dicParser.getDictionary()
+		pass
 
 	def establishYearRange(self, yearRange):
 		if len(yearRange) == 2:
@@ -159,7 +163,7 @@ class GallicaSearch:
 
 	def buildQuery(self):
 		if self.isYearRange:
-			if self.newspaper[0] == "noDict":
+			if not self.newspaperDictionary:
 				self.baseQuery = '(dc.date >= "{firstYear}" and dc.date <= "{secondYear}") and (gallica adj "{' \
 								 '{searchWord}}") sortby dc.date/sort.ascending '
 			else:
@@ -167,7 +171,7 @@ class GallicaSearch:
 								 'newsKey}}}}") and (gallica adj "{{searchWord}}")) sortby dc.date/sort.ascending '
 			self.baseQuery = self.baseQuery.format(firstYear=str(self.lowYear), secondYear=str(self.highYear))
 		else:
-			if self.newspaper[0] == "noDict":
+			if not self.newspaperDictionary:
 				self.baseQuery = '(gallica adj "{searchWord}") and (dc.type all "fascicule") sortby dc.date/sort.ascending'
 			else:
 				self.baseQuery = 'arkPress all "{{newsKey}}" and (gallica adj "{searchWord}") sortby dc.date/sort.ascending'
@@ -189,17 +193,19 @@ class GallicaSearch:
 			self.numResultsForEachPaper.update({paperName: paperCount})
 			# A little weird to calculate total results here
 			self.sumUpTotalResults(paperCount)
-	#Might be a little slow
+
+	#Might be a little slow, why do I do this again?
 	def updateNewspaperCountDictionary(self):
 		currentCount = 0
-		for newspaper in self.newspaperDictionary:
+		for paperName, paperCode in self.newspaperDictionary.items():
 			for result in self.collectedQueries:
-				paperName = result[1]
-				if paperName == newspaper:
+				resultPaperCode = result.get("code")
+				if paperCode == resultPaperCode:
 					currentCount += 1
-			self.updateTopTenPapers(newspaper, currentCount)
-			self.numResultsForEachPaper.update({newspaper: currentCount})
+			self.updateTopTenPapers(paperName, currentCount)
+			self.numResultsForEachPaper.update({paperName: currentCount})
 			currentCount = 0
+		pass
 
 	def updateTopTenPapers(self, name, count):
 		if not self.topTenPapers:
@@ -228,11 +234,12 @@ class GallicaSearch:
 		self.progressTrackerThread.setRetrievalProgress(self.retrievalProgressPercent)
 
 
-class FullSearchWithinDictionary(GallicaSearch):
+class FullSearchWithinDictionary(TermSearch):
 	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, progressTracker):
 		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, progressTracker)
 
 	def runSearch(self):
+		self.findTotalResults()
 		self.createQueryStringList()
 		self.createWorkersForSearch()
 		self.updateNewspaperCountDictionary()
@@ -244,35 +251,38 @@ class FullSearchWithinDictionary(GallicaSearch):
 			hitsInNewspaper = self.numResultsForEachPaper[newspaper]
 			newspaperKey = self.newspaperDictionary[newspaper]
 			numberOfQueriesToSend = ceil(hitsInNewspaper / 50)
-			queryFormatForPaper = self.baseQuery.format(newsKey=newspaperKey)
 			startRecord = 1
 			for i in range(numberOfQueriesToSend):
-				queryRecordPair = [queryFormatForPaper, startRecord]
-				self.listOfAllQueryStrings.append(queryRecordPair)
+				recordAndCode = [startRecord, newspaperKey]
+				self.listOfAllRequestStrings.append(recordAndCode)
 				startRecord += 50
 
 	def createWorkersForSearch(self):
 		progress = 0
 		with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-			for result in executor.map(self.sendWorkersToSearch, self.listOfAllQueryStrings):
+			for result in executor.map(self.sendWorkersToSearch, self.listOfAllRequestStrings):
 				numberResultsInBatch = len(result)
 				self.collectedQueries.extend(result)
 				progress = progress + numberResultsInBatch
 				self.updateRetrievalProgressPercent(progress, self.totalResults)
 			self.updateRetrievalProgressPercent(100, 100)
 
-	def sendWorkersToSearch(self, queryAndRecordStart):
-		query = queryAndRecordStart[0]
-		recordStart = queryAndRecordStart[1]
-		session = GallicaSearch.makeSession()
-		hunterForQuery = GallicaHunter(query, recordStart, 50, session)
+	#TODO: speed up querying by batching more queries into each worker's session?
+	def sendWorkersToSearch(self, recordStartAndCode):
+		recordStart = recordStartAndCode[0]
+		code = recordStartAndCode[1]
+		session = TermSearch.makeSession()
+		queryFormatForPaper = self.baseQuery.format(newsKey=code)
+		hunterForQuery = BatchGetter(queryFormatForPaper, recordStart, 50, session)
 		hunterForQuery.hunt()
 		results = hunterForQuery.getResultList()
+		for result in results:
+			result["code"] = code
 		return results
 
 	def findTotalResults(self):
 		self.createWorkersForFindingTotalResults()
-		self.progressTrackerThread.setDiscoveredResults(self.totalResults)
+		self.progressTrackerThread.setNumberDiscoveredResults(self.totalResults)
 
 	def createWorkersForFindingTotalResults(self):
 		try:
@@ -280,8 +290,6 @@ class FullSearchWithinDictionary(GallicaSearch):
 				for i, result in enumerate(executor.map(self.findNumberResults, self.newspaperDictionary), 1):
 					if result:
 						self.paperNameCounts = self.paperNameCounts + result
-					else:
-						print("WORTHLESS")
 					self.updateDiscoveryProgressPercent(i, len(self.newspaperDictionary))
 			self.generateNewspaperDictionary()
 		except Exception as error:
@@ -289,11 +297,11 @@ class FullSearchWithinDictionary(GallicaSearch):
 			raise
 
 	def findNumberResults(self, newspaper):
-		session = GallicaSearch.makeSession()
+		session = TermSearch.makeSession()
 		paperCounts = []
 		newspaperCode = self.newspaperDictionary[newspaper]
 		newspaperQuery = self.baseQuery.format(newsKey=newspaperCode)
-		hunterForTotalNumberOfQueryResults = GallicaHunter(newspaperQuery, 1, 1, session)
+		hunterForTotalNumberOfQueryResults = BatchGetter(newspaperQuery, 1, 1, session)
 		numberResultsForNewspaper = hunterForTotalNumberOfQueryResults.establishTotalHits(newspaperQuery, False)
 		if numberResultsForNewspaper > 0:
 			paperCounts.append([newspaper, numberResultsForNewspaper, newspaperCode])
@@ -320,11 +328,12 @@ class FullSearchWithinDictionary(GallicaSearch):
 		self.chunkedNewspaperDictionary = listOfSubDicts
 
 #Needs some work, likely broken in some way, haven't looked at it in a while.
-class FullSearchNoDictionary(GallicaSearch):
+class FullSearchNoDictionary(TermSearch):
 	def __init__(self, searchTerm, newspaper, yearRange, strictYearRange, progressTracker):
 		super().__init__(searchTerm, newspaper, yearRange, strictYearRange, progressTracker)
 
 	def runSearch(self):
+		self.findTotalResults()
 		iterations = ceil(self.totalResults / 50)
 		startRecordList = []
 		for i in range(iterations):
@@ -342,20 +351,20 @@ class FullSearchNoDictionary(GallicaSearch):
 		return results
 
 	def findTotalResults(self):
-		hunterForTotalNumberOfQueryResults = GallicaSearch.sendQuery(self.baseQuery, numRecords=1, startRecord=1)
+		hunterForTotalNumberOfQueryResults = TermSearch.sendQuery(self.baseQuery, numRecords=1, startRecord=1)
 		self.totalResults = hunterForTotalNumberOfQueryResults.establishTotalHits(self.baseQuery, False)
 
 
 # make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
 
 
-DEFAULT_TIMEOUT = 1  # seconds
+DEFAULT_TIMEOUT = 5  # seconds
 
 
 class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
 	def __init__(self, *args, **kwargs):
 		retryStrategy = Retry(
-			total=10,
+			total=15,
 			status_forcelist=[500, 502, 503, 504],
 			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
 			backoff_factor=1

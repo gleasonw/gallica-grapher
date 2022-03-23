@@ -1,12 +1,12 @@
+
+
 from Backend.GettingAndGraphing.termSearch import *
-from Backend.GettingAndGraphing.rGrapher import GallicaGrapher
+from Backend.GettingAndGraphing.grapher import Grapher
 
-import csv
-import shutil
-import os
+import time
 
 
-class MultipleSearchTermHunt:
+class MainSearchSupervisor:
 
 	def __init__(self, searchList, newspaper, yearRange, strictYearRange, progressTrackerThread, **kwargs):
 		self.searchTermList = searchList
@@ -18,104 +18,47 @@ class MultipleSearchTermHunt:
 		self.listOfGraphers = []
 		self.bigFileName = ''
 		self.progressTrackerThread = progressTrackerThread
+		self.requestID = progressTrackerThread.getRequestID()
 
 	def getAllResultBundlers(self):
 		return self.searchTermResultList
 
 	def runMultiTermQuery(self):
 		for searchTerm in self.searchTermList:
-			if self.newspaper[0] == "noDict":
-				resultGetterForTerm = FullSearchNoDictionary(searchTerm, self.newspaper, self.yearRange,
+			#TODO: Fix the full search
+			resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
+															 self.yearRange,
 															 self.strictYearRange, self.progressTrackerThread)
-			else:
-				resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
-																 self.yearRange,
-																 self.strictYearRange, self.progressTrackerThread)
 			self.searchTermResultList.append(resultGetterForTerm)
-			resultGetterForTerm.runQuery()
-		self.giveTopPapersToThread()
+			start = time.time()
+			resultGetterForTerm.runSearch()
+			print("Elapsed query time: {0}".format(time.time() - start))
+		start = time.time()
 		self.initiateGraphing()
-
-	def giveTopPapersToThread(self):
-		for bundle in self.searchTermResultList:
-			topTenPapers = bundle.getTopTenPapers()
-			self.progressTrackerThread.addTopPapers(topTenPapers)
-
+		print("Elapsed graphing time: {0}".format(time.time()-start))
+		#TODO: Change to accomodate top ten papers if multiple search terms. Very temporary solution.
+		resultBundle = self.searchTermResultList[0]
+		topPapers = resultBundle.getTopTenPapers()
+		self.progressTrackerThread.setTopPapers(topPapers)
 
 	def initiateGraphing(self):
 		if self.theKwargsForGraphingAndRecordNumber['uniqueGraphs']:
 			if self.theKwargsForGraphingAndRecordNumber['samePage']:
-				self.initiateSinglePageManyGraphs()
+				#Single page many graphs?
+				pass
 			else:
-				self.initiateSingleGraphPerPage()
+				#Many pages of graphs?
+				pass
 		else:
 			self.initiateSingleGraphManyData()
 
-	def createGGplotsForBundles(self):
-		requestId = self.progressTrackerThread.getId()
-		for resultBundle in self.searchTermResultList:
-			fileName = resultBundle.getFileName()
-			topTenPapers = resultBundle.getTopTenPapers()
-			searchTerm = resultBundle.getSearchTerm()
-			grapher = GallicaGrapher(fileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber, requestId,
-									 searchTerm)
-			grapher.parseGraphSettings()
-			self.listOfGraphers.append(grapher)
-
-	def initiateSingleGraphPerPage(self):
-		self.createGGplotsForBundles()
-		for grapher in self.listOfGraphers:
-			grapher.plotGraphAndMakePNG()
-
 	# What exactly does a top ten dictionary mean in this context of multiple terms?
 	def initiateSingleGraphManyData(self):
-		self.makeMultiTermFileName()
-		self.createMassiveCSV()
-		topTenPapers = []
-		requestId = self.progressTrackerThread.getId()
-		grapher = GallicaGrapher(self.bigFileName, topTenPapers, self.theKwargsForGraphingAndRecordNumber, requestId,
-								 self.searchTermList)
-		grapher.parseGraphSettings()
-		grapher.plotGraphAndMakePNG()
-		graphFileName = grapher.getFileName()
-		graphFileName = "/static/{filename}".format(filename=graphFileName)
-		self.progressTrackerThread.setImageRef(graphFileName)
-
-	def initiateSinglePageManyGraphs(self):
-		self.createGGplotsForBundles()
-		self.makeMultiTermFileName()
-		ggPlotList = []
-		for grapher in self.listOfGraphers:
-			ggPlotList.append(grapher.getGGplot())
-		ggPlotList[0].arrangeGGplotsAndPlot(ggPlotList)
+		grapher = Grapher(self.theKwargsForGraphingAndRecordNumber, self.requestID)
+		grapher.graph()
+		self.progressTrackerThread.setGraphingStatus(True)
 
 	def runMultiTermQueryWithDiffPapers(self):
 		pass
 
-	def createMassiveCSV(self):
-		with open(self.bigFileName, "w", encoding="utf8", newline='') as outFile:
-			writer = csv.writer(outFile)
-			writer.writerow(['date', 'journal', 'url', 'term'])
-			for resultBundle in self.searchTermResultList:
-				resultList = resultBundle.getCollectedQueries()
-				if len(resultList) == 0:
-					termDataFileName = resultBundle.getFileName()
-					term = resultBundle.getSearchTerm()
-					filePath = os.path.join("/", termDataFileName)
-					with open(filePath, "r", encoding="utf8") as inFile:
-						reader = csv.reader(inFile)
-						next(reader)
-						for result in reader:
-							writer.writerow(result + [term])
-				else:
-					for csvEntry in resultBundle.getCollectedQueries():
-						searchTermOfResultBundle = resultBundle.searchTerm
-						writer.writerow(csvEntry + [searchTermOfResultBundle])
-		shutil.move(self.bigFileName, os.path.join("../CSVdata", self.bigFileName))
 
-	def makeMultiTermFileName(self):
-		for resultBundle in self.searchTermResultList:
-			self.bigFileName = self.bigFileName + resultBundle.getSearchTerm() + "~"
-		randomBundleForYearRange = self.searchTermResultList[0]
-		self.bigFileName = self.bigFileName + randomBundleForYearRange.getYearRange()
-		self.bigFileName = self.bigFileName + ".csv"

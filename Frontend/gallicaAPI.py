@@ -1,8 +1,8 @@
 import queue
-import redis
+import uuid
 import time
 import os
-from flask import Flask, url_for, render_template, request, redirect, session, jsonify
+from flask import Flask, url_for, render_template, request, session, jsonify
 from celery import Celery
 from Backend.GettingAndGraphing.paperGetter import PaperGetter
 from Frontend.requestForm import SearchForm
@@ -34,18 +34,19 @@ def home():
 	form = SearchForm(request.form)
 	if request.method == 'POST' and form.validate():
 		papers = request.form['chosenPapers']
+		yearStrict = request.form['strictness']
 		papers = parsePapers(papers)
 		term = form.searchTerm.data
 		yearRange = form.yearRange.data
-		yearStrict = form.strictYearRange.data
-		task = getAsyncRequest.apply_async(args=[papers, term, yearRange, yearStrict])
-		return jsonify({}), 202, {'Location': url_for('loadingResults', task_id=task.id)}
+		taskID = str(uuid.uuid4())
+		getAsyncRequest.apply_async(args=[papers, term, yearRange, yearStrict, taskID], task_id=taskID)
+		return jsonify({}), 202, {'Location': url_for('loadingResults', taskId=taskID)}
 	return render_template("mainPage.html", form=form)
 
 
 @celery.task(bind=True)
-def getAsyncRequest(self, papers, term, yearRange, yearStrict):
-	gallicaRequest = RequestThread(term, papers, yearRange, yearStrict)
+def getAsyncRequest(self, papers, term, yearRange, yearStrict, taskID):
+	gallicaRequest = RequestThread(term, papers, yearRange, yearStrict, taskID)
 	gallicaRequest.start()
 	while gallicaRequest.getDiscoveryProgress() < 100:
 		self.update_state(state="DPROGRESS", meta={'percent': gallicaRequest.getDiscoveryProgress(),
@@ -54,54 +55,29 @@ def getAsyncRequest(self, papers, term, yearRange, yearStrict):
 		 										   'totalRetrieved': 0})
 	self.update_state(state="RPROGRESS", meta={'percent': gallicaRequest.getRetrievalProgress(),
 											   'status': "Retrieving results...",
-											   'totalDiscovered': gallicaRequest.getDiscoveredResults(),
+											   'totalDiscovered': gallicaRequest.getNumberDiscoveredResults(),
 											   'totalRetrieved': 0})
 	while gallicaRequest.getRetrievalProgress() < 100:
 		self.update_state(state="RPROGRESS", meta={'percent': gallicaRequest.getRetrievalProgress(),
 												   'status': "Retrieving results...",
-												   'totalDiscovered': 0,
+												   'totalDiscovered': gallicaRequest.getNumberDiscoveredResults(),
 												   'totalRetrieved': 0})
-	self.update_state(state="SUCCESS", meta={'percent': 100,
-											 'status': "Completed...",
-											 'totalDiscovered': gallicaRequest.getDiscoveredResults(),
-											 'totalRetrieved': gallicaRequest.getNumberRetrievedResults()})
+	self.update_state(state="GRAPHING", meta={'percent': 100,
+												   'status': "Graphing results...",
+												   'totalDiscovered': gallicaRequest.getNumberDiscoveredResults(),
+												   'totalRetrieved': gallicaRequest.getNumberRetrievedResults()})
+	while not gallicaRequest.getGraphingStatus():
+		time.sleep(.5)
+	self.update_state(state="SUCCESS", meta={'status': "All done.",
+											 'searchTerms': gallicaRequest.getSearchItems(),
+											 'dateRange': gallicaRequest.getDateRange(),
+											 'topPapers': gallicaRequest.getTopPapers()})
 	return {'percent': 100, 'status': 'Complete!', 'result': 42}
 
 
-@app.route('/papers')
-def papers():
-	getter = PaperGetter()
-	availablePapers = getter.getPapers()
-	return availablePapers
-
-
-@app.route('/results')
-def results():
-	request = session['fetchThread']
-	# Clunky. Is there a better way to coordinate waiting for the graph to finish?
-	imageRef = request.getImageRef()
-
-	while not imageRef:
-		time.sleep(1)
-		imageRef = session['fetchThread'].getImageRef()
-
-	# This will need to be changed for multiple terms, multiple dictionaries.
-	searchTerms = request.getSearchItems()
-	dateRange = request.getDateRange()
-	paperDictionarys = request.getTopPapers()
-	singleDictionaryForSingleTerm = paperDictionarys[0]
-	return render_template('resultsPage.html', imageRef=imageRef, topPapers=singleDictionaryForSingleTerm,
-						   dateRange=dateRange, term=searchTerms)
-
-
-@app.route('/loadingResults/<task_id>')
-def loadingResults(task_id):
-	return render_template('preparingResults.html')
-
-
-@app.route('/loadingResults/progress/<task_id>')
-def getDiscoveryRetrievalProgress(task_id):
-	task = getAsyncRequest.AsyncResult(task_id)
+@app.route('/loadingResults/progress/<taskId>')
+def getProgress(taskId):
+	task = getAsyncRequest.AsyncResult(taskId)
 	if task.state == "PENDING":
 		response = {
 			'state': task.state,
@@ -121,6 +97,13 @@ def getDiscoveryRetrievalProgress(task_id):
 			'discoveryPercent': 100,
 			'retrievalPercent': task.info.get('percent'),
 		}
+	elif task.state == "GRAPHING" or task.state == "SUCCESS":
+		response = {
+			'state': task.state,
+			'discoveryPercent': 100,
+			'retrievalPercent': 100,
+			'status': str(task.info)
+		}
 	else:
 		response = {
 			'state': task.state,
@@ -131,16 +114,40 @@ def getDiscoveryRetrievalProgress(task_id):
 	return jsonify(response)
 
 
-@app.route('/loadingResults/getDiscoveredResults/<task_id>')
-def getTotalDiscovered(task_id):
-	task = getAsyncRequest.AsyncResult(task_id)
+@app.route('/papers')
+def papers():
+	getter = PaperGetter()
+	availablePapers = getter.getPapers()
+	return availablePapers
+
+
+@app.route('/results/<taskId>')
+def results(taskId):
+	task = getAsyncRequest.AsyncResult(taskId)
+	results = task.get()
+	searchTerms = results.get('searchTerms')
+	dateRange = results.get('dateRange')
+	#TODO: investigate why toppapers only sending one
+	topPapers = results.get('topPapers')
+	return render_template('resultsPage.html', topPapers=topPapers,
+						   dateRange=dateRange, term=searchTerms, requestID=taskId)
+
+
+@app.route('/loadingResults/<taskId>')
+def loadingResults(taskId):
+	return render_template('preparingResults.html')
+
+@app.route('/loadingResults/getDiscoveredResults/<taskId>')
+def getTotalDiscovered(taskId):
+	task = getAsyncRequest.AsyncResult(taskId)
 	numberDiscovered = task.info.get('totalDiscovered')
+	numberDiscovered = "{:,}".format(int(numberDiscovered))
 	return jsonify({'numberDiscovered' : numberDiscovered})
 
 
-@app.route('/loadingResults/getNumberRetrievedResults/<task_id>')
-def getTotalRetrieved(task_id):
-	task = getAsyncRequest.AsyncResult(task_id)
+@app.route('/loadingResults/getNumberRetrievedResults/<taskId>')
+def getTotalRetrieved(taskId):
+	task = getAsyncRequest.AsyncResult(taskId)
 	numberRetrieved = task.info.get('totalRetrieved')
 	return jsonify({'numberRetrieved' : numberRetrieved})
 

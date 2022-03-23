@@ -1,6 +1,6 @@
 import psycopg2
 
-#What if paper doesn't exist? I suppose that will be avoided
+#TODO: Make the papercode the primary key for papers and the foreign key for results... paper names can be retrieved whenever
 class DictionaryMaker():
 	def __init__(self, newspaperSetting, yearRange, eliminateEdgePapers):
 		self.newspaperSetting = newspaperSetting
@@ -25,16 +25,12 @@ class DictionaryMaker():
 		try:
 			conn = psycopg2.connect(
 				host="localhost",
-				database="gallica",
+				database="postgres",
 				user="wglea",
 				password="ilike2play"
 			)
 			cursor = conn.cursor()
-			firstPaper = self.newspaperSetting[0]
-			if firstPaper in ["noDict", "unlimited", "finalForm"]:
-				pass
-				#gimme everything you have
-			elif firstPaper in ["all", "full", "complete"]:
+			if not self.newspaperSetting:
 				if self.eliminateEdgePapers:
 					self.establishYearStrictNewspaperDictionary(cursor)
 				else:
@@ -66,8 +62,8 @@ class DictionaryMaker():
 		SQL = """
 			SELECT paperName, paperCode
 				FROM papers
-				WHERE startYear BETWEEN (%s) AND (%s) OR
-					endYear BETWEEN (%s) AND (%s)
+				WHERE (startYear BETWEEN (%s) AND (%s)) OR
+					(endYear BETWEEN (%s) AND (%s))
 			;
 			"""
 		yearTuple = (self.yearRange[0], self.yearRange[1], self.yearRange[0], self.yearRange[1])

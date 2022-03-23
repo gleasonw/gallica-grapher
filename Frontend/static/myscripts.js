@@ -1,6 +1,15 @@
 var $inputpapers = $("input#papers");
+var $inputrange = $("input#yearRange");
+var $paperInputAndDropdown = $(".paperInputAndDropdown")
+var $dropdown = $('.dropdown');
+var $strictnessoption = $('.form-group#strictnesschecker')
 var $paperBubblesContainer = $('.paperBubblesContainer');
 var papers;
+
+$(document).ready(function() {
+    $dropdown.hide()
+    $strictnessoption.hide();
+});
 
 $(function() {
     $('#hidden-form-group').show();
@@ -13,24 +22,6 @@ $(function() {
     });
 });
 
-$(function strictnessChecker(){
-    $('.form-group#strictness').hide();
-    $("input#yearRange,input#papers").on("keyup", function(){
-        if ($("input#yearRange").val() !== "" && !$paperBubblesContainer.children()){
-            let paper = $("input#papers").val();
-            if (paper === "") {
-                $('.form-group#strictness').show();
-            } else {
-                $('.form-group#strictness').hide();
-            }
-        } else {
-            $('.form-group#strictness').hide();
-        }
-    })
-});
-//Now just modify flask to accept the paperBubblesContainer text instead of the input text on a post
-
-
 $("form#searchStuff").submit(function(event) {
     event.preventDefault()
     let paperChoices = '';
@@ -42,7 +33,7 @@ $("form#searchStuff").submit(function(event) {
     userInputs.set('chosenPapers', paperChoices)
     userInputs.set('searchTerm', $("input#searchTerm").val())
     userInputs.set('yearRange', $("input#yearRange").val())
-    userInputs.set('strictness', $("input#strictYearRange").val())
+    userInputs.set('strictness', $("input#strictness").is(":checked"))
     $.ajax({
         type: 'post',
         url: '/home',
@@ -86,6 +77,34 @@ $inputpapers.keydown(function(e) {
         }
     }
 })
+
+$inputpapers.focusin(function(){
+    $dropdown.show()
+})
+
+$inputrange.on("keyup", function(){
+    strictnessButtonHideShowCheck()
+});
+
+//Close dropdown on click out
+$(document).click(function(event) {
+    var $target = $(event.target);
+    if(!$target.closest($paperInputAndDropdown).length && $dropdown.is(":visible")) {
+        $inputpapers.val('');
+        $dropdown.hide();
+    }
+    strictnessButtonHideShowCheck()
+});
+
+function strictnessButtonHideShowCheck(){
+      //Remove strictness option if papers have been selected
+    if (Object.keys($paperBubblesContainer.children()).length > 2 || $inputrange.val() === ""){
+        $strictnessoption.hide();
+    }else{
+        if ($("input#yearRange").val() !== "")
+        $strictnessoption.show();
+    }
+}
 
 $(document).on('click','.paperOptionDrop',function () {
     $inputpapers.val('');

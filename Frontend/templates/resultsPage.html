@@ -8,66 +8,27 @@
     <title>The Gallica Grapher</title>
 </head>
 <body>
+<!--TODO: beautify, add downloads for graph and CSV-->
     <div class = "resultElements">
         <div class = "graphTitle">
-            <a>Usage of '{{term}}' from {{range[0]}} to {{range[1]}}</a>
+            <a>Usage of '{{term[0]}}' from {{dateRange[0]}} to {{dateRange[1]}}</a>
         </div>
-        <table class="resultTable">
-            <tr>
-                <td>
-                     <div class = "topBar">
-                        <div class = "graph">
-                            <img id = "Graph" src={{imageRef}} alt="graph of word frequency data">
-                        </div>
-                     </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div id = "TopPapers">
-                        <div class = "scroller">
-                            <table id = "TopPapersTable">
-                                  <tr><th>Frequency</th><th>Paper</th>
-                                {% for paperCount in topPapers %}
-                                    <tr><td>{{ paperCount[1] }}</td><td> {{ paperCount[0] }}</td></tr>
-                                {% endfor %}
-                            </table>
-                        </div>
-                    </div>
-                    <div id = download>
-                        <p> Download CSV || Download Graph(s). </p>
-                    </div>
-                </td>
-                <td>
-                    <div class = bottomBar>
-<!--                    <form id = "graphSettingStuff">-->
-<!--                        <div class ="form-group">-->
-<!--                            <label class = "settingLabel" for="graphType">Select a new graph type </label>-->
-<!--                            <select name = "graphType" id="graphType">-->
-<!--                                <option value="freqPoly">Frequency Polygraph</option>-->
-<!--                                <option value="stackedBar">Stacked Bar Graph</option>-->
-<!--                                <option value="bar">Bar Graph</option>-->
-<!--                                <option value="percentage">Percentage Graph</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                        <div id="hidden-form-group">-->
-<!--                            <label class = "settingLabel" for="binSize">Histogram bin size in months:</label>-->
-<!--                            <input type="text" id="binSize" name="binSize" /><br />-->
-<!--                        </div>-->
-<!--                        <div class = "form-group">-->
-<!--                            <label class="settingLabel" for = "SeparateGraphs">Separate graphs for each search term?</label>-->
-<!--                            <input type="checkbox" id="SeparateGraphs"/>-->
-<!--                        </div>-->
-<!--                        <div class = "submit-group">-->
-<!--                            <input id = "submitter" type="submit" value="Refresh"/>-->
-<!--                        </div>-->
-<!--                    </form>-->
+        <div id='chart'>
+            <img src="../static/{{requestID}}.svg"  alt="Graph of word frequency data. CSV also available to download."/>
+        </div>
+        <div id = "TopPapers">
+            <div class = "scroller">
+                <table id = "TopPapersTable">
+                      <tr><th>Frequency</th><th>Paper</th>
+                    {% for paperCount in topPapers %}
+                        <tr><td>{{ paperCount[1] }}</td><td> {{ paperCount[0] }}</td></tr>
+                    {% endfor %}
+                </table>
             </div>
-                </td>
-            </tr>
-        </table>
-
-
+        </div>
+        <div id = download>
+            <p> Download CSV || Download Graph(s). </p>
+        </div>
     </div>
     <div class="footer">
         <a>Neat Neat Neat</a>

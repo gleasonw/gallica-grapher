@@ -27,11 +27,6 @@
   color: white;
 }
 
-html, body {
-  margin: 0;
-  height: 100%;
-}
-
 
 
 .progressDescription{
@@ -85,19 +80,12 @@ input[type=text]:focus {
 }
 
 :root {
-  --rad: .7rem;
   --dur: .3s;
   --color-dark: black;
   --color-light: white;
   --font-fam: 'Times New Roman', sans-serif;
   --height: 50%;
   --bez: cubic-bezier(0, 0, 0.43, 1.49);
-}
-
-form {
-    margin: auto;
-    width: 100%;
-    border-radius: var(--rad);
 }
 
 input[type="submit"]{
@@ -107,7 +95,6 @@ input[type="submit"]{
     padding: 12px 20px;
     margin: 15px 0;
     outline: none;
-    border-radius: var(--rad);
     appearance: none;
     transition: all var(--dur) var(--bez);
     transition-property: width, border-radius;
@@ -125,30 +112,38 @@ input#searchTerm,input#yearRange,.inputContainer {
     font-size: large;
     width: auto;
     padding: 12px 20px;
-    margin: 15px 0;
     display: inline-block;
     outline: none;
-    border-radius: var(--rad);
+    margin-top: 15px;
     appearance: none;
-    transition: all var(--dur) var(--bez);
-    transition-property: width, border-radius;
-    z-index: 1;
-    position: relative;
     box-shadow: 0 0 3pt 2pt gray;
 }
-
+.paperInputAndDropdown{
+    display: block;
+}
 .inputContainer{
     display: flex;
+    flex-direction: column;
+}
+
+.delete{
+    font-size: large;
+    margin-right: 8px;
+    font-family: Arial, sans-serif;
+    font-weight: lighter;
+}
+.delete:hover{
+    color: gray;
 }
 
 input#papers{
     height: 100%;
     font-family: var(--font-fam);
     border: 0;
-    border-bottom: solid 1px slategray;
     font-size: large;
     width: 100%;
-    float: right;
+    float: bottom;
+    margin-top: 5px;
 }
 
 label[for="papers"]{
@@ -167,29 +162,25 @@ label[for="papers"]{
 }
 
 .bubblePaper{
-    margin: 2px;
-    border-radius: 10px;
-    background-color: gray;
-    color: white;
+    padding: 3px 5px 3px 10px;
+    margin: 3px 0 3px 5px;
+    box-shadow: inset 0 0 4px 0 #dcd1c7;
+    border: 1px solid #cbc6c3;
+    color: #242527;
     max-height: 30px;
     max-width: 250px;
     cursor: pointer;
+    line-height: 1.4;
     display: flex;
 }
 
 .selectedPaper{
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: small;
+    font-size: medium;
     margin: auto;
     text-align: center;
     white-space: nowrap;
-}
-
-.delete{
-    margin: 2px;
-    font-size: medium;
-    font-family: "Palatino Linotype", Palatino, "Gentium Plus", sans-serif;
 }
 
 
@@ -214,8 +205,8 @@ label[for="papers"]{
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 #hidden-form-group{
@@ -245,17 +236,20 @@ label[for="papers"]{
 
 .dropdown {
     top: 100%;
-    left: 0;
+    display: block;
     max-height: 100px;
     overflow-y: scroll;
-    z-index: 1;
     width: 100%;
+    border-color: slategray;
     box-sizing: border-box;
-    border: 1px solid;
-    list-style-type: none;
-    -webkit-padding-start: 0;
-    padding-inline-start: 0;
     padding-left: 0;
+    box-shadow: 0 4px 5px rgba(0,0,0,.15);
+}
+
+.paperOptionDrop{
+    display: list-item;
+    list-style: none;
+    margin: 2px;
 }
 
 .dropdown > *{
@@ -263,7 +257,7 @@ label[for="papers"]{
 }
 
 .dropdown > *:hover{
-    background-color: black;
+    background-color: blue;
     color: white;
 }
 
@@ -273,15 +267,6 @@ label[for="papers"]{
     justify-content: space-between;
 }
 
-.graph{
-    width: 100%;
-    margin: auto;
-}
-
-.graph #Graph{
-    width: 100%;
-    height: auto;
-}
 .graphTitle{
     font-size: x-large;
     text-align: center;
@@ -327,4 +312,54 @@ label[for="papers"]{
     height: 5%;
 }
 
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-top: 20px;
+}
 
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}

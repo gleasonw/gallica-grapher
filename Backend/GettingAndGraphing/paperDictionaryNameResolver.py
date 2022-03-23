@@ -56,7 +56,7 @@ class paperGetter:
 						writer.writerow([paperName, checkedRange[0], endDate, paperUrl, paperCode])
 
 
-
+	# Creates a name-accurate dictionary of papers... I think
 	def makeBetterDictionary(self):
 		parameters = dict(version=1.2, operation="searchRetrieve", exactSearch=False, collapsing=True,
 						  query=self.query, startRecord=0, maximumRecords=1)
@@ -80,7 +80,7 @@ class paperGetter:
 
 	def gatherPapers(self, startRecord):
 		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-		adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
+		adapter = TimeoutAndRetryHTTPAdapter(timeout=5)
 		gallicaHttpSession.mount("https://", adapter)
 		gallicaHttpSession.mount("http://", adapter)
 		parameters = dict(version=1.2, operation="searchRetrieve", exactSearch=False, collapsing=True,
@@ -111,9 +111,9 @@ class paperGetter:
 		return results
 
 	def renamePapersToTheNameThatShowsUpInResult(self):
-		with open("paperDictionaryWithoutFunkyDates.csv", "r", encoding="utf8") as inFile:
+		with open("Backend/CSVdata/paperDictionaryWithoutFunkyDates.csv", "r", encoding="utf8") as inFile:
 			reader = csv.reader(inFile)
-			with open("../Postgre/paperDictionaryGoodDatesGoodNames.csv", "w", encoding="utf8") as outFile:
+			with open("Backend/CSVdata/paperDictionaryGoodDatesGoodNames.csv", "w", encoding="utf8") as outFile:
 				writer = csv.writer(outFile)
 				next(reader)
 				with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
@@ -126,7 +126,7 @@ class paperGetter:
 		if newspaper:
 			query = 'arkPress all "{0}" sortby dc.date/sort.ascending '
 			gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-			adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
+			adapter = TimeoutAndRetryHTTPAdapter(timeout=5)
 			gallicaHttpSession.mount("https://", adapter)
 			gallicaHttpSession.mount("http://", adapter)
 			newspaperCode = newspaper[4]
@@ -139,7 +139,6 @@ class paperGetter:
 				queryHit = root[4][0]
 				data = queryHit[2][0]
 				journalName = data.find('{http://purl.org/dc/elements/1.1/}title').text
-				print([journalName, newspaper[1], newspaper[2], newspaper[3], newspaper[4]])
 				return [journalName, newspaper[1], newspaper[2], newspaper[3], newspaper[4]]
 			except IndexError:
 				return
@@ -148,11 +147,41 @@ class paperGetter:
 		else:
 			return
 
+	def createUniqueNewspaperTitles(self):
+		with open("../CSVdata/paperDictionaryGoodDatesGoodNames.csv", "r", encoding="utf8") as inFile:
+			reader = csv.reader(inFile)
+			with open("../CSVdata/papersNoDuplicatesGoodDatesGoodNames.csv", "w", encoding="utf8") as outFile:
+				writer = csv.writer(outFile)
+				index = 0
+				for paper in reader:
+					anotherIndex = 0
+					paperName = paper[0]
+					paperStartDate = paper[1]
+					paperEndDate = paper[2]
+					paperIdentifier = paper[4]
+					with open("../CSVdata/paperDictionaryGoodDatesGoodNames.csv", "r", encoding="utf8") as anotherInFile:
+						anotherReader = csv.reader(anotherInFile)
+						for anotherPaper in anotherReader:
+							anotherPaperName = anotherPaper[0]
+							if paperName == anotherPaperName and index != anotherIndex:
+								print("Got one")
+								print(paperName)
+								paperName = "{originalName} ({startDate}-{endDate})".format(originalName=paperName, startDate=paperStartDate, endDate=paperEndDate)
+								break
+							anotherIndex += 1
+						writer.writerow([paperName, paperStartDate, paperEndDate, paperIdentifier])
+						index += 1
+
+
+
+
+
 
 if __name__ == "__main__":
 	gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-	adapter = TimeoutAndRetryHTTPAdapter(timeout=2.5)
+	adapter = TimeoutAndRetryHTTPAdapter(timeout=5)
 	gallicaHttpSession.mount("https://", adapter)
 	gallicaHttpSession.mount("http://", adapter)
 	paperEditor = paperGetter("neat", gallicaHttpSession)
-	paperEditor.renamePapersToTheNameThatShowsUpInResult()
+	paperEditor.createUniqueNewspaperTitles()
+

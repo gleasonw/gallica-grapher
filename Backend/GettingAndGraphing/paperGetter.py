@@ -13,7 +13,7 @@ class PaperGetter:
 		try:
 			conn = psycopg2.connect(
 				host="localhost",
-				database="gallica",
+				database="postgres",
 				user="wglea",
 				password="ilike2play"
 			)

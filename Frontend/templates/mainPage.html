@@ -21,27 +21,31 @@
                     <label class="inputTitle">
                         Do you want a specific paper or papers?
                     </label>
-                    <div class = "inputContainer">
-                        <div class = 'paperBubblesContainer'>
-                        </div>
+                    <div class="paperInputAndDropdown">
+                        <div class = "inputContainer">
+                        <div class = 'paperBubblesContainer'></div>
                         {{ render_field(form.papers, autocomplete="off") }}
-                    </div>
-                    <div class = "dropdown">
+                        </div>
+                        <div class = "dropdown"></div>
                     </div>
                 </div>
                 <div class = "form-group">
                     {{ render_field(form.yearRange) }}
                 </div>
-                <div class = "form-group" id="strictness">
-                    {{ render_field(form.strictYearRange) }}
+                <div class = "form-group" id="strictnesschecker">
+                    <label class="inputTitle">
+                        Restrict search to papers that published continuously along this range?
+                    </label>
+                    <label class="switch">
+                        <input id="strictness" type = "checkbox">
+                        <span class = "slider"></span>
+                    </label>
+
                 </div>
                 <div class = "form-group">
                     <input type=submit value=Go id="gobutton">
                 </div>
             </form>
-        </div>
-        <div class="footer">
-            <a>Neat Neat Neat</a>
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

@@ -2,7 +2,7 @@ import re
 from lxml import etree
 
 
-class GallicaHunter:
+class BatchGetter:
 	def __init__(self, query, startRecord, numRecords, session):
 		self.dateJournalIdentifierResults = []
 		self.query = query
@@ -53,7 +53,6 @@ class GallicaHunter:
 		parameters = {"version": 1.2, "operation": "searchRetrieve", "query": self.query,
 					  "startRecord": self.startRecord, "maximumRecords": self.numRecords, "collapsing": "disabled"}
 		response = self.session.get("", params=parameters)
-		print(response.status_code)
 		root = etree.fromstring(response.content)
 		self.hitListCreator(root)
 
@@ -62,23 +61,26 @@ class GallicaHunter:
 		priorDate = ''
 		for queryHit in targetXMLroot.iter("{http://www.loc.gov/zing/srw/}record"):
 			self.queryHitNumber = self.queryHitNumber + 1
-			data = queryHit[2][0]
-			dateOfHit = data.find('{http://purl.org/dc/elements/1.1/}date').text
-			dateOfHit = GallicaHunter.standardizeSingleDate(dateOfHit)
-			if dateOfHit is not None:
-				journalOfHit = data.find('{http://purl.org/dc/elements/1.1/}title').text
-				if dateOfHit == priorDate and journalOfHit == priorJournal:
-					self.numPurgedResults = self.numPurgedResults + 1
-					continue
+			# It appears the data field is sometimes blank, hence the try
+			try:
+				data = queryHit[2][0]
+				dateOfHit = data.find('{http://purl.org/dc/elements/1.1/}date').text
+				dateOfHit = BatchGetter.standardizeSingleDate(dateOfHit)
+				if dateOfHit is not None:
+					journalOfHit = data.find('{http://purl.org/dc/elements/1.1/}title').text
+					if dateOfHit == priorDate and journalOfHit == priorJournal:
+						self.numPurgedResults = self.numPurgedResults + 1
+						continue
+					else:
+						identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
+						fullResult = {'date': dateOfHit, 'identifier': identifierOfHit}
+						self.dateJournalIdentifierResults.append(fullResult)
+						priorJournal = journalOfHit
+						priorDate = dateOfHit
 				else:
-					identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
-					fullResult = [dateOfHit, journalOfHit, identifierOfHit]
-					self.dateJournalIdentifierResults.append(fullResult)
-					priorJournal = journalOfHit
-					priorDate = dateOfHit
-			else:
-				self.numPurgedResults = self.numPurgedResults + 1
-				continue
+					self.numPurgedResults += 1
+			except IndexError:
+				self.numPurgedResults += 1
 
 	def getNumberPurgedResults(self):
 		return self.numPurgedResults
