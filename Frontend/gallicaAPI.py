@@ -34,7 +34,10 @@ def home():
 	form = SearchForm(request.form)
 	if request.method == 'POST' and form.validate():
 		papers = request.form['chosenPapers']
-		yearStrict = request.form['strictness']
+		if request.form['strictness'] == "false":
+			yearStrict = False
+		else:
+			yearStrict = True
 		papers = parsePapers(papers)
 		term = form.searchTerm.data
 		yearRange = form.yearRange.data

@@ -25,7 +25,6 @@ class MainSearchSupervisor:
 
 	def runMultiTermQuery(self):
 		for searchTerm in self.searchTermList:
-			#TODO: Fix the full search
 			resultGetterForTerm = FullSearchWithinDictionary(searchTerm, self.newspaper,
 															 self.yearRange,
 															 self.strictYearRange, self.progressTrackerThread)
@@ -36,7 +35,6 @@ class MainSearchSupervisor:
 		start = time.time()
 		self.initiateGraphing()
 		print("Elapsed graphing time: {0}".format(time.time()-start))
-		#TODO: Change to accomodate top ten papers if multiple search terms. Very temporary solution.
 		resultBundle = self.searchTermResultList[0]
 		topPapers = resultBundle.getTopTenPapers()
 		self.progressTrackerThread.setTopPapers(topPapers)

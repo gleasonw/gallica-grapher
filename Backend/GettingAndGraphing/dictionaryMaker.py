@@ -1,6 +1,5 @@
 import psycopg2
 
-#TODO: Make the papercode the primary key for papers and the foreign key for results... paper names can be retrieved whenever
 class DictionaryMaker():
 	def __init__(self, newspaperSetting, yearRange, eliminateEdgePapers):
 		self.newspaperSetting = newspaperSetting

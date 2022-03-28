@@ -5,18 +5,23 @@
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="../static/myscripts.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
     <title>The Gallica Grapher</title>
 </head>
 <body>
 <!--TODO: beautify, add downloads for graph and CSV-->
-    <div class = "resultElements">
+    <div class = "mainElements">
+        <div class="mainTitle">
+            <a class = "homeLink" href="http://127.0.0.1:5000/">The Gallica Grapher</a>
+        </div>
         <div class = "graphTitle">
             <a>Usage of '{{term[0]}}' from {{dateRange[0]}} to {{dateRange[1]}}</a>
         </div>
-        <div id='chart'>
-            <img src="../static/{{requestID}}.svg"  alt="Graph of word frequency data. CSV also available to download."/>
+        <div id = "topPapersAndGraph">
+             <div id='chart'>
+            <img id="graphImage" src="../static/{{requestID}}.svg"  alt="Graph of word frequency data. CSV also available to download."/>
         </div>
-        <div id = "TopPapers">
+        <div id = "topPapers">
             <div class = "scroller">
                 <table id = "TopPapersTable">
                       <tr><th>Frequency</th><th>Paper</th>
@@ -25,6 +30,7 @@
                     {% endfor %}
                 </table>
             </div>
+        </div>
         </div>
         <div id = download>
             <p> Download CSV || Download Graph(s). </p>

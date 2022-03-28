@@ -18,6 +18,7 @@
     <orderEntry type="library" name="bootstrap-select" level="application" />
     <orderEntry type="library" name="jquery" level="application" />
     <orderEntry type="library" name="plotly-latest" level="application" />
+    <orderEntry type="library" name="highcharts" level="application" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="renderExternalDocumentation" value="true" />

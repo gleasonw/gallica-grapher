@@ -80,7 +80,7 @@ class paperGetter:
 
 	def gatherPapers(self, startRecord):
 		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-		adapter = TimeoutAndRetryHTTPAdapter(timeout=5)
+		adapter = TimeoutAndRetryHTTPAdapter()
 		gallicaHttpSession.mount("https://", adapter)
 		gallicaHttpSession.mount("http://", adapter)
 		parameters = dict(version=1.2, operation="searchRetrieve", exactSearch=False, collapsing=True,
@@ -126,7 +126,7 @@ class paperGetter:
 		if newspaper:
 			query = 'arkPress all "{0}" sortby dc.date/sort.ascending '
 			gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-			adapter = TimeoutAndRetryHTTPAdapter(timeout=5)
+			adapter = TimeoutAndRetryHTTPAdapter()
 			gallicaHttpSession.mount("https://", adapter)
 			gallicaHttpSession.mount("http://", adapter)
 			newspaperCode = newspaper[4]
@@ -179,7 +179,7 @@ class paperGetter:
 
 if __name__ == "__main__":
 	gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-	adapter = TimeoutAndRetryHTTPAdapter(timeout=5)
+	adapter = TimeoutAndRetryHTTPAdapter()
 	gallicaHttpSession.mount("https://", adapter)
 	gallicaHttpSession.mount("http://", adapter)
 	paperEditor = paperGetter("neat", gallicaHttpSession)

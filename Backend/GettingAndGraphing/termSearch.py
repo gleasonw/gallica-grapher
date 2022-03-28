@@ -65,7 +65,7 @@ class TermSearch:
 	@staticmethod
 	def makeSession():
 		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-		adapter = TimeoutAndRetryHTTPAdapter(timeout=5)
+		adapter = TimeoutAndRetryHTTPAdapter(timeout=25)
 		gallicaHttpSession.mount("https://", adapter)
 		gallicaHttpSession.mount("http://", adapter)
 		return gallicaHttpSession
@@ -126,7 +126,6 @@ class TermSearch:
 
 			except (Exception, psycopg2.DatabaseError) as error:
 				print(error)
-				raise
 			finally:
 				if conn is not None:
 					conn.close()
@@ -151,7 +150,6 @@ class TermSearch:
 	def parseNewspaperDictionary(self):
 		dicParser = DictionaryMaker(self.newspaper, [self.lowYear, self.highYear], self.strictYearRange)
 		self.newspaperDictionary = dicParser.getDictionary()
-		pass
 
 	def establishYearRange(self, yearRange):
 		if len(yearRange) == 2:
@@ -358,7 +356,7 @@ class FullSearchNoDictionary(TermSearch):
 # make list of newspapers with number results. Do at the end of all queries (since # results updated during lower level runs)
 
 
-DEFAULT_TIMEOUT = 5  # seconds
+DEFAULT_TIMEOUT = 10  # seconds
 
 
 class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
@@ -367,7 +365,7 @@ class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
 			total=15,
 			status_forcelist=[500, 502, 503, 504],
 			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
-			backoff_factor=1
+			backoff_factor=2
 		)
 		self.timeout = DEFAULT_TIMEOUT
 		if "timeout" in kwargs:

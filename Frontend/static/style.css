@@ -53,6 +53,21 @@
     font-size: xx-large;
 }
 
+.homeLink{
+    text-decoration: none;
+    background-color: white;
+    color: black;
+}
+
+#graphImage{
+    width: 100%;
+}
+
+#topPapersAndGraph{
+    display: flex;
+    flex-direction: row;
+}
+
 .mainElements{
     font-family: "Palatino Linotype", Palatino, "Gentium Plus", serif;
 }
