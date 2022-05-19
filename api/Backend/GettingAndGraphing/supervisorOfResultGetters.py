@@ -1,5 +1,5 @@
-from Backend.GettingAndGraphing.resultGetterForTerm import *
-from Backend.GettingAndGraphing.graphJSONmaker import GraphJSONmaker
+from resultGetterForTerm import *
+from graphJSONmaker import GraphJSONmaker
 
 import psycopg2
 
@@ -10,8 +10,8 @@ class SupervisorOfResultGetters:
 	def connectToDatabase():
 		conn = psycopg2.connect(
 			host="localhost",
-			database="postgres",
-			user="wglea",
+			database="gallicagrapher",
+			user="wgleason",
 			password="ilike2play"
 		)
 		conn.set_session(autocommit=True)

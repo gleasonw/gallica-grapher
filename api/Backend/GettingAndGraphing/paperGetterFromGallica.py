@@ -4,7 +4,7 @@ import lxml.etree
 from requests_toolbelt import sessions
 from math import ceil
 from lxml import etree
-from Backend.GettingAndGraphing.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
 class PaperGetterFromGallica:
@@ -143,8 +143,8 @@ if __name__ == "__main__":
 	try:
 		conn = psycopg2.connect(
 			host="localhost",
-			database="postgres",
-			user="wglea",
+			database="gallicagrapher",
+			user="wgleason",
 			password="ilike2play"
 		)
 		conn.set_session(autocommit=True)
