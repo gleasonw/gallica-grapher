@@ -1,0 +1,297 @@
+.horizontal-slider {
+    width: 100%;
+    height: 50px;
+}
+.example-thumb {
+  cursor: pointer;
+  position: absolute;
+  z-index: 100;
+  background: #ffffff;
+  border: 5px solid #3774ff;
+  border-radius: 100%;
+  display: block;
+  box-shadow: 0 0 2px 0 rgb(0 0 0 / 44%);
+}
+.example-thumb.active {
+  background-color: grey;
+}
+.example-track {
+  position: relative;
+  background: #ddd;
+}
+.example-track.example-track-1 {
+  background: #83a9ff;
+}
+.example-track {
+  top: 20px;
+  height: 4px;
+}
+.horizontal-slider .example-thumb {
+  top: 12px;
+  width: 10px;
+  outline: none;
+  height: 10px;
+  line-height: 38px;
+}
+.mainTitle {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    border: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: xx-large;
+}
+
+.formBox,.requestBox{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    width: calc(100% - 40px);
+    max-width: 600px;
+    padding: 20px;
+}
+.requestBox{
+    border: solid;
+    position: relative;
+    min-height: 50px;
+}
+.requestBubbleContainer{
+    display: flex;
+    width: 75%;
+    flex-wrap: wrap;
+}
+
+.selectionBubble{
+    padding: 3px 5px 3px 10px;
+    margin: 3px 0 3px 5px;
+    box-shadow: inset 0 0 4px 0 #dcd1c7;
+    border: 1px solid #cbc6c3;
+    color: #242527;
+    max-height: 30px;
+    max-width: 250px;
+    cursor: pointer;
+    line-height: 1.4;
+    display: flex;
+}
+
+input[type='text']{
+    height: 100%;
+    font-family: var(--font-fam);
+    border: 0;
+    font-size: large;
+    width: 100%;
+    float: bottom;
+    margin-top: 5px;
+}
+
+
+.requestBubble{
+    border: 1px solid #e0e0e0;
+}
+.graphingButtonContainer{
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+#startGraphingButton{
+    border: none;
+    height: 100%;
+    min-width: 100px;
+}
+
+#createTicketButton{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+    display: block;
+    padding: 12px 20px 10px;
+    border: none;
+}
+
+.inputContainer {
+    height: var(--height);
+    font-family: var(--font-fam);
+    border: 0;
+    color: var(--color-dark);
+    font-size: large;
+    padding: 12px 20px;
+    display: inline-block;
+    outline: none;
+    appearance: none;
+    box-shadow: 0 0 3pt 2pt gray;
+}
+.paperInputAndDropdown{
+    display: block;
+}
+.inputContainer{
+    display: flex;
+    flex-direction: column;
+}
+.histogramContainer{
+    min-height: 100px;
+    width: 100%;
+}
+.delete{
+    font-size: large;
+    margin-right: 8px;
+    font-family: Arial, sans-serif;
+    font-weight: lighter;
+}
+.delete:hover{
+    color: gray;
+}
+input#papers,input#searchTerm{
+    height: 100%;
+    font-family: var(--font-fam);
+    border: 0;
+    font-size: large;
+    width: 100%;
+    float: bottom;
+    margin-top: 5px;
+}
+
+label[for="papers"],label[for="searchTerm"]{
+    display: none;
+}
+
+.bubblesContainer{
+    display: flex;
+    float: left;
+    height: auto;
+    flex-wrap: wrap;
+}
+
+.bubblePaper,.bubbleTerm{
+    padding: 3px 5px 3px 10px;
+    margin: 3px 0 3px 5px;
+    box-shadow: inset 0 0 4px 0 #dcd1c7;
+    border: 1px solid #cbc6c3;
+    color: #242527;
+    max-height: 30px;
+    max-width: 250px;
+    cursor: pointer;
+    line-height: 1.4;
+    display: flex;
+}
+
+.selectedPaper,.selectedTerm{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: medium;
+    margin: auto;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.searchLabel{
+    font-size: large;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#hidden-form-group{
+    display: none;
+}
+
+.submit-group{
+    width: 100%;
+    margin-top: 40px;
+}
+
+.settingLabel{
+    font-size: medium;
+    float: left;
+    width: 20em;
+    margin-right: 15px;
+}
+
+.dropdown {
+    top: 100%;
+    display: none;
+    max-height: 100px;
+    overflow-y: scroll;
+    width: 100%;
+    border-color: slategray;
+    box-sizing: border-box;
+    padding-left: 0;
+    box-shadow: 0 4px 5px rgba(0,0,0,.15);
+}
+
+.paperOptionDrop{
+    display: list-item;
+    list-style: none;
+    margin: 2px;
+}
+
+.form-group#papergraphoptions,.form-group#termGraphOptions,.form-group#strictnesschecker{
+    display:none;
+}
+
+.dropdown > *{
+    cursor: pointer;
+}
+
+.dropdown > *:hover{
+    background-color: blue;
+    color: white;
+}
+
+.bottomBar{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.graphTitle{
+    font-size: x-large;
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.loadingElements{
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loadingBar {
+    width: 50%;
+    background-color: lightgray;
+}
+
+.twoBars{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    flex-direction: column;
+}
+
+.findingResultsBar {
+  width: 1%;
+  height: 30px;
+  background-color: cadetblue;
+}
+
+.establishResultsBar {
+  width: 1%;
+  height: 30px;
+  background-color: cadetblue;
+}
+
+.footer{
+    height: 5%;
+}
