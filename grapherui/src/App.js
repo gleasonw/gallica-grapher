@@ -135,7 +135,7 @@ class DateInputBox extends React.Component{
                 title: {
                     text: 'Publishing Papers Per Year'
                 },
-                series: [paperJSON]
+                series: paperJSON
             }
             return(
                 <div>
