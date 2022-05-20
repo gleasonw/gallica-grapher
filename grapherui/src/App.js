@@ -9,7 +9,7 @@ function App() {
         <div className="App">
             <header className="header">
                 <div className="mainTitle">
-                    <a className="homeLink" href="http://127.0.0.1:5000/">The Gallica Grapher</a>
+                    <a className="homeLink">The Gallica Grapher</a>
                 </div>
             </header>
             <FormBox/>
@@ -72,17 +72,16 @@ class TermInputBox extends React.Component{
         return(
             <div className='inputContainer'>
                 <SelectionBox></SelectionBox>
-                <form>
-                    <input
-                        type="text"
-                        name="terms"
-                        placeholder="Enter a term..."
-                        onChange={this.props.handleInputChange}/>
-                </form>
+                <input
+                    type="text"
+                    name="terms"
+                    placeholder="Enter a term..."
+                    onChange={this.props.handleInputChange}/>
             </div>
         )
     }
 }
+
 class PaperInputBox extends React.Component{
     render() {
         return(
@@ -100,24 +99,66 @@ class PaperInputBox extends React.Component{
 }
 
 class DateInputBox extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            error: null,
+            isLoaded: false,
+            paperJSON: null
+        };
+    }
+    componentDidMount() {
+        fetch("/paperchartjson").then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        isLoaded: true,
+                        paperJSON: result.data
+                    })
+                },
+                (error) => {
+                    this.setState({
+                        isLoaded: true,
+                        error
+                    });
+                }
+            )
+    }
     render() {
-        return(
-            <div>
-                <div className='histogramContainer'>
+        const {error, isLoaded, paperJSON} = this.state;
+        if (error) {
+            return <div>Error: {error.message}</div>;
+        }else if (!isLoaded) {
+            return <div>Loading...</div>;
+        }else{
+            const options = {
+                title: {
+                    text: 'Publishing Papers Per Year'
+                },
+                series: [paperJSON]
+            }
+            return(
+                <div>
+                    <HighchartsReact
+                        highcharts={Highcharts}
+                        options={options}
+                    />
+                    <div className='chartContainer'>
+                    </div>
+                    <ReactSlider
+                        className="horizontal-slider"
+                        thumbClassName="example-thumb"
+                        trackClassName="example-track"
+                        defaultValue={[0, 100]}
+                        ariaLabel={['Lower thumb', 'Upper thumb']}
+                        ariaValuetext={state => `Thumb value ${state.valueNow}`}
+                        renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
+                        pearling
+                        minDistance={10}
+                    />
                 </div>
-                <ReactSlider
-                    className="horizontal-slider"
-                    thumbClassName="example-thumb"
-                    trackClassName="example-track"
-                    defaultValue={[0, 100]}
-                    ariaLabel={['Lower thumb', 'Upper thumb']}
-                    ariaValuetext={state => `Thumb value ${state.valueNow}`}
-                    renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
-                    pearling
-                    minDistance={10}
-                />
-            </div>
         )
+        }
     }
 }
 

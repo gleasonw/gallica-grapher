@@ -1,5 +1,5 @@
-from resultGetterForTerm import *
-from graphJSONmaker import GraphJSONmaker
+from Backend.GettingAndGraphing.resultGetterForTerm import *
+from Backend.GettingAndGraphing.graphJSONmaker import GraphJSONmaker
 
 import psycopg2
 

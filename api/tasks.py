@@ -1,4 +1,4 @@
-from api.requestThread import RequestThread
+from requestThread import RequestThread
 from celery import Celery
 import time
 

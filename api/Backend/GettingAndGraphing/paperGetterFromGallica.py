@@ -4,7 +4,7 @@ import lxml.etree
 from requests_toolbelt import sessions
 from math import ceil
 from lxml import etree
-from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from Backend.GettingAndGraphing.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
 class PaperGetterFromGallica:

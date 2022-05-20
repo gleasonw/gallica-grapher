@@ -6,10 +6,10 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from requests_toolbelt import sessions
 from time import perf_counter
 
-from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
-from batchGetter import BatchGetter
-from dictionaryMaker import DictionaryMaker
-from paperGetterFromGallica import PaperGetterFromGallica
+from Backend.GettingAndGraphing.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from Backend.GettingAndGraphing.batchGetter import BatchGetter
+from Backend.GettingAndGraphing.dictionaryMaker import DictionaryMaker
+from Backend.GettingAndGraphing.paperGetterFromGallica import PaperGetterFromGallica
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)

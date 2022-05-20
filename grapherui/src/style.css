@@ -50,12 +50,16 @@
     margin-top: 30px;
     width: calc(100% - 40px);
     max-width: 600px;
-    padding: 20px;
 }
 .requestBox{
-    border: solid;
+    border: 0;
+    color: var(--color-dark);
+    font-size: large;
     position: relative;
     min-height: 50px;
+    outline: none;
+    appearance: none;
+    box-shadow: 0 0 3pt 2pt gray;
 }
 .requestBubbleContainer{
     display: flex;
@@ -111,7 +115,7 @@ input[type='text']{
     border: none;
 }
 
-.inputContainer {
+.inputContainer{
     height: var(--height);
     font-family: var(--font-fam);
     border: 0;
@@ -130,7 +134,7 @@ input[type='text']{
     display: flex;
     flex-direction: column;
 }
-.histogramContainer{
+.chartContainer{
     min-height: 100px;
     width: 100%;
 }

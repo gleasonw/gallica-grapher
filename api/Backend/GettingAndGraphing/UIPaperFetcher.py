@@ -13,8 +13,8 @@ class UIPaperFetcher:
 		try:
 			conn = psycopg2.connect(
 				host="localhost",
-				database="postgres",
-				user="wglea",
+				database="gallicagrapher",
+				user="wgleason",
 				password="ilike2play"
 			)
 			cursor = conn.cursor()

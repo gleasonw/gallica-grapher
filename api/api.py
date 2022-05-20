@@ -1,13 +1,18 @@
-import queue, ast, uuid, os
+import queue
+import ast
+import uuid
+import os
 from flask import Flask, url_for, render_template, request, jsonify
 from Backend.GettingAndGraphing.UIPaperFetcher import UIPaperFetcher
-from Frontend.requestForm import SearchForm
-from Frontend.tasks import getAsyncRequest
+from tasks import getAsyncRequest
 
 retrievingThreads = {}
 exceptionBucket = queue.Queue()
 app = Flask(__name__)
 app.secret_key = os.urandom(12).hex()
+basedir = os.path.abspath(os.path.dirname(__file__))
+pathToPaperJSON = os.path.join(basedir, 'static/paperJSON.json')
+
 
 
 @app.route('/about')
@@ -23,31 +28,31 @@ def contact():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-	form = SearchForm(request.form)
-	if request.method == 'POST' and form.validate():
-		if request.form['strictness'] == "false":
-			yearStrict = False
-		else:
-			yearStrict = True
-		if request.form['splitpapers'] == "false":
-			splitPapers = False
-		else:
-			splitPapers = True
-		if request.form['splitterms'] == "false":
-			splitTerms = False
-		else:
-			splitTerms = True
-		try:
-			papers = ast.literal_eval(request.form['papers'])
-			terms = ast.literal_eval(request.form['searchTerm'])
-		except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError):
-			return
-		yearRange = form.yearRange.data
-		taskID = str(uuid.uuid4())
-		getAsyncRequest.apply_async(args=[papers, terms, yearRange, yearStrict, splitPapers, splitTerms, taskID],
-									task_id=taskID)
-		return jsonify({}), 202, {'Location': url_for('loadingResults', taskId=taskID)}
-	return render_template("mainPage.html", form=form)
+	# form = SearchForm(request.form)
+	# if request.method == 'POST' and form.validate():
+	# 	if request.form['strictness'] == "false":
+	# 		yearStrict = False
+	# 	else:
+	# 		yearStrict = True
+	# 	if request.form['splitpapers'] == "false":
+	# 		splitPapers = False
+	# 	else:
+	# 		splitPapers = True
+	# 	if request.form['splitterms'] == "false":
+	# 		splitTerms = False
+	# 	else:
+	# 		splitTerms = True
+	# 	try:
+	# 		papers = ast.literal_eval(request.form['papers'])
+	# 		terms = ast.literal_eval(request.form['searchTerm'])
+	# 	except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError):
+	# 		return
+	# 	yearRange = form.yearRange.data
+	# 	taskID = str(uuid.uuid4())
+	# 	getAsyncRequest.apply_async(args=[papers, terms, yearRange, yearStrict, splitPapers, splitTerms, taskID],
+	# 								task_id=taskID)
+	# 	return jsonify({}), 202, {'Location': url_for('loadingResults', taskId=taskID)}
+	return "hello"
 
 
 @app.route('/loadingResults/progress/<taskId>')
@@ -90,21 +95,18 @@ def getProgress(taskId):
 		}
 	return jsonify(response)
 
+@app.route('/paperchartjson')
+def paperChart():
+	with open(pathToPaperJSON, 'r') as outFile:
+		paperChartJSON = outFile.read()
+	return paperChartJSON
 
+#TODO: Query database based on keywords
 @app.route('/papers')
 def papers():
 	getter = UIPaperFetcher()
 	availablePapers = getter.getPapers()
 	return availablePapers
-
-
-@app.route('/results/<taskId>')
-def results(taskId):
-	task = getAsyncRequest.AsyncResult(taskId)
-	results = task.get()
-	topPapers = results.get('topPapers')
-	return render_template('resultsPage.html', topPapers=topPapers)
-
 
 @app.route('/results/<taskId>/graphData')
 def getGraphData(taskId):
@@ -115,12 +117,6 @@ def getGraphData(taskId):
 	graphJSON = queryResults.get('graphJSON')
 	graphVals = {'terms': searchTerms, 'dateRange': dateRange, 'data': graphJSON}
 	return graphVals
-
-
-@app.route('/loadingResults/<taskId>')
-def loadingResults(taskId):
-	return render_template('preparingResults.html')
-
 
 @app.route('/loadingResults/getNumberTerms/<taskId>')
 def getNumberTerms(taskId):
