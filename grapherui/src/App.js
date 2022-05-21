@@ -113,7 +113,7 @@ class DateInputBox extends React.Component{
                 (result) => {
                     this.setState({
                         isLoaded: true,
-                        paperJSON: result.data
+                        paperJSON: result
                     })
                 },
                 (error) => {
@@ -131,11 +131,26 @@ class DateInputBox extends React.Component{
         }else if (!isLoaded) {
             return <div>Loading...</div>;
         }else{
+            console.log(paperJSON)
             const options = {
-                title: {
-                    text: 'Publishing Papers Per Year'
+                chart: {
+                    type: 'column'
                 },
-                series: paperJSON
+                title: {
+                    text: '# of Publishing Papers by Year'
+                },
+                subtitle: {
+                    text: 'According to BNF tag'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Active newspapers'
+                    }
+                },
+                series: [paperJSON],
+                legend: {
+                    enabled: false
+                }
             }
             return(
                 <div>
@@ -143,8 +158,6 @@ class DateInputBox extends React.Component{
                         highcharts={Highcharts}
                         options={options}
                     />
-                    <div className='chartContainer'>
-                    </div>
                     <ReactSlider
                         className="horizontal-slider"
                         thumbClassName="example-thumb"
