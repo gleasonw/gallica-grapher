@@ -17,15 +17,13 @@ function App() {
     );
 }
 
-class MainContainer extends React.Component {
-    render(){
-        return(
-            <div className="mainContainer">
-                <FormBox/>
-                <RequestBox/>
-            </div>
-        )
-    }
+function MainContainer(){
+    return(
+        <div className="mainContainer">
+            <FormBox/>
+            <RequestBox/>
+        </div>
+    )
 }
 
 class FormBox extends React.Component {
@@ -92,6 +90,23 @@ class TermInputBox extends React.Component{
 }
 
 class PaperInputBox extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            timerForSpacingAjaxRequests: null
+        }
+        this.handleKeyUp = this.handleKeyUp.bind(this);
+    }
+    handleKeyUp(event){
+        clearTimeout(this.state.timerForSpacingAjaxRequests);
+        if (event.target.value){
+            this.setState({timerForSpacingAjaxRequests: setTimeout(this.doneTyping, 500, event.target.value)});
+        }
+    }
+    doneTyping(valueToSend){
+        console.log("Send the query " + valueToSend)
+
+    }
     render() {
         return(
             <div className='inputContainer'>
@@ -100,7 +115,7 @@ class PaperInputBox extends React.Component{
                     type="text"
                     name="papers"
                     placeholder="Search for a paper to restrict search..."
-                    onChange={this.props.handleInputChange}
+                    onKeyUp={this.handleKeyUp}
                 />
             </div>
         )
@@ -140,7 +155,6 @@ class DateInputBox extends React.Component{
         }else if (!isLoaded) {
             return <div>Loading...</div>;
         }else{
-            console.log(paperJSON)
             const options = {
                 chart: {
                     type: 'column',
