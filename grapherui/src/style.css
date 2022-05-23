@@ -2,6 +2,9 @@
     width: 100%;
     height: 50px;
 }
+*{
+    box-sizing: border-box;
+}
 .example-thumb {
   cursor: pointer;
   position: absolute;
@@ -33,33 +36,44 @@
   height: 10px;
   line-height: 38px;
 }
+.App{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.mainContainer{
+    display: flex;
+    flex-wrap: wrap;
+}
 .mainTitle {
-    margin-top: 20px;
-    margin-bottom: 20px;
+    padding: 20px;
     width: 100%;
     border: 1px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: xx-large;
+    float: top;
 }
 
 .formBox,.requestBox{
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 30px;
     width: calc(100% - 40px);
     max-width: 600px;
+    max-height: inherit;
 }
+.highchartsContainer{
+    max-height: inherit;
+}
+
 .requestBox{
     border: 0;
     color: var(--color-dark);
-    font-size: large;
+    font-size: 14px;
     position: relative;
-    min-height: 50px;
     outline: none;
     appearance: none;
     box-shadow: 0 0 3pt 2pt gray;
+    padding: 30px;
 }
 .requestBubbleContainer{
     display: flex;
@@ -69,7 +83,6 @@
 
 .selectionBubble{
     padding: 3px 5px 3px 10px;
-    margin: 3px 0 3px 5px;
     box-shadow: inset 0 0 4px 0 #dcd1c7;
     border: 1px solid #cbc6c3;
     color: #242527;
@@ -84,13 +97,10 @@ input[type='text']{
     height: 100%;
     font-family: var(--font-fam);
     border: 0;
-    font-size: large;
+    font-size: 16px;
     width: 100%;
     float: bottom;
-    margin-top: 5px;
 }
-
-
 .requestBubble{
     border: 1px solid #e0e0e0;
 }
@@ -109,14 +119,12 @@ input[type='text']{
 #createTicketButton{
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 10px;
     display: block;
     padding: 12px 20px 10px;
     border: none;
 }
 
 .inputContainer{
-    height: var(--height);
     font-family: var(--font-fam);
     border: 0;
     color: var(--color-dark);
@@ -134,10 +142,7 @@ input[type='text']{
     display: flex;
     flex-direction: column;
 }
-.chartContainer{
-    min-height: 100px;
-    width: 100%;
-}
+
 .delete{
     font-size: large;
     margin-right: 8px;
@@ -151,10 +156,9 @@ input#papers,input#searchTerm{
     height: 100%;
     font-family: var(--font-fam);
     border: 0;
-    font-size: large;
+    font-size: 16px;
     width: 100%;
     float: bottom;
-    margin-top: 5px;
 }
 
 label[for="papers"],label[for="searchTerm"]{
@@ -164,7 +168,6 @@ label[for="papers"],label[for="searchTerm"]{
 .bubblesContainer{
     display: flex;
     float: left;
-    height: auto;
     flex-wrap: wrap;
 }
 
@@ -185,37 +188,12 @@ label[for="papers"],label[for="searchTerm"]{
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: medium;
-    margin: auto;
     text-align: center;
     white-space: nowrap;
 }
 
 .searchLabel{
     font-size: large;
-}
-
-.form-group{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-#hidden-form-group{
-    display: none;
-}
-
-.submit-group{
-    width: 100%;
-    margin-top: 40px;
-}
-
-.settingLabel{
-    font-size: medium;
-    float: left;
-    width: 20em;
-    margin-right: 15px;
 }
 
 .dropdown {
@@ -253,49 +231,4 @@ label[for="papers"],label[for="searchTerm"]{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-}
-
-.graphTitle{
-    font-size: x-large;
-    text-align: center;
-    margin: auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-.loadingElements{
-    height: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-.loadingBar {
-    width: 50%;
-    background-color: lightgray;
-}
-
-.twoBars{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 400px;
-    flex-direction: column;
-}
-
-.findingResultsBar {
-  width: 1%;
-  height: 30px;
-  background-color: cadetblue;
-}
-
-.establishResultsBar {
-  width: 1%;
-  height: 30px;
-  background-color: cadetblue;
-}
-
-.footer{
-    height: 5%;
 }

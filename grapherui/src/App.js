@@ -12,10 +12,20 @@ function App() {
                     <a className="homeLink">The Gallica Grapher</a>
                 </div>
             </header>
-            <FormBox/>
-            <RequestBox/>
+            <MainContainer/>
         </div>
     );
+}
+
+class MainContainer extends React.Component {
+    render(){
+        return(
+            <div className="mainContainer">
+                <FormBox/>
+                <RequestBox/>
+            </div>
+        )
+    }
 }
 
 class FormBox extends React.Component {
@@ -43,11 +53,9 @@ class FormBox extends React.Component {
     render() {
         return (
             <form onSubmit ={this.handleSubmit} className='formBox'>
-                <label>
-                    <TermInputBox
-                        handleInputChange={() => this.handleInputChange()}
-                    />
-                </label>
+                <TermInputBox
+                    handleInputChange={() => this.handleInputChange()}
+                />
                 <br />
                 <PaperInputBox
                     handleInputChange={() => this.handleInputChange()}
@@ -71,7 +79,7 @@ class TermInputBox extends React.Component{
     render() {
         return(
             <div className='inputContainer'>
-                <SelectionBox></SelectionBox>
+                <SelectionBox/>
                 <input
                     type="text"
                     name="terms"
@@ -86,7 +94,7 @@ class PaperInputBox extends React.Component{
     render() {
         return(
             <div className='inputContainer'>
-                <SelectionBox></SelectionBox>
+                <SelectionBox/>
                 <input
                     type="text"
                     name="papers"
@@ -139,9 +147,6 @@ class DateInputBox extends React.Component{
                 title: {
                     text: '# of Publishing Papers by Year'
                 },
-                subtitle: {
-                    text: 'According to BNF tag'
-                },
                 yAxis: {
                     title: {
                         text: 'Active newspapers'
@@ -154,10 +159,12 @@ class DateInputBox extends React.Component{
             }
             return(
                 <div>
-                    <HighchartsReact
-                        highcharts={Highcharts}
-                        options={options}
-                    />
+                    <div className="highchartsContainer">
+                        <HighchartsReact
+                            highcharts={Highcharts}
+                            options={options}
+                        />
+                    </div>
                     <ReactSlider
                         className="horizontal-slider"
                         thumbClassName="example-thumb"
