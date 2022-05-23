@@ -37,6 +37,7 @@ class FormBox extends React.Component {
             dateRange: null
         };
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleInputChange(event) {
@@ -48,7 +49,7 @@ class FormBox extends React.Component {
         });
     }
     handleSubmit(event) {
-        //Ajax
+        event.preventDefault()
     }
     render() {
         return (
@@ -142,7 +143,8 @@ class DateInputBox extends React.Component{
             console.log(paperJSON)
             const options = {
                 chart: {
-                    type: 'column'
+                    type: 'column',
+                    height: '50%'
                 },
                 title: {
                     text: '# of Publishing Papers by Year'
@@ -159,12 +161,6 @@ class DateInputBox extends React.Component{
             }
             return(
                 <div>
-                    <div className="highchartsContainer">
-                        <HighchartsReact
-                            highcharts={Highcharts}
-                            options={options}
-                        />
-                    </div>
                     <ReactSlider
                         className="horizontal-slider"
                         thumbClassName="example-thumb"
@@ -176,6 +172,12 @@ class DateInputBox extends React.Component{
                         pearling
                         minDistance={10}
                     />
+                    <div className="highchartsContainer">
+                        <HighchartsReact
+                            highcharts={Highcharts}
+                            options={options}
+                        />
+                    </div>
                 </div>
         )
         }
@@ -198,28 +200,41 @@ class SelectionBox extends React.Component {
     render(){
         return(
             <div className='bubblesContainer'>
-                <SelectionBubble
-                    selection="test test test"
-                />
-                <SelectionBubble
-                    selection="test test test"
-                />
             </div>
         )
     }
 }
 
 class RequestBox extends React.Component {
+    constructor(props){
+        super(props);
+        this.handleClick = this.handleClick.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
+    }
+    handleClick(terms){
+        console.log("Hello")
+    }
+    handleSubmit(event){
+        console.log("check check")
+    }
+    renderRequestBubble(terms){
+        return(
+            <RequestBubble
+                requestItems={terms}
+                onClick={() => this.handleClick(terms)}
+            />
+        )
+    }
     render() {
         return(
             <div className='requestBox'>
-                <div className='requestBubbleContainer'>
-                </div>
+                {this.renderRequestBubble(['Brazza','Le Petit Journal','1800-1900'])}
                 <div className='graphingButtonContainer'>
                     <input
                         type='submit'
                         id='startGraphingButton'
                         value='Graph!'
+                        onSubmit={this.handleSubmit}
                     />
                 </div>
             </div>
@@ -228,14 +243,14 @@ class RequestBox extends React.Component {
     }
 }
 
-class RequestBubble extends React.Component {
-    render() {
-        return(
-            <div className='requestBubble'>
-                I am a request bubble
-            </div>
-        );
-    }
+function RequestBubble(props){
+    return(
+        <button className='requestBubble' onClick={props.onClick}>
+            <ul>
+                {props.requestItems.map(element => <li>{element}</li>)}
+            </ul>
+        </button>
+    );
 }
 
 
