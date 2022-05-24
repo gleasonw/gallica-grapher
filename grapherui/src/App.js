@@ -32,10 +32,11 @@ class FormBox extends React.Component {
         this.state = {
             terms: [],
             papers: [],
-            dateRange: null
+            dateRange: null,
+            requestTickets: []
         };
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleKeyPress= this.handleKeyPress.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -45,17 +46,20 @@ class FormBox extends React.Component {
     handleClick(event){
         console.log(event)
     }
-    handleKeyPress(event){
-        console.log(event)
+    handleKeyDown(event){
+        if(event.key === 'Enter'){
+            console.log(event.target.value)
+        }
     }
     handleSubmit(event){
         event.preventDefault()
+        //Pass request tickets to requestbox
     }
     render() {
         return (
             <form onSubmit ={this.handleSubmit} className='formBox'>
                 <TermInputBox
-                    onKeyPress={(i) => this.handleKeyPress(i)}
+                    onKeyDown={this.handleKeyDown}
                 />
                 <br />
                 <PaperInputBox
@@ -76,19 +80,17 @@ class FormBox extends React.Component {
 
 }
 
-class TermInputBox extends React.Component{
-    render() {
-        return(
-            <div className='inputContainer'>
-                <SelectionBox/>
-                <input
-                    type="text"
-                    name="terms"
-                    placeholder="Enter a term..."
-                    onChange={this.props.handleInputChange}/>
-            </div>
-        )
-    }
+function TermInputBox(props){
+    return(
+        <div className='inputContainer'>
+            <SelectionBox/>
+            <input
+                type="text"
+                name="terms"
+                placeholder="Enter a term..."
+                onKeyDown={props.onKeyDown}/>
+        </div>
+    )
 }
 
 class PaperInputBox extends React.Component{
@@ -105,7 +107,7 @@ class PaperInputBox extends React.Component{
         if (event.target.value){
             this.setState({
                 timerForSpacingAjaxRequests:
-                setTimeout(() => {this.getPaperDropdownItems(event.target.value)}, 500)
+                setTimeout(() => {this.getPaperDropdownItems(event.target.value)}, 1500)
                 }
             );
         }
@@ -118,6 +120,7 @@ class PaperInputBox extends React.Component{
             .then(
                 (result) => {
                     isLoaded = true;
+                    console.log(result);
                     this.setState({paperOptions: result});
                 },
                 (error) => {
@@ -126,9 +129,9 @@ class PaperInputBox extends React.Component{
                 }
             )
         if (errorThrown) {
-            this.setState({paperOptions: <div>Error: {errorThrown.message}</div>});
+            this.setState({paperOptions: [<div>Error: {errorThrown.message}</div>]});
         }if (!isLoaded) {
-            this.setState({paperOptions: <div>Loading...</div>});
+            this.setState({paperOptions: [<div>Loading...</div>]});
         }
     }
     render() {
@@ -151,16 +154,21 @@ class PaperInputBox extends React.Component{
 }
 
 function Dropdown(props){
-    if(props.paperOptions){
+    let papers = props.paperOptions['paperNameCodes']
+    if(papers){
         return (
             <ul>
-                {props.paperOptions.map(paper => (
-                    <li key={paper}>
-                        <button onClick={() => props.onClick(paper)}> {paper} </button>
+                {papers.map(paperAndCode => (
+                    <li key={paperAndCode['code']}>
+                        <button onClick={() => props.onClick(paperAndCode)}> {paperAndCode['paper']} </button>
                     </li>
                 ))}
             </ul>
         );
+    }else{
+        return(
+            <div>{papers}</div>
+        )
     }
 }
 

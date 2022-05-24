@@ -11,13 +11,13 @@ class UIPaperFetcher:
 		with self.connection.cursor() as curs:
 			paperNameSearchString = paperNameSearchString.lower()
 			curs.execute("""
-				SELECT papername FROM papers WHERE LOWER(papername) LIKE %(paperNameSearchString)s
+				SELECT papername, papercode FROM papers WHERE LOWER(papername) LIKE %(paperNameSearchString)s
 					ORDER BY papername;
 			""", {'paperNameSearchString': '%' + paperNameSearchString + '%'})
 			self.papers = curs.fetchall()
-			return self.nameDataToJSON()
+			return self.nameCodeDataToJSON()
 
-	def fullPaperDataToJSON(self):
+	def allPaperDataToJSON(self):
 		for i, paperTuple in enumerate(self.papers):
 			identifier = paperTuple[0]
 			paper = paperTuple[1]
@@ -30,11 +30,15 @@ class UIPaperFetcher:
 			self.paperDictAsJSON.update({i: JSONentry})
 		return self.paperDictAsJSON
 
-	def nameDataToJSON(self):
-		deTupledList = []
-		for paper in self.papers:
-			deTupledList.append(paper[0])
-		return {'paperNames':deTupledList}
+	def nameCodeDataToJSON(self):
+		namedPaperCodes = []
+		for paperTuple in self.papers:
+			paper = paperTuple[0]
+			code = paperTuple[1]
+			namedPair = {'paper': paper, 'code': code}
+			namedPaperCodes.append(namedPair)
+		return {'paperNameCodes': namedPaperCodes}
+
 
 
 if __name__ == "__main__":
@@ -49,6 +53,7 @@ if __name__ == "__main__":
 		)
 		getter = UIPaperFetcher(conn)
 		availablePapers = getter.getPapersLikeString(query)
+		pass
 	finally:
 		if conn is not None:
 			conn.close()
