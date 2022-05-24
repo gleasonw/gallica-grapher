@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import ReactSlider from 'react-slider';
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
@@ -37,14 +37,8 @@ class FormBox extends React.Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-        this.setState({
-            [name]: value
-        });
+    handleInputChange(event){
+        console.log(event)
     }
     handleSubmit(event) {
         event.preventDefault()
@@ -53,15 +47,15 @@ class FormBox extends React.Component {
         return (
             <form onSubmit ={this.handleSubmit} className='formBox'>
                 <TermInputBox
-                    handleInputChange={() => this.handleInputChange()}
+                    handleKeyPress ={() => this.handleInputChange}
                 />
                 <br />
                 <PaperInputBox
-                    handleInputChange={() => this.handleInputChange()}
+                    handleClick={() => this.handleInputChange}
                 />
                 <br />
                 <DateInputBox
-                    handleInputChange={() => this.handleInputChange()}
+                    handleInputChange={() => this.handleInputChange}
                 />
                 <input
                     type='submit'
@@ -93,19 +87,25 @@ class PaperInputBox extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            timerForSpacingAjaxRequests: null
+            timerForSpacingAjaxRequests: null,
         }
         this.handleKeyUp = this.handleKeyUp.bind(this);
     }
     handleKeyUp(event){
+        console.log("hello")
         clearTimeout(this.state.timerForSpacingAjaxRequests);
         if (event.target.value){
-            this.setState({timerForSpacingAjaxRequests: setTimeout(this.doneTyping, 500, event.target.value)});
+            this.setState({timerForSpacingAjaxRequests: setTimeout(this.renderDropdown, 500, event.target.value)});
         }
     }
-    doneTyping(valueToSend){
-        console.log("Send the query " + valueToSend)
-
+    renderDropdown(searchString){
+        console.log("Hmmmmm")
+        return(
+            <Dropdown
+                valueToSend={searchString}
+                onClick={infoToBubble => this.props.handleClick(infoToBubble)}
+            />
+        )
     }
     render() {
         return(
@@ -119,6 +119,42 @@ class PaperInputBox extends React.Component{
                 />
             </div>
         )
+    }
+}
+
+function Dropdown(props){
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false)
+    const [paperOptions, setPaperOptions] = useState([]);
+    useEffect(() => {
+        fetch("/papers/" + props.valueToSend)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setIsLoaded(true);
+                    setPaperOptions(result)
+                },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error)
+                }
+            )
+    }, [props.valueToSend])
+
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+        return <div>Loading...</div>;
+    } else {
+        return (
+            <ul>
+                {paperOptions.map(paper => (
+                    <li key={paper}>
+                        <button onClick={() => props.onClick(paper)}> {paper} </button>
+                    </li>
+                ))}
+            </ul>
+        );
     }
 }
 
@@ -261,7 +297,8 @@ function RequestBubble(props){
     return(
         <button className='requestBubble' onClick={props.onClick}>
             <ul>
-                {props.requestItems.map(element => <li>{element}</li>)}
+                {props.requestItems.map(element =>
+                    <li key={element}>{element}</li>)}
             </ul>
         </button>
     );
