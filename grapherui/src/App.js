@@ -35,27 +35,35 @@ class FormBox extends React.Component {
             dateRange: null
         };
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleKeyPress= this.handleKeyPress.bind(this);
+        this.handleClick = this.handleClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleInputChange(event){
         console.log(event)
     }
-    handleSubmit(event) {
+    handleClick(event){
+        console.log(event)
+    }
+    handleKeyPress(event){
+        console.log(event)
+    }
+    handleSubmit(event){
         event.preventDefault()
     }
     render() {
         return (
             <form onSubmit ={this.handleSubmit} className='formBox'>
                 <TermInputBox
-                    handleKeyPress ={() => this.handleInputChange}
+                    onKeyPress={(i) => this.handleKeyPress(i)}
                 />
                 <br />
                 <PaperInputBox
-                    handleClick={() => this.handleInputChange}
+                    onClick={(i) => this.handleClick(i)}
                 />
                 <br />
                 <DateInputBox
-                    handleInputChange={() => this.handleInputChange}
+                    onInputChange={(i) => this.handleInputChange(i)}
                 />
                 <input
                     type='submit'
@@ -88,34 +96,54 @@ class PaperInputBox extends React.Component{
         super(props);
         this.state = {
             timerForSpacingAjaxRequests: null,
+            paperOptions: []
         }
         this.handleKeyUp = this.handleKeyUp.bind(this);
     }
     handleKeyUp(event){
-        console.log("hello")
         clearTimeout(this.state.timerForSpacingAjaxRequests);
         if (event.target.value){
-            this.setState({timerForSpacingAjaxRequests: setTimeout(this.renderDropdown, 500, event.target.value)});
+            this.setState({
+                timerForSpacingAjaxRequests:
+                setTimeout(() => {this.getPaperDropdownItems(event.target.value)}, 500)
+                }
+            );
         }
     }
-    renderDropdown(searchString){
-        console.log("Hmmmmm")
-        return(
-            <Dropdown
-                valueToSend={searchString}
-                onClick={infoToBubble => this.props.handleClick(infoToBubble)}
-            />
-        )
+    getPaperDropdownItems(searchString){
+        let errorThrown = null;
+        let isLoaded = false;
+        fetch("/papers/" + searchString)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    isLoaded = true;
+                    this.setState({paperOptions: result});
+                },
+                (error) => {
+                    isLoaded = true;
+                    errorThrown = error
+                }
+            )
+        if (errorThrown) {
+            this.setState({paperOptions: <div>Error: {errorThrown.message}</div>});
+        }if (!isLoaded) {
+            this.setState({paperOptions: <div>Loading...</div>});
+        }
     }
     render() {
         return(
             <div className='inputContainer'>
-                <SelectionBox/>
+                <SelectionBox selections={this.props.selections}/>
                 <input
                     type="text"
                     name="papers"
                     placeholder="Search for a paper to restrict search..."
                     onKeyUp={this.handleKeyUp}
+                />
+                <Dropdown
+                    paperOptions={this.state.paperOptions}
+                    onClick={this.props.onClick}
                 />
             </div>
         )
@@ -123,32 +151,10 @@ class PaperInputBox extends React.Component{
 }
 
 function Dropdown(props){
-    const [error, setError] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false)
-    const [paperOptions, setPaperOptions] = useState([]);
-    useEffect(() => {
-        fetch("/papers/" + props.valueToSend)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setIsLoaded(true);
-                    setPaperOptions(result)
-                },
-                (error) => {
-                    setIsLoaded(true);
-                    setError(error)
-                }
-            )
-    }, [props.valueToSend])
-
-    if (error) {
-        return <div>Error: {error.message}</div>;
-    } else if (!isLoaded) {
-        return <div>Loading...</div>;
-    } else {
+    if(props.paperOptions){
         return (
             <ul>
-                {paperOptions.map(paper => (
+                {props.paperOptions.map(paper => (
                     <li key={paper}>
                         <button onClick={() => props.onClick(paper)}> {paper} </button>
                     </li>
