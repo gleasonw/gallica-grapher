@@ -2,6 +2,8 @@ import queue
 import ast
 import uuid
 import os
+
+import psycopg2
 from flask import Flask, url_for, render_template, request, jsonify
 from Backend.GettingAndGraphing.UIPaperFetcher import UIPaperFetcher
 from tasks import getAsyncRequest
@@ -28,30 +30,6 @@ def contact():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-	# form = SearchForm(request.form)
-	# if request.method == 'POST' and form.validate():
-	# 	if request.form['strictness'] == "false":
-	# 		yearStrict = False
-	# 	else:
-	# 		yearStrict = True
-	# 	if request.form['splitpapers'] == "false":
-	# 		splitPapers = False
-	# 	else:
-	# 		splitPapers = True
-	# 	if request.form['splitterms'] == "false":
-	# 		splitTerms = False
-	# 	else:
-	# 		splitTerms = True
-	# 	try:
-	# 		papers = ast.literal_eval(request.form['papers'])
-	# 		terms = ast.literal_eval(request.form['searchTerm'])
-	# 	except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError):
-	# 		return
-	# 	yearRange = form.yearRange.data
-	# 	taskID = str(uuid.uuid4())
-	# 	getAsyncRequest.apply_async(args=[papers, terms, yearRange, yearStrict, splitPapers, splitTerms, taskID],
-	# 								task_id=taskID)
-	# 	return jsonify({}), 202, {'Location': url_for('loadingResults', taskId=taskID)}
 	return "hello"
 
 
@@ -102,10 +80,22 @@ def paperChart():
 	return paperChartJSON
 
 #TODO: Query database based on keywords
-@app.route('/papers')
-def papers():
-	getter = UIPaperFetcher()
-	availablePapers = getter.getPapers()
+@app.route('/papers/<query>')
+def papers(query):
+	conn = None
+	#TODO: Make sure the database pattern corresponds to norms
+	try:
+		conn = psycopg2.connect(
+			host="localhost",
+			database="gallicagrapher",
+			user="wgleason",
+			password="ilike2play"
+		)
+		getter = UIPaperFetcher(conn)
+		availablePapers = getter.getPapersLikeString(query)
+	finally:
+		if conn is not None:
+			conn.close()
 	return availablePapers
 
 @app.route('/results/<taskId>/graphData')

@@ -2,38 +2,23 @@ import psycopg2
 
 
 class UIPaperFetcher:
-	def __init__(self):
+	def __init__(self, conn):
 		self.papers = []
-		self.papers = self.queryDatabaseForPapers()
+		self.connection = conn
 		self.paperDictAsJSON = {}
-		self.transformPapersIntoJSON()
 
-	def queryDatabaseForPapers(self):
-		conn = None
-		try:
-			conn = psycopg2.connect(
-				host="localhost",
-				database="gallicagrapher",
-				user="wgleason",
-				password="ilike2play"
-			)
-			cursor = conn.cursor()
-			query = """
-			SELECT paperCode, paperName, startYear, endYear FROM papers
-				ORDER BY paperName;
-			"""
-			cursor.execute(query)
-			return cursor.fetchall()
-		finally:
-			if conn is not None:
-				conn.close()
+	def getPapersLikeString(self, paperNameSearchString):
+		with self.connection.cursor() as curs:
+			paperNameSearchString = paperNameSearchString.lower()
+			curs.execute("""
+				SELECT papername FROM papers WHERE LOWER(papername) LIKE %(paperNameSearchString)s
+					ORDER BY papername;
+			""", {'paperNameSearchString': '%' + paperNameSearchString + '%'})
+			self.papers = curs.fetchall()
+			return self.nameDataToJSON()
 
-	def getPapers(self):
-		return self.paperDictAsJSON
-
-	def transformPapersIntoJSON(self):
-		i = 0
-		for paperTuple in self.papers:
+	def fullPaperDataToJSON(self):
+		for i, paperTuple in enumerate(self.papers):
 			identifier = paperTuple[0]
 			paper = paperTuple[1]
 			startYear = paperTuple[2]
@@ -43,4 +28,27 @@ class UIPaperFetcher:
 						 'startyear': startYear,
 						 'endyear': endYear}
 			self.paperDictAsJSON.update({i: JSONentry})
-			i += 1
+		return self.paperDictAsJSON
+
+	def nameDataToJSON(self):
+		deTupledList = []
+		for paper in self.papers:
+			deTupledList.append(paper[0])
+		return {'paperNames':deTupledList}
+
+
+if __name__ == "__main__":
+	conn = None
+	query = 'Le peti'
+	try:
+		conn = psycopg2.connect(
+			host="localhost",
+			database="gallicagrapher",
+			user="wgleason",
+			password="ilike2play"
+		)
+		getter = UIPaperFetcher(conn)
+		availablePapers = getter.getPapersLikeString(query)
+	finally:
+		if conn is not None:
+			conn.close()
