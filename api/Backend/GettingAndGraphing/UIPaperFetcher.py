@@ -12,7 +12,7 @@ class UIPaperFetcher:
 			paperNameSearchString = paperNameSearchString.lower()
 			curs.execute("""
 				SELECT papername, papercode FROM papers WHERE LOWER(papername) LIKE %(paperNameSearchString)s
-					ORDER BY papername;
+					ORDER BY papername LIMIT 20;
 			""", {'paperNameSearchString': '%' + paperNameSearchString + '%'})
 			self.papers = curs.fetchall()
 			return self.nameCodeDataToJSON()

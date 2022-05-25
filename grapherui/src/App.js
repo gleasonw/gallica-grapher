@@ -30,25 +30,34 @@ class FormBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            textValue: '',
             terms: [],
             papers: [],
             dateRange: null,
             requestTickets: []
         };
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleDateSliderResize = this.handleDateSliderResize.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
     }
-    handleInputChange(event){
-        console.log(event)
+    handleDateSliderResize(event){
+        console.log("Input change?")
     }
-    handleClick(event){
+    handleClick(paperAndCode){
+        console.log(paperAndCode)
+    }
+    handleChange(event){
+        this.setState({textValue: event.target.value})
         console.log(event)
     }
     handleKeyDown(event){
         if(event.key === 'Enter'){
-            console.log(event.target.value)
+            event.preventDefault()
+            const terms = this.state.terms.slice();
+            terms.push(event.target.value)
+            this.setState({terms: terms})
         }
     }
     handleSubmit(event){
@@ -59,15 +68,22 @@ class FormBox extends React.Component {
         return (
             <form onSubmit ={this.handleSubmit} className='formBox'>
                 <TermInputBox
-                    onKeyDown={this.handleKeyDown}
+                    value={this.state.textValue}
+                    handleChange={this.handleChange}
+                    handleKeyDown={this.handleKeyDown}
+                    selectedTerms={this.state.terms}
                 />
                 <br />
+                {/*To do: lift state up? Handle live search in formbox?
+                Pass handleKeyDown.
+                */}
                 <PaperInputBox
-                    onClick={(i) => this.handleClick(i)}
+                    onClick={this.handleClick}
+                    selectedPapers={this.state.papers}
                 />
                 <br />
                 <DateInputBox
-                    onInputChange={(i) => this.handleInputChange(i)}
+                    onInputChange={this.handleDateSliderResize}
                 />
                 <input
                     type='submit'
@@ -83,12 +99,17 @@ class FormBox extends React.Component {
 function TermInputBox(props){
     return(
         <div className='inputContainer'>
-            <SelectionBox/>
+            <SelectionBox
+                terms={props.selectedTerms}
+            />
             <input
                 type="text"
+                value={props.value}
                 name="terms"
                 placeholder="Enter a term..."
-                onKeyDown={props.onKeyDown}/>
+                onChange={props.handleChange}
+                onKeyDown={props.handleKeyDown}
+            />
         </div>
     )
 }
@@ -120,7 +141,6 @@ class PaperInputBox extends React.Component{
             .then(
                 (result) => {
                     isLoaded = true;
-                    console.log(result);
                     this.setState({paperOptions: result});
                 },
                 (error) => {
