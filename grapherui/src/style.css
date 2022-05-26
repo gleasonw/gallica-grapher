@@ -39,15 +39,8 @@
 .App{
     height: 100%;
     width: 100%;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
-}
-.mainContainer{
-    display: flex;
-    flex-wrap: wrap;
-    max-height: 100vh;
-    justify-content: center;
+    align-content: center;
 }
 .mainTitle {
     padding: 20px;
@@ -60,12 +53,20 @@
     float: top;
 }
 
-.formBox,.requestBox{
+.itemEntry, .requestBox{
     width: calc(100% - 40px);
     max-width: 600px;
-    margin: 20px 20px 20px 20px;
-
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    max-height: 100vh;
 }
+.formBox{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .highchartsContainer{
     max-height: inherit;
 }

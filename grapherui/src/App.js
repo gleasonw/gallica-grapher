@@ -12,18 +12,9 @@ function App() {
                     <a className="homeLink">The Gallica Grapher</a>
                 </div>
             </header>
-            <MainContainer/>
+            <FormBox/>
         </div>
     );
-}
-
-function MainContainer(){
-    return(
-        <div className="mainContainer">
-            <FormBox/>
-            <RequestBox/>
-        </div>
-    )
 }
 
 class FormBox extends React.Component {
@@ -33,24 +24,30 @@ class FormBox extends React.Component {
             textValue: '',
             terms: [],
             papers: [],
-            dateRange: null,
-            requestTickets: []
+            dateBoundary: [1499, 2020],
+            currentDateRange: [1499, 2020],
+            requestTickets: [],
         };
-        this.handleDateSliderResize = this.handleDateSliderResize.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
-    handleDateSliderResize(event){
-        console.log("Input change?")
+    deleteBubble(item, isPaper){
+
     }
     handleClick(paperAndCode){
-        console.log(paperAndCode)
+        const papers = this.state.papers.slice();
+        papers.push(paperAndCode)
+        this.setState({papers: papers})
     }
-    handleChange(event){
-        this.setState({textValue: event.target.value})
-        console.log(event)
+    //TODO: make the parameter less confusing. What is getting passed up?
+    handleChange(item){
+        if(item.length !== 2){
+            this.setState({textValue: item.target.value})
+        }else{
+            this.setState({currentDateRange: item})
+        }
     }
     handleKeyDown(event){
         if(event.key === 'Enter'){
@@ -62,35 +59,47 @@ class FormBox extends React.Component {
     }
     handleSubmit(event){
         event.preventDefault()
-        //Pass request tickets to requestbox
+        console.log(this.state.terms)
+        console.log(this.state.papers)
+        console.log(this.state.currentDateRange)
     }
     render() {
         return (
-            <form onSubmit ={this.handleSubmit} className='formBox'>
-                <TermInputBox
-                    value={this.state.textValue}
-                    handleChange={this.handleChange}
-                    handleKeyDown={this.handleKeyDown}
-                    selectedTerms={this.state.terms}
-                />
-                <br />
-                {/*To do: lift state up? Handle live search in formbox?
-                Pass handleKeyDown.
-                */}
-                <PaperInputBox
-                    onClick={this.handleClick}
-                    selectedPapers={this.state.papers}
-                />
-                <br />
-                <DateInputBox
-                    onInputChange={this.handleDateSliderResize}
-                />
-                <input
-                    type='submit'
-                    id='createTicketButton'
-                    value='Create Ticket'
-                />
-            </form>
+            <div className='formBox'>
+                <form onSubmit ={this.handleSubmit} className='itemEntry'>
+                    <TermInputBox
+                        value={this.state.textValue}
+                        onChange={this.handleChange}
+                        handleKeyDown={this.handleKeyDown}
+                        selectedTerms={this.state.terms}
+                        deleteTermBubble={this.deleteBubble}
+                    />
+                    <br />
+                    {/*To do: lift state up? Handle live search in formbox?
+                    Pass handleKeyDown.
+                    */}
+                    <PaperInputBox
+                        onClick={this.handleClick}
+                        selectedPapers={this.state.papers}
+                        deletePaperBubble={this.deleteBubble}
+                    />
+                    <br />
+                    <DateInputBox
+                        onChange={this.handleChange}
+                        minYear={this.state.dateBoundary[0]}
+                        maxYear={this.state.dateBoundary[1]}
+                        lowYear={this.state.currentDateRange[0]}
+                        highYear={this.state.currentDateRange[1]}
+                    />
+                    <input
+                        type='submit'
+                        id='createTicketButton'
+                        value='Create Ticket'
+                    />
+                </form>
+                <RequestBox/>
+            </div>
+
         )
     }
 
@@ -100,14 +109,15 @@ function TermInputBox(props){
     return(
         <div className='inputContainer'>
             <SelectionBox
-                terms={props.selectedTerms}
+                items={props.selectedTerms}
+                onClick={props.deleteTermBubble}
             />
             <input
                 type="text"
                 value={props.value}
                 name="terms"
                 placeholder="Enter a term..."
-                onChange={props.handleChange}
+                onChange={props.onChange}
                 onKeyDown={props.handleKeyDown}
             />
         </div>
@@ -157,7 +167,10 @@ class PaperInputBox extends React.Component{
     render() {
         return(
             <div className='inputContainer'>
-                <SelectionBox selections={this.props.selections}/>
+                <SelectionBox
+                    items={this.props.selectedPapers}
+                    onClick={this.props.deletePaperBubble}
+                />
                 <input
                     type="text"
                     name="papers"
@@ -180,7 +193,12 @@ function Dropdown(props){
             <ul>
                 {papers.map(paperAndCode => (
                     <li key={paperAndCode['code']}>
-                        <button onClick={() => props.onClick(paperAndCode)}> {paperAndCode['paper']} </button>
+                        <button
+                            type='button'
+                            onClick={() => props.onClick(paperAndCode)}
+                        >
+                            {paperAndCode['paper']}
+                        </button>
                     </li>
                 ))}
             </ul>
@@ -247,14 +265,18 @@ class DateInputBox extends React.Component{
                 <div>
                     <ReactSlider
                         className="horizontal-slider"
-                        thumbClassName="example-thumb"
-                        trackClassName="example-track"
-                        defaultValue={[0, 100]}
+                        thumbClassName="sliderThumb"
+                        trackClassName="sliderTrack"
+                        value={[this.props.lowYear, this.props.highYear]}
+                        max={this.props.maxYear}
+                        min={this.props.minYear}
+                        pearling
+                        onChange={this.props.onChange}
                         ariaLabel={['Lower thumb', 'Upper thumb']}
                         ariaValuetext={state => `Thumb value ${state.valueNow}`}
                         renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
-                        pearling
-                        minDistance={10}
+                        minDistance={0}
+
                     />
                     <div className="highchartsContainer">
                         <HighchartsReact
@@ -268,25 +290,20 @@ class DateInputBox extends React.Component{
     }
 }
 
-class SelectionBubble extends React.Component {
-    render(){
-        const selection = this.props.selection
-        return (
-        <div className='selectionBubble' id={selection}>
-            <div className='delete'>X</div>
-            <div className="selection">{selection}</div>
-        </div>
-        );
-    }
-}
 
-class SelectionBox extends React.Component {
-    render(){
-        return(
-            <div className='bubblesContainer'>
-            </div>
-        )
-    }
+function SelectionBox(props){
+    return(
+        <div className='bubblesContainer'>
+            {props.items.map(item => (
+            <button
+                type='button'
+                onClick={() => props.onClick(item)}
+            >
+                {item}
+            </button>
+        ))}
+        </div>
+    )
 }
 
 class RequestBox extends React.Component {
