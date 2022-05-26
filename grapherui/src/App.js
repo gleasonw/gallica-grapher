@@ -27,7 +27,7 @@ class FormBox extends React.Component {
             papers: [],
             dateBoundary: [1499, 2020],
             currentDateRange: [1499, 2020],
-            requestTickets: [],
+            requestTickets: []
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -47,13 +47,9 @@ class FormBox extends React.Component {
         this.setState({terms: terms})
     }
     handleClick(paperAndCode){
-        let paper = paperAndCode['paper']
-        let code = paperAndCode['code']
-        const paperNames = this.state.paperNames.slice();
-        paperNames.push(paper)
-        const paperCodes = this.state.paperCodes.slice();
-        paperCodes.push(code)
-        this.setState({paperNames: paperNames, paperCodes: paperCodes})
+        const papers = this.state.papers.slice();
+        papers.push(paperAndCode)
+        this.setState({papers: papers})
     }
     //TODO: make the parameter less confusing. What is getting passed up?
     handleChange(item){
@@ -74,14 +70,22 @@ class FormBox extends React.Component {
             event.preventDefault()
             const terms = this.state.terms.slice();
             terms.push(event.target.value)
-            this.setState({terms: terms, textValue: ''})
+            this.setState({terms: terms, termInputValue: ''})
         }
     }
     handleSubmit(event){
         event.preventDefault()
-        console.log(this.state.terms)
-        console.log(this.state.paperNames)
-        console.log(this.state.currentDateRange)
+        const requestTickets = this.state.requestTickets.slice()
+        requestTickets.push([this.state.terms, this.state.papers, this.state.currentDateRange])
+        this.setState({
+            requestTickets: requestTickets,
+            terms: [],
+            papers: [],
+            currentDateRange: this.state.dateBoundary,
+            termInputValue: '',
+            paperInputValue: ''
+        })
+
     }
     render() {
         return (
@@ -189,11 +193,11 @@ class PaperInputBox extends React.Component{
     }
     render() {
         const paperNames = [];
-        this.props.selectedPapers.map((paperAndCode) => )
+        this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['paper']))
         return(
             <div className='inputContainer'>
                 <SelectionBox
-                    items={this.props.selectedPapers}
+                    items={paperNames}
                     onClick={this.props.deletePaperBubble}
                 />
                 <input
@@ -219,22 +223,58 @@ function Dropdown(props){
         return (
             <ul>
                 {papers.map(paperAndCode => (
-                    <li key={paperAndCode['code']}>
-                        <button
-                            type='button'
-                            onClick={() => props.onClick(paperAndCode)}
-                        >
-                            {paperAndCode['paper']}
-                        </button>
-                    </li>
+                    <DropdownItem
+                        key={paperAndCode['code']}
+                        paper={paperAndCode['paper']}
+                        onClick={() => props.onClick(paperAndCode)}
+                    />
                 ))}
             </ul>
         );
     }else{
         return(
-            <div>{papers}</div>
+            <div>Loading...</div>
         )
     }
+}
+
+function DropdownItem(props){
+    return(
+        <button
+            type="button"
+            onClick={props.onClick}
+        >
+            {props.paper}
+        </button>
+    )
+}
+
+function SelectionBubble(props){
+    return(
+        <button
+            className='bubbleItem'
+            type='button'
+            onClick={props.onClick}
+        >
+            <div className='bubbleText'>
+                {props.item}
+            </div>
+        </button>
+    )
+}
+
+function SelectionBox(props){
+        return(
+        <div className='bubblesContainer'>
+            {props.items.map((item,index) => (
+            <SelectionBubble
+                onClick={() => props.onClick(index)}
+                key={index}
+                item={item}
+            />
+            ))}
+        </div>
+        )
 }
 
 class DateInputBox extends React.Component{
@@ -315,34 +355,6 @@ class DateInputBox extends React.Component{
         )
         }
     }
-}
-
-function SelectionBubble(props){
-    return(
-        <button
-            className='bubbleItem'
-            type='button'
-            onClick={props.onClick}
-        >
-            <div className='bubbleText'>
-                {props.item}
-            </div>
-        </button>
-    )
-}
-
-function SelectionBox(props){
-        return(
-        <div className='bubblesContainer'>
-            {props.items.map((item,index) => (
-            <SelectionBubble
-                onClick={() => props.onClick(index)}
-                key={index}
-                item={item}
-            />
-            ))}
-        </div>
-        )
 }
 
 class RequestBox extends React.Component {
