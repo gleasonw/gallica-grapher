@@ -71,6 +71,25 @@
     max-height: inherit;
 }
 
+.bubbleItem{
+    padding: 3px 5px 3px 10px;
+    margin: 3px 5px 3px 0;
+    box-shadow: inset 0 0 4px 0 #dcd1c7;
+    border: 1px solid #cbc6c3;
+    color: #242527;
+    max-height: 30px;
+    max-width: 250px;
+    line-height: 1.4;
+    display: flex;
+}
+.bubbleText{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+    margin: auto;
+    text-align: center;
+    white-space: nowrap;
+}
 .requestBox{
     border: 0;
     color: var(--color-dark);
