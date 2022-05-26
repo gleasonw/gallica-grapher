@@ -24,8 +24,7 @@ class FormBox extends React.Component {
             termInputValue: '',
             paperInputValue: '',
             terms: [],
-            paperNames: [],
-            paperCodes: [],
+            papers: [],
             dateBoundary: [1499, 2020],
             currentDateRange: [1499, 2020],
             requestTickets: [],
@@ -34,9 +33,18 @@ class FormBox extends React.Component {
         this.handleClick = this.handleClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.deletePaperBubble = this.deletePaperBubble.bind(this);
+        this.deleteTermBubble = this.deleteTermBubble.bind(this);
     }
-    deleteBubble(item, isPaper){
-
+    deletePaperBubble(bubbleIndex){
+        const papers = this.state.papers.slice()
+        papers.splice(bubbleIndex, 1)
+        this.setState({papers: papers})
+    }
+    deleteTermBubble(bubbleIndex){
+        const terms = this.state.terms.slice()
+        terms.splice(bubbleIndex, 1)
+        this.setState({terms: terms})
     }
     handleClick(paperAndCode){
         let paper = paperAndCode['paper']
@@ -55,7 +63,7 @@ class FormBox extends React.Component {
             if(name === 'papers'){
                 this.setState({paperInputValue: target.value})
             }else{
-                this.setState({textInputValue: target.value})
+                this.setState({termInputValue: target.value})
             }
         }else{
             this.setState({currentDateRange: item})
@@ -80,11 +88,11 @@ class FormBox extends React.Component {
             <div className='formBox'>
                 <form onSubmit ={this.handleSubmit} className='itemEntry'>
                     <TermInputBox
-                        value={this.state.textInputValue}
+                        value={this.state.termInputValue}
                         onChange={this.handleChange}
                         handleKeyDown={this.handleKeyDown}
                         selectedTerms={this.state.terms}
-                        deleteTermBubble={this.deleteBubble}
+                        deleteTermBubble={this.deleteTermBubble}
                     />
                     <br />
                     {/*To do: lift state up? Handle live search in formbox?
@@ -93,8 +101,8 @@ class FormBox extends React.Component {
                     <PaperInputBox
                         onClick={this.handleClick}
                         onChange={this.handleChange}
-                        selectedPapers={this.state.paperNames}
-                        deletePaperBubble={this.deleteBubble}
+                        selectedPapers={this.state.papers}
+                        deletePaperBubble={this.deletePaperBubble}
                         value={this.state.paperInputValue}
                     />
                     <br />
@@ -144,7 +152,7 @@ class PaperInputBox extends React.Component{
         super(props);
         this.state = {
             timerForSpacingAjaxRequests: null,
-            paperOptions: []
+            papersForDropdown: []
         }
         this.handleKeyUp = this.handleKeyUp.bind(this);
     }
@@ -166,7 +174,7 @@ class PaperInputBox extends React.Component{
             .then(
                 (result) => {
                     isLoaded = true;
-                    this.setState({paperOptions: result});
+                    this.setState({papersForDropdown: result});
                 },
                 (error) => {
                     isLoaded = true;
@@ -174,12 +182,14 @@ class PaperInputBox extends React.Component{
                 }
             )
         if (errorThrown) {
-            this.setState({paperOptions: [<div>Error: {errorThrown.message}</div>]});
+            this.setState({papersForDropdown: [<div>Error: {errorThrown.message}</div>]});
         }if (!isLoaded) {
-            this.setState({paperOptions: [<div>Loading...</div>]});
+            this.setState({papersForDropdown: [<div>Loading...</div>]});
         }
     }
     render() {
+        const paperNames = [];
+        this.props.selectedPapers.map((paperAndCode) => )
         return(
             <div className='inputContainer'>
                 <SelectionBox
@@ -195,7 +205,7 @@ class PaperInputBox extends React.Component{
                     onChange={this.props.onChange}
                 />
                 <Dropdown
-                    paperOptions={this.state.paperOptions}
+                    papersForDropdown={this.state.papersForDropdown}
                     onClick={this.props.onClick}
                 />
             </div>
@@ -204,7 +214,7 @@ class PaperInputBox extends React.Component{
 }
 
 function Dropdown(props){
-    let papers = props.paperOptions['paperNameCodes']
+    let papers = props.papersForDropdown['paperNameCodes']
     if(papers){
         return (
             <ul>
@@ -307,24 +317,32 @@ class DateInputBox extends React.Component{
     }
 }
 
-//TODO: Catch duplicate key error, pass
-function SelectionBox(props){
+function SelectionBubble(props){
     return(
-        <div className='bubblesContainer'>
-            {props.items.map(item => (
-            <button
-                className='bubbleItem'
-                type='button'
-                onClick={() => props.onClick(item)}
-                key={item}
-            >
-                <div className='bubbleText'>
-                    {item}
-                </div>
-            </button>
-        ))}
-        </div>
+        <button
+            className='bubbleItem'
+            type='button'
+            onClick={props.onClick}
+        >
+            <div className='bubbleText'>
+                {props.item}
+            </div>
+        </button>
     )
+}
+
+function SelectionBox(props){
+        return(
+        <div className='bubblesContainer'>
+            {props.items.map((item,index) => (
+            <SelectionBubble
+                onClick={() => props.onClick(index)}
+                key={index}
+                item={item}
+            />
+            ))}
+        </div>
+        )
 }
 
 class RequestBox extends React.Component {
@@ -375,6 +393,5 @@ function RequestBubble(props){
         </button>
     );
 }
-
 
 export default App;
