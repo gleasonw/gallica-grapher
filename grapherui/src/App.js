@@ -114,8 +114,15 @@ class FormBox extends React.Component {
     }
     render() {
         return (
-            <div className='formBox'>
-                <form onSubmit ={this.handleSubmit} className='itemEntry'>
+            <div className='mainUI'>
+                <UserInputForm
+
+
+                {/*TODO: Throw into another file, pass down this as props*/}
+
+
+                />
+                <form onSubmit ={this.handleSubmit} className='userInputForm'>
                     <TermInputBox
                         value={this.state.termInputValue}
                         onChange={this.handleChange}
@@ -161,7 +168,10 @@ class FormBox extends React.Component {
     }
 
 }
-
+function UserInputForm(props){
+    return(
+    )
+}
 function TermInputBox(props){
     return(
         <div className='inputContainer'>
