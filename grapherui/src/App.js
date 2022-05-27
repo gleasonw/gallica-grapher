@@ -35,6 +35,7 @@ class FormBox extends React.Component {
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.deletePaperBubble = this.deletePaperBubble.bind(this);
         this.deleteTermBubble = this.deleteTermBubble.bind(this);
+        this.deleteTicket = this.deleteTicket.bind(this);
     }
     deletePaperBubble(bubbleIndex){
         const papers = this.state.papers.slice()
@@ -45,6 +46,11 @@ class FormBox extends React.Component {
         const terms = this.state.terms.slice()
         terms.splice(bubbleIndex, 1)
         this.setState({terms: terms})
+    }
+    deleteTicket(ticketBubbleIndex){
+        const requestTickets = this.state.requestTickets.slice()
+        requestTickets.splice(ticketBubbleIndex, 1)
+        this.setState({requestTickets: requestTickets})
     }
     handleClick(paperAndCode){
         const papers = this.state.papers.slice();
@@ -76,7 +82,12 @@ class FormBox extends React.Component {
     handleSubmit(event){
         event.preventDefault()
         const requestTickets = this.state.requestTickets.slice()
-        requestTickets.push([this.state.terms, this.state.papers, this.state.currentDateRange])
+        const newTicket = {
+            'terms': this.state.terms,
+            'papersAndCodes': this.state.papers,
+            'dateRange': this.state.currentDateRange
+        }
+        requestTickets.push(newTicket)
         this.setState({
             requestTickets: requestTickets,
             terms: [],
@@ -124,7 +135,10 @@ class FormBox extends React.Component {
                         value='Create Ticket'
                     />
                 </form>
-                <RequestBox/>
+                <RequestBox
+                    requestTickets={this.state.requestTickets}
+                    onClick={this.deleteTicket}
+                />
             </div>
 
         )
@@ -156,7 +170,8 @@ class PaperInputBox extends React.Component{
         super(props);
         this.state = {
             timerForSpacingAjaxRequests: null,
-            papersForDropdown: []
+            papersForDropdown:[],
+            dropdownError: null,
         }
         this.handleKeyUp = this.handleKeyUp.bind(this);
     }
@@ -165,31 +180,30 @@ class PaperInputBox extends React.Component{
         if (event.target.value){
             this.setState({
                 timerForSpacingAjaxRequests:
-                setTimeout(() => {this.getPaperDropdownItems(event.target.value)}, 1500)
+                setTimeout(() => {this.getPaperDropdownItems(event.target.value)}, 1000)
                 }
             );
+        }else{
+            this.setState({
+                papersForDropdown: [],
+            })
         }
     }
     getPaperDropdownItems(searchString){
-        let errorThrown = null;
-        let isLoaded = false;
         fetch("/papers/" + searchString)
             .then(res => res.json())
             .then(
                 (result) => {
-                    isLoaded = true;
-                    this.setState({papersForDropdown: result});
+                    this.setState({
+                        papersForDropdown: result});
                 },
-                (error) => {
-                    isLoaded = true;
-                    errorThrown = error
+                (dropdownError) => {
+                    this.setState({
+                        dropdownError
+                    })
+
                 }
             )
-        if (errorThrown) {
-            this.setState({papersForDropdown: [<div>Error: {errorThrown.message}</div>]});
-        }if (!isLoaded) {
-            this.setState({papersForDropdown: [<div>Loading...</div>]});
-        }
     }
     render() {
         const paperNames = [];
@@ -209,7 +223,8 @@ class PaperInputBox extends React.Component{
                     onChange={this.props.onChange}
                 />
                 <Dropdown
-                    papersForDropdown={this.state.papersForDropdown}
+                    papers={this.state.papersForDropdown['paperNameCodes']}
+                    error={this.state.dropdownError}
                     onClick={this.props.onClick}
                 />
             </div>
@@ -218,11 +233,12 @@ class PaperInputBox extends React.Component{
 }
 
 function Dropdown(props){
-    let papers = props.papersForDropdown['paperNameCodes']
-    if(papers){
+    if(props.error){
+        return <div>Error: {props.error.message}</div>
+    }else if(props.papers){
         return (
             <ul>
-                {papers.map(paperAndCode => (
+                {props.papers.map(paperAndCode => (
                     <DropdownItem
                         key={paperAndCode['code']}
                         paper={paperAndCode['paper']}
@@ -232,11 +248,10 @@ function Dropdown(props){
             </ul>
         );
     }else{
-        return(
-            <div>Loading...</div>
-        )
+        return(<div/>)
     }
 }
+
 
 function DropdownItem(props){
     return(
@@ -308,7 +323,7 @@ class DateInputBox extends React.Component{
         if (error) {
             return <div>Error: {error.message}</div>;
         }else if (!isLoaded) {
-            return <div>Loading...</div>;
+            return <div>Loading chart...</div>;
         }else{
             const options = {
                 chart: {
@@ -357,51 +372,52 @@ class DateInputBox extends React.Component{
     }
 }
 
-class RequestBox extends React.Component {
-    constructor(props){
-        super(props);
-        this.handleClick = this.handleClick.bind(this)
-        this.handleSubmit = this.handleSubmit.bind(this)
-    }
-    handleClick(terms){
-        console.log("Hello")
-    }
-    handleSubmit(event){
-        console.log("check check")
-    }
-    renderRequestBubble(terms){
-        return(
-            <RequestBubble
-                requestItems={terms}
-                onClick={() => this.handleClick(terms)}
-            />
-        )
-    }
-    render() {
-        return(
-            <div className='requestBox'>
-                {this.renderRequestBubble(['Brazza','Le Petit Journal','1800-1900'])}
-                <div className='graphingButtonContainer'>
-                    <input
-                        type='submit'
-                        id='startGraphingButton'
-                        value='Graph!'
-                        onSubmit={this.handleSubmit}
-                    />
-                </div>
-            </div>
-        );
-
-    }
-}
-
-function RequestBubble(props){
+function RequestBox(props){
     return(
-        <button className='requestBubble' onClick={props.onClick}>
-            <ul>
-                {props.requestItems.map(element =>
-                    <li key={element}>{element}</li>)}
-            </ul>
+        <div className='requestBox'>
+            <RequestTicketBox
+                tickets={props.requestTickets}
+                onClick={props.onClick}
+            />
+            <div className='graphingButtonContainer'>
+                <input
+                    type='submit'
+                    id='startGraphingButton'
+                    value='Graph!'
+                    onSubmit={props.onSubmit}
+                />
+            </div>
+        </div>
+    );
+
+}
+function RequestTicketBox(props){
+    return(
+        <div className="ticketBox">
+            {props.tickets.map((ticket, index) => (
+                <RequestTicket
+                    ticket={ticket}
+                    onClick={() => props.onClick(index)}
+                    key={index}
+                />
+            ))}
+        </div>
+        )
+}
+function RequestTicket(props){
+    return(
+        <button
+            type="button"
+            className='requestBubble'
+            onClick={props.onClick}
+        >
+            <div className="bubbleText">
+               <ol>
+                <li>{props.ticket['terms'][0]}</li>
+                <li>{props.ticket['papersAndCodes'][0]['paper']}</li>
+                <li>{props.ticket['dateRange']}</li>
+                </ol>
+            </div>
         </button>
     );
 }
