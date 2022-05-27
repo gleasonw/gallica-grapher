@@ -36,6 +36,7 @@ class FormBox extends React.Component {
         this.deletePaperBubble = this.deletePaperBubble.bind(this);
         this.deleteTermBubble = this.deleteTermBubble.bind(this);
         this.deleteTicket = this.deleteTicket.bind(this);
+        this.startGraphing = this.startGraphing.bind(this);
     }
     deletePaperBubble(bubbleIndex){
         const papers = this.state.papers.slice()
@@ -60,13 +61,7 @@ class FormBox extends React.Component {
     //TODO: make the parameter less confusing. What is getting passed up?
     handleChange(item){
         if(item.length !== 2){
-            const target = item.target
-            const name = target.name
-            if(name === 'papers'){
-                this.setState({paperInputValue: target.value})
-            }else{
-                this.setState({termInputValue: target.value})
-            }
+            this.updateInputValue(item)
         }else{
             this.setState({currentDateRange: item})
         }
@@ -74,9 +69,9 @@ class FormBox extends React.Component {
     handleKeyDown(event){
         if(event.key === 'Enter'){
             event.preventDefault()
-            const terms = this.state.terms.slice();
-            terms.push(event.target.value)
-            this.setState({terms: terms, termInputValue: ''})
+            if(event.target.name === 'terms'){
+                this.makeTermBubble(event.target.value)
+            }
         }
     }
     handleSubmit(event){
@@ -98,6 +93,25 @@ class FormBox extends React.Component {
         })
 
     }
+    startGraphing(){
+        //Next step!
+    }
+    updateInputValue(event){
+        const target = event.target
+            const name = target.name
+            if(name === 'papers'){
+                this.setState({paperInputValue: target.value})
+            }else{
+                this.setState({termInputValue: target.value})
+            }
+    }
+    makeTermBubble(term){
+        if(term){
+            const terms = this.state.terms.slice();
+            terms.push(term)
+            this.setState({terms: terms, termInputValue: ''})
+        }
+    }
     render() {
         return (
             <div className='formBox'>
@@ -105,7 +119,7 @@ class FormBox extends React.Component {
                     <TermInputBox
                         value={this.state.termInputValue}
                         onChange={this.handleChange}
-                        handleKeyDown={this.handleKeyDown}
+                        onKeyDown={this.handleKeyDown}
                         selectedTerms={this.state.terms}
                         deleteTermBubble={this.deleteTermBubble}
                     />
@@ -116,6 +130,7 @@ class FormBox extends React.Component {
                     <PaperInputBox
                         onClick={this.handleClick}
                         onChange={this.handleChange}
+                        onKeyDown={this.handleKeyDown}
                         selectedPapers={this.state.papers}
                         deletePaperBubble={this.deletePaperBubble}
                         value={this.state.paperInputValue}
@@ -138,6 +153,7 @@ class FormBox extends React.Component {
                 <RequestBox
                     requestTickets={this.state.requestTickets}
                     onClick={this.deleteTicket}
+                    onSubmit={this.startGraphing}
                 />
             </div>
 
@@ -159,7 +175,7 @@ function TermInputBox(props){
                 name="terms"
                 placeholder="Enter a term..."
                 onChange={props.onChange}
-                onKeyDown={props.handleKeyDown}
+                onKeyDown={props.onKeyDown}
             />
         </div>
     )
@@ -220,6 +236,7 @@ class PaperInputBox extends React.Component{
                     name="papers"
                     placeholder="Search for a paper to restrict search..."
                     onKeyUp={this.handleKeyUp}
+                    onKeyDown={this.props.onKeyDown}
                     onChange={this.props.onChange}
                 />
                 <Dropdown
@@ -405,6 +422,11 @@ function RequestTicketBox(props){
         )
 }
 function RequestTicket(props){
+    const terms = props.ticket['terms']
+    const papers = props.ticket['papersAndCodes']
+    const dateRange = props.ticket['dateRange']
+    const termLabel = terms.length > 0 ? terms[0] : 'none';
+    const paperLabel = papers.length > 0 ? papers[0]['paper'] : 'none';
     return(
         <button
             type="button"
@@ -413,9 +435,9 @@ function RequestTicket(props){
         >
             <div className="bubbleText">
                <ol>
-                <li>{props.ticket['terms'][0]}</li>
-                <li>{props.ticket['papersAndCodes'][0]['paper']}</li>
-                <li>{props.ticket['dateRange']}</li>
+                <li>{termLabel}</li>
+                <li>{paperLabel}</li>
+                <li>{dateRange}</li>
                 </ol>
             </div>
         </button>
