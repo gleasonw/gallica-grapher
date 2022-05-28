@@ -56,6 +56,7 @@ function TermInputBox(props){
                 placeholder="Enter a term..."
                 onChange={props.onChange}
                 onKeyDown={props.onKeyDown}
+                autoComplete="off"
             />
         </div>
     )
@@ -118,6 +119,7 @@ class PaperInputBox extends React.Component{
                     onKeyUp={this.handleKeyUp}
                     onKeyDown={this.props.onKeyDown}
                     onChange={this.props.onChange}
+                    autoComplete="off"
                 />
                 <Dropdown
                     papers={this.state.papersForDropdown['paperNameCodes']}

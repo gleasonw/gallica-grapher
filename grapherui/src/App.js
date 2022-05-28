@@ -13,9 +13,7 @@ function App() {
                     <a className="homeLink">The Gallica Grapher</a>
                 </div>
             </header>
-            <InputUI/>
             <QueryProgressUI/>
-            <ResultUI/>
         </div>
     );
 }

@@ -267,8 +267,28 @@ label[for="papers"],label[for="searchTerm"]{
     color: white;
 }
 
-.bottomBar{
+.queryProgressUI{
+    max-width: 90vw;
+    min-height: 80vh;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 30px;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    margin-top: 30px;
+    justify-content: center;
+}
+
+@media screen and (max-width: 800px){
+    .queryProgressUI{
+        flex-direction: column;
+    }
+}
+
+.ticketProgressBox{
+    border: solid;
+    width: calc(100% - 40px);
+    max-width: 600px;
+    margin: 20px;
+    flex: 1;
+
 }
