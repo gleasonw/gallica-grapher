@@ -52,7 +52,7 @@
     font-size: xx-large;
     float: top;
 }
-
+/*TODO: use flex settings like in queryProgress*/
 .userInputForm, .requestBox{
     width: calc(100% - 40px);
     max-width: 600px;
@@ -272,7 +272,6 @@ label[for="papers"],label[for="searchTerm"]{
     min-height: 80vh;
     margin-left: auto;
     margin-right: auto;
-    padding: 30px;
     display: flex;
     margin-top: 30px;
     justify-content: center;

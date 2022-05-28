@@ -3,7 +3,6 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import TicketInfo from "./TicketInfo";
 
 function QueryProgressUI(props) {
-    //TODO: Lift state up, receive request tickets as prop
     const [ticketProgressPercents, setProgressPercents] = useState([]);
     return(
         <div className='queryProgressUI'>

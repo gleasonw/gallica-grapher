@@ -12,7 +12,6 @@ class InputUI extends React.Component {
             papers: [],
             dateBoundary: [1499, 2020],
             currentDateRange: [1499, 2020],
-            requestTickets: []
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -58,6 +57,7 @@ class InputUI extends React.Component {
             }
         }
     }
+    //TODO: send this method to app
     handleSubmit(event){
         event.preventDefault()
         const requestTickets = this.state.requestTickets.slice()
@@ -117,7 +117,7 @@ class InputUI extends React.Component {
 
                 />
                 <RequestBox
-                    requestTickets={this.state.requestTickets}
+                    requestTickets={this.props.requestTickets}
                     onClick={this.deleteTicket}
                     onSubmit={this.startGraphing}
                 />
