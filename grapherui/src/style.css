@@ -61,7 +61,7 @@
     margin-top: 30px;
     max-height: 100vh;
 }
-.mainUI{
+.inputUI{
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -85,10 +85,13 @@
 .bubbleText{
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 16px;
+    font-size: 14px;
     margin: auto;
     text-align: center;
     white-space: nowrap;
+}
+.ticket{
+    max-width: 300px;
 }
 .requestBox{
     border: 0;
@@ -167,6 +170,7 @@ input[type='text']{
 .paperInputAndDropdown{
     display: block;
 }
+
 .inputContainer{
     display: flex;
     flex-direction: column;
@@ -225,22 +229,29 @@ label[for="papers"],label[for="searchTerm"]{
     font-size: large;
 }
 
-.dropdown {
+.paperDropdown {
     top: 100%;
-    display: none;
-    max-height: 100px;
+    max-height: 300px;
+    display: block;
     overflow-y: scroll;
+    font-size: 14px;
     width: 100%;
     border-color: slategray;
     box-sizing: border-box;
     padding-left: 0;
     box-shadow: 0 4px 5px rgba(0,0,0,.15);
 }
-
-.paperOptionDrop{
-    display: list-item;
+.paperDropdown > *:hover{
+    background-color: blue;
+    color: white;
+}
+.paperDropdownItem{
+    display: block;
     list-style: none;
-    margin: 2px;
+    border: none;
+    width: 100%;
+    text-align: left;
+    background-color: white;
 }
 
 .form-group#papergraphoptions,.form-group#termGraphOptions,.form-group#strictnesschecker{
