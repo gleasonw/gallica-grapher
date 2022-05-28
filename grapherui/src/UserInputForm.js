@@ -18,7 +18,7 @@ function UserInputForm(props){
             Pass handleKeyDown.
             */}
             <PaperInputBox
-                onClick={props.onClick}
+                onClick={props.onPaperDropItemClick}
                 onChange={props.onChange}
                 onKeyDown={props.onKeyDown}
                 selectedPapers={props.selectedPapers}
@@ -35,9 +35,10 @@ function UserInputForm(props){
                 highYear={props.highYearValue}
             />
             <input
-                type='submit'
+                type='button'
                 id='createTicketButton'
                 value='Create Ticket'
+                onClick={props.onClick}
             />
         </form>
     )

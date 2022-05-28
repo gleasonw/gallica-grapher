@@ -6,7 +6,13 @@ function QueryProgressUI(props) {
     const [ticketProgressPercents, setProgressPercents] = useState([]);
     return(
         <div className='queryProgressUI'>
-            <TicketProgressBox/>
+            {props.tickets.map(ticket => (
+                <TicketProgressBox
+                    terms={ticket['terms']}
+                    papers={ticket['papersAndCodes']}
+                    dateRange={ticket['dateRange']}
+                />
+            ))}
         </div>
     )
 }
@@ -14,9 +20,9 @@ function TicketProgressBox(props){
     return(
         <div className='ticketProgressBox'>
             <TicketInfo
-                terms={['hello']}
-                papers={[{'code': '1234123', 'paper':'neat'}]}
-                dateRange={[1989,2001]}
+                terms={props.terms}
+                papers={props.papers}
+                dateRange={props.dateRange}
             />
             <ProgressBar
                 animated

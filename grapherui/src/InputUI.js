@@ -15,12 +15,9 @@ class InputUI extends React.Component {
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.deletePaperBubble = this.deletePaperBubble.bind(this);
         this.deleteTermBubble = this.deleteTermBubble.bind(this);
-        this.deleteTicket = this.deleteTicket.bind(this);
-        this.startGraphing = this.startGraphing.bind(this);
     }
     deletePaperBubble(bubbleIndex){
         const papers = this.state.papers.slice()
@@ -31,11 +28,6 @@ class InputUI extends React.Component {
         const terms = this.state.terms.slice()
         terms.splice(bubbleIndex, 1)
         this.setState({terms: terms})
-    }
-    deleteTicket(ticketBubbleIndex){
-        const requestTickets = this.state.requestTickets.slice()
-        requestTickets.splice(ticketBubbleIndex, 1)
-        this.setState({requestTickets: requestTickets})
     }
     handleClick(paperAndCode){
         const papers = this.state.papers.slice();
@@ -56,29 +48,6 @@ class InputUI extends React.Component {
                 this.makeTermBubble(event.target.value)
             }
         }
-    }
-    //TODO: send this method to app
-    handleSubmit(event){
-        event.preventDefault()
-        const requestTickets = this.state.requestTickets.slice()
-        const newTicket = {
-            'terms': this.state.terms,
-            'papersAndCodes': this.state.papers,
-            'dateRange': this.state.currentDateRange
-        }
-        requestTickets.push(newTicket)
-        this.setState({
-            requestTickets: requestTickets,
-            terms: [],
-            papers: [],
-            currentDateRange: this.state.dateBoundary,
-            termInputValue: '',
-            paperInputValue: ''
-        })
-
-    }
-    startGraphing(){
-        //Next step!
     }
     updateInputValue(event){
         const target = event.target
@@ -105,8 +74,14 @@ class InputUI extends React.Component {
                     lowYearValue={this.state.currentDateRange[0]}
                     highYearValue={this.state.currentDateRange[1]}
                     onChange={this.handleChange}
-                    onClick={this.handleClick}
-                    onSubmit={this.handleSubmit}
+                    onClick={() => this.props.onCreateTicketClick(
+                        {
+                            'terms': this.state.terms,
+                            'papersAndCodes': this.state.papers,
+                            'dateRange': this.state.currentDateRange
+                        }
+                    )}
+                    onPaperDropItemClick={this.handleClick}
                     onKeyDown={this.handleKeyDown}
                     selectedTerms={this.state.terms}
                     selectedPapers={this.state.papers}
@@ -114,12 +89,11 @@ class InputUI extends React.Component {
                     deletePaperBubble={this.deletePaperBubble}
                     minYear={this.state.dateBoundary[0]}
                     maxYear={this.state.dateBoundary[1]}
-
                 />
                 <RequestBox
                     requestTickets={this.props.requestTickets}
-                    onClick={this.deleteTicket}
-                    onSubmit={this.startGraphing}
+                    onTicketClick={this.props.onTicketClick}
+                    onGraphStartClick={this.props.onInputSubmit}
                 />
             </div>
 
@@ -132,14 +106,14 @@ function RequestBox(props){
         <div className='requestBox'>
             <RequestTicketBox
                 tickets={props.requestTickets}
-                onClick={props.onClick}
+                onTicketClick={props.onTicketClick}
             />
             <div className='graphingButtonContainer'>
                 <input
                     type='submit'
                     id='startGraphingButton'
                     value='Graph!'
-                    onSubmit={props.onSubmit}
+                    onClick={props.onGraphStartClick}
                 />
             </div>
         </div>
@@ -152,7 +126,7 @@ function RequestTicketBox(props){
             {props.tickets.map((ticket, index) => (
                 <RequestTicket
                     ticket={ticket}
-                    onClick={() => props.onClick(index)}
+                    onClick={() => props.onTicketClick(index)}
                     key={index}
                 />
             ))}

@@ -6,7 +6,7 @@ import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
-    const [requestInfoGroups, setRequestInfoGroups] = useState([])
+    const [tickets, setTickets] = useState([])
     const [gettingInput, setGettingInput] = useState(true)
     const [runningQueries, setRunningQueries] = useState(false)
     const header =
@@ -15,18 +15,37 @@ function App() {
                 The Gallica Grapher
             </div>
         </header>
-    function initializeQueries(userTickets){
+    function handleInputSubmit(event){
+        event.preventDefault()
         setGettingInput(false)
         setRunningQueries(true)
-        setRequestInfoGroups(userTickets)
+    }
+    function handleCreateTicketClick(items){
+        createTicketFromInput(items)
+    }
+    function handleTicketClick(index){
+        deleteTicketAtIndex(index);
+    }
+    function createTicketFromInput(items){
+        let updatedTickets = tickets.slice();
+        updatedTickets.push(items);
+        setTickets(updatedTickets)
+    }
+    function deleteTicketAtIndex(index){
+        console.log("delete")
+        const updatedTickets = tickets.slice()
+        updatedTickets.splice(index, 1)
+        setTickets(updatedTickets)
     }
     if(gettingInput){
         return (
             <div className="App">
                 {header}
                 <InputUI
-                    requestTickets={requestInfoGroups}
-                    onSubmit={initializeQueries}
+                    requestTickets={tickets}
+                    onInputSubmit={handleInputSubmit}
+                    onCreateTicketClick={handleCreateTicketClick}
+                    onTicketClick={handleTicketClick}
                 />
             </div>
         )
@@ -35,6 +54,7 @@ function App() {
             <div className="App">
                 {header}
                 <QueryProgressUI
+                    tickets={tickets}
                 />
             </div>
           )
