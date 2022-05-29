@@ -30,9 +30,7 @@ class InputUI extends React.Component {
         this.setState({terms: terms})
     }
     handleClick(paperAndCode){
-        const papers = this.state.papers.slice();
-        papers.push(paperAndCode)
-        this.setState({papers: papers})
+        this.makePaperBubble(paperAndCode)
     }
     handleChange(item){
         if(item.length !== 2){
@@ -57,6 +55,11 @@ class InputUI extends React.Component {
             }else{
                 this.setState({termInputValue: target.value})
             }
+    }
+    makePaperBubble(paperAndCode){
+        const papers = this.state.papers.slice();
+        papers.push(paperAndCode)
+        this.setState({papers: papers})
     }
     makeTermBubble(term){
         if(term){

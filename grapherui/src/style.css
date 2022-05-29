@@ -63,12 +63,9 @@
 }
 .inputUI{
     width: 100%;
+    height: 100%;
     display: flex;
     flex-wrap: wrap;
-}
-
-.highchartsContainer{
-    max-height: inherit;
 }
 
 .bubbleItem{
@@ -131,6 +128,7 @@ input[type='text']{
     font-size: 16px;
     width: 100%;
     float: bottom;
+    padding-left: 5px;
 }
 .requestBubble{
     border: 1px solid #e0e0e0;
@@ -161,7 +159,6 @@ input[type='text']{
     color: var(--color-dark);
     font-size: large;
     padding: 12px 20px;
-    display: inline-block;
     outline: none;
     appearance: none;
     box-shadow: 0 0 3pt 2pt gray;
@@ -169,11 +166,6 @@ input[type='text']{
 }
 .paperInputAndDropdown{
     display: block;
-}
-
-.inputContainer{
-    display: flex;
-    flex-direction: column;
 }
 
 .delete{
@@ -228,18 +220,26 @@ label[for="papers"],label[for="searchTerm"]{
 .searchLabel{
     font-size: large;
 }
-
+.dropdownContainer{
+    max-width: 600px;
+    position: relative;
+    z-index: 5;
+    bottom: 20px;
+}
 .paperDropdown {
-    top: 100%;
+    background-color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 10px;
     max-height: 300px;
     display: block;
     overflow-y: scroll;
-    font-size: 14px;
+    font-size: 16px;
     width: 100%;
     border-color: slategray;
     box-sizing: border-box;
-    padding-left: 0;
     box-shadow: 0 4px 5px rgba(0,0,0,.15);
+    position: absolute;
 }
 .paperDropdown > *:hover{
     background-color: blue;
@@ -252,14 +252,13 @@ label[for="papers"],label[for="searchTerm"]{
     width: 100%;
     text-align: left;
     background-color: white;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .form-group#papergraphoptions,.form-group#termGraphOptions,.form-group#strictnesschecker{
     display:none;
-}
-
-.dropdown > *{
-    cursor: pointer;
 }
 
 .dropdown > *:hover{

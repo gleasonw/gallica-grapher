@@ -107,26 +107,30 @@ class PaperInputBox extends React.Component{
         const paperNames = [];
         this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['paper']))
         return(
-            <div className='inputContainer'>
-                <SelectionBox
-                    items={paperNames}
-                    onClick={this.props.deletePaperBubble}
-                />
-                <input
-                    type="text"
-                    value={this.props.paperInputValue}
-                    name="papers"
-                    placeholder="Search for a paper to restrict search..."
-                    onKeyUp={this.handleKeyUp}
-                    onKeyDown={this.props.onKeyDown}
-                    onChange={this.props.onChange}
-                    autoComplete="off"
-                />
-                <Dropdown
-                    papers={this.state.papersForDropdown['paperNameCodes']}
-                    error={this.state.dropdownError}
-                    onClick={this.props.onClick}
-                />
+            <div>
+                <div className='inputContainer'>
+                    <SelectionBox
+                        items={paperNames}
+                        onClick={this.props.deletePaperBubble}
+                    />
+                    <input
+                        type="text"
+                        value={this.props.paperInputValue}
+                        name="papers"
+                        placeholder="Search for a paper to restrict search..."
+                        onKeyUp={this.handleKeyUp}
+                        onKeyDown={this.props.onKeyDown}
+                        onChange={this.props.onChange}
+                        autoComplete="off"
+                    />
+                </div>
+                <div className='dropdownContainer'>
+                    <Dropdown
+                        papers={this.state.papersForDropdown['paperNameCodes']}
+                        error={this.state.dropdownError}
+                        onClick={this.props.onClick}
+                    />
+                </div>
             </div>
         )
     }
