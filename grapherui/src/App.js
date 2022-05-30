@@ -26,6 +26,9 @@ function App() {
     function handleTicketClick(index){
         deleteTicketAtIndex(index);
     }
+    function addRequestIDtoTicket(requestID, ticketIndex){
+
+    }
     function createTicketFromInput(items){
         let updatedTickets = tickets.slice();
         updatedTickets.push(items);
@@ -62,7 +65,9 @@ function App() {
         return (
             <div className="App">
                 {header}
-                <ResultUI/>
+                <ResultUI
+                    tickets={tickets}
+                />
             </div>
           )
     }

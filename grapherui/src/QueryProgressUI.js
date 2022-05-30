@@ -1,6 +1,6 @@
 import React,{useState, useEffect} from 'react';
 import ProgressBar from 'react-bootstrap/ProgressBar';
-import TicketInfo from "./TicketInfo";
+import TicketLabel from "./TicketLabel";
 
 function QueryProgressUI(props) {
     const [ticketProgressPercents, setProgressPercents] = useState([]);
@@ -19,7 +19,7 @@ function QueryProgressUI(props) {
 function TicketProgressBox(props){
     return(
         <div className='ticketProgressBox'>
-            <TicketInfo
+            <TicketLabel
                 terms={props.terms}
                 papers={props.papers}
                 dateRange={props.dateRange}

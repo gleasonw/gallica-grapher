@@ -1,6 +1,6 @@
 import React from "react";
 import UserInputForm from './UserInputForm';
-import TicketInfo from "./TicketInfo";
+import TicketLabel from "./TicketLabel";
 
 class InputUI extends React.Component {
     constructor(props) {
@@ -147,7 +147,7 @@ function RequestTicket(props){
             onClick={props.onClick}
         >
             <div className="ticket">
-                <TicketInfo
+                <TicketLabel
                     terms={terms}
                     papers={papers}
                     dateRange={dateRange}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-class TicketInfo extends React.Component{
+class TicketLabel extends React.Component{
     render(){
         return(
             <div>
@@ -43,4 +43,4 @@ function TicketDateRow(props){
     }
 }
 
-export default TicketInfo;
+export default TicketLabel;
