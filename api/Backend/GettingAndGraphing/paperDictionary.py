@@ -1,7 +1,7 @@
 import psycopg2
 
 
-class DictionaryMaker():
+class DictionaryMaker:
 	def __init__(self, newspaperSetting, dbConnection):
 		self.newspaperList = newspaperSetting
 		self.dictionary = {}

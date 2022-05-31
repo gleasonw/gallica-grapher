@@ -4,7 +4,7 @@ import time
 import ciso8601
 
 
-class GraphJSONmaker:
+class TicketGraphData:
     def __init__(self, requestID, connectionToDB, averageWindow=11, splitPapers=False, splitTerms=False,
                  groupBy='month'):
         self.dbConnection = connectionToDB
@@ -204,6 +204,6 @@ if __name__ == "__main__":
         user="wglea",
         password="ilike2play"
     )
-    grapher = GraphJSONmaker("9f036013-3c68-4bd2-ab02-4dd022171d5f", conn, splitPapers=True, averageWindow=11)
+    grapher = TicketGraphData("9f036013-3c68-4bd2-ab02-4dd022171d5f", conn, splitPapers=True, averageWindow=11)
     grapher.makeGraphJSON()
     conn.close()

@@ -1,13 +1,15 @@
-import concurrent.futures, psycopg2, datetime
+import concurrent.futures
+import datetime
+import psycopg2
+from math import ceil
 
 import lxml.etree
-from requests_toolbelt import sessions
-from math import ceil
-from lxml import etree
 from Backend.GettingAndGraphing.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from lxml import etree
+from requests_toolbelt import sessions
 
 
-class PaperGetterFromGallica:
+class GallicaPaperQuery:
 
 	@staticmethod
 	def removeNonDigitYearsFromDateRange(dateRangeToStandardize):
@@ -24,7 +26,7 @@ class PaperGetterFromGallica:
 	@staticmethod
 	def prepPaperDateRangeForDBEntry(publicationRange=None):
 		if publicationRange:
-			standardizedRange = PaperGetterFromGallica.removeNonDigitYearsFromDateRange(publicationRange)
+			standardizedRange = GallicaPaperQuery.removeNonDigitYearsFromDateRange(publicationRange)
 			if len(standardizedRange) == 2:
 				startDate = standardizedRange[0]
 				endDate = standardizedRange[1]
@@ -73,7 +75,7 @@ class PaperGetterFromGallica:
 		if result:
 			paperInfo = result[0]
 			paperName = paperInfo[0]
-			startDate, endDate = PaperGetterFromGallica.prepPaperDateRangeForDBEntry(publicationRange=paperInfo[1])
+			startDate, endDate = GallicaPaperQuery.prepPaperDateRangeForDBEntry(publicationRange=paperInfo[1])
 			return paperName, startDate, endDate
 		else:
 			return None, None, None
@@ -95,12 +97,12 @@ class PaperGetterFromGallica:
 				for result in executor.map(self.sendPaperQueryToGallica, startRecordList):
 					if result:
 						for paperData in result:
-							startYear, endYear = PaperGetterFromGallica.prepPaperDateRangeForDBEntry(
+							startYear, endYear = GallicaPaperQuery.prepPaperDateRangeForDBEntry(
 								publicationRange=paperData[1])
 							paperName = paperData[0]
 							print(paperName)
 							paperCode = paperData[2]
-							PaperGetterFromGallica.addPaperMetadataToDB(paperName, paperCode, startYear, endYear, cursor)
+							GallicaPaperQuery.addPaperMetadataToDB(paperName, paperCode, startYear, endYear, cursor)
 		except psycopg2.DatabaseError as e:
 			print(e)
 
@@ -148,7 +150,7 @@ if __name__ == "__main__":
 			password="ilike2play"
 		)
 		conn.set_session(autocommit=True)
-		paperGetter = PaperGetterFromGallica(conn)
+		paperGetter = GallicaPaperQuery(conn)
 		paperGetter.addMostNewspapersOnGallicaToDB()
 	finally:
 		if conn is not None:

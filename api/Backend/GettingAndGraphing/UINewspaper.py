@@ -1,17 +1,19 @@
 import psycopg2
 
 
-class UIPaperFetcher:
+class UINewspaper:
 	def __init__(self, conn):
 		self.papers = []
 		self.connection = conn
 		self.paperDictAsJSON = {}
 
-	def getPapersLikeString(self, paperNameSearchString):
+	def getPapersSimilarToString(self, paperNameSearchString):
 		with self.connection.cursor() as curs:
 			paperNameSearchString = paperNameSearchString.lower()
 			curs.execute("""
-				SELECT papername, papercode FROM papers WHERE LOWER(papername) LIKE %(paperNameSearchString)s
+				SELECT papername, papercode 
+					FROM papers 
+					WHERE LOWER(papername) LIKE %(paperNameSearchString)s
 					ORDER BY papername LIMIT 20;
 			""", {'paperNameSearchString': '%' + paperNameSearchString + '%'})
 			self.papers = curs.fetchall()
@@ -38,22 +40,3 @@ class UIPaperFetcher:
 			namedPair = {'paper': paper, 'code': code}
 			namedPaperCodes.append(namedPair)
 		return {'paperNameCodes': namedPaperCodes}
-
-
-
-if __name__ == "__main__":
-	conn = None
-	query = 'Le peti'
-	try:
-		conn = psycopg2.connect(
-			host="localhost",
-			database="gallicagrapher",
-			user="wgleason",
-			password="ilike2play"
-		)
-		getter = UIPaperFetcher(conn)
-		availablePapers = getter.getPapersLikeString(query)
-		pass
-	finally:
-		if conn is not None:
-			conn.close()

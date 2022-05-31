@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
+import {v4 as uuidv4} from 'uuid';
 import InputUI from "./InputUI";
 import QueryProgressUI from "./QueryProgressUI";
 import ResultUI from "./ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+
 function App() {
     const [tickets, setTickets] = useState([])
-    const [gettingInput, setGettingInput] = useState(true)
+    const [gettingInput, setGettingInput] = useState(false)
     const [runningQueries, setRunningQueries] = useState(false)
     const header =
         <header className="header">

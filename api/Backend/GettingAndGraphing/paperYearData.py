@@ -1,7 +1,8 @@
 import psycopg2
 import json
-#TODO: Cache.
-class PaperChartMaker:
+
+
+class PaperYearData:
 
     def __init__(self):
         self.yearOccurrenceArray = None
@@ -17,7 +18,7 @@ class PaperChartMaker:
         for i, yearFreq in enumerate(self.yearOccurrenceArray):
             year = i + 1499
             self.yearFreqList.append([year, yearFreq])
-        self.JSONData = json.dumps({'data' : self.yearFreqList})
+        self.JSONData = json.dumps({'data': self.yearFreqList})
         with open('../../static/paperJSON.json', 'w') as outFile:
             outFile.write(self.JSONData)
 
@@ -57,6 +58,7 @@ class PaperChartMaker:
             else:
                 pass
 
+
 if __name__ == "__main__":
-    chartMaker = PaperChartMaker()
+    chartMaker = PaperYearData()
     chartMaker.createChartJSON()
