@@ -3,7 +3,7 @@ import queue
 import psycopg2
 from flask import Flask, jsonify
 
-from Backend.GettingAndGraphing.UINewspaper import UINewspaper
+from UINewspaper import UINewspaper
 from tasks import getAsyncRequest
 
 retrievingThreads = {}

@@ -4,7 +4,7 @@ import psycopg2
 from math import ceil
 
 import lxml.etree
-from Backend.GettingAndGraphing.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 from lxml import etree
 from requests_toolbelt import sessions
 
@@ -51,6 +51,28 @@ class GallicaPaperQuery:
 							INSERT INTO papers (papername, startyear, endyear, papercode) 
 								VALUES (%s, %s, %s, %s);
 							""", (paperName, startYear, endYear, paperCode))
+	#TODO: Duplicate code
+	@staticmethod
+	def getPaperMetadataFromXML(targetXMLroot):
+		results = []
+		for queryHit in targetXMLroot.iter("{http://www.loc.gov/zing/srw/}record"):
+			data = queryHit[2][0]
+			journalName = data.find('{http://purl.org/dc/elements/1.1/}title').text
+			if journalName is None:
+				raise FileNotFoundError
+			journalCodeContainer = data.find('{http://purl.org/dc/elements/1.1/}relation').text
+			if journalCodeContainer:
+				journalCode = journalCodeContainer[-11:]
+			else:
+				raise FileNotFoundError
+			#It's ok if there is no date associated with a paper
+			#TODO: If there is no 'date' attached to the result, is it somewhere else?
+			try:
+				journalDate = data.find('{http://purl.org/dc/elements/1.1/}date').text
+			except AttributeError:
+				journalDate = None
+			results.append([journalName, journalDate, journalCode])
+		return results
 
 	def __init__(self, dbConnection):
 		gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
@@ -117,27 +139,6 @@ class GallicaPaperQuery:
 			print(response.content)
 			return None
 		return data
-
-	def getPaperMetadataFromXML(self, targetXMLroot):
-		results = []
-		for queryHit in targetXMLroot.iter("{http://www.loc.gov/zing/srw/}record"):
-			data = queryHit[2][0]
-			journalName = data.find('{http://purl.org/dc/elements/1.1/}title').text
-			if journalName is None:
-				raise FileNotFoundError
-			journalCodeContainer = data.find('{http://purl.org/dc/elements/1.1/}relation').text
-			if journalCodeContainer:
-				journalCode = journalCodeContainer[-11:]
-			else:
-				raise FileNotFoundError
-			#It's ok if there is no date associated with a paper
-			#TODO: If there is no 'date' attached to the result, is it somewhere else?
-			try:
-				journalDate = data.find('{http://purl.org/dc/elements/1.1/}date').text
-			except AttributeError:
-				journalDate = None
-			results.append([journalName, journalDate, journalCode])
-		return results
 
 
 if __name__ == "__main__":

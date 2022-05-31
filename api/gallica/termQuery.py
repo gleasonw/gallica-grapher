@@ -1,10 +1,9 @@
 import datetime
 import psycopg2
 
-from GettingAndGraphing.paperGetterFromGallica import PaperGetterFromGallica
 from requests_toolbelt import sessions
 
-from GettingAndGraphing.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
 class TermQuery:

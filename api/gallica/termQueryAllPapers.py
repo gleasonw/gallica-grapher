@@ -1,5 +1,5 @@
-from GettingAndGraphing.termQuery import *
-from GettingAndGraphing.resultBatch import ResultBatch
+from resultBatch import ResultBatch
+from termQuery import TermQuery
 
 
 class TermQueryAllPapers(TermQuery):

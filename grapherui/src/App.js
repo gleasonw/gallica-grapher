@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
     const [tickets, setTickets] = useState([])
-    const [gettingInput, setGettingInput] = useState(false)
+    const [gettingInput, setGettingInput] = useState(true)
     const [runningQueries, setRunningQueries] = useState(false)
     const header =
         <header className="header">

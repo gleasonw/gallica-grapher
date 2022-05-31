@@ -1,8 +1,6 @@
-import re
-
 from lxml import etree
 
-from GettingAndGraphing.result import Result
+from result import Result
 
 
 class ResultBatch:

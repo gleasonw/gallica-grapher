@@ -1,7 +1,7 @@
 import psycopg2
-from GettingAndGraphing.termQueryAllPapers import TermQueryAllPapers
-from GettingAndGraphing.termQuerySelectPapers import TermQuerySelectPapers
-from GettingAndGraphing.ticketGraphData import TicketGraphData
+from termQueryAllPapers import TermQueryAllPapers
+from termQuerySelectPapers import TermQuerySelectPapers
+from ticketGraphData import TicketGraphData
 
 
 class TicketQuery:
