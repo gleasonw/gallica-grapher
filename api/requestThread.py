@@ -2,80 +2,85 @@ import re
 import threading
 from Backend.GettingAndGraphing.ticketQuery import TicketQuery
 
-#for testing
+# for testing
 import uuid
 
 
 class RequestThread(threading.Thread):
-	def __init__(self, searchTerms, papers, yearRange, requestID, eliminateEdgePapers=False):
-		splitter = re.compile("[\w']+")
-		self.searchItems = searchTerms
-		self.paperChoices = papers
-		self.yearRange = re.findall(splitter, yearRange)
-		self.tolerateEdgePapers = eliminateEdgePapers
-		self.discoveryProgress = 0
-		self.retrievalProgress = 0
-		self.currentTerm = ""
-		self.graphJSON = None
-		self.totalResultsForQuery = 0
-		self.numberRetrievedResults = 0
-		self.listOfTopPapersForTerms = []
-		self.id = requestID
-		self.graphingFinishedStatus = False
-		super().__init__()
+    def __init__(self,
+                 searchTerms,
+                 papers,
+                 yearRange,
+                 requestID,
+                 eliminateEdgePapers=False):
 
-	def run(self):
-		requestToRun = TicketQuery(
-				self.searchItems,
-				self.paperChoices,
-				self.yearRange,
-				self.tolerateEdgePapers,
-				self)
-		requestToRun.start()
+        self.keywords = searchTerms
+        self.papers = papers
+        self.yearRange = yearRange
+        self.tolerateEdgePapers = eliminateEdgePapers
+        self.progress = 0
+        self.currentTerm = ""
+        self.graphJSONForTicket = None
+        self.numResultsDiscovered = 0
+        self.numResultsRetrieved = 0
+        self.topPapersForTerms = []
+        self.id = requestID
+        super().__init__()
 
-	def setProgress(self, amount):
-		self.discoveryProgress = amount
+    def run(self):
+        requestToRun = TicketQuery(
 
-	def getProgress(self):
-		return self.discoveryProgress
+            self.keywords,
+            self.papers,
+            self.yearRange,
+            self.tolerateEdgePapers,
+            self)
+        requestToRun.run()
 
-	def setCurrentTerm(self, term):
-		self.currentTerm = term
+    def setProgress(self, amount):
+        self.progress = amount
 
-	def getCurrentTerm(self):
-		return self.currentTerm
+    def getProgress(self):
+        return self.progress
 
-	def setNumberDiscoveredResults(self, total):
-		self.totalResultsForQuery = total
+    def setCurrentTerm(self, term):
+        self.currentTerm = term
 
-	def getNumberDiscoveredResults(self):
-		return self.totalResultsForQuery
+    def getCurrentTerm(self):
+        return self.currentTerm
 
-	def setNumberRetrievedResults(self, count):
-		self.numberRetrievedResults = count
+    def setNumDiscovered(self, total):
+        self.numResultsDiscovered = total
 
-	def getNumberRetrievedResults(self):
-		return self.numberRetrievedResults
+    def getNumDiscovered(self):
+        return self.numResultsDiscovered
 
-	def getRequestID(self):
-		return self.id
+    def setNumRetrieved(self, count):
+        self.numResultsRetrieved = count
 
-	def setTopPapers(self, papers):
-		self.listOfTopPapersForTerms = papers
+    def getNumRetrieved(self):
+        return self.numResultsRetrieved
 
-	def getTopPapers(self):
-		return self.listOfTopPapersForTerms
+    def getRequestID(self):
+        return self.id
 
-	def setGraphJSON(self, json):
-		self.graphJSON = json
+    def setTopPapers(self, papers):
+        self.topPapersForTerms = papers
 
-	def getGraphJSON(self):
-		return self.graphJSON
+    def getTopPapers(self):
+        return self.topPapersForTerms
+
+    def setGraphJSON(self, json):
+        self.graphJSONForTicket = json
+
+    def getGraphJSON(self):
+        return self.graphJSONForTicket
+
 
 if __name__ == "__main__":
-	request = RequestThread(["brazza","malamine"],
-							[],
-							"1850-1950",
-							str(uuid.uuid4()),
-							eliminateEdgePapers=False)
-	request.run()
+    request = RequestThread(["brazza", "malamine"],
+                            [],
+                            "1850-1950",
+                            str(uuid.uuid4()),
+                            eliminateEdgePapers=False)
+    request.run()

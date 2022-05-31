@@ -4,3 +4,5 @@ node_modules
 
 .flaskenv
 .pyc
+
+__pycache__

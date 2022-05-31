@@ -1,8 +1,7 @@
-from Backend.GettingAndGraphing.termQuery import TermQueryOnSelectPapers
-from Backend.GettingAndGraphing.termQuery import TermQueryOnAllPapers
-from Backend.GettingAndGraphing.graphJSONmaker import GraphJSONmaker
-
 import psycopg2
+from GettingAndGraphing.termQueryAllPapers import TermQueryAllPapers
+from GettingAndGraphing.termQuerySelectPapers import TermQuerySelectPapers
+from GettingAndGraphing.ticketGraphData import TicketGraphData
 
 
 class TicketQuery:
@@ -19,76 +18,94 @@ class TicketQuery:
         return conn
 
     def __init__(self,
-                 searchList,
-                 newspaperList,
+                 keywords,
+                 papers,
                  yearRange,
                  eliminateEdgePapers,
                  progressTrackerThread):
 
-        self.searchTermList = searchList
-        self.newspaperList = newspaperList
+        self.keywords = keywords
+        self.papers = papers
         self.yearRange = yearRange
         self.eliminateEdgePapers = eliminateEdgePapers
         self.progressThread = progressTrackerThread
         self.requestID = progressTrackerThread.getRequestID()
         self.connectionToDB = TicketQuery.connectToDatabase()
-        self.topPaperList = []
+        self.topPapers = []
+        self.termQueries = []
+        self.totalResults = 0
+        self.numRetrieved = 0
 
-    def start(self):
-        self.retrieveResults()
+    def run(self):
+        self.initQueryObjects()
+        self.getNumResults()
+        self.initKeywordSearch()
         self.closeDbConnectionForRequest()
+        self.sendTopPapersToRequestThread()
+        self.generateGraphJSON()
 
-    def closeDbConnectionForRequest(self):
-        self.connectionToDB.close()
-        self.connectionToDB = None
-
-    def generateSelectPaperTermRetrievalObject(self):
-        for searchTerm in self.searchTermList:
-            resultGetterForTerm = ResultGetterForTermSelectPapers(
-                searchTerm,
-                self.newspaperList,
-                self.yearRange,
-                self.progressThread,
-                self.connectionToDB)
-            self.retrievalObjectList.append(resultGetterForTerm)
-
-    def retrieveResultsForTicket(self):
-        for searchTerm in self.searchTermList:
-            self.resetProgress()
-            self.sendTermToRequestThread(searchTerm)
-            paramsForQuery = [
-                searchTerm,
-                self.yearRange,
-                self.eliminateEdgePapers,
-                self.progressThread,
-                self.connectionToDB
-            ]
-            if self.newspaperList:
-                termQuery = TermQueryOnSelectPapers(paramsForQuery)
+    def initQueryObjects(self):
+        for keyword in self.keywords:
+            if self.papers:
+                termQuery = self.genSelectPaperQuery(keyword)
             else:
-                termQuery = TermQueryOnAllPapers(paramsForQuery)
-            termQuery.runSearch()
-            self.sendTopPapersToRequestThread()
-            self.generateGraphJSON()
+                termQuery = self.genAllPaperQuery(keyword)
+            self.termQueries.append(termQuery)
 
-    def resetProgress(self):
-        self.progressThread.setProgress(0)
+    def genSelectPaperQuery(self, keyword):
+        query = TermQuerySelectPapers(
+            keyword,
+            self.papers,
+            self.yearRange,
+            self.requestID,
+            self.updateProgress,
+            self.connectionToDB
+        )
+        return query
+
+    def genAllPaperQuery(self, keyword):
+        query = TermQueryAllPapers(
+            keyword,
+            self.yearRange,
+            self.eliminateEdgePapers,
+            self.requestID,
+            self.updateProgress,
+            self.connectionToDB
+        )
+        return query
+
+    def getNumResults(self):
+        for query in self.termQueries:
+            numResultsForKeyword = query.getTotalResults()
+            self.totalResults += numResultsForKeyword
+
+    def initKeywordSearch(self):
+        for query in self.termQueries:
+            keyword = query.getKeyword()
+            self.sendTermToRequestThread(keyword)
+            query.runSearch()
 
     def sendTermToRequestThread(self, term):
         self.progressThread.setCurrentTerm(term)
 
+    def updateProgress(self, addition):
+        self.numRetrieved += addition
+        progressPercent = int(self.numRetrieved/self.totalResults)
+        self.progressThread.setProgress(progressPercent)
+
     def generateGraphJSON(self):
-        JSONmaker = GraphJSONmaker(
+        graphData = TicketGraphData(
             self.requestID,
-            self.connectionToDB,
-            splitPapers=self.paperTrendLines,
-            splitTerms=self.termTrendLines)
-        JSONmaker.makeGraphJSON()
-        graphJSON = JSONmaker.getGraphJSON()
+            self.connectionToDB)
+        graphJSON = graphData.getGraphJSON()
         self.progressThread.setGraphJSON(graphJSON)
 
     def sendTopPapersToRequestThread(self):
-        for termQuery in self.retrievalObjectList:
+        for termQuery in self.termQueries:
             topPapers = termQuery.getTopTenPapers()
-            self.topPaperList.append(topPapers)
-        self.progressThread.setTopPapers(self.topPaperList)
+            self.topPapers.append(topPapers)
+        self.progressThread.setTopPapers(self.topPapers)
+
+    def closeDbConnectionForRequest(self):
+        self.connectionToDB.close()
+        self.connectionToDB = None

@@ -4,7 +4,6 @@ import psycopg2
 from GettingAndGraphing.paperGetterFromGallica import PaperGetterFromGallica
 from requests_toolbelt import sessions
 
-from GettingAndGraphing.paperDictionary import DictionaryMaker
 from GettingAndGraphing.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
@@ -15,39 +14,42 @@ class TermQuery:
         gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
         adapter = TimeoutAndRetryHTTPAdapter(timeout=25)
         gallicaHttpSession.mount("https://", adapter)
-        gallicaHttpSession.mount("http://", adapter)
         return gallicaHttpSession
 
     def __init__(self,
                  searchTerm,
                  yearRange,
-                 progressTrackerThread,
+                 requestID,
+                 progressTracker,
                  dbConnection,
-                 newspaperList=None,
+                 papers=None,
                  strictYearRange=False):
 
+        self.keyword = searchTerm
         self.lowYear = None
         self.highYear = None
         self.isYearRange = None
         self.baseQuery = None
-        self.progressTrackerThread = progressTrackerThread
-        self.requestID = progressTrackerThread.getRequestID()
+        self.requestID = requestID
         self.eliminateEdgePapers = strictYearRange
         self.totalResults = 0
         self.progress = 0
-        self.newspaperList = newspaperList
-        self.newspaperDictionary = {}
-        self.collectedQueries = []
-        self.searchTerm = searchTerm
+        self.papersAndCodes = papers
+        self.results = []
         self.topTenPapers = None
-        self.numResultsForEachPaper = {}
-        self.establishYearRange(yearRange)
-        self.buildQuery()
-        self.recordCodeStrings = []
+        self.numResultsInEachPaper = {}
+        self.indexAndCodeStrings = []
         self.currentEntryDataJustInCase = None
+        self.progressTracker = progressTracker
         self.dbConnection = dbConnection
         self.paperNameCounts = []
+
+        self.establishYearRange(yearRange)
         self.gallicaHttpSession = TermQuery.makeSession()
+        self.buildQuery()
+
+    def getKeyword(self):
+        return self.keyword
 
     def getTopTenPapers(self):
         return self.topTenPapers
@@ -57,26 +59,26 @@ class TermQuery:
             cursor = self.dbConnection.cursor()
             cursor.execute("""
 				SELECT count(requestResults.identifier) AS papercount, papers.papername
-					FROM (SELECT identifier, paperid FROM results WHERE requestid = %s AND searchterm = %s) AS requestResults 
+					FROM (SELECT identifier, paperid 
+					        FROM results WHERE requestid = %s AND searchterm = %s) 
+                            AS requestResults 
 					INNER JOIN papers ON requestResults.paperid = papers.papercode 
 					GROUP BY papers.papername 
 					ORDER BY papercount DESC
 					LIMIT 10;
-			""", (self.requestID, self.searchTerm))
+			""", (self.requestID, self.keyword))
             self.topTenPapers = cursor.fetchall()
             pass
         except psycopg2.DatabaseError as error:
             print(error)
 
     def postResultsToDB(self):
-        print("Num collected: ", len(self.collectedQueries))
         try:
-            for hitList in self.collectedQueries:
+            for hitList in self.results:
                 self.currentEntryDataJustInCase = hitList
                 self.insertOneResultToTable(hitList)
-        except psycopg2.IntegrityError as e:
+        except psycopg2.IntegrityError:
             try:
-                print(e)
                 missingCode = self.currentEntryDataJustInCase.get('journalCode')
                 paperFetcher = PaperGetterFromGallica(self.dbConnection)
                 paperFetcher.addPaperToDBbyCode(missingCode)
@@ -92,15 +94,12 @@ class TermQuery:
         entryDay = int(entryDateBits[2])
         entryDate = datetime.datetime(entryYear, entryMonth, entryDay)
         cursor.execute("""
-						INSERT INTO results (identifier, date, searchterm, paperID, requestid)
+						INSERT INTO results 
+						    (identifier, date, searchterm, paperID, requestid)
 						VALUES (%s, %s, %s, %s, %s);
 						""",
-                       (entry.get('identifier'), entryDate, self.searchTerm,
+                       (entry.get('identifier'), entryDate, self.keyword,
                         entry.get('journalCode'), self.requestID))
-
-    def parseNewspaperDictionary(self):
-        dicParser = DictionaryMaker(self.newspaperList, self.dbConnection)
-        self.newspaperDictionary = dicParser.getDictionary()
 
     def establishYearRange(self, yearRange):
         if len(yearRange) == 2:
@@ -117,9 +116,9 @@ class TermQuery:
             self.buildDatelessQuery()
 
     def buildYearRangeQuery(self):
-        lowYear= str(self.lowYear)
+        lowYear = str(self.lowYear)
         highYear = str(self.highYear)
-        if not self.newspaperList:
+        if not self.papers:
             self.baseQuery = f"""
                 (dc.date >= "{lowYear}" and dc.date <= "{highYear}") 
                 and (gallica adj "{{searchWord}}") 
@@ -135,7 +134,7 @@ class TermQuery:
             """
 
     def buildDatelessQuery(self):
-        if not self.newspaperList:
+        if not self.papers:
             self.baseQuery = """
                 (gallica adj "{searchWord}") 
                 and (dc.type all "fascicule") 
@@ -147,15 +146,13 @@ class TermQuery:
                 and (gallica adj "{searchWord}")
                 sortby dc.date/sort.ascending
             """
-        self.baseQuery = self.baseQuery.format(searchWord=self.searchTerm)
+        self.baseQuery = self.baseQuery.format(searchWord=self.keyword)
         
     def completeSearch(self):
-        self.updateProgress(100, 100)
-        if len(self.collectedQueries) != 0:
+        if len(self.results) != 0:
             self.postResultsToDB()
             self.discoverTopTenPapers()
 
-    def updateProgress(self, iteration, total):
-        percentComplete = int((iteration / total) * 100)
-        self.progressTrackerThread.setProgress(percentComplete)
+    def updateProgress(self, addition):
+        self.progressTracker(addition)
 

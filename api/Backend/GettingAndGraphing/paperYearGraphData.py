@@ -2,7 +2,7 @@ import psycopg2
 import json
 
 
-class PaperYearData:
+class PaperYearGraphData:
 
     def __init__(self):
         self.yearOccurrenceArray = None
@@ -60,5 +60,5 @@ class PaperYearData:
 
 
 if __name__ == "__main__":
-    chartMaker = PaperYearData()
+    chartMaker = PaperYearGraphData()
     chartMaker.createChartJSON()
