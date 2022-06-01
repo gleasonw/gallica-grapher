@@ -1,4 +1,5 @@
 from lxml import etree
+import re
 
 
 class Result:
@@ -28,8 +29,9 @@ class Result:
         else:
             return dateToStandardize
 
-    def __init__(self, xml):
-        self.hitData = xml[0][2]
+    def __init__(self, xmlRoot):
+
+        self.recordData = xmlRoot.findall("{http://www.loc.gov/zing/srw/}recordData")
         self.paper = ''
         self.date = ''
         self.identifier = ''
@@ -47,15 +49,15 @@ class Result:
         return self.identifier
 
     def getDateFromHit(self):
-        dateOfHit = self.hitData.find('{http://purl.org/dc/elements/1.1/}date').text
+        dateOfHit = self.recordData.find('{http://purl.org/dc/elements/1.1/}date').text
 
         self.date = Result.standardizeSingleDate(dateOfHit)
 
     def getPaperFromHit(self):
-        journalOfHit = self.hitData.find('{http://purl.org/dc/elements/1.1/}relation').text
+        journalOfHit = self.recordData.find('{http://purl.org/dc/elements/1.1/}relation').text
         if journalOfHit:
             self.paper = journalOfHit[-11:len(journalOfHit)]
 
     def getIdentifierFromHit(self):
-        identifierOfHit = data.find('{http://purl.org/dc/elements/1.1/}identifier').text
+        identifierOfHit = self.recordData.find('{http://purl.org/dc/elements/1.1/}identifier').text
         self.identifier = identifierOfHit
