@@ -1,6 +1,5 @@
-import re
 import threading
-from Backend.GettingAndGraphing.ticketQuery import TicketQuery
+from ticketQuery import TicketQuery
 
 # for testing
 import uuid
@@ -13,7 +12,6 @@ class RequestThread(threading.Thread):
                  yearRange,
                  requestID,
                  eliminateEdgePapers=False):
-
         self.keywords = searchTerms
         self.papers = papers
         self.yearRange = yearRange
@@ -78,9 +76,9 @@ class RequestThread(threading.Thread):
 
 
 if __name__ == "__main__":
-    request = RequestThread(["brazza", "malamine"],
+    request = RequestThread(["brazza"],
                             [],
-                            "1850-1950",
+                            [1901, 1904],
                             str(uuid.uuid4()),
                             eliminateEdgePapers=False)
     request.run()

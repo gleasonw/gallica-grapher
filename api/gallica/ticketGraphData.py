@@ -3,66 +3,69 @@ import json
 import time
 import ciso8601
 
-
+#dbconnection is none?
 class TicketGraphData:
     def __init__(self,
-                 requestID,
-                 connectionToDB,
-                 averageWindow=11,
-                 groupBy='month'):
+                 requestid,
+                 dbconnection,
+                 averagewindow=11,
+                 groupby='month'):
 
-        self.dbConnection = connectionToDB
-        self.requestID = requestID
-        self.pandasDataFrame = None
-        self.averageWindow = int(averageWindow)
-        self.groupBy = groupBy
-        self.graphJSON = None
+        self.dbConnection = dbconnection
+        self.requestID = requestid
+        self.averageWindow = int(averagewindow)
+        self.groupBy = groupby
         self.request = None
         self.searchTerms = []
+        self.data = []
+        self.jsonedData = ''
 
         self.makeGraphJSON()
 
     def getGraphJSON(self):
-        return self.graphJSON
+        return self.jsonedData
 
     def makeGraphJSON(self):
         self.buildQueryForGraphData()
-        self.graphJSON = self.executeQuery()
+        self.graphJSON = self.runQuery()
 
     def buildQueryForGraphData(self):
         if self.groupBy == "day":
-            self.request = """
-            SELECT issuedate, AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM (SELECT date as issuedate, count(*) AS mentions 
-                FROM results WHERE requestid = %s 
-                GROUP BY date ORDER BY date ASC) AS countTable;
-            """
+            self.initDayRequest()
         elif self.groupBy == "month":
-            self.request = """
-            SELECT make_date(year::integer, month::integer, 1) as issuedate, AVG(mentions) 
-            OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM (SELECT date_part('month', date) AS month, date_part('year', date) AS year, count(*) AS mentions 
-                FROM results WHERE requestid = %s 
-                GROUP BY date_part('month', date), date_part('year', date) ORDER BY year,month ASC) AS countTable;
-            """
+            self.initMonthRequest()
         else:
-            self.request = """
-            SELECT issuedate, AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM (SELECT date_part('year', date) AS issuedate, count(*) AS mentions 
-                FROM results WHERE requestid = %s
-                GROUP BY date_part('year', date) ORDER BY issuedate ASC) AS countTable;
-            """
+            self.initYearRequest()
 
-    def executeQuery(self):
+    def initDayRequest(self):
+        self.request = """
+        SELECT date, AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM (SELECT date, count(*) AS mentions 
+            FROM results WHERE requestid = %s 
+            GROUP BY date ORDER BY date ASC) AS countTable;
+        """
+
+    def initMonthRequest(self):
+        self.request = """
+        SELECT year || '-' || month as issuedate, AVG(mentions) 
+        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM (SELECT date_part('month', date) AS month, date_part('year', date) AS year, count(*) AS mentions 
+            FROM results WHERE requestid = %s 
+            GROUP BY date_part('month', date), date_part('year', date) ORDER BY year,month ASC) AS countTable;
+        """
+
+    def initYearRequest(self):
+        self.request = """
+        SELECT year, AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM (SELECT date_part('year', date) AS year, count(*) AS mentions 
+            FROM results WHERE requestid = %s
+            GROUP BY date_part('year', date) ORDER BY year ASC) AS countTable;
+        """
+
+    def runQuery(self):
         self.getSearchTerms()
-        data = self.fetchQueryResults()
-        data = self.makeDateFrequencyPairIntoList(data)
-        dataToJson = {
-            'name': self.searchTerms,
-            'data': data
-        }
-        jsonedData = json.dumps(dataToJson)
-        return [jsonedData]
+        self.fetchQueryResults()
+        self.createJSON()
 
     def getSearchTerms(self):
         getSearchTerms = """
@@ -75,30 +78,29 @@ class TicketGraphData:
     def fetchQueryResults(self):
         cursor = self.dbConnection.cursor()
         cursor.execute(self.request, (self.averageWindow, self.requestID,))
-        data = cursor.fetchall()
-        return data
+        self.data = cursor.fetchall()
 
-    @staticmethod
-    def makeDateFrequencyPairIntoList(data):
-        for i, entry in enumerate(data):
-            if isinstance(entry, str):
-                entry = entry.split(', ')
-                date = ciso8601.parse_datetime(entry[0])
-            else:
-                date = entry[0]
-            dateInMilliSeconds = time.mktime(date.timetuple()) * 1000
-            frequency = float(entry[1])
-            data[i] = [dateInMilliSeconds, frequency]
-        return data
-
+    def createJSON(self):
+        dataToJson = {
+            'name': self.searchTerms,
+            'data': self.data
+        }
+        self.jsonedData = json.dumps(dataToJson,
+                                     indent=4,
+                                     sort_keys=True,
+                                     default=str)
 
 if __name__ == "__main__":
     conn = psycopg2.connect(
         host="localhost",
-        database="postgres",
-        user="wglea",
+        database="gallicagrapher",
+        user="wgleason",
         password="ilike2play"
     )
-    grapher = TicketGraphData("9f036013-3c68-4bd2-ab02-4dd022171d5f", conn, averageWindow=11)
-    grapher.makeGraphJSON()
+    grapher = TicketGraphData("ecae3a19-2f11-4517-88cd-c86ca59bb720",
+                              conn,
+                              groupby='year',
+                              averagewindow=0)
+    json = grapher.getGraphJSON()
+    print(json)
     conn.close()

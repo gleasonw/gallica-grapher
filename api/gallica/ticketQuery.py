@@ -1,7 +1,9 @@
 import psycopg2
-from termQueryAllPapers import TermQueryAllPapers
-from termQuerySelectPapers import TermQuerySelectPapers
+
+from keywordQueryAllPapers import KeywordQueryAllPapers
+from keywordQuerySelectPapers import KeywordQuerySelectPapers
 from ticketGraphData import TicketGraphData
+
 
 
 class TicketQuery:
@@ -20,16 +22,16 @@ class TicketQuery:
     def __init__(self,
                  keywords,
                  papers,
-                 yearRange,
-                 eliminateEdgePapers,
-                 progressTrackerThread):
+                 years,
+                 edgepapers,
+                 progressthread):
 
         self.keywords = keywords
         self.papers = papers
-        self.yearRange = yearRange
-        self.eliminateEdgePapers = eliminateEdgePapers
-        self.progressThread = progressTrackerThread
-        self.requestID = progressTrackerThread.getRequestID()
+        self.yearRange = years
+        self.eliminateEdgePapers = edgepapers
+        self.progressThread = progressthread
+        self.requestID = progressthread.getRequestID()
         self.connectionToDB = TicketQuery.connectToDatabase()
         self.topPapers = []
         self.termQueries = []
@@ -39,10 +41,9 @@ class TicketQuery:
     def run(self):
         self.initQueryObjects()
         self.getNumResults()
-        self.initKeywordSearch()
-        self.closeDbConnectionForRequest()
+        self.startQueries()
         self.sendTopPapersToRequestThread()
-        self.generateGraphJSON()
+        self.closeDbConnectionForRequest()
 
     def initQueryObjects(self):
         for keyword in self.keywords:
@@ -53,7 +54,7 @@ class TicketQuery:
             self.termQueries.append(termQuery)
 
     def genSelectPaperQuery(self, keyword):
-        query = TermQuerySelectPapers(
+        query = KeywordQuerySelectPapers(
             keyword,
             self.papers,
             self.yearRange,
@@ -64,7 +65,7 @@ class TicketQuery:
         return query
 
     def genAllPaperQuery(self, keyword):
-        query = TermQueryAllPapers(
+        query = KeywordQueryAllPapers(
             keyword,
             self.yearRange,
             self.eliminateEdgePapers,
@@ -76,16 +77,16 @@ class TicketQuery:
 
     def getNumResults(self):
         for query in self.termQueries:
-            numResultsForKeyword = query.getTotalResults()
+            numResultsForKeyword = query.getEstimateNumResults()
             self.totalResults += numResultsForKeyword
 
-    def initKeywordSearch(self):
+    def startQueries(self):
         for query in self.termQueries:
             keyword = query.getKeyword()
-            self.sendTermToRequestThread(keyword)
+            self.sendTermToFrontend(keyword)
             query.runSearch()
 
-    def sendTermToRequestThread(self, term):
+    def sendTermToFrontend(self, term):
         self.progressThread.setCurrentTerm(term)
 
     def updateProgress(self, addition):
@@ -93,16 +94,9 @@ class TicketQuery:
         progressPercent = int(self.numRetrieved/self.totalResults)
         self.progressThread.setProgress(progressPercent)
 
-    def generateGraphJSON(self):
-        graphData = TicketGraphData(
-            self.requestID,
-            self.connectionToDB)
-        graphJSON = graphData.getGraphJSON()
-        self.progressThread.setGraphJSON(graphJSON)
-
     def sendTopPapersToRequestThread(self):
         for termQuery in self.termQueries:
-            topPapers = termQuery.getTopTenPapers()
+            topPapers = termQuery.getTopPapers()
             self.topPapers.append(topPapers)
         self.progressThread.setTopPapers(self.topPapers)
 

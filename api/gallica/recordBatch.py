@@ -1,9 +1,9 @@
 from lxml import etree
 
-from result import Result
+from record import Record
 
 
-class ResultBatch:
+class RecordBatch:
     def __init__(self,
                  query,
                  session,
@@ -18,7 +18,7 @@ class ResultBatch:
         self.numPurgedResults = 0
         self.numRecords = numRecords
         self.session = session
-        self.hitData = None
+        self.xmlRoot = None
         self.params = {
             "version": 1.2,
             "operation": "searchRetrieve",
@@ -31,54 +31,59 @@ class ResultBatch:
 
     def getNumResults(self):
         self.params['exactSearch'] = "false"
-        response = self.session.get("", params=parameters)
-        root = etree.fromstring(response.content)
-        numResults = int(root[2].text)
+        self.fetchXMLRoot()
+        numResults = int(self.xmlRoot.find("{http://www.loc.gov/zing/srw/}numberOfRecords").text)
         return numResults
 
-    def getResultBatch(self):
-        response = self.session.get("", params=self.params)
-        root = etree.fromstring(response.content)
-        self.getResultsFromXML(root)
+    def getRecordBatch(self):
+        self.fetchXMLRoot()
+        self.parseRecordsFromXML()
         return self.dateJournalIdentifierResults
 
-    def getResultsFromXML(self, xml):
-        for result in xml.iter("{http://www.loc.gov/zing/srw/}record"):
-            if self.resultIsValid(result):
-                self.addResult(result)
+    def fetchXMLRoot(self):
+        response = self.session.get("", params=self.params)
+        self.xmlRoot = etree.fromstring(response.content)
+        et = etree.ElementTree(self.xmlRoot)
+        et.write('output.xml', pretty_print=True)
+
+    def parseRecordsFromXML(self):
+        for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
+            record = Record(result)
+            if self.recordIsValid(record):
+                self.addRecord(record)
             else:
+                print(record.getIdentifier())
                 self.numPurgedResults += 1
 
-    def resultIsValid(self, hit):
-        result = Result(hit)
-        dateOfHit = result.getDate()
-        paperOfHit = result.getPaper()
-        identifierOfHit = result.getIdentifier()
+    def recordIsValid(self, record):
+
+        dateOfHit = record.getDate()
+        paperOfHit = record.getPaper()
+        identifierOfHit = record.getIdentifier()
         if dateOfHit and paperOfHit:
-            return self.resultIsUnique(dateOfHit, identifierOfHit)
+            return self.recordIsUnique(dateOfHit, identifierOfHit)
         else:
             return False
 
-    def resultIsUnique(self, currentDate, currentPaper):
+    def recordIsUnique(self, currentDate, currentPaper):
         if self.dateJournalIdentifierResults:
-            return self.checkIfCurrentResultEqualsPrior(currentDate, currentPaper)
-        else:
-            return True
+            if self.currentResultEqualsPrior(currentDate, currentPaper):
+                return False
+        return True
 
     # TODO: What if the duplicate is not directly before?
-    def checkIfCurrentResultEqualsPrior(self, currentDate, currentPaper):
+    def currentResultEqualsPrior(self, currentDate, currentPaper):
         priorDate = self.dateJournalIdentifierResults[-1]['date']
         priorPaper = self.dateJournalIdentifierResults[-1]['identifier']
         if currentDate == priorDate and currentPaper == priorPaper:
-            self.numPurgedResults = self.numPurgedResults + 1
-            return False
-        else:
             return True
+        else:
+            return False
 
-    def addResult(self, result):
-        date = result.getDate
-        identifier = result.getIdentifier()
-        paper = result.getPaper()
+    def addRecord(self, record):
+        date = record.getDate()
+        identifier = record.getIdentifier()
+        paper = record.getPaper()
         fullResult = {
             'date': date,
             'identifier': identifier,

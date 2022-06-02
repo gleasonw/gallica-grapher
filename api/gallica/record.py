@@ -2,21 +2,21 @@ from lxml import etree
 import re
 
 
-class Result:
+class Record:
 
     @staticmethod
-    def standardizeSingleDate(dateToStandardize):
+    def standardizeDate(date):
         yearMonDay = re.compile(r"^\d{4}-\d{2}-\d{2}$")
         twoYears = re.compile(r"^\d{4}-\d{4}$")
         oneYear = re.compile(r"^\d{4}$")
         oneYearOneMon = re.compile(r"^\d{4}-\d{2}$")
-        if not yearMonDay.match(dateToStandardize):
-            if oneYear.match(dateToStandardize):
-                return dateToStandardize + "-01-01"
-            elif oneYearOneMon.match(dateToStandardize):
-                return dateToStandardize + "-01"
-            elif twoYears.match(dateToStandardize):
-                dates = dateToStandardize.split("-")
+        if not yearMonDay.match(date):
+            if oneYear.match(date):
+                return date + "-01-01"
+            elif oneYearOneMon.match(date):
+                return date + "-01"
+            elif twoYears.match(date):
+                dates = date.split("-")
                 lowerDate = int(dates[0])
                 higherDate = int(dates[1])
                 if higherDate - lowerDate <= 10:
@@ -27,11 +27,11 @@ class Result:
             else:
                 return None
         else:
-            return dateToStandardize
+            return date
 
-    def __init__(self, xmlRoot):
-
-        self.recordData = xmlRoot.findall("{http://www.loc.gov/zing/srw/}recordData")
+    def __init__(self, root):
+        record = root[2]
+        self.recordData = record[0]
         self.paper = ''
         self.date = ''
         self.identifier = ''
@@ -51,7 +51,7 @@ class Result:
     def getDateFromHit(self):
         dateOfHit = self.recordData.find('{http://purl.org/dc/elements/1.1/}date').text
 
-        self.date = Result.standardizeSingleDate(dateOfHit)
+        self.date = Record.standardizeDate(dateOfHit)
 
     def getPaperFromHit(self):
         journalOfHit = self.recordData.find('{http://purl.org/dc/elements/1.1/}relation').text

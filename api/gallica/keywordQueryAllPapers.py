@@ -1,8 +1,12 @@
-from resultBatch import ResultBatch
-from termQuery import TermQuery
+import datetime
+from math import ceil
+
+from recordBatch import RecordBatch
+from keywordQuery import KeywordQuery
+from concurrent.futures import ThreadPoolExecutor
 
 
-class TermQueryAllPapers(TermQuery):
+class KeywordQueryAllPapers(KeywordQuery):
     def __init__(self,
                  searchTerm,
                  yearRange,
@@ -11,13 +15,40 @@ class TermQueryAllPapers(TermQuery):
                  progressTracker,
                  dbConnection):
 
-        self.indexSlices = []
+        self.recordIndexChunks = []
+        self.eliminateEdgePapers = eliminateEdgePapers
         super().__init__(searchTerm,
                          yearRange,
                          requestID,
                          progressTracker,
-                         dbConnection,
-                         strictYearRange=eliminateEdgePapers)
+                         dbConnection)
+
+        self.findNumTotalResults()
+
+    def buildYearRangeQuery(self):
+        lowYear = str(self.lowYear)
+        highYear = str(self.highYear)
+        self.baseQuery = (
+            f'dc.date >= "{lowYear}" '
+            f'and dc.date <= "{highYear}" '
+            f'and (gallica all "{self.keyword}") '
+            'and (dc.type all "fascicule") '
+            'sortby dc.date/sort.ascending'
+        )
+
+    def buildDatelessQuery(self):
+        self.baseQuery = (
+            f'(gallica all "{self.keyword}") '
+            'and (dc.type all "fascicule") '
+            'sortby dc.date/sort.ascending'
+        )
+
+    def findNumTotalResults(self):
+        tempBatch = RecordBatch(self.baseQuery,
+                                self.gallicaHttpSession,
+                                numRecords=1)
+        self.estimateNumResults = tempBatch.getNumResults()
+        return self.estimateNumResults
 
     def runSearch(self):
         workerPool = self.generateSearchWorkers(50)
@@ -27,34 +58,29 @@ class TermQueryAllPapers(TermQuery):
         self.completeSearch()
 
     def generateSearchWorkers(self, numWorkers):
-        iterations = ceil(self.totalResults / 50)
-        self.indexSlices = [(i * 50) + 1 for i in range(iterations)]
+        iterations = ceil(self.estimateNumResults / 50)
+        self.recordIndexChunks = \
+            [(i * 50) + 1 for i in range(iterations)]
         executor = ThreadPoolExecutor(max_workers=numWorkers)
         return executor
 
     def doSearch(self, workers):
         with workers as executor:
-            for i, result in enumerate(executor.map(self.sendWorkersToSearch, self.indexSlices)):
+            for result in executor.map(
+                    self.sendWorkersToSearch,
+                    self.recordIndexChunks):
                 numResultsInBatch = len(result)
                 self.updateProgress(numResultsInBatch)
                 self.results.extend(result)
 
     def sendWorkersToSearch(self, startRecord):
-        batch = ResultBatch(
+        batch = RecordBatch(
             self.baseQuery,
             self.gallicaHttpSession,
             startRecord=startRecord,
         )
-        results = batch.getResultBatch()
+        results = batch.getRecordBatch()
         return results
-
-    def getTotalResults(self):
-        tempBatch = ResultBatch(self.baseQuery,
-                                self.gallicaHttpSession,
-                                startRecord=1,
-                                numRecords=1)
-        self.totalResults = tempBatch.getNumResults()
-        return self.totalResults
 
     def cullResultsFromEdgePapers(self):
         cursor = self.dbConnection.cursor()
