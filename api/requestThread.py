@@ -36,6 +36,7 @@ class RequestThread(threading.Thread):
         requestToRun.run()
 
     def setProgress(self, amount):
+        print(amount)
         self.progress = amount
 
     def getProgress(self):

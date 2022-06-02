@@ -1,6 +1,6 @@
 from lxml import etree
-from time import perf_counter
 from record import Record
+from record import PaperRecord
 
 
 class RecordBatch:
@@ -11,7 +11,7 @@ class RecordBatch:
                  numRecords=50,
                  ):
 
-        self.dateJournalIdentifierResults = []
+        self.batch = []
         self.query = query
         self.queryHitNumber = 0
         self.startRecord = startRecord
@@ -30,24 +30,21 @@ class RecordBatch:
         }
 
     def getNumResults(self):
-        self.params['exactSearch'] = "false"
         self.fetchXMLRoot()
-        numResults = int(self.xmlRoot.find("{http://www.loc.gov/zing/srw/}numberOfRecords").text)
+        numResults = self.xmlRoot\
+            .find("{http://www.loc.gov/zing/srw/}numberOfRecords").text
+        numResults = int(numResults)
         return numResults
 
     def getRecordBatch(self):
-        start = perf_counter()
         self.fetchXMLRoot()
-        end = perf_counter()
-        print(f"Time for request: {end-start}")
         self.parseRecordsFromXML()
-        return self.dateJournalIdentifierResults
+        return self.batch
 
     def fetchXMLRoot(self):
         response = self.session.get("", params=self.params)
         self.xmlRoot = etree.fromstring(response.content)
         et = etree.ElementTree(self.xmlRoot)
-        et.write('output.xml', pretty_print=True)
 
     def parseRecordsFromXML(self):
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
@@ -55,29 +52,27 @@ class RecordBatch:
             if self.recordIsValid(record):
                 self.addRecord(record)
             else:
-                print(record.getIdentifier())
                 self.numPurgedResults += 1
 
     def recordIsValid(self, record):
-
         dateOfHit = record.getDate()
-        paperOfHit = record.getPaper()
-        identifierOfHit = record.getIdentifier()
+        paperOfHit = record.getPaperCode()
+        urlOfHit = record.getUrl()
         if dateOfHit and paperOfHit:
-            return self.recordIsUnique(dateOfHit, identifierOfHit)
+            return self.recordIsUnique(dateOfHit, urlOfHit)
         else:
             return False
 
     def recordIsUnique(self, currentDate, currentPaper):
-        if self.dateJournalIdentifierResults:
+        if self.batch:
             if self.currentResultEqualsPrior(currentDate, currentPaper):
                 return False
         return True
 
     # TODO: What if the duplicate is not directly before?
     def currentResultEqualsPrior(self, currentDate, currentPaper):
-        priorDate = self.dateJournalIdentifierResults[-1]['date']
-        priorPaper = self.dateJournalIdentifierResults[-1]['identifier']
+        priorDate = self.batch[-1]['date']
+        priorPaper = self.batch[-1]['url']
         if currentDate == priorDate and currentPaper == priorPaper:
             return True
         else:
@@ -85,14 +80,54 @@ class RecordBatch:
 
     def addRecord(self, record):
         date = record.getDate()
-        identifier = record.getIdentifier()
-        paper = record.getPaper()
+        url = record.getUrl()
+        paper = record.getPaperCode()
         fullResult = {
             'date': date,
-            'identifier': identifier,
-            'journalCode': paper
+            'url': url,
+            'paperCode': paper
         }
-        self.dateJournalIdentifierResults.append(fullResult)
+        self.batch.append(fullResult)
 
     def getNumberPurgedResults(self):
         return self.numPurgedResults
+
+
+class PaperRecordBatch(RecordBatch):
+
+    def __init__(self,
+                 query,
+                 session,
+                 startRecord=1,
+                 numRecords=50):
+
+        super().__init__(query,
+                         session,
+                         startRecord,
+                         numRecords)
+
+    def parseRecordsFromXML(self):
+        for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
+            record = PaperRecord(result)
+            if self.recordIsValid(record):
+                self.addRecord(record)
+            else:
+                self.numPurgedResults += 1
+
+    def recordIsValid(self, record):
+        code = record.getPaperCode()
+        if code:
+            return True
+        else:
+            return False
+
+    def addRecord(self, record):
+        date = record.getDate()
+        url = record.getUrl()
+        paper = record.getPaperCode()
+        fullResult = {
+            'date': date,
+            'url': url,
+            'paperCode': paper
+        }
+        self.batch.append(fullResult)

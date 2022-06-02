@@ -18,7 +18,7 @@ CREATE INDEX ON papers
 CREATE TABLE results (
     id integer primary key generated always as identity,
     identifier text,
-    date date,
+    date text,
     searchTerm text,
     paperID text,
     requestID text,

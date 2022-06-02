@@ -1,9 +1,7 @@
 import psycopg2
 
-from keywordQueryAllPapers import KeywordQueryAllPapers
-from keywordQuerySelectPapers import KeywordQuerySelectPapers
+from keywordQuery import KeywordQueryAllPapers, KeywordQuerySelectPapers
 from ticketGraphData import TicketGraphData
-
 
 
 class TicketQuery:
@@ -91,7 +89,7 @@ class TicketQuery:
 
     def updateProgress(self, addition):
         self.numRetrieved += addition
-        progressPercent = int(self.numRetrieved/self.totalResults)
+        progressPercent = self.numRetrieved/self.totalResults
         self.progressThread.setProgress(progressPercent)
 
     def sendTopPapersToRequestThread(self):
