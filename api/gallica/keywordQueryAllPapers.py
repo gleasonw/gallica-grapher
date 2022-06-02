@@ -67,17 +67,17 @@ class KeywordQueryAllPapers(KeywordQuery):
     def doSearch(self, workers):
         with workers as executor:
             for result in executor.map(
-                    self.sendWorkersToSearch,
+                    self.fetchBatchFromIndex,
                     self.recordIndexChunks):
                 numResultsInBatch = len(result)
                 self.updateProgress(numResultsInBatch)
                 self.results.extend(result)
 
-    def sendWorkersToSearch(self, startRecord):
+    def fetchBatchFromIndex(self, index):
         batch = RecordBatch(
             self.baseQuery,
             self.gallicaHttpSession,
-            startRecord=startRecord,
+            startRecord=index,
         )
         results = batch.getRecordBatch()
         return results

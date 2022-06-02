@@ -3,7 +3,6 @@ from math import ceil
 from recordBatch import RecordBatch
 from keywordQuery import KeywordQuery
 import concurrent.futures
-import asyncio
 
 
 class KeywordQuerySelectPapers(KeywordQuery):

@@ -1,5 +1,5 @@
 from lxml import etree
-
+from time import perf_counter
 from record import Record
 
 
@@ -36,7 +36,10 @@ class RecordBatch:
         return numResults
 
     def getRecordBatch(self):
+        start = perf_counter()
         self.fetchXMLRoot()
+        end = perf_counter()
+        print(f"Time for request: {end-start}")
         self.parseRecordsFromXML()
         return self.dateJournalIdentifierResults
 

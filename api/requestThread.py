@@ -76,9 +76,9 @@ class RequestThread(threading.Thread):
 
 
 if __name__ == "__main__":
-    request = RequestThread(["brazza"],
+    request = RequestThread(["croissant"],
                             [],
-                            [1901, 1904],
+                            [1920, 1925],
                             str(uuid.uuid4()),
                             eliminateEdgePapers=False)
     request.run()

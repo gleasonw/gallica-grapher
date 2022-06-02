@@ -66,6 +66,7 @@ class KeywordQuery:
         """, (self.requestID, self.keyword))
         self.topPapers = cursor.fetchall()
 
+    #TODO: allpaperquery not posting all its results to DB... also, clean this!
     def postResultsToDB(self):
         try:
             for hitList in self.results:
