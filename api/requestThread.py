@@ -1,5 +1,5 @@
 import threading
-from ticketQuery import TicketQuery
+from requestTicket import TicketQuery
 
 # for testing
 import uuid
@@ -26,13 +26,7 @@ class RequestThread(threading.Thread):
         super().__init__()
 
     def run(self):
-        requestToRun = TicketQuery(
-
-            self.keywords,
-            self.papers,
-            self.yearRange,
-            self.tolerateEdgePapers,
-            self)
+        requestToRun = TicketQuery(self.keywords, self.papers, self.yearRange, self)
         requestToRun.run()
 
     def setProgress(self, amount):

@@ -21,13 +21,11 @@ class TicketQuery:
                  keywords,
                  papers,
                  years,
-                 edgepapers,
                  progressthread):
 
         self.keywords = keywords
         self.papers = papers
         self.yearRange = years
-        self.eliminateEdgePapers = edgepapers
         self.progressThread = progressthread
         self.requestID = progressthread.getRequestID()
         self.connectionToDB = TicketQuery.connectToDatabase()
@@ -63,14 +61,7 @@ class TicketQuery:
         return query
 
     def genAllPaperQuery(self, keyword):
-        query = KeywordQueryAllPapers(
-            keyword,
-            self.yearRange,
-            self.eliminateEdgePapers,
-            self.requestID,
-            self.updateProgress,
-            self.connectionToDB
-        )
+        query = KeywordQueryAllPapers(keyword, self.yearRange, self.requestID, self.updateProgress, self.connectionToDB)
         return query
 
     def getNumResults(self):

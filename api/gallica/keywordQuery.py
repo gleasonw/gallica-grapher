@@ -6,7 +6,7 @@ import psycopg2
 from requests_toolbelt import sessions
 
 from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
-from gallicaPaperQuery import GallicaPaperQuery
+from newspapers import Newspapers
 from concurrent.futures import ThreadPoolExecutor
 from recordBatch import RecordBatch
 
@@ -103,7 +103,7 @@ class KeywordQuery:
 
     def addMissingPaperToDB(self, record):
         missingCode = record["paperCode"]
-        paperQuery = GallicaPaperQuery(self.dbConnection)
+        paperQuery = Newspapers(self.dbConnection)
         paperQuery.addPaperToDBbyCode(missingCode)
 
     def establishYearRange(self, yearRange):
@@ -139,13 +139,11 @@ class KeywordQueryAllPapers(KeywordQuery):
     def __init__(self,
                  searchTerm,
                  yearRange,
-                 eliminateEdgePapers,
                  requestID,
                  progressTracker,
                  dbConnection):
 
         self.recordIndexChunks = []
-        self.eliminateEdgePapers = eliminateEdgePapers
         super().__init__(searchTerm,
                          yearRange,
                          requestID,
@@ -182,8 +180,6 @@ class KeywordQueryAllPapers(KeywordQuery):
     def runSearch(self):
         workerPool = self.generateSearchWorkers(50)
         self.doSearch(workerPool)
-        if self.eliminateEdgePapers:
-            self.cullResultsFromEdgePapers()
         self.completeSearch()
 
     def generateSearchWorkers(self, numWorkers):
@@ -210,21 +206,6 @@ class KeywordQueryAllPapers(KeywordQuery):
         )
         results = batch.getRecordBatch()
         return results
-
-    def cullResultsFromEdgePapers(self):
-        cursor = self.dbConnection.cursor()
-        startYear = datetime.date(int(self.lowYear), 1, 1)
-        endYear = datetime.date(int(self.highYear), 1, 1)
-        cursor.execute("""
-        DELETE FROM results 
-            WHERE results.requestID = %s 
-            AND
-            results.paperID IN 
-            (SELECT papercode FROM papers 
-                WHERE (papers.startyear > %s AND papers.startyear < %s) 
-                OR (papers.endyear < %s AND papers.endyear > %s));
-        """, (self.requestID, startYear, endYear, endYear, startYear))
-
 
 class KeywordQuerySelectPapers(KeywordQuery):
     def __init__(self,

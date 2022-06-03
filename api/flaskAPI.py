@@ -3,7 +3,7 @@ import queue
 import psycopg2
 from flask import Flask, jsonify
 
-from gallica.UINewspaper import UINewspaper
+from gallica.newspapers import Newspapers
 from tasks import getAsyncRequest
 from ticketGraphData import TicketGraphData
 
@@ -45,8 +45,8 @@ def papers(query):
     # TODO: Make sure the database pattern corresponds to norms
     try:
         conn = connectDB()
-        getter = UINewspaper(conn)
-        availablePapers = getter.getPapersSimilarToString(query)
+        getter = Newspapers(conn)
+        availablePapers = getter.getPapersSimilarToKeyword(query)
     finally:
         if conn is not None:
             conn.close()

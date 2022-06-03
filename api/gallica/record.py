@@ -41,25 +41,31 @@ class Record:
 
     def standardizeDate(self):
         yearMonDay = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+        if not yearMonDay.match(self.date):
+            self.fillDateGap()
+
+    def fillDateGap(self):
         twoYears = re.compile(r"^\d{4}-\d{4}$")
         oneYear = re.compile(r"^\d{4}$")
         oneYearOneMon = re.compile(r"^\d{4}-\d{2}$")
-        if not yearMonDay.match(self.date):
-            if oneYear.match(self.date):
-                self.date += "-01-01"
-            elif oneYearOneMon.match(self.date):
-                self.date += "-01"
-            elif twoYears.match(self.date):
-                dates = self.date.split("-")
-                lowerDate = int(dates[0])
-                higherDate = int(dates[1])
-                if higherDate - lowerDate <= 10:
-                    newDate = (lowerDate + higherDate) // 2
-                    self.date = str(newDate) + "-01-01"
-                else:
-                    self.date = None
-            else:
-                self.date = None
+        if oneYear.match(self.date):
+            self.date += "-01-01"
+        elif oneYearOneMon.match(self.date):
+            self.date += "-01"
+        elif twoYears.match(self.date):
+            self.averageYearsAsNewDate()
+        else:
+            self.date = None
+
+    def averageYearsAsNewDate(self):
+        dates = self.date.split("-")
+        lowerDate = int(dates[0])
+        higherDate = int(dates[1])
+        if higherDate - lowerDate <= 10:
+            newDate = (lowerDate + higherDate) // 2
+            self.date = str(newDate) + "-01-01"
+        else:
+            self.date = None
 
 
 class PaperRecord(Record):
@@ -67,11 +73,7 @@ class PaperRecord(Record):
     def __init__(self, root):
         super().__init__(root)
         self.title = ''
-        self.dateRange = []
         self.parseTitleFromXML()
-
-    def getDate(self):
-        return self.dateRange
 
     def getTitle(self):
         return self.title
@@ -80,36 +82,9 @@ class PaperRecord(Record):
         self.title = self.recordData.find(
             '{http://purl.org/dc/elements/1.1/}title').text
 
-    def standardizeDate(self):
-        twoYears = re.compile(r"^\d{4}-\d{4}$")
-        if not twoYears.match(self.date):
-            self.generateOtherDateRange()
-        else:
-            self.generateTwoYearRange()
-
-    def generateTwoYearRange(self):
-        dateRange = self.date.split("-")
-        startYear = dateRange[0]
-        endYear = dateRange[1]
-        if startYear.isdigit() and endYear.isdigit():
-            self.dateRange = [int(startYear), int(endYear)]
-        elif startYear.isdigit():
-            #self.findMoreEndDateInfo()
-        elif endYear.isdigit()
-            #self.findMoreStartDateInfo()
-        else:
-            #self.findMoreStartEndDateInfo()
-
-    def generateOtherDateRange(self):
-        oneYear = re.compile(r"^\d{4}$")
-        if oneYear.match(self.date):
-            self.generateOneYearRange()
-        else:
-            self.dateRange = [self.date, None]
-
-    def generateOneYearRange(self):
-        startYear = int(self.date)
-        self.dateRange = [startYear, None]
+    def parseDateFromXML(self):
+        self.date = self.recordData.find(
+            '{http://purl.org/dc/elements/1.1/}date').text
 
 
 

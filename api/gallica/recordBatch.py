@@ -44,13 +44,12 @@ class RecordBatch:
     def fetchXMLRoot(self):
         response = self.session.get("", params=self.params)
         self.xmlRoot = etree.fromstring(response.content)
-        et = etree.ElementTree(self.xmlRoot)
 
     def parseRecordsFromXML(self):
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
             record = Record(result)
             if self.recordIsValid(record):
-                self.addRecord(record)
+                self.addRecordToBatch(record)
             else:
                 self.numPurgedResults += 1
 
@@ -78,7 +77,7 @@ class RecordBatch:
         else:
             return False
 
-    def addRecord(self, record):
+    def addRecordToBatch(self, record):
         date = record.getDate()
         url = record.getUrl()
         paper = record.getPaperCode()
@@ -110,7 +109,7 @@ class PaperRecordBatch(RecordBatch):
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
             record = PaperRecord(result)
             if self.recordIsValid(record):
-                self.addRecord(record)
+                self.addRecordToBatch(record)
             else:
                 self.numPurgedResults += 1
 
@@ -121,13 +120,13 @@ class PaperRecordBatch(RecordBatch):
         else:
             return False
 
-    def addRecord(self, record):
+    def addRecordToBatch(self, record):
         date = record.getDate()
-        url = record.getUrl()
-        paper = record.getPaperCode()
+        code = record.getPaperCode()
+        title = record.getTitle()
         fullResult = {
             'date': date,
-            'url': url,
-            'paperCode': paper
+            'code': code,
+            'title': title
         }
         self.batch.append(fullResult)

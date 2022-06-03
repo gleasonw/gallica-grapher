@@ -2,16 +2,15 @@ DROP TABLE IF EXISTS results;
 DROP TABLE IF EXISTS papers;
 
 CREATE TABLE papers (
-     paperName text,
-     startYear date,
-     endYear date,
-     paperCode varChar(20),
-     PRIMARY KEY(paperCode)
+     title text,
+     date text,
+     code varChar(20),
+     PRIMARY KEY(code)
     );
 
 CREATE INDEX ON papers
     (
-    paperCode
+    code
     );
 
 
@@ -22,5 +21,5 @@ CREATE TABLE results (
     searchTerm text,
     paperID text,
     requestID text,
-    FOREIGN KEY(paperID) REFERENCES papers(paperCode)
+    FOREIGN KEY(paperID) REFERENCES papers(code)
 );

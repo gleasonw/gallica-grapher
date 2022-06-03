@@ -1,9 +1,7 @@
 import psycopg2
 import json
-import time
-import ciso8601
 
-#dbconnection is none?
+
 class TicketGraphData:
     def __init__(self,
                  requestid,
