@@ -1,88 +1,83 @@
 import concurrent.futures
 import psycopg2
+from requests_toolbelt import sessions
+from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 from recordBatch import PaperRecordBatch
 
 
-class Newspapers:
+class Newspaper:
 
     def __init__(self):
         self.query = ''
         self.dbConnection = None
+        self.session = None
         self.papers = []
         self.initDBConnection()
+        self.initGallicaSession()
 
-    #TODO: Closing connection?
-    def initDBConnection(self):
-        conn = psycopg2.connect(
-            host="localhost",
-            database="gallicagrapher",
-            user="wgleason",
-            password="ilike2play"
-        )
-        conn.set_session(autocommit=True)
-        self.dbConnection = conn
-
-    #This takes a while...
     def sendGallicaPapersToDB(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
-        self.beginPaperQueries()
+        self.fetchAllPapersFromGallica()
         self.dbConnection.close()
 
-    def beginPaperQueries(self):
-        numPapers = self.getNumPapers()
-        with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+    def fetchAllPapersFromGallica(self):
+        numPapers = self.getNumPapersOnGallica()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
             for batch in executor.map(self.fetchBatchPapersAtIndex,
                                       range(1, numPapers, 50)):
                 for paper in batch:
-                    title = paper['title']
-                    date = paper['date']
-                    code = paper['code']
-                    print(title)
-                    self.addMetadataToDB(code, title, date)
+                    self.insertPaper(paper)
 
     def fetchBatchPapersAtIndex(self, index):
-        batch = PaperRecordBatch(self.query, startRecord=index)
+        batch = PaperRecordBatch(self.query,
+                                 self.session,
+                                 startRecord=index)
         records = batch.getRecordBatch()
         return records
 
-    def getNumPapers(self):
+    def getNumPapersOnGallica(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
-        tempBatch = PaperRecordBatch(self.query, numRecords=1)
+        tempBatch = PaperRecordBatch(self.query,
+                                     self.session,
+                                     numRecords=1)
         numResults = tempBatch.getNumResults()
         return numResults
 
     def addPaperToDBbyCode(self, code):
-        metadata = self.fetchMetadataFromCode(code)
-        if metadata:
-            title = metadata[0]
-            code = metadata[1]
-            date = metadata[2]
-            self.addMetadataToDB(title, code, date)
+        record = self.fetchPaperRecordFromCode(code)
+        if record:
+            self.insertPaper(record)
             self.dbConnection.close()
         else:
             raise FileNotFoundError
 
-    def fetchMetadataFromCode(self, code):
+    def fetchPaperRecordFromCode(self, code):
         self.query = f'arkPress all "{code}_date"'
-        batch = PaperRecordBatch(self.query, numRecords=1)
+        batch = PaperRecordBatch(self.query,
+                                 self.session,
+                                 numRecords=1)
         result = batch.getRecordBatch()
         if result:
             record = result[0]
-            title = record['title']
-            code = record['code']
-            date = record['date']
-            return [title, code, date]
+            return record
         else:
             return None
 
-    def addMetadataToDB(self, code, title, date=None):
+    def insertPaper(self, paper):
+        title = paper.getTitle()
+        dateRange = paper.getDate()
+        continuous = paper.getContinuous()
+        code = paper.getPaperCode()
+        lowYear = dateRange[0]
+        highYear = dateRange[-1]
+
         with self.dbConnection.cursor() as curs:
             curs.execute(
                 """
-                INSERT INTO papers (title, date, code) 
-                    VALUES (%s, %s, %s);
-                """, (title, date, code))
+                INSERT INTO papers (title, startdate, enddate, continuous, code) 
+                    VALUES (%s, %s, %s, %s, %s);
+                """, (title, lowYear, highYear, continuous, code))
 
     def getPapersSimilarToKeyword(self, keyword):
         with self.dbConnection.cursor() as curs:
@@ -90,7 +85,7 @@ class Newspapers:
             curs.execute("""
                 SELECT title, code
                     FROM papers 
-                    WHERE LOWER(title) LIKE %(keyword)s
+                    WHERE LOWER(title) LIKE %(paperNameSearchString)s
                     ORDER BY title LIMIT 20;
             """, {'paperNameSearchString': '%' + keyword + '%'})
             self.papers = curs.fetchall()
@@ -105,7 +100,22 @@ class Newspapers:
             namedPaperCodes.append(namedPair)
         return {'paperNameCodes': namedPaperCodes}
 
+    #TODO: Closing connection?
+    def initDBConnection(self):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="gallicagrapher",
+            user="wgleason",
+            password="ilike2play"
+        )
+        conn.set_session(autocommit=True)
+        self.dbConnection = conn
+
+    def initGallicaSession(self):
+        self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
+        adapter = TimeoutAndRetryHTTPAdapter()
+        self.session.mount("https://", adapter)
 
 if __name__ == "__main__":
-    papers = Newspapers()
+    papers = Newspaper()
     print(papers.sendGallicaPapersToDB())

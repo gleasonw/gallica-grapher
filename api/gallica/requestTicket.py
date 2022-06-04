@@ -1,21 +1,12 @@
 import psycopg2
 
-from keywordQuery import KeywordQueryAllPapers, KeywordQuerySelectPapers
-from ticketGraphData import TicketGraphData
+from keywordQuery import KeywordQueryAllPapers
+from keywordQuery import KeywordQuerySelectPapers
+from requests_toolbelt import sessions
+from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
 class TicketQuery:
-
-    @staticmethod
-    def connectToDatabase():
-        conn = psycopg2.connect(
-            host="localhost",
-            database="gallicagrapher",
-            user="wgleason",
-            password="ilike2play"
-        )
-        conn.set_session(autocommit=True)
-        return conn
 
     def __init__(self,
                  keywords,
@@ -28,11 +19,15 @@ class TicketQuery:
         self.yearRange = years
         self.progressThread = progressthread
         self.requestID = progressthread.getRequestID()
-        self.connectionToDB = TicketQuery.connectToDatabase()
+        self.connectionToDB = None
+        self.session = None
         self.topPapers = []
         self.termQueries = []
         self.totalResults = 0
         self.numRetrieved = 0
+
+        self.connectToDatabase()
+        self.initGallicaSession()
 
     def run(self):
         self.initQueryObjects()
@@ -56,12 +51,18 @@ class TicketQuery:
             self.yearRange,
             self.requestID,
             self.updateProgress,
-            self.connectionToDB
-        )
+            self.connectionToDB,
+            self.session)
         return query
 
     def genAllPaperQuery(self, keyword):
-        query = KeywordQueryAllPapers(keyword, self.yearRange, self.requestID, self.updateProgress, self.connectionToDB)
+        query = KeywordQueryAllPapers(
+            keyword,
+            self.yearRange,
+            self.requestID,
+            self.updateProgress,
+            self.connectionToDB,
+            self.session)
         return query
 
     def getNumResults(self):
@@ -81,6 +82,8 @@ class TicketQuery:
     def updateProgress(self, addition):
         self.numRetrieved += addition
         progressPercent = self.numRetrieved/self.totalResults
+        progressPercent *= 100
+        progressPercent = int(progressPercent)
         self.progressThread.setProgress(progressPercent)
 
     def sendTopPapersToRequestThread(self):
@@ -88,6 +91,21 @@ class TicketQuery:
             topPapers = termQuery.getTopPapers()
             self.topPapers.append(topPapers)
         self.progressThread.setTopPapers(self.topPapers)
+
+    def initGallicaSession(self):
+        self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
+        adapter = TimeoutAndRetryHTTPAdapter()
+        self.session.mount("https://", adapter)
+
+    def connectToDatabase(self):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="gallicagrapher",
+            user="wgleason",
+            password="ilike2play"
+        )
+        conn.set_session(autocommit=True)
+        self.connectionToDB = conn
 
     def closeDbConnectionForRequest(self):
         self.connectionToDB.close()

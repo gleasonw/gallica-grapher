@@ -1,6 +1,8 @@
 from lxml import etree
-from record import Record
+from record import KeywordRecord
 from record import PaperRecord
+from requests_toolbelt import sessions
+from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
 class RecordBatch:
@@ -10,13 +12,10 @@ class RecordBatch:
                  startRecord=1,
                  numRecords=50,
                  ):
-
         self.batch = []
         self.query = query
         self.queryHitNumber = 0
-        self.startRecord = startRecord
         self.numPurgedResults = 0
-        self.numRecords = numRecords
         self.session = session
         self.xmlRoot = None
         self.params = {
@@ -24,72 +23,76 @@ class RecordBatch:
             "operation": "searchRetrieve",
             "query": self.query,
             "exactSearch": "true",
-            "startRecord": self.startRecord,
-            "maximumRecords": self.numRecords,
+            "startRecord": startRecord,
+            "maximumRecords": numRecords,
             "collapsing": "disabled"
         }
 
+    def getNumberPurgedResults(self):
+        return self.numPurgedResults
+
     def getNumResults(self):
-        self.fetchXMLRoot()
-        numResults = self.xmlRoot\
+        self.fetchXML()
+        numResults = self.xmlRoot \
             .find("{http://www.loc.gov/zing/srw/}numberOfRecords").text
         numResults = int(numResults)
         return numResults
 
     def getRecordBatch(self):
-        self.fetchXMLRoot()
+        self.fetchXML()
         self.parseRecordsFromXML()
         return self.batch
 
-    def fetchXMLRoot(self):
-        response = self.session.get("", params=self.params)
+    # TODO: Investigate requests toolbelt threading module
+    # TODO: generate a sane timeout strategy
+    def fetchXML(self):
+        response = self.session.get("",
+                                    params=self.params,
+                                    timeout=15)
         self.xmlRoot = etree.fromstring(response.content)
 
     def parseRecordsFromXML(self):
+        pass
+
+
+class KeywordRecordBatch(RecordBatch):
+
+    def __init__(self,
+                 query,
+                 session,
+                 startRecord=1,
+                 numRecords=50):
+        super().__init__(
+            query,
+            session,
+            startRecord=startRecord,
+            numRecords=numRecords
+        )
+
+    def parseRecordsFromXML(self):
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
-            record = Record(result)
-            if self.recordIsValid(record):
-                self.addRecordToBatch(record)
+            record = KeywordRecord(result)
+            if record.isValid() and self.recordIsUnique(record):
+                self.batch.append(record)
             else:
                 self.numPurgedResults += 1
 
-    def recordIsValid(self, record):
-        dateOfHit = record.getDate()
-        paperOfHit = record.getPaperCode()
-        urlOfHit = record.getUrl()
-        if dateOfHit and paperOfHit:
-            return self.recordIsUnique(dateOfHit, urlOfHit)
-        else:
-            return False
-
-    def recordIsUnique(self, currentDate, currentPaper):
+    def recordIsUnique(self, record):
         if self.batch:
-            if self.currentResultEqualsPrior(currentDate, currentPaper):
+            if self.currentResultEqualsPrior(record):
                 return False
         return True
 
     # TODO: What if the duplicate is not directly before?
-    def currentResultEqualsPrior(self, currentDate, currentPaper):
+    def currentResultEqualsPrior(self, record):
         priorDate = self.batch[-1]['date']
         priorPaper = self.batch[-1]['url']
+        currentDate = record.getDate()
+        currentPaper = record.getPaperCode()
         if currentDate == priorDate and currentPaper == priorPaper:
             return True
         else:
             return False
-
-    def addRecordToBatch(self, record):
-        date = record.getDate()
-        url = record.getUrl()
-        paper = record.getPaperCode()
-        fullResult = {
-            'date': date,
-            'url': url,
-            'paperCode': paper
-        }
-        self.batch.append(fullResult)
-
-    def getNumberPurgedResults(self):
-        return self.numPurgedResults
 
 
 class PaperRecordBatch(RecordBatch):
@@ -102,31 +105,21 @@ class PaperRecordBatch(RecordBatch):
 
         super().__init__(query,
                          session,
-                         startRecord,
-                         numRecords)
+                         startRecord=startRecord,
+                         numRecords=numRecords,
+                         )
+        self.params["collapsing"] = "true"
 
     def parseRecordsFromXML(self):
+        gallicaSessionForPaperYears = sessions.BaseUrlSession(
+            "https://gallica.bnf.fr/services/Issues"
+        )
+        adapter = TimeoutAndRetryHTTPAdapter()
+        gallicaSessionForPaperYears.mount("https://", adapter)
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
-            record = PaperRecord(result)
-            if self.recordIsValid(record):
-                self.addRecordToBatch(record)
+            record = PaperRecord(result, gallicaSessionForPaperYears)
+            if record.isValid():
+                self.batch.append(record)
             else:
                 self.numPurgedResults += 1
 
-    def recordIsValid(self, record):
-        code = record.getPaperCode()
-        if code:
-            return True
-        else:
-            return False
-
-    def addRecordToBatch(self, record):
-        date = record.getDate()
-        code = record.getPaperCode()
-        title = record.getTitle()
-        fullResult = {
-            'date': date,
-            'code': code,
-            'title': title
-        }
-        self.batch.append(fullResult)

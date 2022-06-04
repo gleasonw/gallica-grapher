@@ -3,7 +3,9 @@ DROP TABLE IF EXISTS papers;
 
 CREATE TABLE papers (
      title text,
-     date text,
+     startDate int,
+     endDate int,
+     continuous bool,
      code varChar(20),
      PRIMARY KEY(code)
     );

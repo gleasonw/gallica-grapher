@@ -3,29 +3,23 @@ from math import ceil
 
 import psycopg2
 
-from requests_toolbelt import sessions
 
 from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
-from newspapers import Newspapers
+from newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
+from recordBatch import KeywordRecordBatch
 from recordBatch import RecordBatch
 
 
 class KeywordQuery:
-
-    @staticmethod
-    def makeSession():
-        gallicaHttpSession = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-        adapter = TimeoutAndRetryHTTPAdapter(timeout=25)
-        gallicaHttpSession.mount("https://", adapter)
-        return gallicaHttpSession
 
     def __init__(self,
                  searchTerm,
                  yearRange,
                  requestID,
                  progressTracker,
-                 dbConnection):
+                 dbConnection,
+                 session):
 
         self.keyword = searchTerm
         self.lowYear = None
@@ -35,14 +29,14 @@ class KeywordQuery:
         self.requestID = requestID
         self.estimateNumResults = 0
         self.progress = 0
-        self.results = []
+        self.keywordRecords = []
         self.topPapers = None
         self.currentEntryDataJustInCase = None
         self.progressTracker = progressTracker
         self.dbConnection = dbConnection
 
         self.establishYearRange(yearRange)
-        self.gallicaHttpSession = KeywordQuery.makeSession()
+        self.gallicaHttpSession = session
         self.buildQuery()
 
     def getKeyword(self):
@@ -53,58 +47,6 @@ class KeywordQuery:
 
     def getEstimateNumResults(self):
         return self.estimateNumResults
-
-    def discoverTopPapers(self):
-        cursor = self.dbConnection.cursor()
-        cursor.execute("""
-        
-        SELECT count(requestResults.identifier) AS papercount, papers.papername
-            FROM (SELECT identifier, paperid 
-                    FROM results WHERE requestid = %s AND searchterm = %s) 
-                    AS requestResults 
-            INNER JOIN papers ON requestResults.paperid = papers.papercode 
-            GROUP BY papers.papername 
-            ORDER BY papercount DESC
-            LIMIT 10;
-                
-        """, (self.requestID, self.keyword))
-        self.topPapers = cursor.fetchall()
-
-    def postRecordsToDB(self):
-        for record in self.results:
-            self.postRecord(record)
-
-    def postRecord(self, record):
-        try:
-            self.insertOneResultToTable(record)
-        except psycopg2.IntegrityError:
-            self.addMissingPaperToDB(record)
-            self.insertOneResultToTable(record)
-
-    def insertOneResultToTable(self, record):
-        cursor = self.dbConnection.cursor()
-        url = record.get('url')
-        paperCode = record.get('paperCode')
-        date = record.get('date')
-        cursor.execute("""
-        
-        INSERT INTO results 
-            (identifier, date, searchterm, paperID, requestid)
-        VALUES (%s, %s, %s, %s, %s);
-        
-        """, (
-            url,
-            date,
-            self.keyword,
-            paperCode,
-            self.requestID)
-
-                       )
-
-    def addMissingPaperToDB(self, record):
-        missingCode = record["paperCode"]
-        paperQuery = Newspapers(self.dbConnection)
-        paperQuery.addPaperToDBbyCode(missingCode)
 
     def establishYearRange(self, yearRange):
         if len(yearRange) == 2:
@@ -120,19 +62,76 @@ class KeywordQuery:
         else:
             self.buildDatelessQuery()
 
+    def updateProgress(self, addition):
+        self.progressTracker(addition)
+
+    def completeQuery(self):
+        if self.keywordRecords:
+            self.postRecordsToDB()
+            self.discoverTopPapers()
+
+    def postRecordsToDB(self):
+        for record in self.keywordRecords:
+            self.attemptInsertRecord(record)
+
+    def attemptInsertRecord(self, record):
+        try:
+            self.insertRecord(record)
+        except psycopg2.IntegrityError:
+            missingCode = record.getPaperCode()
+            if KeywordQuery.attemptAddMissingPaper(missingCode):
+                self.insertRecord(record)
+
+    def insertRecord(self, record):
+        with self.dbConnection.cursor() as curs:
+            url = record.getUrl()
+            paperCode = record.getPaperCode()
+            date = record.getDate()
+            curs.execute("""
+            
+            INSERT INTO results 
+                (identifier, date, searchterm, paperID, requestid)
+            VALUES (%s, %s, %s, %s, %s);
+            
+            """, (
+                url,
+                date,
+                self.keyword,
+                paperCode,
+                self.requestID)
+
+                         )
+
+    def discoverTopPapers(self):
+        cursor = self.dbConnection.cursor()
+        cursor.execute("""
+
+        SELECT count(requestResults.identifier) AS papercount, papers.title
+            FROM (SELECT identifier, paperid 
+                    FROM results WHERE requestid = %s AND searchterm = %s) 
+                    AS requestResults 
+            INNER JOIN papers ON requestResults.paperid = papers.title 
+            GROUP BY papers.title
+            ORDER BY papercount DESC
+            LIMIT 10;
+
+        """, (self.requestID, self.keyword))
+        self.topPapers = cursor.fetchall()
+
     def buildYearRangeQuery(self):
         pass
 
     def buildDatelessQuery(self):
         pass
 
-    def completeSearch(self):
-        if len(self.results) != 0:
-            self.postRecordsToDB()
-            self.discoverTopPapers()
-
-    def updateProgress(self, addition):
-        self.progressTracker(addition)
+    @staticmethod
+    def attemptAddMissingPaper(code):
+        try:
+            papers = Newspaper()
+            papers.addPaperToDBbyCode(code)
+            return True
+        except FileNotFoundError:
+            return False
 
 
 class KeywordQueryAllPapers(KeywordQuery):
@@ -141,14 +140,10 @@ class KeywordQueryAllPapers(KeywordQuery):
                  yearRange,
                  requestID,
                  progressTracker,
-                 dbConnection):
-
+                 dbConnection,
+                 session):
         self.recordIndexChunks = []
-        super().__init__(searchTerm,
-                         yearRange,
-                         requestID,
-                         progressTracker,
-                         dbConnection)
+        super().__init__(searchTerm, yearRange, requestID, progressTracker, dbConnection, session)
 
         self.findNumTotalResults()
 
@@ -171,16 +166,17 @@ class KeywordQueryAllPapers(KeywordQuery):
         )
 
     def findNumTotalResults(self):
-        tempBatch = RecordBatch(self.baseQuery,
-                                self.gallicaHttpSession,
-                                numRecords=1)
+        tempBatch = RecordBatch(
+            self.baseQuery,
+            self.gallicaHttpSession,
+            numRecords=1)
         self.estimateNumResults = tempBatch.getNumResults()
         return self.estimateNumResults
 
     def runSearch(self):
         workerPool = self.generateSearchWorkers(50)
         self.doSearch(workerPool)
-        self.completeSearch()
+        self.completeQuery()
 
     def generateSearchWorkers(self, numWorkers):
         iterations = ceil(self.estimateNumResults / 50)
@@ -196,16 +192,16 @@ class KeywordQueryAllPapers(KeywordQuery):
                     self.recordIndexChunks):
                 numResultsInBatch = len(result)
                 self.updateProgress(numResultsInBatch)
-                self.results.extend(result)
+                self.keywordRecords.extend(result)
 
     def fetchBatchFromIndex(self, index):
-        batch = RecordBatch(
+        batch = KeywordRecordBatch(
             self.baseQuery,
             self.gallicaHttpSession,
-            startRecord=index,
-        )
+            startRecord=index)
         results = batch.getRecordBatch()
         return results
+
 
 class KeywordQuerySelectPapers(KeywordQuery):
     def __init__(self,
@@ -214,7 +210,8 @@ class KeywordQuerySelectPapers(KeywordQuery):
                  yearRange,
                  requestID,
                  progressTracker,
-                 dbConnection):
+                 dbConnection,
+                 session):
 
         self.papers = papers
         self.paperCodeWithNumResults = {}
@@ -224,9 +221,10 @@ class KeywordQuerySelectPapers(KeywordQuery):
                          yearRange,
                          requestID,
                          progressTracker,
-                         dbConnection)
+                         dbConnection,
+                         session)
 
-        self.findNumResultsForEachPaper()
+        self.setNumResultsForEachPaper()
         self.sumUpPaperResultsForTotalEstimate()
 
     def buildYearRangeQuery(self):
@@ -247,20 +245,21 @@ class KeywordQuerySelectPapers(KeywordQuery):
             'sortby dc.date/sort.ascending'
         )
 
-    def findNumResultsForEachPaper(self):
+    def setNumResultsForEachPaper(self):
         with ThreadPoolExecutor(max_workers=10) as executor:
             for paperCode, numResults in executor.map(
-                    self.setNumberResultsInPaper,
+                    self.fetchNumberResultsInPaper,
                     self.papers):
                 self.paperCodeWithNumResults[paperCode] = numResults
 
-    def setNumberResultsInPaper(self, paper):
+    def fetchNumberResultsInPaper(self, paper):
         paperCode = paper["paperCode"]
         numResultQuery = self.baseQuery.format(newsKey=paperCode)
-        batch = RecordBatch(numResultQuery,
-                            self.gallicaHttpSession,
-                            startRecord=1,
-                            numRecords=1)
+        batch = RecordBatch(
+            numResultQuery,
+            self.gallicaHttpSession,
+            startRecord=1,
+            numRecords=1)
         numResults = batch.getNumResults()
         return paperCode, numResults
 
@@ -271,7 +270,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
     def runSearch(self):
         self.initBatchQueries()
         self.mapThreadsToSearch(50)
-        self.completeSearch()
+        self.completeQuery()
 
     def initBatchQueries(self):
         for paperCode, count in self.paperCodeWithNumResults.items():
@@ -287,19 +286,21 @@ class KeywordQuerySelectPapers(KeywordQuery):
 
     def mapThreadsToSearch(self, numWorkers):
         with ThreadPoolExecutor(max_workers=numWorkers) as executor:
-            for result in executor.map(self.getResultsAtRecordIndex,
-                                       self.batchQueryStrings):
+            for result in executor.map(
+                    self.getResultsAtRecordIndex,
+                    self.batchQueryStrings):
                 numResultsInBatch = len(result)
-                self.results.extend(result)
+                self.keywordRecords.extend(result)
                 self.updateProgress(numResultsInBatch)
 
     def getResultsAtRecordIndex(self, recordStartAndCode):
         recordStart = recordStartAndCode[0]
         code = recordStartAndCode[1]
         query = self.baseQuery.format(newsKey=code)
-        batch = RecordBatch(query,
-                            self.gallicaHttpSession,
-                            startRecord=recordStart,
-                            numRecords=50)
+        batch = KeywordRecordBatch(
+            query,
+            self.gallicaHttpSession,
+            startRecord=recordStart,
+            numRecords=50)
         results = batch.getRecordBatch()
         return results

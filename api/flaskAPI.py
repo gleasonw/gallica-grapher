@@ -3,7 +3,7 @@ import queue
 import psycopg2
 from flask import Flask, jsonify
 
-from gallica.newspapers import Newspapers
+from gallica.newspaper import Newspaper
 from tasks import getAsyncRequest
 from ticketGraphData import TicketGraphData
 
@@ -41,44 +41,20 @@ def paperChart():
 
 @app.route('/papers/<query>')
 def papers(query):
-    conn = None
-    # TODO: Make sure the database pattern corresponds to norms
-    try:
-        conn = connectDB()
-        getter = Newspapers(conn)
-        availablePapers = getter.getPapersSimilarToKeyword(query)
-    finally:
-        if conn is not None:
-            conn.close()
+    newspapers = Newspaper()
+    availablePapers = newspapers.getPapersSimilarToKeyword(query)
     return availablePapers
 
 
 @app.route('/graphData/<requestid>/<window>/<timegroup>/')
 def getGraphData(requestid, window, timegroup):
-    conn = None
-    try:
-        conn = connectDB()
-        graphData = TicketGraphData(
-            requestid,
-            conn,
-            averagewindow=window,
-            groupby=timegroup)
-        graphJSON = graphData.getGraphJSON()
-        items = {'graphJSON': graphJSON}
-    finally:
-        if conn is not None:
-            conn.close()
+    graphData = TicketGraphData(
+        requestid,
+        averagewindow=window,
+        groupby=timegroup)
+    graphJSON = graphData.getGraphJSON()
+    items = {'graphJSON': graphJSON}
     return items
-
-
-def connectDB():
-    conn = psycopg2.connect(
-        host="localhost",
-        database="gallicagrapher",
-        user="wgleason",
-        password="ilike2play"
-    )
-    return conn
 
 
 if __name__ == "__main__":

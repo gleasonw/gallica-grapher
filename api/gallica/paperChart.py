@@ -16,10 +16,10 @@ class PaperYearGraphData:
         self.getPaperMetadata()
         self.countPublishingPapersInEachYear()
         for i, yearFreq in enumerate(self.yearOccurrenceArray):
-            year = i + 1499
+            year = i + self.lowYear
             self.yearFreqList.append([year, yearFreq])
         self.JSONData = json.dumps({'data': self.yearFreqList})
-        with open('../../static/paperJSON.json', 'w') as outFile:
+        with open('../static/paperJSON.json', 'w') as outFile:
             outFile.write(self.JSONData)
 
     def getPaperMetadata(self):
@@ -32,12 +32,12 @@ class PaperYearGraphData:
                 password="ilike2play"
             )
             cursor = conn.cursor()
-            cursor.execute("SELECT MIN(startyear) FROM papers;")
-            self.lowYear = cursor.fetchone()[0].year
-            cursor.execute("SELECT MAX(endyear) FROM papers;")
-            self.highYear = cursor.fetchone()[0].year
+            cursor.execute("SELECT MIN(startdate) FROM papers WHERE continuous is TRUE;")
+            self.lowYear = cursor.fetchone()[0]
+            cursor.execute("SELECT MAX(enddate) FROM papers WHERE continuous is TRUE;")
+            self.highYear = cursor.fetchone()[0]
             self.yearOccurrenceArray = [0 for i in range(self.lowYear, self.highYear + 1)]
-            cursor.execute("SELECT startyear, endyear FROM papers;")
+            cursor.execute("SELECT startdate, enddate FROM papers WHERE continuous is TRUE;")
             self.yearRangeList = cursor.fetchall()
         finally:
             if conn is not None:
@@ -45,19 +45,12 @@ class PaperYearGraphData:
 
     def countPublishingPapersInEachYear(self):
         for yearRange in self.yearRangeList:
-            if yearRange[0] and yearRange[1]:
-                lowerYear = yearRange[0].year
-                higherYear = yearRange[1].year
+            lowerYear = yearRange[0]
+            higherYear = yearRange[1]
+            if lowerYear and higherYear:
                 for i in range(lowerYear, higherYear + 1):
                     indexToIterate = i - self.lowYear
                     self.yearOccurrenceArray[indexToIterate] += 1
-            elif yearRange[0] and not yearRange[1]:
-                lowerYear = yearRange[0].year
-                indexToIterate = lowerYear - self.lowYear
-                self.yearOccurrenceArray[indexToIterate] += 1
-            else:
-                pass
-
 
 if __name__ == "__main__":
     chartMaker = PaperYearGraphData()

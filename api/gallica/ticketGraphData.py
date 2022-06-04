@@ -5,11 +5,10 @@ import json
 class TicketGraphData:
     def __init__(self,
                  requestid,
-                 dbconnection,
                  averagewindow=11,
                  groupby='month'):
 
-        self.dbConnection = dbconnection
+        self.dbConnection = None
         self.requestID = requestid
         self.averageWindow = int(averagewindow)
         self.groupBy = groupby
@@ -18,6 +17,7 @@ class TicketGraphData:
         self.data = []
         self.jsonedData = ''
 
+        self.initDBConnection()
         self.makeGraphJSON()
 
     def getGraphJSON(self):
@@ -25,7 +25,7 @@ class TicketGraphData:
 
     def makeGraphJSON(self):
         self.buildQueryForGraphData()
-        self.graphJSON = self.runQuery()
+        self.runQuery()
 
     def buildQueryForGraphData(self):
         if self.groupBy == "day":
@@ -62,7 +62,7 @@ class TicketGraphData:
 
     def runQuery(self):
         self.getSearchTerms()
-        self.fetchQueryResults()
+        self.binRecordsAndFetch()
         self.createJSON()
 
     def getSearchTerms(self):
@@ -73,10 +73,10 @@ class TicketGraphData:
         cursor.execute(getSearchTerms, (self.requestID,))
         self.searchTerms = cursor.fetchone()[0]
 
-    def fetchQueryResults(self):
-        cursor = self.dbConnection.cursor()
-        cursor.execute(self.request, (self.averageWindow, self.requestID,))
-        self.data = cursor.fetchall()
+    def binRecordsAndFetch(self):
+        with self.dbConnection.cursor() as curs:
+            curs.execute(self.request, (self.averageWindow, self.requestID,))
+            self.data = curs.fetchall()
 
     def createJSON(self):
         dataToJson = {
@@ -88,17 +88,12 @@ class TicketGraphData:
                                      sort_keys=True,
                                      default=str)
 
-if __name__ == "__main__":
-    conn = psycopg2.connect(
-        host="localhost",
-        database="gallicagrapher",
-        user="wgleason",
-        password="ilike2play"
-    )
-    grapher = TicketGraphData("ecae3a19-2f11-4517-88cd-c86ca59bb720",
-                              conn,
-                              groupby='year',
-                              averagewindow=0)
-    json = grapher.getGraphJSON()
-    print(json)
-    conn.close()
+    def initDBConnection(self):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="gallicagrapher",
+            user="wgleason",
+            password="ilike2play"
+        )
+        conn.set_session(autocommit=True)
+        self.dbConnection = conn

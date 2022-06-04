@@ -37,7 +37,6 @@ function App() {
         setTickets(updatedTickets)
     }
     function deleteTicketAtIndex(index){
-        console.log("delete")
         const updatedTickets = tickets.slice()
         updatedTickets.splice(index, 1)
         setTickets(updatedTickets)

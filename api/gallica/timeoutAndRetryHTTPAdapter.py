@@ -9,7 +9,7 @@ class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
 			total=10,
 			status_forcelist=[413, 429, 500, 502, 503, 504],
 			method_whitelist=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
-			backoff_factor=2
+			backoff_factor=1
 		)
 		self.timeout = DEFAULT_TIMEOUT
 		if "timeout" in kwargs:
