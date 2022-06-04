@@ -18,9 +18,10 @@ function App() {
             </div>
         </header>
     function handleInputSubmit(event){
-        event.preventDefault()
-        setGettingInput(false)
-        setRunningQueries(true)
+        event.preventDefault();
+        generateTicketIDs();
+        setGettingInput(false);
+        setRunningQueries(true);
     }
     function handleCreateTicketClick(items){
         createTicketFromInput(items)
@@ -28,8 +29,12 @@ function App() {
     function handleTicketClick(index){
         deleteTicketAtIndex(index);
     }
-    function addRequestIDtoTicket(requestID, ticketIndex){
-
+    function generateTicketIDs(){
+        let updatedTickets = tickets.slice()
+        for (let i = 0; i < tickets.length; i++){
+            updatedTickets[i]['id'] = uuidv4();
+        }
+        setTickets(updatedTickets)
     }
     function createTicketFromInput(items){
         let updatedTickets = tickets.slice();

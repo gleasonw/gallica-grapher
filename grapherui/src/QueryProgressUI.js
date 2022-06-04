@@ -4,6 +4,11 @@ import TicketLabel from "./TicketLabel";
 
 function QueryProgressUI(props) {
     const [ticketProgressPercents, setProgressPercents] = useState([]);
+    useEffect(() => {
+            //Post tickets to API
+            //Set timeout update on ticket progress percents
+        }
+    )
     return(
         <div className='queryProgressUI'>
             {props.tickets.map(ticket => (
