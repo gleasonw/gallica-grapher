@@ -1,7 +1,7 @@
 import os
 import queue
-import psycopg2
-from flask import Flask, jsonify
+from flask import Flask
+from flask import request
 
 from gallica.newspaper import Newspaper
 from tasks import getAsyncRequest
@@ -13,6 +13,13 @@ app = Flask(__name__)
 app.secret_key = os.urandom(12).hex()
 basedir = os.path.abspath(os.path.dirname(__file__))
 pathToPaperJSON = os.path.join(basedir, 'static/paperJSON.json')
+
+
+@app.route('/init', methods=['POST'])
+def init():
+    tickets = request.get_json()["tickets"]
+    requestTask = getAsyncRequest(tickets)
+    return "Got it"
 
 
 @app.route('/loadingResults/progress/<taskID>')
@@ -29,7 +36,7 @@ def getProgress(taskID):
             'state': task.state,
             'percent': task.info.get('percent'),
         }
-    return jsonify(response)
+    return response
 
 
 @app.route('/paperchartjson')

@@ -1,14 +1,21 @@
 import React,{useState, useEffect} from 'react';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import TicketLabel from "./TicketLabel";
+import axios from "axios";
 
 function QueryProgressUI(props) {
     const [ticketProgressPercents, setProgressPercents] = useState([]);
     useEffect(() => {
-            //Post tickets to API
-            //Set timeout update on ticket progress percents
+        axios.post('/init', {
+            tickets: props.tickets
+        }).then(
+            updateProgress()
+        )
         }
     )
+    function updateProgress(){
+
+    }
     return(
         <div className='queryProgressUI'>
             {props.tickets.map(ticket => (

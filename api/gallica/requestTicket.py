@@ -1,5 +1,3 @@
-import psycopg2
-
 from keywordQuery import KeywordQueryAllPapers
 from keywordQuery import KeywordQuerySelectPapers
 from requests_toolbelt import sessions
@@ -9,47 +7,45 @@ from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 class TicketQuery:
 
     def __init__(self,
-                 keywords,
-                 papers,
-                 years,
-                 progressthread):
+                 ticket,
+                 progresstrack,
+                 dbconnection,
+                 session):
 
-        self.keywords = keywords
-        self.papers = papers
-        self.yearRange = years
-        self.progressThread = progressthread
-        self.requestID = progressthread.getRequestID()
-        self.connectionToDB = None
-        self.session = None
+        self.keywords = ticket["terms"]
+        self.papersAndCodes = ticket["papersAndCodes"]
+        self.yearRange = ticket["dateRange"]
+        self.ticketID = ticket["id"]
+        self.progressThread = progresstrack
+        self.connectionToDB = dbconnection
+        self.session = session
+        self.keywordQueries = []
         self.topPapers = []
-        self.termQueries = []
         self.totalResults = 0
         self.numRetrieved = 0
-
-        self.connectToDatabase()
-        self.initGallicaSession()
 
     def run(self):
         self.initQueryObjects()
         self.getNumResults()
         self.startQueries()
         self.sendTopPapersToRequestThread()
-        self.closeDbConnectionForRequest()
 
     def initQueryObjects(self):
-        for keyword in self.keywords:
-            if self.papers:
+        if self.papersAndCodes:
+            for keyword in self.keywords:
                 termQuery = self.genSelectPaperQuery(keyword)
-            else:
+                self.keywordQueries.append(termQuery)
+        else:
+            for keyword in self.keywords:
                 termQuery = self.genAllPaperQuery(keyword)
-            self.termQueries.append(termQuery)
+                self.keywordQueries.append(termQuery)
 
     def genSelectPaperQuery(self, keyword):
         query = KeywordQuerySelectPapers(
             keyword,
-            self.papers,
+            self.papersAndCodes,
             self.yearRange,
-            self.requestID,
+            self.ticketID,
             self.updateProgress,
             self.connectionToDB,
             self.session)
@@ -59,25 +55,25 @@ class TicketQuery:
         query = KeywordQueryAllPapers(
             keyword,
             self.yearRange,
-            self.requestID,
+            self.ticketID,
             self.updateProgress,
             self.connectionToDB,
             self.session)
         return query
 
     def getNumResults(self):
-        for query in self.termQueries:
+        for query in self.keywordQueries:
             numResultsForKeyword = query.getEstimateNumResults()
             self.totalResults += numResultsForKeyword
 
     def startQueries(self):
-        for query in self.termQueries:
+        for query in self.keywordQueries:
             keyword = query.getKeyword()
             self.sendTermToFrontend(keyword)
             query.runSearch()
 
     def sendTermToFrontend(self, term):
-        self.progressThread.setCurrentTerm(term)
+        self.progressThread.setCurrentID(term)
 
     def updateProgress(self, addition):
         self.numRetrieved += addition
@@ -87,26 +83,7 @@ class TicketQuery:
         self.progressThread.setProgress(progressPercent)
 
     def sendTopPapersToRequestThread(self):
-        for termQuery in self.termQueries:
+        for termQuery in self.keywordQueries:
             topPapers = termQuery.getTopPapers()
             self.topPapers.append(topPapers)
         self.progressThread.setTopPapers(self.topPapers)
-
-    def initGallicaSession(self):
-        self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-        adapter = TimeoutAndRetryHTTPAdapter()
-        self.session.mount("https://", adapter)
-
-    def connectToDatabase(self):
-        conn = psycopg2.connect(
-            host="localhost",
-            database="gallicagrapher",
-            user="wgleason",
-            password="ilike2play"
-        )
-        conn.set_session(autocommit=True)
-        self.connectionToDB = conn
-
-    def closeDbConnectionForRequest(self):
-        self.connectionToDB.close()
-        self.connectionToDB = None

@@ -1,5 +1,8 @@
 import threading
 from requestTicket import TicketQuery
+import psycopg2
+from requests_toolbelt import sessions
+from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 # for testing
 import uuid
@@ -7,40 +10,42 @@ import uuid
 
 class RequestThread(threading.Thread):
     def __init__(self,
-                 searchTerms,
-                 papers,
-                 yearRange,
-                 requestID,
-                 eliminateEdgePapers=False):
-        self.keywords = searchTerms
-        self.papers = papers
-        self.yearRange = yearRange
-        self.tolerateEdgePapers = eliminateEdgePapers
+                 tickets):
         self.progress = 0
-        self.currentTerm = ""
+        self.currentID = ''
         self.graphJSONForTicket = None
+        self.session = None
+        self.DBconnection = None
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.topPapersForTerms = []
-        self.id = requestID
+        self.tickets = tickets
+
+        self.initGallicaSession()
+        self.connectToDatabase()
+
         super().__init__()
 
     def run(self):
-        requestToRun = TicketQuery(self.keywords, self.papers, self.yearRange, self)
-        requestToRun.run()
+        for ticket in self.tickets:
+            requestToRun = TicketQuery(ticket,
+                                       self,
+                                       self.DBconnection,
+                                       self.session)
+            requestToRun.run()
+        self.DBconnection.close()
 
     def setProgress(self, amount):
-        print(amount)
         self.progress = amount
 
     def getProgress(self):
         return self.progress
 
-    def setCurrentTerm(self, term):
-        self.currentTerm = term
+    def setCurrentID(self, ticketID):
+        self.currentID = ticketID
 
-    def getCurrentTerm(self):
-        return self.currentTerm
+    def getCurrentID(self):
+        return self.currentID
 
     def setNumDiscovered(self, total):
         self.numResultsDiscovered = total
@@ -54,9 +59,6 @@ class RequestThread(threading.Thread):
     def getNumRetrieved(self):
         return self.numResultsRetrieved
 
-    def getRequestID(self):
-        return self.id
-
     def setTopPapers(self, papers):
         self.topPapersForTerms = papers
 
@@ -69,11 +71,17 @@ class RequestThread(threading.Thread):
     def getGraphJSON(self):
         return self.graphJSONForTicket
 
+    def initGallicaSession(self):
+        self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
+        adapter = TimeoutAndRetryHTTPAdapter()
+        self.session.mount("https://", adapter)
 
-if __name__ == "__main__":
-    request = RequestThread(["croissant"],
-                            [],
-                            [1920, 1925],
-                            str(uuid.uuid4()),
-                            eliminateEdgePapers=False)
-    request.run()
+    def connectToDatabase(self):
+        conn = psycopg2.connect(
+            host="localhost",
+            database="gallicagrapher",
+            user="wgleason",
+            password="ilike2play"
+        )
+        conn.set_session(autocommit=True)
+        self.DBconnection = conn
