@@ -1,14 +1,12 @@
-import datetime
 from math import ceil
 
 import psycopg2
 
 
-from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
-from newspaper import Newspaper
+from .newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
-from recordBatch import KeywordRecordBatch
-from recordBatch import RecordBatch
+from .recordBatch import KeywordRecordBatch
+from .recordBatch import RecordBatch
 
 
 class KeywordQuery:
@@ -253,7 +251,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
                 self.paperCodeWithNumResults[paperCode] = numResults
 
     def fetchNumberResultsInPaper(self, paper):
-        paperCode = paper["paperCode"]
+        paperCode = paper["code"]
         numResultQuery = self.baseQuery.format(newsKey=paperCode)
         batch = RecordBatch(
             numResultQuery,

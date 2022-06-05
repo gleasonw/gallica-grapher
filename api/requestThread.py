@@ -1,11 +1,8 @@
 import threading
-from requestTicket import TicketQuery
+from .gallica.requestTicket import TicketQuery
 import psycopg2
 from requests_toolbelt import sessions
-from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
-
-# for testing
-import uuid
+from .gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
 class RequestThread(threading.Thread):

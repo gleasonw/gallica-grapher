@@ -1,9 +1,9 @@
 import concurrent.futures
 import psycopg2
 from requests_toolbelt import sessions
-from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from .timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
-from recordBatch import PaperRecordBatch
+from .recordBatch import PaperRecordBatch
 
 
 class Newspaper:

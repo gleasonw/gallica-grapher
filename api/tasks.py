@@ -1,12 +1,13 @@
-from requestThread import RequestThread
 from celery import Celery
+from .requestThread import RequestThread
 
-celery = Celery('tasks', broker='redis://localhost:6379/0')
-celery.conf.result_backend = 'redis://localhost:6379/0'
+celery = Celery('api.tasks',
+                broker='amqp://',
+                backend='redis://')
 
 
 @celery.task(bind=True)
-def getAsyncRequest(self, tickets):
+def spawnRequestThread(self, tickets):
     gallicaRequest = RequestThread(tickets)
     gallicaRequest.start()
     while gallicaRequest.getProgress() < 100:

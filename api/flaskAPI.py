@@ -1,30 +1,26 @@
-import os
 import queue
 from flask import Flask
 from flask import request
 
-from gallica.newspaper import Newspaper
-from tasks import getAsyncRequest
-from ticketGraphData import TicketGraphData
+from api.gallica.newspaper import Newspaper
+from api.gallica.ticketGraphData import TicketGraphData
+from api.tasks import spawnRequestThread
 
 retrievingThreads = {}
 exceptionBucket = queue.Queue()
 app = Flask(__name__)
-app.secret_key = os.urandom(12).hex()
-basedir = os.path.abspath(os.path.dirname(__file__))
-pathToPaperJSON = os.path.join(basedir, 'static/paperJSON.json')
 
 
 @app.route('/init', methods=['POST'])
 def init():
     tickets = request.get_json()["tickets"]
-    requestTask = getAsyncRequest(tickets)
-    return "Got it"
+    task = spawnRequestThread.delay(tickets)
+    return task.id
 
 
 @app.route('/loadingResults/progress/<taskID>')
 def getProgress(taskID):
-    task = getAsyncRequest.AsyncResult(taskID)
+    task = spawnRequestThread.AsyncResult(taskID)
     if task.state == "FAILURE":
         response = {
             'state': task.state,
@@ -41,7 +37,7 @@ def getProgress(taskID):
 
 @app.route('/paperchartjson')
 def paperChart():
-    with open(pathToPaperJSON, 'r') as outFile:
+    with open('./static/paperJSON.json', 'r') as outFile:
         paperChartJSON = outFile.read()
     return paperChartJSON
 

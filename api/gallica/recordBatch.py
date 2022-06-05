@@ -1,8 +1,8 @@
 from lxml import etree
-from record import KeywordRecord
-from record import PaperRecord
+from .record import KeywordRecord
+from .record import PaperRecord
 from requests_toolbelt import sessions
-from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from .timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
 class RecordBatch:
@@ -44,7 +44,6 @@ class RecordBatch:
         return self.batch
 
     # TODO: Investigate requests toolbelt threading module
-    # TODO: generate a sane timeout strategy
     def fetchXML(self):
         response = self.session.get("",
                                     params=self.params,
@@ -85,11 +84,8 @@ class KeywordRecordBatch(RecordBatch):
 
     # TODO: What if the duplicate is not directly before?
     def currentResultEqualsPrior(self, record):
-        priorDate = self.batch[-1]['date']
-        priorPaper = self.batch[-1]['url']
-        currentDate = record.getDate()
-        currentPaper = record.getPaperCode()
-        if currentDate == priorDate and currentPaper == priorPaper:
+        priorRecord = self.batch[-1]
+        if record.getDate() == priorRecord.getDate() and record.getPaperCode() == priorRecord.getPaperCode():
             return True
         else:
             return False

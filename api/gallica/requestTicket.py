@@ -1,7 +1,5 @@
-from keywordQuery import KeywordQueryAllPapers
-from keywordQuery import KeywordQuerySelectPapers
-from requests_toolbelt import sessions
-from timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from .keywordQuery import KeywordQueryAllPapers
+from .keywordQuery import KeywordQuerySelectPapers
 
 
 class TicketQuery:
