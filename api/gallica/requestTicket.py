@@ -1,3 +1,5 @@
+from math import ceil
+
 from .keywordQuery import KeywordQueryAllPapers
 from .keywordQuery import KeywordQuerySelectPapers
 
@@ -20,11 +22,13 @@ class TicketQuery:
         self.keywordQueries = []
         self.topPapers = []
         self.totalResults = 0
-        self.numRetrieved = 0
+        self.numBatchesRetrieved = 0
+        self.numBatches = 0
 
     def run(self):
         self.initQueryObjects()
         self.getNumResults()
+        self.numBatches = ceil(self.totalResults / 50)
         self.startQueries()
         self.sendTopPapersToRequestThread()
 
@@ -73,9 +77,9 @@ class TicketQuery:
     def sendTermToFrontend(self, term):
         self.progressThread.setCurrentID(term)
 
-    def updateProgress(self, addition):
-        self.numRetrieved += addition
-        progressPercent = self.numRetrieved/self.totalResults
+    def updateProgress(self):
+        self.numBatchesRetrieved += 1
+        progressPercent = self.numBatchesRetrieved/self.numBatches
         progressPercent *= 100
         progressPercent = int(progressPercent)
         self.progressThread.setProgress(progressPercent)

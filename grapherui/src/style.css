@@ -126,7 +126,6 @@ header{
 }
 .requestBubbleContainer{
     display: flex;
-    width: 75%;
     flex-wrap: wrap;
 }
 

@@ -8,6 +8,7 @@ from .gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 class RequestThread(threading.Thread):
     def __init__(self,
                  tickets):
+        print(tickets)
         self.progress = 0
         self.currentID = ''
         self.graphJSONForTicket = None
@@ -33,6 +34,7 @@ class RequestThread(threading.Thread):
         self.DBconnection.close()
 
     def setProgress(self, amount):
+        print(amount)
         self.progress = amount
 
     def getProgress(self):

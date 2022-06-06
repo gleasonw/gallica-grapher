@@ -8,9 +8,9 @@ function QueryProgressUI(props) {
     useEffect(() => {
         axios.post('/init', {
             tickets: props.tickets
-        }).then(
-            updateProgress()
-        )
+        }).then(taskid => {
+            updateProgress(taskid)
+        })
         }
     )
     function updateProgress(){

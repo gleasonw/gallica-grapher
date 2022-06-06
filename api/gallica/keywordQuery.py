@@ -60,8 +60,8 @@ class KeywordQuery:
         else:
             self.buildDatelessQuery()
 
-    def updateProgress(self, addition):
-        self.progressTracker(addition)
+    def updateProgress(self):
+        self.progressTracker()
 
     def completeQuery(self):
         if self.keywordRecords:
@@ -188,8 +188,7 @@ class KeywordQueryAllPapers(KeywordQuery):
             for result in executor.map(
                     self.fetchBatchFromIndex,
                     self.recordIndexChunks):
-                numResultsInBatch = len(result)
-                self.updateProgress(numResultsInBatch)
+                self.progressTracker()
                 self.keywordRecords.extend(result)
 
     def fetchBatchFromIndex(self, index):
@@ -287,9 +286,8 @@ class KeywordQuerySelectPapers(KeywordQuery):
             for result in executor.map(
                     self.getResultsAtRecordIndex,
                     self.batchQueryStrings):
-                numResultsInBatch = len(result)
                 self.keywordRecords.extend(result)
-                self.updateProgress(numResultsInBatch)
+                self.progressTracker()
 
     def getResultsAtRecordIndex(self, recordStartAndCode):
         recordStart = recordStartAndCode[0]

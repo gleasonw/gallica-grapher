@@ -54,7 +54,7 @@ function App() {
                     requestTickets={tickets}
                     onInputSubmit={handleInputSubmit}
                     onCreateTicketClick={handleCreateTicketClick}
-                    onTicketClick={handleTicketClick}
+                    onTicketClick={handleTicketClick}z
                 />
             </div>
         )

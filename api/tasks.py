@@ -1,4 +1,5 @@
 from celery import Celery
+import time
 from .requestThread import RequestThread
 
 celery = Celery('api.tasks',
@@ -16,6 +17,7 @@ def spawnRequestThread(self, tickets):
             'id': gallicaRequest.getCurrentID(),
             'percent': gallicaRequest.getProgress(),
         })
+        time.sleep(1)
     self.update_state(
         state="SUCCESS",
         meta={

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactSlider from 'react-slider';
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
@@ -14,9 +14,6 @@ function UserInputForm(props){
                 deleteTermBubble={props.deleteTermBubble}
             />
             <br />
-            {/*To do: lift state up? Handle live search in formbox?
-            Pass handleKeyDown.
-            */}
             <PaperInputBox
                 onClick={props.onPaperDropItemClick}
                 onChange={props.onChange}
@@ -26,7 +23,6 @@ function UserInputForm(props){
                 value={props.paperInputValue}
             />
             <br />
-            {/*TODO: Add manual entry for dates, can be impractical... input fields?*/}
             <DateInputBox
                 onChange={props.onChange}
                 minYear={props.minYear}
@@ -197,83 +193,73 @@ function SelectionBox(props){
         )
 }
 
-class DateInputBox extends React.Component{
-    constructor(props) {
-        super(props);
-        this.state = {
-            error: null,
-            isLoaded: false,
-            paperJSON: null
-        };
-    }
-    componentDidMount() {
-        fetch("/paperchartjson").then(res => res.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        isLoaded: true,
-                        paperJSON: result
-                    })
-                },
-                (error) => {
-                    this.setState({
-                        isLoaded: true,
-                        error
-                    });
-                }
-            )
-    }
-    render() {
-        const {error, isLoaded, paperJSON} = this.state;
-        if (error) {
-            return <div>Error: {error.message}</div>;
-        }else if (!isLoaded) {
-            return <div>Loading chart...</div>;
-        }else{
-            const options = {
-                chart: {
-                    type: 'column',
-                    height: '50%'
-                },
-                title: {
-                    text: '# of Publishing Papers by Year'
-                },
-                yAxis: {
-                    title: {
-                        text: 'Active newspapers'
+function DateInputBox(props){
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [items, setItems] = useState([]);
+    useEffect(() => {
+            fetch("/paperchartjson")
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        setIsLoaded(true);
+                        setItems(result);
+                    },
+                    (error) => {
+                        setIsLoaded(true);
+                        setError(error);
                     }
-                },
-                series: [paperJSON],
-                legend: {
-                    enabled: false
+                )
+        console.log("nice")
+    }, []);
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }else if (!isLoaded) {
+        return <div>Loading chart...</div>;
+    }else{
+        const options = {
+            chart: {
+                type: 'column',
+                height: '50%'
+            },
+            title: {
+                text: '# of Publishing Papers by Year'
+            },
+            yAxis: {
+                title: {
+                    text: 'Active newspapers'
                 }
+            },
+            series: [items],
+            legend: {
+                enabled: false
             }
-            return(
-                <div>
-                    <ReactSlider
-                        className="horizontal-slider"
-                        thumbClassName="sliderThumb"
-                        trackClassName="sliderTrack"
-                        value={[this.props.lowYear, this.props.highYear]}
-                        max={this.props.maxYear}
-                        min={this.props.minYear}
-                        pearling
-                        onChange={this.props.onChange}
-                        ariaLabel={['Lower thumb', 'Upper thumb']}
-                        ariaValuetext={state => `Thumb value ${state.valueNow}`}
-                        renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
-                        minDistance={0}
-
-                    />
-                    <div className="highchartsContainer">
-                        <HighchartsReact
-                            highcharts={Highcharts}
-                            options={options}
-                        />
-                    </div>
-                </div>
-        )
         }
+        return(
+            <div>
+                <ReactSlider
+                    className="horizontal-slider"
+                    thumbClassName="sliderThumb"
+                    trackClassName="sliderTrack"
+                    value={[props.lowYear, props.highYear]}
+                    max={props.maxYear}
+                    min={props.minYear}
+                    pearling
+                    onChange={props.onChange}
+                    ariaLabel={['Lower thumb', 'Upper thumb']}
+                    ariaValuetext={state => `Thumb value ${state.valueNow}`}
+                    renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
+                    minDistance={0}
+
+                />
+                <div className="highchartsContainer">
+                    <HighchartsReact
+                        highcharts={Highcharts}
+                        options={options}
+                    />
+                </div>
+            </div>
+        )
     }
 }
 
