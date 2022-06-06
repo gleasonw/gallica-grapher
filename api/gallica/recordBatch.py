@@ -85,7 +85,7 @@ class KeywordRecordBatch(RecordBatch):
     # TODO: What if the duplicate is not directly before?
     def currentResultEqualsPrior(self, record):
         priorRecord = self.batch[-1]
-        if record.getDate() == priorRecord.getDate() and record.getPaperCode() == priorRecord.getPaperCode():
+        if record.getYearMonDay() == priorRecord.getYearMonDay() and record.getPaperCode() == priorRecord.getPaperCode():
             return True
         else:
             return False

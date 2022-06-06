@@ -66,7 +66,7 @@ class Newspaper:
 
     def insertPaper(self, paper):
         title = paper.getTitle()
-        dateRange = paper.getDate()
+        dateRange = paper.getYearMonDay()
         continuous = paper.getContinuous()
         code = paper.getPaperCode()
         lowYear = dateRange[0]

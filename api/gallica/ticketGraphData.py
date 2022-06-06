@@ -37,27 +37,35 @@ class TicketGraphData:
 
     def initDayRequest(self):
         self.request = """
-        SELECT date, AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM (SELECT date, count(*) AS mentions 
+        SELECT year || '-' || month || '-' || day as issuedate, AVG(mentions)
+        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM (SELECT year, month, day, count(*) AS mentions 
             FROM results WHERE requestid = %s 
-            GROUP BY date ORDER BY date ASC) AS countTable;
+            AND month IS NOT NULL
+            AND day IS NOT NULL
+            GROUP BY year, month, day 
+            ORDER BY year, month, day) AS countTable;
         """
 
     def initMonthRequest(self):
         self.request = """
         SELECT year || '-' || month as issuedate, AVG(mentions) 
         OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM (SELECT date_part('month', date) AS month, date_part('year', date) AS year, count(*) AS mentions 
+        FROM (SELECT year, month, count(*) AS mentions 
             FROM results WHERE requestid = %s 
-            GROUP BY date_part('month', date), date_part('year', date) ORDER BY year,month ASC) AS countTable;
+            AND month IS NOT NULL
+            GROUP BY year, month
+            ORDER BY year,month) AS countTable;
         """
 
     def initYearRequest(self):
         self.request = """
-        SELECT year, AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM (SELECT date_part('year', date) AS year, count(*) AS mentions 
+        SELECT year as issuedate, AVG(mentions) 
+        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM (SELECT year, count(*) AS mentions 
             FROM results WHERE requestid = %s
-            GROUP BY date_part('year', date) ORDER BY year ASC) AS countTable;
+            GROUP BY year 
+            ORDER BY year) AS countTable;
         """
 
     def runQuery(self):

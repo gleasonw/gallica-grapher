@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import InputUI from "./InputUI";
-import QueryProgressUI from "./QueryProgressUI";
+import RunningQueriesUI from "./RunningQueriesUI";
 import ResultUI from "./ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -10,8 +10,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
     const [tickets, setTickets] = useState([])
     const [idTickets, setIDTickets] = useState({})
-    const [gettingInput, setGettingInput] = useState(true)
+    const [gettingInput, setGettingInput] = useState(false)
     const [runningQueries, setRunningQueries] = useState(false)
+    let wrapperSetRunningQueries = useCallback(val => {
+        setRunningQueries(val);
+    }, [setRunningQueries]);
     const header =
         <header className="header">
             <div className="mainTitle">
@@ -64,8 +67,9 @@ function App() {
           return (
             <div className="App">
                 {header}
-                <QueryProgressUI
+                <RunningQueriesUI
                     tickets={idTickets}
+                    setRunningQueries={wrapperSetRunningQueries}
                 />
             </div>
           )

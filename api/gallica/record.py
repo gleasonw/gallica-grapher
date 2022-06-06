@@ -1,13 +1,15 @@
 from lxml import etree
+import re
 
-
+#TODO: Day, month, year for DB
 class Record:
     def __init__(self, root):
         record = root[2]
         self.recordData = record[0]
         self.valid = None
         self.paperCode = ''
-        self.date = ''
+        self.dateText = ''
+        self.yearMonDay = []
         self.url = ''
         self.parsePaperCodeFromXML()
         self.parseURLFromXML()
@@ -15,8 +17,8 @@ class Record:
     def getPaperCode(self):
         return self.paperCode
 
-    def getDate(self):
-        return self.date
+    def getYearMonDay(self):
+        return self.yearMonDay
 
     def getUrl(self):
         return self.url
@@ -51,12 +53,28 @@ class KeywordRecord(Record):
             '{http://purl.org/dc/elements/1.1/}date')
         if dateElement is not None:
             self.date = dateElement.text
+            self.decomposeDate()
 
     def checkIfValid(self):
         if self.date and self.paperCode:
             self.valid = True
         else:
             self.valid = False
+
+    def decomposeDate(self):
+        yearMonDay = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+        oneYear = re.compile(r"^\d{4}$")
+        oneYearOneMon = re.compile(r"^\d{4}-\d{2}$")
+        if yearMonDay.match(self.date):
+            splitDate = self.date.split('-')
+            self.yearMonDay = [splitDate[0], splitDate[1], splitDate[2]]
+        elif oneYearOneMon.match(self.date):
+            splitDate = self.date.split('-')
+            self.yearMonDay = [splitDate[0], splitDate[1], None]
+        elif oneYear.match(self.date):
+            self.yearMonDay = [self.date, None, None]
+        else:
+            self.yearMonDay = [None, None, None]
 
 
 class PaperRecord(Record):

@@ -84,20 +84,30 @@ class KeywordQuery:
         with self.dbConnection.cursor() as curs:
             url = record.getUrl()
             paperCode = record.getPaperCode()
-            date = record.getDate()
+            yearMonDay = record.getYearMonDay()
+            year = yearMonDay[0]
+            mon = yearMonDay[1]
+            day = yearMonDay[2]
             curs.execute("""
-            
             INSERT INTO results 
-                (identifier, date, searchterm, paperID, requestid)
-            VALUES (%s, %s, %s, %s, %s);
-            
+                (
+                identifier, 
+                year, 
+                mon, 
+                day, 
+                searchterm, 
+                paperID, 
+                requestid
+                )
+            VALUES (%s, %s, %s, %s, %s, %s, %s);
             """, (
                 url,
-                date,
+                year,
+                mon,
+                day,
                 self.keyword,
                 paperCode,
                 self.requestID)
-
                          )
 
     def discoverTopPapers(self):

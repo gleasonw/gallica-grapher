@@ -12,15 +12,15 @@ def spawnRequestThread(self, tickets):
     gallicaRequest = RequestThread(tickets)
     gallicaRequest.start()
     while gallicaRequest.getProgress() < 100:
-        self.update_state(meta={
-            'status': "Fetching...",
-            'currentID': gallicaRequest.getCurrentID(),
-            'progress': gallicaRequest.getProgress(),
-        })
+        self.update_state(
+            state="PROGRESS",
+            meta={
+                'currentID': gallicaRequest.getCurrentID(),
+                'progress': gallicaRequest.getProgress(),
+            })
         time.sleep(1)
     self.update_state(
         state="SUCCESS",
-        meta={
-            'status': "All done."
-        })
+        meta={'toppapers':gallicaRequest.getTopPapers()}
+    )
     return {'percent': 100, 'status': 'Complete!', 'result': 42}

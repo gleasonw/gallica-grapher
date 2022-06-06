@@ -1,25 +1,26 @@
 DROP TABLE IF EXISTS results;
-DROP TABLE IF EXISTS papers;
 
-CREATE TABLE papers (
-     title text,
-     startDate int,
-     endDate int,
-     continuous bool,
-     code varChar(20),
-     PRIMARY KEY(code)
-    );
-
-CREATE INDEX ON papers
-    (
-    code
-    );
+-- CREATE TABLE papers (
+--      title text,
+--      startDate int,
+--      endDate int,
+--      continuous bool,
+--      code varChar(20),
+--      PRIMARY KEY(code)
+--     );
+--
+-- CREATE INDEX ON papers
+--     (
+--     code
+--     );
 
 
 CREATE TABLE results (
     id integer primary key generated always as identity,
     identifier text,
-    date text,
+    year int,
+    month int,
+    day int,
     searchTerm text,
     paperID text,
     requestID text,

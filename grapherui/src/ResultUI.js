@@ -8,7 +8,7 @@ function ResultUI(props){
     const [paperAndOtherStats, setPaperAndOtherStats] = useState([]);
     const [grouped, setGrouped] = useState(true);
     useEffect(() => {
-        //Fetch graph data, stats, assign requestID to each
+        //The squid model
         }
     )
 

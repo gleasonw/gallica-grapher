@@ -21,7 +21,6 @@ def init():
 @app.route('/progress/<taskID>')
 def getProgress(taskID):
     task = spawnRequestThread.AsyncResult(taskID)
-    task.get()
     response = {
         'state': task.state,
         'progress': task.info.get('progress'),

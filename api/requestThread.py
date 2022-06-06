@@ -34,7 +34,6 @@ class RequestThread(threading.Thread):
         self.DBconnection.close()
 
     def setProgress(self, amount):
-        print(amount)
         self.progress = amount
 
     def getProgress(self):
