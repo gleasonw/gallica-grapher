@@ -8,10 +8,8 @@ from .gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 class RequestThread(threading.Thread):
     def __init__(self,
                  tickets):
-        print(tickets)
         self.progress = 0
         self.currentID = ''
-        self.graphJSONForTicket = None
         self.session = None
         self.DBconnection = None
         self.numResultsDiscovered = 0
@@ -25,8 +23,10 @@ class RequestThread(threading.Thread):
         super().__init__()
 
     def run(self):
-        for ticket in self.tickets:
+        for key, ticket in self.tickets.items():
+            self.currentID = key
             requestToRun = TicketQuery(ticket,
+                                       key,
                                        self,
                                        self.DBconnection,
                                        self.session)
@@ -39,9 +39,6 @@ class RequestThread(threading.Thread):
 
     def getProgress(self):
         return self.progress
-
-    def setCurrentID(self, ticketID):
-        self.currentID = ticketID
 
     def getCurrentID(self):
         return self.currentID
@@ -63,12 +60,6 @@ class RequestThread(threading.Thread):
 
     def getTopPapers(self):
         return self.topPapersForTerms
-
-    def setGraphJSON(self, json):
-        self.graphJSONForTicket = json
-
-    def getGraphJSON(self):
-        return self.graphJSONForTicket
 
     def initGallicaSession(self):
         self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")

@@ -8,6 +8,7 @@ class TicketQuery:
 
     def __init__(self,
                  ticket,
+                 key,
                  progresstrack,
                  dbconnection,
                  session):
@@ -15,7 +16,7 @@ class TicketQuery:
         self.keywords = ticket["terms"]
         self.papersAndCodes = ticket["papersAndCodes"]
         self.yearRange = ticket["dateRange"]
-        self.ticketID = ticket["id"]
+        self.ticketID = key
         self.progressThread = progresstrack
         self.connectionToDB = dbconnection
         self.session = session
@@ -70,12 +71,7 @@ class TicketQuery:
 
     def startQueries(self):
         for query in self.keywordQueries:
-            keyword = query.getKeyword()
-            self.sendTermToFrontend(keyword)
             query.runSearch()
-
-    def sendTermToFrontend(self, term):
-        self.progressThread.setCurrentID(term)
 
     def updateProgress(self):
         self.numBatchesRetrieved += 1

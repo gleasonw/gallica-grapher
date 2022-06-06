@@ -15,23 +15,18 @@ app = Flask(__name__)
 def init():
     tickets = request.get_json()["tickets"]
     task = spawnRequestThread.delay(tickets)
-    return task.id
+    return {"taskid": task.id}
 
 
-@app.route('/loadingResults/progress/<taskID>')
+@app.route('/progress/<taskID>')
 def getProgress(taskID):
     task = spawnRequestThread.AsyncResult(taskID)
-    if task.state == "FAILURE":
-        response = {
-            'state': task.state,
-            'percent': 0,
-            'status': str(task.info)
-        }
-    else:
-        response = {
-            'state': task.state,
-            'percent': task.info.get('percent'),
-        }
+    task.get()
+    response = {
+        'state': task.state,
+        'progress': task.info.get('progress'),
+        'currentID': task.info.get('currentID')
+    }
     return response
 
 

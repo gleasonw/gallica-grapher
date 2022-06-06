@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
     const [tickets, setTickets] = useState([])
+    const [idTickets, setIDTickets] = useState({})
     const [gettingInput, setGettingInput] = useState(true)
     const [runningQueries, setRunningQueries] = useState(false)
     const header =
@@ -30,11 +31,12 @@ function App() {
         deleteTicketAtIndex(index);
     }
     function generateTicketIDs(){
-        let updatedTickets = tickets.slice()
+        let ticketsWithID = {};
         for (let i = 0; i < tickets.length; i++){
-            updatedTickets[i]['id'] = uuidv4();
+            let id = uuidv4()
+            ticketsWithID[id] = tickets[i]
         }
-        setTickets(updatedTickets)
+        setIDTickets(ticketsWithID)
     }
     function createTicketFromInput(items){
         let updatedTickets = tickets.slice();
@@ -63,7 +65,7 @@ function App() {
             <div className="App">
                 {header}
                 <QueryProgressUI
-                    tickets={tickets}
+                    tickets={idTickets}
                 />
             </div>
           )

@@ -65,7 +65,6 @@ header{
     height: 90%;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
 }
 @media screen and (max-width: 1300px){
     .inputUI{
@@ -75,6 +74,9 @@ header{
         width: calc(100% - 40px);
         margin-left: auto !important;
         margin-right: auto !important;
+    }
+    .ticketBox{
+        max-height: 100px;
     }
 }
 .userInputForm{
@@ -91,9 +93,8 @@ header{
 }
 .requestBox{
     border: 0;
-    color: var(--color-dark);
     font-size: 14px;
-    margin-bottom: 100px;
+    margin-bottom: 50px;
     margin-right: auto;
     margin-left: 15px;
     position: relative;
@@ -122,7 +123,8 @@ header{
     white-space: nowrap;
 }
 .ticket{
-    max-width: 300px;
+    margin: 5px;
+    flex: 1;
 }
 .requestBubbleContainer{
     display: flex;
@@ -155,6 +157,8 @@ input[type='text']{
 }
 .requestBubble{
     border: 1px solid #e0e0e0;
+    flex: 1;
+    margin: 5px;
 }
 .graphingButtonContainer{
     height: 100%;
@@ -167,6 +171,12 @@ input[type='text']{
     height: 100%;
     min-width: 100px;
 }
+.ticketBox{
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    max-width: 500px;
+}
 
 #createTicketButton{
     margin: 30px auto;
@@ -176,9 +186,7 @@ input[type='text']{
 }
 
 .inputContainer{
-    font-family: var(--font-fam);
     border: 0;
-    color: var(--color-dark);
     font-size: large;
     padding: 12px 20px;
     outline: none;
@@ -215,7 +223,11 @@ label[for="papers"],label[for="searchTerm"]{
 .bubblesContainer{
     display: flex;
     float: left;
-    flex-wrap: wrap;
+    overflow-x: scroll;
+    max-height: 34px;
+    height: 34px;
+    background-color: cornflowerblue;
+    width: 100%;
 }
 
 .selectedPaper,.selectedTerm{

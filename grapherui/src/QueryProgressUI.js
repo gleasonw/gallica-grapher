@@ -3,26 +3,55 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import TicketLabel from "./TicketLabel";
 import axios from "axios";
 
+
 function QueryProgressUI(props) {
-    const [ticketProgressPercents, setProgressPercents] = useState([]);
+    const [ticketProgressPercents, setProgressPercents] = useState({});
+    const [finished, setFinished] = useState(false);
     useEffect(() => {
         axios.post('/init', {
             tickets: props.tickets
-        }).then(taskid => {
-            updateProgress(taskid)
         })
-        }
-    )
-    function updateProgress(){
+        .then(result => {
+            let progressPercents = {}
+            Object.keys(props.tickets).map(key => (
+                progressPercents[key] = 0
+            ))
+            setProgressPercents(progressPercents)
+            updateProgress(result.data["taskid"])
+            })
 
-    }
+        function updateProgress(taskid) {
+            let progress = 0;
+            let currentID = '';
+            let state = '';
+            fetch("progress/" + taskid)
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        progress = result["progress"]
+                        currentID = result["currentID"]
+                        state = result["state"]
+                    }
+                )
+            let updatedProgressPercents = structuredClone(ticketProgressPercents)
+            updatedProgressPercents[currentID] = progress
+            setProgressPercents(updatedProgressPercents)
+            if (state === "SUCCESS"){
+                setFinished(true);
+            }else{
+                setTimeout(updateProgress, 1000, taskid);
+            }
+        }
+    }, [props.tickets, ticketProgressPercents])
     return(
         <div className='queryProgressUI'>
-            {props.tickets.map(ticket => (
+            {Object.keys(props.tickets).map(key => (
                 <TicketProgressBox
-                    terms={ticket['terms']}
-                    papers={ticket['papersAndCodes']}
-                    dateRange={ticket['dateRange']}
+                    terms={props.tickets[key]['terms']}
+                    papers={props.tickets[key]['papersAndCodes']}
+                    dateRange={props.tickets[key]['dateRange']}
+                    key={key}
+                    progress={ticketProgressPercents[key]}
                 />
             ))}
         </div>
@@ -38,7 +67,7 @@ function TicketProgressBox(props){
             />
             <ProgressBar
                 animated
-                now={45}
+                now={props.progress}
             />
         </div>
     )
