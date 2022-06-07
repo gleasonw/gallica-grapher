@@ -109,7 +109,7 @@ function Graph(props) {
             } else {
                 categories = generateYearCategories(lowestDate, highestDate)
             }
-            setDateCategories(categories.flat())
+            setDateCategories(categories)
         }
 
         function generateMonthCategories(lowYear, highYear) {
@@ -119,14 +119,14 @@ function Graph(props) {
                         (year + lowYear).toString() + "/" + (month + 1).toString()
                     )
                 )
-            ))
+            )).flat()
         }
 
         function generateYearCategories(lowYear, highYear) {
             let range = genRange(lowYear, highYear)
             return range.map(year => (
                 (year + lowYear).toString()
-            ))
+            )).flat()
         }
 
         function genRange(lowYear, highYear) {
@@ -137,28 +137,6 @@ function Graph(props) {
             generatePartialDateCategories()
         }
     }, [props.tickets, props.timeBin])
-    const options = {
-        title: {
-            text: 'My fun chart'
-            },
-        yAxis: {
-            title: {
-                text: 'Mentions'
-            }
-        },
-        xAxis: {
-            categories: dateCategories
-        },
-        series: [
-                    {
-                        name: ['nice', 'bert'],
-                        data: [
-                            {'x': 0, y: 100},
-                            {'x': 5, y: 1120}
-                        ]
-                    }
-                ]
-    }
     return(
         <div>
             <DownloadButton
@@ -167,7 +145,7 @@ function Graph(props) {
             />
             <HighchartsReact
                 highcharts={Highcharts}
-                options={options}
+                options={props.options}
             />
         </div>
     );
