@@ -78,7 +78,7 @@ function App() {
             <div className="App">
                 {header}
                 <ResultUI
-                    tickets={tickets}
+                    tickets={idTickets}
                 />
             </div>
           )
