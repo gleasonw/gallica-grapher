@@ -71,6 +71,7 @@ class TicketGraphData:
     def runQuery(self):
         self.getSearchTerms()
         self.binRecordsAndFetch()
+        self.floatDecimals()
         self.createJSON()
 
     def getSearchTerms(self):
@@ -86,6 +87,9 @@ class TicketGraphData:
             curs.execute(self.request, (self.averageWindow, self.requestID,))
             self.data = curs.fetchall()
 
+    def floatDecimals(self):
+        pass
+
     def createJSON(self):
         dataToJson = {
             'name': self.searchTerms,
@@ -93,8 +97,7 @@ class TicketGraphData:
         }
         self.jsonedData = json.dumps(dataToJson,
                                      indent=4,
-                                     sort_keys=True,
-                                     default=str)
+                                     sort_keys=True)
 
     def initDBConnection(self):
         conn = psycopg2.connect(

@@ -7,10 +7,29 @@ function ResultUI(props){
     const [JSONGraphData, setJSONGraphData] = useState([]);
     const [paperAndOtherStats, setPaperAndOtherStats] = useState([]);
     const [grouped, setGrouped] = useState(true);
+    const [timeBin, setTimeBin] = useState('month');
+    const [averageWindow, setAverageWindow] = useState(0)
+    //Testing
+    const [tickets, setTickets] = useState({'1234':
+                                                        {
+                                                            "terms": ["malamine"],
+                                                            "papersAndCodes": [],
+                                                            "dateRange": [1800, 1900],
+                                                        }
+                                                    })
+
     useEffect(() => {
-        //The squid model
+        let updatedGraphData = []
+        for(const key in tickets){
+            fetch("/graphData?key="+key+"&averageWindow="+averageWindow+"&timeBin="+timeBin)
+                .then(res => res.json())
+                .then(result => {
+                    let graphJSON = JSON.parse(result["graphJSON"])
+                    updatedGraphData.push(graphJSON)
+                })
         }
-    )
+        setJSONGraphData(updatedGraphData)
+    }, [averageWindow, tickets, timeBin]);
 
     function handleClick() {
         console.log("Here you go")
@@ -23,7 +42,7 @@ function ResultUI(props){
                     Group
                 </button>
                 <GroupedTicketLabelBar
-                    tickets={props.tickets}
+                    tickets={tickets}
                 />
                 <Graph
                     onClick={handleClick}
@@ -74,9 +93,6 @@ function Graph(props) {
         title: {
             text: 'Solar Employment Growth by Sector, 2010-2016'
             },
-        subtitle: {
-            text: 'Source: thesolarfoundation.com'
-            },
         yAxis: {
             title: {
                 text: 'Number of Employees'
@@ -101,7 +117,7 @@ function Graph(props) {
                 pointStart: 2010
             }
         },
-        series: [props.graphingData],
+        series: props.graphingData,
         responsive: {
             rules: [{
                 condition: {

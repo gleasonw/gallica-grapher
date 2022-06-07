@@ -1,6 +1,7 @@
 import queue
 from flask import Flask
 from flask import request
+from flask_cors import CORS
 
 from api.gallica.newspaper import Newspaper
 from api.gallica.ticketGraphData import TicketGraphData
@@ -9,6 +10,7 @@ from api.tasks import spawnRequestThread
 retrievingThreads = {}
 exceptionBucket = queue.Queue()
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/init', methods=['POST'])
@@ -43,12 +45,12 @@ def papers(query):
     return availablePapers
 
 
-@app.route('/graphData/<requestid>/<window>/<timegroup>/')
-def getGraphData(requestid, window, timegroup):
+@app.route('/graphData')
+def getGraphData():
     graphData = TicketGraphData(
-        requestid,
-        averagewindow=window,
-        groupby=timegroup)
+        request.args["key"],
+        averagewindow=request.args["averageWindow"],
+        groupby=request.args["timeBin"])
     graphJSON = graphData.getGraphJSON()
     items = {'graphJSON': graphJSON}
     return items

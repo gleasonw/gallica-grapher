@@ -12,6 +12,7 @@ function App() {
     const [idTickets, setIDTickets] = useState({})
     const [gettingInput, setGettingInput] = useState(false)
     const [runningQueries, setRunningQueries] = useState(false)
+
     let wrapperSetRunningQueries = useCallback(val => {
         setRunningQueries(val);
     }, [setRunningQueries]);
