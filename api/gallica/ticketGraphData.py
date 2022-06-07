@@ -37,41 +37,45 @@ class TicketGraphData:
 
     def initDayRequest(self):
         self.request = """
-        SELECT year || '-' || month || '-' || day as issuedate, AVG(mentions)
-        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM (SELECT year, month, day, count(*) AS mentions 
-            FROM results WHERE requestid = %s 
-            AND month IS NOT NULL
-            AND day IS NOT NULL
-            GROUP BY year, month, day 
-            ORDER BY year, month, day) AS countTable;
+        SELECT issuedate, avgFrequency::float8
+            FROM (SELECT year || '/' || month || '/' || day as issuedate, AVG(mentions)
+            OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM (SELECT year, month, day, count(*) AS mentions 
+                FROM results WHERE requestid = %s 
+                AND month IS NOT NULL
+                AND day IS NOT NULL
+                GROUP BY year, month, day 
+                ORDER BY year, month, day) 
+                AS countTable) AS decimalAvg;
         """
 
     def initMonthRequest(self):
         self.request = """
-        SELECT year || '-' || month as issuedate, AVG(mentions) 
-        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM (SELECT year, month, count(*) AS mentions 
-            FROM results WHERE requestid = %s 
-            AND month IS NOT NULL
-            GROUP BY year, month
-            ORDER BY year,month) AS countTable;
+        SELECT issuedate, avgFrequency::float8 
+            FROM (SELECT year || '/' || month as issuedate, AVG(mentions) 
+            OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM (SELECT year, month, count(*) AS mentions 
+                FROM results WHERE requestid = %s 
+                AND month IS NOT NULL
+                GROUP BY year, month
+                ORDER BY year,month) AS countTable) AS decimalAvg;
         """
 
     def initYearRequest(self):
         self.request = """
-        SELECT year as issuedate, AVG(mentions) 
-        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM (SELECT year, count(*) AS mentions 
-            FROM results WHERE requestid = %s
-            GROUP BY year 
-            ORDER BY year) AS countTable;
+        SELECT issuedate, avgFrequency::float8 
+            FROM(SELECT year as issuedate, AVG(mentions)
+            OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM (SELECT year, count(*) AS mentions 
+                FROM results WHERE requestid = %s
+                AND year IS NOT NULL
+                GROUP BY year 
+                ORDER BY year) AS countTable) AS decimalAvg;
         """
 
     def runQuery(self):
         self.getSearchTerms()
         self.binRecordsAndFetch()
-        self.floatDecimals()
         self.createJSON()
 
     def getSearchTerms(self):
@@ -87,17 +91,19 @@ class TicketGraphData:
             curs.execute(self.request, (self.averageWindow, self.requestID,))
             self.data = curs.fetchall()
 
-    def floatDecimals(self):
-        pass
-
     def createJSON(self):
+        indexedData = list(map(
+            lambda indexWData: {'x': indexWData[0], 'y': indexWData[1][1]},
+            enumerate(self.data)))
         dataToJson = {
             'name': self.searchTerms,
-            'data': self.data
+            'data': indexedData
         }
         self.jsonedData = json.dumps(dataToJson,
-                                     indent=4,
-                                     sort_keys=True)
+                                     indent=4
+                                     )
+
+
 
     def initDBConnection(self):
         conn = psycopg2.connect(

@@ -9,6 +9,7 @@ function ResultUI(props){
     const [grouped, setGrouped] = useState(true);
     const [timeBin, setTimeBin] = useState('month');
     const [averageWindow, setAverageWindow] = useState(0)
+    const [dateCategories, setDateCategories] = useState([])
     //Testing
     const [tickets, setTickets] = useState({'1234':
                                                         {
@@ -34,7 +35,6 @@ function ResultUI(props){
     function handleClick() {
         console.log("Here you go")
     }
-
     if(grouped){
         return(
             <div className='resultUI'>
@@ -47,6 +47,8 @@ function ResultUI(props){
                 <Graph
                     onClick={handleClick}
                     graphingData={JSONGraphData}
+                    timeBin={timeBin}
+                    tickets={tickets}
                 />
                 <GroupedTicketInfoBar
                     onClick={handleClick}
@@ -82,6 +84,7 @@ function GroupedTicketLabelBar(props) {
                     terms={props.tickets[key]['terms']}
                     papers={props.tickets[key]['papersAndCodes']}
                     dateRange={props.tickets[key]['terms']}
+                    key={key}
                 />
             ))}
         </div>
@@ -89,49 +92,72 @@ function GroupedTicketLabelBar(props) {
 }
 
 function Graph(props) {
+    const [dateCategories, setDateCategories] = useState([]);
+    useEffect(() => {
+        function generatePartialDateCategories() {
+            const lowDates = Object.keys(props.tickets).map(key => (
+                props.tickets[key]["dateRange"][0]
+            ))
+            const highDates = Object.keys(props.tickets).map(key => (
+                props.tickets[key]["dateRange"][1]
+            ))
+            const lowestDate = Math.min(...lowDates)
+            const highestDate = Math.max(...highDates)
+            let categories = []
+            if (props.timeBin === 'month') {
+                categories = generateMonthCategories(lowestDate, highestDate)
+            } else {
+                categories = generateYearCategories(lowestDate, highestDate)
+            }
+            setDateCategories(categories.flat())
+        }
+
+        function generateMonthCategories(lowYear, highYear) {
+            let range = genRange(lowYear, highYear)
+            return range.map(year => (
+                [...Array(12).keys()].map(month => (
+                        (year + lowYear).toString() + "/" + (month + 1).toString()
+                    )
+                )
+            ))
+        }
+
+        function generateYearCategories(lowYear, highYear) {
+            let range = genRange(lowYear, highYear)
+            return range.map(year => (
+                (year + lowYear).toString()
+            ))
+        }
+
+        function genRange(lowYear, highYear) {
+            const delta = ((highYear - lowYear) + 1)
+            return [...Array(delta).keys()]
+        }
+        if(props.timeBin === "year" || props.timeBin === "month"){
+            generatePartialDateCategories()
+        }
+    }, [props.tickets, props.timeBin])
     const options = {
         title: {
-            text: 'Solar Employment Growth by Sector, 2010-2016'
+            text: 'My fun chart'
             },
         yAxis: {
             title: {
-                text: 'Number of Employees'
+                text: 'Mentions'
             }
         },
         xAxis: {
-            accessibility: {
-                rangeDescription: 'Range: 2010 to 2017'
-            }
+            categories: dateCategories
         },
-        legend: {
-            layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle'
-        },
-        plotOptions: {
-            series: {
-                label: {
-                    connectorAllowed: false
-                }
-            ,
-                pointStart: 2010
-            }
-        },
-        series: props.graphingData,
-        responsive: {
-            rules: [{
-                condition: {
-                    maxWidth: 500
-                },
-                chartOptions: {
-                    legend: {
-                        layout: 'horizontal',
-                        align: 'center',
-                        verticalAlign: 'bottom'
+        series: [
+                    {
+                        name: ['nice', 'bert'],
+                        data: [
+                            {'x': 0, y: 100},
+                            {'x': 5, y: 1120}
+                        ]
                     }
-                }
-            }]
-        }
+                ]
     }
     return(
         <div>

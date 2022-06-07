@@ -7,6 +7,6 @@ class TestTicketGraphData(TestCase):
         graphData = TicketGraphData(
             '1234',
             averagewindow=0,
-            groupby='day'
+            groupby='year'
         )
         print(graphData.getGraphJSON())
