@@ -1,7 +1,10 @@
+import datetime
 import json
 import psycopg2
 from .ticketGraphSeries import TicketGraphSeries
 import itertools
+import ciso8601
+
 
 class TicketGraphOptions:
     def __init__(self,
@@ -15,7 +18,7 @@ class TicketGraphOptions:
         self.groupBy = groupby
         self.dataBatches = []
         self.categories = []
-        self.mappedSeries = []
+        self.seriesCollection = []
         self.options = {}
         self.lowYear = None
         self.highYear = None
@@ -42,6 +45,9 @@ class TicketGraphOptions:
     def generateOptions(self):
         if self.groupBy in ['month', 'year']:
             self.generateCategoriesForHighcharts()
+        else:
+            self.parseDaysIntoJSTimestamp()
+        self.formatOptions()
 
     def generateCategoriesForHighcharts(self):
         self.lowYear = self.getLowestYear()
@@ -51,9 +57,10 @@ class TicketGraphOptions:
             self.indexYearMonthBatches()
         else:
             self.createYearCategories()
-            self.mapYearsToCategoryIndex()
+            self.indexYearBatches()
 
     def createMonthCategories(self):
+
         def gen12MonthsInYear(year):
             return list(map(
                 lambda month: f'{year}/{month}',
@@ -66,17 +73,17 @@ class TicketGraphOptions:
         self.categories = itertools.chain.from_iterable(self.categories)
 
     def createYearCategories(self):
-        self.categories = [int(i) for i in range(self.lowYear, self.highYear + 1)]
+        self.categories = [i for i in range(self.lowYear, self.highYear + 1)]
 
     def getLowestYear(self):
         lowYears = list(map(
-            lambda batch: int(batch[0][0]),
+            lambda batch: batch[0][0],
             self.dataBatches))
         return min(lowYears)
 
     def getHighestYear(self):
         highYears = list(map(
-            lambda batch: int(batch[-1][0]),
+            lambda batch: batch[-1][0],
             self.dataBatches))
         return max(highYears)
 
@@ -87,10 +94,10 @@ class TicketGraphOptions:
             def indexYearMonthRecord(record):
                 year = record[0]
                 month = record[1]
-                freq = record[-1]
+                freq = record[2]
                 index = (year - self.lowYear) + (month - 1)
                 return {
-                    'x': int(index),
+                    'x': index,
                     'y': freq
                 }
             return list(map(
@@ -98,23 +105,85 @@ class TicketGraphOptions:
                 batch
             ))
 
-        self.mappedSeries = list(map(
-            indexYearMonthBatch,
-            self.dataBatches
-        ))
+        self.seriesCollection = list(map(indexYearMonthBatch, self.dataBatches))
 
-    def mapYearsToCategoryIndex(self):
+    def indexYearBatches(self):
         
-        def mapYearsOfBatch(batch):
+        def indexYearBatch(batch):
+
+            def indexYearRecord(record):
+                year = record[0]
+                freq = record[1]
+                index = year - self.lowYear
+                return {
+                    'x': index,
+                    'y': freq
+                }
+
             return list(map(
                 indexYearRecord,
                 batch
             ))
 
-        self.mappedSeries = list(map(
-            mapYearsOfBatch,
-            self.dataBatches
-        ))
+        self.seriesCollection = list(map(indexYearBatch, self.dataBatches))
+
+    def parseDaysIntoJSTimestamp(self):
+
+        def parseBatch(batch):
+
+            def parseRecord(record):
+
+                def makeDayTwoDigits(dateString):
+                    dates = dateString.split('-')
+                    day = dates[2]
+                    if len(day) == 1:
+                        dates[2] = f'0{day}'
+                    return "".join(dates)
+
+                date = makeDayTwoDigits(record[0])
+                freq = record[1]
+                dateObject = ciso8601.parse_datetime(date)
+                timestamp = datetime.datetime.timestamp(dateObject) * 1000
+                return {
+                    'x': timestamp,
+                    'y': freq
+                }
+
+            return list(map(parseRecord, batch))
+
+        self.seriesCollection = list(map(parseBatch, self.dataBatches))
+
+    def formatOptions(self):
+        if self.groupBy == 'day':
+            self.formatDayOptions()
+        else:
+            self.options = {
+                'yAxis': {
+                    'title': {
+                        'text': 'Mentions'
+                    }
+                },
+                'xAxis': {
+                    'categories': self.categories,
+                    'accessibility': {
+                        'rangeDescription': f'Range: {self.lowYear} to {self.highYear}'
+                    }
+                },
+                'series': self.seriesCollection
+            }
+
+    def formatDayOptions(self):
+        self.options = {
+            'yAxis': {
+                'title': {
+                    'text': 'Mentions'
+                }
+            },
+            'xAxis': {
+                'type': 'datetime'
+            },
+            'series': self.seriesCollection
+        }
 
     def initDBConnection(self):
         conn = psycopg2.connect(
