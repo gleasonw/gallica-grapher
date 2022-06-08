@@ -37,8 +37,8 @@ class TicketGraphSeries:
 
     def initDayRequest(self):
         self.request = """
-        SELECT issuedate, avgFrequency::float8
-            FROM (SELECT year || '/' || month || '/' || day as issuedate, AVG(mentions)
+        SELECT year, month, day, avgFrequency::float8
+            FROM (SELECT year, month, day, AVG(mentions)
             OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
             FROM (SELECT year, month, day, count(*) AS mentions 
                 FROM results WHERE requestid = %s 

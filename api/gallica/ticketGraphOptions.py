@@ -1,8 +1,6 @@
 import datetime
-import json
 import psycopg2
 from .ticketGraphSeries import TicketGraphSeries
-import itertools
 import ciso8601
 
 
@@ -43,144 +41,124 @@ class TicketGraphOptions:
         return series.getSeries()
 
     def generateOptions(self):
-        if self.groupBy in ['month', 'year']:
-            self.generateCategoriesForHighcharts()
-        else:
-            self.parseDaysIntoJSTimestamp()
+        self.parseDatesToJSTimestamp()
         self.formatOptions()
 
-    def generateCategoriesForHighcharts(self):
-        self.lowYear = self.getLowestYear()
-        self.highYear = self.getHighestYear()
-        if self.groupBy == 'month':
-            self.createMonthCategories()
-            self.indexYearMonthBatches()
-        else:
-            self.createYearCategories()
-            self.indexYearBatches()
-
-    def createMonthCategories(self):
-
-        def gen12MonthsInYear(year):
-            return list(map(
-                lambda month: f'{year}/{month}',
-                range(1, 13)
-            ))
-
-        self.categories = list(map(
-            gen12MonthsInYear,
-            range(self.lowYear, self.highYear + 1)))
-        self.categories = itertools.chain.from_iterable(self.categories)
-
-    def createYearCategories(self):
-        self.categories = [i for i in range(self.lowYear, self.highYear + 1)]
-
-    def getLowestYear(self):
-        lowYears = list(map(
-            lambda batch: batch[0][0],
-            self.dataBatches))
-        return min(lowYears)
-
-    def getHighestYear(self):
-        highYears = list(map(
-            lambda batch: batch[-1][0],
-            self.dataBatches))
-        return max(highYears)
-
-    def indexYearMonthBatches(self):
-        
-        def indexYearMonthBatch(batch):
-
-            def indexYearMonthRecord(record):
-                year = record[0]
-                month = record[1]
-                freq = record[2]
-                index = (year - self.lowYear) + (month - 1)
-                return {
-                    'x': index,
-                    'y': freq
-                }
-            return list(map(
-                indexYearMonthRecord,
-                batch
-            ))
-
-        self.seriesCollection = list(map(indexYearMonthBatch, self.dataBatches))
-
-    def indexYearBatches(self):
-        
-        def indexYearBatch(batch):
-
-            def indexYearRecord(record):
-                year = record[0]
-                freq = record[1]
-                index = year - self.lowYear
-                return {
-                    'x': index,
-                    'y': freq
-                }
-
-            return list(map(
-                indexYearRecord,
-                batch
-            ))
-
-        self.seriesCollection = list(map(indexYearBatch, self.dataBatches))
-
-    def parseDaysIntoJSTimestamp(self):
+    def parseDatesToJSTimestamp(self):
 
         def parseBatch(batch):
 
-            def parseRecord(record):
+            def makeMonthTwoDigits(month):
+                if month < 10:
+                    month = f'0{month}'
+                return month
 
-                def makeDayTwoDigits(dateString):
-                    dates = dateString.split('-')
-                    day = dates[2]
-                    if len(day) == 1:
-                        dates[2] = f'0{day}'
-                    return "".join(dates)
+            def makeDayTwoDigits(day):
+                if day < 10:
+                    day = f'0{day}'
+                return day
 
-                date = makeDayTwoDigits(record[0])
-                freq = record[1]
+            def dateToTimestamp(date):
                 dateObject = ciso8601.parse_datetime(date)
                 timestamp = datetime.datetime.timestamp(dateObject) * 1000
-                return {
-                    'x': timestamp,
-                    'y': freq
-                }
+                return timestamp
 
-            return list(map(parseRecord, batch))
+            #Dummy day added to simplify Highcharts comparison.
+            def parseYearMonRecord(record):
+                year = record[0]
+                month = makeMonthTwoDigits(record[1])
+                freq = record[2]
+                JStimestamp = dateToTimestamp(f"{year}-{month}-01")
+                return [
+                    JStimestamp,
+                    freq
+                ]
+
+            def parseYearMonDayRecord(record):
+                year = record[0]
+                month = makeMonthTwoDigits(record[1])
+                day = makeDayTwoDigits(record[2])
+                freq = record[3]
+                JStimestamp = dateToTimestamp(f"{year}-{month}-{day}")
+                return [
+                    JStimestamp,
+                    freq
+                ]
+
+            if self.groupBy == 'year':
+                data = batch["data"]
+            elif self.groupBy == 'month':
+                data = list(map(
+                    parseYearMonRecord,
+                    batch["data"]
+                ))
+            else:
+                data = list(map(
+                    parseYearMonDayRecord,
+                    batch["data"]
+                ))
+            return {
+                'name': batch["keywords"],
+                'data': data
+            }
 
         self.seriesCollection = list(map(parseBatch, self.dataBatches))
 
     def formatOptions(self):
-        if self.groupBy == 'day':
-            self.formatDayOptions()
+        if self.groupBy == 'year':
+            self.formatYearOptions()
+        elif self.groupBy == 'month':
+            self.formatYearMonOptions()
         else:
-            self.options = {
-                'yAxis': {
-                    'title': {
-                        'text': 'Mentions'
-                    }
-                },
-                'xAxis': {
-                    'categories': self.categories,
-                    'accessibility': {
-                        'rangeDescription': f'Range: {self.lowYear} to {self.highYear}'
-                    }
-                },
-                'series': self.seriesCollection
-            }
+            self.formatYearMonDayOptions()
 
-    def formatDayOptions(self):
+    def formatYearOptions(self):
         self.options = {
+            'title': {
+                'text': "Hello world"
+            },
+            'yAxis': {
+                'title': {
+                    'text': 'Mentions'
+                }
+            },
+            'series': self.seriesCollection
+        }
+
+    def formatYearMonOptions(self):
+        self.options = {
+            'title': {
+                'text': "Hello world"
+            },
             'yAxis': {
                 'title': {
                     'text': 'Mentions'
                 }
             },
             'xAxis': {
-                'type': 'datetime'
+                'type': 'datetime',
+
+                #Don't display the dummy day
+                'dateTimeLabelFormats': {
+                    'month': '%b',
+                    'year': '%Y'
+                }
+            },
+            'series': self.seriesCollection
+        }
+
+    def formatYearMonDayOptions(self):
+        self.options = {
+            'title': {
+                'text': "Hello world"
+            },
+            'yAxis': {
+                'title': {
+                    'text': 'Mentions'
+                }
+            },
+            'xAxis': {
+                'type': 'datetime',
             },
             'series': self.seriesCollection
         }

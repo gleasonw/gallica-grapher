@@ -93,7 +93,7 @@ class KeywordQuery:
                 (
                 identifier, 
                 year, 
-                mon, 
+                month, 
                 day, 
                 searchterm, 
                 paperID, 

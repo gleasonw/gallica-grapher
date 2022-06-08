@@ -47,12 +47,13 @@ def papers(query):
 
 @app.route('/graphData')
 def getGraphData():
-    graphData = TicketGraphOptions(
-        request.args["key"],
+
+    options = TicketGraphOptions(
+        request.args["keys"],
         averagewindow=request.args["averageWindow"],
         groupby=request.args["timeBin"])
-    graphJSON = graphData.getGraphJSON()
-    items = {'graphJSON': graphJSON}
+
+    items = {'options': options.getOptions()}
     return items
 
 

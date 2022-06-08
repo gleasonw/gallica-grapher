@@ -4,7 +4,7 @@ import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 
 function ResultUI(props){
-    const [JSONGraphData, setJSONGraphData] = useState([]);
+    const [groupOptions, setGroupOptions] = useState([]);
     const [paperAndOtherStats, setPaperAndOtherStats] = useState([]);
     const [grouped, setGrouped] = useState(true);
     const [timeBin, setTimeBin] = useState('month');
@@ -20,16 +20,15 @@ function ResultUI(props){
                                                     })
 
     useEffect(() => {
-        let updatedGraphData = []
-        for(const key in tickets){
-            fetch("/graphData?key="+key+"&averageWindow="+averageWindow+"&timeBin="+timeBin)
-                .then(res => res.json())
-                .then(result => {
-                    let graphJSON = JSON.parse(result["graphJSON"])
-                    updatedGraphData.push(graphJSON)
-                })
-        }
-        setJSONGraphData(updatedGraphData)
+        let updatedGroupOptions = []
+        let keys = Object.keys(tickets)
+        fetch("/graphData?keys="+keys+"&averageWindow="+averageWindow+"&timeBin="+timeBin)
+            .then(res => res.json())
+            .then(result => {
+                updatedGroupOptions.push(result["options"])
+            })
+
+        setGroupOptions(updatedGroupOptions)
     }, [averageWindow, tickets, timeBin]);
 
     function handleClick() {
@@ -46,7 +45,7 @@ function ResultUI(props){
                 />
                 <Graph
                     onClick={handleClick}
-                    graphingData={JSONGraphData}
+                    options={groupOptions}
                     timeBin={timeBin}
                     tickets={tickets}
                 />
@@ -92,51 +91,6 @@ function GroupedTicketLabelBar(props) {
 }
 
 function Graph(props) {
-    const [dateCategories, setDateCategories] = useState([]);
-    useEffect(() => {
-        function generatePartialDateCategories() {
-            const lowDates = Object.keys(props.tickets).map(key => (
-                props.tickets[key]["dateRange"][0]
-            ))
-            const highDates = Object.keys(props.tickets).map(key => (
-                props.tickets[key]["dateRange"][1]
-            ))
-            const lowestDate = Math.min(...lowDates)
-            const highestDate = Math.max(...highDates)
-            let categories = []
-            if (props.timeBin === 'month') {
-                categories = generateMonthCategories(lowestDate, highestDate)
-            } else {
-                categories = generateYearCategories(lowestDate, highestDate)
-            }
-            setDateCategories(categories)
-        }
-
-        function generateMonthCategories(lowYear, highYear) {
-            let range = genRange(lowYear, highYear)
-            return range.map(year => (
-                [...Array(12).keys()].map(month => (
-                        (year + lowYear).toString() + "/" + (month + 1).toString()
-                    )
-                )
-            )).flat()
-        }
-
-        function generateYearCategories(lowYear, highYear) {
-            let range = genRange(lowYear, highYear)
-            return range.map(year => (
-                (year + lowYear).toString()
-            )).flat()
-        }
-
-        function genRange(lowYear, highYear) {
-            const delta = ((highYear - lowYear) + 1)
-            return [...Array(delta).keys()]
-        }
-        if(props.timeBin === "year" || props.timeBin === "month"){
-            generatePartialDateCategories()
-        }
-    }, [props.tickets, props.timeBin])
     return(
         <div>
             <DownloadButton
@@ -150,6 +104,7 @@ function Graph(props) {
         </div>
     );
 }
+
 function GroupedTicketInfoBar(props) {
     return(
         <div className='groupedInfoBar'>

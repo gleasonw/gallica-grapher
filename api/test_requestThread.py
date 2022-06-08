@@ -5,8 +5,8 @@ from api.requestThread import RequestThread
 class TestRequestThread(TestCase):
     def test_run(self):
         request = RequestThread({
-            '1234': {
-                "terms": ["malamine"],
+            '4321': {
+                "terms": ["brazza"],
                 "papersAndCodes": [],
                 "dateRange": [1800, 1900],
             }
