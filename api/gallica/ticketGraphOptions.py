@@ -11,7 +11,7 @@ class TicketGraphOptions:
                  groupby='day'):
 
         self.dbConnection = None
-        self.requestIDs = requestids
+        self.requestIDs = requestids.split(',')
         self.averageWindow = int(averagewindow)
         self.groupBy = groupby
         self.dataBatches = []

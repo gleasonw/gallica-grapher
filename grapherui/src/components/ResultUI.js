@@ -1,10 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import TicketLabel from "./TicketLabel";
-import Highcharts from 'highcharts'
-import HighchartsReact from 'highcharts-react-official'
+import Chart from "./Chart";
 
 function ResultUI(props){
-    const [groupOptions, setGroupOptions] = useState([]);
+    const [groupOptions, setGroupOptions] = useState({});
     const [paperAndOtherStats, setPaperAndOtherStats] = useState([]);
     const [grouped, setGrouped] = useState(true);
     const [timeBin, setTimeBin] = useState('month');
@@ -16,19 +15,25 @@ function ResultUI(props){
                                                             "terms": ["malamine"],
                                                             "papersAndCodes": [],
                                                             "dateRange": [1800, 1900],
+                                                        },
+                                                    '4321':
+                                                        {
+                                                            "terms": ["brazza"],
+                                                            "papersAndCodes": [],
+                                                            "dateRange": [1800, 1900],
                                                         }
                                                     })
 
     useEffect(() => {
-        let updatedGroupOptions = []
+        let updatedGroupOptions = {}
         let keys = Object.keys(tickets)
         fetch("/graphData?keys="+keys+"&averageWindow="+averageWindow+"&timeBin="+timeBin)
             .then(res => res.json())
             .then(result => {
-                updatedGroupOptions.push(result["options"])
+                console.log(result)
+                updatedGroupOptions = result["options"]
+                setGroupOptions(updatedGroupOptions)
             })
-
-        setGroupOptions(updatedGroupOptions)
     }, [averageWindow, tickets, timeBin]);
 
     function handleClick() {
@@ -43,9 +48,9 @@ function ResultUI(props){
                 <GroupedTicketLabelBar
                     tickets={tickets}
                 />
-                <Graph
+                <GroupedChart
                     onClick={handleClick}
-                    options={groupOptions}
+                    groupOptions={groupOptions}
                     timeBin={timeBin}
                     tickets={tickets}
                 />
@@ -90,19 +95,21 @@ function GroupedTicketLabelBar(props) {
     );
 }
 
-function Graph(props) {
+function GroupedChart(props){
     return(
         <div>
             <DownloadButton
                 text='Download Graph'
                 onClick={() => props.onClick}
             />
-            <HighchartsReact
-                highcharts={Highcharts}
-                options={props.options}
+            <Chart
+                onClick={props.handleClick}
+                options={props.groupOptions}
+                timeBin={props.timeBin}
+                tickets={props.tickets}
             />
         </div>
-    );
+    )
 }
 
 function GroupedTicketInfoBar(props) {
@@ -172,7 +179,7 @@ function TicketResult(props) {
                 papers={[{'code':'35135','paper':'nice'}]}
                 dateRange={[1789,1902]}
             />
-            <Graph/>
+            <Chart/>
             <TicketStats
                 onClick={props.onClick}
             />

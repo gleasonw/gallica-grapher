@@ -1,8 +1,8 @@
 import React, {useState, useCallback} from 'react';
 import {v4 as uuidv4} from 'uuid';
-import InputUI from "./InputUI";
-import RunningQueriesUI from "./RunningQueriesUI";
-import ResultUI from "./ResultUI";
+import InputUI from "./components/InputUI";
+import RunningQueriesUI from "./components/RunningQueriesUI";
+import ResultUI from "./components/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
