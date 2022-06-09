@@ -64,7 +64,7 @@ function ChartOptions(props){
                 value={props.averageWindow}
                 onChange={props.onChange}
                 name='averageWindow'
-                label='Average window'
+                label='Rolling average'
                 type='number'
             />
 

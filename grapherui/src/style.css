@@ -301,7 +301,6 @@ label[for="papers"],label[for="searchTerm"]{
 
 }
 .resultUI{
-    border: solid;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -320,12 +319,26 @@ label[for="papers"],label[for="searchTerm"]{
 .ticketLabel *{
     font-size: 16px;
 }
-.groupedStatBar{
+.groupedResultsUI{
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+.groupedResultsUI > div{
+    margin: 20px;
+}
+.groupedStatBar, .groupedLabelBar{
     display: flex;
     border: solid;
     flex-wrap: wrap;
 }
-.groupedStat{
+.groupedStat, .groupedLabel{
     flex: 1;
+}
+.groupedStat{
     border: solid;
+    padding: 30px;
+}
+.groupedLabel *{
+    font-size: 16px;
 }

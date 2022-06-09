@@ -33,7 +33,7 @@ export function GroupedTicketResults(props) {
     }, [averageWindow, props.tickets, alignment]);
 
     return (
-        <div>
+        <div className='groupedResultsUI'>
             <GroupedTicketLabelBar tickets={props.tickets}/>
             <GroupedChart
                 onClick={props.handleClick}
@@ -45,22 +45,25 @@ export function GroupedTicketResults(props) {
             <GroupedStatBar
                 onClick={props.handleClick}
                 paperStats={props.paperStats}
+                tickets={props.tickets}
             />
         </div>
 
     )
 }
-
+//TODO: Sync label color with line color
 function GroupedTicketLabelBar(props) {
     return (
         <div className='groupedLabelBar'>
             {Object.keys(props.tickets).map(key => (
-                <TicketLabel
-                    terms={props.tickets[key]['terms']}
-                    papers={props.tickets[key]['papersAndCodes']}
-                    dateRange={props.tickets[key]['terms']}
-                    key={key}
-                />
+                <div className = 'groupedLabel'>
+                    <TicketLabel
+                        terms={props.tickets[key]['terms']}
+                        papers={props.tickets[key]['papersAndCodes']}
+                        dateRange={props.tickets[key]['dateRange']}
+                        key={key}
+                    />
+                </div>
             ))}
         </div>
     );
@@ -82,11 +85,15 @@ function GroupedChart(props) {
 function GroupedStatBar(props) {
     return (
         <div className='groupedStatBar'>
-            <GroupedTicketStat/>
-            <GroupedTicketStat/>
-            <GroupedTicketStat/>
-            <GroupedTicketStat/>
-            <GroupedTicketStat/>
+            {Object.keys(props.tickets).map(key => (
+                <GroupedTicketStat
+                    terms={props.tickets[key]['terms']}
+                    papers={props.tickets[key]['papersAndCodes']}
+                    dateRange={props.tickets[key]['dateRange']}
+                    ticketID={key}
+                    key={key}
+                />
+            ))}
         </div>
     );
 }
@@ -95,12 +102,14 @@ function GroupedTicketStat(props) {
     return (
         <div className='groupedStat'>
             <TicketLabel
-                terms={['nice']}
-                papers={[{'code': '35135', 'paper': 'nice'}]}
-                dateRange={[1789, 1902]}
+                terms={props.terms}
+                papers={props.papers}
+                dateRange={props.dateRange}
             />
             <TicketPapers
-                onClick={props.onClick}
+                ticketID={props.ticketID}
+                continuous={false}
+                dateRange={props.dateRange}
             />
         </div>
     )
