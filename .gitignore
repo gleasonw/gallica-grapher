@@ -42,3 +42,12 @@ Thumbs.db
 *.png
 node_modules/
 venv/
+=======
+.idea
+venv
+node_modules
+
+.flaskenv
+.pyc
+
+__pycache__
