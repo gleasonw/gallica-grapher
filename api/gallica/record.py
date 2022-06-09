@@ -1,7 +1,7 @@
 from lxml import etree
 import re
 
-#TODO: Day, month, year for DB
+
 class Record:
     def __init__(self, root):
         record = root[2]

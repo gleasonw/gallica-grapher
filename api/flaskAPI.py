@@ -6,6 +6,7 @@ from flask_cors import CORS
 from api.gallica.newspaper import Newspaper
 from api.gallica.ticketGraphOptions import TicketGraphOptions
 from api.tasks import spawnRequestThread
+from api.gallica.topPapers import TopPapers
 
 retrievingThreads = {}
 exceptionBucket = queue.Queue()
@@ -56,6 +57,16 @@ def getGraphData():
     items = {'options': options.getOptions()}
     return items
 
+@app.route('/topPapers')
+def getTopPapersFromID():
+
+    topPapers = TopPapers(
+        request.args["id"],
+        request.args["dateRange"],
+        continuous=request.args["continuous"]
+    )
+    items = {"topPapers" : topPapers.getTopPapers()}
+    return items
 
 if __name__ == "__main__":
     app.run(debug=True)

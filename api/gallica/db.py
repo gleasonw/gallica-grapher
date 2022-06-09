@@ -7,6 +7,9 @@ class DB:
         self.conn = None
         self.initDBConnection()
 
+    def getConn(self):
+        return self.conn
+
     def initDBConnection(self):
         conn = psycopg2.connect(
             host="localhost",

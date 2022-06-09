@@ -134,7 +134,7 @@ class TicketGraphOptions:
                 }
             },
             'title': {
-                'text': self.names
+                'text': None
             },
             'yAxis': {
                 'title': {
@@ -153,7 +153,7 @@ class TicketGraphOptions:
                 'zoomType': 'X'
             },
             'title': {
-                'text': self.names
+                'text': None
             },
             'yAxis': {
                 'title': {
@@ -178,7 +178,7 @@ class TicketGraphOptions:
                 'zoomType': 'X'
             },
             'title': {
-                'text': self.names
+                'text': None
             },
             'yAxis': {
                 'title': {
