@@ -69,6 +69,7 @@ function SoloTicketResult(props) {
                 dateRange={props.dateRange}
             />
             <Chart options={props.options}/>
+
             <TicketPapers onClick={props.onClick}/>
         </div>
     )
