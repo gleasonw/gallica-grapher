@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="initialize db.sql" type="DatabaseScript" nameIsGenerated="true">
-    <script-file value="$PROJECT_DIR$/Backend/Postgre/initialize db.sql" />
-    <script-mode>FILE</script-mode>
-    <data-source id="7f652e44-6781-4a1b-bea8-ce46aae9be7f" />
-    <method v="2" />
-  </configuration>
-</component>
