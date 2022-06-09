@@ -11,24 +11,27 @@ class TicketGraphOptions:
                  groupby='day'):
 
         self.dbConnection = None
-        self.requestIDs = requestids.split(',')
-        self.averageWindow = int(averagewindow)
-        self.groupBy = groupby
         self.dataBatches = []
         self.categories = []
         self.seriesCollection = []
         self.options = {}
         self.lowYear = None
         self.highYear = None
+        self.names = []
 
         self.initDBConnection()
-        self.selectGraphSeries()
+        if requestids and averagewindow and groupby:
+            self.averageWindow = int(averagewindow)
+            self.requestIDs = requestids.split(',')
+            self.groupBy = groupby
+            self.selectGraphSeries()
 
     def getOptions(self):
         return self.options
 
     def selectGraphSeries(self):
         self.dataBatches = list(map(self.selectDataForRequestID, self.requestIDs))
+        self.getBatchNames()
         self.generateOptions()
         self.dbConnection.close()
 
@@ -104,6 +107,12 @@ class TicketGraphOptions:
 
         self.seriesCollection = list(map(parseBatch, self.dataBatches))
 
+    def getBatchNames(self):
+        self.names = list(map(
+            lambda batch: batch["keywords"],
+            self.dataBatches
+        ))
+
     def formatOptions(self):
         if self.groupBy == 'year':
             self.formatYearOptions()
@@ -114,21 +123,37 @@ class TicketGraphOptions:
 
     def formatYearOptions(self):
         self.options = {
+            'chart': {
+                'zoomType': 'x'
+            },
+            'plotOptions': {
+                'line': {
+                    'marker': {
+                        'enabled': False
+                    }
+                }
+            },
             'title': {
-                'text': "Hello world"
+                'text': self.names
             },
             'yAxis': {
                 'title': {
                     'text': 'Mentions'
                 }
             },
+            'xAxis': {
+                'type': 'line'
+            },
             'series': self.seriesCollection
         }
 
     def formatYearMonOptions(self):
         self.options = {
+            'chart': {
+                'zoomType': 'X'
+            },
             'title': {
-                'text': "Hello world"
+                'text': self.names
             },
             'yAxis': {
                 'title': {
@@ -149,8 +174,11 @@ class TicketGraphOptions:
 
     def formatYearMonDayOptions(self):
         self.options = {
+            'chart': {
+                'zoomType': 'X'
+            },
             'title': {
-                'text': "Hello world"
+                'text': self.names
             },
             'yAxis': {
                 'title': {

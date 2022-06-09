@@ -5,27 +5,42 @@ import TicketPapers from "./TicketPapers";
 import {useEffect, useState} from "react";
 
 export function GroupedTicketResults(props) {
-    const [timeBin, setTimeBin] = useState('year');
     const [averageWindow, setAverageWindow] = useState(0)
     const [groupOptions, setGroupOptions] = useState({});
+    const [alignment, setAlignment] = React.useState('year');
+
+    const handleChange = (event, newAlignment) => {
+        if(event.target.name === 'timeBin'){
+            if(newAlignment){
+                setAlignment(newAlignment);
+            }
+        }else{
+            setAverageWindow(event.target.value)
+        }
+
+    };
 
     useEffect(() => {
+        const window = averageWindow ? averageWindow : 0;
         let updatedGroupOptions = {}
         let keys = Object.keys(props.tickets)
-        fetch("/graphData?keys="+keys+"&averageWindow="+averageWindow+"&timeBin="+timeBin)
+        fetch("/graphData?keys="+keys+"&averageWindow="+window+"&timeBin="+alignment)
             .then(res => res.json())
             .then(result => {
                 updatedGroupOptions = result["options"]
                 setGroupOptions(updatedGroupOptions)
             })
-    }, [averageWindow, props.tickets, timeBin]);
+    }, [averageWindow, props.tickets, alignment]);
 
     return (
         <div>
             <GroupedTicketLabelBar tickets={props.tickets}/>
             <GroupedChart
                 onClick={props.handleClick}
-                groupOptions={props.groupOptions}
+                groupOptions={groupOptions}
+                onChange={handleChange}
+                timeBinVal={alignment}
+                averageWindow={averageWindow}
             />
             <GroupedStatBar
                 onClick={props.handleClick}
@@ -54,11 +69,11 @@ function GroupedTicketLabelBar(props) {
 function GroupedChart(props) {
     return (
         <div>
-            <button className='downloadButton' onClick={props.onClick}>
-                Download graph!
-            </button>
             <Chart
                 options={props.groupOptions}
+                onChange={props.onChange}
+                timeBinVal={props.timeBinVal}
+                averageWindow={props.averageWindow}
             />
         </div>
     )

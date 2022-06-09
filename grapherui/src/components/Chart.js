@@ -4,43 +4,73 @@ import React from "react";
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Button from '@mui/material/Button'
 
 function Chart(props) {
-    const JSONoptions = props.options
+    const JSONoptions = props.options;
     return (
         <div>
             <HighchartsReact
                 highcharts={Highcharts}
                 options={JSONoptions}
             />
-            <ChartOptions/>
+            <ChartOptions
+                timeBinVal={props.timeBinVal}
+                averageWindow={props.averageWindow}
+                onChange={props.onChange}
+            />
         </div>
 
 
     );
 }
 function ChartOptions(props){
-    const [alignment, setAlignment] = React.useState('left');
-
-    const handleAlignment = (event, newAlignment) => {
-    setAlignment(newAlignment);
-    };
     return(
         <div>
             <ToggleButtonGroup
-              value={alignment}
+              value={props.timeBinVal}
               exclusive
-              onChange={handleAlignment}
-              aria-label="text alignment"
+              onChange={props.onChange}
+              aria-label="Time bin size selection"
             >
-              <ToggleButton value="left" aria-label="year-grouped">
-              </ToggleButton>
-              <ToggleButton value="center" aria-label="mon-grouped">
-              </ToggleButton>
-              <ToggleButton value="right" aria-label="day-grouped">
-              </ToggleButton>
+
+                <ToggleButton
+                    value="year"
+                    aria-label="year-grouped"
+                    name='timeBin'
+                >
+                    year
+                </ToggleButton>
+
+                <ToggleButton
+                    value="month"
+                    aria-label="month-grouped"
+                    name='timeBin'
+                >
+                    month
+                </ToggleButton>
+
+                <ToggleButton
+                    value="day"
+                    aria-label="day-grouped"
+                    name='timeBin'
+                >
+                    day
+                </ToggleButton>
+
             </ToggleButtonGroup>
-            <TextField/>
+
+            <TextField
+                value={props.averageWindow}
+                onChange={props.onChange}
+                name='averageWindow'
+                label='Average window'
+                type='number'
+            />
+
+            <Button variant="text">
+                Download PNG
+            </Button>
 
         </div>
 

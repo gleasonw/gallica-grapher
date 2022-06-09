@@ -8,7 +8,11 @@ function ResultUI(props){
     const [paperStats, setPaperStats] = useState([]);
     const [grouped, setGrouped] = useState(true);
     //Testing
-    const [tickets, setTickets] = useState({})
+    const [tickets, setTickets] = useState({'4321': {
+                "terms": ["brazza"],
+                "papersAndCodes": [],
+                "dateRange": [1800, 1900],
+            }})
 
     function handleClick() {
         console.log("Here you go")
@@ -53,13 +57,16 @@ function SoloTicketResult(props) {
 
     useEffect(() => {
         let updatedGroupOptions = {}
-        fetch("/graphData?keys="+props.key+"&averageWindow="+averageWindow+"&timeBin="+timeBin)
+        fetch(
+            "/graphData?keys=" + props.key +
+            "&averageWindow=" + averageWindow +
+            "&timeBin=" + timeBin)
             .then(res => res.json())
             .then(result => {
                 updatedGroupOptions = result["options"]
                 setGroupOptions(updatedGroupOptions)
             })
-    }, []);
+    }, [averageWindow, props.key, timeBin]);
 
     return (
         <div className='ticketResults'>
