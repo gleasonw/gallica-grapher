@@ -46,6 +46,7 @@ venv/
 .idea
 venv
 node_modules
+.md
 
 .flaskenv
 .pyc
