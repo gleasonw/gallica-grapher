@@ -4,7 +4,7 @@ from flask import request
 from flask_cors import CORS
 
 from api.gallica.newspaper import Newspaper
-from api.gallica.ticketGraphOptions import TicketGraphOptions
+from api.gallica.ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from api.tasks import spawnRequestThread
 from api.gallica.topPapers import TopPapers
 
@@ -49,12 +49,12 @@ def papers(query):
 @app.route('/graphData')
 def getGraphData():
 
-    options = TicketGraphOptions(
+    options = TicketGraphSeriesBatch(
         request.args["keys"],
         averagewindow=request.args["averageWindow"],
         groupby=request.args["timeBin"])
 
-    items = {'options': options.getOptions()}
+    items = {'options': options.getSeries()}
     return items
 
 @app.route('/topPapers')

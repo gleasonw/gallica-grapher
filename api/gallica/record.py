@@ -6,7 +6,7 @@ class Record:
     def __init__(self, root):
         record = root[2]
         self.recordData = record[0]
-        self.valid = None
+        self.valid = False
         self.paperCode = ''
         self.dateText = ''
         self.yearMonDay = []
@@ -58,8 +58,6 @@ class KeywordRecord(Record):
     def checkIfValid(self):
         if self.date and self.paperCode:
             self.valid = True
-        else:
-            self.valid = False
 
     def decomposeDate(self):
         yearMonDay = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -83,7 +81,8 @@ class PaperRecord(Record):
         super().__init__(root)
         self.title = ''
         self.publishingYears = []
-        self.continuousRange = None
+        self.publishingRange = [None, None]
+        self.continuousRange = False
         self.session = gallicaSession
         self.checkIfValid()
         self.parseTitleFromXML()
@@ -98,7 +97,13 @@ class PaperRecord(Record):
     def getContinuous(self):
         return self.continuousRange
 
-    #TODO: Could this be really slow?
+    def getDate(self):
+        return self.publishingRange
+
+    def checkIfValid(self):
+        if self.paperCode:
+            self.valid = True
+
     def fetchYearsPublished(self):
         paramsForArk = {'ark': f'ark:/12148/{self.paperCode}/date'}
         response = self.session.get("",
@@ -119,7 +124,7 @@ class PaperRecord(Record):
             self.checkIfYearsContinuous()
             self.generateAvailableRange()
         else:
-            self.date = [None, None]
+            return
 
     def checkIfYearsContinuous(self):
         for i, year in enumerate(self.publishingYears):
@@ -128,21 +133,15 @@ class PaperRecord(Record):
                 return
             nextYear = self.publishingYears[i + 1]
             if year + 1 != nextYear:
-                self.continuousRange = False
                 return
 
     def generateAvailableRange(self):
         if self.publishingYears:
             lowYear = self.publishingYears[0]
             highYear = self.publishingYears[-1]
-            self.date = [lowYear, highYear]
+            self.publishingRange = [lowYear, highYear]
 
     def parseTitleFromXML(self):
         self.title = self.recordData.find(
             '{http://purl.org/dc/elements/1.1/}title').text
 
-    def checkIfValid(self):
-        if self.paperCode:
-            self.valid = True
-        else:
-            self.valid = False

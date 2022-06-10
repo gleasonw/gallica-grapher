@@ -11,7 +11,7 @@ class TopPapers:
         database = DB()
         self.conn = database.getConn()
         self.ticketID = ticketID
-        self.continuous = None
+        self.continuous = False
         self.lowYear = None
         self.highYear = None
 
@@ -71,9 +71,7 @@ class TopPapers:
             self.topPapers = cursor.fetchall()
 
     def parseContinuous(self, continuous):
-        if continuous == 'false':
-            self.continuous = False
-        else:
+        if continuous == 'true':
             self.continuous = True
 
     def parseDateString(self, dateString):

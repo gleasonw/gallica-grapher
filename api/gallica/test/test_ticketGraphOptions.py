@@ -1,10 +1,10 @@
 from unittest import TestCase
-from gallica.ticketGraphOptions import TicketGraphOptions
+from gallica.ticketGraphSeriesBatch import TicketGraphSeriesBatch
 
 
 class TestTicketGraphOptions(TestCase):
-    options = TicketGraphOptions(
-        ['1234', '4321'],
-        groupby='year'
+    options = TicketGraphSeriesBatch(
+        '4321',
+        groupby='year',
     )
-    print(options.getOptions())
+    print(options.getSeries())

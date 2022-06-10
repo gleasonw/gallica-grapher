@@ -1,19 +1,18 @@
 import concurrent.futures
-import psycopg2
 from requests_toolbelt import sessions
-from .timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from gallica.db import DB
 
-from .recordBatch import PaperRecordBatch
+from gallica.recordBatch import PaperRecordBatch
 
 
 class Newspaper:
 
     def __init__(self):
         self.query = ''
-        self.dbConnection = None
         self.session = None
         self.papers = []
-        self.initDBConnection()
+        self.dbConnection = DB().getConn()
         self.initGallicaSession()
 
     def sendGallicaPapersToDB(self):
@@ -66,11 +65,11 @@ class Newspaper:
 
     def insertPaper(self, paper):
         title = paper.getTitle()
-        dateRange = paper.getYearMonDay()
+        dateRange = paper.getDate()
         continuous = paper.getContinuous()
         code = paper.getPaperCode()
         lowYear = dateRange[0]
-        highYear = dateRange[-1]
+        highYear = dateRange[1]
 
         with self.dbConnection.cursor() as curs:
             curs.execute(
@@ -100,22 +99,12 @@ class Newspaper:
             namedPaperCodes.append(namedPair)
         return {'paperNameCodes': namedPaperCodes}
 
-    #TODO: Closing connection?
-    def initDBConnection(self):
-        conn = psycopg2.connect(
-            host="localhost",
-            database="gallicagrapher",
-            user="wgleason",
-            password="ilike2play"
-        )
-        conn.set_session(autocommit=True)
-        self.dbConnection = conn
-
     def initGallicaSession(self):
         self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
         adapter = TimeoutAndRetryHTTPAdapter()
         self.session.mount("https://", adapter)
 
+
 if __name__ == "__main__":
     papers = Newspaper()
-    print(papers.sendGallicaPapersToDB())
+    papers.fetchAllPapersFromGallica()

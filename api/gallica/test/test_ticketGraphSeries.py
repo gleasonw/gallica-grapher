@@ -11,5 +11,5 @@ class TestTicketGraphSeries(TestCase):
             password="ilike2play"
         )
         conn.set_session(autocommit=True)
-        series = TicketGraphSeries('1234',dbConnection=conn,groupby='day')
+        series = TicketGraphSeries('4321',dbConnection=conn,groupby='month')
         print(series.getSeries())

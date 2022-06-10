@@ -31,7 +31,7 @@ function TicketProgressContainer(props){
         initPercents[key] = 0
     ))
     const [ticketProgressPercents, setTicketProgressPercents] = useState(initPercents)
-
+//TODO: Exiting before final render
     useEffect(() => {
         function updateProgress(){
             let progress = 0;
@@ -47,7 +47,7 @@ function TicketProgressContainer(props){
                     updatedTickets[currentTicket] = progress
                     setTicketProgressPercents(updatedTickets)
                     if (state === "SUCCESS") {
-                        props.setRunningQueries(false);
+                        setTimeout(props.setRunningQueries, 1000, false);
                     }
                 });
         }

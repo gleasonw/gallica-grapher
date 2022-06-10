@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 
 export function TicketPapers(props) {
     const [topPapers, setTopPapers] = useState([]);
-
+//TODO: effect firing too early, before all results are in
     useEffect(() => {
         let updatedPapers = [];
         console.log(props.ticketID)
