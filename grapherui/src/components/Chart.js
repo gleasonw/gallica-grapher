@@ -7,12 +7,11 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button'
 
 function Chart(props) {
-    const JSONoptions = props.options;
     return (
         <div>
             <HighchartsReact
                 highcharts={Highcharts}
-                options={JSONoptions}
+                options={props.options}
             />
             <ChartOptions
                 timeBinVal={props.timeBinVal}

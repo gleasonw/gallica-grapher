@@ -1,46 +1,15 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
 import TicketPapers from "./TicketPapers";
-import {useEffect, useState} from "react";
 
 export function GroupedTicketResults(props) {
-    const [averageWindow, setAverageWindow] = useState(0)
-    const [groupOptions, setGroupOptions] = useState({});
-    const [alignment, setAlignment] = React.useState('year');
-
-    const handleChange = (event, newAlignment) => {
-        if(event.target.name === 'timeBin'){
-            if(newAlignment){
-                setAlignment(newAlignment);
-            }
-        }else{
-            setAverageWindow(event.target.value)
-        }
-
-    };
-
-    useEffect(() => {
-        const window = averageWindow ? averageWindow : 0;
-        let updatedGroupOptions = {}
-        let keys = Object.keys(props.tickets)
-        fetch("/graphData?keys="+keys+"&averageWindow="+window+"&timeBin="+alignment)
-            .then(res => res.json())
-            .then(result => {
-                updatedGroupOptions = result["options"]
-                setGroupOptions(updatedGroupOptions)
-            })
-    }, [averageWindow, props.tickets, alignment]);
-
     return (
         <div className='groupedResultsUI'>
             <GroupedTicketLabelBar tickets={props.tickets}/>
             <GroupedChart
-                onClick={props.handleClick}
-                groupOptions={groupOptions}
-                onChange={handleChange}
-                timeBinVal={alignment}
-                averageWindow={averageWindow}
+                settings={props.settings}
+                onChange={props.onChange}
             />
             <GroupedStatBar
                 onClick={props.handleClick}
@@ -70,13 +39,80 @@ function GroupedTicketLabelBar(props) {
 }
 
 function GroupedChart(props) {
+    const timeBin = props.settings["timeBin"];
+    const keyedSeries = structuredClone(props.settings["series"]);
+    const [options, setOptions] = useState({});
+    useEffect(() => {
+        let groupedSeries = []
+        groupSeries()
+        let options = {
+            chart: {
+                zoomType: 'x'
+            },
+            legend: {
+                dateTimeLabelFormats: {
+                    month: '%b',
+                    year: '%Y'
+                }
+            },
+            title: {
+                text: null
+            },
+            yAxis: {
+                title: {
+                    text: 'Mentions'
+                }
+            },
+            series: groupedSeries
+        }
+        if(timeBin === 'year'){
+            function formatYearOptions(){
+                options.plotOptions = {
+                        line: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    }
+                options.xAxis = {
+                        type: 'line'
+                    }
+            }
+            formatYearOptions()
+        }else if(timeBin === 'month'){
+            function formatYearMonOptions(){
+                options.xAxis = {
+                        type: 'datetime',
+                        dateTimeLabelFormats: {
+                            month: '%b',
+                            year: '%Y'
+                        }
+                    }
+            }
+            formatYearMonOptions()
+        }else{
+            function formatYearMonDayOptions() {
+                options.xAxis = {type: 'datetime'}
+            }
+            formatYearMonDayOptions()
+        }
+        function groupSeries(){
+            groupedSeries.push(
+                Object.keys(keyedSeries).map(key =>
+                keyedSeries[key]
+            ))
+        }
+        setOptions(options)
+    },[keyedSeries, timeBin])
+
     return (
         <div>
             <Chart
-                options={props.groupOptions}
-                onChange={props.onChange}
-                timeBinVal={props.timeBinVal}
-                averageWindow={props.averageWindow}
+                options={options}
+                onChange={() => props.onChange}
+                continuous={props.settings["continuous"]}
+                timeBinVal={props.settings["timeBin"]}
+                averageWindow={props.settings["averageWindow"]}
             />
         </div>
     )

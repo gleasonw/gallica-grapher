@@ -1,8 +1,9 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
 import GroupedTicketResults from "./GroupedTicketResults";
 import TicketPapers from "./TicketPapers";
+import Button from "@mui/material/Button"
 
 function ResultUI(props){
     let starterSettings = {}
@@ -21,10 +22,10 @@ function ResultUI(props){
         series: {}
     }
     const [grouped, setGrouped] = useState(true);
-    const [graphSettings, setGraphSettings] = useState({starterSettings: starterSettings});
+    const [graphSettings, setGraphSettings] = useState(starterSettings);
     const [graphSettingsHistory, setGraphSettingsHistory] = useState({});
 
-    //Called once on initial render
+    //Called on initial render
     useEffect(() => {
         const requestIDS = Object.keys(props.tickets);
         let starterSettings = {};
@@ -40,24 +41,34 @@ function ResultUI(props){
 
     //Toggle grouped
     function handleClick(){
+        if(grouped){
+            restoreIndividualOptions();
+            setGrouped(false);
+        }else{
+            stashIndividualOptionsHistory();
+            setGrouped(true);
+        }
 
     }
-    //Store individual prop settings on group
     function stashIndividualOptionsHistory(){
+        setGraphSettingsHistory(graphSettings)
 
     }
-    //Restore individual prop settings on degroup
     function restoreIndividualOptions(){
-
+        setGraphSettings(graphSettingsHistory)
     }
-    // Set new timeBin, averageWindow, or continuous, for given key, then call fetchNewSeries to update key's series
-    function onChange(){
-
+    function handleChange(event, ticketID){
+        const val = event.target.value;
+        const name = event.target.name;
+        let updatedSettings = structuredClone(graphSettings);
+        updatedSettings[ticketID][name] = val;
+        setGraphSettings(updatedSettings)
     }
     //Fetch new series when timeBin, averageWindow, or continuous changes
     function fetchNewSeries(key) {
         let updatedSettings = structuredClone(graphSettings);
         const settingsForKey = updatedSettings.key
+        console.log(settingsForKey)
         fetch(
             "/graphData?keys=" + key +
             "&averageWindow=" + settingsForKey.averageWindow +
@@ -73,29 +84,32 @@ function ResultUI(props){
     if(grouped){
         return(
             <div className='resultUI'>
-                <button className='graphGroupButton'>
+                <Button onClick={handleClick}>
                     Group
-                </button>
+                </Button>
                 <GroupedTicketResults
                     tickets={props.tickets}
-                    settings={graphSettings.group}
+                    settings={graphSettings["group"]}
+                    onChange={handleChange}
                 />
             </div>
         )
     }else{
         return(
             <div className='resultUI'>
-                <input type='button' className='graphGroupButton'/>
+                <Button onClick={handleClick}>
+                    Group
+                </Button>
                 <div className='ticketResultsContainer'>
                     {Object.keys(props.tickets).map(key => (
                         <SoloTicketResult
-                            terms={props.tickets.key.terms}
-                            papers={props.tickets.key.papersAndCodes}
-                            dateRange={props.tickets.key.dateRange}
+                            terms={props.tickets[key]["terms"]}
+                            papers={props.tickets[key]["papersAndCodes"]}
+                            dateRange={props.tickets[key]["dateRange"]}
                             key={key}
                             requestID={key}
-                            settings={graphSettings.key}
-                            setIndividualOptions={() => handleIndividualOptionsChange}
+                            settings={graphSettings[key]}
+                            onChange={handleChange}
                         />
                     ))}
                 </div>
