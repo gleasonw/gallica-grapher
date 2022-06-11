@@ -2,13 +2,13 @@ import React, {useEffect, useState} from "react";
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
 import TicketPapers from "./TicketPapers";
+import {useReducer} from "@types/react";
 
 export function GroupedTicketResults(props) {
     return (
         <div className='groupedResultsUI'>
             <GroupedTicketLabelBar tickets={props.tickets}/>
             <GroupedChart
-                settings={props.groupSettings}
                 ticketSettings={props.ticketSettings}
                 onChange={props.onChange}
             />
@@ -43,6 +43,12 @@ function GroupedChart(props) {
     const timeBin = props.groupSettings["timeBin"];
     const keyedSeries = structuredClone(props.ticketSettings["series"]);
     const [options, setOptions] = useState({});
+    const [groupedGraphSettings, dispatch] = useReducer(
+        groupedSettingsReducer, {
+            timeBin: 'year',
+            averageWindow: '0',
+            continuous: 'false'
+        });
     useEffect(() => {
         let groupedSeries = []
         groupSeries()

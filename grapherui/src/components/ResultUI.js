@@ -1,141 +1,197 @@
-import React, {useEffect, useState, useReducer} from 'react';
-import TicketLabel from "./TicketLabel";
-import Chart from "./Chart";
+// noinspection JSCheckFunctionSignatures
+
+import React, {useEffect, useReducer, useState} from 'react';
 import GroupedTicketResults from "./GroupedTicketResults";
-import TicketPapers from "./TicketPapers";
 import Button from "@mui/material/Button"
+import SoloTickets from "./SoloTickets";
 
 function ResultUI(props){
 
+    function initGraphSettings(tickets){
+        const initSetting = {
+            timeBin: 'year',
+            averageWindow: '0',
+            continuous: 'false',
+            series: []
+        }
+        let initialGraphSettings = {}
+        tickets.map(key => (
+            initialGraphSettings[key] = initSetting
+        ));
+        initialGraphSettings["group"] = initSetting
+        return initialGraphSettings
+    }
 
     const [grouped, setGrouped] = useState(true);
-    const [graphSettings, dispatch] = useReducer(settingsReducer, props.tickets, initSettings);
-    const [groupedGraphSettings, setGroupedGraphSettings] = useState(starterGroupSettings);
-    const [graphSettingsHistory, setGraphSettingsHistory] = useState({});
+    const [graphSettings, dispatch] = useReducer(
+        settingsReducer,
+        props.tickets,
+        initGraphSettings);
+    const [settingHistory, setSettingHistory] = useState({});
 
-    //Called on initial render
     useEffect(() => {
         const requestIDS = Object.keys(props.tickets);
-        let starterSettings = {};
         fetch(
-            "/graphData?keys=" + requestIDS + "&averageWindow=0&timeBin=year")
+            "/graphData?keys="+requestIDS+
+            "&averageWindow=0&timeBin=year")
             .then(res => res.json())
             .then(result => {
                 result["options"].map(key => (
-                    starterSettings[key] = key.options
+                    handleSetSeries({
+                        key: key,
+                        series: result
+                    })
                 ))
             })
     }, [props.tickets]);
 
-    function initSettings(tickets){
-        let starterSettings = {};
-        tickets.map(key => (
-            starterSettings[key] = {
-            timeBin: 'year',
-            averageWindow: '0',
-            continuous: 'false',
+    function settingsReducer(graphSettings, action){
+        switch (action.type){
+            case 'setSeries' : {
+                return {
+                    ...graphSettings,
+                    [action.key]: {
+                        ...graphSettings[action.key],
+                        series: action.series
+                    }
+                }
             }
-        ));
-        return starterSettings
-    }
-
-    function settingsReducer(state, action){
-        return graphSettings
-    }
-
-    //Toggle grouped
-    function handleClick(){
-        if(grouped){
-            restoreIndividualOptions();
-            setGrouped(false);
-        }else{
-            stashIndividualOptionsHistory();
-            setGrouped(true);
+            case 'setTimeBin': {
+                return {
+                    ...graphSettings,
+                    [action.key]: {
+                        ...graphSettings[action.key],
+                        timeBin: action.timeBin,
+                        series: action.series
+                    }
+                }
+            }case 'setAverageWindow': {
+                return {
+                    ...graphSettings,
+                    [action.key]: {
+                        ...graphSettings[action.key],
+                        averageWindow: action.averageWindow,
+                        series: action.series
+                    }
+                }
+            }case 'toggleContinuous': {
+                return {
+                    ...graphSettings,
+                    [action.key]: {
+                        ...graphSettings[action.key],
+                        continuous: !graphSettings[action.key].continuous,
+                        series: action.series
+                    }
+                }
+            }case 'restore': {
+                return {}
+            }
+            default:
+                throw Error("Unknown action: " + action.type);
         }
 
     }
-    function stashIndividualOptionsHistory(){
-        setGraphSettingsHistory(graphSettings)
 
+    function handleClick(){
+        grouped ?
+            handleRestore() :
+            stashIndividualOptionsHistory()
+        setGrouped(!grouped)
     }
-    function restoreIndividualOptions(){
-        setGraphSettings(graphSettingsHistory)
+
+    function stashIndividualOptionsHistory(){
+        setSettingHistory(graphSettings)
     }
-    function handleChange(event, ticketID){
-        const val = event.target.value;
-        const name = event.target.name;
-        let updatedSettings = structuredClone(graphSettings);
-        updatedSettings[ticketID][name] = val;
-        setGraphSettings(updatedSettings)
+
+    function handleRestore(){
+        if(settingHistory){
+            const newSettings = {
+                ...settingHistory,
+                group: graphSettings.group
+            }
+            dispatch({
+                type: 'restoreSettings',
+                settings: newSettings
+            })
+        }
     }
-    //Fetch new series when timeBin, averageWindow, or continuous changes
-    function fetchNewSeries(key) {
-        let updatedSettings = structuredClone(graphSettings);
-        const settingsForKey = updatedSettings.key
-        console.log(settingsForKey)
+
+    function handleUpdateTimeBin(ticket){
+        const newSeries = updateSeries(ticket);
+        dispatch({
+            type: 'setTimeBin',
+            key: ticket.key,
+            timeBin: ticket.timeBin,
+            series: newSeries
+        })
+    }
+
+    function handleUpdateAverageWindow(ticket){
+        const newSeries = updateSeries(ticket);
+        dispatch({
+            type: 'setTimeBin',
+            key: ticket.key,
+            averageWindow: ticket.averageWindow,
+            series: newSeries
+        })
+    }
+
+    function handleUpdateContinuous(ticket){
+        const newSeries = updateSeries(ticket);
+        dispatch({
+            type: 'setTimeBin',
+            key: ticket.key,
+            continuous: ticket.continuous,
+            series: newSeries
+        })
+    }
+
+    function handleSetSeries(ticket){
+        dispatch({
+            type: 'setSeries',
+            key: ticket.key,
+            series: ticket.series
+        })
+    }
+
+    function updateSeries(settings){
+        const keys = settings.key === "group" ?
+            Object.keys(props.tickets) :
+            [settings.key]
+        let newSeries = {}
         fetch(
-            "/graphData?keys=" + key +
-            "&averageWindow=" + settingsForKey.averageWindow +
-            "&timeBin=" + settingsForKey.timeBin)
+            "/graphData?keys=" + keys +
+            "&averageWindow=" + settings.averageWindow +
+            "&timeBin=" + settings.timeBin)
             .then(res => res.json())
             .then(result => {
-                //set key's series to result
+                newSeries = result
             })
+        return newSeries
     }
 
-
-
-    if(grouped){
-        return(
-            <div className='resultUI'>
-                <Button onClick={handleClick}>
-                    Group
-                </Button>
+    return(
+        <div className='resultUI'>
+            <Button onClick={handleClick}>
+                Group
+            </Button>
+            {grouped ? (
                 <GroupedTicketResults
                     tickets={props.tickets}
-                    groupSettings={groupedGraphSettings}
-                    ticketSettings={graphSettings}
-                    onChange={handleChange}
+                    groupSettings={graphSettings.group}
+                    onSetTimeBin={handleUpdateTimeBin}
+                    onSetAverageWindow={handleUpdateAverageWindow}
+                    onSetContinuous={handleUpdateContinuous}
                 />
-            </div>
-        )
-    }else{
-        return(
-            <div className='resultUI'>
-                <Button onClick={handleClick}>
-                    Group
-                </Button>
-                <div className='ticketResultsContainer'>
-                    {Object.keys(props.tickets).map(key => (
-                        <SoloTicketResult
-                            terms={props.tickets[key]["terms"]}
-                            papers={props.tickets[key]["papersAndCodes"]}
-                            dateRange={props.tickets[key]["dateRange"]}
-                            key={key}
-                            requestID={key}
-                            settings={graphSettings[key]}
-                            onChange={handleChange}
-                        />
-                    ))}
-                </div>
-            </div>
-        )
-    }
-
-}
-//TODO: Pass graph settings up, send them to group ticket result, only fetch when necessary
-function SoloTicketResult(props) {
-
-    return (
-        <div className='ticketResults'>
-            <TicketLabel
-                terms={props.terms}
-                papers={props.papers}
-                dateRange={props.dateRange}
-            />
-            <Chart options={props.options}/>
-
-            <TicketPapers onClick={props.onClick}/>
+            ) : (
+                <SoloTickets
+                    tickets={props.tickets}
+                    onSetTimeBin={handleUpdateTimeBin}
+                    onSetAverageWindow={handleUpdateAverageWindow}
+                    onSetContinuous={handleUpdateContinuous}
+                    settings={graphSettings}
+                />
+            )}
         </div>
     )
 }
