@@ -1,4 +1,4 @@
-import React,{useState, useEffect, useCallback} from 'react';
+import React,{useState, useEffect, useLayoutEffect} from 'react';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import TicketLabel from "./TicketLabel";
 import axios from "axios";
@@ -32,7 +32,7 @@ function TicketProgressContainer(props){
     ))
     const [ticketProgressPercents, setTicketProgressPercents] = useState(initPercents)
 //TODO: Exiting before final render
-    useEffect(() => {
+    useLayoutEffect(() => {
         function updateProgress(){
             let progress = 0;
             let currentTicket = '';

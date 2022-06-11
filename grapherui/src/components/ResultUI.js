@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useReducer} from 'react';
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
 import GroupedTicketResults from "./GroupedTicketResults";
@@ -6,23 +6,11 @@ import TicketPapers from "./TicketPapers";
 import Button from "@mui/material/Button"
 
 function ResultUI(props){
-    let starterSettings = {}
-    props.tickets.map(key => (
-        starterSettings[key] = {
-            timeBin: 'year',
-            averageWindow: '0',
-            continuous: 'false',
-            series: {}
-        }
-    ));
-    starterSettings["group"] = {
-        timeBin: 'year',
-        averageWindow: '0',
-        continuous: 'false',
-        series: {}
-    }
+
+
     const [grouped, setGrouped] = useState(true);
-    const [graphSettings, setGraphSettings] = useState(starterSettings);
+    const [graphSettings, dispatch] = useReducer(settingsReducer, props.tickets, initSettings);
+    const [groupedGraphSettings, setGroupedGraphSettings] = useState(starterGroupSettings);
     const [graphSettingsHistory, setGraphSettingsHistory] = useState({});
 
     //Called on initial render
@@ -38,6 +26,22 @@ function ResultUI(props){
                 ))
             })
     }, [props.tickets]);
+
+    function initSettings(tickets){
+        let starterSettings = {};
+        tickets.map(key => (
+            starterSettings[key] = {
+            timeBin: 'year',
+            averageWindow: '0',
+            continuous: 'false',
+            }
+        ));
+        return starterSettings
+    }
+
+    function settingsReducer(state, action){
+        return graphSettings
+    }
 
     //Toggle grouped
     function handleClick(){
@@ -89,7 +93,8 @@ function ResultUI(props){
                 </Button>
                 <GroupedTicketResults
                     tickets={props.tickets}
-                    settings={graphSettings["group"]}
+                    groupSettings={groupedGraphSettings}
+                    ticketSettings={graphSettings}
                     onChange={handleChange}
                 />
             </div>

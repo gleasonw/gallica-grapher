@@ -8,7 +8,8 @@ export function GroupedTicketResults(props) {
         <div className='groupedResultsUI'>
             <GroupedTicketLabelBar tickets={props.tickets}/>
             <GroupedChart
-                settings={props.settings}
+                settings={props.groupSettings}
+                ticketSettings={props.ticketSettings}
                 onChange={props.onChange}
             />
             <GroupedStatBar
@@ -39,8 +40,8 @@ function GroupedTicketLabelBar(props) {
 }
 
 function GroupedChart(props) {
-    const timeBin = props.settings["timeBin"];
-    const keyedSeries = structuredClone(props.settings["series"]);
+    const timeBin = props.groupSettings["timeBin"];
+    const keyedSeries = structuredClone(props.ticketSettings["series"]);
     const [options, setOptions] = useState({});
     useEffect(() => {
         let groupedSeries = []
@@ -110,9 +111,9 @@ function GroupedChart(props) {
             <Chart
                 options={options}
                 onChange={() => props.onChange}
-                continuous={props.settings["continuous"]}
-                timeBinVal={props.settings["timeBin"]}
-                averageWindow={props.settings["averageWindow"]}
+                continuous={props.groupSettings["continuous"]}
+                timeBinVal={props.groupSettings["timeBin"]}
+                averageWindow={props.groupSettings["averageWindow"]}
             />
         </div>
     )
