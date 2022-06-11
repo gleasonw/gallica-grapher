@@ -1,20 +1,19 @@
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
 import TicketPapers from "./TicketPapers";
-import React from "react";
+import generateOptions from "./generateOptions";
+import React, {useContext} from "react";
+import {GraphSettingsContext} from "./GraphSettingsContext";
+import TicketStats from "./TicketStats";
 
 function SoloTickets(props) {
     return (
         <div className='ticketResultsContainer'>
             {Object.keys(props.tickets).map(key => (
                 <SoloTicketResult
-                    terms={props.tickets[key]["terms"]}
-                    papers={props.tickets[key]["papersAndCodes"]}
-                    dateRange={props.tickets[key]["dateRange"]}
+                    ticket={props.tickets[key]}
                     key={key}
-                    requestID={key}
-                    settings={props.settings[key]}
-
+                    ticketID={key}
                 />
             ))}
         </div>
@@ -22,17 +21,18 @@ function SoloTickets(props) {
 }
 
 function SoloTicketResult(props) {
+    const settings = useContext(GraphSettingsContext);
+    const ticketSettings = settings[props.ticketID];
+    const options = generateOptions(
+        ticketSettings.timeBin,
+        ticketSettings.series)
     return (
-        <div className='ticketResults'>
-            <TicketLabel
-                terms={props.terms}
-                papers={props.papers}
-                dateRange={props.dateRange}
-            />
-            <Chart options={props.options}/>
+        <TicketStats
+            grouped={false}
+            options={options}
+            ticketID={props.ticketID}
 
-            <TicketPapers onClick={props.onClick}/>
-        </div>
+        />
     )
 }
 

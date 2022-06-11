@@ -1,10 +1,12 @@
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
-import React from "react";
+import React, {useContext} from "react";
+import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button'
+import Switch from "@mui/material/Switch";
 
 function Chart(props) {
     return (
@@ -14,22 +16,30 @@ function Chart(props) {
                 options={props.options}
             />
             <ChartOptions
-                timeBinVal={props.timeBinVal}
-                averageWindow={props.averageWindow}
-                onChange={props.onChange}
+                settingsID={props.settingsID}
             />
         </div>
 
 
     );
 }
+
 function ChartOptions(props){
+    const settings = useContext(GraphSettingsContext);
+    const settingsForID = settings[props.settingsID];
+    const dispatch = useContext(GraphSettingsDispatchContext)
     return(
         <div>
             <ToggleButtonGroup
-              value={props.timeBinVal}
+              value={settingsForID.timeBin}
               exclusive
-              onChange={props.onChange}
+              onChange={e => {
+                dispatch({
+                    type: 'setTimeBin',
+                    key: props.settingsID,
+                    timeBin: e.target.valueOf()
+                })
+              }}
               aria-label="Time bin size selection"
             >
 
@@ -61,10 +71,28 @@ function ChartOptions(props){
 
             <TextField
                 value={props.averageWindow}
-                onChange={props.onChange}
+                onChange={e => {
+                    dispatch({
+                        type: 'setTimeBin',
+                        key: props.settingsID,
+                        averageWindow: e.target.value,
+                    });
+                }}
                 name='averageWindow'
                 label='Rolling average'
                 type='number'
+            />
+
+            <Switch
+                checked={props.continuous}
+                onChange={e => {
+                    dispatch({
+                        type: 'setContinuous',
+                        key: props.settingsID,
+                        continuous: e.target.valueOf(),
+                    })
+                }}
+                label='require continuous newspapers'
             />
 
             <Button variant="text">

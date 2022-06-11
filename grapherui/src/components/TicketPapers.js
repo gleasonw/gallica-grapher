@@ -6,7 +6,6 @@ export function TicketPapers(props) {
 //TODO: effect firing too early, before all results are in
     useEffect(() => {
         let updatedPapers = [];
-        console.log(props.ticketID)
         fetch(
             "/topPapers?id="+props.ticketID+
             "&continuous="+props.continuous+
