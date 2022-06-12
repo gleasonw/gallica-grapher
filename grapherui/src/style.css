@@ -314,7 +314,6 @@ label[for="papers"],label[for="searchTerm"]{
 }
 .ticketLabel{
     flex: 1;
-    border: solid;
 }
 .ticketLabel *{
     font-size: 16px;

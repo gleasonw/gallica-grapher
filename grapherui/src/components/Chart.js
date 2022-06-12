@@ -15,7 +15,7 @@ function Chart(props) {
                 highcharts={Highcharts}
                 options={props.options}
             />
-            <ChartOptions
+            <ChartSettings
                 settingsID={props.settingsID}
             />
         </div>
@@ -24,7 +24,7 @@ function Chart(props) {
     );
 }
 
-function ChartOptions(props){
+function ChartSettings(props){
     const settings = useContext(GraphSettingsContext);
     const settingsForID = settings[props.settingsID];
     const dispatch = useContext(GraphSettingsDispatchContext)
@@ -37,7 +37,7 @@ function ChartOptions(props){
                 dispatch({
                     type: 'setTimeBin',
                     key: props.settingsID,
-                    timeBin: e.target.valueOf()
+                    timeBin: e.target.value
                 })
               }}
               aria-label="Time bin size selection"
@@ -73,7 +73,7 @@ function ChartOptions(props){
                 value={props.averageWindow}
                 onChange={e => {
                     dispatch({
-                        type: 'setTimeBin',
+                        type: 'setAverageWindow',
                         key: props.settingsID,
                         averageWindow: e.target.value,
                     });

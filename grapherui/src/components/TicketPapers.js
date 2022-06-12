@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import Button from "@mui/material/Button";
-import {useContext} from "@types/react";
+import {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 
 export function TicketPapers(props) {
@@ -12,7 +12,7 @@ export function TicketPapers(props) {
         fetch(
             "/topPapers?id="+props.ticketID+
             "&continuous="+ticketSettings.continuous+
-            "&dateRange="+ticketSettings.dateRange)
+            "&dateRange="+props.dateRange)
             .then(res => res.json())
             .then(result => {
                 updatedPapers = result["topPapers"]
@@ -23,16 +23,18 @@ export function TicketPapers(props) {
     return (
         <div className='ticketStats'>
             <table className='topPaperTable'>
-                <tr>
-                    <th>Paper</th>
-                    <th>Count</th>
-                </tr>
-                {topPapers.map(paperCount => (
+                <tbody>
                     <tr>
-                        <td>{paperCount[0]}</td>
-                        <td>{paperCount[1]}</td>
+                        <th>Paper</th>
+                        <th>Count</th>
                     </tr>
-                ))}
+                    {topPapers.map(paperCount => (
+                        <tr key={paperCount[0]}>
+                            <td>{paperCount[0]}</td>
+                            <td>{paperCount[1]}</td>
+                        </tr>
+                    ))}
+                </tbody>
             </table>
             <Button variant='text'>
                 Download full result CSV

@@ -49,12 +49,12 @@ def papers(query):
 @app.route('/graphData')
 def getGraphData():
 
-    options = TicketGraphSeriesBatch(
+    series = TicketGraphSeriesBatch(
         request.args["keys"],
         averagewindow=request.args["averageWindow"],
         groupby=request.args["timeBin"])
 
-    items = {'options': options.getSeries()}
+    items = {'series': series.getSeries()}
     return items
 
 @app.route('/topPapers')

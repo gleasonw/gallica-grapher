@@ -20,14 +20,12 @@ function GroupedTicketLabelBar(props) {
     return (
         <div className='groupedLabelBar'>
             {Object.keys(props.tickets).map(key => (
-                <div className = 'groupedLabel'>
-                    <TicketLabel
-                        terms={props.tickets[key].terms}
-                        papers={props.tickets[key].papersAndCodes}
-                        dateRange={props.tickets[key].dateRange}
-                        key={key}
-                    />
-                </div>
+                <TicketLabel
+                    terms={props.tickets[key].terms}
+                    papers={props.tickets[key].papersAndCodes}
+                    dateRange={props.tickets[key].dateRange}
+                    key={key}
+                />
             ))}
         </div>
     );
@@ -40,13 +38,10 @@ function GroupedChart() {
     const timeBin = groupSettings.timeBin;
     const keyedSeries = groupSettings.series;
     const [options, setOptions] = useState({});
-
     useEffect(() => {
-        let groupedSeries = [];
-        groupedSeries.push(
+        let groupedSeries =
             Object.keys(keyedSeries).map(key =>
-            keyedSeries[key]
-        ))
+            keyedSeries[key])
         setOptions(generateOptions(timeBin, groupedSeries))
     },[keyedSeries, timeBin])
 
@@ -61,31 +56,18 @@ function GroupedChart() {
 }
 
 function GroupedStatBar(props) {
-    const settings = useContext(GraphSettingsContext);
     return (
         <div className='groupedStatBar'>
             {Object.keys(props.tickets).map(key => (
-                <GroupedTicketStat
-                    ticket={props.tickets[key]}
-                    settings={settings[key]}
-                    ticketID={key}
+                <TicketStats
                     key={key}
+                    ticket={props.tickets[key]}
+                    ticketID={key}
+                    grouped={true}
                 />
             ))}
         </div>
     );
-}
-
-function GroupedTicketStat(props) {
-    return (
-        <div className='groupedStat'>
-            <TicketStats
-                ticket={props.ticket}
-                ticketID={props.ticketID}
-                grouped={true}
-            />
-        </div>
-    )
 }
 
 export default GroupedTicketResults;

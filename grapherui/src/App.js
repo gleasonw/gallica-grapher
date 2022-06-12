@@ -79,7 +79,13 @@ function App() {
             <div className="App">
                 {header}
                 <ResultUI
-                    tickets={idTickets}
+                    tickets={{
+                        '4321':{
+                            'terms': ['brazza'],
+                            'papersAndCodes': [{'paper':'huh','code':'1234'}],
+                            'dateRange': [1800,1900]
+                        }
+                    }}
                 />
             </div>
           )

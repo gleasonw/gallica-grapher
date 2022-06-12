@@ -4,21 +4,18 @@ import Button from "@mui/material/Button"
 import SoloTickets from "./SoloTickets";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 
-//TODO: another pass over state, in particular, ensuring no duplicate keys.
-//TODO: Flatten state so one key => graphSettings, searchSettings?
+
 //TODO: use context for tickets.
-//TODO:
 function ResultUI(props){
 
+    const [firstDegroup, setFirstDegroup] = useState(true);
     const [grouped, setGrouped] = useState(true);
     const [graphSettings, dispatch] = useReducer(
         settingsReducer,
         props.tickets,
-        initGraphSettings);
-    const [settingHistory, setSettingHistory] = useState({});
+        initGraphSettings)
 
-    //TODO: Populate the group series first. Then, on degroup, use group series
-    //TODO: data to populate individual series.
+    //TODO: Catch errors on fetch
     useEffect(() => {
         const requestIDS = Object.keys(props.tickets);
         fetch(
@@ -29,49 +26,30 @@ function ResultUI(props){
                 dispatch({
                     type: 'setSeries',
                     key: 'group',
-                    series: result
+                    series: result.series
                 })
             })
     }, [props.tickets]);
 
     function handleClick(){
-        grouped ?
-            handleRestore() :
-            stashIndividualOptionsHistory()
+        if(firstDegroup && grouped){
+            populateTicketSettingsFromGroup()
+            setFirstDegroup(false)
+        }
         setGrouped(!grouped)
     }
 
-    function stashIndividualOptionsHistory(){
-        setSettingHistory(graphSettings)
-    }
-
-    //If it's not the first degroup, use the history. If it is the first, use
-    //the group data.
-
-    function handleRestore(){
-        settingHistory ?
-            loadSoloGraphDataFromHistory() :
-            loadSoloGraphDataFromGroup()
-    }
-
-    function loadSoloGraphDataFromHistory(){
-        const newSettings = {
-            ...settingHistory,
-            group: graphSettings.group
-        }
-        dispatch({
-            type: 'restoreSettings',
-            settings: newSettings
-        })
-
-    }
-    function loadSoloGraphDataFromGroup(){
-        const groupSeries = graphSettings.group.series;
+    function populateTicketSettingsFromGroup(){
+        const groupSettings = graphSettings.group;
+        const groupSeries = groupSettings.series;
         groupSeries.map(key => (
             dispatch({
-                type: 'setSeries',
+                type: 'setTicketSettings',
                 key: key,
-                series: groupSeries[key]
+                settings: {
+                    ...groupSettings,
+                    series: groupSeries[key]
+                }
             })
         ))
     }
@@ -84,7 +62,7 @@ function ResultUI(props){
             series: []
         }
         let initialGraphSettings = {}
-        tickets.map(key => (
+        Object.keys(tickets).map(key => (
             initialGraphSettings[key] = initSetting
         ));
         initialGraphSettings["group"] = initSetting
@@ -92,8 +70,8 @@ function ResultUI(props){
     }
 
     return(
-        <GraphSettingsContext value={graphSettings}>
-            <GraphSettingsDispatchContext value={dispatch()}>
+        <GraphSettingsContext.Provider value={graphSettings}>
+            <GraphSettingsDispatchContext.Provider value={dispatch}>
                 <div className='resultUI'>
                     <Button onClick={handleClick}>
                         Group
@@ -108,11 +86,11 @@ function ResultUI(props){
                         />
                     )}
                 </div>
-            </GraphSettingsDispatchContext>
-        </GraphSettingsContext>
+            </GraphSettingsDispatchContext.Provider>
+        </GraphSettingsContext.Provider>
     )
 }
-
+//TODO: Async updates.
 function settingsReducer(graphSettings, action){
     switch (action.type){
         case 'setSeries' : {
@@ -125,14 +103,18 @@ function settingsReducer(graphSettings, action){
             }
         }
         case 'setTimeBin': {
-            const newSeries = updateSeries(action);
-            return {
-                ...graphSettings,
-                [action.key]: {
-                    ...graphSettings[action.key],
-                    timeBin: action.timeBin,
-                    series: newSeries
+            if(action.timeBin){
+                const newSeries = updateSeries(action);
+                return {
+                    ...graphSettings,
+                    [action.key]: {
+                        ...graphSettings[action.key],
+                        timeBin: action.timeBin,
+                        series: newSeries
+                    }
                 }
+            }else{
+                return graphSettings
             }
         }case 'setAverageWindow': {
             const newSeries = updateSeries(action);
@@ -154,23 +136,35 @@ function settingsReducer(graphSettings, action){
                     series: newSeries
                 }
             }
-        }case 'restore': {
-            return {}
+        }case 'setTicketSettings': {
+            return {
+                ...graphSettings,
+                [action.key]: action.settings
+            }
         }
         default:
             throw Error("Unknown action: " + action.type);
     }
     function updateSeries(settings){
-        let newSeries = {}
-        fetch(
-            "/graphData?keys=" + settings.key +
-            "&averageWindow=" + settings.averageWindow +
+        //TODO: A wonky way of getting the keys. I feel I could organize better.
+        const averageWindow = settings.averageWindow ?
+            settings.averageWindow : 0;
+        const ticketIDs = settings.key === 'group' ?
+            Object.keys(graphSettings).filter(key => key !== 'group') :
+            settings.key
+        return fetch(
+            "/graphData?keys=" + ticketIDs +
+            "&averageWindow=" + averageWindow +
             "&timeBin=" + settings.timeBin)
             .then(res => res.json())
-            .then(result => {
-                newSeries = result
-            })
-        return newSeries
+            .then(
+                (result) => {
+                    return result
+                },
+                (error) => {
+                    return error
+                }
+            )
     }
 }
 export default ResultUI;

@@ -8,7 +8,7 @@ export default function TicketStats(props){
         <div className={props.grouped ? 'ticketResults' : 'groupedStat'}>
             <TicketLabel
                 terms={props.ticket.terms}
-                papers={props.ticket.papers}
+                papers={props.ticket.papersAndCodes}
                 dateRange={props.ticket.dateRange}
             />
             {!props.grouped &&
@@ -17,7 +17,10 @@ export default function TicketStats(props){
                     settingsID={props.ticketID}
                 />
             }
-            <TicketPapers ticketID={props.ticketID}/>
+            <TicketPapers
+                ticketID={props.ticketID}
+                dateRange={props.ticket.dateRange}
+            />
         </div>
     )
 }

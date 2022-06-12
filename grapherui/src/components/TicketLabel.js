@@ -3,7 +3,7 @@ import React from 'react';
 class TicketLabel extends React.Component{
     render(){
         return(
-            <div>
+            <div className='ticketLabel'>
                 <TicketTermRow terms={this.props.terms}/>
                 <TicketPaperRow papers={this.props.papers}/>
                 <TicketDateRow dateRange={this.props.dateRange}/>

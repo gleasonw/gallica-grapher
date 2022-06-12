@@ -19,7 +19,12 @@ class TicketGraphSeriesBatch:
             self.selectGraphSeries()
 
     def getSeries(self):
-        return self.dataBatches
+        dataBatchesDict = {}
+        for dataBatch in self.dataBatches:
+            requestID = dataBatch[0]
+            series = dataBatch[1]
+            dataBatchesDict[requestID] = series
+        return dataBatchesDict
 
     def selectGraphSeries(self):
         self.dataBatches = list(map(
@@ -33,7 +38,7 @@ class TicketGraphSeriesBatch:
             self.dbConnection,
             self.averageWindow,
             self.groupBy)
-        return {requestID: series.getSeries()}
+        return [requestID, series.getSeries()]
 
 
 class TicketGraphSeries:
