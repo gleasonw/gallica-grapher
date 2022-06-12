@@ -1,6 +1,5 @@
 
-
-export default function generateOptions(timeBin, series){
+function generateOptions(timeBin, series){
     let options = {
         chart: {
             zoomType: 'x'
@@ -54,3 +53,4 @@ export default function generateOptions(timeBin, series){
     }
     return options;
 }
+module.exports = generateOptions;

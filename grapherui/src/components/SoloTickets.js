@@ -1,6 +1,3 @@
-import TicketLabel from "./TicketLabel";
-import Chart from "./Chart";
-import TicketPapers from "./TicketPapers";
 import generateOptions from "./generateOptions";
 import React, {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
@@ -28,10 +25,10 @@ function SoloTicketResult(props) {
         ticketSettings.series)
     return (
         <TicketStats
+            ticket={props.ticket}
+            ticketID={props.ticketID}
             grouped={false}
             options={options}
-            ticketID={props.ticketID}
-
         />
     )
 }

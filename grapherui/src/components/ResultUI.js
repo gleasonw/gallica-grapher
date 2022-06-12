@@ -4,6 +4,10 @@ import Button from "@mui/material/Button"
 import SoloTickets from "./SoloTickets";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 
+//TODO: another pass over state, in particular, ensuring no duplicate keys.
+//TODO: Flatten state so one key => graphSettings, searchSettings?
+//TODO: use context for tickets.
+//TODO:
 function ResultUI(props){
 
     const [grouped, setGrouped] = useState(true);
@@ -13,6 +17,8 @@ function ResultUI(props){
         initGraphSettings);
     const [settingHistory, setSettingHistory] = useState({});
 
+    //TODO: Populate the group series first. Then, on degroup, use group series
+    //TODO: data to populate individual series.
     useEffect(() => {
         const requestIDS = Object.keys(props.tickets);
         fetch(
@@ -20,13 +26,11 @@ function ResultUI(props){
             "&averageWindow=0&timeBin=year")
             .then(res => res.json())
             .then(result => {
-                result["options"].map(key => (
-                    dispatch({
-                        type: 'setSeries',
-                        key: key,
-                        series: result
-                    })
-                ))
+                dispatch({
+                    type: 'setSeries',
+                    key: 'group',
+                    series: result
+                })
             })
     }, [props.tickets]);
 
@@ -41,17 +45,35 @@ function ResultUI(props){
         setSettingHistory(graphSettings)
     }
 
+    //If it's not the first degroup, use the history. If it is the first, use
+    //the group data.
+
     function handleRestore(){
-        if(settingHistory){
-            const newSettings = {
-                ...settingHistory,
-                group: graphSettings.group
-            }
-            dispatch({
-                type: 'restoreSettings',
-                settings: newSettings
-            })
+        settingHistory ?
+            loadSoloGraphDataFromHistory() :
+            loadSoloGraphDataFromGroup()
+    }
+
+    function loadSoloGraphDataFromHistory(){
+        const newSettings = {
+            ...settingHistory,
+            group: graphSettings.group
         }
+        dispatch({
+            type: 'restoreSettings',
+            settings: newSettings
+        })
+
+    }
+    function loadSoloGraphDataFromGroup(){
+        const groupSeries = graphSettings.group.series;
+        groupSeries.map(key => (
+            dispatch({
+                type: 'setSeries',
+                key: key,
+                series: groupSeries[key]
+            })
+        ))
     }
 
     function initGraphSettings(tickets){

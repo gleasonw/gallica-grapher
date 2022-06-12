@@ -25,7 +25,7 @@ class TicketQuery:
         self.totalResults = 0
         self.numBatchesRetrieved = 0
         self.numBatches = 0
-
+#TODO: Get rid of top paper sending, add "finished adding to database" check
     def run(self):
         self.initQueryObjects()
         self.getNumResults()

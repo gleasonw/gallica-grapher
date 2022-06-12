@@ -1,21 +1,24 @@
 import React, {useState, useEffect} from "react";
 import Button from "@mui/material/Button";
+import {useContext} from "@types/react";
+import {GraphSettingsContext} from "./GraphSettingsContext";
 
 export function TicketPapers(props) {
     const [topPapers, setTopPapers] = useState([]);
-//TODO: effect firing too early, before all results are in
+    const settings = useContext(GraphSettingsContext);
+    const ticketSettings = settings[props.ticketID];
     useEffect(() => {
         let updatedPapers = [];
         fetch(
             "/topPapers?id="+props.ticketID+
-            "&continuous="+props.continuous+
-            "&dateRange="+props.dateRange)
+            "&continuous="+ticketSettings.continuous+
+            "&dateRange="+ticketSettings.dateRange)
             .then(res => res.json())
             .then(result => {
                 updatedPapers = result["topPapers"]
                 setTopPapers(updatedPapers)
             })
-    }, [props.continuous, props.dateRange, props.ticketID])
+    }, [props.ticketID, ticketSettings.continuous, ticketSettings.dateRange])
 
     return (
         <div className='ticketStats'>

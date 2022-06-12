@@ -10,7 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
     const [tickets, setTickets] = useState([])
     const [idTickets, setIDTickets] = useState({})
-    const [gettingInput, setGettingInput] = useState(true)
+    const [gettingInput, setGettingInput] = useState(false)
     const [runningQueries, setRunningQueries] = useState(false)
 
     let wrapperSetRunningQueries = useCallback(val => {

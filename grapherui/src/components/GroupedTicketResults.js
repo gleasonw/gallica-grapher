@@ -2,8 +2,8 @@ import React, {useEffect, useState, useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
-import TicketPapers from "./TicketPapers";
 import generateOptions from "./generateOptions"
+import TicketStats from "./TicketStats";
 
 export function GroupedTicketResults(props) {
     return (
@@ -32,8 +32,8 @@ function GroupedTicketLabelBar(props) {
         </div>
     );
 }
-
-function GroupedChart(props) {
+//TODO: ensure the object series --> array series works
+function GroupedChart() {
     const settings = useContext(GraphSettingsContext);
     const groupSettings = settings.group;
 
@@ -79,15 +79,10 @@ function GroupedStatBar(props) {
 function GroupedTicketStat(props) {
     return (
         <div className='groupedStat'>
-            <TicketLabel
-                terms={props.ticket.terms}
-                papers={props.ticket.papers}
-                dateRange={props.ticket.dateRange}
-            />
-            <TicketPapers
+            <TicketStats
+                ticket={props.ticket}
                 ticketID={props.ticketID}
-                continuous={props.settings.continuous}
-                dateRange={props.ticket.dateRange}
+                grouped={true}
             />
         </div>
     )

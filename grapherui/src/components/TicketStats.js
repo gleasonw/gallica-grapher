@@ -11,15 +11,13 @@ export default function TicketStats(props){
                 papers={props.ticket.papers}
                 dateRange={props.ticket.dateRange}
             />
-            {props.grouped && <Chart
-                options={props.options}
-                settingsID={props.ticketID}
-            />}
-            <TicketPapers
-                ticketID={props.ticketID}
-                continuous={props.continuous}
-                dateRange={props.ticket.dateRange}
-            />
+            {!props.grouped &&
+                <Chart
+                    options={props.options}
+                    settingsID={props.ticketID}
+                />
+            }
+            <TicketPapers ticketID={props.ticketID}/>
         </div>
     )
 }

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallica.ticketGraphSeries import TicketGraphSeries
+from ticketGraphSeriesBatch import TicketGraphSeries
 import psycopg2
 
 class TestTicketGraphSeries(TestCase):
