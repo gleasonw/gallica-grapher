@@ -2,21 +2,16 @@ import datetime
 import ciso8601
 from db import DB
 
-
+#TODO: test with continuous settings
 class TicketGraphSeriesBatch:
-    def __init__(self,
-                 requestids,
-                 averagewindow=0,
-                 groupby='day'):
+
+    def __init__(self, settings):
 
         self.dbConnection = DB().getConn()
         self.dataBatches = []
-
-        if requestids and groupby:
-            self.averageWindow = int(averagewindow)
-            self.requestIDs = requestids.split(',')
-            self.groupBy = groupby
-            self.selectGraphSeries()
+        self.settings = settings
+        self.requestIDs = settings["ticketIDs"]
+        self.selectGraphSeries()
 
     def getSeries(self):
         dataBatchesDict = {}
@@ -35,23 +30,32 @@ class TicketGraphSeriesBatch:
     def selectDataForRequestID(self, requestID):
         series = TicketGraphSeries(
             requestID,
-            self.dbConnection,
-            self.averageWindow,
-            self.groupBy)
+            self.settings,
+            self.dbConnection)
         return [requestID, series.getSeries()]
+
+
+def parseContinuous(cont):
+    if cont.lower() == "true":
+        return True
+    else:
+        return False
 
 
 class TicketGraphSeries:
 
     def __init__(self,
                  requestid,
-                 dbConnection,
-                 averagewindow=0,
-                 groupby='month'):
+                 settings,
+                 dbConnection):
 
+        self.continuous = parseContinuous(settings["continuous"])
         self.requestID = requestid
-        self.averageWindow = int(averagewindow)
-        self.timeBin = groupby
+        self.averageWindow = int(settings["averageWindow"])
+        self.timeBin = settings["groupby"]
+        dateRange = settings["dateRange"].split(",")
+        self.lowYear = dateRange[0]
+        self.highYear = dateRange[1]
         self.data = []
         self.searchTerms = []
         self.request = None
@@ -80,40 +84,124 @@ class TicketGraphSeries:
     def initDayRequest(self):
         self.request = """
         SELECT year, month, day, avgFrequency::float8
-            FROM (SELECT year, month, day, AVG(mentions)
-            OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM (SELECT year, month, day, count(*) AS mentions 
-                FROM results WHERE requestid = %s 
-                AND month IS NOT NULL
-                AND day IS NOT NULL
+            FROM 
+                (SELECT year, month, day, 
+                    AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+                FROM 
+                    (SELECT year, month, day, count(*) AS mentions 
+                    FROM results 
+                    WHERE requestid = %s 
+                        AND month IS NOT NULL
+                        AND day IS NOT NULL
+                    GROUP BY year, month, day 
+                    ORDER BY year, month, day) 
+                    AS countTable) AS decimalAvg;
+        """
+
+    def initDayContinuousPaperRequest(self):
+        self.request = """
+        SELECT year, month, day, avgFrequency::float8
+        FROM 
+            (SELECT year, month, day, 
+                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM 
+                (SELECT year, month, day, count(*) AS mentions 
+                FROM 
+                    (SELECT year, month, day, paperid
+                    FROM results 
+                    WHERE requestid=%s
+                        AND month IS NOT NULL 
+                        AND day IS NOT NULL) AS resultsForTicket
+                    
+                    INNER JOIN papers 
+                    ON resultsForTicket.paperid = papers.code
+                        AND papers.startdate < %s
+                        AND papers.enddate > %s
+                        AND continuous IS TRUE
                 GROUP BY year, month, day 
-                ORDER BY year, month, day) 
-                AS countTable) AS decimalAvg;
+                ORDER BY year, month, day) AS countTable) 
+        AS floatAvg;
         """
 
     def initMonthRequest(self):
         self.request = """
         SELECT year, month, avgFrequency::float8 
-            FROM (SELECT year, month, AVG(mentions) 
-            OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM (SELECT year, month, count(*) AS mentions 
-                FROM results WHERE requestid = %s 
-                AND month IS NOT NULL
+        FROM 
+            (SELECT year, month, 
+                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM 
+                (SELECT year, month, count(*) AS mentions 
+                FROM results 
+                    WHERE requestid = %s 
+                        AND month IS NOT NULL
                 GROUP BY year, month
-                ORDER BY year,month) AS countTable) AS decimalAvg;
+                ORDER BY year,month) AS countTable) 
+        AS decimalAvg;
         """
+
+    def initMonthContinuousPaperRequest(self):
+        self.request = """
+        SELECT year, month, avgFrequency::float8
+        FROM 
+            (SELECT year, month,
+                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM 
+                (SELECT year, month, count(*) AS mentions 
+                FROM 
+                    (SELECT year, month, paperid
+                    FROM results 
+                    WHERE requestid=%s
+                        AND month IS NOT NULL ) AS resultsForTicket
+
+                    INNER JOIN papers 
+                    ON resultsForTicket.paperid = papers.code
+                        AND papers.startdate < %s
+                        AND papers.enddate > %s
+                        AND continuous IS TRUE
+                GROUP BY year, month
+                ORDER BY year, month) 
+            AS countTable) 
+        AS floatAvg;
+                """
 
     def initYearRequest(self):
         self.request = """
         SELECT year, avgFrequency::float8 
-            FROM(SELECT year, AVG(mentions)
-            OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM (SELECT year, count(*) AS mentions 
-                FROM results WHERE requestid = %s
-                AND year IS NOT NULL
-                GROUP BY year 
-                ORDER BY year) AS countTable) AS decimalAvg;
+            FROM
+                (SELECT year, 
+                    AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+                FROM 
+                    (SELECT year, count(*) AS mentions 
+                    FROM results 
+                    WHERE requestid = %s
+                        AND year IS NOT NULL
+                    GROUP BY year 
+                    ORDER BY year) AS countTable) 
+        AS decimalAvg;
         """
+
+    def initYearContinuousPaperRequest(self):
+        self.request = """
+        SELECT year, avgFrequency::float8
+        FROM 
+            (SELECT year,
+                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM 
+                (SELECT year, count(*) AS mentions 
+                FROM 
+                    (SELECT year, paperid
+                    FROM results 
+                    WHERE requestid=%s) AS resultsForTicket
+
+                    INNER JOIN papers 
+                    ON resultsForTicket.paperid = papers.code
+                        AND papers.startdate < %s
+                        AND papers.enddate > %s
+                        AND continuous IS TRUE
+                    GROUP BY year
+                    ORDER BY year) AS countTable) 
+        AS floatAvg;
+                """
 
     def runQuery(self):
         self.getSearchTerms()
@@ -130,8 +218,13 @@ class TicketGraphSeries:
 
     def binRecordsAndFetch(self):
         with self.dbConnection.cursor() as curs:
-            curs.execute(self.request, (self.averageWindow, self.requestID,))
-            self.data = curs.fetchall()
+            if self.continuous:
+                curs.execute(self.request, (self.averageWindow, self.requestID,))
+                self.data = curs.fetchall()
+            else:
+                curs.execute(self.request, (self.averageWindow, self.requestID,))
+                self.data = curs.fetchall()
+
 
     def parseDatesToJSTimestamp(self):
 

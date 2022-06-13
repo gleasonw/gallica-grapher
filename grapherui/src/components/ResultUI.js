@@ -15,22 +15,6 @@ function ResultUI(props){
         props.tickets,
         initGraphSettings)
 
-    //TODO: Catch errors on fetch
-    useEffect(() => {
-        const requestIDS = Object.keys(props.tickets);
-        fetch(
-            "/graphData?keys="+requestIDS+
-            "&averageWindow=0&timeBin=year")
-            .then(res => res.json())
-            .then(result => {
-                dispatch({
-                    type: 'setSeries',
-                    key: 'group',
-                    series: result.series
-                })
-            })
-    }, [props.tickets]);
-
     function handleClick(){
         if(firstDegroup && grouped){
             populateTicketSettingsFromGroup()
@@ -144,27 +128,6 @@ function settingsReducer(graphSettings, action){
         }
         default:
             throw Error("Unknown action: " + action.type);
-    }
-    function updateSeries(settings){
-        //TODO: A wonky way of getting the keys. I feel I could organize better.
-        const averageWindow = settings.averageWindow ?
-            settings.averageWindow : 0;
-        const ticketIDs = settings.key === 'group' ?
-            Object.keys(graphSettings).filter(key => key !== 'group') :
-            settings.key
-        return fetch(
-            "/graphData?keys=" + ticketIDs +
-            "&averageWindow=" + averageWindow +
-            "&timeBin=" + settings.timeBin)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    return result
-                },
-                (error) => {
-                    return error
-                }
-            )
     }
 }
 export default ResultUI;

@@ -48,25 +48,27 @@ def papers(query):
 
 @app.route('/graphData')
 def getGraphData():
-
-    series = TicketGraphSeriesBatch(
-        request.args["keys"],
-        averagewindow=request.args["averageWindow"],
-        groupby=request.args["timeBin"])
-
+    settings = {
+        'ticketIDs': request.args["keys"],
+        'averageWindow': request.args["averageWindow"],
+        'groupBy': request.args["timeBin"],
+        'continuous': request.args["continuous"]
+    }
+    series = TicketGraphSeriesBatch(settings)
     items = {'series': series.getSeries()}
     return items
 
+
 @app.route('/topPapers')
 def getTopPapersFromID():
-
     topPapers = TopPapers(
         request.args["id"],
         request.args["dateRange"],
         continuous=request.args["continuous"]
     )
-    items = {"topPapers" : topPapers.getTopPapers()}
+    items = {"topPapers": topPapers.getTopPapers()}
     return items
+
 
 if __name__ == "__main__":
     app.run(debug=True)

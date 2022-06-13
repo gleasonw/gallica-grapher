@@ -5,20 +5,25 @@ class TopPapers:
 
     def __init__(self,
                  ticketID,
-                 dateString,
+                 dateRange,
                  continuous):
 
         database = DB()
         self.conn = database.getConn()
         self.ticketID = ticketID
-        self.continuous = False
-        self.lowYear = None
-        self.highYear = None
+        self.continuous = self.parseContinuous(continuous)
+        dateRange = dateRange.split(",")
+        self.lowYear = dateRange[0]
+        self.highYear = dateRange[1]
 
         self.topPapers = []
         self.selectTopPapers()
-        self.parseContinuous(continuous)
-        self.parseDateString(dateString)
+
+    def parseContinuous(self, cont):
+        if cont.lower() == "true":
+            return True
+        else:
+            return False
 
     def getTopPapers(self):
         return self.topPapers
@@ -69,12 +74,3 @@ class TopPapers:
 
             """, (self.ticketID, self.lowYear, self.highYear,))
             self.topPapers = cursor.fetchall()
-
-    def parseContinuous(self, continuous):
-        if continuous == 'true':
-            self.continuous = True
-
-    def parseDateString(self, dateString):
-        dateRange = dateString.split(",")
-        self.lowYear = dateRange[0]
-        self.highYear = dateRange[1]
