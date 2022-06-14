@@ -52,7 +52,8 @@ def getGraphData():
         'ticketIDs': request.args["keys"],
         'averageWindow': request.args["averageWindow"],
         'groupBy': request.args["timeBin"],
-        'continuous': request.args["continuous"]
+        'continuous': request.args["continuous"],
+        'dateRange': request.args["dateRange"]
     }
     series = TicketGraphSeriesBatch(settings)
     items = {'series': series.getSeries()}

@@ -2,15 +2,15 @@ import datetime
 import ciso8601
 from db import DB
 
-#TODO: test with continuous settings
+
+# TODO: test with continuous settings
 class TicketGraphSeriesBatch:
 
     def __init__(self, settings):
-
         self.dbConnection = DB().getConn()
         self.dataBatches = []
         self.settings = settings
-        self.requestIDs = settings["ticketIDs"]
+        self.requestIDs = settings["ticketIDs"].split(",")
         self.selectGraphSeries()
 
     def getSeries(self):
@@ -52,7 +52,7 @@ class TicketGraphSeries:
         self.continuous = parseContinuous(settings["continuous"])
         self.requestID = requestid
         self.averageWindow = int(settings["averageWindow"])
-        self.timeBin = settings["groupby"]
+        self.timeBin = settings["groupBy"]
         dateRange = settings["dateRange"].split(",")
         self.lowYear = dateRange[0]
         self.highYear = dateRange[1]
@@ -83,125 +83,154 @@ class TicketGraphSeries:
 
     def initDayRequest(self):
         self.request = """
-        SELECT year, month, day, avgFrequency::float8
-            FROM 
-                (SELECT year, month, day, 
+        
+        WITH binned_frequencies AS (
+            SELECT year, month, day, count(*) AS mentions 
+            FROM results 
+            WHERE requestid = %s 
+                AND month IS NOT NULL
+                AND day IS NOT NULL
+            GROUP BY year, month, day 
+            ORDER BY year, month, day),
+            
+            averaged_frequencies AS (
+            SELECT year, month, day, 
                     AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-                FROM 
-                    (SELECT year, month, day, count(*) AS mentions 
-                    FROM results 
-                    WHERE requestid = %s 
-                        AND month IS NOT NULL
-                        AND day IS NOT NULL
-                    GROUP BY year, month, day 
-                    ORDER BY year, month, day) 
-                    AS countTable) AS decimalAvg;
+            FROM binned_frequencies)
+            
+        SELECT year, month, day, avgFrequency::numeric
+            FROM averaged_frequencies;
+                
         """
 
     def initDayContinuousPaperRequest(self):
         self.request = """
-        SELECT year, month, day, avgFrequency::float8
-        FROM 
+        
+        WITH ticket_results AS 
+            (SELECT year, month, day, paperid
+            FROM results 
+            WHERE requestid=%s
+                AND month IS NOT NULL 
+                AND day IS NOT NULL),
+        
+            binned_results_only_continuous AS 
+            (SELECT year, month, day, count(*) AS mentions 
+            FROM 
+                ticket_results
+                    
+                JOIN papers 
+                ON ticket_results.paperid = papers.code
+                    AND papers.startdate < %s
+                    AND papers.enddate > %s
+                    AND continuous IS TRUE
+                GROUP BY year, month, day 
+                ORDER BY year, month, day),
+                
+            averaged_frequencies AS 
             (SELECT year, month, day, 
                 AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM 
-                (SELECT year, month, day, count(*) AS mentions 
-                FROM 
-                    (SELECT year, month, day, paperid
-                    FROM results 
-                    WHERE requestid=%s
-                        AND month IS NOT NULL 
-                        AND day IS NOT NULL) AS resultsForTicket
-                    
-                    INNER JOIN papers 
-                    ON resultsForTicket.paperid = papers.code
-                        AND papers.startdate < %s
-                        AND papers.enddate > %s
-                        AND continuous IS TRUE
-                GROUP BY year, month, day 
-                ORDER BY year, month, day) AS countTable) 
-        AS floatAvg;
+            FROM binned_results_only_continuous)
+        
+        SELECT year, month, day, avgFrequency::numeric
+        FROM averaged_frequencies;
         """
 
     def initMonthRequest(self):
         self.request = """
-        SELECT year, month, avgFrequency::float8 
-        FROM 
+        WITH binned_frequencies AS
+            (SELECT year, month, count(*) AS mentions 
+                    FROM results continuous
+                        WHERE requestid = %s 
+                            AND month IS NOT NULL
+                    GROUP BY year, month
+                    ORDER BY year,month),
+        
+            averaged_frequencies AS 
             (SELECT year, month, 
-                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM 
-                (SELECT year, month, count(*) AS mentions 
-                FROM results 
-                    WHERE requestid = %s 
-                        AND month IS NOT NULL
-                GROUP BY year, month
-                ORDER BY year,month) AS countTable) 
-        AS decimalAvg;
+                    AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM binned_frequencies)
+        
+        SELECT year, month, avgFrequency::numeric 
+        FROM averaged_frequencies;
         """
 
     def initMonthContinuousPaperRequest(self):
         self.request = """
-        SELECT year, month, avgFrequency::float8
-        FROM 
-            (SELECT year, month,
-                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM 
+        WITH ticket_results AS
+            (SELECT year, month, paperid
+            FROM results 
+            WHERE requestid=%s
+                AND month IS NOT NULL),
+                
+            binned_frequencies_only_continuous AS
                 (SELECT year, month, count(*) AS mentions 
                 FROM 
-                    (SELECT year, month, paperid
-                    FROM results 
-                    WHERE requestid=%s
-                        AND month IS NOT NULL ) AS resultsForTicket
+                    ticket_results
 
-                    INNER JOIN papers 
-                    ON resultsForTicket.paperid = papers.code
+                    JOIN papers 
+                    ON ticket_results.paperid = papers.code
                         AND papers.startdate < %s
                         AND papers.enddate > %s
                         AND continuous IS TRUE
                 GROUP BY year, month
-                ORDER BY year, month) 
-            AS countTable) 
-        AS floatAvg;
-                """
+                ORDER BY year, month),
+                
+            averaged_frequencies AS
+                (SELECT year, month, 
+                    AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+                FROM binned_frequencies_only_continuous)
+                
+        SELECT year, month, avgFrequency::numeric
+        FROM averaged_frequencies;
+        """
 
     def initYearRequest(self):
         self.request = """
-        SELECT year, avgFrequency::float8 
-            FROM
-                (SELECT year, 
+        WITH binned_frequencies AS
+            (SELECT year, count(*) AS mentions 
+            FROM results 
+            WHERE requestid = %s
+                AND year IS NOT NULL
+            GROUP BY year 
+            ORDER BY year),
+            
+            averaged_frequencies AS
+            (SELECT year, 
                     AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-                FROM 
-                    (SELECT year, count(*) AS mentions 
-                    FROM results 
-                    WHERE requestid = %s
-                        AND year IS NOT NULL
-                    GROUP BY year 
-                    ORDER BY year) AS countTable) 
-        AS decimalAvg;
+            FROM binned_frequencies)
+            
+        SELECT year, avgFrequency::numeric
+        FROM averaged_frequencies;
         """
 
     def initYearContinuousPaperRequest(self):
         self.request = """
-        SELECT year, avgFrequency::float8
-        FROM 
+        WITH ticket_results AS
+            (SELECT year, paperid
+            FROM results 
+            WHERE requestid=%s),
+            
+            binned_frequencies_only_continuous AS
+            (SELECT year, count(*) AS mentions 
+            FROM 
+                ticket_results
+
+                JOIN papers 
+                ON ticket_results.paperid = papers.code
+                    AND papers.startdate < %s
+                    AND papers.enddate > %s
+                    AND continuous IS TRUE
+                GROUP BY year
+                ORDER BY year),
+                
+            averaged_frequencies AS
             (SELECT year,
                 AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM 
-                (SELECT year, count(*) AS mentions 
-                FROM 
-                    (SELECT year, paperid
-                    FROM results 
-                    WHERE requestid=%s) AS resultsForTicket
-
-                    INNER JOIN papers 
-                    ON resultsForTicket.paperid = papers.code
-                        AND papers.startdate < %s
-                        AND papers.enddate > %s
-                        AND continuous IS TRUE
-                    GROUP BY year
-                    ORDER BY year) AS countTable) 
-        AS floatAvg;
-                """
+            FROM binned_frequencies_only_continuous)
+                
+        SELECT year, avgFrequency::numeric
+        FROM averaged_frequencies;
+        """
 
     def runQuery(self):
         self.getSearchTerms()
@@ -219,13 +248,20 @@ class TicketGraphSeries:
     def binRecordsAndFetch(self):
         with self.dbConnection.cursor() as curs:
             if self.continuous:
-                curs.execute(self.request, (self.averageWindow, self.requestID,))
-                self.data = curs.fetchall()
+                curs.execute(
+                    self.request,
+                    (self.requestID,
+                     self.averageWindow,
+                     self.lowYear,
+                     self.highYear
+                     ))
             else:
-                curs.execute(self.request, (self.averageWindow, self.requestID,))
-                self.data = curs.fetchall()
-
-
+                curs.execute(
+                    self.request,
+                    (self.requestID,
+                     self.averageWindow,))
+            self.data = curs.fetchall()
+#TODO: store this in the database instead of computing it repeatedly on demand
     def parseDatesToJSTimestamp(self):
 
         def makeMonthTwoDigits(month):

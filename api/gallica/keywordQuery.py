@@ -1,4 +1,5 @@
 from math import ceil
+import io
 
 import psycopg2
 
@@ -68,9 +69,22 @@ class KeywordQuery:
             self.postRecordsToDB()
             self.discoverTopPapers()
 
+#TODO: Add db trigger on foreign key error? Or at least skip it?
     def postRecordsToDB(self):
-        for record in self.keywordRecords:
-            self.attemptInsertRecord(record)
+        with self.dbConnection.cursor() as curs:
+            csvFileLikeObject = io.StringIO()
+            for record in self.keywordRecords:
+                csvFileLikeObject.write(
+                    ",".join([
+                        record.getUrl(),
+                        record.getDate(),
+                        self.keyword,
+                        record.getPaperCode(),
+                        self.requestID
+                    ]) + '\n')
+                self.attemptInsertRecord(record)
+            csvFileLikeObject.seek(0)
+            curs.copy_from(csvFileLikeObject, 'results', sep=',')
 
     def attemptInsertRecord(self, record):
         try:

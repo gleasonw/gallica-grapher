@@ -58,7 +58,7 @@ class KeywordRecord(Record):
     def checkIfValid(self):
         if self.date and self.paperCode:
             self.valid = True
-
+#TODO: add unix timestamp column, store alongside year mon day
     def decomposeDate(self):
         yearMonDay = re.compile(r"^\d{4}-\d{2}-\d{2}$")
         oneYear = re.compile(r"^\d{4}$")
