@@ -22,7 +22,7 @@ class RecordBatch:
             "version": 1.2,
             "operation": "searchRetrieve",
             "query": self.query,
-            "exactSearch": "true",
+            "exactSearch": "False",
             "startRecord": startRecord,
             "maximumRecords": numRecords,
             "collapsing": "disabled"
@@ -93,17 +93,19 @@ class KeywordRecordBatch(RecordBatch):
 
 class PaperRecordBatch(RecordBatch):
 
-    def __init__(self,
-                 query,
-                 session,
-                 startRecord=1,
-                 numRecords=50):
+    def __init__(
+            self,
+            query,
+            session,
+            startRecord=1,
+            numRecords=50):
 
-        super().__init__(query,
-                         session,
-                         startRecord=startRecord,
-                         numRecords=numRecords,
-                         )
+        super().__init__(
+            query,
+            session,
+            startRecord=startRecord,
+            numRecords=numRecords)
+
         self.params["collapsing"] = "true"
 
     def parseRecordsFromXML(self):

@@ -18,7 +18,10 @@ DROP TABLE IF EXISTS results;
 CREATE TABLE results (
     id integer primary key generated always as identity,
     identifier text,
-    date date,
+    year int,
+    month int,
+    day int,
+    jstime int,
     searchTerm text,
     paperID text,
     requestID text,

@@ -235,7 +235,6 @@ class TicketGraphSeries:
     def runQuery(self):
         self.getSearchTerms()
         self.binRecordsAndFetch()
-        self.parseDatesToJSTimestamp()
 
     def getSearchTerms(self):
         getSearchTerms = """
@@ -261,56 +260,4 @@ class TicketGraphSeries:
                     (self.requestID,
                      self.averageWindow,))
             self.data = curs.fetchall()
-#TODO: store this in the database instead of computing it repeatedly on demand
-    def parseDatesToJSTimestamp(self):
 
-        def makeMonthTwoDigits(month):
-            if month < 10:
-                month = f'0{month}'
-            return month
-
-        def makeDayTwoDigits(day):
-            if day < 10:
-                day = f'0{day}'
-            return day
-
-        def dateToTimestamp(date):
-            dateObject = ciso8601.parse_datetime(date)
-            timestamp = datetime.datetime.timestamp(dateObject) * 1000
-            return timestamp
-
-        # Dummy day added to simplify Highcharts comparison.
-        def parseYearMonRecord(record):
-            year = record[0]
-            month = makeMonthTwoDigits(record[1])
-            freq = record[2]
-            JStimestamp = dateToTimestamp(f"{year}-{month}-01")
-            return [
-                JStimestamp,
-                freq
-            ]
-
-        def parseYearMonDayRecord(record):
-            year = record[0]
-            month = makeMonthTwoDigits(record[1])
-            day = makeDayTwoDigits(record[2])
-            freq = record[3]
-            JStimestamp = dateToTimestamp(f"{year}-{month}-{day}")
-            return [
-                JStimestamp,
-                freq
-            ]
-
-        if self.timeBin == 'year':
-            dataWithTimestamps = self.data
-        elif self.timeBin == 'month':
-            dataWithTimestamps = list(map(
-                parseYearMonRecord,
-                self.data
-            ))
-        else:
-            dataWithTimestamps = list(map(
-                parseYearMonDayRecord,
-                self.data
-            ))
-        self.data = dataWithTimestamps

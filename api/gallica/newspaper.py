@@ -1,4 +1,6 @@
 import concurrent.futures
+import io
+
 from requests_toolbelt import sessions
 from gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 from gallica.db import DB
@@ -11,37 +13,60 @@ class Newspaper:
     def __init__(self):
         self.query = ''
         self.session = None
-        self.papers = []
+        self.papersSimilarToKeyword = []
+        self.paperRecords = []
         self.dbConnection = DB().getConn()
         self.initGallicaSession()
 
     def sendGallicaPapersToDB(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
         self.fetchAllPapersFromGallica()
+        self.copyPapersToDB()
         self.dbConnection.close()
 
     def fetchAllPapersFromGallica(self):
-        numPapers = self.getNumPapersOnGallica()
-        with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
-            for batch in executor.map(self.fetchBatchPapersAtIndex,
-                                      range(1, numPapers, 50)):
-                for paper in batch:
-                    self.insertPaper(paper)
+        with self.session:
+            numPapers = self.getNumPapersOnGallica()
+            with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+                for batch in executor.map(self.fetchBatchPapersAtIndex,
+                                          range(1, numPapers, 50)):
+                    print(batch)
+                    self.paperRecords.extend(batch)
 
     def fetchBatchPapersAtIndex(self, index):
-        batch = PaperRecordBatch(self.query,
-                                 self.session,
-                                 startRecord=index)
+        batch = PaperRecordBatch(
+            self.query,
+            self.session,
+            startRecord=index)
         records = batch.getRecordBatch()
         return records
 
     def getNumPapersOnGallica(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
-        tempBatch = PaperRecordBatch(self.query,
-                                     self.session,
-                                     numRecords=1)
+        tempBatch = PaperRecordBatch(
+            self.query,
+            self.session,
+            numRecords=1)
         numResults = tempBatch.getNumResults()
         return numResults
+
+    def copyPapersToDB(self):
+        with self.dbConnection.cursor() as curs:
+            csvFileLikeObject = io.StringIO()
+            for paperRecord in self.paperRecords:
+                dateRange = paperRecord.getDate()
+                lowYear = dateRange[0]
+                highYear = dateRange[1]
+                csvFileLikeObject.write(
+                    ",".join([
+                        paperRecord.getTitle(),
+                        lowYear,
+                        highYear,
+                        str(paperRecord.getContinuous()),
+                        paperRecord.getPaperCode()
+                    ]) + '\n')
+            csvFileLikeObject.seek(0)
+            curs.copy_from(csvFileLikeObject, 'papers', sep=',')
 
     def addPaperToDBbyCode(self, code):
         record = self.fetchPaperRecordFromCode(code)
@@ -53,9 +78,10 @@ class Newspaper:
 
     def fetchPaperRecordFromCode(self, code):
         self.query = f'arkPress all "{code}_date"'
-        batch = PaperRecordBatch(self.query,
-                                 self.session,
-                                 numRecords=1)
+        batch = PaperRecordBatch(
+            self.query,
+            self.session,
+            numRecords=1)
         result = batch.getRecordBatch()
         if result:
             record = result[0]
@@ -87,12 +113,12 @@ class Newspaper:
                     WHERE LOWER(title) LIKE %(paperNameSearchString)s
                     ORDER BY title LIMIT 20;
             """, {'paperNameSearchString': '%' + keyword + '%'})
-            self.papers = curs.fetchall()
+            self.papersSimilarToKeyword = curs.fetchall()
             return self.nameCodeDataToJSON()
 
     def nameCodeDataToJSON(self):
         namedPaperCodes = []
-        for paperTuple in self.papers:
+        for paperTuple in self.papersSimilarToKeyword:
             paper = paperTuple[0]
             code = paperTuple[1]
             namedPair = {'paper': paper, 'code': code}
@@ -103,8 +129,3 @@ class Newspaper:
         self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
         adapter = TimeoutAndRetryHTTPAdapter()
         self.session.mount("https://", adapter)
-
-
-if __name__ == "__main__":
-    papers = Newspaper()
-    papers.fetchAllPapersFromGallica()

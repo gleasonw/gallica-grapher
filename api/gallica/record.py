@@ -1,5 +1,5 @@
 from lxml import etree
-import re
+from gallica.date import Date
 
 
 class Record:
@@ -8,7 +8,7 @@ class Record:
         self.recordData = record[0]
         self.valid = False
         self.paperCode = ''
-        self.dateText = ''
+        self.date = ''
         self.yearMonDay = []
         self.url = ''
         self.parsePaperCodeFromXML()
@@ -17,8 +17,8 @@ class Record:
     def getPaperCode(self):
         return self.paperCode
 
-    def getYearMonDay(self):
-        return self.yearMonDay
+    def getDate(self):
+        pass
 
     def getUrl(self):
         return self.url
@@ -48,31 +48,21 @@ class KeywordRecord(Record):
         self.parseDateFromXML()
         self.checkIfValid()
 
+    def getDate(self):
+        return self.date.getDate()
+
+    def getJSTimestamp(self):
+        return self.date.getJSTimestamp()
+
     def parseDateFromXML(self):
         dateElement = self.recordData.find(
             '{http://purl.org/dc/elements/1.1/}date')
         if dateElement is not None:
-            self.date = dateElement.text
-            self.decomposeDate()
+            self.date = Date(dateElement.txt)
 
     def checkIfValid(self):
         if self.date and self.paperCode:
             self.valid = True
-#TODO: add unix timestamp column, store alongside year mon day
-    def decomposeDate(self):
-        yearMonDay = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-        oneYear = re.compile(r"^\d{4}$")
-        oneYearOneMon = re.compile(r"^\d{4}-\d{2}$")
-        if yearMonDay.match(self.date):
-            splitDate = self.date.split('-')
-            self.yearMonDay = [splitDate[0], splitDate[1], splitDate[2]]
-        elif oneYearOneMon.match(self.date):
-            splitDate = self.date.split('-')
-            self.yearMonDay = [splitDate[0], splitDate[1], None]
-        elif oneYear.match(self.date):
-            self.yearMonDay = [self.date, None, None]
-        else:
-            self.yearMonDay = [None, None, None]
 
 
 class PaperRecord(Record):
@@ -84,6 +74,7 @@ class PaperRecord(Record):
         self.publishingRange = [None, None]
         self.continuousRange = False
         self.session = gallicaSession
+
         self.checkIfValid()
         self.parseTitleFromXML()
         self.fetchYearsPublished()
@@ -106,9 +97,10 @@ class PaperRecord(Record):
 
     def fetchYearsPublished(self):
         paramsForArk = {'ark': f'ark:/12148/{self.paperCode}/date'}
-        response = self.session.get("",
-                                    params=paramsForArk,
-                                    timeout=15)
+        response = self.session.get(
+            "",
+            params=paramsForArk,
+            timeout=15)
         try:
             root = etree.fromstring(response.content)
             for yearElement in root.iter("year"):
@@ -123,8 +115,6 @@ class PaperRecord(Record):
         if self.publishingYears:
             self.checkIfYearsContinuous()
             self.generateAvailableRange()
-        else:
-            return
 
     def checkIfYearsContinuous(self):
         for i, year in enumerate(self.publishingYears):
@@ -137,11 +127,10 @@ class PaperRecord(Record):
 
     def generateAvailableRange(self):
         if self.publishingYears:
-            lowYear = self.publishingYears[0]
-            highYear = self.publishingYears[-1]
+            lowYear = str(self.publishingYears[0])
+            highYear = str(self.publishingYears[-1])
             self.publishingRange = [lowYear, highYear]
 
     def parseTitleFromXML(self):
         self.title = self.recordData.find(
             '{http://purl.org/dc/elements/1.1/}title').text
-

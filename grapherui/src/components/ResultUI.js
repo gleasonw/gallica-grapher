@@ -88,7 +88,6 @@ function settingsReducer(graphSettings, action){
         }
         case 'setTimeBin': {
             if(action.timeBin){
-                const newSeries = updateSeries(action);
                 return {
                     ...graphSettings,
                     [action.key]: {
@@ -101,7 +100,6 @@ function settingsReducer(graphSettings, action){
                 return graphSettings
             }
         }case 'setAverageWindow': {
-            const newSeries = updateSeries(action);
             return {
                 ...graphSettings,
                 [action.key]: {
@@ -111,7 +109,6 @@ function settingsReducer(graphSettings, action){
                 }
             }
         }case 'toggleContinuous': {
-            const newSeries = updateSeries(action);
             return {
                 ...graphSettings,
                 [action.key]: {
