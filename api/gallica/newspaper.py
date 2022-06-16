@@ -50,6 +50,11 @@ class Newspaper:
         numResults = tempBatch.getNumResults()
         return numResults
 
+    def cleanCSVvalue(self, value):
+        if value is None:
+            return r'\N'
+        return str(value).replace('|', '\\|')
+
     def copyPapersToDB(self):
         with self.dbConnection.cursor() as curs:
             csvFileLikeObject = io.StringIO()
@@ -57,16 +62,15 @@ class Newspaper:
                 dateRange = paperRecord.getDate()
                 lowYear = dateRange[0]
                 highYear = dateRange[1]
-                csvFileLikeObject.write(
-                    ",".join([
-                        paperRecord.getTitle(),
-                        lowYear,
-                        highYear,
-                        str(paperRecord.getContinuous()),
-                        paperRecord.getPaperCode()
-                    ]) + '\n')
+                csvFileLikeObject.write('|'.join(map(self.cleanCSVvalue, (
+                    paperRecord.getTitle(),
+                    lowYear,
+                    highYear,
+                    paperRecord.getContinuous(),
+                    paperRecord.getPaperCode()
+                ))) + '\n')
             csvFileLikeObject.seek(0)
-            curs.copy_from(csvFileLikeObject, 'papers', sep=',')
+            curs.copy_from(csvFileLikeObject, 'papers', sep='|')
 
     def addPaperToDBbyCode(self, code):
         record = self.fetchPaperRecordFromCode(code)

@@ -1,5 +1,6 @@
+import json
 from unittest import TestCase
-from gallica.record import PaperRecord
+from unittest.mock import patch, MagicMock
 from gallica.newspaper import Newspaper
 
 
@@ -8,10 +9,7 @@ class TestNewspaper(TestCase):
         newspaper = Newspaper()
         self.assertEqual(newspaper.getNumPapersOnGallica(), 14189)
 
-    def test_get_all_papers(self):
+    def test_send_papers_to_db(self):
         newspaper = Newspaper()
-        newspaper.paperRecords = [
-
-        ]
         newspaper.sendGallicaPapersToDB()
         self.assertGreater(len(newspaper.paperRecords), 14000)

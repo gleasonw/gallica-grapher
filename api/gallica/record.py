@@ -58,7 +58,7 @@ class KeywordRecord(Record):
         dateElement = self.recordData.find(
             '{http://purl.org/dc/elements/1.1/}date')
         if dateElement is not None:
-            self.date = Date(dateElement.txt)
+            self.date = Date(dateElement.text)
 
     def checkIfValid(self):
         if self.date and self.paperCode:
@@ -127,8 +127,8 @@ class PaperRecord(Record):
 
     def generateAvailableRange(self):
         if self.publishingYears:
-            lowYear = str(self.publishingYears[0])
-            highYear = str(self.publishingYears[-1])
+            lowYear = self.publishingYears[0]
+            highYear = self.publishingYears[-1]
             self.publishingRange = [lowYear, highYear]
 
     def parseTitleFromXML(self):

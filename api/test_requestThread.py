@@ -8,7 +8,7 @@ class TestRequestThread(TestCase):
             '4321': {
                 "terms": ["brazza"],
                 "papersAndCodes": [],
-                "dateRange": [1800, 1900],
+                "dateRange": [1850, 1900],
             }
         }
 

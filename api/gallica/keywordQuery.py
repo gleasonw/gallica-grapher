@@ -2,7 +2,6 @@ from math import ceil
 import io
 import psycopg2
 
-
 from .newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
 from .recordBatch import KeywordRecordBatch
@@ -63,14 +62,20 @@ class KeywordQuery:
     def updateProgress(self):
         self.progressTracker()
 
-#TODO: Add db trigger on foreign key error? Or at least skip it?
+    # TODO: Add db trigger on foreign key error? Or at least skip it?
     def postRecordsToDB(self):
+
+        def cleanCSVvalue(value):
+            if value is None:
+                return r'\N'
+            return str(value).replace('|', '\\|')
+
         with self.dbConnection.cursor() as curs:
             csvFileLikeObject = io.StringIO()
             for record in self.keywordRecords:
                 yearMonDay = record.getDate()
                 csvFileLikeObject.write(
-                    ",".join([
+                    "|".join(map(cleanCSVvalue, (
                         record.getUrl(),
                         yearMonDay[0],
                         yearMonDay[1],
@@ -79,9 +84,21 @@ class KeywordQuery:
                         self.keyword,
                         record.getPaperCode(),
                         self.requestID
-                    ]) + '\n')
+                    ))) + '\n')
             csvFileLikeObject.seek(0)
-            curs.copy_from(csvFileLikeObject, 'results', sep=',')
+            curs.copy_from(
+                csvFileLikeObject,
+                'results', sep='|',
+                columns=(
+                    'identifier',
+                    'year',
+                    'month',
+                    'day',
+                    'jstime',
+                    'searchterm',
+                    'paperid',
+                    'requestid')
+            )
 
     def attemptPostRecords(self):
         try:

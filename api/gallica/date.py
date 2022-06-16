@@ -80,13 +80,13 @@ class Date:
         self.jsTimestamp = None
 
     def getMonthTwoDigits(self):
-        if int(self.month) < 10:
+        if len(self.month) == 1:
             return f'0{self.month}'
         else:
             return self.month
 
     def getDayTwoDigits(self):
-        if int(self.day) < 10:
+        if len(self.day) == 1:
             return f'0{self.day}'
         else:
             return self.day
