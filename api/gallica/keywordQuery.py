@@ -1,6 +1,5 @@
 from math import ceil
 import io
-import psycopg2
 
 from .newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
@@ -59,10 +58,8 @@ class KeywordQuery:
         else:
             self.buildDatelessQuery()
 
-    def updateProgress(self):
-        self.progressTracker()
-
-    # TODO: Add db trigger on foreign key error? Or at least skip it?
+    # TODO: Before posting, add paper codes that aren't in the DB to the DB.
+    # TODO: move state up?
     def postRecordsToDB(self):
 
         def cleanCSVvalue(value):
@@ -88,7 +85,7 @@ class KeywordQuery:
             csvFileLikeObject.seek(0)
             curs.copy_from(
                 csvFileLikeObject,
-                'results', sep='|',
+                'holdingResults', sep='|',
                 columns=(
                     'identifier',
                     'year',
@@ -99,38 +96,39 @@ class KeywordQuery:
                     'paperid',
                     'requestid')
             )
+            self.postMissingPapers(curs)
+            self.copyResultsToFinalTable(curs)
 
-    def attemptPostRecords(self):
-        try:
-            self.postRecordsToDB()
-        except psycopg2.IntegrityError:
-            "A paper has gone missing! Probably."
+    def postMissingPapers(self, curs):
+        paperGetter = Newspaper(self.gallicaHttpSession)
+        curs.execute(
+            """
+            WITH papersInResults AS 
+                (SELECT DISTINCT paperid 
+                FROM holdingResults 
+                WHERE requestid = %s)
+                
+            SELECT paperid FROM papersInResults
+            WHERE paperid NOT IN 
+                (SELECT paperid FROM papers);
+            """
+            , (self.requestID,))
+        missingPapers = curs.fetchall()
+        paperGetter.sendTheseGallicaPapersToDB(missingPapers)
 
-    def insertRecord(self, record):
-        with self.dbConnection.cursor() as curs:
-            yearMonDay = record.Date()
-            curs.execute("""
+    def copyResultsToFinalTable(self, curs):
+        curs.execute(
+            """
+            WITH resultsForRequest AS (
+                DELETE FROM holdingresults
+                WHERE requestid = %s
+                RETURNING identifier, year, month, day, jstime, searchterm, paperid, requestid
+            )
+            
             INSERT INTO results 
-                (
-                identifier, 
-                year, 
-                month, 
-                day, 
-                searchterm, 
-                paperID, 
-                requestid
-                )
-            VALUES (%s, %s, %s, %s, %s, %s, %s);
-            """, (
-                record.getUrl(),
-                yearMonDay[0],
-                yearMonDay[1],
-                yearMonDay[2],
-                record.getJSTimestamp(),
-                self.keyword,
-                record.getPaperCode(),
-                self.requestID)
-                         )
+                (SELECT * FROM resultsForRequest);
+            """
+        ), (self.requestID,)
 
     def buildYearRangeQuery(self):
         pass

@@ -10,15 +10,22 @@ from gallica.recordBatch import PaperRecordBatch
 
 class Newspaper:
 
-    def __init__(self):
+    #TODO: split into multiple classes
+    def __init__(self, gallicaSession=None):
         self.query = ''
-        self.session = None
         self.papersSimilarToKeyword = []
         self.paperRecords = []
         self.dbConnection = DB().getConn()
-        self.initGallicaSession()
+        if not gallicaSession:
+            self.initGallicaSession()
+        else:
+            self.session = gallicaSession
 
-    def sendGallicaPapersToDB(self):
+    def sendTheseGallicaPapersToDB(self, paperCodes):
+        for i in range(0, len(paperCodes), 15):
+            self.query = 'arkPress all "' + '" or arkPress all "'.join(paperCodes[i:i+15]) + '"'
+
+    def sendAllGallicaPapersToDB(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
         self.fetchAllPapersFromGallica()
         self.copyPapersToDB()
@@ -72,26 +79,15 @@ class Newspaper:
             csvFileLikeObject.seek(0)
             curs.copy_from(csvFileLikeObject, 'papers', sep='|')
 
-    def addPaperToDBbyCode(self, code):
-        record = self.fetchPaperRecordFromCode(code)
-        if record:
-            self.insertPaper(record)
-            self.dbConnection.close()
-        else:
-            raise FileNotFoundError
-
-    def fetchPaperRecordFromCode(self, code):
-        self.query = f'arkPress all "{code}_date"'
+    def fetchThese15PaperRecords(self, paperCodes):
+        self.query =
         batch = PaperRecordBatch(
             self.query,
             self.session,
             numRecords=1)
         result = batch.getRecordBatch()
         if result:
-            record = result[0]
-            return record
-        else:
-            return None
+            self.paperRecords.extend(result)
 
     def insertPaper(self, paper):
         title = paper.getTitle()

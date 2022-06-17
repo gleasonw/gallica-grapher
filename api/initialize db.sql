@@ -1,21 +1,4 @@
-DROP TABLE IF EXISTS results;
-
--- CREATE TABLE papers (
---      title text,
---      startDate int,
---      endDate int,
---      continuous bool,
---      code varChar(20),
---      PRIMARY KEY(code)
---     );
---
--- CREATE INDEX ON papers
---     (
---     code
---     );
-
-
-CREATE TABLE results (
+CREATE TABLE holdingResults (
     id integer primary key generated always as identity,
     identifier text,
     year int,
@@ -24,10 +7,9 @@ CREATE TABLE results (
     jstime int,
     searchTerm text,
     paperID text,
-    requestID text,
-    FOREIGN KEY(paperID) REFERENCES papers(code)
+    requestID text
 );
 
-CREATE INDEX ON results (
+CREATE INDEX ON holdingResults (
     requestID, paperID
 );

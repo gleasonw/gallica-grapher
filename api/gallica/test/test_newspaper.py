@@ -11,5 +11,5 @@ class TestNewspaper(TestCase):
 
     def test_send_papers_to_db(self):
         newspaper = Newspaper()
-        newspaper.sendGallicaPapersToDB()
+        newspaper.sendAllGallicaPapersToDB()
         self.assertGreater(len(newspaper.paperRecords), 14000)
