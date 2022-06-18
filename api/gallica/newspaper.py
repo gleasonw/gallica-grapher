@@ -22,8 +22,11 @@ class Newspaper:
             self.session = gallicaSession
 
     def sendTheseGallicaPapersToDB(self, paperCodes):
-        for i in range(0, len(paperCodes), 15):
-            self.query = 'arkPress all "' + '" or arkPress all "'.join(paperCodes[i:i+15]) + '"'
+        with self.session:
+            for i in range(0, len(paperCodes), 15):
+                batchOf15 = self.fetchThese15PaperRecords(paperCodes[i:i+15])
+                self.paperRecords.extend(batchOf15)
+        self.copyPapersToDB()
 
     def sendAllGallicaPapersToDB(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
@@ -80,29 +83,12 @@ class Newspaper:
             curs.copy_from(csvFileLikeObject, 'papers', sep='|')
 
     def fetchThese15PaperRecords(self, paperCodes):
-        self.query =
+        self.query = 'arkPress all "' + '_date" or arkPress all "'.join(paperCodes) + '_date"'
         batch = PaperRecordBatch(
             self.query,
             self.session,
-            numRecords=1)
-        result = batch.getRecordBatch()
-        if result:
-            self.paperRecords.extend(result)
-
-    def insertPaper(self, paper):
-        title = paper.getTitle()
-        dateRange = paper.getDate()
-        continuous = paper.getContinuous()
-        code = paper.getPaperCode()
-        lowYear = dateRange[0]
-        highYear = dateRange[1]
-
-        with self.dbConnection.cursor() as curs:
-            curs.execute(
-                """
-                INSERT INTO papers (title, startdate, enddate, continuous, code) 
-                    VALUES (%s, %s, %s, %s, %s);
-                """, (title, lowYear, highYear, continuous, code))
+            numRecords=15)
+        return batch.getRecordBatch()
 
     def getPapersSimilarToKeyword(self, keyword):
         with self.dbConnection.cursor() as curs:

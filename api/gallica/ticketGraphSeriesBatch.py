@@ -3,7 +3,7 @@ import ciso8601
 from db import DB
 
 
-# TODO: test with continuous settings
+# TODO: tests with continuous settings
 class TicketGraphSeriesBatch:
 
     def __init__(self, settings):

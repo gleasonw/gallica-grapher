@@ -8,7 +8,6 @@ class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
 		retryStrategy = Retry(
 			total=10,
 			status_forcelist=[413, 429, 500, 502, 503, 504],
-			allowed_methods=["HEAD", "GET", "OPTIONS", "PUT", "DELETE"],
 			backoff_factor=1
 		)
 		self.timeout = DEFAULT_TIMEOUT

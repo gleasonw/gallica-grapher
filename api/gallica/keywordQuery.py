@@ -26,20 +26,16 @@ class KeywordQuery:
         self.estimateNumResults = 0
         self.progress = 0
         self.keywordRecords = []
-        self.topPapers = None
-        self.currentEntryDataJustInCase = None
         self.progressTracker = progressTracker
         self.dbConnection = dbConnection
 
         self.establishYearRange(yearRange)
         self.gallicaHttpSession = session
         self.buildQuery()
+        self.fetchNumTotalResults()
 
     def getKeyword(self):
         return self.keyword
-
-    def getTopPapers(self):
-        return self.topPapers
 
     def getEstimateNumResults(self):
         return self.estimateNumResults
@@ -136,14 +132,8 @@ class KeywordQuery:
     def buildDatelessQuery(self):
         pass
 
-    @staticmethod
-    def attemptAddMissingPaper(code):
-        try:
-            papers = Newspaper()
-            papers.addPaperToDBbyCode(code)
-            return True
-        except FileNotFoundError:
-            return False
+    def fetchNumTotalResults(self):
+        pass
 
 
 class KeywordQueryAllPapers(KeywordQuery):
@@ -156,8 +146,6 @@ class KeywordQueryAllPapers(KeywordQuery):
                  session):
         self.recordIndexChunks = []
         super().__init__(searchTerm, yearRange, requestID, progressTracker, dbConnection, session)
-
-        self.findNumTotalResults()
 
     def buildYearRangeQuery(self):
         lowYear = str(self.lowYear)
@@ -177,7 +165,7 @@ class KeywordQueryAllPapers(KeywordQuery):
             'sortby dc.date/sort.ascending'
         )
 
-    def findNumTotalResults(self):
+    def fetchNumTotalResults(self):
         tempBatch = RecordBatch(
             self.baseQuery,
             self.gallicaHttpSession,
@@ -192,6 +180,7 @@ class KeywordQueryAllPapers(KeywordQuery):
             if self.keywordRecords:
                 self.postRecordsToDB()
 
+    # TODO: isolate concurrent code, only one class should be responsible for talking to Gallica
     def generateSearchWorkers(self, numWorkers):
         iterations = ceil(self.estimateNumResults / 50)
         self.recordIndexChunks = \
@@ -237,9 +226,6 @@ class KeywordQuerySelectPapers(KeywordQuery):
                          dbConnection,
                          session)
 
-        self.setNumResultsForEachPaper()
-        self.sumUpPaperResultsForTotalEstimate()
-
     def buildYearRangeQuery(self):
         lowYear = str(self.lowYear)
         highYear = str(self.highYear)
@@ -254,9 +240,13 @@ class KeywordQuerySelectPapers(KeywordQuery):
     def buildDatelessQuery(self):
         self.baseQuery = (
             'arkPress all "{newsKey}_date" '
-            f'and (gallica adj "{self.keyword}") '
+            f'and (gallica all "{self.keyword}") '
             'sortby dc.date/sort.ascending'
         )
+
+    def fetchNumTotalResults(self):
+        self.setNumResultsForEachPaper()
+        self.sumUpPaperResultsForTotalEstimate()
 
     def setNumResultsForEachPaper(self):
         with ThreadPoolExecutor(max_workers=10) as executor:
@@ -301,12 +291,12 @@ class KeywordQuerySelectPapers(KeywordQuery):
     def mapThreadsToSearch(self, numWorkers):
         with ThreadPoolExecutor(max_workers=numWorkers) as executor:
             for result in executor.map(
-                    self.getResultsAtRecordIndex,
+                    self.getPaperResultsAtRecordIndex,
                     self.batchQueryStrings):
                 self.keywordRecords.extend(result)
                 self.progressTracker()
 
-    def getResultsAtRecordIndex(self, recordStartAndCode):
+    def getPaperResultsAtRecordIndex(self, recordStartAndCode):
         recordStart = recordStartAndCode[0]
         code = recordStartAndCode[1]
         query = self.baseQuery.format(newsKey=code)
