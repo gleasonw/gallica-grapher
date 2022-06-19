@@ -4,7 +4,7 @@ from .keywordQuery import KeywordQueryAllPapers
 from .keywordQuery import KeywordQuerySelectPapers
 
 
-class TicketQuery:
+class RequestTicket:
 
     def __init__(self,
                  ticket,
@@ -25,13 +25,13 @@ class TicketQuery:
         self.totalResults = 0
         self.numBatchesRetrieved = 0
         self.numBatches = 0
-#TODO: Get rid of top paper sending, add "finished adding to database" check
+
+# TODO: Get rid of top paper sending, add "finished adding to database" check?
     def run(self):
         self.initQueryObjects()
         self.getNumResults()
         self.numBatches = ceil(self.totalResults / 50)
         self.startQueries()
-        self.sendTopPapersToRequestThread()
 
     def initQueryObjects(self):
         if self.papersAndCodes:
@@ -79,9 +79,3 @@ class TicketQuery:
         progressPercent *= 100
         progressPercent = int(progressPercent)
         self.progressThread.setProgress(progressPercent)
-
-    def sendTopPapersToRequestThread(self):
-        for termQuery in self.keywordQueries:
-            topPapers = termQuery.getTopPapers()
-            self.topPapers.append(topPapers)
-        self.progressThread.setTopPapers(self.topPapers)

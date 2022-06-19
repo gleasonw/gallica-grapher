@@ -82,9 +82,8 @@ class TestKeywordQueryAllPapers(TestCase):
 
 
 class TestKeywordQuerySelectPapers(TestCase):
-    def test_build_year_range_query(self):
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
 
+    def buildDummyDict(self):
         with open(os.path.join(here, "data/dummy_newspaper_choice_dicts")) as f:
             dummyNewspaperChoices = f.read().splitlines()
             choiceDict = []
@@ -93,7 +92,12 @@ class TestKeywordQuerySelectPapers(TestCase):
                 choiceDict.append(
                     {'name': nameCode[0].strip(),
                      'code': nameCode[1].strip()})
+            return choiceDict
 
+    def test_build_year_range_query(self):
+        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
+
+        choiceDict = self.buildDummyDict()
         query = KeywordQuerySelectPapers(
             'brazza',
             choiceDict,
@@ -112,19 +116,100 @@ class TestKeywordQuerySelectPapers(TestCase):
             'sortby dc.date/sort.ascending')
 
     def test_build_dateless_query(self):
-        self.fail()
+        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
+        choiceDict = self.buildDummyDict()
+
+        query = KeywordQuerySelectPapers(
+            'brazza',
+            choiceDict,
+            [],
+            '1234',
+            MagicMock(),
+            MagicMock(),
+            MagicMock())
+
+        self.assertEqual(
+            query.baseQuery,
+            'arkPress all "{newsKey}_date" '
+            'and (gallica all "brazza") '
+            'sortby dc.date/sort.ascending')
 
     def test_set_num_results_for_each_paper(self):
-        self.fail()
 
-    def test_fetch_number_results_in_paper(self):
-        self.fail()
+        choiceDict = self.buildDummyDict()
+        KeywordQuerySelectPapers.fetchNumberResultsInPaper = MagicMock(return_value=['a', 1])
+        KeywordQuerySelectPapers.sumUpPaperResultsForTotalEstimate = MagicMock()
+
+        query = KeywordQuerySelectPapers(
+            'brazza',
+            choiceDict,
+            [],
+            '1234',
+            MagicMock(),
+            MagicMock(),
+            MagicMock())
+
+        self.assertDictEqual(query.paperCodeWithNumResults, {'a': 1})
+
+    @patch('gallica.recordBatch.RecordBatch.getNumResults', return_value=3)
+    def test_fetch_number_results_in_paper(self, mock_getNumResults):
+
+        choiceDict = self.buildDummyDict()
+        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
+        query = KeywordQuerySelectPapers(
+            'brazza',
+            choiceDict,
+            [],
+            '1234',
+            MagicMock(),
+            MagicMock(),
+            MagicMock())
+
+        resultTest = query.fetchNumberResultsInPaper({'code': 'a'})
+
+        self.assertEqual(
+            resultTest,
+            ('a', 3))
 
     def test_sum_up_paper_results_for_total_estimate(self):
-        self.fail()
+
+        choiceDict = self.buildDummyDict()
+        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
+        query = KeywordQuerySelectPapers(
+            'brazza',
+            choiceDict,
+            [],
+            '1234',
+            MagicMock(),
+            MagicMock(),
+            MagicMock())
+        query.paperCodeWithNumResults = {'a': 1, 'b': 2}
+        query.sumUpPaperResultsForTotalEstimate()
+
+        self.assertEqual(
+            query.estimateNumResults,
+            3)
 
     def test_init_batch_queries(self):
-        self.fail()
 
-    def test_append_batch_query_strings_for_paper(self):
-        self.fail()
+        choiceDict = self.buildDummyDict()
+        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
+        query = KeywordQuerySelectPapers(
+            'brazza',
+            choiceDict,
+            [],
+            '1234',
+            MagicMock(),
+            MagicMock(),
+            MagicMock())
+        query.paperCodeWithNumResults = {'a': 125, 'b': 256}
+
+        query.createURLIndecesForEachPaper()
+
+        self.assertListEqual(
+            query.batchQueryStrings,
+            [
+                [1, 'a'], [51, 'a'], [101, 'a'],
+                [1, 'b'], [51, 'b'], [101, 'b'], [151, 'b'], [201, 'b'], [251, 'b']
+            ]
+        )

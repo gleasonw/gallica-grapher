@@ -1,5 +1,5 @@
 import threading
-from .gallica.requestTicket import TicketQuery
+from .gallica.requestTicket import RequestTicket
 import psycopg2
 from requests_toolbelt import sessions
 from .gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
@@ -25,11 +25,11 @@ class RequestThread(threading.Thread):
     def run(self):
         for key, ticket in self.tickets.items():
             self.currentID = key
-            requestToRun = TicketQuery(ticket,
-                                       key,
-                                       self,
-                                       self.DBconnection,
-                                       self.session)
+            requestToRun = RequestTicket(ticket,
+                                         key,
+                                         self,
+                                         self.DBconnection,
+                                         self.session)
             requestToRun.run()
         self.DBconnection.close()
 
@@ -48,17 +48,11 @@ class RequestThread(threading.Thread):
     def getNumDiscovered(self):
         return self.numResultsDiscovered
 
-    def setNumRetrieved(self, count):
+    def setNumActuallyRetrieved(self, count):
         self.numResultsRetrieved = count
 
-    def getNumRetrieved(self):
+    def getNumActuallyRetrieved(self):
         return self.numResultsRetrieved
-
-    def setTopPapers(self, papers):
-        self.topPapersForTerms = papers
-
-    def getTopPapers(self):
-        return self.topPapersForTerms
 
     def initGallicaSession(self):
         self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")

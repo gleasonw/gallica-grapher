@@ -1,6 +1,7 @@
 from unittest import TestCase
 from ticketGraphSeriesBatch import TicketGraphSeriesBatch
 
+
 class TestTicketGraphSeriesBatch(TestCase):
     def test_get_series(self):
         settings = {

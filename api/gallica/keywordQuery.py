@@ -271,22 +271,20 @@ class KeywordQuerySelectPapers(KeywordQuery):
 
     def runSearch(self):
         with self.gallicaHttpSession:
-            self.initBatchQueries()
+            self.createURLIndecesForEachPaper()
             self.mapThreadsToSearch(50)
             if self.keywordRecords:
                 self.postRecordsToDB()
 
-    def initBatchQueries(self):
+    def createURLIndecesForEachPaper(self):
         for paperCode, count in self.paperCodeWithNumResults.items():
             numBatches = ceil(count / 50)
             self.appendBatchQueryStringsForPaper(numBatches, paperCode)
 
     def appendBatchQueryStringsForPaper(self, numBatches, code):
-        startRecord = 1
         for i in range(numBatches):
-            recordAndCode = [startRecord, code]
+            recordAndCode = [1 + 50*i, code]
             self.batchQueryStrings.append(recordAndCode)
-            startRecord += 50
 
     def mapThreadsToSearch(self, numWorkers):
         with ThreadPoolExecutor(max_workers=numWorkers) as executor:

@@ -3,6 +3,7 @@ from .record import KeywordRecord
 from .record import PaperRecord
 from requests_toolbelt import sessions
 from .timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from .gallicaSession import GallicaSession
 
 
 class RecordBatch:
@@ -44,6 +45,7 @@ class RecordBatch:
         return self.batch
 
     # TODO: Investigate requests toolbelt threading module
+    # TODO: Move to a new class focused solely on concurrent requests
     def fetchXML(self):
         response = self.session.get("",
                                     params=self.params,
@@ -108,12 +110,9 @@ class PaperRecordBatch(RecordBatch):
 
         self.params["collapsing"] = "true"
 
+    # TODO: at the end of bulk queries, run date queries for each code, so leave date unset here. One session = better, and we can better employ concurrency (get more batches of date information per request?).
     def parseRecordsFromXML(self):
-        gallicaSessionForPaperYears = sessions.BaseUrlSession(
-            "https://gallica.bnf.fr/services/Issues"
-        )
-        adapter = TimeoutAndRetryHTTPAdapter()
-        gallicaSessionForPaperYears.mount("https://", adapter)
+        gallicaSessionForPaperYears = GallicaSession("https://gallica.bnf.fr/services/Issues")
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
             record = PaperRecord(result, gallicaSessionForPaperYears)
             if record.isValid():
