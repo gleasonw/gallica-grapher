@@ -8,7 +8,7 @@ class Record:
         self.recordData = record[0]
         self.valid = False
         self.paperCode = ''
-        self.date = ''
+        self.date = None
         self.yearMonDay = []
         self.url = ''
         self.parsePaperCodeFromXML()
@@ -27,18 +27,22 @@ class Record:
         return self.valid
 
     def parsePaperCodeFromXML(self):
-        paperCode = self.recordData.find(
-            '{http://purl.org/dc/elements/1.1/}relation').text
+        paperCodeElement = self.recordData.find(
+            '{http://purl.org/dc/elements/1.1/}relation')
 
-        if paperCode:
-            self.paperCode = paperCode[-11:len(paperCode)]
+        if paperCodeElement is not None:
+            elementText = paperCodeElement.text
+            self.paperCode = elementText[-11:len(elementText)]
 
     def parseURLFromXML(self):
-        self.url = self.recordData.find(
-            '{http://purl.org/dc/elements/1.1/}identifier').text
+        urlElement = self.recordData.find(
+            '{http://purl.org/dc/elements/1.1/}identifier')
+        if urlElement is not None:
+            self.url = urlElement.text
 
     def checkIfValid(self):
-        pass
+        if self.paperCode:
+            self.valid = True
 
 
 class KeywordRecord(Record):
@@ -60,10 +64,6 @@ class KeywordRecord(Record):
         if dateElement is not None:
             self.date = Date(dateElement.text)
 
-    def checkIfValid(self):
-        if self.date and self.paperCode:
-            self.valid = True
-
 
 class PaperRecord(Record):
 
@@ -80,20 +80,16 @@ class PaperRecord(Record):
         self.fetchYearsPublished()
         self.parseYears()
         self.checkIfYearsContinuous()
-        self.generateAvailableRange()
+        self.generatePublishingRange()
 
     def getTitle(self):
         return self.title
 
-    def getContinuous(self):
+    def isContinuous(self):
         return self.continuousRange
 
     def getDate(self):
         return self.publishingRange
-
-    def checkIfValid(self):
-        if self.paperCode:
-            self.valid = True
 
     def fetchYearsPublished(self):
         paramsForArk = {'ark': f'ark:/12148/{self.paperCode}/date'}
@@ -114,7 +110,7 @@ class PaperRecord(Record):
     def parseYears(self):
         if self.publishingYears:
             self.checkIfYearsContinuous()
-            self.generateAvailableRange()
+            self.generatePublishingRange()
 
     def checkIfYearsContinuous(self):
         for i, year in enumerate(self.publishingYears):
@@ -125,7 +121,7 @@ class PaperRecord(Record):
             if year + 1 != nextYear:
                 return
 
-    def generateAvailableRange(self):
+    def generatePublishingRange(self):
         if self.publishingYears:
             lowYear = self.publishingYears[0]
             highYear = self.publishingYears[-1]

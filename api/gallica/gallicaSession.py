@@ -1,5 +1,5 @@
 from requests_toolbelt import sessions
-from api.gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 
 class GallicaSession:

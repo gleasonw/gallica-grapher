@@ -76,7 +76,7 @@ class Newspaper:
                     paperRecord.getTitle(),
                     lowYear,
                     highYear,
-                    paperRecord.getContinuous(),
+                    paperRecord.isContinuous(),
                     paperRecord.getPaperCode()
                 ))) + '\n')
             csvFileLikeObject.seek(0)
