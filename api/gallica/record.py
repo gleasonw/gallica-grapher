@@ -11,6 +11,7 @@ class Record:
         self.date = None
         self.yearMonDay = []
         self.url = ''
+
         self.parsePaperCodeFromXML()
         self.parseURLFromXML()
 

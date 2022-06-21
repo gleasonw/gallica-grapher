@@ -56,32 +56,12 @@ class KeywordQuery:
 
     # TODO: Before posting, add paper codes that aren't in the DB to the DB.
     # TODO: move state up?
-    def postRecordsToDB(self):
-
-        def cleanCSVvalue(value):
-            if value is None:
-                return r'\N'
-            return str(value).replace('|', '\\|')
-
+    def postRecordsToHoldingResultsDB(self):
         with self.dbConnection.cursor() as curs:
-            csvFileLikeObject = io.StringIO()
-            for record in self.keywordRecords:
-                yearMonDay = record.getDate()
-                csvFileLikeObject.write(
-                    "|".join(map(cleanCSVvalue, (
-                        record.getUrl(),
-                        yearMonDay[0],
-                        yearMonDay[1],
-                        yearMonDay[2],
-                        record.getJSTimestamp(),
-                        self.keyword,
-                        record.getPaperCode(),
-                        self.requestID
-                    ))) + '\n')
-            csvFileLikeObject.seek(0)
+            csvStream = self.generateResultCSVstream()
             curs.copy_from(
-                csvFileLikeObject,
-                'holdingResults', sep='|',
+                csvStream,
+                'holdingresults', sep='|',
                 columns=(
                     'identifier',
                     'year',
@@ -94,6 +74,30 @@ class KeywordQuery:
             )
             self.postMissingPapers(curs)
             self.copyResultsToFinalTable(curs)
+
+    def generateResultCSVstream(self):
+
+        def cleanCSVvalue(value):
+            if value is None:
+                return r'\N'
+            return str(value).replace('|', '\\|')
+
+        csvFileLikeObject = io.StringIO()
+        for record in self.keywordRecords:
+            yearMonDay = record.getDate()
+            csvFileLikeObject.write(
+                "|".join(map(cleanCSVvalue, (
+                    record.getUrl(),
+                    yearMonDay[0],
+                    yearMonDay[1],
+                    yearMonDay[2],
+                    record.getJSTimestamp(),
+                    self.keyword,
+                    record.getPaperCode(),
+                    self.requestID
+                ))) + '\n')
+        csvFileLikeObject.seek(0)
+        return csvFileLikeObject
 
     def postMissingPapers(self, curs):
         paperGetter = Newspaper(self.gallicaHttpSession)
@@ -178,7 +182,7 @@ class KeywordQueryAllPapers(KeywordQuery):
             workerPool = self.generateSearchWorkers(50)
             self.doSearch(workerPool)
             if self.keywordRecords:
-                self.postRecordsToDB()
+                self.postRecordsToHoldingResultsDB()
 
     # TODO: isolate concurrent code, only one class should be responsible for talking to Gallica
     def generateSearchWorkers(self, numWorkers):
@@ -274,7 +278,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
             self.createURLIndecesForEachPaper()
             self.mapThreadsToSearch(50)
             if self.keywordRecords:
-                self.postRecordsToDB()
+                self.postRecordsToHoldingResultsDB()
 
     def createURLIndecesForEachPaper(self):
         for paperCode, count in self.paperCodeWithNumResults.items():

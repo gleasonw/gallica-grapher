@@ -1,16 +1,95 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
-from gallica.gallicaSession import GallicaSession
+from gallica.db import DB
+import psycopg2
 from gallica.keywordQuery import KeywordQuery
 from gallica.keywordQuery import KeywordQueryAllPapers
 from gallica.keywordQuery import KeywordQuerySelectPapers
+from gallica.record import KeywordRecord
+from gallica.record import Record
 import os
 
+
 here = os.path.dirname(__file__)
+
+
 class TestKeywordQuery(TestCase):
 
+    @staticmethod
+    def getMockBatchOf5KeywordRecords():
+        Record.parsePaperCodeFromXML = MagicMock(return_value="123")
+        Record.parseURLFromXML = MagicMock(return_value="http://example.com")
+        KeywordRecord.parseDateFromXML = MagicMock()
+        KeywordRecord.checkIfValid = MagicMock()
+
+        payload = KeywordQuery(
+            'term!',
+            [],
+            'id!',
+            MagicMock,
+            MagicMock,
+            MagicMock
+        )
+        codes = ['a', 'b', 'c', 'd', 'e']
+        for i in range(5):
+            mockRecord = KeywordRecord([None, None, [None]])
+            mockRecord.getDate = MagicMock(return_value=[1920, 10, 1])
+            mockRecord.getJSTimestamp = MagicMock(return_value=1234)
+            mockRecord.getUrl = MagicMock(return_value='1234.com')
+            mockRecord.getPaperCode = MagicMock(return_value=codes[i])
+            payload.keywordRecords.append(mockRecord)
+
+        return payload
+
     def test_post_results(self):
-        self.fail()
+        dbConnection = DB().getConn()
+        payload = TestKeywordQuery.getMockBatchOf5KeywordRecords()
+        payload.dbConnection = dbConnection
+        payload.postMissingPapers = MagicMock
+        payload.copyResultsToFinalTable = MagicMock
+
+        payload.postRecordsToHoldingResultsDB()
+
+        with dbConnection.cursor() as curs:
+            curs.execute(
+                """
+                    WITH resultsForRequest AS (
+                        DELETE FROM holdingresults
+                        WHERE requestid = 'id!'
+                        RETURNING identifier, year, month, day, jstime, searchterm, paperid, requestid
+                    )
+                    
+                    SELECT * FROM resultsForRequest;
+                """
+                )
+            postedResults = curs.fetchall()
+
+        firstRow = postedResults[0]
+        self.assertEqual(len(postedResults), 5)
+        self.assertEqual(firstRow[0], "1234.com")
+        self.assertEqual(firstRow[1], 1920)
+        self.assertEqual(firstRow[2], 10)
+        self.assertEqual(firstRow[3], 1)
+        self.assertEqual(firstRow[4], 1234)
+        self.assertEqual(firstRow[5], "term!")
+        self.assertEqual(firstRow[6], "a")
+        self.assertEqual(firstRow[7], "id!")
+
+    def test_generate_result_CSV_stream(self):
+        payload = TestKeywordQuery.getMockBatchOf5KeywordRecords()
+        testStream = payload.generateResultCSVstream()
+        streamRows = testStream.getvalue().split("\n")
+        firstStreamRow = streamRows[0].split("|")
+
+        self.assertEqual(len(streamRows), 6)
+        self.assertEqual(firstStreamRow[0], "1234.com")
+        self.assertEqual(firstStreamRow[1], '1920')
+        self.assertEqual(firstStreamRow[2], '10')
+        self.assertEqual(firstStreamRow[3], '1')
+        self.assertEqual(firstStreamRow[4], "1234")
+        self.assertEqual(firstStreamRow[5], "term!")
+        self.assertEqual(firstStreamRow[6], "a")
+        self.assertEqual(firstStreamRow[7], "id!")
 
     def test_post_missing_papers(self):
         self.fail()
@@ -19,197 +98,201 @@ class TestKeywordQuery(TestCase):
         self.fail()
 
     def test_establish_year_range(self):
-        self.fail()
-
-    def test_build_query(self):
-        self.fail()
-
-
-class TestKeywordQueryAllPapers(TestCase):
-
-    def test_find_num_results_for_settings(self):
-        self.fail()
-
-    def test_build_year_range_query(self):
-        KeywordQueryAllPapers.fetchNumTotalResults = MagicMock(return_value=3)
-
-        query = KeywordQueryAllPapers(
-            'brazza',
-            [1850,1900],
+        KeywordQuery.fetchNumTotalResults = MagicMock
+        noRangeQuery = KeywordQuery(
+            '',
+            [],
             '1234',
-            progressTracker=MagicMock(),
-            dbConnection=MagicMock(),
-            session=MagicMock()
+            MagicMock,
+            MagicMock,
+            MagicMock
         )
-
-        self.assertEqual(
-            query.baseQuery,
-            'dc.date >= "1850" and dc.date <= "1900" '
-            'and (gallica all "brazza") '
-            'and (dc.type all "fascicule") '
-            'sortby dc.date/sort.ascending')
-
-    def test_build_dateless_query(self):
-        KeywordQueryAllPapers.fetchNumTotalResults = MagicMock(return_value=3)
-
-        query = KeywordQueryAllPapers(
-            'brazza',
-            [],
+        rangeQuery = KeywordQuery(
+            '',
+            [1, 1],
             '1234',
-            progressTracker=MagicMock(),
-            dbConnection=MagicMock(),
-            session=MagicMock()
+            MagicMock,
+            MagicMock,
+            MagicMock
         )
-
-        self.assertEqual(
-            query.baseQuery,
-            '(gallica all "brazza") '
-            'and (dc.type all "fascicule") '
-            'sortby dc.date/sort.ascending')
-
-    def test_fetch_num_total_results(self):
-
-        query = KeywordQueryAllPapers(
-            'brazza',
-            [],
-            '1234',
-            progressTracker=MagicMock(),
-            dbConnection=MagicMock(),
-            session=GallicaSession().getSession()
-        )
-
-        self.assertEqual(query.estimateNumResults, 78514)
+        self.assertFalse(noRangeQuery.isYearRange)
+        self.assertTrue(rangeQuery.isYearRange)
 
 
-class TestKeywordQuerySelectPapers(TestCase):
 
-    def buildDummyDict(self):
-        with open(os.path.join(here, "data/dummy_newspaper_choice_dicts")) as f:
-            dummyNewspaperChoices = f.read().splitlines()
-            choiceDict = []
-            for nameCode in dummyNewspaperChoices:
-                nameCode = nameCode.split(',')
-                choiceDict.append(
-                    {'name': nameCode[0].strip(),
-                     'code': nameCode[1].strip()})
-            return choiceDict
 
-    def test_build_year_range_query(self):
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
+    class TestKeywordQueryAllPapers(TestCase):
 
-        choiceDict = self.buildDummyDict()
-        query = KeywordQuerySelectPapers(
-            'brazza',
-            choiceDict,
-            [1850, 1900],
-            '1234',
-            MagicMock(),
-            MagicMock(),
-            MagicMock())
+        def test_find_num_results_for_settings(self):
+            self.fail()
 
-        self.assertEqual(
-            query.baseQuery,
-            'arkPress all "{newsKey}_date" '
-            'and dc.date >= "1850" '
-            'and dc.date <= "1900" '
-            'and (gallica all "brazza") '
-            'sortby dc.date/sort.ascending')
+        def test_build_year_range_query(self):
+            KeywordQueryAllPapers.fetchNumTotalResults = MagicMock(return_value=3)
 
-    def test_build_dateless_query(self):
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
-        choiceDict = self.buildDummyDict()
+            query = KeywordQueryAllPapers(
+                'brazza',
+                [1850,1900],
+                '1234',
+                progressTracker=MagicMock(),
+                dbConnection=MagicMock(),
+                session=MagicMock()
+            )
 
-        query = KeywordQuerySelectPapers(
-            'brazza',
-            choiceDict,
-            [],
-            '1234',
-            MagicMock(),
-            MagicMock(),
-            MagicMock())
+            self.assertEqual(
+                query.baseQuery,
+                'dc.date >= "1850" and dc.date <= "1900" '
+                'and (gallica all "brazza") '
+                'and (dc.type all "fascicule") '
+                'sortby dc.date/sort.ascending')
 
-        self.assertEqual(
-            query.baseQuery,
-            'arkPress all "{newsKey}_date" '
-            'and (gallica all "brazza") '
-            'sortby dc.date/sort.ascending')
+        def test_build_dateless_query(self):
+            KeywordQueryAllPapers.fetchNumTotalResults = MagicMock(return_value=3)
 
-    def test_set_num_results_for_each_paper(self):
+            query = KeywordQueryAllPapers(
+                'brazza',
+                [],
+                '1234',
+                progressTracker=MagicMock(),
+                dbConnection=MagicMock(),
+                session=MagicMock()
+            )
 
-        choiceDict = self.buildDummyDict()
-        KeywordQuerySelectPapers.fetchNumberResultsInPaper = MagicMock(return_value=['a', 1])
-        KeywordQuerySelectPapers.sumUpPaperResultsForTotalEstimate = MagicMock()
+            self.assertEqual(
+                query.baseQuery,
+                '(gallica all "brazza") '
+                'and (dc.type all "fascicule") '
+                'sortby dc.date/sort.ascending')
 
-        query = KeywordQuerySelectPapers(
-            'brazza',
-            choiceDict,
-            [],
-            '1234',
-            MagicMock(),
-            MagicMock(),
-            MagicMock())
 
-        self.assertDictEqual(query.paperCodeWithNumResults, {'a': 1})
+    class TestKeywordQuerySelectPapers(TestCase):
 
-    @patch('gallica.recordBatch.RecordBatch.getNumResults', return_value=3)
-    def test_fetch_number_results_in_paper(self, mock_getNumResults):
+        def buildDummyDict(self):
+            with open(os.path.join(here, "data/dummy_newspaper_choice_dicts")) as f:
+                dummyNewspaperChoices = f.read().splitlines()
+                choiceDict = []
+                for nameCode in dummyNewspaperChoices:
+                    nameCode = nameCode.split(',')
+                    choiceDict.append(
+                        {'name': nameCode[0].strip(),
+                         'code': nameCode[1].strip()})
+                return choiceDict
 
-        choiceDict = self.buildDummyDict()
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
-        query = KeywordQuerySelectPapers(
-            'brazza',
-            choiceDict,
-            [],
-            '1234',
-            MagicMock(),
-            MagicMock(),
-            MagicMock())
+        def test_build_year_range_query(self):
+            KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
 
-        resultTest = query.fetchNumberResultsInPaper({'code': 'a'})
+            choiceDict = self.buildDummyDict()
+            query = KeywordQuerySelectPapers(
+                'brazza',
+                choiceDict,
+                [1850, 1900],
+                '1234',
+                MagicMock(),
+                MagicMock(),
+                MagicMock())
 
-        self.assertEqual(
-            resultTest,
-            ('a', 3))
+            self.assertEqual(
+                query.baseQuery,
+                'arkPress all "{newsKey}_date" '
+                'and dc.date >= "1850" '
+                'and dc.date <= "1900" '
+                'and (gallica all "brazza") '
+                'sortby dc.date/sort.ascending')
 
-    def test_sum_up_paper_results_for_total_estimate(self):
+        def test_build_dateless_query(self):
+            KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
+            choiceDict = self.buildDummyDict()
 
-        choiceDict = self.buildDummyDict()
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
-        query = KeywordQuerySelectPapers(
-            'brazza',
-            choiceDict,
-            [],
-            '1234',
-            MagicMock(),
-            MagicMock(),
-            MagicMock())
-        query.paperCodeWithNumResults = {'a': 1, 'b': 2}
-        query.sumUpPaperResultsForTotalEstimate()
+            query = KeywordQuerySelectPapers(
+                'brazza',
+                choiceDict,
+                [],
+                '1234',
+                MagicMock(),
+                MagicMock(),
+                MagicMock())
 
-        self.assertEqual(
-            query.estimateNumResults,
-            3)
+            self.assertEqual(
+                query.baseQuery,
+                'arkPress all "{newsKey}_date" '
+                'and (gallica all "brazza") '
+                'sortby dc.date/sort.ascending')
 
-    def test_init_batch_queries(self):
+        def test_set_num_results_for_each_paper(self):
 
-        choiceDict = self.buildDummyDict()
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
-        query = KeywordQuerySelectPapers(
-            'brazza',
-            choiceDict,
-            [],
-            '1234',
-            MagicMock(),
-            MagicMock(),
-            MagicMock())
-        query.paperCodeWithNumResults = {'a': 125, 'b': 256}
+            choiceDict = self.buildDummyDict()
+            KeywordQuerySelectPapers.fetchNumberResultsInPaper = MagicMock(return_value=['a', 1])
+            KeywordQuerySelectPapers.sumUpPaperResultsForTotalEstimate = MagicMock()
 
-        query.createURLIndecesForEachPaper()
+            query = KeywordQuerySelectPapers(
+                'brazza',
+                choiceDict,
+                [],
+                '1234',
+                MagicMock(),
+                MagicMock(),
+                MagicMock())
 
-        self.assertListEqual(
-            query.batchQueryStrings,
-            [
-                [1, 'a'], [51, 'a'], [101, 'a'],
-                [1, 'b'], [51, 'b'], [101, 'b'], [151, 'b'], [201, 'b'], [251, 'b']
-            ]
-        )
+            self.assertDictEqual(query.paperCodeWithNumResults, {'a': 1})
+
+        @patch('gallica.recordBatch.RecordBatch.getNumResults', return_value=3)
+        def test_fetch_number_results_in_paper(self, mock_getNumResults):
+
+            choiceDict = self.buildDummyDict()
+            KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
+            query = KeywordQuerySelectPapers(
+                'brazza',
+                choiceDict,
+                [],
+                '1234',
+                MagicMock(),
+                MagicMock(),
+                MagicMock())
+
+            resultTest = query.fetchNumberResultsInPaper({'code': 'a'})
+
+            self.assertEqual(
+                resultTest,
+                ('a', 3))
+
+        def test_sum_up_paper_results_for_total_estimate(self):
+
+            choiceDict = self.buildDummyDict()
+            KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
+            query = KeywordQuerySelectPapers(
+                'brazza',
+                choiceDict,
+                [],
+                '1234',
+                MagicMock(),
+                MagicMock(),
+                MagicMock())
+            query.paperCodeWithNumResults = {'a': 1, 'b': 2}
+            query.sumUpPaperResultsForTotalEstimate()
+
+            self.assertEqual(
+                query.estimateNumResults,
+                3)
+
+        def test_init_batch_queries(self):
+
+            choiceDict = self.buildDummyDict()
+            KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
+            query = KeywordQuerySelectPapers(
+                'brazza',
+                choiceDict,
+                [],
+                '1234',
+                MagicMock(),
+                MagicMock(),
+                MagicMock())
+            query.paperCodeWithNumResults = {'a': 125, 'b': 256}
+
+            query.createURLIndecesForEachPaper()
+
+            self.assertListEqual(
+                query.batchQueryStrings,
+                [
+                    [1, 'a'], [51, 'a'], [101, 'a'],
+                    [1, 'b'], [51, 'b'], [101, 'b'], [151, 'b'], [201, 'b'], [251, 'b']
+                ]
+            )

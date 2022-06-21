@@ -71,10 +71,10 @@ class Newspaper:
 
     def copyPapersToDB(self):
         with self.dbConnection.cursor() as curs:
-            csvStream = self.generateCSVStream()
+            csvStream = self.generateCSVstream()
             curs.copy_from(csvStream, 'papers', sep='|')
 
-    def generateCSVStream(self):
+    def generateCSVstream(self):
         csvFileLikeObject = io.StringIO()
         for paperRecord in self.paperRecords:
             dateRange = paperRecord.getDate()
