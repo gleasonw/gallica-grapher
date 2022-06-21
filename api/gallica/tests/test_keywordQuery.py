@@ -1,14 +1,12 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from gallica.db import DB
-import psycopg2
 from gallica.keywordQuery import KeywordQuery
 from gallica.keywordQuery import KeywordQueryAllPapers
 from gallica.keywordQuery import KeywordQuerySelectPapers
 from gallica.record import KeywordRecord
 from gallica.record import Record
 import os
-
 
 here = os.path.dirname(__file__)
 
@@ -91,11 +89,88 @@ class TestKeywordQuery(TestCase):
         self.assertEqual(firstStreamRow[6], "a")
         self.assertEqual(firstStreamRow[7], "id!")
 
-    def test_post_missing_papers(self):
-        self.fail()
+    def test_get_missing_papers(self):
+        dbConnection = DB().getConn()
+        payload = TestKeywordQuery.getMockBatchOf5KeywordRecords()
+        payload.dbConnection = dbConnection
+        payload.copyResultsToFinalTable = MagicMock
+        payload.postMissingPapers = MagicMock
+
+        payload.postRecordsToHoldingResultsDB()
+        with dbConnection.cursor() as curs:
+            missing = payload.getMissingPapers(curs)
+        self.assertEqual(len(missing), 5)
+        self.assertListEqual(
+            sorted(missing),
+            [('a',), ('b',), ('c',), ('d',), ('e',)])
+        with dbConnection.cursor() as curs:
+            curs.execute(
+                """
+                DELETE FROM holdingresults WHERE requestid = 'id!';
+                """
+            )
 
     def test_move_results_to_final(self):
-        self.fail()
+        dbConnection = DB().getConn()
+        payload = TestKeywordQuery.getMockBatchOf5KeywordRecords()
+        payload.dbConnection = dbConnection
+        payload.postMissingPapers = MagicMock
+        with dbConnection.cursor() as curs:
+            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'a');")
+            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'b');")
+            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'c');")
+            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'d');")
+            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'e');")
+            noMissingPapers = payload.getMissingPapers(curs)
+            self.assertCountEqual(noMissingPapers, [])
+
+        payload.postRecordsToHoldingResultsDB()
+
+        with dbConnection.cursor() as curs:
+            curs.execute(
+            """
+            SELECT * 
+            FROM results 
+            WHERE paperid = 'a'
+            OR paperid = 'b'
+            OR paperid = 'c'
+            OR paperid = 'd'
+            OR paperid = 'e';
+            """)
+            added = curs.fetchall()
+        self.assertEqual(len(added), 5)
+        firstRow = added[0]
+        self.assertEqual(len(added), 5)
+        self.assertEqual(firstRow[1], "1234.com")
+        self.assertEqual(firstRow[2], 1920)
+        self.assertEqual(firstRow[3], 10)
+        self.assertEqual(firstRow[4], 1)
+        self.assertEqual(firstRow[5], 1234)
+        self.assertEqual(firstRow[6], "term!")
+        self.assertEqual(firstRow[7], "a")
+        self.assertEqual(firstRow[8], "id!")
+
+        with dbConnection.cursor() as curs:
+            curs.execute(
+                """
+                DELETE FROM results 
+                WHERE paperid = 'a'
+                OR paperid = 'b'
+                OR paperid = 'c'
+                OR paperid = 'd'
+                OR paperid = 'e';
+                """
+            )
+            curs.execute(
+                """
+                DELETE FROM papers 
+                WHERE code = 'a'
+                OR code = 'b'
+                OR code = 'c'
+                OR code = 'd'
+                OR code = 'e';
+                """
+            )
 
     def test_establish_year_range(self):
         KeywordQuery.fetchNumTotalResults = MagicMock
@@ -117,9 +192,6 @@ class TestKeywordQuery(TestCase):
         )
         self.assertFalse(noRangeQuery.isYearRange)
         self.assertTrue(rangeQuery.isYearRange)
-
-
-
 
     class TestKeywordQueryAllPapers(TestCase):
 

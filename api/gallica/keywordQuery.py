@@ -101,20 +101,23 @@ class KeywordQuery:
 
     def postMissingPapers(self, curs):
         paperGetter = Newspaper(self.gallicaHttpSession)
+        missingPapers = self.getMissingPapers(curs)
+        paperGetter.sendTheseGallicaPapersToDB(missingPapers)
+
+    def getMissingPapers(self, curs):
         curs.execute(
             """
             WITH papersInResults AS 
                 (SELECT DISTINCT paperid 
                 FROM holdingResults 
                 WHERE requestid = %s)
-                
+
             SELECT paperid FROM papersInResults
             WHERE paperid NOT IN 
-                (SELECT paperid FROM papers);
+                (SELECT code FROM papers);
             """
             , (self.requestID,))
-        missingPapers = curs.fetchall()
-        paperGetter.sendTheseGallicaPapersToDB(missingPapers)
+        return curs.fetchall()
 
     def copyResultsToFinalTable(self, curs):
         curs.execute(
@@ -125,10 +128,10 @@ class KeywordQuery:
                 RETURNING identifier, year, month, day, jstime, searchterm, paperid, requestid
             )
             
-            INSERT INTO results 
+            INSERT INTO results (identifier, year, month, day, jstime, searchterm, paperid, requestid)
                 (SELECT * FROM resultsForRequest);
             """
-        ), (self.requestID,)
+            , (self.requestID,))
 
     def buildYearRangeQuery(self):
         pass
@@ -287,7 +290,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
 
     def appendBatchQueryStringsForPaper(self, numBatches, code):
         for i in range(numBatches):
-            recordAndCode = [1 + 50*i, code]
+            recordAndCode = [1 + 50 * i, code]
             self.batchQueryStrings.append(recordAndCode)
 
     def mapThreadsToSearch(self, numWorkers):

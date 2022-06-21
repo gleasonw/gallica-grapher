@@ -7,8 +7,7 @@ class TestTopPapers(TestCase):
         papers = TopPapers(
             '4321',
             1800,
-            1900,
-            continuous=True
+            1900
         )
         self.assertEqual(papers.getTopPapers(),
                           [('Gazette nationale ou le Moniteur universel',285)])

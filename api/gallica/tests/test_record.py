@@ -63,9 +63,10 @@ class TestPaperRecord(TestCase):
         here = os.path.dirname(__file__)
         dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
-        dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        PaperRecord.fetchYearsPublished = MagicMock()
-        paperRecord = PaperRecord(dummyRecordXML, MagicMock)
+        firstRecord = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
+
+        with patch.object(PaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
+            paperRecord = PaperRecord(firstRecord, MagicMock)
 
         self.assertTrue(paperRecord.isValid())
 
@@ -76,8 +77,8 @@ class TestPaperRecord(TestCase):
             mock_get.return_value = MagicMock(content=f.read())
         dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
-        dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        paperRecord = PaperRecord(dummyRecordXML, GallicaSession().getSession())
+        firstRecord = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
+        paperRecord = PaperRecord(firstRecord, GallicaSession().getSession())
 
         self.assertEqual(
             paperRecord.getDate(),
@@ -86,34 +87,34 @@ class TestPaperRecord(TestCase):
 
     def test_check_if_years_continuous(self):
         here = os.path.dirname(__file__)
-        PaperRecord.fetchYearsPublished = MagicMock()
         dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        continuousPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
-        sporadicPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
-        continuousPaperRecord.publishingYears = [1918, 1919, 1920]
-        sporadicPaperRecord.publishingYears = [1918, 1919, 2020, 2021]
 
-        continuousPaperRecord.checkIfYearsContinuous()
-        sporadicPaperRecord.checkIfYearsContinuous()
+        with patch.object(PaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
+            continuousPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
+            sporadicPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
+            continuousPaperRecord.publishingYears = [1918, 1919, 1920]
+            sporadicPaperRecord.publishingYears = [1918, 1919, 2020, 2021]
+            continuousPaperRecord.checkIfYearsContinuous()
+            sporadicPaperRecord.checkIfYearsContinuous()
 
         self.assertTrue(continuousPaperRecord.isContinuous())
         self.assertFalse(sporadicPaperRecord.isContinuous())
 
     def test_generate_available_range(self):
         here = os.path.dirname(__file__)
-        PaperRecord.fetchYearsPublished = MagicMock()
         dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        continuousPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
-        sporadicPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
-        continuousPaperRecord.publishingYears = [1918, 1919, 1920]
-        sporadicPaperRecord.publishingYears = [1918, 1919, 2020, 2021]
 
-        continuousPaperRecord.generatePublishingRange()
-        sporadicPaperRecord.generatePublishingRange()
+        with patch.object(PaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
+            continuousPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
+            sporadicPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
+            continuousPaperRecord.publishingYears = [1918, 1919, 1920]
+            sporadicPaperRecord.publishingYears = [1918, 1919, 2020, 2021]
+            continuousPaperRecord.generatePublishingRange()
+            sporadicPaperRecord.generatePublishingRange()
 
         self.assertEqual(
             continuousPaperRecord.publishingRange,
@@ -126,11 +127,12 @@ class TestPaperRecord(TestCase):
 
     def test_parse_title_from_xml(self):
         here = os.path.dirname(__file__)
-        PaperRecord.fetchYearsPublished = MagicMock()
         dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        record = PaperRecord(dummyRecordXML, MagicMock)
+
+        with patch.object(PaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
+            record = PaperRecord(dummyRecordXML, MagicMock)
 
         self.assertEqual(
             record.getTitle(),

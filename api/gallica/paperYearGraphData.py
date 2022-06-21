@@ -1,5 +1,6 @@
 import psycopg2
 import json
+from gallica.db import DB
 
 
 class PaperYearGraphData:
@@ -23,14 +24,8 @@ class PaperYearGraphData:
             outFile.write(self.JSONData)
 
     def getPaperMetadata(self):
-        conn = None
+        conn = DB().getConn()
         try:
-            conn = psycopg2.connect(
-                host="localhost",
-                database="gallicagrapher",
-                user="wgleason",
-                password="ilike2play"
-            )
             cursor = conn.cursor()
             cursor.execute("SELECT MIN(startdate) FROM papers WHERE continuous is TRUE;")
             self.lowYear = cursor.fetchone()[0]
