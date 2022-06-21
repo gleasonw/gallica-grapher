@@ -217,6 +217,47 @@
                 <uri>bpt6k969388g</uri>
             </srw:extraRecordData>
         </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1892</dc:date>
+                    <dc:description> 1892</dc:description>
+                    <dc:description>1892 (N3).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient à l’ensemble documentaire : NordPdeC1</dc:description>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k969388g</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Boulogne-sur-Mer)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32896241g</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32896241g/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Droit, économie, politique, JO-85351 (BIS)</dc:source>
+                    <dc:title>L'Indépendant de Boulogne-sur-Mer. Supplément illustré</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>4</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k969388g.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k969388g</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k969388g.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k969388g.medres</medres>
+                <nqamoyen>86.07</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k969388g.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k969388g</uri>
+            </srw:extraRecordData>
+        </srw:record>
     </srw:records>
     <srw:nextRecordPosition>6</srw:nextRecordPosition>
 </srw:searchRetrieveResponse>
