@@ -1,0 +1,862 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<srw:searchRetrieveResponse xmlns:ns6="http://gallica.bnf.fr/namespaces/gallica/" xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:srw="http://www.loc.gov/zing/srw/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <srw:version>1.2</srw:version>
+    <srw:echoedSearchRetrieveRequest>
+        <srw:query>arkPress all cb41459716t_date or arkPress all cb32690181n_date or arkPress all cb32751426x_date or arkPress all cb327808508_date or arkPress all cb32750493t_date or arkPress all cb32709443d_date or arkPress all cb327345882_date or arkPress all cb327514189_date or arkPress all cb32751344k_date or arkPress all cb32802219g_date or arkPress all cb44323340r_date or arkPress all cb43569230n_date or arkPress all cb32750197c_date or arkPress all cb413185897_date or arkPress all cb327967661_date or arkPress all cb32751440g_date or arkPress all cb46864227g_date or arkPress all cb32806070n_date or arkPress all cb32820888w_date or arkPress all cb328209138_date</srw:query>
+        <srw:version>1.2</srw:version>
+    </srw:echoedSearchRetrieveRequest>
+    <srw:numberOfRecords>199</srw:numberOfRecords>
+    <srw:extraResponseData>&lt;numberOfRecordsDecollapser&gt;199&lt;/numberOfRecordsDecollapser&gt;</srw:extraResponseData>
+    <srw:records>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Marchais, Antoine. Auteur du texte</dc:creator>
+                    <dc:date>1654</dc:date>
+                    <dc:description> 1654</dc:description>
+                    <dc:description>1654.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 219</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k1511024c</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Blois. Par Fr. de La Saugere, imprimeur du Roy, &amp; de son Altesse Royalle, M. DC. LII. [-M. DC. LIIII.] Avec privilege du Roy</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb46864227g</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb46864227g/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Arsenal, RESERVE 8-NF-7147</dc:source>
+                    <dc:title>Description de l'état present de la France</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>0</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k1511024c.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k1511024c</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k1511024c.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k1511024c.medres</medres>
+                <nqamoyen>0.0</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k1511024c.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k1511024c</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1650</dc:date>
+                    <dc:description> 1650</dc:description>
+                    <dc:description>1650.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 22</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5700872x</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[S.l.] M. DC. L.</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb44323340r</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb44323340r/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2417</dc:source>
+                    <dc:title>Le Courieer burlesque de la guerre de Bourdeaux</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>1</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5700872x.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5700872x</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5700872x.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5700872x.medres</medres>
+                <nqamoyen>63.14</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5700872x.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5700872x</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1652</dc:date>
+                    <dc:description> 1652</dc:description>
+                    <dc:description>1652.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 20</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5664573z</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Paris, chez Jacob Chevalier, proche S. Jean de Latran. M. DC. LII. [-A Paris, chez Marignon Jacquet, ruë de la Boucherie, aux trois Oysons. M. DC. LII.]</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb413185897</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb413185897/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-1935</dc:source>
+                    <dc:title>Le Babillard du temps, en vers burlesques</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>2</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5664573z.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5664573z</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5664573z.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5664573z.medres</medres>
+                <nqamoyen>82.17</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5664573z.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5664573z</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Saint-Julien (16..-17..?). Auteur du texte</dc:creator>
+                    <dc:date>1649</dc:date>
+                    <dc:description> 1649</dc:description>
+                    <dc:description>1649.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 32</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5695154c</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Paris, chez Claude Boudeville, ruë des Carmes, au Lys fleurissant. M. DC. XLVIIII. [-M. DC. XLIX.] Avec permission</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32751426x</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32751426x/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2437</dc:source>
+                    <dc:title>Courrier françois, traduit fidellement en vers burlesques</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>3</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5695154c.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5695154c</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5695154c.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5695154c.medres</medres>
+                <nqamoyen>68.98</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5695154c.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5695154c</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1652</dc:date>
+                    <dc:description> 1652</dc:description>
+                    <dc:description>1652.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 20</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5618708x</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Paris, chez Jacob Chevalier, proche S. Jean de Latran. M. DC. LII. [-A Paris, chez Marignon Jacquet, ruë de la Boucherie, aux trois Oysons. M. DC. LII.]</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb413185897</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb413185897/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-1935</dc:source>
+                    <dc:title>Le Babillard du temps, en vers burlesques</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>4</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5618708x.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5618708x</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5618708x.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5618708x.medres</medres>
+                <nqamoyen>70.23</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5618708x.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5618708x</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Auteur de la Gazette des Halles. Auteur du texte</dc:creator>
+                    <dc:date>1649</dc:date>
+                    <dc:description> 1649</dc:description>
+                    <dc:description>1649 (N3).</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 20</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k57216137</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Paris, chez Michel Mettayer, imprimeur ordinaire du Roy, demeurant en l'isle Nostre Dame sur le Pont Marie, au Cigne. M. DC. XLIX.</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb327808508</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb327808508/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-4513</dc:source>
+                    <dc:title>La Gazette des Halles touchant les affaires du temps. Premiere nouvelle.</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>5</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k57216137.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k57216137</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k57216137.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k57216137.medres</medres>
+                <nqamoyen>82.17</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k57216137.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k57216137</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649</dc:date>
+                    <dc:description> 1649</dc:description>
+                    <dc:description>1649.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 18</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k10484998</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Paris, chez Nicolas de La Vigne, prés Sainct Hilaire. M. DC. XLIX. Avec permission. - A Paris, chez la Vefve Musnier, au Mont Sainct Hilaire en la court d'Albret. M. DC. XLIX. Avec permißion.</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32750493t</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32750493t/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2421-2422, YE-4516</dc:source>
+                    <dc:title>Le Courrier de la cour, apportant les nouvelles de S. Germain, depuis le quinziesme mars 1649. jusques au vingt-deuxiesme. En vers burlesques.</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>6</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k10484998.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k10484998</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k10484998.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k10484998.medres</medres>
+                <nqamoyen>0.0</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k10484998.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k10484998</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Saint-Julien (16..-17..?). Auteur du texte</dc:creator>
+                    <dc:date>1649</dc:date>
+                    <dc:description> 1649</dc:description>
+                    <dc:description>1649 (N1)- (N12).</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 32</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k1168510n</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Paris, chez Claude Boudeville, ruë des Carmes, au Lys fleurissant. M. DC. XLVIIII. [-M. DC. XLIX.] Avec permission</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32751426x</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32751426x/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2437</dc:source>
+                    <dc:title>Courrier françois, traduit fidellement en vers burlesques</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>7</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k1168510n.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k1168510n</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k1168510n.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k1168510n.medres</medres>
+                <nqamoyen>77.67</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k1168510n.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k1168510n</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649-03-15</dc:date>
+                    <dc:description>15 mars 1649</dc:description>
+                    <dc:description>1649/03/15 (N1)-1649/03/31 (N2).</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 18</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5702575r</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Paris, chez Nicolas de La Vigne, prés Sainct Hilaire. M. DC. XLIX. Avec permission. - A Paris, chez la Vefve Musnier, au Mont Sainct Hilaire en la court d'Albret. M. DC. XLIX. Avec permißion.</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32750493t</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32750493t/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2421-2422, YE-4516</dc:source>
+                    <dc:title>Le Courrier de la cour, apportant les nouvelles de S. Germain, depuis le quinziesme mars 1649. jusques au vingt-deuxiesme. En vers burlesques.</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>8</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5702575r.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5702575r</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5702575r.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5702575r.medres</medres>
+                <nqamoyen>66.12</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5702575r.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5702575r</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649-03-22</dc:date>
+                    <dc:description>22 mars 1649</dc:description>
+                    <dc:description>1649/03/22 (N2 DOUBLON)-1649/03/31.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 18</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5722131r</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>A Paris, chez Nicolas de La Vigne, prés Sainct Hilaire. M. DC. XLIX. Avec permission. - A Paris, chez la Vefve Musnier, au Mont Sainct Hilaire en la court d'Albret. M. DC. XLIX. Avec permißion.</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32750493t</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32750493t/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2421-2422, YE-4516</dc:source>
+                    <dc:title>Le Courrier de la cour, apportant les nouvelles de S. Germain, depuis le quinziesme mars 1649. jusques au vingt-deuxiesme. En vers burlesques.</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>9</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5722131r.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5722131r</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5722131r.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5722131r.medres</medres>
+                <nqamoyen>69.85</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5722131r.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5722131r</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Martial du Mans, Le P. (religieux pénitent). Auteur du texte</dc:creator>
+                    <dc:creator>Jouannaux, Claude (Abbé). Auteur du texte</dc:creator>
+                    <dc:date>1647</dc:date>
+                    <dc:description> 1647</dc:description>
+                    <dc:description>1647-1775.</dc:description>
+                    <dc:description/>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k9780371t</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher> (A Paris)</dc:publisher>
+                    <dc:publisher>chez George et Louis Josse (A Paris)</dc:publisher>
+                    <dc:publisher>chez Louis Josse (A Paris)</dc:publisher>
+                    <dc:publisher>chez J. F. Josse et C. J. B. Delespine le fils (A Paris)</dc:publisher>
+                    <dc:publisher>chez Delaguette (A Paris)</dc:publisher>
+                    <dc:publisher>chez P. Al. Le Prieur (A Paris)</dc:publisher>
+                    <dc:publisher>chez Despilly (A Paris)</dc:publisher>
+                    <dc:publisher>chez Claude Herissant (A Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32690181n</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32690181n/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Philosophie, histoire, sciences de l'homme, 8-Z LE SENNE-14236</dc:source>
+                    <dc:title>Almanach spirituel de l'an ... Pour la ville et fauxbourgs de Paris</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>10</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k9780371t.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k9780371t</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k9780371t.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k9780371t.medres</medres>
+                <nqamoyen>65.15</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k9780371t.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k9780371t</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:contributor>Renaudot, Théophraste (1586-1653). Directeur de publication</dc:contributor>
+                    <dc:contributor>Renaudot, Eusèbe (1613-1679). Directeur de publication</dc:contributor>
+                    <dc:date>1634</dc:date>
+                    <dc:description> 1634</dc:description>
+                    <dc:description>1634-1641.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 485</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k54011063</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:language>français</dc:language>
+                    <dc:publisher> (Paris)</dc:publisher>
+                    <dc:publisher>Veuve Guillaume Loyson (Paris)</dc:publisher>
+                    <dc:publisher>Jean-Baptiste I Loyson (Paris)</dc:publisher>
+                    <dc:publisher>Louis Chamhoudry (Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb41459716t</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb41459716t/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, z-4045</dc:source>
+                    <dc:title>... Centurie des questions traitées ez conférences du Bureau d'adresse ...</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>11</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k54011063.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k54011063</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k54011063.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k54011063.medres</medres>
+                <nqamoyen>68.97</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k54011063.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k54011063</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649</dc:date>
+                    <dc:description> 1649</dc:description>
+                    <dc:description>1649.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 68</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5575025h</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:language>français</dc:language>
+                    <dc:publisher>A Paris, chez Nicolas de La Vigne, prés Sainct Hilaire. M. DC. XLIX. Avec permission.</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32709443d</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32709443d/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-1933</dc:source>
+                    <dc:title>Le Babillard [-Le sixiesme babillard] du temps en vers burlesques</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>12</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5575025h.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5575025h</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5575025h.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5575025h.medres</medres>
+                <nqamoyen>71.32</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5575025h.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5575025h</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Robinet, Charles (1608?-1698). Auteur du texte</dc:creator>
+                    <dc:date>1656-01-03</dc:date>
+                    <dc:description>03 janvier 1656</dc:description>
+                    <dc:description>1656/01/03-1658/08/05.</dc:description>
+                    <dc:description/>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k8944051</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:language>français</dc:language>
+                    <dc:publisher> (Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb328209138</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb328209138/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Philosophie, histoire, sciences de l'homme, FOL-LC2-26</dc:source>
+                    <dc:title>La Muze royale, à Madame la princesse Palatine</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>13</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k8944051.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k8944051</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k8944051.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k8944051.medres</medres>
+                <nqamoyen>0.0</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k8944051.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k8944051</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649-03</dc:date>
+                    <dc:description> mars 1649</dc:description>
+                    <dc:description>1649/03 (PART1).</dc:description>
+                    <dc:description> Note : + 1649/06/28-1649/07/12 (NOUV SER,PART2-4).</dc:description>
+                    <dc:format>Nombre total de vues : 80</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k1048501w</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:language>français</dc:language>
+                    <dc:publisher> (A Paris)</dc:publisher>
+                    <dc:publisher>chez Estienne Hebert, au Mont Sainct Hilaire (A Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb327345882</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb327345882/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2163-2164, 2778, 4519-4520</dc:source>
+                    <dc:title>Le Burlesque ON de ce temps, qui scait tout, qui fait tout, et qui dit tout</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>14</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k1048501w.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k1048501w</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k1048501w.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k1048501w.medres</medres>
+                <nqamoyen>0.0</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k1048501w.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k1048501w</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649-03</dc:date>
+                    <dc:description> mars 1649</dc:description>
+                    <dc:description>1649/03 (PART2).</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 80</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k57206432</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:language>français</dc:language>
+                    <dc:publisher> (A Paris)</dc:publisher>
+                    <dc:publisher>chez Estienne Hebert, au Mont Sainct Hilaire (A Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb327345882</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb327345882/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2163-2164, 2778, 4519-4520</dc:source>
+                    <dc:title>Le Burlesque ON de ce temps, qui scait tout, qui fait tout, et qui dit tout</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>15</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k57206432.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k57206432</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k57206432.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k57206432.medres</medres>
+                <nqamoyen>41.84</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k57206432.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k57206432</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649-07-01</dc:date>
+                    <dc:description>01 juillet 1649</dc:description>
+                    <dc:description>1649/07/01 (EXTRAORDINAIRE)-1649/07/12 (NOUV SER,PART4).</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 80</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5700639m</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:language>français</dc:language>
+                    <dc:publisher> (A Paris)</dc:publisher>
+                    <dc:publisher>chez Estienne Hebert, au Mont Sainct Hilaire (A Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb327345882</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb327345882/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2163-2164, 2778, 4519-4520</dc:source>
+                    <dc:title>Le Burlesque ON de ce temps, qui scait tout, qui fait tout, et qui dit tout</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>16</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5700639m.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5700639m</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5700639m.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5700639m.medres</medres>
+                <nqamoyen>68.83</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5700639m.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5700639m</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649-07-06</dc:date>
+                    <dc:description>06 juillet 1649</dc:description>
+                    <dc:description>1649/07/06 (NOUV SER,PART3).</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 80</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k56758955</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:language>français</dc:language>
+                    <dc:publisher> (A Paris)</dc:publisher>
+                    <dc:publisher>chez Estienne Hebert, au Mont Sainct Hilaire (A Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb327345882</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb327345882/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Littérature et art, YE-2163-2164, 2778, 4519-4520</dc:source>
+                    <dc:title>Le Burlesque ON de ce temps, qui scait tout, qui fait tout, et qui dit tout</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>17</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k56758955.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k56758955</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k56758955.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k56758955.medres</medres>
+                <nqamoyen>70.64</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k56758955.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k56758955</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649</dc:date>
+                    <dc:description> 1649</dc:description>
+                    <dc:description>1649.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 108</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5532840x</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>Rolin de La Haye (Paris)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb327514189</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb327514189/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Philosophie, histoire, sciences de l'homme, 4-LB37-1156 (A)</dc:source>
+                    <dc:title>Le Courier françois</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>18</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5532840x.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5532840x</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5532840x.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5532840x.medres</medres>
+                <nqamoyen>66.82</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5532840x.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5532840x</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:date>1649</dc:date>
+                    <dc:description> 1649</dc:description>
+                    <dc:description>1649.</dc:description>
+                    <dc:description/>
+                    <dc:format>Nombre total de vues : 34</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k5436228d</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:language>français</dc:language>
+                    <dc:publisher> (Amsterdam)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32751344k</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32751344k/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Bibliothèque nationale de France, département Manuscrits, 4-LB37-5248 (78)</dc:source>
+                    <dc:title>Le Courrier du temps apportant ce qui se passe de plus secret en la cour des princes de l'Europe [Fouquet de Croissy]</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en série imprimée</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>19</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile></epubFile>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k5436228d.highres</highres>
+                <infoSupModifiable></infoSupModifiable>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k5436228d</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k5436228d.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k5436228d.medres</medres>
+                <nqamoyen>70.06</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k5436228d.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k5436228d</uri>
+            </srw:extraRecordData>
+        </srw:record>
+    </srw:records>
+    <srw:nextRecordPosition>21</srw:nextRecordPosition>
+</srw:searchRetrieveResponse>

@@ -46,7 +46,7 @@ class RecordBatch:
     # TODO: Move to a new class focused solely on concurrent requests
     def fetchXML(self):
         response = self.session.get(
-            query="",
+            "",
             params=self.params,
             timeout=15)
         self.xmlRoot = etree.fromstring(response.content)

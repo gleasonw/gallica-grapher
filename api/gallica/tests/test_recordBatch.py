@@ -7,6 +7,8 @@ from gallica.gallicaSession import GallicaSession
 
 import os
 
+from record import KeywordRecord
+
 here = os.path.dirname(__file__)
 
 
@@ -78,7 +80,33 @@ class TestKeywordRecordBatch(TestCase):
         self.assertEqual(batch.numPurgedResults, 2)
 
     def test_record_is_unique(self):
-        self.fail()
+        batch = KeywordRecordBatch(
+            '',
+            GallicaSession().getSession()
+        )
+        batch.currentResultEqualsPrior = MagicMock(return_value=True)
+        self.assertTrue(batch.recordIsUnique(None))
+        batch.batch = ['test']
+        self.assertFalse(batch.recordIsUnique(None))
+        batch.currentResultEqualsPrior = MagicMock(return_value=False)
+        self.assertTrue(batch.recordIsUnique(None))
 
-    def test_current_result_equals_prior(self):
-        self.fail()
+    @patch('requests_toolbelt.sessions.BaseUrlSession.get')
+    def test_current_result_equals_prior(self, mock_get):
+        with open(os.path.join(here, 'data/dummyKeywordRecords.xml'), "rb") as f:
+            mock_get.return_value = MagicMock(content=f.read())
+
+        batch = KeywordRecordBatch(
+            '',
+            GallicaSession().getSession())
+
+        batch.fetchXML()
+        self.assertCountEqual(batch.batch, [])
+        xmlWithDuplicateEndCouple = [xml for xml in batch.xmlRoot.iter(
+            "{http://www.loc.gov/zing/srw/}record")]
+        secondToLastRecord = KeywordRecord(xmlWithDuplicateEndCouple[-2])
+        lastRecord = KeywordRecord(xmlWithDuplicateEndCouple[-1])
+
+        self.assertTrue(batch.recordIsUnique(secondToLastRecord))
+        batch.batch.append(secondToLastRecord)
+        self.assertFalse(batch.recordIsUnique(lastRecord))

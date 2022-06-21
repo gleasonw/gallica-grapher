@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from gallica.newspaper import Newspaper
 import os
 
@@ -8,7 +8,10 @@ here = os.path.dirname(__file__)
 
 class TestNewspaper(TestCase):
 
-    def test_fetch_record_data_from_code_strings(self):
+    @patch('requests_toolbelt.sessions.BaseUrlSession.get')
+    def test_fetch_record_data_from_code_strings(self, mock_get):
+        with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
+            mock_get.return_value = MagicMock(content=f.read())
         newspaper = Newspaper()
         newspaper.copyPapersToDB = MagicMock()
         filename = os.path.join(here, "data/newspaper_codes")
@@ -21,11 +24,13 @@ class TestNewspaper(TestCase):
         )
         assert newspaper.copyPapersToDB.called
 
-    def test_fetched_paper_record_validity(self):
+    @patch('requests_toolbelt.sessions.BaseUrlSession.get')
+    def test_fetched_paper_record_validity(self, mock_get):
+        with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
+            mock_get.return_value = MagicMock(content=f.read())
         newspaper = Newspaper()
         newspaper.copyPapersToDB = MagicMock()
-        filename = os.path.join(here, "data/newspaper_codes")
-        with open(filename) as f:
+        with open(os.path.join(here, "data/newspaper_codes")) as f:
             paperCodes = f.read().splitlines()
         newspaper.sendTheseGallicaPapersToDB(paperCodes)
 
@@ -38,12 +43,42 @@ class TestNewspaper(TestCase):
 
         assert newspaper.copyPapersToDB.called
 
-# TODO: Create a table with our codes, delete them, then check if they are back in after running the function
+    def test_fetch_papers_data_in_batches(self):
+
+        def boomerangBatchForTesting(batchItems):
+            return batchItems
+
+        Newspaper.fetchTheseMax20PaperRecords = MagicMock(
+            side_effect=boomerangBatchForTesting)
+        with open(os.path.join(here, "data/newspaper_codes")) as f:
+            paperCodes = f.read().splitlines()
+        newspaper = Newspaper()
+        newspaper.fetchPapersDataInBatches(paperCodes)
+        self.assertListEqual(
+            newspaper.paperRecords,
+            paperCodes
+        )
+
     def test_copy_papers_to_db(self):
         self.fail()
 
-    def test_num_papers(self):
+
+    # TODO: mock paperrecords better
+    @patch('requests_toolbelt.sessions.BaseUrlSession.get')
+    def test_generate_csv_stream(self, mock_get):
+        with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
+            mock_get.return_value = MagicMock(content=f.read())
+        with open(os.path.join(here, "data/newspaper_codes")) as f:
+            paperCodes = f.read().splitlines()
         newspaper = Newspaper()
-        self.assertEqual(newspaper.getNumPapersOnGallica(), 14189)
+        newspaper.sendTheseGallicaPapersToDB(paperCodes)
+
+    @patch('requests_toolbelt.sessions.BaseUrlSession.get')
+    def test_num_papers(self, mock_get):
+        with open(os.path.join(here, 'data/dummyNewspaperRecords.xml'), "rb") as f:
+            mock_get.return_value = MagicMock(content=f.read())
+        newspaper = Newspaper()
+        numPapers = newspaper.getNumPapersOnGallica()
+        self.assertEqual(numPapers, 18509)
 
 

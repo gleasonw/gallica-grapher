@@ -23,10 +23,13 @@ class Newspaper:
 
     def sendTheseGallicaPapersToDB(self, paperCodes):
         with self.session:
-            for i in range(0, len(paperCodes), 15):
-                batchOf15 = self.fetchThese15PaperRecords(paperCodes[i:i+15])
-                self.paperRecords.extend(batchOf15)
+            self.fetchPapersDataInBatches(paperCodes)
         self.copyPapersToDB()
+
+    def fetchPapersDataInBatches(self, paperCodes):
+        for i in range(0, len(paperCodes), 20):
+            batchOf20 = self.fetchTheseMax20PaperRecords(paperCodes[i:i + 20])
+            self.paperRecords.extend(batchOf20)
 
     def sendAllGallicaPapersToDB(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
@@ -38,8 +41,9 @@ class Newspaper:
         with self.session:
             numPapers = self.getNumPapersOnGallica()
             with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
-                for batch in executor.map(self.fetchBatchPapersAtIndex,
-                                          range(1, numPapers, 50)):
+                for batch in executor.map(
+                        self.fetchBatchPapersAtIndex,
+                        range(1, numPapers, 50)):
                     print(batch)
                     self.paperRecords.extend(batch)
 
@@ -67,27 +71,32 @@ class Newspaper:
 
     def copyPapersToDB(self):
         with self.dbConnection.cursor() as curs:
-            csvFileLikeObject = io.StringIO()
-            for paperRecord in self.paperRecords:
-                dateRange = paperRecord.getDate()
-                lowYear = dateRange[0]
-                highYear = dateRange[1]
-                csvFileLikeObject.write('|'.join(map(self.cleanCSVvalue, (
-                    paperRecord.getTitle(),
-                    lowYear,
-                    highYear,
-                    paperRecord.isContinuous(),
-                    paperRecord.getPaperCode()
-                ))) + '\n')
-            csvFileLikeObject.seek(0)
-            curs.copy_from(csvFileLikeObject, 'papers', sep='|')
+            csvStream = self.generateCSVStream()
+            curs.copy_from(csvStream, 'papers', sep='|')
 
-    def fetchThese15PaperRecords(self, paperCodes):
+    def generateCSVStream(self):
+        csvFileLikeObject = io.StringIO()
+        for paperRecord in self.paperRecords:
+            dateRange = paperRecord.getDate()
+            lowYear = dateRange[0]
+            highYear = dateRange[1]
+            csvFileLikeObject.write('|'.join(map(self.cleanCSVvalue, (
+                paperRecord.getTitle(),
+                lowYear,
+                highYear,
+                paperRecord.isContinuous(),
+                paperRecord.getPaperCode()
+            ))) + '\n')
+        csvFileLikeObject.seek(0)
+        return csvFileLikeObject
+
+
+    def fetchTheseMax20PaperRecords(self, paperCodes):
         self.query = 'arkPress all "' + '_date" or arkPress all "'.join(paperCodes) + '_date"'
         batch = PaperRecordBatch(
             self.query,
             self.session,
-            numRecords=15)
+            numRecords=20)
         return batch.getRecordBatch()
 
     def getPapersSimilarToKeyword(self, keyword):
