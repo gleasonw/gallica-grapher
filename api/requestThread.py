@@ -25,11 +25,12 @@ class RequestThread(threading.Thread):
     def run(self):
         for key, ticket in self.tickets.items():
             self.currentID = key
-            requestToRun = RequestTicket(ticket,
-                                         key,
-                                         self,
-                                         self.DBconnection,
-                                         self.session)
+            requestToRun = RequestTicket(
+                ticket,
+                key,
+                self,
+                self.DBconnection,
+                self.session)
             requestToRun.run()
         self.DBconnection.close()
 

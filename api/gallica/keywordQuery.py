@@ -12,7 +12,7 @@ class KeywordQuery:
     def __init__(self,
                  searchTerm,
                  yearRange,
-                 requestID,
+                 ticketID,
                  progressTracker,
                  dbConnection,
                  session):
@@ -22,7 +22,7 @@ class KeywordQuery:
         self.highYear = None
         self.isYearRange = None
         self.baseQuery = None
-        self.requestID = requestID
+        self.ticketID = ticketID
         self.estimateNumResults = 0
         self.progress = 0
         self.keywordRecords = []
@@ -94,7 +94,7 @@ class KeywordQuery:
                     record.getJSTimestamp(),
                     self.keyword,
                     record.getPaperCode(),
-                    self.requestID
+                    self.ticketID
                 ))) + '\n')
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
@@ -116,7 +116,7 @@ class KeywordQuery:
             WHERE paperid NOT IN 
                 (SELECT code FROM papers);
             """
-            , (self.requestID,))
+            , (self.ticketID,))
         return curs.fetchall()
 
     def copyResultsToFinalTable(self, curs):
@@ -131,7 +131,7 @@ class KeywordQuery:
             INSERT INTO results (identifier, year, month, day, jstime, searchterm, paperid, requestid)
                 (SELECT * FROM resultsForRequest);
             """
-            , (self.requestID,))
+            , (self.ticketID,))
 
     def buildYearRangeQuery(self):
         pass
@@ -147,12 +147,12 @@ class KeywordQueryAllPapers(KeywordQuery):
     def __init__(self,
                  searchTerm,
                  yearRange,
-                 requestID,
+                 ticketID,
                  progressTracker,
                  dbConnection,
                  session):
         self.recordIndexChunks = []
-        super().__init__(searchTerm, yearRange, requestID, progressTracker, dbConnection, session)
+        super().__init__(searchTerm, yearRange, ticketID, progressTracker, dbConnection, session)
 
     def buildYearRangeQuery(self):
         lowYear = str(self.lowYear)
@@ -217,7 +217,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
                  searchTerm,
                  papers,
                  yearRange,
-                 requestID,
+                 ticketID,
                  progressTracker,
                  dbConnection,
                  session):
@@ -228,7 +228,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
 
         super().__init__(searchTerm,
                          yearRange,
-                         requestID,
+                         ticketID,
                          progressTracker,
                          dbConnection,
                          session)

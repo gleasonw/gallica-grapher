@@ -28,20 +28,17 @@ class RequestTicket:
 
 # TODO: Get rid of top paper sending, add "finished adding to database" check?
     def run(self):
-        self.initQueryObjects()
-        self.getNumResults()
-        self.numBatches = ceil(self.totalResults / 50)
+        if self.papersAndCodes:
+            self.initQueryObjects(self.genSelectPaperQuery)
+        else:
+            self.initQueryObjects(self.genAllPaperQuery)
+        self.sumResultsOfEachTicket()
         self.startQueries()
 
-    def initQueryObjects(self):
-        if self.papersAndCodes:
-            for keyword in self.keywords:
-                termQuery = self.genSelectPaperQuery(keyword)
-                self.keywordQueries.append(termQuery)
-        else:
-            for keyword in self.keywords:
-                termQuery = self.genAllPaperQuery(keyword)
-                self.keywordQueries.append(termQuery)
+    def initQueryObjects(self, generator):
+        for keyword in self.keywords:
+            keywordQuery = generator(keyword)
+            self.keywordQueries.append(keywordQuery)
 
     def genSelectPaperQuery(self, keyword):
         query = KeywordQuerySelectPapers(
@@ -64,12 +61,13 @@ class RequestTicket:
             self.session)
         return query
 
-    def getNumResults(self):
+    def sumResultsOfEachTicket(self):
         for query in self.keywordQueries:
             numResultsForKeyword = query.getEstimateNumResults()
             self.totalResults += numResultsForKeyword
 
     def startQueries(self):
+        self.numBatches = ceil(self.totalResults / 50)
         for query in self.keywordQueries:
             query.runSearch()
 
