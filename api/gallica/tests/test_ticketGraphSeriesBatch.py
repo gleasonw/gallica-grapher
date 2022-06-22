@@ -1,15 +1,16 @@
 from unittest import TestCase
-from ticketGraphSeriesBatch import TicketGraphSeriesBatch
 
 
 class TestTicketGraphSeriesBatch(TestCase):
+    def test_get_series_batch(self):
+        self.fail()
+
+    def test_select_all_series_from_db(self):
+        self.fail()
+
+    def test_select_one_series(self):
+        self.fail()
+
+class TestTicketGraphSeries(TestCase):
     def test_get_series(self):
-        settings = {
-            "ticketIDs": "4321,1234",
-            'averageWindow': "0",
-            'groupBy': "month",
-            'continuous': "false",
-            'dateRange': "1800,1900"
-        }
-        batch = TicketGraphSeriesBatch(settings)
-        print(batch.getSeries())
+        self.fail()

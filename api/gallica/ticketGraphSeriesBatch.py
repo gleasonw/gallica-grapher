@@ -11,9 +11,9 @@ class TicketGraphSeriesBatch:
         self.dataBatches = []
         self.settings = settings
         self.requestIDs = settings["ticketIDs"].split(",")
-        self.selectGraphSeries()
+        self.selectAllSeriesFromDB()
 
-    def getSeries(self):
+    def getSeriesBatch(self):
         dataBatchesDict = {}
         for dataBatch in self.dataBatches:
             requestID = dataBatch[0]
@@ -21,13 +21,13 @@ class TicketGraphSeriesBatch:
             dataBatchesDict[requestID] = series
         return dataBatchesDict
 
-    def selectGraphSeries(self):
+    def selectAllSeriesFromDB(self):
         self.dataBatches = list(map(
-            self.selectDataForRequestID,
+            self.selectOneSeries,
             self.requestIDs))
         self.dbConnection.close()
 
-    def selectDataForRequestID(self, requestID):
+    def selectOneSeries(self, requestID):
         series = TicketGraphSeries(
             requestID,
             self.settings,
@@ -59,7 +59,6 @@ class TicketGraphSeries:
         self.data = []
         self.searchTerms = []
         self.request = None
-
         self.dbConnection = dbConnection
         self.makeSeries()
 
@@ -234,7 +233,7 @@ class TicketGraphSeries:
 
     def runQuery(self):
         self.getSearchTerms()
-        self.binRecordsAndFetch()
+        self.executeQuery()
 
     def getSearchTerms(self):
         getSearchTerms = """
@@ -244,20 +243,22 @@ class TicketGraphSeries:
         cursor.execute(getSearchTerms, (self.requestID,))
         self.searchTerms = cursor.fetchone()[0]
 
-    def binRecordsAndFetch(self):
+    def executeQuery(self):
         with self.dbConnection.cursor() as curs:
             if self.continuous:
-                curs.execute(
-                    self.request,
-                    (self.requestID,
-                     self.averageWindow,
-                     self.lowYear,
-                     self.highYear
-                     ))
+                params = (
+                    self.requestID,
+                    self.averageWindow,
+                    self.lowYear,
+                    self.highYear,
+                )
             else:
-                curs.execute(
-                    self.request,
-                    (self.requestID,
-                     self.averageWindow,))
+                params = (
+                    self.requestID,
+                    self.averageWindow,
+                )
+            curs.execute(
+                self.request,
+                params
+            )
             self.data = curs.fetchall()
-

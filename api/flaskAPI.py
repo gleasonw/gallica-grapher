@@ -56,7 +56,7 @@ def getGraphData():
         'dateRange': request.args["dateRange"]
     }
     series = TicketGraphSeriesBatch(settings)
-    items = {'series': series.getSeries()}
+    items = {'series': series.getSeriesBatch()}
     return items
 
 
