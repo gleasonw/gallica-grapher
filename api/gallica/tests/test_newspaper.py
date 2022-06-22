@@ -64,6 +64,7 @@ class TestNewspaper(TestCase):
     def test_copy_papers_to_db(self):
         self.fail()
 
+    # TODO: use patches instead of explicit mocking
     def test_generate_csv_stream(self):
         newspaper = Newspaper()
         Record.parsePaperCodeFromXML = MagicMock(return_value="123")
