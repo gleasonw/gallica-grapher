@@ -1,5 +1,3 @@
-import datetime
-import ciso8601
 from db import DB
 
 
@@ -13,6 +11,7 @@ class TicketGraphSeriesBatch:
         self.requestIDs = settings["ticketIDs"].split(",")
         self.selectAllSeriesFromDB()
 
+    # TODO: rewrite to avoid confusing list--> dict
     def getSeriesBatch(self):
         dataBatchesDict = {}
         for dataBatch in self.dataBatches:
@@ -69,10 +68,10 @@ class TicketGraphSeries:
         }
 
     def makeSeries(self):
-        self.buildQueryForGraphData()
+        self.buildQueryForSeries()
         self.runQuery()
 
-    def buildQueryForGraphData(self):
+    def buildQueryForSeries(self):
         if self.timeBin == "day":
             self.initDayRequest()
         elif self.timeBin == "month":
