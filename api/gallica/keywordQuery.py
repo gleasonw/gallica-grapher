@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from .recordBatch import KeywordRecordBatch
 from .recordBatch import RecordBatch
 
-
+# TODO: remove results with same date and code
 class KeywordQuery:
 
     def __init__(self,
@@ -54,14 +54,14 @@ class KeywordQuery:
         else:
             self.buildDatelessQuery()
 
-    # TODO: Before posting, add paper codes that aren't in the DB to the DB.
     # TODO: move state up?
     def postRecordsToHoldingResultsDB(self):
         with self.dbConnection.cursor() as curs:
             csvStream = self.generateResultCSVstream()
             curs.copy_from(
                 csvStream,
-                'holdingresults', sep='|',
+                'holdingresults',
+                sep='|',
                 columns=(
                     'identifier',
                     'year',

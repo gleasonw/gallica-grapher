@@ -90,7 +90,6 @@ class Newspaper:
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
 
-
     def fetchTheseMax20PaperRecords(self, paperCodes):
         self.query = 'arkPress all "' + '_date" or arkPress all "'.join(paperCodes) + '_date"'
         batch = PaperRecordBatch(
@@ -124,3 +123,7 @@ class Newspaper:
         self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
         adapter = TimeoutAndRetryHTTPAdapter()
         self.session.mount("https://", adapter)
+
+if __name__ == '__main__':
+    newspaper = Newspaper()
+    newspaper.sendAllGallicaPapersToDB()

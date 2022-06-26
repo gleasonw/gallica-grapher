@@ -3,38 +3,27 @@ from db import DB
 
 class TopPapers:
 
-    def __init__(self,
-                 ticketID,
-                 dateRange,
-                 continuous):
+    def __init__(
+            self,
+            ticketID,
+            continuous,
+            dateRange=None):
 
-        database = DB()
-        self.conn = database.getConn()
+        self.conn = DB().getConn()
         self.ticketID = ticketID
-        self.continuous = self.parseContinuous(continuous)
-        dateRange = dateRange.split(",")
-        self.lowYear = dateRange[0]
-        self.highYear = dateRange[1]
-
+        self.continuous = continuous.lower() == "true"
+        if self.continuous:
+            self.lowYear, self.highYear = dateRange.split(",")
         self.topPapers = []
-        self.selectTopPapers()
-
-    def parseContinuous(self, cont):
-        if cont.lower() == "true":
-            return True
-        else:
-            return False
 
     def getTopPapers(self):
+        if self.continuous:
+            self.selectTopContinuousPapers()
+        else:
+            self.selectTopPapers()
         return self.topPapers
 
     def selectTopPapers(self):
-        if self.continuous:
-            self.queryTopContinuousPapers()
-        else:
-            self.queryTopPapers()
-
-    def queryTopPapers(self):
         with self.conn.cursor() as cursor:
             cursor.execute("""
     
@@ -50,7 +39,7 @@ class TopPapers:
             """, (self.ticketID,))
             self.topPapers = cursor.fetchall()
 
-    def queryTopContinuousPapers(self):
+    def selectTopContinuousPapers(self):
         with self.conn.cursor() as cursor:
             cursor.execute("""
 

@@ -54,7 +54,7 @@ class TestKeywordRecord(TestCase):
 
         self.assertEqual(
             dummyRecord.getJSTimestamp(),
-            -2737642022000
+            -2737670400000
         )
 
 

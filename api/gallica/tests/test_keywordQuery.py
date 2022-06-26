@@ -13,12 +13,11 @@ here = os.path.dirname(__file__)
 
 class TestKeywordQuery(TestCase):
 
-    @staticmethod
-    def getMockBatchOf5KeywordRecords():
-        Record.parsePaperCodeFromXML = MagicMock(return_value="123")
-        Record.parseURLFromXML = MagicMock(return_value="http://example.com")
-        KeywordRecord.parseDateFromXML = MagicMock()
-        KeywordRecord.checkIfValid = MagicMock()
+    @patch('record.Record')
+    def getMockBatchOf5KeywordRecords(self, mock_record):
+        mock_record.return_value = mock_record
+        mock_record.parsePaperCodeFromXML = MagicMock(return_value="123")
+        mock_record.parseURLFromXML = MagicMock(return_value="http://example.com")
 
         payload = KeywordQuery(
             'term!',
@@ -30,18 +29,20 @@ class TestKeywordQuery(TestCase):
         )
         codes = ['a', 'b', 'c', 'd', 'e']
         for i in range(5):
-            mockRecord = KeywordRecord([None, None, [None]])
+            mockRecord = MagicMock()
             mockRecord.getDate = MagicMock(return_value=[1920, 10, 1])
             mockRecord.getJSTimestamp = MagicMock(return_value=1234)
             mockRecord.getUrl = MagicMock(return_value='1234.com')
             mockRecord.getPaperCode = MagicMock(return_value=codes[i])
+            mockRecord.parseDateFromXML = MagicMock()
+            mockRecord.checkIfValid = MagicMock()
             payload.keywordRecords.append(mockRecord)
 
         return payload
 
     def test_post_results(self):
         dbConnection = DB().getConn()
-        payload = TestKeywordQuery.getMockBatchOf5KeywordRecords()
+        payload = self.getMockBatchOf5KeywordRecords()
         payload.dbConnection = dbConnection
         payload.postMissingPapers = MagicMock
         payload.copyResultsToFinalTable = MagicMock
@@ -51,13 +52,13 @@ class TestKeywordQuery(TestCase):
         with dbConnection.cursor() as curs:
             curs.execute(
                 """
-                    WITH resultsForRequest AS (
-                        DELETE FROM holdingresults
-                        WHERE requestid = 'id!'
-                        RETURNING identifier, year, month, day, jstime, searchterm, paperid, requestid
-                    )
-                    
-                    SELECT * FROM resultsForRequest;
+                WITH resultsForRequest AS (
+                    DELETE FROM holdingresults
+                    WHERE requestid = 'id!'
+                    RETURNING identifier, year, month, day, jstime, searchterm, paperid, requestid
+                )
+                
+                SELECT * FROM resultsForRequest;
                 """
                 )
             postedResults = curs.fetchall()
@@ -74,7 +75,7 @@ class TestKeywordQuery(TestCase):
         self.assertEqual(firstRow[7], "id!")
 
     def test_generate_result_CSV_stream(self):
-        payload = TestKeywordQuery.getMockBatchOf5KeywordRecords()
+        payload = self.getMockBatchOf5KeywordRecords()
         testStream = payload.generateResultCSVstream()
         streamRows = testStream.getvalue().split("\n")
         firstStreamRow = streamRows[0].split("|")
@@ -91,7 +92,7 @@ class TestKeywordQuery(TestCase):
 
     def test_get_missing_papers(self):
         dbConnection = DB().getConn()
-        payload = TestKeywordQuery.getMockBatchOf5KeywordRecords()
+        payload = self.getMockBatchOf5KeywordRecords()
         payload.dbConnection = dbConnection
         payload.copyResultsToFinalTable = MagicMock
         payload.postMissingPapers = MagicMock
@@ -112,7 +113,7 @@ class TestKeywordQuery(TestCase):
 
     def test_move_results_to_final(self):
         dbConnection = DB().getConn()
-        payload = TestKeywordQuery.getMockBatchOf5KeywordRecords()
+        payload = self.getMockBatchOf5KeywordRecords()
         payload.dbConnection = dbConnection
         payload.postMissingPapers = MagicMock
         with dbConnection.cursor() as curs:

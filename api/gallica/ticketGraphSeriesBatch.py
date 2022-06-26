@@ -72,12 +72,20 @@ class TicketGraphSeries:
         self.runQuery()
 
     def buildQueryForSeries(self):
-        if self.timeBin == "day":
+        if self.timeBin == "day" and self.continuous:
+            self.initDayContinuousPaperRequest()
+        elif self.timeBin == "day" and not self.continuous:
             self.initDayRequest()
-        elif self.timeBin == "month":
+        elif self.timeBin == "month" and self.continuous:
+            self.initMonthContinuousPaperRequest()
+        elif self.timeBin == "month" and not self.continuous:
             self.initMonthRequest()
-        else:
+        elif self.timeBin == "year" and self.continuous:
+            self.initYearContinuousPaperRequest()
+        elif self.timeBin == "year" and not self.continuous:
             self.initYearRequest()
+        else:
+            raise Exception("Invalid time bin")
 
     def initDayRequest(self):
         self.request = """
@@ -247,9 +255,9 @@ class TicketGraphSeries:
             if self.continuous:
                 params = (
                     self.requestID,
-                    self.averageWindow,
                     self.lowYear,
                     self.highYear,
+                    self.averageWindow
                 )
             else:
                 params = (

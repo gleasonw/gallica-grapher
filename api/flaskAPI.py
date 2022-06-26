@@ -64,8 +64,8 @@ def getGraphData():
 def getTopPapersFromID():
     topPapers = TopPapers(
         request.args["id"],
-        request.args["dateRange"],
-        continuous=request.args["continuous"]
+        continuous=request.args["continuous"],
+        dateRange=request.args["dateRange"]
     )
     items = {"topPapers": topPapers.getTopPapers()}
     return items

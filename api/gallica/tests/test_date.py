@@ -51,7 +51,7 @@ class TestDate(TestCase):
         )
         self.assertEqual(
             fullDate.getJSTimestamp(),
-            -5356771622000.0
+            -5356800000000.0,
         )
         self.assertIsNone(
             nonsense.getJSTimestamp()
