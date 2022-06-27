@@ -1,6 +1,7 @@
 import api.flaskAPI as flaskAPI
 import unittest
 from unittest.mock import patch, MagicMock
+import json
 
 
 class TestAPI(unittest.TestCase):
@@ -9,11 +10,28 @@ class TestAPI(unittest.TestCase):
         flaskAPI.app.config['TESTING'] = True
         self.app = flaskAPI.app.test_client()
 
-    def test_init(self):
-        assert True
+    @patch("api.flaskAPI.spawnRequestThread.delay")
+    def test_init(self,mock_spawnRequestThread):
+        mock_spawnRequestThread.return_value = MagicMock(id="test")
+        response = self.app.post(
+            '/init',
+            json={'tickets': {}})
 
-    def test_getProgress(self):
-        assert True
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json['taskid'], "test")
+
+    @patch("api.flaskAPI.spawnRequestThread.AsyncResult")
+    def test_getProgress(self, mock_task):
+        mock_task.return_value = MagicMock(
+            state="PENDING",
+            info={"progress": 0, "currentID": ""}
+        )
+        response = self.app.get('/progress/test')
+        jsonResponse = json.loads(response.data)
+
+        self.assertEqual(jsonResponse["state"], "PENDING")
+        self.assertEqual(jsonResponse["progress"], 0)
+        self.assertEqual(jsonResponse["currentID"], "")
 
     def test_paperChart(self):
         testJSON = self.app.get('/paperchartjson')
@@ -37,5 +55,13 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.data,b'{"series":[]}\n')
 
-    def test_getTopPapersFromID(self):
-        assert True
+    @patch("api.flaskAPI.TopPapers")
+    def test_getTopPapersFromID(self, mock_topPapers):
+        mockedTopPapers = mock_topPapers.return_value
+        mockedTopPapers.getTopPapers.return_value = []
+        query='topPapers?id=test&continuous=test&dateRange=test'
+        testTopPapersFromID = self.app.get(query)
+
+        assert testTopPapersFromID.status_code == 200
+        self.assertEqual(testTopPapersFromID.data,b'{"topPapers":[]}\n')
+
