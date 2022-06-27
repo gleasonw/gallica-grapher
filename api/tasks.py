@@ -1,6 +1,6 @@
 from celery import Celery
 import time
-from .requestThread import RequestThread
+from api.requestThread import RequestThread
 
 celery = Celery('api.tasks',
                 broker='amqp://',

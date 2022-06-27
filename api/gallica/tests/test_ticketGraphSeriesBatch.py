@@ -40,7 +40,7 @@ class TestTicketGraphSeriesBatch(TestCase):
         self.assertListEqual(batch.requestIDs, ['1234', '4321'])
         self.assertListEqual(batch.dataBatches, ['neat', 'neat'])
 
-    @patch("ticketGraphSeriesBatch.TicketGraphSeries", getSeries=MagicMock(return_value=[1, 2, 3]))
+    @patch("ticketGraphSeriesBatch.TicketGraphSeries")
     @patch("ticketGraphSeriesBatch.TicketGraphSeriesBatch.selectAllSeriesFromDB")
     @patch("psycopg2.connect")
     def test_select_one_series(self,mock_connect, mock_select, mock_series):

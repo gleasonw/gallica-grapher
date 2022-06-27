@@ -1,12 +1,13 @@
+import os
 import queue
 from flask import Flask
 from flask import request
 from flask_cors import CORS
 
-from api.gallica.newspaper import Newspaper
-from api.gallica.ticketGraphSeriesBatch import TicketGraphSeriesBatch
-from api.tasks import spawnRequestThread
-from api.gallica.topPapers import TopPapers
+from gallica.newspaper import Newspaper
+from gallica.ticketGraphSeriesBatch import TicketGraphSeriesBatch
+from tasks import spawnRequestThread
+from gallica.topPapers import TopPapers
 
 retrievingThreads = {}
 exceptionBucket = queue.Queue()
@@ -34,7 +35,7 @@ def getProgress(taskID):
 
 @app.route('/paperchartjson')
 def paperChart():
-    with open('./static/paperJSON.json', 'r') as outFile:
+    with open(os.path.join(os.path.dirname(__file__), 'static/paperJSON.json'), 'r') as outFile:
         paperChartJSON = outFile.read()
     return paperChartJSON
 
@@ -55,6 +56,7 @@ def getGraphData():
         'continuous': request.args["continuous"],
         'dateRange': request.args["dateRange"]
     }
+    print(TicketGraphSeriesBatch)
     series = TicketGraphSeriesBatch(settings)
     items = {'series': series.getSeriesBatch()}
     return items

@@ -66,3 +66,33 @@ class DBtester:
                 """
                 , (id,))
             return curs.fetchone()[0]
+
+    def getEarliestContinuousPaperDate(self):
+        with self.conn.cursor() as curs:
+            curs.execute("""
+            SELECT MIN(startdate)
+            FROM papers
+            WHERE continuous
+            """)
+            return curs.fetchone()[0]
+
+    def getLatestContinuousPaperDate(self):
+        with self.conn.cursor() as curs:
+            curs.execute("""
+            SELECT MAX(enddate)
+            FROM papers
+            WHERE continuous
+            """)
+            return curs.fetchone()[0]
+
+    def getNumberContinuousPapers(self):
+        with self.conn.cursor() as curs:
+            curs.execute("""
+            SELECT COUNT(*)
+            FROM papers
+            WHERE continuous = TRUE
+            """)
+            return curs.fetchone()[0]
+
+    def close(self):
+        self.conn.close()

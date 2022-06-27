@@ -1,4 +1,3 @@
-import psycopg2
 import json
 from gallica.db import DB
 
@@ -16,23 +15,19 @@ class PaperYearGraphData:
     def createChartJSON(self):
         self.getPaperMetadata()
         self.countPublishingPapersInEachYear()
-        for i, yearFreq in enumerate(self.yearOccurrenceArray):
-            year = i + self.lowYear
-            self.yearFreqList.append([year, yearFreq])
-        self.JSONData = json.dumps({'data': self.yearFreqList})
-        with open('../static/paperJSON.json', 'w') as outFile:
-            outFile.write(self.JSONData)
+        self.generateYearFrequencyList()
+        self.generateJSONfileForGraphing()
 
     def getPaperMetadata(self):
         conn = DB().getConn()
         try:
             cursor = conn.cursor()
-            cursor.execute("SELECT MIN(startdate) FROM papers WHERE continuous is TRUE;")
+            cursor.execute("SELECT MIN(startdate) FROM papers WHERE continuous;")
             self.lowYear = cursor.fetchone()[0]
-            cursor.execute("SELECT MAX(enddate) FROM papers WHERE continuous is TRUE;")
+            cursor.execute("SELECT MAX(enddate) FROM papers WHERE continuous;")
             self.highYear = cursor.fetchone()[0]
             self.yearOccurrenceArray = [0 for i in range(self.lowYear, self.highYear + 1)]
-            cursor.execute("SELECT startdate, enddate FROM papers WHERE continuous is TRUE;")
+            cursor.execute("SELECT startdate, enddate FROM papers WHERE continuous;")
             self.yearRangeList = cursor.fetchall()
         finally:
             if conn is not None:
@@ -46,6 +41,16 @@ class PaperYearGraphData:
                 for i in range(lowerYear, higherYear + 1):
                     indexToIterate = i - self.lowYear
                     self.yearOccurrenceArray[indexToIterate] += 1
+
+    def generateYearFrequencyList(self):
+        for i, yearFreq in enumerate(self.yearOccurrenceArray):
+            year = i + self.lowYear
+            self.yearFreqList.append([year, yearFreq])
+
+    def generateJSONfileForGraphing(self):
+        self.JSONData = json.dumps({'data': self.yearFreqList})
+        with open('../static/paperJSON.json', 'w') as outFile:
+            outFile.write(self.JSONData)
 
 if __name__ == "__main__":
     chartMaker = PaperYearGraphData()

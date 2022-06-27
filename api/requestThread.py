@@ -1,12 +1,11 @@
 import threading
-from .gallica.requestTicket import RequestTicket
+from gallica.requestTicket import RequestTicket
 from db import DB
 from gallicaSession import GallicaSession
 
 
 class RequestThread(threading.Thread):
-    def __init__(self,
-                 tickets):
+    def __init__(self, tickets):
         self.progress = 0
         self.currentID = ''
         self.session = GallicaSession().getSession()

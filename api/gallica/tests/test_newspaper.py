@@ -1,9 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from gallica.newspaper import Newspaper
-from gallica.record import Record, PaperRecord
 import os
-from lxml import etree
 from DBtester import DBtester
 
 here = os.path.dirname(__file__)
