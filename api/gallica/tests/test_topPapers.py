@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from gallica.topPapers import TopPapers
+from DBtester import DBtester
 
 
 class TestTopPapers(TestCase):
@@ -25,10 +26,47 @@ class TestTopPapers(TestCase):
         self.assertEqual(messyTopTest.continuous, False)
 
     def test_get_top_papers(self):
-        self.fail()
+        continuousTopTest = TopPapers(
+            ticketID="1",
+            dateRange="1900,2000",
+            continuous="true")
+        sporadicTopTest = TopPapers(
+            ticketID="1",
+            dateRange="1900,2000",
+            continuous="false"
+        )
+        continuousTopTest.selectTopPapers = MagicMock()
+        continuousTopTest.selectTopContinuousPapers = MagicMock()
+        sporadicTopTest.selectTopPapers = MagicMock()
+        sporadicTopTest.selectTopContinuousPapers = MagicMock()
+
+        continuousTopTest.getTopPapers()
+        sporadicTopTest.getTopPapers()
+
+        continuousTopTest.selectTopContinuousPapers.assert_called_once()
+        sporadicTopTest.selectTopPapers.assert_called_once()
 
     def test_select_top_papers(self):
-        self.fail()
+        testTopPapers = DBtester().getTestTopPapers(
+            continuous='false',
+            dateRange=''
+        )
+
+        firstPaperCount = testTopPapers[0][1]
+        secondPaperCount = testTopPapers[1][1]
+        self.assertEqual(len(testTopPapers), 2)
+        self.assertEqual(firstPaperCount, 13)
+        self.assertEqual(secondPaperCount, 5)
+
 
     def test_select_top_continuous_papers(self):
-        self.fail()
+        testTopPapers = DBtester().getTestTopPapers(
+            continuous='true',
+            dateRange="1900,1907"
+        )
+
+        firstPaperCount = testTopPapers[0][1]
+
+        self.assertEqual(len(testTopPapers), 1)
+        self.assertEqual(firstPaperCount, 13)
+

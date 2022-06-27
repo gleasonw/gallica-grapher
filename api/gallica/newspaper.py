@@ -64,23 +64,24 @@ class Newspaper:
         numResults = tempBatch.getNumResults()
         return numResults
 
-    def cleanCSVvalue(self, value):
-        if value is None:
-            return r'\N'
-        return str(value).replace('|', '\\|')
-
     def copyPapersToDB(self):
         with self.dbConnection.cursor() as curs:
             csvStream = self.generateCSVstream()
             curs.copy_from(csvStream, 'papers', sep='|')
 
     def generateCSVstream(self):
+
+        def cleanCSVvalue(value):
+            if value is None:
+                return r'\N'
+            return str(value).replace('|', '\\|')
+
         csvFileLikeObject = io.StringIO()
         for paperRecord in self.paperRecords:
             dateRange = paperRecord.getDate()
             lowYear = dateRange[0]
             highYear = dateRange[1]
-            csvFileLikeObject.write('|'.join(map(self.cleanCSVvalue, (
+            csvFileLikeObject.write('|'.join(map(cleanCSVvalue, (
                 paperRecord.getTitle(),
                 lowYear,
                 highYear,

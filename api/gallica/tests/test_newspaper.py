@@ -4,16 +4,21 @@ from gallica.newspaper import Newspaper
 from gallica.record import Record, PaperRecord
 import os
 from lxml import etree
+from DBtester import DBtester
 
 here = os.path.dirname(__file__)
 
 
 class TestNewspaper(TestCase):
 
+    @staticmethod
+    def getMockedPaperFetch():
+        with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
+            return MagicMock(content=f.read())
+
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_send_these_gallica_papers_to_db(self, mock_get):
-        with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
-            mock_get.return_value = MagicMock(content=f.read())
+        mock_get.return_value = TestNewspaper.getMockedPaperFetch()
         with open(os.path.join(here, "data/newspaper_codes")) as f:
             paperCodes = f.read().splitlines()
 
@@ -66,7 +71,37 @@ class TestNewspaper(TestCase):
         )
 
     def test_copy_papers_to_db(self):
-        self.fail()
+        testerPaper = Newspaper()
+        mockPaperRecords = [
+            MagicMock(
+                getDate=MagicMock(return_value=[1800,1900]),
+                getTitle=MagicMock(return_value='test1'),
+                isContinuous=MagicMock(return_value=True),
+                getPaperCode=MagicMock(return_value='12345')),
+            MagicMock(
+                getDate=MagicMock(return_value=[1899,1900]),
+                getTitle=MagicMock(return_value='test2'),
+                isContinuous=MagicMock(return_value=False),
+                getPaperCode=MagicMock(return_value='54321')),
+        ]
+        testerPaper.paperRecords = mockPaperRecords
+
+        testerPaper.copyPapersToDB()
+
+        firstPaper = DBtester().deleteAndReturnPaper('12345')
+        secondPaper = DBtester().deleteAndReturnPaper('54321')
+
+        self.assertEqual(
+            firstPaper,
+            '(test1,1800,1900,t,12345)'
+        )
+        self.assertEqual(
+            secondPaper,
+            '(test2,1899,1900,f,54321)'
+        )
+
+
+        pass
 
     @patch('record.PaperRecord')
     @patch('record.Record')

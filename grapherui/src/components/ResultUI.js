@@ -4,7 +4,7 @@ import Button from "@mui/material/Button"
 import SoloTickets from "./SoloTickets";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 
-
+//TODO: break up individual settings and grouped settings in state
 //TODO: use context for tickets.
 function ResultUI(props){
 

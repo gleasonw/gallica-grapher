@@ -1,10 +1,12 @@
 import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from ticketGraphSeriesBatch import TicketGraphSeriesBatch
-from ticketGraphSeriesBatch import TicketGraphSeries
-from ticketGraphSeriesBatch import parseContinuous
+
 from gallica.db import DB
+from ticketGraphSeriesBatch import TicketGraphSeries
+from ticketGraphSeriesBatch import TicketGraphSeriesBatch
+from ticketGraphSeriesBatch import parseContinuous
+from DBtester import DBtester
 
 
 class TestTicketGraphSeriesBatch(TestCase):
@@ -142,40 +144,9 @@ class TestTicketGraphSeries(TestCase):
         testSeries.buildQueryForSeries()
         mock_initDayContinuous.assert_called_once()
 
-    @staticmethod
-    def getTestSeries(timeBin, continuous, averageWindow):
-        conn = DB().getConn()
-        with open(os.path.join(os.path.dirname(__file__), 'data/dummyResults')) as f:
-            with conn.cursor() as curs:
-                curs.copy_from(f, 'results', sep=',', columns=(
-                        'identifier',
-                        'year',
-                        'month',
-                        'day',
-                        'jstime',
-                        'searchterm',
-                        'paperid',
-                        'requestid'))
-                series = TicketGraphSeries(
-                    "id!",
-                    {
-                        "averageWindow": averageWindow,
-                        "groupBy": timeBin,
-                        "dateRange": "1900, 1907",
-                        "continuous": continuous
-                    },
-                    conn
-                )
-                testSeries = series.getSeries()
-                curs.execute("""
-                DELETE FROM results
-                WHERE requestid = 'id!';
-                """)
-                return testSeries
-
     def test_day_binned_request(self):
 
-        testSeries = TestTicketGraphSeries.getTestSeries('day', 'false', 0)
+        testSeries = DBtester().getTestSeries('day', 'false', 0)
 
         self.assertIsNotNone(testSeries["name"])
         self.assertIsNotNone(testSeries["data"])
@@ -188,7 +159,7 @@ class TestTicketGraphSeries(TestCase):
 
     def test_day_binned_continuous_request(self):
 
-        testSeries = TestTicketGraphSeries.getTestSeries('day', 'true', 0)
+        testSeries = DBtester().getTestSeries('day', 'true', 0)
 
         self.assertIsNotNone(testSeries["name"])
         self.assertIsNotNone(testSeries["data"])
@@ -201,7 +172,7 @@ class TestTicketGraphSeries(TestCase):
 
     def test_month_binned_request(self):
 
-            testSeries = TestTicketGraphSeries.getTestSeries('month', 'false', 0)
+            testSeries = DBtester().getTestSeries('month', 'false', 0)
 
             self.assertIsNotNone(testSeries["name"])
             self.assertIsNotNone(testSeries["data"])
@@ -214,7 +185,7 @@ class TestTicketGraphSeries(TestCase):
 
     def test_month_binned_continuous_request(self):
 
-        testSeries = TestTicketGraphSeries.getTestSeries('month', 'true', 0)
+        testSeries = DBtester().getTestSeries('month', 'true', 0)
 
         self.assertIsNotNone(testSeries["name"])
         self.assertIsNotNone(testSeries["data"])
@@ -226,7 +197,7 @@ class TestTicketGraphSeries(TestCase):
             7)
 
     def test_year_binned_request(self):
-        testSeries = TestTicketGraphSeries.getTestSeries('year', 'false', 0)
+        testSeries = DBtester().getTestSeries('year', 'false', 0)
 
         self.assertIsNotNone(testSeries["name"])
         self.assertIsNotNone(testSeries["data"])
@@ -238,7 +209,7 @@ class TestTicketGraphSeries(TestCase):
             8)
 
     def test_year_binned_continuous_request(self):
-        testSeries = TestTicketGraphSeries.getTestSeries('year', 'true', 0)
+        testSeries = DBtester().getTestSeries('year', 'true', 0)
 
         self.assertIsNotNone(testSeries["name"])
         self.assertIsNotNone(testSeries["data"])
@@ -251,7 +222,7 @@ class TestTicketGraphSeries(TestCase):
 
     def test_rolling_average(self):
 
-        testSeries = TestTicketGraphSeries.getTestSeries('year', 'false', 1)
+        testSeries = DBtester().getTestSeries('year', 'false', 1)
 
         self.assertIsNotNone(testSeries["name"])
         self.assertIsNotNone(testSeries["data"])
@@ -263,7 +234,7 @@ class TestTicketGraphSeries(TestCase):
             testRolledAverage,
             2.5)
 
-        testSeries = TestTicketGraphSeries.getTestSeries('year', 'false', 3)
+        testSeries = DBtester().getTestSeries('year', 'false', 3)
 
         testRolledAverage = testSeries["data"][3][1]
         self.assertEqual(
