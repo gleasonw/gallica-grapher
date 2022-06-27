@@ -56,7 +56,6 @@ def getGraphData():
         'continuous': request.args["continuous"],
         'dateRange': request.args["dateRange"]
     }
-    print(TicketGraphSeriesBatch)
     series = TicketGraphSeriesBatch(settings)
     items = {'series': series.getSeriesBatch()}
     return items

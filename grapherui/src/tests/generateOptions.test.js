@@ -1,4 +1,4 @@
-const genOptions = require('../components/generateOptions');
+const genOptions = require('../pages/results/generateOptions');
 
 test("Generates Highcharts options for a year-binned series", () => {
     expect(genOptions('year',[])).toMatchObject({
