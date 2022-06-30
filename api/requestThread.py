@@ -49,3 +49,15 @@ class RequestThread(threading.Thread):
 
     def getNumActuallyRetrieved(self):
         return self.numResultsRetrieved
+
+if __name__ == "__main__":
+    request = RequestThread(
+        {
+            '1': {
+                'terms': ['brazza'],
+                'papersAndCodes': [],
+                'dateRange': [1850, 1950]
+                }
+        }
+    )
+    request.run()

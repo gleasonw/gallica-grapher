@@ -92,7 +92,8 @@ class Newspaper:
         return csvFileLikeObject
 
     def fetchTheseMax20PaperRecords(self, paperCodes):
-        self.query = 'arkPress all "' + '_date" or arkPress all "'.join(paperCodes) + '_date"'
+        formattedPaperCodes = [f"{paperCode}_date" for paperCode in paperCodes]
+        self.query = 'arkPress all "' + '" or arkPress all "'.join(formattedPaperCodes) + '"'
         batch = PaperRecordBatch(
             self.query,
             self.session,

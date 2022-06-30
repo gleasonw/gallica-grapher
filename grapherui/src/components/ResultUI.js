@@ -42,8 +42,7 @@ function ResultUI(props){
         const initSetting = {
             timeBin: 'year',
             averageWindow: '0',
-            continuous: 'false',
-            series: []
+            continuous: 'false'
         }
         let initialGraphSettings = {}
         Object.keys(tickets).map(key => (
@@ -93,7 +92,6 @@ function settingsReducer(graphSettings, action){
                     [action.key]: {
                         ...graphSettings[action.key],
                         timeBin: action.timeBin,
-                        series: newSeries
                     }
                 }
             }else{
@@ -105,7 +103,6 @@ function settingsReducer(graphSettings, action){
                 [action.key]: {
                     ...graphSettings[action.key],
                     averageWindow: action.averageWindow,
-                    series: newSeries
                 }
             }
         }case 'toggleContinuous': {
@@ -114,7 +111,6 @@ function settingsReducer(graphSettings, action){
                 [action.key]: {
                     ...graphSettings[action.key],
                     continuous: action.continuous,
-                    series: newSeries
                 }
             }
         }case 'setTicketSettings': {

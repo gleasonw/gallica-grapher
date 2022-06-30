@@ -10,6 +10,11 @@ here = os.path.dirname(__file__)
 class TestNewspaper(TestCase):
 
     @staticmethod
+    def getPaperCodes():
+        with open(os.path.join(here, "data/newspaper_codes")) as f:
+            return f.read().splitlines()
+
+    @staticmethod
     def getMockedPaperFetch():
         with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
             return MagicMock(content=f.read())
@@ -53,19 +58,27 @@ class TestNewspaper(TestCase):
         def boomerangBatchForTesting(batchItems):
             return [i for i in range(len(batchItems))]
 
-        with open(os.path.join(here, "data/newspaper_codes")) as f:
-            paperCodes = f.read().splitlines()
-
+        paperCodes20 = TestNewspaper.getPaperCodes()
         newspaper = Newspaper(MagicMock())
         newspaper.fetchTheseMax20PaperRecords = MagicMock(
             side_effect=boomerangBatchForTesting
         )
 
-        newspaper.fetchPapersDataInBatches(paperCodes)
+        newspaper.fetchPapersDataInBatches(paperCodes20)
 
         self.assertEqual(
             len(newspaper.paperRecords),
-            len(paperCodes)
+            len(paperCodes20)
+        )
+
+        oneMissingPaper = Newspaper(MagicMock())
+        oneMissingPaper.fetchTheseMax20PaperRecords = MagicMock(
+            side_effect=boomerangBatchForTesting)
+        oneMissingPaper.fetchPapersDataInBatches(["12345"])
+
+        self.assertEqual(
+            len(oneMissingPaper.paperRecords),
+            1
         )
 
     def test_copy_papers_to_db(self):
@@ -152,5 +165,16 @@ class TestNewspaper(TestCase):
         newspaper = Newspaper()
         numPapers = newspaper.getNumPapersOnGallica()
         self.assertEqual(numPapers, 18509)
+
+    @patch('gallica.newspaper.PaperRecordBatch')
+    def test_fetch_max_20_paper_records(self, mock_paper_record_batch):
+        mock_paper_record_batch.return_value = mock_paper_record_batch
+        mock_paper_record_batch.getRecordBatch = MagicMock(return_value=[])
+        testCodes = TestNewspaper.getPaperCodes()
+
+        newspaper = Newspaper()
+        newspaper.fetchTheseMax20PaperRecords(testCodes)
+
+        self.assertEqual(len(newspaper.paperRecords), 0)
 
 

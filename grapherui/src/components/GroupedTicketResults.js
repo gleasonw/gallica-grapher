@@ -1,15 +1,16 @@
-import React, {useEffect, useState, useContext} from "react";
+import React, {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
 import generateOptions from "./generateOptions"
 import TicketStats from "./TicketStats";
+import useData from "./useData";
 
 export function GroupedTicketResults(props) {
     return (
         <div className='groupedResultsUI'>
             <GroupedTicketLabelBar tickets={props.tickets}/>
-            <GroupedChart/>
+            <GroupedChart tickets={props.tickets}/>
             <GroupedStatBar tickets={props.tickets}/>
         </div>
 
@@ -30,25 +31,24 @@ function GroupedTicketLabelBar(props) {
         </div>
     );
 }
-//TODO: ensure the object series --> array series works
-function GroupedChart() {
-    const settings = useContext(GraphSettingsContext);
-    const groupSettings = settings.group;
-
-    const timeBin = groupSettings.timeBin;
-    const keyedSeries = groupSettings.series;
-    const [options, setOptions] = useState({});
-    useEffect(() => {
-        let groupedSeries =
-            Object.keys(keyedSeries).map(key =>
-            keyedSeries[key])
-        setOptions(generateOptions(timeBin, groupedSeries))
-    },[keyedSeries, timeBin])
+function GroupedChart(props) {
+    const settings = useContext(GraphSettingsContext).group;
+    const timeBin = settings.timeBin;
+    const dateRange = getWidestDateRange(props.tickets);
+    const query =
+        "/graphData?keys=" + Object.keys(props.tickets) +
+        "&continuous=" + settings.continuous +
+        "&dateRange=" + dateRange +
+        "&timeBin=" + settings.timeBin +
+        "&averageWindow=" + settings.averageWindow;
+    const keyedSeries = useData(query)
+    let groupedSeries = Object.keys(keyedSeries).map(key =>
+        keyedSeries[key])
 
     return (
         <div>
             <Chart
-                options={options}
+                options={generateOptions(timeBin, groupedSeries)}
                 settingsID='group'
             />
         </div>
@@ -68,6 +68,22 @@ function GroupedStatBar(props) {
             ))}
         </div>
     );
+}
+
+function getWidestDateRange(tickets) {
+    let widestDateRange = 0;
+    let widestTicket = null;
+    Object.keys(tickets).forEach(key => {
+        const lowYear = tickets[key].dateRange.lowYear;
+        const highYear = tickets[key].dateRange.highYear;
+        const thisWidth = highYear - lowYear;
+        if (thisWidth > widestDateRange) {
+            widestDateRange = thisWidth;
+            widestTicket = key;
+        }
+    }
+    )
+    return tickets[widestTicket].dateRange;
 }
 
 export default GroupedTicketResults;

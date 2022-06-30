@@ -1,13 +1,13 @@
 
 
-function updateSeries(ticketIDs, settings){
-    return fetch(
+async function updateSeries(ticketIDs, settings){
+    const data = fetch(
         "/graphData?keys=" + ticketIDs +
         "&averageWindow=" + settings.averageWindow +
         "&timeBin=" + settings.timeBin +
         "&continuous=" + settings.continuous
     )
-    .then(res => res.json())
+    return await data.json();
 }
 
 module.exports = updateSeries()

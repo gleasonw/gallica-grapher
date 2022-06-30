@@ -18,7 +18,7 @@ export function TicketPapers(props) {
                 updatedPapers = result["topPapers"]
                 setTopPapers(updatedPapers)
             })
-    }, [props.ticketID, ticketSettings.continuous, ticketSettings.dateRange])
+    }, [props.dateRange, props.ticketID, ticketSettings.continuous, ticketSettings.dateRange])
 
     return (
         <div className='ticketStats'>

@@ -1,7 +1,7 @@
 from lxml import etree
-from .record import KeywordRecord
-from .record import PaperRecord
-from .gallicaSession import GallicaSession
+from gallica.record import KeywordRecord
+from gallica.record import PaperRecord
+from gallica.gallicaSession import GallicaSession
 
 
 class RecordBatch:

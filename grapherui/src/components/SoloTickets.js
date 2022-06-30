@@ -1,8 +1,8 @@
 import generateOptions from "./generateOptions";
-import updateSeries from "./updateSeries";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import TicketStats from "./TicketStats";
+import useData from "./useData";
 
 function SoloTickets(props) {
     return (
@@ -19,34 +19,20 @@ function SoloTickets(props) {
 }
 
 function SoloTicketResult(props) {
-    const settings = useContext(GraphSettingsContext);
-    const ticketSettings = settings[props.ticketID];
-    const [error, setError] = useState(null);
-    const [loaded, setLoaded] = useState(false);
-    const [series, setSeries] = useState({});
+    const settings = useContext(
+        GraphSettingsContext)[props.ticketID];
+    const query =
+        "/graphData?keys=" + props.ticketID +
+        "&continuous=" + settings.continuous +
+        "&dateRange=" + props.dateRange +
+        "&timeBin=" + settings.timeBin +
+        "&averageWindow=" + settings.averageWindow;
 
-    useEffect(() => {
-        if(!props.series){
-            updateSeries(
-                props.ticketID,
-                ticketSettings
-            ).then(
-                (result) => {
-                    setLoaded(true);
-                    setSeries(result);
-                },
-                (error) => {
-                    setLoaded(true);
-                    setError(error);
-                }
-            )
-        }else{
-            setSeries(props.series)
-        }
-    }, [props.series, ticketSettings, props.ticketID])
+    const graphData = useData(query);
     const options = generateOptions(
-        ticketSettings.timeBin,
-        ticketSettings.series)
+        settings.timeBin,
+        graphData)
+
     return (
         <TicketStats
             ticket={props.ticket}

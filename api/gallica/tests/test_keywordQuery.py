@@ -4,8 +4,7 @@ from gallica.db import DB
 from gallica.keywordQuery import KeywordQuery
 from gallica.keywordQuery import KeywordQueryAllPapers
 from gallica.keywordQuery import KeywordQuerySelectPapers
-from gallica.record import KeywordRecord
-from gallica.record import Record
+from gallica.date import Date
 import os
 
 here = os.path.dirname(__file__)
@@ -31,7 +30,8 @@ class TestKeywordQuery(TestCase):
         for i in range(5):
             mockRecord = MagicMock()
             mockRecord.getDate = MagicMock(return_value=[1920, 10, 1])
-            mockRecord.getJSTimestamp = MagicMock(return_value=1234)
+            mockRecord.getJSTimestamp = MagicMock(
+                return_value=Date.dateToTimestamp("1920-10-01"))
             mockRecord.getUrl = MagicMock(return_value='1234.com')
             mockRecord.getPaperCode = MagicMock(return_value=codes[i])
             mockRecord.parseDateFromXML = MagicMock()
@@ -69,7 +69,7 @@ class TestKeywordQuery(TestCase):
         self.assertEqual(firstRow[1], 1920)
         self.assertEqual(firstRow[2], 10)
         self.assertEqual(firstRow[3], 1)
-        self.assertEqual(firstRow[4], 1234)
+        self.assertEqual(firstRow[4], Date.dateToTimestamp("1920-10-01"))
         self.assertEqual(firstRow[5], "term!")
         self.assertEqual(firstRow[6], "a")
         self.assertEqual(firstRow[7], "id!")
@@ -85,7 +85,7 @@ class TestKeywordQuery(TestCase):
         self.assertEqual(firstStreamRow[1], '1920')
         self.assertEqual(firstStreamRow[2], '10')
         self.assertEqual(firstStreamRow[3], '1')
-        self.assertEqual(firstStreamRow[4], "1234")
+        self.assertEqual(firstStreamRow[4], Date.dateToTimestamp("1920-10-01"))
         self.assertEqual(firstStreamRow[5], "term!")
         self.assertEqual(firstStreamRow[6], "a")
         self.assertEqual(firstStreamRow[7], "id!")
