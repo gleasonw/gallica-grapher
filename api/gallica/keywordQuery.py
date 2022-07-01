@@ -54,26 +54,29 @@ class KeywordQuery:
         else:
             self.buildDatelessQuery()
 
-    # TODO: move state up?
-    def postRecordsToHoldingResultsDB(self):
+    def moveRecordsToDB(self):
         with self.dbConnection.cursor() as curs:
-            csvStream = self.generateResultCSVstream()
-            curs.copy_from(
-                csvStream,
-                'holdingresults',
-                sep='|',
-                columns=(
-                    'identifier',
-                    'year',
-                    'month',
-                    'day',
-                    'jstime',
-                    'searchterm',
-                    'paperid',
-                    'requestid')
-            )
-            self.postMissingPapers(curs)
-            self.copyResultsToFinalTable(curs)
+            self.moveRecordsToHoldingResultsDB(curs)
+            self.addMissingPapers(curs)
+            self.moveRecordsToFinalTable(curs)
+
+    # TODO: move state up? Why is keyword query doing this?
+    def moveRecordsToHoldingResultsDB(self, curs):
+        csvStream = self.generateResultCSVstream()
+        curs.copy_from(
+            csvStream,
+            'holdingresults',
+            sep='|',
+            columns=(
+                'identifier',
+                'year',
+                'month',
+                'day',
+                'jstime',
+                'searchterm',
+                'paperid',
+                'requestid')
+        )
 
     def generateResultCSVstream(self):
 
@@ -99,7 +102,7 @@ class KeywordQuery:
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
 
-    def postMissingPapers(self, curs):
+    def addMissingPapers(self, curs):
         paperGetter = Newspaper(self.gallicaHttpSession)
         missingPapers = self.getMissingPapers(curs)
         paperGetter.sendTheseGallicaPapersToDB(missingPapers)
@@ -119,7 +122,7 @@ class KeywordQuery:
             , (self.ticketID,))
         return curs.fetchall()
 
-    def copyResultsToFinalTable(self, curs):
+    def moveRecordsToFinalTable(self, curs):
         curs.execute(
             """
             WITH resultsForRequest AS (
@@ -152,7 +155,13 @@ class KeywordQueryAllPapers(KeywordQuery):
                  dbConnection,
                  session):
         self.recordIndexChunks = []
-        super().__init__(searchTerm, yearRange, ticketID, progressTracker, dbConnection, session)
+        super().__init__(
+            searchTerm,
+            yearRange,
+            ticketID,
+            progressTracker,
+            dbConnection,
+            session)
 
     def buildYearRangeQuery(self):
         lowYear = str(self.lowYear)
@@ -185,13 +194,12 @@ class KeywordQueryAllPapers(KeywordQuery):
             workerPool = self.generateSearchWorkers(50)
             self.doSearch(workerPool)
             if self.keywordRecords:
-                self.postRecordsToHoldingResultsDB()
+                self.moveRecordsToDB()
 
     # TODO: isolate concurrent code, only one class should be responsible for talking to Gallica
     def generateSearchWorkers(self, numWorkers):
         iterations = ceil(self.estimateNumResults / 50)
-        self.recordIndexChunks = \
-            [(i * 50) + 1 for i in range(iterations)]
+        self.recordIndexChunks = [(i * 50) + 1 for i in range(iterations)]
         executor = ThreadPoolExecutor(max_workers=numWorkers)
         return executor
 
@@ -281,7 +289,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
             self.createURLIndecesForEachPaper()
             self.mapThreadsToSearch(50)
             if self.keywordRecords:
-                self.postRecordsToHoldingResultsDB()
+                self.moveRecordsToDB()
 
     def createURLIndecesForEachPaper(self):
         for paperCode, count in self.paperCodeWithNumResults.items():

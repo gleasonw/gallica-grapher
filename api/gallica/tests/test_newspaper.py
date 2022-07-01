@@ -111,9 +111,6 @@ class TestNewspaper(TestCase):
             '(test2,1899,1900,f,54321)'
         )
 
-
-        pass
-
     @patch('record.PaperRecord')
     @patch('record.Record')
     def test_generate_csv_stream(self, mock_record, mock_paper_record):

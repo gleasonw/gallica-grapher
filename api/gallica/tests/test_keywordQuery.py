@@ -12,6 +12,31 @@ here = os.path.dirname(__file__)
 
 class TestKeywordQuery(TestCase):
 
+    @staticmethod
+    def cleanUpHoldingResults():
+        dbConnection = DB().getConn()
+        with dbConnection.cursor() as curs:
+            curs.execute(
+                """
+                DELETE FROM holdingresults WHERE requestid = 'id!';
+                """)
+        dbConnection.close()
+
+    @staticmethod
+    def cleanUpPapersDB():
+        dbConnection = DB().getConn()
+        with dbConnection.cursor() as curs:
+            curs.execute(
+                """
+                DELETE FROM papers 
+                WHERE code = 'a' 
+                OR code = 'b' 
+                OR code = 'c' 
+                OR code = 'd' 
+                OR code = 'e';
+                """)
+        dbConnection.close()
+
     @patch('record.Record')
     def getMockBatchOf5KeywordRecords(self, mock_record):
         mock_record.return_value = mock_record
@@ -40,14 +65,26 @@ class TestKeywordQuery(TestCase):
 
         return payload
 
-    def test_post_results(self):
+    def test_move_records_to_db(self):
+        testQuery = KeywordQuery('', [], '1234', MagicMock, MagicMock(cursor=MagicMock), MagicMock)
+        testQuery.moveRecordsToHoldingResultsDB = MagicMock()
+        testQuery.moveRecordsToFinalTable = MagicMock()
+        testQuery.addMissingPapers = MagicMock()
+
+        testQuery.moveRecordsToDB()
+
+        self.assertTrue(testQuery.moveRecordsToHoldingResultsDB.called)
+        self.assertTrue(testQuery.moveRecordsToFinalTable.called)
+        self.assertTrue(testQuery.addMissingPapers.called)
+
+    def test_move_records_to_holding_db(self):
         dbConnection = DB().getConn()
         payload = self.getMockBatchOf5KeywordRecords()
         payload.dbConnection = dbConnection
-        payload.postMissingPapers = MagicMock
-        payload.copyResultsToFinalTable = MagicMock
+        payload.addMissingPapers = MagicMock
+        payload.moveRecordsToFinalTable = MagicMock
 
-        payload.postRecordsToHoldingResultsDB()
+        payload.moveRecordsToHoldingResultsDB(dbConnection.cursor())
 
         with dbConnection.cursor() as curs:
             curs.execute(
@@ -57,22 +94,27 @@ class TestKeywordQuery(TestCase):
                     WHERE requestid = 'id!'
                     RETURNING identifier, year, month, day, jstime, searchterm, paperid, requestid
                 )
-                
+
                 SELECT * FROM resultsForRequest;
                 """
-                )
+            )
             postedResults = curs.fetchall()
 
         firstRow = postedResults[0]
         self.assertEqual(len(postedResults), 5)
-        self.assertEqual(firstRow[0], "1234.com")
-        self.assertEqual(firstRow[1], 1920)
-        self.assertEqual(firstRow[2], 10)
-        self.assertEqual(firstRow[3], 1)
-        self.assertEqual(firstRow[4], Date.dateToTimestamp("1920-10-01"))
-        self.assertEqual(firstRow[5], "term!")
-        self.assertEqual(firstRow[6], "a")
-        self.assertEqual(firstRow[7], "id!")
+        self.assertListEqual(
+            firstRow,
+            [
+                '1234.com',
+                1920,
+                10,
+                1,
+                Date.dateToTimestamp("1920-10-01"),
+                'term!',
+                'a',
+                'id!'
+            ]
+        )
 
     def test_generate_result_CSV_stream(self):
         payload = self.getMockBatchOf5KeywordRecords()
@@ -94,84 +136,38 @@ class TestKeywordQuery(TestCase):
         dbConnection = DB().getConn()
         payload = self.getMockBatchOf5KeywordRecords()
         payload.dbConnection = dbConnection
-        payload.copyResultsToFinalTable = MagicMock
-        payload.postMissingPapers = MagicMock
+        payload.moveRecordsToFinalTable = MagicMock
+        payload.addMissingPapers = MagicMock
+        try:
 
-        payload.postRecordsToHoldingResultsDB()
-        with dbConnection.cursor() as curs:
-            missing = payload.getMissingPapers(curs)
-        self.assertEqual(len(missing), 5)
-        self.assertListEqual(
-            sorted(missing),
-            [('a',), ('b',), ('c',), ('d',), ('e',)])
-        with dbConnection.cursor() as curs:
-            curs.execute(
-                """
-                DELETE FROM holdingresults WHERE requestid = 'id!';
-                """
-            )
+            payload.moveRecordsToHoldingResultsDB(dbConnection.cursor())
+            missing = payload.getMissingPapers(dbConnection.cursor())
 
-    def test_move_results_to_final(self):
-        dbConnection = DB().getConn()
+            self.assertEqual(len(missing), 5)
+            self.assertListEqual(
+                sorted(missing),
+                [('a',), ('b',), ('c',), ('d',), ('e',)])
+
+        except Exception as e:
+            self.fail(e)
+        finally:
+            TestKeywordQuery.cleanUpHoldingResults()
+            dbConnection.close()
+
+    @patch('gallica.keywordQuery.Newspaper')
+    def test_add_missing_papers(self, mock_paper):
+        mock_paper = mock_paper.return_value
+        mock_paper.sendTheseGallicaPapersToDB = MagicMock()
         payload = self.getMockBatchOf5KeywordRecords()
-        payload.dbConnection = dbConnection
-        payload.postMissingPapers = MagicMock
-        with dbConnection.cursor() as curs:
-            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'a');")
-            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'b');")
-            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'c');")
-            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'d');")
-            curs.execute("INSERT INTO papers VALUES ('',1,1,true,'e');")
-            noMissingPapers = payload.getMissingPapers(curs)
-            self.assertCountEqual(noMissingPapers, [])
+        payload.getMissingPapers = MagicMock()
 
-        payload.postRecordsToHoldingResultsDB()
+        payload.addMissingPapers(MagicMock)
 
-        with dbConnection.cursor() as curs:
-            curs.execute(
-            """
-            SELECT * 
-            FROM results 
-            WHERE paperid = 'a'
-            OR paperid = 'b'
-            OR paperid = 'c'
-            OR paperid = 'd'
-            OR paperid = 'e';
-            """)
-            added = curs.fetchall()
-        self.assertEqual(len(added), 5)
-        firstRow = added[0]
-        self.assertEqual(len(added), 5)
-        self.assertEqual(firstRow[1], "1234.com")
-        self.assertEqual(firstRow[2], 1920)
-        self.assertEqual(firstRow[3], 10)
-        self.assertEqual(firstRow[4], 1)
-        self.assertEqual(firstRow[5], 1234)
-        self.assertEqual(firstRow[6], "term!")
-        self.assertEqual(firstRow[7], "a")
-        self.assertEqual(firstRow[8], "id!")
+        self.assertTrue(payload.getMissingPapers.called)
+        self.assertTrue(mock_paper.sendTheseGallicaPapersToDB.called)
 
-        with dbConnection.cursor() as curs:
-            curs.execute(
-                """
-                DELETE FROM results 
-                WHERE paperid = 'a'
-                OR paperid = 'b'
-                OR paperid = 'c'
-                OR paperid = 'd'
-                OR paperid = 'e';
-                """
-            )
-            curs.execute(
-                """
-                DELETE FROM papers 
-                WHERE code = 'a'
-                OR code = 'b'
-                OR code = 'c'
-                OR code = 'd'
-                OR code = 'e';
-                """
-            )
+
+
 
     def test_establish_year_range(self):
         KeywordQuery.fetchNumTotalResults = MagicMock
@@ -204,7 +200,7 @@ class TestKeywordQuery(TestCase):
 
             query = KeywordQueryAllPapers(
                 'brazza',
-                [1850,1900],
+                [1850, 1900],
                 '1234',
                 progressTracker=MagicMock(),
                 dbConnection=MagicMock(),
@@ -235,7 +231,6 @@ class TestKeywordQuery(TestCase):
                 '(gallica all "brazza") '
                 'and (dc.type all "fascicule") '
                 'sortby dc.date/sort.ascending')
-
 
     class TestKeywordQuerySelectPapers(TestCase):
 
@@ -291,7 +286,6 @@ class TestKeywordQuery(TestCase):
                 'sortby dc.date/sort.ascending')
 
         def test_set_num_results_for_each_paper(self):
-
             choiceDict = self.buildDummyDict()
             KeywordQuerySelectPapers.fetchNumberResultsInPaper = MagicMock(return_value=['a', 1])
             KeywordQuerySelectPapers.sumUpPaperResultsForTotalEstimate = MagicMock()
@@ -309,7 +303,6 @@ class TestKeywordQuery(TestCase):
 
         @patch('gallica.recordBatch.RecordBatch.getNumResults', return_value=3)
         def test_fetch_number_results_in_paper(self, mock_getNumResults):
-
             choiceDict = self.buildDummyDict()
             KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
             query = KeywordQuerySelectPapers(
@@ -328,7 +321,6 @@ class TestKeywordQuery(TestCase):
                 ('a', 3))
 
         def test_sum_up_paper_results_for_total_estimate(self):
-
             choiceDict = self.buildDummyDict()
             KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
             query = KeywordQuerySelectPapers(
@@ -347,7 +339,6 @@ class TestKeywordQuery(TestCase):
                 3)
 
         def test_init_batch_queries(self):
-
             choiceDict = self.buildDummyDict()
             KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
             query = KeywordQuerySelectPapers(
