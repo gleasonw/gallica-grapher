@@ -89,7 +89,7 @@ function ChartSettings(props){
                     dispatch({
                         type: 'setContinuous',
                         key: props.settingsID,
-                        continuous: e.target.valueOf(),
+                        continuous: e.target.checked,
                     })
                 }}
                 label='require continuous newspapers'

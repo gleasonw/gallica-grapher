@@ -1,5 +1,6 @@
 from db import DB
-
+import datetime
+import ciso8601
 
 # TODO: tests with continuous settings
 class TicketGraphSeriesBatch:
@@ -55,6 +56,7 @@ class TicketGraphSeries:
         dateRange = settings["dateRange"].split(",")
         self.lowYear = dateRange[0]
         self.highYear = dateRange[1]
+        self.dataNoJSTimestamp = []
         self.data = []
         self.searchTerms = []
         self.request = None
@@ -64,12 +66,18 @@ class TicketGraphSeries:
     def getSeries(self):
         return {
             'name': self.searchTerms,
-            'data': self.data
+            'data': self.dataNoJSTimestamp
         }
 
     def makeSeries(self):
         self.buildQueryForSeries()
         self.runQuery()
+        if self.timeBin == "day" or self.timeBin == "month":
+            self.calculateJStime()
+        elif self.timeBin == "year":
+            self.data = self.dataNoJSTimestamp
+        else:
+            raise Exception("Invalid time bin")
 
     def buildQueryForSeries(self):
         if self.timeBin == "day" and self.continuous:
@@ -268,4 +276,46 @@ class TicketGraphSeries:
                 self.request,
                 params
             )
-            self.data = curs.fetchall()
+            self.dataNoJSTimestamp = curs.fetchall()
+
+    def calculateJStime(self):
+
+        def getMonthTwoDigits(month):
+            if len(month) == 1:
+                return f'0{month}'
+            else:
+                return month
+
+        def getDayTwoDigits(day):
+            if len(day) == 1:
+                return f'0{day}'
+            else:
+                return day
+
+        def dateToTimestamp(date):
+            dateObject = ciso8601.parse_datetime(date)
+            dateObject = dateObject.replace(tzinfo=datetime.timezone.utc)
+            timestamp = datetime.datetime.timestamp(dateObject) * 1000
+            return timestamp
+
+        if self.timeBin == "day":
+            for row in self.dataNoJSTimestamp:
+                year = row[0]
+                month = getMonthTwoDigits(row[1])
+                day = getDayTwoDigits(row[2])
+                frequency = row[3]
+                date = f'{year}-{month}-{day}'
+                self.data.append(
+                    (dateToTimestamp(date), frequency)
+                )
+        elif self.timeBin == "month":
+            for row in self.dataNoJSTimestamp:
+                year = row[0]
+                month = getMonthTwoDigits(row[1])
+                frequency = row[2]
+                date = f'{year}-{month}-01'
+                self.data.append(
+                    (dateToTimestamp(date), frequency)
+                )
+
+

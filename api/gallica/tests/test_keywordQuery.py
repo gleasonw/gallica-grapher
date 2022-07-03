@@ -100,7 +100,7 @@ class TestKeywordQuery(TestCase):
             )
             postedResults = curs.fetchall()
 
-        firstRow = postedResults[0]
+        firstRow = list(postedResults[0])
         self.assertEqual(len(postedResults), 5)
         self.assertListEqual(
             firstRow,
@@ -127,7 +127,7 @@ class TestKeywordQuery(TestCase):
         self.assertEqual(firstStreamRow[1], '1920')
         self.assertEqual(firstStreamRow[2], '10')
         self.assertEqual(firstStreamRow[3], '1')
-        self.assertEqual(firstStreamRow[4], Date.dateToTimestamp("1920-10-01"))
+        self.assertEqual(firstStreamRow[4], str(Date.dateToTimestamp("1920-10-01")))
         self.assertEqual(firstStreamRow[5], "term!")
         self.assertEqual(firstStreamRow[6], "a")
         self.assertEqual(firstStreamRow[7], "id!")

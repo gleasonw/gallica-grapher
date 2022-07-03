@@ -19,20 +19,33 @@ class TestNewspaper(TestCase):
         with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
             return MagicMock(content=f.read())
 
+    @staticmethod
+    def deleteDummyPapersForTesting():
+        tester = DBtester()
+        tester.deleteAndReturnPaper('cb41459716t')
+        tester.deleteAndReturnPaper('cb32690181n')
+        tester.deleteAndReturnPaper('cb32751426x')
+        tester.deleteAndReturnPaper('cb327808508')
+        tester.deleteAndReturnPaper('cb32750493t')
+        tester.deleteAndReturnPaper('cb32709443d')
+        tester.deleteAndReturnPaper('cb327345882')
+        tester.deleteAndReturnPaper('cb327514189')
+        tester.deleteAndReturnPaper('cb32751344k')
+        tester.deleteAndReturnPaper('cb32802219g')
+
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_send_these_gallica_papers_to_db(self, mock_get):
         mock_get.return_value = TestNewspaper.getMockedPaperFetch()
-        with open(os.path.join(here, "data/newspaper_codes")) as f:
-            paperCodes = f.read().splitlines()
-
+        paperCodes = TestNewspaper.getPaperCodes()
+        tupledPaperCodes = [(code,) for code in paperCodes]
         newspaper = Newspaper()
         newspaper.copyPapersToDB = MagicMock()
         newspaper.fetchPapersDataInBatches = MagicMock()
 
-        newspaper.sendTheseGallicaPapersToDB(paperCodes)
+        newspaper.sendTheseGallicaPapersToDB(tupledPaperCodes)
 
         newspaper.copyPapersToDB.assert_called_once()
-        newspaper.fetchPapersDataInBatches.assert_called_with(paperCodes)
+        newspaper.fetchPapersDataInBatches.assert_called_with(tupledPaperCodes)
 
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_fetched_paper_record_validity(self, mock_get):
@@ -81,34 +94,18 @@ class TestNewspaper(TestCase):
             1
         )
 
-    def test_copy_papers_to_db(self):
+    def test_get_records_and_copy_to_db(self):
+        TestNewspaper.deleteDummyPapersForTesting()
         testerPaper = Newspaper()
-        mockPaperRecords = [
-            MagicMock(
-                getDate=MagicMock(return_value=[1800,1900]),
-                getTitle=MagicMock(return_value='test1'),
-                isContinuous=MagicMock(return_value=True),
-                getPaperCode=MagicMock(return_value='12345')),
-            MagicMock(
-                getDate=MagicMock(return_value=[1899,1900]),
-                getTitle=MagicMock(return_value='test2'),
-                isContinuous=MagicMock(return_value=False),
-                getPaperCode=MagicMock(return_value='54321')),
-        ]
-        testerPaper.paperRecords = mockPaperRecords
+        paperCodes = TestNewspaper.getPaperCodes()
+        tupledPaperCodes = [(code,) for code in paperCodes]
+        testerPaper.sendTheseGallicaPapersToDB(tupledPaperCodes)
 
-        testerPaper.copyPapersToDB()
-
-        firstPaper = DBtester().deleteAndReturnPaper('12345')
-        secondPaper = DBtester().deleteAndReturnPaper('54321')
+        hopefullyReplacedPapers = DBtester().getTesterPapers()
 
         self.assertEqual(
-            firstPaper,
-            '(test1,1800,1900,t,12345)'
-        )
-        self.assertEqual(
-            secondPaper,
-            '(test2,1899,1900,f,54321)'
+            len(hopefullyReplacedPapers),
+            10
         )
 
     @patch('record.PaperRecord')

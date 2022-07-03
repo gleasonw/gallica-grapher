@@ -31,6 +31,15 @@ class Newspaper:
             batchOf20 = self.fetchTheseMax20PaperRecords(paperCodes[i:i + 20])
             self.paperRecords.extend(batchOf20)
 
+    def fetchTheseMax20PaperRecords(self, paperCodes):
+        formattedPaperCodes = [f"{paperCode[0]}_date" for paperCode in paperCodes]
+        self.query = 'arkPress all "' + '" or arkPress all "'.join(formattedPaperCodes) + '"'
+        batch = PaperRecordBatch(
+            self.query,
+            self.session,
+            numRecords=20)
+        return batch.getRecordBatch()
+
     def sendAllGallicaPapersToDB(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
         self.fetchAllPapersFromGallica()
@@ -44,7 +53,6 @@ class Newspaper:
                 for batch in executor.map(
                         self.fetchBatchPapersAtIndex,
                         range(1, numPapers, 50)):
-                    print(batch)
                     self.paperRecords.extend(batch)
 
     def fetchBatchPapersAtIndex(self, index):
@@ -91,14 +99,6 @@ class Newspaper:
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
 
-    def fetchTheseMax20PaperRecords(self, paperCodes):
-        formattedPaperCodes = [f"{paperCode}_date" for paperCode in paperCodes]
-        self.query = 'arkPress all "' + '" or arkPress all "'.join(formattedPaperCodes) + '"'
-        batch = PaperRecordBatch(
-            self.query,
-            self.session,
-            numRecords=20)
-        return batch.getRecordBatch()
 
     def getPapersSimilarToKeyword(self, keyword):
         with self.dbConnection.cursor() as curs:

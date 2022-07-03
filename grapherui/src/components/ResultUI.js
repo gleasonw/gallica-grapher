@@ -105,7 +105,7 @@ function settingsReducer(graphSettings, action){
                     averageWindow: action.averageWindow,
                 }
             }
-        }case 'toggleContinuous': {
+        }case 'setContinuous': {
             return {
                 ...graphSettings,
                 [action.key]: {

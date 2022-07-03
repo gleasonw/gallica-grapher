@@ -41,14 +41,12 @@ function GroupedChart(props) {
         "&dateRange=" + dateRange +
         "&timeBin=" + settings.timeBin +
         "&averageWindow=" + settings.averageWindow;
-    const keyedSeries = useData(query)
-    let groupedSeries = Object.keys(keyedSeries).map(key =>
-        keyedSeries[key])
+    const series = useData(query);
 
     return (
         <div>
             <Chart
-                options={generateOptions(timeBin, groupedSeries)}
+                options={generateOptions(timeBin, series)}
                 settingsID='group'
             />
         </div>
@@ -74,8 +72,8 @@ function getWidestDateRange(tickets) {
     let widestDateRange = 0;
     let widestTicket = null;
     Object.keys(tickets).forEach(key => {
-        const lowYear = tickets[key].dateRange.lowYear;
-        const highYear = tickets[key].dateRange.highYear;
+        const lowYear = tickets[key].dateRange[0];
+        const highYear = tickets[key].dateRange[1];
         const thisWidth = highYear - lowYear;
         if (thisWidth > widestDateRange) {
             widestDateRange = thisWidth;

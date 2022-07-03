@@ -10,7 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
     const [tickets, setTickets] = useState([])
     const [idTickets, setIDTickets] = useState({})
-    const [gettingInput, setGettingInput] = useState(true)
+    const [gettingInput, setGettingInput] = useState(false)
     const [runningQueries, setRunningQueries] = useState(false)
 
     let wrapperSetRunningQueries = useCallback(val => {
@@ -80,10 +80,10 @@ function App() {
                 {header}
                 <ResultUI
                     tickets={{
-                        '4321':{
+                        '1':{
                             'terms': ['brazza'],
-                            'papersAndCodes': [{'paper':'huh','code':'1234'}],
-                            'dateRange': [1800,1900]
+                            'papersAndCodes': [],
+                            'dateRange': [1880,1915]
                         }
                     }}
                 />

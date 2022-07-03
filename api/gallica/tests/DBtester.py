@@ -94,5 +94,23 @@ class DBtester:
             """)
             return curs.fetchone()[0]
 
+    def getTesterPapers(self):
+        with self.conn.cursor() as curs:
+            curs.execute("""
+            SELECT *
+            FROM papers
+            WHERE code = 'cb41459716t'
+            OR code = 'cb32690181n'
+            OR code = 'cb32751426x'
+            OR code = 'cb327808508'
+            OR code = 'cb32750493t'
+            OR code = 'cb32709443d'
+            OR code = 'cb327345882'
+            OR code = 'cb327514189'
+            OR code = 'cb32751344k'
+            OR code = 'cb32802219g';
+            """)
+            return curs.fetchall()
+
     def close(self):
         self.conn.close()

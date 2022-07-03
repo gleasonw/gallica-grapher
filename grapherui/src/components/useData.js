@@ -8,7 +8,7 @@ export default function useData(url) {
       .then(response => response.json())
       .then(json => {
         if (!ignore) {
-          setResult(json);
+          setResult(json.series);
         }
       });
     return () => {
