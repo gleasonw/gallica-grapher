@@ -209,7 +209,6 @@ input[type='text']{
 }
 input#papers,input#searchTerm{
     height: 100%;
-    font-family: var(--font-fam);
     border: 0;
     font-size: 16px;
     width: 100%;
@@ -283,7 +282,7 @@ label[for="papers"],label[for="searchTerm"]{
     color: white;
 }
 
-.queryProgressUI{
+.queryProgressUI, .ticketResultsContainer{
     max-width: 90vw;
     min-height: 80vh;
     margin-left: auto;
@@ -293,12 +292,33 @@ label[for="papers"],label[for="searchTerm"]{
     margin-top: 30px;
     justify-content: center;
 }
-.ticketProgressBox{
+.ticketProgressBox, .groupedStat{
     border: solid;
     width: calc(100% - 40px);
-    max-width: 600px;
+    max-width: 800px;
     margin: 20px;
 
+}
+.ticketResults{
+    flex: 1;
+}
+.topPaperTable{
+    width: 100%;
+    max-width: 800px;
+    margin: 20px;
+}
+td{
+    max-width: 100px;
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+td:hover{
+    background-color: lightblue;
+    overflow: visible;
+    white-space: normal;
+    height: auto;
 }
 .resultUI{
     display: flex;
@@ -330,8 +350,9 @@ label[for="papers"],label[for="searchTerm"]{
     display: flex;
     border: solid;
     flex-wrap: wrap;
+    justify-content: center;
 }
-.groupedStat, .groupedLabel{
+.groupedLabel{
     flex: 1;
 }
 .groupedStat{
