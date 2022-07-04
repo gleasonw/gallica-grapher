@@ -52,6 +52,18 @@ class TestTicketGraphSeriesBatch(TestCase):
 
 class TestTicketGraphSeries(TestCase):
 
+    def setUp(self):
+        self.testInstance = TicketGraphSeries(
+            "1",
+            {
+                "averageWindow": 5,
+                "groupBy": 'day',
+                "dateRange": "1890, 1900",
+                "continuous": "false"
+            },
+            MagicMock()
+        )
+
     def test_parse_continuous(self):
         self.assertFalse(parseContinuous(""))
         self.assertFalse(parseContinuous("false"))
@@ -240,6 +252,38 @@ class TestTicketGraphSeries(TestCase):
         self.assertEqual(
             testRolledAverage,
             2.25)
+
+    def test_get_jstimestamp_day(self):
+        self.testInstance.dataNoJSTimestamp = [
+            (1800, 5, 10, 1,)
+        ]
+        self.testInstance.timeBin = 'day'
+        self.testInstance.data = []
+
+        self.testInstance.calculateJStime()
+
+        self.assertEqual(
+            self.testInstance.data[0][0],
+            -5353516800000.0
+        )
+
+    def test_get_jstimestamp_month(self):
+        self.testInstance.dataNoJSTimestamp = [
+            (1800, 4, 1,)
+        ]
+        self.testInstance.timeBin = 'month'
+        self.testInstance.data = []
+
+        self.testInstance.calculateJStime()
+
+        self.assertEqual(
+            self.testInstance.data[0][0],
+            -5356886400000
+        )
+
+
+
+
 
 
 

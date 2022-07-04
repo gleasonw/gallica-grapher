@@ -55,8 +55,6 @@ class TestKeywordQuery(TestCase):
         for i in range(5):
             mockRecord = MagicMock()
             mockRecord.getDate = MagicMock(return_value=[1920, 10, 1])
-            mockRecord.getJSTimestamp = MagicMock(
-                return_value=Date.dateToTimestamp("1920-10-01"))
             mockRecord.getUrl = MagicMock(return_value='1234.com')
             mockRecord.getPaperCode = MagicMock(return_value=codes[i])
             mockRecord.parseDateFromXML = MagicMock()
@@ -92,7 +90,7 @@ class TestKeywordQuery(TestCase):
                 WITH resultsForRequest AS (
                     DELETE FROM holdingresults
                     WHERE requestid = 'id!'
-                    RETURNING identifier, year, month, day, jstime, searchterm, paperid, requestid
+                    RETURNING identifier, year, month, day, searchterm, paperid, requestid
                 )
 
                 SELECT * FROM resultsForRequest;
@@ -109,7 +107,6 @@ class TestKeywordQuery(TestCase):
                 1920,
                 10,
                 1,
-                Date.dateToTimestamp("1920-10-01"),
                 'term!',
                 'a',
                 'id!'
@@ -127,10 +124,9 @@ class TestKeywordQuery(TestCase):
         self.assertEqual(firstStreamRow[1], '1920')
         self.assertEqual(firstStreamRow[2], '10')
         self.assertEqual(firstStreamRow[3], '1')
-        self.assertEqual(firstStreamRow[4], str(Date.dateToTimestamp("1920-10-01")))
-        self.assertEqual(firstStreamRow[5], "term!")
-        self.assertEqual(firstStreamRow[6], "a")
-        self.assertEqual(firstStreamRow[7], "id!")
+        self.assertEqual(firstStreamRow[4], "term!")
+        self.assertEqual(firstStreamRow[5], "a")
+        self.assertEqual(firstStreamRow[6], "id!")
 
     def test_get_missing_papers(self):
         dbConnection = DB().getConn()

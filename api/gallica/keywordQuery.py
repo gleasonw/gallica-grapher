@@ -72,7 +72,6 @@ class KeywordQuery:
                 'year',
                 'month',
                 'day',
-                'jstime',
                 'searchterm',
                 'paperid',
                 'requestid')
@@ -94,7 +93,6 @@ class KeywordQuery:
                     yearMonDay[0],
                     yearMonDay[1],
                     yearMonDay[2],
-                    record.getJSTimestamp(),
                     self.keyword,
                     record.getPaperCode(),
                     self.ticketID
@@ -128,10 +126,10 @@ class KeywordQuery:
             WITH resultsForRequest AS (
                 DELETE FROM holdingresults
                 WHERE requestid = %s
-                RETURNING identifier, year, month, day, jstime, searchterm, paperid, requestid
+                RETURNING identifier, year, month, day, searchterm, paperid, requestid
             )
             
-            INSERT INTO results (identifier, year, month, day, jstime, searchterm, paperid, requestid)
+            INSERT INTO results (identifier, year, month, day, searchterm, paperid, requestid)
                 (SELECT * FROM resultsForRequest);
             """
             , (self.ticketID,))

@@ -1,7 +1,4 @@
-import datetime
 import re
-
-import ciso8601
 
 
 class Date:
@@ -32,7 +29,7 @@ class Date:
         elif oneYear.match(self.dateText):
             self.setYear()
         else:
-
+            pass
 
     def setYearMonDay(self):
         splitDate = self.dateText.split('-')

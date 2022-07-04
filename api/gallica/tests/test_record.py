@@ -43,21 +43,6 @@ class TestRecord(TestCase):
         self.assertFalse(absentCodeRecord.isValid())
 
 
-class TestKeywordRecord(TestCase):
-
-    def test_get_jstimestamp(self):
-        here = os.path.dirname(__file__)
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyKeywordRecords.xml'))
-        dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
-        dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        dummyRecord = KeywordRecord(dummyRecordXML)
-
-        self.assertEqual(
-            dummyRecord.getJSTimestamp(),
-            -2737670400000
-        )
-
-
 class TestPaperRecord(TestCase):
     def test_check_if_valid(self):
         here = os.path.dirname(__file__)

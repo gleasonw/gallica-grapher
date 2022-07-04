@@ -53,8 +53,8 @@ class RequestThread(threading.Thread):
 if __name__ == "__main__":
     request = RequestThread(
         {
-            '1': {
-                'terms': ['brazza'],
+            '2': {
+                'terms': ['malamine'],
                 'papersAndCodes': [],
                 'dateRange': [1850, 1950]
                 }

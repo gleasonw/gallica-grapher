@@ -66,7 +66,7 @@ class TicketGraphSeries:
     def getSeries(self):
         return {
             'name': self.searchTerms,
-            'data': self.dataNoJSTimestamp
+            'data': self.data
         }
 
     def makeSeries(self):
@@ -112,7 +112,7 @@ class TicketGraphSeries:
                     AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
             FROM binned_frequencies)
             
-        SELECT year, month, day, avgFrequency::numeric
+        SELECT year, month, day, avgFrequency::float8
             FROM averaged_frequencies;
                 
         """
@@ -145,7 +145,7 @@ class TicketGraphSeries:
                 AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
             FROM binned_results_only_continuous)
         
-        SELECT year, month, day, avgFrequency::numeric
+        SELECT year, month, day, avgFrequency::float8
         FROM averaged_frequencies;
         """
 
@@ -164,7 +164,7 @@ class TicketGraphSeries:
                     AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
             FROM binned_frequencies)
         
-        SELECT year, month, avgFrequency::numeric 
+        SELECT year, month, avgFrequency::float8 
         FROM averaged_frequencies;
         """
 
@@ -194,7 +194,7 @@ class TicketGraphSeries:
                     AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
                 FROM binned_frequencies_only_continuous)
                 
-        SELECT year, month, avgFrequency::numeric
+        SELECT year, month, avgFrequency::float8
         FROM averaged_frequencies;
         """
 
@@ -213,7 +213,7 @@ class TicketGraphSeries:
                     AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
             FROM binned_frequencies)
             
-        SELECT year, avgFrequency::numeric
+        SELECT year, avgFrequency::float8
         FROM averaged_frequencies;
         """
 
@@ -222,7 +222,8 @@ class TicketGraphSeries:
         WITH ticket_results AS
             (SELECT year, paperid
             FROM results 
-            WHERE requestid=%s),
+            WHERE requestid=%s
+                AND year IS NOT NULL),
             
             binned_frequencies_only_continuous AS
             (SELECT year, count(*) AS mentions 
@@ -242,7 +243,7 @@ class TicketGraphSeries:
                 AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
             FROM binned_frequencies_only_continuous)
                 
-        SELECT year, avgFrequency::numeric
+        SELECT year, avgFrequency::float8
         FROM averaged_frequencies;
         """
 
@@ -281,13 +282,13 @@ class TicketGraphSeries:
     def calculateJStime(self):
 
         def getMonthTwoDigits(month):
-            if len(month) == 1:
+            if month < 10:
                 return f'0{month}'
             else:
                 return month
 
         def getDayTwoDigits(day):
-            if len(day) == 1:
+            if day < 10:
                 return f'0{day}'
             else:
                 return day

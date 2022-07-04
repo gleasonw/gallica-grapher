@@ -40,19 +40,3 @@ class TestDate(TestCase):
             moreNonsense.getDate(),
             [None, None, None]
         )
-
-    def test_get_jstimestamp(self):
-        fullDate = Date("1800-4-2")
-        anotherFullDate = Date("1800-4-2")
-        nonsense = Date("12??")
-        self.assertEqual(
-            fullDate.getJSTimestamp(),
-            anotherFullDate.getJSTimestamp()
-        )
-        self.assertEqual(
-            fullDate.getJSTimestamp(),
-            -5356800000000.0,
-        )
-        self.assertIsNone(
-            nonsense.getJSTimestamp()
-        )

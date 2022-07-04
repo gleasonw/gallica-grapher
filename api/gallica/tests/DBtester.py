@@ -44,7 +44,6 @@ class DBtester:
                     'year',
                     'month',
                     'day',
-                    'jstime',
                     'searchterm',
                     'paperid',
                     'requestid'))
