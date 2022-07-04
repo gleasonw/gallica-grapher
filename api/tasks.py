@@ -1,10 +1,11 @@
 from celery import Celery
 import time
-from api.requestThread import RequestThread
+from requestThread import RequestThread
 
-celery = Celery('api.tasks',
-                broker='amqp://',
-                backend='redis://')
+celery = Celery(
+    'api.tasks',
+    broker='amqp://',
+    backend='redis://localhost:6379/0')
 
 
 @celery.task(bind=True)

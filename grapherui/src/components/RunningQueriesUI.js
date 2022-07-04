@@ -1,24 +1,15 @@
 import React,{useState, useEffect, useLayoutEffect} from 'react';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import TicketLabel from "./TicketLabel";
-import axios from "axios";
+
 
 
 function RunningQueriesUI(props) {
-    const [requestID, setRequestID] = useState('');
-    useEffect(() => {
-        axios.post('/init', {
-            tickets: props.tickets
-        })
-            .then(result => {
-                setRequestID(result.data["taskid"])
-            })
-    }, [props.tickets]);
     return(
         <div>
             <TicketProgressContainer
                 tickets={props.tickets}
-                requestid={requestID}
+                requestid={props.requestID}
                 setRunningQueries={props.setRunningQueries}
             />
         </div>
@@ -32,7 +23,7 @@ function TicketProgressContainer(props){
     ))
     const [ticketProgressPercents, setTicketProgressPercents] = useState(initPercents)
 //TODO: Exiting before final render
-    useLayoutEffect(() => {
+    useEffect(() => {
         function updateProgress(){
             let progress = 0;
             let currentTicket = '';
@@ -47,6 +38,7 @@ function TicketProgressContainer(props){
                     updatedTickets[currentTicket] = progress
                     setTicketProgressPercents(updatedTickets)
                     if (state === "SUCCESS") {
+                        console.log('finisehd')
                         setTimeout(props.setRunningQueries, 1000, false);
                     }
                 });
@@ -70,7 +62,6 @@ function TicketProgressContainer(props){
 
 }
 function TicketProgressBox(props){
-    console.log(props.progress)
     return(
         <div className='ticketProgressBox'>
             <TicketLabel

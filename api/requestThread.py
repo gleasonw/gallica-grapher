@@ -1,7 +1,7 @@
 import threading
 from gallica.requestTicket import RequestTicket
-from db import DB
-from gallicaSession import GallicaSession
+from gallica.db import DB
+from gallica.gallicaSession import GallicaSession
 
 
 class RequestThread(threading.Thread):

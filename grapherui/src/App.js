@@ -5,53 +5,69 @@ import RunningQueriesUI from "./components/RunningQueriesUI";
 import ResultUI from "./components/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from "axios";
 
 
 function App() {
-    const [tickets, setTickets] = useState([])
-    const [idTickets, setIDTickets] = useState({})
-    const [gettingInput, setGettingInput] = useState(true)
-    const [runningQueries, setRunningQueries] = useState(false)
+    const [tickets, setTickets] = useState([]);
+    const [idTickets, setIDTickets] = useState({});
+    const [requestID, setRequestID] = useState('');
+    const [gettingInput, setGettingInput] = useState(true);
+    const [runningQueries, setRunningQueries] = useState(false);
 
     let wrapperSetRunningQueries = useCallback(val => {
         setRunningQueries(val);
     }, [setRunningQueries]);
+
     const header =
         <header className="header">
             <div className="mainTitle">
                 The Gallica Grapher
             </div>
         </header>
-    function handleInputSubmit(event){
+
+    async function handleInputSubmit(event){
         event.preventDefault();
-        generateTicketIDs();
+        const ticksWithIDS = generateTicketIDs();
+        const {request} = await axios.post('/init', {
+            tickets: ticksWithIDS
+        })
+        const taskID = JSON.parse(request.response)["taskid"];
+        setIDTickets(ticksWithIDS);
+        setRequestID(taskID);
         setGettingInput(false);
         setRunningQueries(true);
     }
+
     function handleCreateTicketClick(items){
         createTicketFromInput(items)
     }
+
     function handleTicketClick(index){
         deleteTicketAtIndex(index);
     }
+
     function generateTicketIDs(){
         let ticketsWithID = {};
         for (let i = 0; i < tickets.length; i++){
             let id = uuidv4()
             ticketsWithID[id] = tickets[i]
         }
-        setIDTickets(ticketsWithID)
+        return ticketsWithID
     }
+
     function createTicketFromInput(items){
         let updatedTickets = tickets.slice();
         updatedTickets.push(items);
         setTickets(updatedTickets)
     }
+
     function deleteTicketAtIndex(index){
         const updatedTickets = tickets.slice()
         updatedTickets.splice(index, 1)
         setTickets(updatedTickets)
     }
+
     if(gettingInput){
         return (
             <div className="App">
@@ -71,6 +87,7 @@ function App() {
                 <RunningQueriesUI
                     tickets={idTickets}
                     setRunningQueries={wrapperSetRunningQueries}
+                    requestID={requestID}
                 />
             </div>
           )
