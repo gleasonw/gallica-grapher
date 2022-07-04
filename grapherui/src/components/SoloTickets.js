@@ -24,7 +24,7 @@ function SoloTicketResult(props) {
     const query =
         "/graphData?keys=" + props.ticketID +
         "&continuous=" + settings.continuous +
-        "&dateRange=" + props.dateRange +
+        "&dateRange=" + props.ticket.dateRange +
         "&timeBin=" + settings.timeBin +
         "&averageWindow=" + settings.averageWindow;
 

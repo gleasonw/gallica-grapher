@@ -84,6 +84,11 @@ function App() {
                             'terms': ['brazza'],
                             'papersAndCodes': [],
                             'dateRange': [1880,1915]
+                        },
+                        '2':{
+                            'terms': ['malamine'],
+                            'papersAndCodes': [],
+                            'dateRange': [1880,1915]
                         }
                     }}
                 />

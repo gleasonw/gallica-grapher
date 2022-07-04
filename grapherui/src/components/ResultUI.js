@@ -1,6 +1,8 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import GroupedTicketResults from "./GroupedTicketResults";
-import Button from "@mui/material/Button"
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from "@mui/material/Switch";
 import SoloTickets from "./SoloTickets";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 
@@ -9,17 +11,13 @@ import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSetting
 function ResultUI(props){
 
     const [firstDegroup, setFirstDegroup] = useState(true);
-    const [grouped, setGrouped] = useState(true);
+    const [grouped, setGrouped] = useState(props.tickets.length > 1);
     const [graphSettings, dispatch] = useReducer(
         settingsReducer,
         props.tickets,
         initGraphSettings)
 
-    function handleClick(){
-        if(firstDegroup && grouped){
-            populateTicketSettingsFromGroup()
-            setFirstDegroup(false)
-        }
+    function handleGroupToggle(){
         setGrouped(!grouped)
     }
 
@@ -56,9 +54,20 @@ function ResultUI(props){
         <GraphSettingsContext.Provider value={graphSettings}>
             <GraphSettingsDispatchContext.Provider value={dispatch}>
                 <div className='resultUI'>
-                    <Button onClick={handleClick}>
-                        Group
-                    </Button>
+                    {Object.keys(props.tickets).length > 1  &&
+                        <FormGroup>
+                            <FormControlLabel
+                                labelPlacement="bottom"
+                                control={
+                                    <Switch
+                                        checked={grouped}
+                                        onChange={handleGroupToggle}
+                                    />
+                                }
+                                label={grouped ? 'Ungroup' : 'Group'}
+                            />
+                        </FormGroup>
+                    }
                     {grouped ? (
                         <GroupedTicketResults
                             tickets={props.tickets}
@@ -68,6 +77,7 @@ function ResultUI(props){
                             tickets={props.tickets}
                         />
                     )}
+                    }
                 </div>
             </GraphSettingsDispatchContext.Provider>
         </GraphSettingsContext.Provider>
@@ -102,7 +112,8 @@ function settingsReducer(graphSettings, action){
                 ...graphSettings,
                 [action.key]: {
                     ...graphSettings[action.key],
-                    averageWindow: action.averageWindow,
+                    averageWindow: action.averageWindow ?
+                        action.averageWindow : 0,
                 }
             }
         }case 'setContinuous': {
