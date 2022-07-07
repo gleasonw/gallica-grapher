@@ -33,6 +33,7 @@ function App() {
             tickets: ticksWithIDS
         })
         const taskID = JSON.parse(request.response)["taskid"];
+        console.log(taskID)
         setIDTickets(ticksWithIDS);
         setRequestID(taskID);
         setGettingInput(false);
@@ -76,7 +77,7 @@ function App() {
                     requestTickets={tickets}
                     onInputSubmit={handleInputSubmit}
                     onCreateTicketClick={handleCreateTicketClick}
-                    onTicketClick={handleTicketClick}z
+                    onTicketClick={handleTicketClick}
                 />
             </div>
         )
@@ -96,7 +97,7 @@ function App() {
             <div className="App">
                 {header}
                 <ResultUI
-                    tickets={tickets}
+                    tickets={idTickets}
                 />
             </div>
           )

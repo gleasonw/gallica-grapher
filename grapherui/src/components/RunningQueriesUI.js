@@ -38,7 +38,6 @@ function TicketProgressContainer(props){
                     updatedTickets[currentTicket] = progress
                     setTicketProgressPercents(updatedTickets)
                     if (state === "SUCCESS") {
-                        console.log('finisehd')
                         setTimeout(props.setRunningQueries, 1000, false);
                     }
                 });

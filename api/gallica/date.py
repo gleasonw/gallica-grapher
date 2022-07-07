@@ -16,7 +16,7 @@ class Date:
             self.month,
             self.day
         ]
-
+    # TODO: duplicates? how many records are we getting rid of?
     # TODO: Parse suspect dates, add that as a column
     def parseDateText(self):
         yearMonDay = re.compile(r"^\d{4}-\d{1,2}-\d{1,2}$")

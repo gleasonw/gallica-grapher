@@ -5,7 +5,7 @@ from requestThread import RequestThread
 celery = Celery(
     'api.tasks',
     broker='amqp://',
-    backend='redis://localhost:6379/0')
+    backend='redis://localhost')
 
 
 @celery.task(bind=True)
@@ -21,4 +21,4 @@ def spawnRequestThread(self, tickets):
             })
         time.sleep(1)
     self.update_state(state="SUCCESS")
-    return {'percent': 100, 'status': 'Complete!', 'result': 42}
+    return {'progress': 100, 'status': 'Complete!', 'result': 42}
