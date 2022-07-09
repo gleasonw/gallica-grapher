@@ -99,7 +99,6 @@ class Newspaper:
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
 
-
     def getPapersSimilarToKeyword(self, keyword):
         with self.dbConnection.cursor() as curs:
             keyword = keyword.lower()
@@ -125,6 +124,7 @@ class Newspaper:
         self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
         adapter = TimeoutAndRetryHTTPAdapter()
         self.session.mount("https://", adapter)
+
 
 if __name__ == '__main__':
     newspaper = Newspaper()

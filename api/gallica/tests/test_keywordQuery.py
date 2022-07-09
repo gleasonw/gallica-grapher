@@ -417,22 +417,23 @@ class TestKeywordQuerySelectPapers(TestCase):
             'and (gallica all "brazza") '
             'sortby dc.date/sort.ascending')
 
-    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.sumUpPaperResultsForTotalEstimate')
     @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumberResultsInPaper')
-    def test_set_num_results_for_each_paper(self, mock_fetch, mock_sum):
-        mock_fetch.return_value = ['a', 1]
-        choiceDict = self.buildDummyDict()
+    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults')
+    def test_set_num_results_for_each_paper(self, mock_fetch, mock_fetch_paper):
+        mock_fetch_paper.return_value = ['b', 1]
 
         query = KeywordQuerySelectPapers(
             'brazza',
-            choiceDict,
+            [{'name': 'a', 'code': 'b'}],
             [],
             '1234',
             MagicMock(),
             MagicMock(),
             MagicMock())
 
-        self.assertDictEqual(query.paperCodeWithNumResults, {'a': 1})
+        query.setNumResultsForEachPaper()
+
+        self.assertDictEqual(query.paperCodeWithNumResults, {'b': 1})
 
     @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults')
     @patch('gallica.keywordQuery.RecordBatch.getNumResults', return_value=3)
@@ -453,9 +454,9 @@ class TestKeywordQuerySelectPapers(TestCase):
             resultTest,
             ('a', 3))
 
-    def test_sum_up_paper_results_for_total_estimate(self):
+    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults')
+    def test_sum_up_paper_results_for_total_estimate(self, mock_fetch):
         choiceDict = self.buildDummyDict()
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
         query = KeywordQuerySelectPapers(
             'brazza',
             choiceDict,

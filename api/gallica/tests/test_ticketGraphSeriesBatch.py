@@ -86,7 +86,7 @@ class TestTicketGraphSeries(TestCase):
 
         self.assertDictEqual(
             test,
-            {'name':[],'resources':[]}
+            {'name':[],'data':[]}
         )
 
     @patch("ticketGraphSeriesBatch.TicketGraphSeries.buildQueryForSeries")
@@ -161,12 +161,12 @@ class TestTicketGraphSeries(TestCase):
         testSeries = DBtester().getTestSeries('day', 'false', 0)
 
         self.assertIsNotNone(testSeries["name"])
-        self.assertIsNotNone(testSeries["resources"])
+        self.assertIsNotNone(testSeries["data"])
         self.assertListEqual(
             testSeries["name"],
             ['brazza', 'brazzaWack'])
         self.assertEqual(
-            len(testSeries["resources"]),
+            len(testSeries["data"]),
             9)
 
     def test_day_binned_continuous_request(self):
@@ -174,12 +174,12 @@ class TestTicketGraphSeries(TestCase):
         testSeries = DBtester().getTestSeries('day', 'true', 0)
 
         self.assertIsNotNone(testSeries["name"])
-        self.assertIsNotNone(testSeries["resources"])
+        self.assertIsNotNone(testSeries["data"])
         self.assertListEqual(
             testSeries["name"],
             ['brazza', 'brazzaWack'])
         self.assertEqual(
-            len(testSeries["resources"]),
+            len(testSeries["data"]),
             7)
 
     def test_month_binned_request(self):
@@ -187,12 +187,12 @@ class TestTicketGraphSeries(TestCase):
             testSeries = DBtester().getTestSeries('month', 'false', 0)
 
             self.assertIsNotNone(testSeries["name"])
-            self.assertIsNotNone(testSeries["resources"])
+            self.assertIsNotNone(testSeries["data"])
             self.assertListEqual(
                 testSeries["name"],
                 ['brazza', 'brazzaWack'])
             self.assertEqual(
-                len(testSeries["resources"]),
+                len(testSeries["data"]),
                 8)
 
     def test_month_binned_continuous_request(self):
@@ -200,36 +200,36 @@ class TestTicketGraphSeries(TestCase):
         testSeries = DBtester().getTestSeries('month', 'true', 0)
 
         self.assertIsNotNone(testSeries["name"])
-        self.assertIsNotNone(testSeries["resources"])
+        self.assertIsNotNone(testSeries["data"])
         self.assertListEqual(
             testSeries["name"],
             ['brazza', 'brazzaWack'])
         self.assertEqual(
-            len(testSeries["resources"]),
+            len(testSeries["data"]),
             7)
 
     def test_year_binned_request(self):
         testSeries = DBtester().getTestSeries('year', 'false', 0)
 
         self.assertIsNotNone(testSeries["name"])
-        self.assertIsNotNone(testSeries["resources"])
+        self.assertIsNotNone(testSeries["data"])
         self.assertListEqual(
             testSeries["name"],
             ['brazza', 'brazzaWack'])
         self.assertEqual(
-            len(testSeries["resources"]),
+            len(testSeries["data"]),
             8)
 
     def test_year_binned_continuous_request(self):
         testSeries = DBtester().getTestSeries('year', 'true', 0)
 
         self.assertIsNotNone(testSeries["name"])
-        self.assertIsNotNone(testSeries["resources"])
+        self.assertIsNotNone(testSeries["data"])
         self.assertListEqual(
             testSeries["name"],
             ['brazza', 'brazzaWack'])
         self.assertEqual(
-            len(testSeries["resources"]),
+            len(testSeries["data"]),
             7)
 
     def test_rolling_average(self):
@@ -237,18 +237,18 @@ class TestTicketGraphSeries(TestCase):
         testSeries = DBtester().getTestSeries('year', 'false', 1)
 
         self.assertIsNotNone(testSeries["name"])
-        self.assertIsNotNone(testSeries["resources"])
+        self.assertIsNotNone(testSeries["data"])
         self.assertListEqual(
             testSeries["name"],
             ['brazza', 'brazzaWack'])
-        testRolledAverage = testSeries["resources"][3][1]
+        testRolledAverage = testSeries["data"][3][1]
         self.assertEqual(
             testRolledAverage,
             2.5)
 
         testSeries = DBtester().getTestSeries('year', 'false', 3)
 
-        testRolledAverage = testSeries["resources"][3][1]
+        testRolledAverage = testSeries["data"][3][1]
         self.assertEqual(
             testRolledAverage,
             2.25)
