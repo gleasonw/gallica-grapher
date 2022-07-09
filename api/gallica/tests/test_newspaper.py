@@ -11,12 +11,12 @@ class TestNewspaper(TestCase):
 
     @staticmethod
     def getPaperCodes():
-        with open(os.path.join(here, "data/newspaper_codes")) as f:
+        with open(os.path.join(here, "resources/newspaper_codes")) as f:
             return f.read().splitlines()
 
     @staticmethod
     def getMockedPaperFetch():
-        with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
+        with open(os.path.join(here, 'resources/20PaperRecords.xml'), "rb") as f:
             return MagicMock(content=f.read())
 
     @staticmethod
@@ -49,11 +49,11 @@ class TestNewspaper(TestCase):
 
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_fetched_paper_record_validity(self, mock_get):
-        with open(os.path.join(here, 'data/20PaperRecords.xml'), "rb") as f:
+        with open(os.path.join(here, 'resources/20PaperRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
         newspaper = Newspaper()
         newspaper.copyPapersToDB = MagicMock()
-        with open(os.path.join(here, "data/newspaper_codes")) as f:
+        with open(os.path.join(here, "resources/newspaper_codes")) as f:
             paperCodes = f.read().splitlines()
         newspaper.sendTheseGallicaPapersToDB(paperCodes)
 
@@ -154,7 +154,7 @@ class TestNewspaper(TestCase):
 
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_num_papers(self, mock_get):
-        with open(os.path.join(here, 'data/dummyNewspaperRecords.xml'), "rb") as f:
+        with open(os.path.join(here, 'resources/dummyNewspaperRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
         newspaper = Newspaper()
         numPapers = newspaper.getNumPapersOnGallica()

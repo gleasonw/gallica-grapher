@@ -12,7 +12,7 @@ class TestRecord(TestCase):
 
     def test_parse_paper_code_from_xml(self):
         here = os.path.dirname(__file__)
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
+        dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
         dummyRecord = Record(dummyRecordXML)
@@ -23,7 +23,7 @@ class TestRecord(TestCase):
 
     def test_parse_urlfrom_xml(self):
         here = os.path.dirname(__file__)
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
+        dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
         dummyRecord = Record(dummyRecordXML)
@@ -34,7 +34,7 @@ class TestRecord(TestCase):
 
     def test_check_if_valid(self):
         here = os.path.dirname(__file__)
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyKeywordRecords.xml'))
+        dummyRoot = etree.parse(os.path.join(here, 'resources/dummyKeywordRecords.xml'))
         dummys = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         malformedDateRecord = KeywordRecord(dummys[1])
         absentCodeRecord = KeywordRecord(dummys[2])
@@ -46,7 +46,7 @@ class TestRecord(TestCase):
 class TestPaperRecord(TestCase):
     def test_check_if_valid(self):
         here = os.path.dirname(__file__)
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
+        dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         firstRecord = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
 
@@ -58,9 +58,9 @@ class TestPaperRecord(TestCase):
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_fetch_years_published(self, mock_get):
         here = os.path.dirname(__file__)
-        with open(os.path.join(here, 'data/continuousDateFetch.xml'), "rb") as f:
+        with open(os.path.join(here, 'resources/continuousDateFetch.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
+        dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         firstRecord = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
         paperRecord = PaperRecord(firstRecord, GallicaSession().getSession())
@@ -72,7 +72,7 @@ class TestPaperRecord(TestCase):
 
     def test_check_if_years_continuous(self):
         here = os.path.dirname(__file__)
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
+        dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
 
@@ -89,7 +89,7 @@ class TestPaperRecord(TestCase):
 
     def test_generate_available_range(self):
         here = os.path.dirname(__file__)
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
+        dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
 
@@ -112,7 +112,7 @@ class TestPaperRecord(TestCase):
 
     def test_parse_title_from_xml(self):
         here = os.path.dirname(__file__)
-        dummyRoot = etree.parse(os.path.join(here, 'data/dummyNewspaperRecords.xml'))
+        dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
 

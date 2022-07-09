@@ -27,9 +27,6 @@ class RecordBatch:
             "collapsing": "disabled"
         }
 
-    def getNumberPurgedResults(self):
-        return self.numPurgedResults
-
     def getNumResults(self):
         self.fetchXML()
         numResults = self.xmlRoot.find(

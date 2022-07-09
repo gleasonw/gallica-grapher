@@ -23,7 +23,7 @@ class DBtester:
             self.conn
         )
         testSeries = series.getSeries()
-        self.deleteTestResults()
+        self.deleteTestResultsFromFinal()
         return testSeries
 
     def getTestTopPapers(self, continuous, dateRange):
@@ -33,11 +33,11 @@ class DBtester:
             continuous=continuous,
             dateRange=dateRange)
         testResults = topPapers.getTopPapers()
-        self.deleteTestResults()
+        self.deleteTestResultsFromFinal()
         return testResults
 
     def copyTestResults(self):
-        with open(os.path.join(os.path.dirname(__file__), 'data/dummyResults')) as f:
+        with open(os.path.join(os.path.dirname(__file__), 'resources/dummyResults')) as f:
             with self.conn.cursor() as curs:
                 curs.copy_from(f, 'results', sep=',', columns=(
                     'identifier',
@@ -48,7 +48,7 @@ class DBtester:
                     'paperid',
                     'requestid'))
 
-    def deleteTestResults(self):
+    def deleteTestResultsFromFinal(self):
         with self.conn.cursor() as curs:
             curs.execute("""
             DELETE FROM results
@@ -110,6 +110,56 @@ class DBtester:
             OR code = 'cb32802219g';
             """)
             return curs.fetchall()
+
+    def deleteAndReturnTestResultsInHolding(self):
+        with self.conn.cursor() as curs:
+            curs.execute(
+                """
+                DELETE FROM holdingresults
+                WHERE requestid = 'id!'
+                RETURNING identifier, year, month, day, searchterm, paperid, requestid;
+                """
+            )
+            postedResults = curs.fetchall()
+        return postedResults
+
+    def deleteAndReturnTestResultsInFinal(self):
+        with self.conn.cursor() as curs:
+            curs.execute(
+                """
+                DELETE FROM results
+                WHERE requestid = 'id!'
+                RETURNING identifier, year, month, day, searchterm, paperid, requestid;
+                """
+            )
+            postedResults = curs.fetchall()
+        return postedResults
+
+    def insertTestPapers(self):
+        with self.conn.cursor() as curs:
+            curs.execute(
+                """
+                INSERT INTO papers (code, title, startdate, enddate, continuous)
+                VALUES ('a', 'a', '1900', '1901', TRUE),
+                ('b', 'b', '1902', '1903', TRUE),
+                ('c', 'c', '1904', '1905', TRUE),
+                ('d', 'd', '1906', '1907', TRUE),
+                ('e', 'e', '1908', '1909', TRUE);
+                """
+            )
+
+    def deleteTestPapers(self):
+        with self.conn.cursor() as curs:
+            curs.execute(
+                """
+                DELETE FROM papers 
+                WHERE code = 'a' 
+                OR code = 'b' 
+                OR code = 'c' 
+                OR code = 'd' 
+                OR code = 'e';
+                """
+            )
 
     def close(self):
         self.conn.close()

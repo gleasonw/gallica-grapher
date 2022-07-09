@@ -54,9 +54,9 @@ if __name__ == "__main__":
     request = RequestThread(
         {
             '2': {
-                'terms': ['malamine'],
-                'papersAndCodes': [],
-                'dateRange': [1850, 1950]
+                'terms': ['brazza'],
+                'papersAndCodes': [{'code': 'cb32895690j', 'paper': 'Gallica'}],
+                'dateRange': [1000,2000]
                 }
         }
     )

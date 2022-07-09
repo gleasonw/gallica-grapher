@@ -1,10 +1,11 @@
 from math import ceil
 import io
 
-from .newspaper import Newspaper
+from newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
-from .recordBatch import KeywordRecordBatch
-from .recordBatch import RecordBatch
+from recordBatch import KeywordRecordBatch
+from recordBatch import RecordBatch
+
 
 # TODO: remove results with same date and code
 class KeywordQuery:
@@ -28,11 +29,27 @@ class KeywordQuery:
         self.keywordRecords = []
         self.progressTracker = progressTracker
         self.dbConnection = dbConnection
+        self.workChunks = []
 
         self.establishYearRange(yearRange)
         self.gallicaHttpSession = session
         self.buildQuery()
         self.fetchNumTotalResults()
+
+    def doSearchChunk(self, chunk):
+        return []
+
+    def generateWorkChunks(self):
+        pass
+
+    def buildYearRangeQuery(self):
+        pass
+
+    def buildDatelessQuery(self):
+        pass
+
+    def fetchNumTotalResults(self):
+        pass
 
     def getKeyword(self):
         return self.keyword
@@ -53,6 +70,19 @@ class KeywordQuery:
             self.buildYearRangeQuery()
         else:
             self.buildDatelessQuery()
+
+    def runSearch(self):
+        self.generateWorkChunks()
+        with self.gallicaHttpSession:
+            self.doThreadedSearch()
+        if self.keywordRecords:
+            self.moveRecordsToDB()
+
+    def doThreadedSearch(self):
+        with ThreadPoolExecutor(max_workers=50) as executor:
+            for result in executor.map(self.doSearchChunk, self.workChunks):
+                self.progressTracker()
+                self.keywordRecords.extend(result)
 
     def moveRecordsToDB(self):
         with self.dbConnection.cursor() as curs:
@@ -77,33 +107,11 @@ class KeywordQuery:
                 'requestid')
         )
 
-    def generateResultCSVstream(self):
-
-        def cleanCSVvalue(value):
-            if value is None:
-                return r'\N'
-            return str(value).replace('|', '\\|')
-
-        csvFileLikeObject = io.StringIO()
-        for record in self.keywordRecords:
-            yearMonDay = record.getDate()
-            csvFileLikeObject.write(
-                "|".join(map(cleanCSVvalue, (
-                    record.getUrl(),
-                    yearMonDay[0],
-                    yearMonDay[1],
-                    yearMonDay[2],
-                    self.keyword,
-                    record.getPaperCode(),
-                    self.ticketID
-                ))) + '\n')
-        csvFileLikeObject.seek(0)
-        return csvFileLikeObject
-
     def addMissingPapers(self, curs):
         paperGetter = Newspaper(self.gallicaHttpSession)
         missingPapers = self.getMissingPapers(curs)
-        paperGetter.sendTheseGallicaPapersToDB(missingPapers)
+        if missingPapers:
+            paperGetter.sendTheseGallicaPapersToDB(missingPapers)
 
     def getMissingPapers(self, curs):
         curs.execute(
@@ -134,17 +142,32 @@ class KeywordQuery:
             """
             , (self.ticketID,))
 
-    def buildYearRangeQuery(self):
-        pass
+    def generateResultCSVstream(self):
 
-    def buildDatelessQuery(self):
-        pass
+        def cleanCSVvalue(value):
+            if value is None:
+                return r'\N'
+            return str(value).replace('|', '\\|')
 
-    def fetchNumTotalResults(self):
-        pass
+        csvFileLikeObject = io.StringIO()
+        for record in self.keywordRecords:
+            yearMonDay = record.getDate()
+            csvFileLikeObject.write(
+                "|".join(map(cleanCSVvalue, (
+                    record.getUrl(),
+                    yearMonDay[0],
+                    yearMonDay[1],
+                    yearMonDay[2],
+                    self.keyword,
+                    record.getPaperCode(),
+                    self.ticketID
+                ))) + '\n')
+        csvFileLikeObject.seek(0)
+        return csvFileLikeObject
 
 
 class KeywordQueryAllPapers(KeywordQuery):
+
     def __init__(self,
                  searchTerm,
                  yearRange,
@@ -152,7 +175,6 @@ class KeywordQueryAllPapers(KeywordQuery):
                  progressTracker,
                  dbConnection,
                  session):
-        self.recordIndexChunks = []
         super().__init__(
             searchTerm,
             yearRange,
@@ -187,35 +209,17 @@ class KeywordQueryAllPapers(KeywordQuery):
         self.estimateNumResults = tempBatch.getNumResults()
         return self.estimateNumResults
 
-    def runSearch(self):
-        with self.gallicaHttpSession:
-            workerPool = self.generateSearchWorkers(50)
-            self.doSearch(workerPool)
-            if self.keywordRecords:
-                self.moveRecordsToDB()
-
-    # TODO: isolate concurrent code, only one class should be responsible for talking to Gallica
-    def generateSearchWorkers(self, numWorkers):
-        iterations = ceil(self.estimateNumResults / 50)
-        self.recordIndexChunks = [(i * 50) + 1 for i in range(iterations)]
-        executor = ThreadPoolExecutor(max_workers=numWorkers)
-        return executor
-
-    def doSearch(self, workers):
-        with workers as executor:
-            for result in executor.map(
-                    self.fetchBatchFromIndex,
-                    self.recordIndexChunks):
-                self.progressTracker()
-                self.keywordRecords.extend(result)
-
-    def fetchBatchFromIndex(self, index):
+    def doSearchChunk(self, index):
         batch = KeywordRecordBatch(
             self.baseQuery,
             self.gallicaHttpSession,
             startRecord=index)
         results = batch.getRecordBatch()
         return results
+
+    def generateWorkChunks(self):
+        iterations = ceil(self.estimateNumResults / 50)
+        self.workChunks = [(i * 50) + 1 for i in range(iterations)]
 
 
 class KeywordQuerySelectPapers(KeywordQuery):
@@ -261,6 +265,27 @@ class KeywordQuerySelectPapers(KeywordQuery):
         self.setNumResultsForEachPaper()
         self.sumUpPaperResultsForTotalEstimate()
 
+    def doSearchChunk(self, recordStartAndCode):
+        recordStart = recordStartAndCode[0]
+        code = recordStartAndCode[1]
+        query = self.baseQuery.format(newsKey=code)
+        batch = KeywordRecordBatch(
+            query,
+            self.gallicaHttpSession,
+            startRecord=recordStart)
+        results = batch.getRecordBatch()
+        return results
+
+    def generateWorkChunks(self):
+        for paperCode, count in self.paperCodeWithNumResults.items():
+            numBatches = ceil(count / 50)
+            self.appendBatchQueryStringsForPaper(numBatches, paperCode)
+
+    def appendBatchQueryStringsForPaper(self, numBatches, code):
+        for i in range(numBatches):
+            recordAndCode = [1 + 50 * i, code]
+            self.workChunks.append(recordAndCode)
+
     def setNumResultsForEachPaper(self):
         with ThreadPoolExecutor(max_workers=10) as executor:
             for paperCode, numResults in executor.map(
@@ -281,39 +306,3 @@ class KeywordQuerySelectPapers(KeywordQuery):
     def sumUpPaperResultsForTotalEstimate(self):
         for paperCode, count in self.paperCodeWithNumResults.items():
             self.estimateNumResults += count
-
-    def runSearch(self):
-        with self.gallicaHttpSession:
-            self.createURLIndecesForEachPaper()
-            self.mapThreadsToSearch(50)
-            if self.keywordRecords:
-                self.moveRecordsToDB()
-
-    def createURLIndecesForEachPaper(self):
-        for paperCode, count in self.paperCodeWithNumResults.items():
-            numBatches = ceil(count / 50)
-            self.appendBatchQueryStringsForPaper(numBatches, paperCode)
-
-    def appendBatchQueryStringsForPaper(self, numBatches, code):
-        for i in range(numBatches):
-            recordAndCode = [1 + 50 * i, code]
-            self.batchQueryStrings.append(recordAndCode)
-
-    def mapThreadsToSearch(self, numWorkers):
-        with ThreadPoolExecutor(max_workers=numWorkers) as executor:
-            for result in executor.map(
-                    self.getPaperResultsAtRecordIndex,
-                    self.batchQueryStrings):
-                self.keywordRecords.extend(result)
-                self.progressTracker()
-
-    def getPaperResultsAtRecordIndex(self, recordStartAndCode):
-        recordStart = recordStartAndCode[0]
-        code = recordStartAndCode[1]
-        query = self.baseQuery.format(newsKey=code)
-        batch = KeywordRecordBatch(
-            query,
-            self.gallicaHttpSession,
-            startRecord=recordStart)
-        results = batch.getRecordBatch()
-        return results

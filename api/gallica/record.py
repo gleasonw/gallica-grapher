@@ -9,7 +9,6 @@ class Record:
         self.valid = False
         self.paperCode = ''
         self.date = None
-        self.yearMonDay = []
         self.url = ''
 
         self.parsePaperCodeFromXML()
@@ -55,9 +54,6 @@ class KeywordRecord(Record):
 
     def getDate(self):
         return self.date.getDate()
-
-    def getJSTimestamp(self):
-        return self.date.getJSTimestamp()
 
     def parseDateFromXML(self):
         dateElement = self.recordData.find(

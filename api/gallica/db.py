@@ -7,6 +7,13 @@ class DB:
         self.conn = None
         self.initDBConnection()
 
+    def __enter__(self):
+        return self.conn
+
+    def __exit__(self):
+        self.conn.close()
+        self.conn = None
+
     def getConn(self):
         return self.conn
 

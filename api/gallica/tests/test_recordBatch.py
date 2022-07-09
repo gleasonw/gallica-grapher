@@ -14,10 +14,14 @@ here = os.path.dirname(__file__)
 
 class TestRecordBatch(TestCase):
 
+    @staticmethod
+    def get_request_mock():
+        with open(os.path.join(here, 'resources/dummyKeywordRecords.xml'), "rb") as f:
+            return MagicMock(content=f.read())
+
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_get_num_results(self, mock_get):
-        with open(os.path.join(here, 'data/dummyKeywordRecords.xml'), "rb") as f:
-            mock_get.return_value = MagicMock(content=f.read())
+        mock_get.return_value = self.get_request_mock()
         batch = RecordBatch(
             '',
             GallicaSession().getSession()
@@ -26,8 +30,7 @@ class TestRecordBatch(TestCase):
 
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_fetch_xml(self, mock_get):
-        with open(os.path.join(here, 'data/dummyKeywordRecords.xml'), "rb") as f:
-            mock_get.return_value = MagicMock(content=f.read())
+        mock_get.return_value = self.get_request_mock()
         batch = RecordBatch(
             '',
             GallicaSession().getSession()
@@ -35,14 +38,18 @@ class TestRecordBatch(TestCase):
 
         batch.fetchXML()
 
-        self.assertIsNotNone(batch.xmlRoot)
+        self.assertEqual(
+            6,
+            len(batch.xmlRoot.findall(
+                ".//{http://www.loc.gov/zing/srw/}record")
+            ))
 
 
 class TestPaperRecordBatch(TestCase):
 
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_parse_records_from_xml(self, mock_get):
-        with open(os.path.join(here, 'data/dummyNewspaperRecords.xml'), "rb") as f:
+        with open(os.path.join(here, 'resources/dummyNewspaperRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
 
         batch = PaperRecordBatch(
@@ -52,7 +59,7 @@ class TestPaperRecordBatch(TestCase):
 
         batch.fetchXML()
 
-        with open(os.path.join(here, 'data/continuousDateFetch.xml'), "rb") as f:
+        with open(os.path.join(here, 'resources/continuousDateFetch.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
 
         batch.parseRecordsFromXML()
@@ -65,7 +72,7 @@ class TestKeywordRecordBatch(TestCase):
 
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_parse_records_from_xml(self, mock_get):
-        with open(os.path.join(here, 'data/dummyKeywordRecords.xml'), "rb") as f:
+        with open(os.path.join(here, 'resources/dummyKeywordRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
 
         batch = KeywordRecordBatch(
@@ -93,7 +100,7 @@ class TestKeywordRecordBatch(TestCase):
 
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_current_result_equals_prior(self, mock_get):
-        with open(os.path.join(here, 'data/dummyKeywordRecords.xml'), "rb") as f:
+        with open(os.path.join(here, 'resources/dummyKeywordRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
 
         batch = KeywordRecordBatch(
