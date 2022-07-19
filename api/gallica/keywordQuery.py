@@ -1,5 +1,6 @@
 from math import ceil
 import io
+from lxml import etree
 
 from newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
@@ -80,9 +81,9 @@ class KeywordQuery:
 
     def doThreadedSearch(self):
         with ThreadPoolExecutor(max_workers=50) as executor:
-            for result in executor.map(self.doSearchChunk, self.workChunks):
+            for recordBatch in executor.map(self.doSearchChunk, self.workChunks):
                 self.progressTracker()
-                self.keywordRecords.extend(result)
+                self.keywordRecords.extend(recordBatch)
 
     def moveRecordsToDB(self):
         with self.dbConnection.cursor() as curs:
@@ -190,14 +191,14 @@ class KeywordQueryAllPapers(KeywordQuery):
             f'dc.date >= "{lowYear}" '
             f'and dc.date <= "{highYear}" '
             f'and (gallica all "{self.keyword}") '
-            'and (dc.type all "fascicule") '
+            'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending'
         )
 
     def buildDatelessQuery(self):
         self.baseQuery = (
             f'(gallica all "{self.keyword}") '
-            'and (dc.type all "fascicule") '
+            'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending'
         )
 
@@ -214,8 +215,8 @@ class KeywordQueryAllPapers(KeywordQuery):
             self.baseQuery,
             self.gallicaHttpSession,
             startRecord=index)
-        results = batch.getRecordBatch()
-        return results
+        records = batch.getRecordBatch()
+        return records
 
     def generateWorkChunks(self):
         iterations = ceil(self.estimateNumResults / 50)
@@ -247,7 +248,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
         lowYear = str(self.lowYear)
         highYear = str(self.highYear)
         self.baseQuery = (
-            'arkPress all "{newsKey}_date" '
+            'arkPress adj "{newsKey}_date" '
             f'and dc.date >= "{lowYear}" '
             f'and dc.date <= "{highYear}" '
             f'and (gallica all "{self.keyword}") '
@@ -256,9 +257,9 @@ class KeywordQuerySelectPapers(KeywordQuery):
 
     def buildDatelessQuery(self):
         self.baseQuery = (
-            'arkPress all "{newsKey}_date" '
+            'arkPress adj "{newsKey}_date" '
             f'and (gallica all "{self.keyword}") '
-            'sortby dc.date/sort.ascending'
+            # 'sortby dc.date/sort.ascending'
         )
 
     def fetchNumTotalResults(self):
@@ -273,8 +274,15 @@ class KeywordQuerySelectPapers(KeywordQuery):
             query,
             self.gallicaHttpSession,
             startRecord=recordStart)
-        results = batch.getRecordBatch()
-        return results
+        records = batch.getRecordBatch()
+        return records
+
+    def recordsNotUnique(self, records):
+        for record in records:
+            for priorRecords in self.keywordRecords:
+                if record.getUrl() == priorRecords.getUrl():
+                    return True
+        return False
 
     def generateWorkChunks(self):
         for paperCode, count in self.paperCodeWithNumResults.items():

@@ -56,7 +56,7 @@ if __name__ == "__main__":
             '2': {
                 'terms': ['brazza'],
                 'papersAndCodes': [{'code': 'cb32895690j', 'paper': 'Gallica'}],
-                'dateRange': [1000,2000]
+                'dateRange': []
                 }
         }
     )

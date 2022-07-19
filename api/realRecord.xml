@@ -1,0 +1,2412 @@
+<srw:searchRetrieveResponse xmlns:ns6="http://gallica.bnf.fr/namespaces/gallica/" xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:srw="http://www.loc.gov/zing/srw/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <srw:version>1.2</srw:version>
+    <srw:echoedSearchRetrieveRequest>
+        <srw:query>arkPress all "cb32895690j_date" and dc.date &gt;= "1875" and dc.date &lt;= "1960" and (gallica all "brazza") sortby dc.date/sort.ascending</srw:query>
+        <srw:version>1.2</srw:version>
+    </srw:echoedSearchRetrieveRequest>
+    <srw:numberOfRecords>706</srw:numberOfRecords>
+    <srw:extraResponseData>&lt;numberOfRecordsDecollapser&gt;706&lt;/numberOfRecordsDecollapser&gt;</srw:extraResponseData>
+    <srw:records>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1934-07-24</dc:date>
+                    <dc:description>24 juillet 1934</dc:description>
+                    <dc:description>1934/07/24 (Num&#233;ro 26122).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k633680c</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>0</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k633680c.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k633680c</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k633680c.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k633680c.medres</medres>
+                <nqamoyen>75.82</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k633680c.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k633680c</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1935-03-17</dc:date>
+                    <dc:description>17 mars 1935</dc:description>
+                    <dc:description>1935/03/17 (Num&#233;ro 26358).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k633915s</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>1</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k633915s.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k633915s</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k633915s.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k633915s.medres</medres>
+                <nqamoyen>82.77</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k633915s.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k633915s</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1935-03-22</dc:date>
+                    <dc:description>22 mars 1935</dc:description>
+                    <dc:description>1935/03/22 (Num&#233;ro 26363).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6339207</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>2</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6339207.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6339207</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6339207.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6339207.medres</medres>
+                <nqamoyen>77.72</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6339207.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6339207</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1935-06-25</dc:date>
+                    <dc:description>25 juin 1935</dc:description>
+                    <dc:description>1935/06/25 (Num&#233;ro 26458).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6340158</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>3</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6340158.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6340158</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6340158.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6340158.medres</medres>
+                <nqamoyen>77.9</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6340158.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6340158</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1935-08-25</dc:date>
+                    <dc:description>25 ao&#251;t 1935</dc:description>
+                    <dc:description>1935/08/25 (Num&#233;ro 26519).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634076q</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>4</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634076q.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634076q</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634076q.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634076q.medres</medres>
+                <nqamoyen>79.51</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634076q.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634076q</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1935-09-02</dc:date>
+                    <dc:description>02 septembre 1935</dc:description>
+                    <dc:description>1935/09/02 (Num&#233;ro 26527).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6340849</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>5</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6340849.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6340849</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6340849.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6340849.medres</medres>
+                <nqamoyen>83.88</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6340849.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6340849</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1935-09-13</dc:date>
+                    <dc:description>13 septembre 1935</dc:description>
+                    <dc:description>1935/09/13 (Num&#233;ro 26538).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6340951</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>6</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6340951.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6340951</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6340951.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6340951.medres</medres>
+                <nqamoyen>82.41</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6340951.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6340951</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1936-02-09</dc:date>
+                    <dc:description>09 f&#233;vrier 1936</dc:description>
+                    <dc:description>1936/02/09 (Num&#233;ro 26687).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634244j</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>7</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634244j.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634244j</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634244j.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634244j.medres</medres>
+                <nqamoyen>74.32</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634244j.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634244j</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1936-08-17</dc:date>
+                    <dc:description>17 ao&#251;t 1936</dc:description>
+                    <dc:description>1936/08/17 (Num&#233;ro 26877).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6344322</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>8</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6344322.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6344322</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6344322.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6344322.medres</medres>
+                <nqamoyen>80.4</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6344322.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6344322</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1936-09-30</dc:date>
+                    <dc:description>30 septembre 1936</dc:description>
+                    <dc:description>1936/09/30 (Num&#233;ro 26921).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634476z</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>9</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634476z.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634476z</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634476z.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634476z.medres</medres>
+                <nqamoyen>76.23</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634476z.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634476z</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1936-11-22</dc:date>
+                    <dc:description>22 novembre 1936</dc:description>
+                    <dc:description>1936/11/22 (Num&#233;ro 26974).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634529p</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>10</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634529p.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634529p</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634529p.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634529p.medres</medres>
+                <nqamoyen>81.44</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634529p.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634529p</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1936-12-20</dc:date>
+                    <dc:description>20 d&#233;cembre 1936</dc:description>
+                    <dc:description>1936/12/20 (Num&#233;ro 27002).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634557z</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>11</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634557z.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634557z</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634557z.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634557z.medres</medres>
+                <nqamoyen>81.93</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634557z.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634557z</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-01-01</dc:date>
+                    <dc:description>01 janvier 1937</dc:description>
+                    <dc:description>1937/01/01 (Num&#233;ro 27014).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6345692</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>12</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6345692.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6345692</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6345692.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6345692.medres</medres>
+                <nqamoyen>84.5</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6345692.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6345692</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-01-03</dc:date>
+                    <dc:description>03 janvier 1937</dc:description>
+                    <dc:description>1937/01/03 (Num&#233;ro 27016).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634571c</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>13</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634571c.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634571c</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634571c.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634571c.medres</medres>
+                <nqamoyen>84.08</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634571c.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634571c</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-01-06</dc:date>
+                    <dc:description>06 janvier 1937</dc:description>
+                    <dc:description>1937/01/06 (Num&#233;ro 27019).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634574h</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>14</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634574h.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634574h</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634574h.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634574h.medres</medres>
+                <nqamoyen>83.6</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634574h.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634574h</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-01-31</dc:date>
+                    <dc:description>31 janvier 1937</dc:description>
+                    <dc:description>1937/01/31 (Num&#233;ro 27044).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6345993</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>15</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6345993.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6345993</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6345993.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6345993.medres</medres>
+                <nqamoyen>84.42</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6345993.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6345993</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-04-10</dc:date>
+                    <dc:description>10 avril 1937</dc:description>
+                    <dc:description>1937/04/10 (Num&#233;ro 27113).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6346680</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>16</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6346680.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6346680</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6346680.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6346680.medres</medres>
+                <nqamoyen>84.26</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6346680.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6346680</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-06-17</dc:date>
+                    <dc:description>17 juin 1937</dc:description>
+                    <dc:description>1937/06/17 (Num&#233;ro 27180).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6347354</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>17</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6347354.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6347354</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6347354.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6347354.medres</medres>
+                <nqamoyen>82.1</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6347354.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6347354</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-06-18</dc:date>
+                    <dc:description>18 juin 1937</dc:description>
+                    <dc:description>1937/06/18 (Num&#233;ro 27181).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634736h</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>18</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634736h.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634736h</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634736h.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634736h.medres</medres>
+                <nqamoyen>77.55</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634736h.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634736h</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-08-18</dc:date>
+                    <dc:description>18 ao&#251;t 1937</dc:description>
+                    <dc:description>1937/08/18 (Num&#233;ro 27242).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634796k</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>19</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634796k.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634796k</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634796k.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634796k.medres</medres>
+                <nqamoyen>77.86</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634796k.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634796k</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-08-19</dc:date>
+                    <dc:description>19 ao&#251;t 1937</dc:description>
+                    <dc:description>1937/08/19 (Num&#233;ro 27243).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634797z</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>20</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634797z.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634797z</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634797z.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634797z.medres</medres>
+                <nqamoyen>79.4</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634797z.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634797z</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-10-15</dc:date>
+                    <dc:description>15 octobre 1937</dc:description>
+                    <dc:description>1937/10/15 (Num&#233;ro 27301).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634854r</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>21</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634854r.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634854r</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634854r.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634854r.medres</medres>
+                <nqamoyen>78.06</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634854r.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634854r</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1937-11-07</dc:date>
+                    <dc:description>07 novembre 1937</dc:description>
+                    <dc:description>1937/11/07 (Num&#233;ro 27324).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k634877k</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>22</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k634877k.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k634877k</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k634877k.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k634877k.medres</medres>
+                <nqamoyen>79.1</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k634877k.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k634877k</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1938-05-15</dc:date>
+                    <dc:description>15 mai 1938</dc:description>
+                    <dc:description>1938/05/15 (Num&#233;ro 27512).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636513m</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>23</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636513m.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636513m</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636513m.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636513m.medres</medres>
+                <nqamoyen>81.94</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636513m.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636513m</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1938-07-29</dc:date>
+                    <dc:description>29 juillet 1938</dc:description>
+                    <dc:description>1938/07/29 (Num&#233;ro 27587).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636588x</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>24</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636588x.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636588x</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636588x.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636588x.medres</medres>
+                <nqamoyen>83.8</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636588x.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636588x</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1938-08-24</dc:date>
+                    <dc:description>24 ao&#251;t 1938</dc:description>
+                    <dc:description>1938/08/24 (Num&#233;ro 27613).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6366149</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>25</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6366149.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6366149</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6366149.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6366149.medres</medres>
+                <nqamoyen>87.96</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6366149.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6366149</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1938-09-01</dc:date>
+                    <dc:description>01 septembre 1938</dc:description>
+                    <dc:description>1938/09/01 (Num&#233;ro 27621).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636622w</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>26</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636622w.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636622w</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636622w.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636622w.medres</medres>
+                <nqamoyen>85.82</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636622w.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636622w</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1938-09-04</dc:date>
+                    <dc:description>04 septembre 1938</dc:description>
+                    <dc:description>1938/09/04 (Num&#233;ro 27624).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6366251</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>27</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6366251.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6366251</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6366251.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6366251.medres</medres>
+                <nqamoyen>83.08</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6366251.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6366251</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1938-11-11</dc:date>
+                    <dc:description>11 novembre 1938</dc:description>
+                    <dc:description>1938/11/11 (Num&#233;ro 27692).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636693p</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>28</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636693p.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636693p</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636693p.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636693p.medres</medres>
+                <nqamoyen>82.06</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636693p.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636693p</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-01-22</dc:date>
+                    <dc:description>22 janvier 1939</dc:description>
+                    <dc:description>1939/01/22 (Num&#233;ro 27762).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636764b</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>29</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636764b.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636764b</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636764b.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636764b.medres</medres>
+                <nqamoyen>79.47</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636764b.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636764b</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-02-03</dc:date>
+                    <dc:description>03 f&#233;vrier 1939</dc:description>
+                    <dc:description>1939/02/03 (Num&#233;ro 27774).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636776f</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>30</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636776f.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636776f</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636776f.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636776f.medres</medres>
+                <nqamoyen>75.47</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636776f.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636776f</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-03-01</dc:date>
+                    <dc:description>01 mars 1939</dc:description>
+                    <dc:description>1939/03/01 (Num&#233;ro 27800).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636802t</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>31</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636802t.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636802t</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636802t.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636802t.medres</medres>
+                <nqamoyen>75.99</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636802t.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636802t</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-03-15</dc:date>
+                    <dc:description>15 mars 1939</dc:description>
+                    <dc:description>1939/03/15 (Num&#233;ro 27814).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636816p</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>32</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636816p.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636816p</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636816p.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636816p.medres</medres>
+                <nqamoyen>80.19</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636816p.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636816p</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-04-11</dc:date>
+                    <dc:description>11 avril 1939</dc:description>
+                    <dc:description>1939/04/11 (Num&#233;ro 27841).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636843k</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>33</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636843k.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636843k</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636843k.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636843k.medres</medres>
+                <nqamoyen>86.12</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636843k.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636843k</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-06-08</dc:date>
+                    <dc:description>08 juin 1939</dc:description>
+                    <dc:description>1939/06/08 (Num&#233;ro 27899).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636901r</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>34</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636901r.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636901r</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636901r.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636901r.medres</medres>
+                <nqamoyen>79.83</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636901r.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636901r</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-06-18</dc:date>
+                    <dc:description>18 juin 1939</dc:description>
+                    <dc:description>1939/06/18 (Num&#233;ro 27909).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6369113</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>35</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6369113.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6369113</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6369113.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6369113.medres</medres>
+                <nqamoyen>83.85</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6369113.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6369113</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-07-02</dc:date>
+                    <dc:description>02 juillet 1939</dc:description>
+                    <dc:description>1939/07/02 (Num&#233;ro 27923).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636925z</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>36</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636925z.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636925z</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636925z.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636925z.medres</medres>
+                <nqamoyen>85.5</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636925z.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636925z</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-07-08</dc:date>
+                    <dc:description>08 juillet 1939</dc:description>
+                    <dc:description>1939/07/08 (Num&#233;ro 27929).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636931s</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>37</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636931s.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636931s</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636931s.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636931s.medres</medres>
+                <nqamoyen>83.15</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636931s.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636931s</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-07-09</dc:date>
+                    <dc:description>09 juillet 1939</dc:description>
+                    <dc:description>1939/07/09 (Num&#233;ro 27930).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6369325</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>38</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6369325.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6369325</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6369325.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6369325.medres</medres>
+                <nqamoyen>84.63</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6369325.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6369325</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-07-14</dc:date>
+                    <dc:description>14 juillet 1939</dc:description>
+                    <dc:description>1939/07/14 (Num&#233;ro 27935).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6369372</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>39</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6369372.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6369372</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6369372.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6369372.medres</medres>
+                <nqamoyen>85.5</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6369372.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6369372</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-08-07</dc:date>
+                    <dc:description>07 ao&#251;t 1939</dc:description>
+                    <dc:description>1939/08/07 (Num&#233;ro 27959).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636961t</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>40</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636961t.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636961t</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636961t.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636961t.medres</medres>
+                <nqamoyen>86.43</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636961t.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636961t</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-08-21</dc:date>
+                    <dc:description>21 ao&#251;t 1939</dc:description>
+                    <dc:description>1939/08/21 (Num&#233;ro 27973).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k636975p</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>41</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k636975p.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k636975p</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k636975p.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k636975p.medres</medres>
+                <nqamoyen>83.7</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k636975p.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k636975p</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-10-01</dc:date>
+                    <dc:description>01 octobre 1939</dc:description>
+                    <dc:description>1939/10/01 (Num&#233;ro 28013).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k637016g</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>42</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k637016g.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k637016g</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k637016g.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k637016g.medres</medres>
+                <nqamoyen>88.9</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k637016g.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k637016g</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1939-12-27</dc:date>
+                    <dc:description>27 d&#233;cembre 1939</dc:description>
+                    <dc:description>1939/12/27 (Num&#233;ro 28100).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6371039</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>43</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6371039.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6371039</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6371039.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6371039.medres</medres>
+                <nqamoyen>77.28</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6371039.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6371039</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1940-01-29</dc:date>
+                    <dc:description>29 janvier 1940</dc:description>
+                    <dc:description>1940/01/29 (Num&#233;ro 28133).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k637136g</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>44</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k637136g.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k637136g</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k637136g.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k637136g.medres</medres>
+                <nqamoyen>83.62</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k637136g.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k637136g</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1940-01-30</dc:date>
+                    <dc:description>30 janvier 1940</dc:description>
+                    <dc:description>1940/01/30 (Num&#233;ro 28134).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k637137v</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>45</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k637137v.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k637137v</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k637137v.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k637137v.medres</medres>
+                <nqamoyen>83.79</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k637137v.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k637137v</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1940-01-31</dc:date>
+                    <dc:description>31 janvier 1940</dc:description>
+                    <dc:description>1940/01/31 (Num&#233;ro 28135).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6371387</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>46</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6371387.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6371387</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6371387.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6371387.medres</medres>
+                <nqamoyen>81.85</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6371387.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6371387</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1940-02-02</dc:date>
+                    <dc:description>02 f&#233;vrier 1940</dc:description>
+                    <dc:description>1940/02/02 (Num&#233;ro 28137).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k637140j</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>47</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k637140j.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k637140j</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k637140j.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k637140j.medres</medres>
+                <nqamoyen>77.04</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k637140j.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k637140j</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1940-02-03</dc:date>
+                    <dc:description>03 f&#233;vrier 1940</dc:description>
+                    <dc:description>1940/02/03 (Num&#233;ro 28138).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k637141x</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>48</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k637141x.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k637141x</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k637141x.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k637141x.medres</medres>
+                <nqamoyen>80.16</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k637141x.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k637141x</uri>
+            </srw:extraRecordData>
+        </srw:record>
+        <srw:record>
+            <srw:recordSchema>http://www.openarchives.org/OAI/2.0/OAIdc.xsd</srw:recordSchema>
+            <srw:recordPacking>xml</srw:recordPacking>
+            <srw:recordData>
+                <oai_dc:dc>
+                    <dc:creator>Parti social fran&#231;ais. Auteur du texte</dc:creator>
+                    <dc:date>1940-02-04</dc:date>
+                    <dc:description>04 f&#233;vrier 1940</dc:description>
+                    <dc:description>1940/02/04 (Num&#233;ro 28139).</dc:description>
+                    <dc:description/>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCFeTra</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : GCGen1</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo00</dc:description>
+                    <dc:description>Appartient &#224; l&#8217;ensemble documentaire : BnPlCo01</dc:description>
+                    <dc:format>Nombre total de vues : 146118</dc:format>
+                    <dc:identifier>https://gallica.bnf.fr/ark:/12148/bpt6k6371429</dc:identifier>
+                    <dc:language>fre</dc:language>
+                    <dc:publisher>[s.n.] (Paris)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Clermont-Ferrand)</dc:publisher>
+                    <dc:publisher>[s.n.][s.n.] (Pau)</dc:publisher>
+                    <dc:relation>Notice du catalogue : http://catalogue.bnf.fr/ark:/12148/cb32895690j</dc:relation>
+                    <dc:relation>https://gallica.bnf.fr/ark:/12148/cb32895690j/date</dc:relation>
+                    <dc:rights>domaine public</dc:rights>
+                    <dc:rights>public domain</dc:rights>
+                    <dc:source>Biblioth&#232;que nationale de France</dc:source>
+                    <dc:title>Le Petit journal</dc:title>
+                    <dc:type>texte</dc:type>
+                    <dc:type>text</dc:type>
+                    <dc:type>publication en s&#233;rie imprim&#233;e</dc:type>
+                    <dc:type>printed serial</dc:type>
+                </oai_dc:dc>
+            </srw:recordData>
+            <srw:recordIdentifier>ark</srw:recordIdentifier>
+            <srw:recordPosition>49</srw:recordPosition>
+            <srw:extraRecordData>
+                <epubFile/>
+                <highres>https://gallica.bnf.fr/ark:/12148/bpt6k6371429.highres</highres>
+                <infoSupModifiable/>
+                <link>https://gallica.bnf.fr/ark:/12148/bpt6k6371429</link>
+                <lowres>https://gallica.bnf.fr/ark:/12148/bpt6k6371429.lowres</lowres>
+                <medres>https://gallica.bnf.fr/ark:/12148/bpt6k6371429.medres</medres>
+                <nqamoyen>85.03</nqamoyen>
+                <provenance>Gallica</provenance>
+                <thumbnail>https://gallica.bnf.fr/ark:/12148/bpt6k6371429.thumbnail</thumbnail>
+                <typedoc>fascicules</typedoc>
+                <uri>bpt6k6371429</uri>
+            </srw:extraRecordData>
+        </srw:record>
+    </srw:records>
+    <srw:nextRecordPosition>651</srw:nextRecordPosition>
+</srw:searchRetrieveResponse>

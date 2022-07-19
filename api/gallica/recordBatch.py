@@ -26,16 +26,17 @@ class RecordBatch:
             "maximumRecords": numRecords,
             "collapsing": "disabled"
         }
+        self.fetchXML()
 
     def getNumResults(self):
-        self.fetchXML()
         numResults = self.xmlRoot.find(
-            "{http://www.loc.gov/zing/srw/}numberOfRecords").text
-        numResults = int(numResults)
+            "{http://www.loc.gov/zing/srw/}numberOfRecords")
+        if numResults is not None:
+            numResults = numResults.text
+            numResults = int(numResults)
         return numResults
 
     def getRecordBatch(self):
-        self.fetchXML()
         self.parseRecordsFromXML()
         return self.batch
 
@@ -47,6 +48,8 @@ class RecordBatch:
             params=self.params,
             timeout=15)
         self.xmlRoot = etree.fromstring(response.content)
+        print(f'for url: {response.url} num results: {self.getNumResults()} ')
+
 
     def parseRecordsFromXML(self):
         pass
@@ -69,7 +72,7 @@ class KeywordRecordBatch(RecordBatch):
     def parseRecordsFromXML(self):
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
             record = KeywordRecord(result)
-            if record.isValid() and self.recordIsUnique(record):
+            if record.isValid():
                 self.batch.append(record)
             else:
                 self.numPurgedResults += 1
