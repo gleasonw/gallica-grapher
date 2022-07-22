@@ -14,6 +14,7 @@ class RequestThread(threading.Thread):
         self.numResultsRetrieved = 0
         self.topPapersForTerms = []
         self.tickets = tickets
+        self.finished = False
 
         super().__init__()
 
@@ -27,7 +28,11 @@ class RequestThread(threading.Thread):
                 self.DBconnection,
                 self.session)
             requestToRun.run()
+        self.finished = True
         self.DBconnection.close()
+
+    def isFinished(self):
+        return self.finished
 
     def setProgress(self, amount):
         self.progress = amount

@@ -13,11 +13,7 @@ function App() {
     const [idTickets, setIDTickets] = useState({});
     const [requestID, setRequestID] = useState('');
     const [gettingInput, setGettingInput] = useState(true);
-    const [runningQueries, setRunningQueries] = useState(false);
-
-    let wrapperSetRunningQueries = useCallback(val => {
-        setRunningQueries(val);
-    }, [setRunningQueries]);
+    const [numFinishedTickets, setNumFinishedTickets] = useState(0);
 
     const header =
         <header className="header">
@@ -37,7 +33,6 @@ function App() {
         setIDTickets(ticksWithIDS);
         setRequestID(taskID);
         setGettingInput(false);
-        setRunningQueries(true);
     }
 
     function handleCreateTicketClick(items){
@@ -69,6 +64,10 @@ function App() {
         setTickets(updatedTickets)
     }
 
+    function handleTicketFinish(){
+        setNumFinishedTickets(numFinishedTickets + 1);
+    }
+
     if(gettingInput){
         return (
             <div className="App">
@@ -81,13 +80,13 @@ function App() {
                 />
             </div>
         )
-    }else if(runningQueries){
+    }else if(numFinishedTickets < tickets.length){
           return (
             <div className="App">
                 {header}
                 <RunningQueriesUI
                     tickets={idTickets}
-                    setRunningQueries={wrapperSetRunningQueries}
+                    onFinish={handleTicketFinish}
                     requestID={requestID}
                 />
             </div>

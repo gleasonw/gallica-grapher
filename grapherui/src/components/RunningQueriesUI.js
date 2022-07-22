@@ -1,4 +1,4 @@
-import React,{useState, useEffect, useLayoutEffect} from 'react';
+import React,{useState, useEffect} from 'react';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import TicketLabel from "./TicketLabel";
 
@@ -10,7 +10,7 @@ function RunningQueriesUI(props) {
             <TicketProgressContainer
                 tickets={props.tickets}
                 requestid={props.requestID}
-                setRunningQueries={props.setRunningQueries}
+                onFinish={props.onFinish}
             />
         </div>
     )
@@ -18,11 +18,13 @@ function RunningQueriesUI(props) {
 
 function TicketProgressContainer(props){
     const initPercents = {}
+
     Object.keys(props.tickets).map(key => (
         initPercents[key] = 0
     ))
+
     const [ticketProgressPercents, setTicketProgressPercents] = useState(initPercents)
-//TODO: Exiting before final render
+    //TODO: this is broken, not updating progress for next ticket
     useEffect(() => {
         function updateProgress(){
             let progress = 0;
@@ -38,7 +40,7 @@ function TicketProgressContainer(props){
                     updatedTickets[currentTicket] = progress
                     setTicketProgressPercents(updatedTickets)
                     if (state === "SUCCESS") {
-                        setTimeout(props.setRunningQueries, 1000, false);
+                        setTimeout(props.onFinish, 1000)
                     }
                 });
         }

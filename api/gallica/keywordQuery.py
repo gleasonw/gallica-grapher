@@ -2,13 +2,13 @@ from math import ceil
 import io
 from lxml import etree
 
-from newspaper import Newspaper
+from .newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
-from recordBatch import KeywordRecordBatch
-from recordBatch import RecordBatch
+from .recordBatch import KeywordRecordBatch
+from .recordBatch import RecordBatch
 
 
-# TODO: remove results with same date and code
+# TODO: use ors to combine keywords within single ticket
 class KeywordQuery:
 
     def __init__(self,
@@ -80,7 +80,7 @@ class KeywordQuery:
             self.moveRecordsToDB()
 
     def doThreadedSearch(self):
-        with ThreadPoolExecutor(max_workers=50) as executor:
+        with ThreadPoolExecutor(max_workers=100) as executor:
             for recordBatch in executor.map(self.doSearchChunk, self.workChunks):
                 self.progressTracker()
                 self.keywordRecords.extend(recordBatch)
@@ -139,7 +139,7 @@ class KeywordQuery:
             )
             
             INSERT INTO results (identifier, year, month, day, searchterm, paperid, requestid)
-                (SELECT * FROM resultsForRequest);
+                (SELECT DISTINCT identifier, year, month, day , searchterm, paperid, requestid FROM resultsForRequest);
             """
             , (self.ticketID,))
 

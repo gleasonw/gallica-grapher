@@ -19,6 +19,7 @@ def spawnRequestThread(self, tickets):
                 'currentID': gallicaRequest.getCurrentID(),
                 'progress': gallicaRequest.getProgress(),
             })
+    while not gallicaRequest.isFinished():
         time.sleep(1)
     self.update_state(state="SUCCESS")
     return {'progress': 100, 'status': 'Complete!', 'result': 42}
