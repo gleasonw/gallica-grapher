@@ -83,13 +83,14 @@ class TestKeywordRecordBatch(TestCase):
         batch.fetchXML()
         batch.parseRecordsFromXML()
 
-        self.assertEqual(len(batch.batch), 4)
-        self.assertEqual(batch.numPurgedResults, 2)
+        self.assertEqual(len(batch.batch), 5)
+        self.assertEqual(batch.numPurgedResults, 1)
 
-    def test_record_is_unique(self):
+    @patch('gallica.recordBatch.RecordBatch.fetchXML')
+    def test_record_is_unique(self, mock_fetch):
         batch = KeywordRecordBatch(
             '',
-            GallicaSession().getSession()
+            MagicMock
         )
         batch.currentResultEqualsPrior = MagicMock(return_value=True)
         self.assertTrue(batch.recordIsUnique(None))

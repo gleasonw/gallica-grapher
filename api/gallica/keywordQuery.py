@@ -259,7 +259,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
         self.baseQuery = (
             'arkPress adj "{newsKey}_date" '
             f'and (gallica all "{self.keyword}") '
-            # 'sortby dc.date/sort.ascending'
+            'sortby dc.date/sort.ascending'
         )
 
     def fetchNumTotalResults(self):

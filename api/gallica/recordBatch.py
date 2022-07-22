@@ -10,6 +10,7 @@ class RecordBatch:
                  session,
                  startRecord=1,
                  numRecords=50,
+                 collapsing=False
                  ):
         self.batch = []
         self.query = query
@@ -24,7 +25,7 @@ class RecordBatch:
             "exactSearch": "False",
             "startRecord": startRecord,
             "maximumRecords": numRecords,
-            "collapsing": "disabled"
+            "collapsing": collapsing
         }
         self.fetchXML()
 
@@ -105,9 +106,8 @@ class PaperRecordBatch(RecordBatch):
             query,
             session,
             startRecord=startRecord,
-            numRecords=numRecords)
-
-        self.params["collapsing"] = "true"
+            numRecords=numRecords,
+            collapsing=True)
 
     # TODO: at the end of bulk queries, run date queries for each code, so leave date unset here. One session = better, and we can better employ concurrency (get more batches of date information per request?).
     def parseRecordsFromXML(self):

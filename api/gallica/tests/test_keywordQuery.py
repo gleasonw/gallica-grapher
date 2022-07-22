@@ -289,7 +289,7 @@ class TestKeywordQueryAllPapers(TestCase):
             query.baseQuery,
             'dc.date >= "1850" and dc.date <= "1900" '
             'and (gallica all "brazza") '
-            'and (dc.type all "fascicule") '
+            'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending')
 
     def test_build_dateless_query(self):
@@ -307,7 +307,7 @@ class TestKeywordQueryAllPapers(TestCase):
         self.assertEqual(
             query.baseQuery,
             '(gallica all "brazza") '
-            'and (dc.type all "fascicule") '
+            'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending')
 
     @patch('gallica.keywordQuery.RecordBatch')
@@ -391,7 +391,7 @@ class TestKeywordQuerySelectPapers(TestCase):
 
         self.assertEqual(
             query.baseQuery,
-            'arkPress all "{newsKey}_date" '
+            'arkPress adj "{newsKey}_date" '
             'and dc.date >= "1850" '
             'and dc.date <= "1900" '
             'and (gallica all "brazza") '
@@ -413,7 +413,7 @@ class TestKeywordQuerySelectPapers(TestCase):
 
         self.assertEqual(
             query.baseQuery,
-            'arkPress all "{newsKey}_date" '
+            'arkPress adj "{newsKey}_date" '
             'and (gallica all "brazza") '
             'sortby dc.date/sort.ascending')
 
@@ -435,9 +435,10 @@ class TestKeywordQuerySelectPapers(TestCase):
 
         self.assertDictEqual(query.paperCodeWithNumResults, {'b': 1})
 
+    @patch('gallica.keywordQuery.RecordBatch.fetchXML')
     @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults')
     @patch('gallica.keywordQuery.RecordBatch.getNumResults', return_value=3)
-    def test_fetch_number_results_in_paper(self, mock_getNumResults, mock_fetch):
+    def test_fetch_number_results_in_paper(self, mock_getNumResults, mock_fetch, mock_fetch_xml):
         choiceDict = self.buildDummyDict()
         query = KeywordQuerySelectPapers(
             'brazza',
@@ -512,7 +513,7 @@ class TestKeywordQuerySelectPapers(TestCase):
         testBatch = query.doSearchChunk([1, 'a'])
 
         mock_record_batch.assert_called_with(
-            'arkPress all "a_date" '
+            'arkPress adj "a_date" '
             'and (gallica all "brazza") '
             'sortby dc.date/sort.ascending',
             mockedSession,

@@ -57,14 +57,19 @@ class DBtester:
 
     def deleteAndReturnPaper(self, id):
         with self.conn.cursor() as curs:
-            curs.execute(
-                """
-                DELETE FROM papers
-                WHERE code = %s
-                RETURNING (title, startdate, enddate, continuous, code)
-                """
-                , (id,))
-            return curs.fetchone()[0]
+            try:
+                curs.execute(
+                    """
+                    DELETE FROM papers
+                    WHERE code = %s
+                    RETURNING (title, startdate, enddate, continuous, code)
+                    """
+                    , (id,))
+                result = curs.fetchone()[0]
+            except TypeError as e:
+                print("Code not in database")
+                return None
+            return result
 
     def getEarliestContinuousPaperDate(self):
         with self.conn.cursor() as curs:
