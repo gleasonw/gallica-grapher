@@ -76,4 +76,4 @@ class RequestTicket:
         progressPercent = self.numBatchesRetrieved/self.numBatches
         progressPercent *= 100
         progressPercent = int(progressPercent)
-        self.progressThread.setProgress(progressPercent)
+        self.progressThread.setProgress(self.ticketID, progressPercent)

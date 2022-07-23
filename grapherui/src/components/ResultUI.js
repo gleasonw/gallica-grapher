@@ -11,7 +11,7 @@ import {settingsReducer} from "./SettingsReducer";
 //TODO: use context for tickets.
 function ResultUI(props){
 
-    const [grouped, setGrouped] = useState(props.tickets.length > 1);
+    const [grouped, setGrouped] = useState(true);
     const [graphSettings, dispatch] = useReducer(
         settingsReducer,
         props.tickets,

@@ -19,7 +19,6 @@ CORS(app)
 def init():
     tickets = request.get_json()["tickets"]
     task = spawnRequestThread.delay(tickets)
-    print(task.backend)
     return {"taskid": task.id}
 
 
@@ -29,14 +28,10 @@ def getProgress(taskID):
     if task.info:
         response = {
             'state': task.state,
-            'progress': task.info.get('progress'),
-            'currentID': task.info.get('currentID')
+            'progress': task.info.get('progress')
         }
     else:
-        response = {
-            'state': task.state,
-            'progress': 100
-        }
+        response = {'state': task.state}
     return response
 
 

@@ -80,7 +80,7 @@ class KeywordQuery:
             self.moveRecordsToDB()
 
     def doThreadedSearch(self):
-        with ThreadPoolExecutor(max_workers=100) as executor:
+        with ThreadPoolExecutor(max_workers=75) as executor:
             for recordBatch in executor.map(self.doSearchChunk, self.workChunks):
                 self.progressTracker()
                 self.keywordRecords.extend(recordBatch)

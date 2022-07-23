@@ -12,14 +12,11 @@ celery = Celery(
 def spawnRequestThread(self, tickets):
     gallicaRequest = RequestThread(tickets)
     gallicaRequest.start()
-    while gallicaRequest.getProgress() < 100:
+    while not gallicaRequest.isFinished():
         self.update_state(
             state="PROGRESS",
             meta={
-                'currentID': gallicaRequest.getCurrentID(),
-                'progress': gallicaRequest.getProgress(),
+                'progress': gallicaRequest.getKeyedProgress()
             })
-    while not gallicaRequest.isFinished():
-        time.sleep(1)
     self.update_state(state="SUCCESS")
     return {'progress': 100, 'status': 'Complete!', 'result': 42}

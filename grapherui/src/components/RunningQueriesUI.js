@@ -24,25 +24,21 @@ function TicketProgressContainer(props){
     ))
 
     const [ticketProgressPercents, setTicketProgressPercents] = useState(initPercents)
-    //TODO: this is broken, not updating progress for next ticket
+
     useEffect(() => {
-        function updateProgress(){
+        async function updateProgress() {
             let progress = 0;
-            let currentTicket = '';
             let state = '';
-            fetch("progress/" + props.requestid)
-                .then(res => res.json())
-                .then(result => {
-                    progress = result["progress"]
-                    currentTicket = result["currentID"]
-                    state = result["state"]
-                    let updatedTickets = structuredClone(ticketProgressPercents)
-                    updatedTickets[currentTicket] = progress
-                    setTicketProgressPercents(updatedTickets)
-                    if (state === "SUCCESS") {
-                        setTimeout(props.onFinish, 1000)
-                    }
-                });
+            const currentTicketProgress = await fetch("progress/" + props.requestid);
+            currentTicketProgress.json().then(data => {
+                progress = data["progress"]
+                setTicketProgressPercents(progress)
+                console.log(progress)
+                state = data["state"]
+                if (state === "SUCCESS") {
+                    props.onFinish()
+                }
+            });
         }
         setTimeout(updateProgress, 1000)
     }, [props, ticketProgressPercents]);

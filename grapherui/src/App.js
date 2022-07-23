@@ -13,7 +13,7 @@ function App() {
     const [idTickets, setIDTickets] = useState({});
     const [requestID, setRequestID] = useState('');
     const [gettingInput, setGettingInput] = useState(true);
-    const [numFinishedTickets, setNumFinishedTickets] = useState(0);
+    const [fetchingData, setFetchingData] = useState(false);
 
     const header =
         <header className="header">
@@ -33,6 +33,7 @@ function App() {
         setIDTickets(ticksWithIDS);
         setRequestID(taskID);
         setGettingInput(false);
+        setFetchingData(true);
     }
 
     function handleCreateTicketClick(items){
@@ -65,7 +66,7 @@ function App() {
     }
 
     function handleTicketFinish(){
-        setNumFinishedTickets(numFinishedTickets + 1);
+        setFetchingData(false);
     }
 
     if(gettingInput){
@@ -80,7 +81,7 @@ function App() {
                 />
             </div>
         )
-    }else if(numFinishedTickets < tickets.length){
+    }else if(fetchingData){
           return (
             <div className="App">
                 {header}

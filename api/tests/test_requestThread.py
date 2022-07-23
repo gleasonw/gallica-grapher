@@ -28,17 +28,12 @@ class TestRequestThread(TestCase):
 
         testThread.setProgress(10)
 
-        self.assertEqual(testThread.progress, 10)
+        self.assertEqual(testThread.keyedProgress, 10)
 
     def test_get_progress(self):
         testThread = RequestThread({})
 
-        self.assertEqual(testThread.getProgress(), 0)
-
-    def test_get_current_id(self):
-        testThread = RequestThread({})
-
-        self.assertEqual(testThread.getCurrentID(), '')
+        self.assertEqual(testThread.getKeyedProgress()['progress'], 0)
 
     def test_set_num_discovered(self):
         testThread = RequestThread({})

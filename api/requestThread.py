@@ -6,8 +6,6 @@ from gallica.gallicaSession import GallicaSession
 
 class RequestThread(threading.Thread):
     def __init__(self, tickets):
-        self.progress = 0
-        self.currentID = ''
         self.session = GallicaSession().getSession()
         self.DBconnection = DB().getConn()
         self.numResultsDiscovered = 0
@@ -15,12 +13,12 @@ class RequestThread(threading.Thread):
         self.topPapersForTerms = []
         self.tickets = tickets
         self.finished = False
+        self.ticketProgress = self.initProgressToZero()
 
         super().__init__()
 
     def run(self):
         for key, ticket in self.tickets.items():
-            self.currentID = key
             requestToRun = RequestTicket(
                 ticket,
                 key,
@@ -31,17 +29,20 @@ class RequestThread(threading.Thread):
         self.finished = True
         self.DBconnection.close()
 
+    def initProgressToZero(self):
+        progressDict = {}
+        for key, ticket in self.tickets.items():
+            progressDict[key] = 0
+        return progressDict
+
     def isFinished(self):
         return self.finished
 
-    def setProgress(self, amount):
-        self.progress = amount
+    def setProgress(self, ticket, amount):
+        self.ticketProgress[ticket] = amount
 
-    def getProgress(self):
-        return self.progress
-
-    def getCurrentID(self):
-        return self.currentID
+    def getKeyedProgress(self):
+        return self.ticketProgress
 
     def setNumDiscovered(self, total):
         self.numResultsDiscovered = total

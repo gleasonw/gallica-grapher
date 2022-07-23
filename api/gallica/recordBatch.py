@@ -49,8 +49,6 @@ class RecordBatch:
             params=self.params,
             timeout=15)
         self.xmlRoot = etree.fromstring(response.content)
-        print(f'for url: {response.url} num results: {self.getNumResults()} ')
-
 
     def parseRecordsFromXML(self):
         pass

@@ -14,7 +14,7 @@ class TimeoutAndRetryHTTPAdapter(HTTPAdapter):
 		if "timeout" in kwargs:
 			self.timeout = kwargs["timeout"]
 			del kwargs["timeout"]
-		super().__init__(*args, **kwargs, max_retries=retryStrategy, pool_maxsize=50)
+		super().__init__(*args, **kwargs, max_retries=retryStrategy, pool_maxsize=100)
 
 	def send(self, request, **kwargs):
 		timeout = kwargs.get("timeout")
