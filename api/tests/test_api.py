@@ -21,7 +21,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.json['taskid'], "test")
 
     @patch("api.flaskAPI.spawnRequestThread.AsyncResult")
-    def test_getProgress(self, mock_task):
+    def test_get_pending_state(self, mock_task):
         mock_task.return_value = MagicMock(
             state="PENDING",
             info={"progress": 0, "currentID": ""}
@@ -30,8 +30,6 @@ class TestAPI(unittest.TestCase):
         jsonResponse = json.loads(response.data)
 
         self.assertEqual(jsonResponse["state"], "PENDING")
-        self.assertEqual(jsonResponse["progress"], 0)
-        self.assertEqual(jsonResponse["currentID"], "")
 
     def test_paperChart(self):
         testJSON = self.app.get('/paperchartjson')

@@ -120,6 +120,6 @@ class TestPaperRecord(TestCase):
             record = PaperRecord(dummyRecordXML, MagicMock)
 
         self.assertEqual(
-            record.getTitle(),
+            record.getPaperTitle(),
             "L'Anti-cafard. Revue anti-boche, publiée très irrégulièrement avec le concours de toutes les bonnes volontés"
         )

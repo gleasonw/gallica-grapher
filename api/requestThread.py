@@ -13,7 +13,7 @@ class RequestThread(threading.Thread):
         self.topPapersForTerms = []
         self.tickets = tickets
         self.finished = False
-        self.ticketProgress = self.initProgressToZero()
+        self.ticketProgressStats = self.initProgressStats()
 
         super().__init__()
 
@@ -29,20 +29,25 @@ class RequestThread(threading.Thread):
         self.finished = True
         self.DBconnection.close()
 
-    def initProgressToZero(self):
+    def initProgressStats(self):
         progressDict = {}
         for key, ticket in self.tickets.items():
-            progressDict[key] = 0
+            progressDict[key] = {
+                'progress': 0,
+                'numResultsDiscovered': 0,
+                'numResultsRetrieved': 0,
+                'randomPaper': None
+            }
         return progressDict
 
     def isFinished(self):
         return self.finished
 
-    def setProgress(self, ticket, amount):
-        self.ticketProgress[ticket] = amount
+    def setTicketProgressStats(self, ticketKey, progressStats):
+        self.ticketProgressStats[ticketKey] = progressStats
 
-    def getKeyedProgress(self):
-        return self.ticketProgress
+    def getProgressStats(self):
+        return self.ticketProgressStats
 
     def setNumDiscovered(self, total):
         self.numResultsDiscovered = total

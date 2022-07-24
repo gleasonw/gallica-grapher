@@ -37,7 +37,7 @@ class RecordBatch:
             numResults = int(numResults)
         return numResults
 
-    def getRecordBatch(self):
+    def getRecords(self):
         self.parseRecordsFromXML()
         return self.batch
 
@@ -52,6 +52,12 @@ class RecordBatch:
 
     def parseRecordsFromXML(self):
         pass
+
+    def getRandomPaper(self):
+        lastPaper = self.batch[-1]
+        lastPaper.parseTitleFromXML()
+        lastPaperTitle = lastPaper.getPaperTitle()
+        return lastPaperTitle
 
 
 class KeywordRecordBatch(RecordBatch):

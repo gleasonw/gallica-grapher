@@ -23,7 +23,7 @@ function TicketProgressContainer(props){
         initPercents[key] = 0
     ))
 
-    const [ticketProgressPercents, setTicketProgressPercents] = useState(initPercents)
+    const [progressStats, setProgressStats] = useState(initPercents)
 
     useEffect(() => {
         async function updateProgress() {
@@ -32,8 +32,7 @@ function TicketProgressContainer(props){
             const currentTicketProgress = await fetch("progress/" + props.requestid);
             currentTicketProgress.json().then(data => {
                 progress = data["progress"]
-                setTicketProgressPercents(progress)
-                console.log(progress)
+                setProgressStats(progress)
                 state = data["state"]
                 if (state === "SUCCESS") {
                     props.onFinish()
@@ -41,17 +40,17 @@ function TicketProgressContainer(props){
             });
         }
         setTimeout(updateProgress, 1000)
-    }, [props, ticketProgressPercents]);
+    }, [props, progressStats]);
 
     return(
-        <div  className='queryProgressUI'>
+        <div className='queryProgressUI'>
             {Object.keys(props.tickets).map(key => (
                 <TicketProgressBox
                     terms={props.tickets[key]['terms']}
                     papers={props.tickets[key]['papersAndCodes']}
                     dateRange={props.tickets[key]['dateRange']}
                     key={key}
-                    progress={ticketProgressPercents[key]}
+                    progress={progressStats[key]}
                 />
             ))}
         </div>

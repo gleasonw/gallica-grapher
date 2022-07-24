@@ -174,9 +174,17 @@ class TestRequestTicket(TestCase):
         ticket.numBatchesRetrieved = 2
         ticket.numBatches = 10
 
-        ticket.updateProgress()
+        ticket.updateProgressStatsAndIncludeRandomPaper('the seattle times')
 
-        ticket.progressThread.setProgress.assert_called_with(30)
+        ticket.progressThread.setTicketProgressStats.assert_called_with(
+            "",
+            {
+                'progress': 30,
+                'numResultsDiscovered': 0,
+                'numResultsRetrieved': 150,
+                'randomPaper': 'the seattle times'
+            }
+        )
 
 
 

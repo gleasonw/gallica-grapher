@@ -82,8 +82,9 @@ class KeywordQuery:
     def doThreadedSearch(self):
         with ThreadPoolExecutor(max_workers=75) as executor:
             for recordBatch in executor.map(self.doSearchChunk, self.workChunks):
-                self.progressTracker()
-                self.keywordRecords.extend(recordBatch)
+                randomPaper = recordBatch.getRandomPaper()
+                self.progressTracker(randomPaper)
+                self.keywordRecords.extend(recordBatch.getRecordBatch())
 
     def moveRecordsToDB(self):
         with self.dbConnection.cursor() as curs:
@@ -215,8 +216,7 @@ class KeywordQueryAllPapers(KeywordQuery):
             self.baseQuery,
             self.gallicaHttpSession,
             startRecord=index)
-        records = batch.getRecordBatch()
-        return records
+        return batch
 
     def generateWorkChunks(self):
         iterations = ceil(self.estimateNumResults / 50)
@@ -274,8 +274,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
             query,
             self.gallicaHttpSession,
             startRecord=recordStart)
-        records = batch.getRecordBatch()
-        return records
+        return batch
 
     def recordsNotUnique(self, records):
         for record in records:

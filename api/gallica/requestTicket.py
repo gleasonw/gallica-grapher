@@ -46,7 +46,7 @@ class RequestTicket:
             self.papersAndCodes,
             self.yearRange,
             self.ticketID,
-            self.updateProgress,
+            self.updateProgressStatsAndIncludeRandomPaper,
             self.connectionToDB,
             self.session)
         return query
@@ -56,7 +56,7 @@ class RequestTicket:
             keyword,
             self.yearRange,
             self.ticketID,
-            self.updateProgress,
+            self.updateProgressStatsAndIncludeRandomPaper,
             self.connectionToDB,
             self.session)
         return query
@@ -71,9 +71,15 @@ class RequestTicket:
         for query in self.keywordQueries:
             query.runSearch()
 
-    def updateProgress(self):
+    def updateProgressStatsAndIncludeRandomPaper(self, randomPaper):
         self.numBatchesRetrieved += 1
         progressPercent = self.numBatchesRetrieved/self.numBatches
         progressPercent *= 100
         progressPercent = int(progressPercent)
-        self.progressThread.setProgress(self.ticketID, progressPercent)
+        ticketProgressStats = {
+            'progress': progressPercent,
+            'numResultsDiscovered': self.totalResults,
+            'numResultsRetrieved': self.numBatchesRetrieved*50,
+            'randomPaper': randomPaper
+        }
+        self.progressThread.setTicketProgressStats(self.ticketID, ticketProgressStats)

@@ -59,7 +59,7 @@ class TestNewspaper(TestCase):
 
         for paperRecord in newspaper.paperRecords:
             self.assertIsInstance(paperRecord.paperCode, str)
-            self.assertIsInstance(paperRecord.title, str)
+            self.assertIsInstance(paperRecord.paperTitle, str)
             self.assertIsInstance(paperRecord.publishingRange, list)
             self.assertIsInstance(paperRecord.continuousRange, bool)
             self.assertIsInstance(paperRecord.url, str)
@@ -123,7 +123,7 @@ class TestNewspaper(TestCase):
         mock_paper_record.checkIfYearsContinuous = MagicMock(return_value=True)
         mock_paper_record.generatePublishingRange = MagicMock(return_value=["range"])
         mock_paper_record.getDate = MagicMock(return_value=[1,2])
-        mock_paper_record.getTitle = MagicMock(return_value="title")
+        mock_paper_record.getPaperTitle = MagicMock(return_value="title")
         mock_paper_record.isContinuous = MagicMock(return_value=True)
         mock_paper_record.getPaperCode = MagicMock(return_value="123")
 
@@ -163,7 +163,7 @@ class TestNewspaper(TestCase):
     @patch('gallica.newspaper.PaperRecordBatch')
     def test_fetch_max_20_paper_records(self, mock_paper_record_batch):
         mock_paper_record_batch.return_value = mock_paper_record_batch
-        mock_paper_record_batch.getRecordBatch = MagicMock(return_value=[])
+        mock_paper_record_batch.getRecords = MagicMock(return_value=[])
         testCodes = TestNewspaper.getPaperCodes()
 
         newspaper = Newspaper()

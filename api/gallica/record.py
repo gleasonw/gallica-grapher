@@ -10,6 +10,7 @@ class Record:
         self.paperCode = ''
         self.date = None
         self.url = ''
+        self.paperTitle = None
 
         self.parsePaperCodeFromXML()
         self.parseURLFromXML()
@@ -26,6 +27,9 @@ class Record:
     def isValid(self):
         return self.valid
 
+    def getPaperTitle(self):
+        return self.paperTitle
+
     def parsePaperCodeFromXML(self):
         paperCodeElement = self.recordData.find(
             '{http://purl.org/dc/elements/1.1/}relation')
@@ -39,6 +43,10 @@ class Record:
             '{http://purl.org/dc/elements/1.1/}identifier')
         if urlElement is not None:
             self.url = urlElement.text
+
+    def parseTitleFromXML(self):
+        self.paperTitle = self.recordData.find(
+            '{http://purl.org/dc/elements/1.1/}title').text
 
     def checkIfValid(self):
         if self.paperCode:
@@ -66,7 +74,6 @@ class PaperRecord(Record):
 
     def __init__(self, root, gallicaSession):
         super().__init__(root)
-        self.title = ''
         self.publishingYears = []
         self.publishingRange = [None, None]
         self.continuousRange = False
@@ -78,9 +85,6 @@ class PaperRecord(Record):
         self.parseYears()
         self.checkIfYearsContinuous()
         self.generatePublishingRange()
-
-    def getTitle(self):
-        return self.title
 
     def isContinuous(self):
         return self.continuousRange
@@ -123,7 +127,3 @@ class PaperRecord(Record):
             lowYear = self.publishingYears[0]
             highYear = self.publishingYears[-1]
             self.publishingRange = [lowYear, highYear]
-
-    def parseTitleFromXML(self):
-        self.title = self.recordData.find(
-            '{http://purl.org/dc/elements/1.1/}title').text

@@ -1,5 +1,4 @@
 from celery import Celery
-import time
 from requestThread import RequestThread
 
 celery = Celery(
@@ -16,7 +15,7 @@ def spawnRequestThread(self, tickets):
         self.update_state(
             state="PROGRESS",
             meta={
-                'progress': gallicaRequest.getKeyedProgress()
+                'progress': gallicaRequest.getProgressStats()
             })
     self.update_state(state="SUCCESS")
     return {'progress': 100, 'status': 'Complete!', 'result': 42}

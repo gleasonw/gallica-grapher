@@ -21,19 +21,19 @@ class TestRequestThread(TestCase):
         mock_ticket.assert_called_once()
         mock_ticket.return_value.run.assert_called_once()
         testThread.DBconnection.close.assert_called_once()
-        self.assertEqual(testThread.currentID, '1')
+        self.assertEqual(testThread.ticketProgressStats['1'], 0)
 
     def test_set_progress(self):
         testThread = RequestThread({})
 
-        testThread.setProgress(10)
+        testThread.setTicketProgressStats('1', 10)
 
-        self.assertEqual(testThread.keyedProgress, 10)
+        self.assertEqual(testThread.ticketProgressStats['1'], 10)
 
     def test_get_progress(self):
         testThread = RequestThread({})
 
-        self.assertEqual(testThread.getKeyedProgress()['progress'], 0)
+        self.assertEqual(testThread.getProgressStats()['progress'], 0)
 
     def test_set_num_discovered(self):
         testThread = RequestThread({})

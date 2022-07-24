@@ -331,7 +331,7 @@ class TestKeywordQueryAllPapers(TestCase):
         mock_keyword_batch = mock_keyword_batch.return_value
         mock_record_batch = mock_record_batch.return_value
         mock_record_batch.getNumResults = MagicMock(return_value=3)
-        mock_keyword_batch.getRecordBatch = MagicMock(return_value='batch!')
+        mock_keyword_batch.getRecords = MagicMock(return_value='batch!')
         query = KeywordQueryAllPapers(
             'brazza',
             [1850, 1900],

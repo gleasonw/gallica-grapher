@@ -38,7 +38,7 @@ class Newspaper:
             self.query,
             self.session,
             numRecords=20)
-        return batch.getRecordBatch()
+        return batch.getRecords()
 
     def sendAllGallicaPapersToDB(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
@@ -60,7 +60,7 @@ class Newspaper:
             self.query,
             self.session,
             startRecord=index)
-        records = batch.getRecordBatch()
+        records = batch.getRecords()
         return records
 
     def getNumPapersOnGallica(self):
@@ -90,7 +90,7 @@ class Newspaper:
             lowYear = dateRange[0]
             highYear = dateRange[1]
             csvFileLikeObject.write('|'.join(map(cleanCSVvalue, (
-                paperRecord.getTitle(),
+                paperRecord.getPaperTitle(),
                 lowYear,
                 highYear,
                 paperRecord.isContinuous(),
