@@ -2,11 +2,11 @@ import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import React, {useContext} from "react";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
-import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button'
 import Switch from "@mui/material/Switch";
+import Slider from '@mui/material/Slider';
 
 function Chart(props) {
     return (
@@ -68,9 +68,16 @@ function ChartSettings(props){
                 </ToggleButton>
 
             </ToggleButtonGroup>
-
-            <TextField
-                value={props.averageWindow}
+            <Slider
+                aria-label="averageWindow"
+                defaultValue={0}
+                valueLabelDisplay="auto"
+                step={1}
+                marks={true}
+                min={0}
+                max={31}
+                track={false}
+                value={settingsForID.averageWindow}
                 onChange={e => {
                     dispatch({
                         type: 'setAverageWindow',
@@ -78,13 +85,9 @@ function ChartSettings(props){
                         averageWindow: e.target.value,
                     });
                 }}
-                name='averageWindow'
-                label='Rolling average'
-                type='number'
             />
-
             <Switch
-                checked={props.continuous}
+                checked={settingsForID.continuous}
                 onChange={e => {
                     dispatch({
                         type: 'setContinuous',

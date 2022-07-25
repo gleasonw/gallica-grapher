@@ -127,7 +127,9 @@ class TestKeywordQuery(TestCase):
             GallicaSession().getSession())
         testQuery.workChunks = [1, 2, 3, 4]
         testQuery.progressTracker = MagicMock()
-        testQuery.doSearchChunk = MagicMock(side_effect=lambda x: [x])
+        testQuery.doSearchChunk = MagicMock(
+            side_effect=lambda x: MagicMock(
+                getRecords=MagicMock(return_value=[x])))
 
         testQuery.doThreadedSearch()
 
@@ -341,7 +343,7 @@ class TestKeywordQueryAllPapers(TestCase):
             session=MagicMock()
         )
 
-        self.assertEqual(query.doSearchChunk(1), 'batch!')
+        self.assertEqual(query.doSearchChunk(1), mock_keyword_batch)
 
     @patch('gallica.keywordQuery.KeywordQueryAllPapers.fetchNumTotalResults')
     def test_generate_work_chunks(self, mock_total_results):

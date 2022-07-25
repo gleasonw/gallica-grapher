@@ -315,10 +315,12 @@ td{
     white-space: nowrap;
 }
 td:hover{
-    background-color: lightblue;
     overflow: visible;
     white-space: normal;
     height: auto;
+}
+tr:hover{
+    background-color: lightblue;
 }
 .resultUI{
     display: flex;

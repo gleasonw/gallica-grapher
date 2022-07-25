@@ -38,7 +38,7 @@ class KeywordQuery:
         self.fetchNumTotalResults()
 
     def doSearchChunk(self, chunk):
-        return []
+        return KeywordRecordBatch(self.gallicaHttpSession, chunk)
 
     def generateWorkChunks(self):
         pass
@@ -82,9 +82,13 @@ class KeywordQuery:
     def doThreadedSearch(self):
         with ThreadPoolExecutor(max_workers=75) as executor:
             for recordBatch in executor.map(self.doSearchChunk, self.workChunks):
-                randomPaper = recordBatch.getRandomPaper()
-                self.progressTracker(randomPaper)
-                self.keywordRecords.extend(recordBatch.getRecordBatch())
+                recordsForIndex = recordBatch.getRecords()
+                if recordsForIndex:
+                    randomPaper = recordBatch.getRandomPaper()
+                    self.progressTracker(randomPaper)
+                    self.keywordRecords.extend(recordsForIndex)
+                else:
+                    print("No records for batch")
 
     def moveRecordsToDB(self):
         with self.dbConnection.cursor() as curs:

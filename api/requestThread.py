@@ -61,6 +61,7 @@ class RequestThread(threading.Thread):
     def getNumActuallyRetrieved(self):
         return self.numResultsRetrieved
 
+
 if __name__ == "__main__":
     request = RequestThread(
         {

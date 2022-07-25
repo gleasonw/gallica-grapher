@@ -27,7 +27,7 @@ function renderRow(items){
     if(items.length !== 0){
         return(
             <div className='bubbleText'>
-                {items}
+                '{items}'
             </div>
         )
     }

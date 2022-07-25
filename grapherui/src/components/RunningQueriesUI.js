@@ -17,24 +17,26 @@ function RunningQueriesUI(props) {
 }
 
 function TicketProgressContainer(props){
-    const initPercents = {}
+    const initProgressStats = {}
 
     Object.keys(props.tickets).map(key => (
-        initPercents[key] = 0
+        initProgressStats[key] = {
+            progress: 0,
+            numResultsDiscovered: 0,
+            numResultsRetrieved: 0,
+            randomPaper: ''
+        }
     ))
 
-    const [progressStats, setProgressStats] = useState(initPercents)
+    const [progressStats, setProgressStats] = useState(initProgressStats)
 
     useEffect(() => {
         async function updateProgress() {
-            let progress = 0;
-            let state = '';
             const currentTicketProgress = await fetch("progress/" + props.requestid);
             currentTicketProgress.json().then(data => {
-                progress = data["progress"]
+                const progress = data["progress"]
                 setProgressStats(progress)
-                state = data["state"]
-                if (state === "SUCCESS") {
+                if (data["state"] === "SUCCESS") {
                     props.onFinish()
                 }
             });
@@ -50,7 +52,7 @@ function TicketProgressContainer(props){
                     papers={props.tickets[key]['papersAndCodes']}
                     dateRange={props.tickets[key]['dateRange']}
                     key={key}
-                    progress={progressStats[key]}
+                    progressStats={progressStats[key]}
                 />
             ))}
         </div>
@@ -65,10 +67,18 @@ function TicketProgressBox(props){
                 papers={props.papers}
                 dateRange={props.dateRange}
             />
-            <ProgressBar
-                animated
-                now={props.progress}
-            />
+            <div className='progressStats'>
+                <ProgressBar
+                    animated
+                    now={props.progressStats.progress}
+                />
+                <div className='progressStatsText'>
+                    {props.progressStats.numResultsRetrieved} of {props.progressStats.numResultsDiscovered} results retrieved
+                </div>
+                <div className='progressStatsText'>
+                    {props.progressStats.randomPaper}
+                </div>
+            </div>
         </div>
     )
 }

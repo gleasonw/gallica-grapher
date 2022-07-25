@@ -20,6 +20,7 @@ export default function TicketStats(props){
             <TicketPapers
                 ticketID={props.ticketID}
                 dateRange={props.ticket.dateRange}
+                grouped={props.grouped}
             />
         </div>
     )

@@ -6,7 +6,7 @@ import {GraphSettingsContext} from "./GraphSettingsContext";
 export function TicketPapers(props) {
     const [topPapers, setTopPapers] = useState([]);
     const settings = useContext(GraphSettingsContext);
-    const ticketSettings = settings[props.ticketID];
+    const ticketSettings = props.grouped ? settings.group : settings[props.ticketID];
     useEffect(() => {
         let updatedPapers = [];
         fetch(
