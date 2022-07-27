@@ -18,6 +18,11 @@ export function GroupedTicketResults(props) {
 }
 //TODO: Sync label color with line color
 function GroupedTicketLabelBar(props) {
+    const highChartsSeriesColors = [
+        '#0066ff', '#ff0000', '#ff9900', '#00ff00',
+        '#0000ff', '#ff00ff', '#00ffff', '#ffff00',
+        '#000000'];
+    //TODO: add color to each ticket
     return (
         <div className='groupedLabelBar'>
             {Object.keys(props.tickets).map(key => (

@@ -3,6 +3,7 @@ import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
 import TicketPapers from "./TicketPapers";
 
+//TODO: generate colors for each ticket, pass to highcharts options
 export default function TicketStats(props){
     return(
         <div className={props.grouped ? 'ticketResults' : 'groupedStat'}>

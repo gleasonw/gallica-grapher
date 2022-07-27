@@ -55,4 +55,5 @@ function generateOptions(timeBin, series){
         return options;
     }
 }
+
 module.exports = generateOptions;

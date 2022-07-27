@@ -23,7 +23,7 @@ function Chart(props) {
 
     );
 }
-
+//TODO: labels
 function ChartSettings(props){
     const settings = useContext(GraphSettingsContext);
     const settingsForID = settings[props.settingsID];

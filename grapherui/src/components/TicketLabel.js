@@ -12,7 +12,9 @@ class TicketLabel extends React.Component{
     }
 }
 function TicketTermRow(props){
-    const terms = props.terms
+    const terms = props.terms.map(
+        term => "'" + term + "'"
+    )
     return(renderRow(terms))
 }
 function TicketPaperRow(props){
@@ -27,7 +29,7 @@ function renderRow(items){
     if(items.length !== 0){
         return(
             <div className='bubbleText'>
-                '{items}'
+                {items}
             </div>
         )
     }

@@ -26,6 +26,7 @@ class RequestThread(threading.Thread):
                 self.DBconnection,
                 self.session)
             requestToRun.run()
+            self.setTicketProgressTo100AndMarkAsDone(key)
         self.finished = True
         self.DBconnection.close()
 
@@ -45,6 +46,14 @@ class RequestThread(threading.Thread):
 
     def setTicketProgressStats(self, ticketKey, progressStats):
         self.ticketProgressStats[ticketKey] = progressStats
+
+    def setTicketProgressTo100AndMarkAsDone(self, ticketKey):
+        self.setTicketProgressStats(ticketKey, {
+            'progress': 100,
+            'numResultsDiscovered': self.numResultsDiscovered,
+            'numResultsRetrieved': self.numResultsRetrieved,
+            'randomPaper': None
+        })
 
     def getProgressStats(self):
         return self.ticketProgressStats
