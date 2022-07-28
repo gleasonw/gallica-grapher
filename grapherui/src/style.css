@@ -50,46 +50,57 @@ html, body, #root {
 header{
     height: 10%;
 }
-.mainTitle {
-    padding: 20px;
+.infoAndHomeBar{
+    height: 90%;
     width: 100%;
-    border: 1px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.mainTitle {
+    padding: 0 40px 40px;
+    width: 548px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: xx-large;
-    float: top;
+    font-size: 44px;
+    line-height: 56px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .inputUI{
     width: 100%;
-    height: 90%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    justify-content: center;
 }
-@media screen and (max-width: 1300px){
-    .inputUI{
-        flex-direction: column;
-    }
+@media screen and (max-width: 748px){
     .userInputForm, .requestBox {
-        width: calc(100% - 40px);
-        margin-left: auto !important;
-        margin-right: auto !important;
+        width: 100%;
+        max-width: 648px;
+        padding: 0 16px;
     }
     .ticketBox{
         max-height: 100px;
+    }
+    .mainTitle{
+        font-size: 24px;
+        line-height: 34px;
+        width: 248px;
     }
 }
 .userInputForm{
     margin-top: 15px;
 }
 .userInputForm, .requestBox{
-    width: calc(100% - 40px);
-    max-width: 600px;
+    width: 100%;
+    max-width: 748px;
     margin-top: 15px;
 }
 .userInputForm{
     margin-left: auto;
-    margin-right: 15px;
+    margin-right: auto;
 }
 .requestBox{
     border: 0;

@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import ReactSlider from 'react-slider';
-import Highcharts from 'highcharts'
-import HighchartsReact from 'highcharts-react-official'
+import TextField from "@mui/material/TextField";
 
 function UserInputForm(props){
     return(
@@ -193,73 +191,13 @@ function SelectionBox(props){
 }
 
 function DateInputBox(props){
-    const [error, setError] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [items, setItems] = useState([]);
-    useEffect(() => {
-            fetch("/paperchartjson")
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        setIsLoaded(true);
-                        setItems(result);
-                    },
-                    (error) => {
-                        setIsLoaded(true);
-                        setError(error);
-                    }
-                )
-        console.log("nice")
-    }, []);
-    if (error) {
-        return <div>Error: {error.message}</div>;
-    }else if (!isLoaded) {
-        return <div>Loading chart...</div>;
-    }else{
-        const options = {
-            chart: {
-                type: 'column',
-                height: '50%'
-            },
-            title: {
-                text: '# of Publishing Papers by Year'
-            },
-            yAxis: {
-                title: {
-                    text: 'Active newspapers'
-                }
-            },
-            series: [items],
-            legend: {
-                enabled: false
-            }
-        }
-        return(
-            <div>
-                <ReactSlider
-                    className="horizontal-slider"
-                    thumbClassName="sliderThumb"
-                    trackClassName="sliderTrack"
-                    value={[props.lowYear, props.highYear]}
-                    max={props.maxYear}
-                    min={props.minYear}
-                    pearling
-                    onChange={props.onChange}
-                    ariaLabel={['Lower thumb', 'Upper thumb']}
-                    ariaValuetext={state => `Thumb value ${state.valueNow}`}
-                    renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
-                    minDistance={0}
-
-                />
-                <div className="highchartsContainer">
-                    <HighchartsReact
-                        highcharts={Highcharts}
-                        options={options}
-                    />
-                </div>
-            </div>
-        )
-    }
+    return(
+        <div>
+            <TextField id="lowYear" label="Low Year" value={props.lowYear} onChange={props.onChange} />
+            to
+            <TextField id="highYear" label="High Year" value={props.highYear} onChange={props.onChange} />
+        </div>
+    )
 }
 
 export default UserInputForm;

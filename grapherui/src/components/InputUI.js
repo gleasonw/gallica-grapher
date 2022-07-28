@@ -71,6 +71,9 @@ class InputUI extends React.Component {
     render() {
         return (
             <div className='inputUI'>
+                <div className="mainTitle">
+                    Enter a word or phrase to query Gallica then graph the results.
+                </div>
                 <UserInputForm
                     termInputValue={this.state.termInputValue}
                     paperInputValue={this.state.paperInputValue}

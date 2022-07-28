@@ -17,8 +17,13 @@ function App() {
 
     const header =
         <header className="header">
-            <div className="mainTitle">
-                The Gallica Grapher
+            <div className="infoAndHomeBar">
+                <div>
+                    Graphing Gallica
+                </div>
+                <div className="info">
+                    Info
+                </div>
             </div>
         </header>
 
