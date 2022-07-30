@@ -98,7 +98,7 @@ class Newspaper:
             ))) + '\n')
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
-
+#TODO: return the paper's publishing years alongside the title
     def getPapersSimilarToKeyword(self, keyword):
         with self.dbConnection.cursor() as curs:
             keyword = keyword.lower()

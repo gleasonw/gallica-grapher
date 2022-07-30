@@ -6,7 +6,7 @@ function UserInputForm(props){
         <form onSubmit={props.onSubmit} className='userInputForm'>
             <TermInputBox
                 value={props.termInputValue}
-                onChange={props.onChange}
+                onChange={props.onTermChange}
                 onKeyDown={props.onKeyDown}
                 selectedTerms={props.selectedTerms}
                 deleteTermBubble={props.deleteTermBubble}
@@ -14,7 +14,7 @@ function UserInputForm(props){
             <br />
             <PaperInputBox
                 onClick={props.onPaperDropItemClick}
-                onChange={props.onChange}
+                onChange={props.onPaperChange}
                 onKeyDown={props.onKeyDown}
                 selectedPapers={props.selectedPapers}
                 deletePaperBubble={props.deletePaperBubble}
@@ -22,7 +22,8 @@ function UserInputForm(props){
             />
             <br />
             <DateInputBox
-                onChange={props.onChange}
+                onLowDateChange={props.onLowDateChange}
+                onHighDateChange={props.onHighDateChange}
                 minYear={props.minYear}
                 maxYear={props.maxYear}
                 lowYear={props.lowYearValue}
@@ -187,20 +188,25 @@ function SelectionBox(props){
 function DateInputBox(props){
     return(
         <div className='dateInputs'>
-            <TextField
+            <div className='inputContainer'>
+            <input
                 id="lowYear"
-                label="Low Year"
+                type='text'
                 value={props.lowYear}
-                onChange={props.onChange}
-            sx={{
-                color: 'white',
-            }}/>
+                onChange={props.onLowDateChange}
+                placeholder='1499'
+            />
+            </div>
             to
-            <TextField
+            <div className='inputContainer'>
+            <input
                 id="highYear"
-                label="High Year"
+                type='text'
                 value={props.highYear}
-                onChange={props.onChange} />
+                onChange={props.onHighDateChange}
+                placeholder='2020'
+            />
+            </div>
         </div>
     )
 }

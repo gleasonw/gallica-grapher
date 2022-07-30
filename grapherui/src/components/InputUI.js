@@ -11,9 +11,12 @@ class InputUI extends React.Component {
             terms: [],
             papers: [],
             dateBoundary: [1499, 2020],
-            currentDateRange: [1499, 2020],
+            currentDateRange: ['', ''],
         };
-        this.handleChange = this.handleChange.bind(this);
+        this.handleLowDateChange = this.handleLowDateChange.bind(this);
+        this.handleHighDateChange = this.handleHighDateChange.bind(this);
+        this.handlePaperChange = this.handlePaperChange.bind(this);
+        this.handleTermChange = this.handleTermChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.deletePaperBubble = this.deletePaperBubble.bind(this);
@@ -32,12 +35,21 @@ class InputUI extends React.Component {
     handleClick(paperAndCode){
         this.makePaperBubble(paperAndCode)
     }
-    handleChange(item){
-        if(item.length !== 2){
-            this.updateInputValue(item)
-        }else{
-            this.setState({currentDateRange: item})
-        }
+    handleLowDateChange(event){
+        const range = this.state.currentDateRange.slice()
+        range[0] = event.target.value
+        this.setState({currentDateRange: range})
+    }
+    handleHighDateChange(event){
+        const range = this.state.currentDateRange.slice()
+        range[1] = event.target.value
+        this.setState({currentDateRange: range})
+    }
+    handlePaperChange(event){
+        this.setState({paperInputValue: event.target.value})
+    }
+    handleTermChange(event){
+        this.setState({termInputValue: event.target.value})
     }
     handleKeyDown(event){
         if(event.key === 'Enter'){
@@ -46,15 +58,6 @@ class InputUI extends React.Component {
                 this.makeTermBubble(event.target.value)
             }
         }
-    }
-    updateInputValue(event){
-        const target = event.target
-            const name = target.name
-            if(name === 'papers'){
-                this.setState({paperInputValue: target.value})
-            }else{
-                this.setState({termInputValue: target.value})
-            }
     }
     makePaperBubble(paperAndCode){
         const papers = this.state.papers.slice();
@@ -70,7 +73,7 @@ class InputUI extends React.Component {
     }
     render() {
         return (
-            <div>
+            <div className='inputBody'>
                 <div className='inputUI'>
                 {this.props.header}
                 <div className="mainTitle">
@@ -81,7 +84,10 @@ class InputUI extends React.Component {
                     paperInputValue={this.state.paperInputValue}
                     lowYearValue={this.state.currentDateRange[0]}
                     highYearValue={this.state.currentDateRange[1]}
-                    onChange={this.handleChange}
+                    onLowDateChange={this.handleLowDateChange}
+                    onHighDateChange={this.handleHighDateChange}
+                    onPaperChange={this.handlePaperChange}
+                    onTermChange={this.handleTermChange}
                     onClick={() => this.props.onCreateTicketClick(
                         {
                             'terms': this.state.terms,
@@ -115,7 +121,27 @@ class InputUI extends React.Component {
 function ExampleBox(props){
     return(
         <div className='exampleBox'>
-            Hello World
+            <ExampleQuery
+                terms={['Jules Verne']}
+                papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
+                dateRange={['1850', '1860']}
+            />
+            <ExampleQuery
+                terms={['Jules Verne']}
+                papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
+                dateRange={['1850', '1860']}
+            />
+        </div>
+    )
+}
+function ExampleQuery(props){
+    return(
+        <div className='exampleQuery'>
+            <TicketLabel
+                terms={props.terms}
+                papers={props.papers}
+                dateRange={props.dateRange}
+            />
         </div>
     )
 }

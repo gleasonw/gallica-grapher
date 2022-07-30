@@ -70,6 +70,10 @@ header{
     margin-right: auto;
     color: #bababa
 }
+.inputBody{
+    height: 100%;
+    width: 100%;
+}
 .inputUI{
     background-position-x: 0;
     background-position-y: 0;
@@ -77,6 +81,7 @@ header{
     background-size: auto;
     background-origin: padding-box;
     background-clip: border-box;
+    height: 75%;
 }
 @media screen and (max-width: 748px){
     .userInputForm{
@@ -113,12 +118,17 @@ header{
     width: 100%;
     max-width: 748px;
     margin-top: 15px;
+    margin-bottom: 30px;
     color: #bababa;
+}
+.dateInput{
+    color: green;
 }
 .requestBox{
     margin-left: auto;
     margin-right: auto;
     float: right;
+    display: none;
 }
 .bubbleItem{
     padding: 3px 5px 3px 10px;
@@ -171,7 +181,7 @@ input[type='text']{
     float: bottom;
     padding-left: 5px;
     background-color: inherit;
-    color: #999;
+    color: #bababa;
 }
 .requestBubble{
     border: 1px solid #e0e0e0;
@@ -204,10 +214,19 @@ input[type='text']{
     box-shadow: 0 0 3pt 2pt gray;
     border-radius: 5px;
     margin: 10px;
-    background-color:
+    background-color: rgb(42, 41, 38);
 }
 .paperInputAndDropdown{
     display: block;
+}
+.exampleQuery{
+    width: calc(50% - 20px);
+    padding: 24px;
+    max-height: 500px;
+}
+.exampleQuery:hover{
+    box-shadow: 0 8px 10px 1px rgba(0,0,0,.07),0 3px 14px 3px rgba(0,0,0,.06),0 4px 5px 0 rgba(0,0,0,.1);
+    cursor: pointer;
 }
 
 .delete{
@@ -295,7 +314,7 @@ label[for="papers"],label[for="searchTerm"]{
     color: white;
 }
 
-.queryProgressUI, .ticketResultsContainer{
+.queryProgressUI, .ticketResultsContainer, .exampleBox{
     max-width: 90vw;
     min-height: 80vh;
     margin-left: auto;
