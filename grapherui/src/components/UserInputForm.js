@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import TextField from "@mui/material/TextField";
 
 function UserInputForm(props){
@@ -27,12 +27,6 @@ function UserInputForm(props){
                 maxYear={props.maxYear}
                 lowYear={props.lowYearValue}
                 highYear={props.highYearValue}
-            />
-            <input
-                type='button'
-                id='createTicketButton'
-                value='Create Ticket'
-                onClick={props.onClick}
             />
         </form>
     )
@@ -192,10 +186,21 @@ function SelectionBox(props){
 
 function DateInputBox(props){
     return(
-        <div>
-            <TextField id="lowYear" label="Low Year" value={props.lowYear} onChange={props.onChange} />
+        <div className='dateInputs'>
+            <TextField
+                id="lowYear"
+                label="Low Year"
+                value={props.lowYear}
+                onChange={props.onChange}
+            sx={{
+                color: 'white',
+            }}/>
             to
-            <TextField id="highYear" label="High Year" value={props.highYear} onChange={props.onChange} />
+            <TextField
+                id="highYear"
+                label="High Year"
+                value={props.highYear}
+                onChange={props.onChange} />
         </div>
     )
 }

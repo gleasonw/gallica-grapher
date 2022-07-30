@@ -70,7 +70,9 @@ class InputUI extends React.Component {
     }
     render() {
         return (
-            <div className='inputUI'>
+            <div>
+                <div className='inputUI'>
+                {this.props.header}
                 <div className="mainTitle">
                     Enter a word or phrase to query Gallica then graph the results.
                 </div>
@@ -102,10 +104,20 @@ class InputUI extends React.Component {
                     onGraphStartClick={this.props.onInputSubmit}
                 />
             </div>
+            <ExampleBox/>
+        </div>
+
 
         )
     }
 
+}
+function ExampleBox(props){
+    return(
+        <div className='exampleBox'>
+            Hello World
+        </div>
+    )
 }
 function RequestBox(props){
     return(

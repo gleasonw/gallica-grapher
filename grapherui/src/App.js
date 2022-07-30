@@ -22,7 +22,7 @@ function App() {
                     Graphing Gallica
                 </div>
                 <div className="info">
-                    Info
+                    <img src="resources/info.png" alt="Information button"/>
                 </div>
             </div>
         </header>
@@ -77,31 +77,31 @@ function App() {
     if(gettingInput){
         return (
             <div className="App">
-                {header}
                 <InputUI
                     requestTickets={tickets}
                     onInputSubmit={handleInputSubmit}
                     onCreateTicketClick={handleCreateTicketClick}
                     onTicketClick={handleTicketClick}
+                    header={header}
                 />
             </div>
         )
     }else if(fetchingData){
           return (
             <div className="App">
-                {header}
                 <RunningQueriesUI
                     tickets={idTickets}
                     onFinish={handleTicketFinish}
                     requestID={requestID}
+                    header={header}
                 />
             </div>
           )
     }else{
         return (
             <div className="App">
-                {header}
                 <ResultUI
+                    header={header}
                     tickets={idTickets}
                 />
             </div>

@@ -68,15 +68,18 @@ header{
     line-height: 56px;
     margin-left: auto;
     margin-right: auto;
+    color: #bababa
 }
 .inputUI{
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    background-position-x: 0;
+    background-position-y: 0;
+    background: rgb(22, 21, 18) linear-gradient(rgb(46, 42, 36), rgb(22, 21, 18) 116px) no-repeat scroll;
+    background-size: auto;
+    background-origin: padding-box;
+    background-clip: border-box;
 }
 @media screen and (max-width: 748px){
-    .userInputForm, .requestBox {
+    .userInputForm{
         width: 100%;
         max-width: 648px;
         padding: 0 16px;
@@ -93,7 +96,7 @@ header{
 .userInputForm{
     margin-top: 15px;
 }
-.userInputForm, .requestBox{
+.userInputForm{
     width: 100%;
     max-width: 748px;
     margin-top: 15px;
@@ -102,17 +105,20 @@ header{
     margin-left: auto;
     margin-right: auto;
 }
+.dateInputs{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 748px;
+    margin-top: 15px;
+    color: #bababa;
+}
 .requestBox{
-    border: 0;
-    font-size: 14px;
-    margin-bottom: 50px;
+    margin-left: auto;
     margin-right: auto;
-    margin-left: 15px;
-    position: relative;
-    outline: none;
-    appearance: none;
-    box-shadow: 0 0 3pt 2pt gray;
-    flex: 1;
+    float: right;
 }
 .bubbleItem{
     padding: 3px 5px 3px 10px;
@@ -158,13 +164,14 @@ header{
 
 input[type='text']{
     height: 100%;
-    font-family: var(--font-fam);
     border: 0;
     outline: none;
     font-size: 16px;
     width: 100%;
     float: bottom;
     padding-left: 5px;
+    background-color: inherit;
+    color: #999;
 }
 .requestBubble{
     border: 1px solid #e0e0e0;
@@ -172,15 +179,7 @@ input[type='text']{
     margin: 5px;
 }
 .graphingButtonContainer{
-    height: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-#startGraphingButton{
-    border: none;
-    height: 100%;
-    min-width: 100px;
+    border: solid;
 }
 .ticketBox{
     display: flex;
@@ -203,7 +202,9 @@ input[type='text']{
     outline: none;
     appearance: none;
     box-shadow: 0 0 3pt 2pt gray;
-    margin-bottom: 10px;
+    border-radius: 5px;
+    margin: 10px;
+    background-color:
 }
 .paperInputAndDropdown{
     display: block;
@@ -236,8 +237,9 @@ label[for="papers"],label[for="searchTerm"]{
     overflow-x: scroll;
     max-height: 34px;
     height: 34px;
-    background-color: cornflowerblue;
     width: 100%;
+    border: 1px dashed #e0e0e0;
+    border-radius: inherit;
 }
 
 .selectedPaper,.selectedTerm{
