@@ -1,5 +1,4 @@
 import React from 'react';
-import TextField from "@mui/material/TextField";
 
 function UserInputForm(props){
     return(
@@ -29,6 +28,21 @@ function UserInputForm(props){
                 lowYear={props.lowYearValue}
                 highYear={props.highYearValue}
             />
+            <div className='createTicketAndGraphButtonContainer'>
+                <input
+                    type='button'
+                    id='graphButton'
+                    value='Graph 📊'
+                    onClick={props.onInputSubmit}
+                />
+                <input
+                    type='button'
+                    id='createTicketButton'
+                    value='Add query +'
+                    onClick={props.onCreateTicketClick}
+                />
+            </div>
+
         </form>
     )
 }
@@ -37,6 +51,7 @@ function TermInputBox(props){
         <div className='inputContainer'>
             <SelectionBox
                 items={props.selectedTerms}
+                bubblesLabel={'Terms:'}
                 onClick={props.deleteTermBubble}
             />
             <input
@@ -100,6 +115,7 @@ class PaperInputBox extends React.Component{
                 <div className='inputContainer'>
                     <SelectionBox
                         items={paperNames}
+                        bubblesLabel={'In Papers:'}
                         onClick={this.props.deletePaperBubble}
                     />
                     <input
@@ -164,8 +180,18 @@ function SelectionBubble(props){
             type='button'
             onClick={props.onClick}
         >
-            <div className='bubbleText'>
+            <span className='bubbleText'>
                 {props.item}
+            </span>
+            <div className='bubbleDeleteButton'>
+                <svg className="deleteButton" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+                    <g transform="rotate(-45 50 50)">
+                        <rect x="0" y="40" width="100" height="20"></rect>
+                    </g>
+                    <g transform="rotate(45 50 50)">
+                        <rect x="0" y="40" width="100" height="20"></rect>
+                    </g>
+                </svg>
             </div>
         </button>
     )
@@ -174,6 +200,9 @@ function SelectionBubble(props){
 function SelectionBox(props){
         return(
         <div className='bubblesContainer'>
+            <span className='bubblesLabel'>
+                {props.bubblesLabel}
+            </span>
             {props.items.map((item,index) => (
             <SelectionBubble
                 onClick={() => props.onClick(index)}

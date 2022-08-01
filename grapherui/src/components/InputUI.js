@@ -74,44 +74,51 @@ class InputUI extends React.Component {
     render() {
         return (
             <div className='inputBody'>
-                <div className='inputUI'>
-                {this.props.header}
-                <div className="mainTitle">
-                    Enter a word or phrase to query Gallica then graph the results.
+                <div className='inputFormAndRequestBoxContainer'>
+                    <div className='inputUI'>
+                        {this.props.header}
+                        <div className="mainTitle">
+                            Enter a word or phrase to query Gallica then graph the results.
+                        </div>
+                        <UserInputForm
+                            termInputValue={this.state.termInputValue}
+                            paperInputValue={this.state.paperInputValue}
+                            lowYearValue={this.state.currentDateRange[0]}
+                            highYearValue={this.state.currentDateRange[1]}
+                            onLowDateChange={this.handleLowDateChange}
+                            onHighDateChange={this.handleHighDateChange}
+                            onPaperChange={this.handlePaperChange}
+                            onTermChange={this.handleTermChange}
+                            onCreateTicketClick={() => this.props.onCreateTicketClick(
+                                {
+                                    'terms': this.state.terms,
+                                    'papersAndCodes': this.state.papers,
+                                    'dateRange': this.state.currentDateRange
+                                }
+                            )}
+                            onPaperDropItemClick={this.handleClick}
+                            onKeyDown={this.handleKeyDown}
+                            selectedTerms={this.state.terms}
+                            selectedPapers={this.state.papers}
+                            deleteTermBubble={this.deleteTermBubble}
+                            deletePaperBubble={this.deletePaperBubble}
+                            minYear={this.state.dateBoundary[0]}
+                            maxYear={this.state.dateBoundary[1]}
+                        />
+                        <RequestBox
+                            requestTickets={this.props.requestTickets}
+                            onTicketClick={this.props.onTicketClick}
+                            onGraphStartClick={this.props.onInputSubmit}
+                        />
+                    </div>
+                    <div className='seeExamplesButton'>
+                        <div className='seeExamplesText'>
+                            Try example queries ↓
+                        </div>
+                    </div>
                 </div>
-                <UserInputForm
-                    termInputValue={this.state.termInputValue}
-                    paperInputValue={this.state.paperInputValue}
-                    lowYearValue={this.state.currentDateRange[0]}
-                    highYearValue={this.state.currentDateRange[1]}
-                    onLowDateChange={this.handleLowDateChange}
-                    onHighDateChange={this.handleHighDateChange}
-                    onPaperChange={this.handlePaperChange}
-                    onTermChange={this.handleTermChange}
-                    onClick={() => this.props.onCreateTicketClick(
-                        {
-                            'terms': this.state.terms,
-                            'papersAndCodes': this.state.papers,
-                            'dateRange': this.state.currentDateRange
-                        }
-                    )}
-                    onPaperDropItemClick={this.handleClick}
-                    onKeyDown={this.handleKeyDown}
-                    selectedTerms={this.state.terms}
-                    selectedPapers={this.state.papers}
-                    deleteTermBubble={this.deleteTermBubble}
-                    deletePaperBubble={this.deletePaperBubble}
-                    minYear={this.state.dateBoundary[0]}
-                    maxYear={this.state.dateBoundary[1]}
-                />
-                <RequestBox
-                    requestTickets={this.props.requestTickets}
-                    onTicketClick={this.props.onTicketClick}
-                    onGraphStartClick={this.props.onInputSubmit}
-                />
-            </div>
             <ExampleBox/>
-        </div>
+            </div>
 
 
         )
@@ -121,6 +128,7 @@ class InputUI extends React.Component {
 function ExampleBox(props){
     return(
         <div className='exampleBox'>
+            Or, try an example.
             <ExampleQuery
                 terms={['Jules Verne']}
                 papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
@@ -132,6 +140,7 @@ function ExampleBox(props){
                 dateRange={['1850', '1860']}
             />
         </div>
+
     )
 }
 function ExampleQuery(props){
@@ -148,16 +157,10 @@ function ExampleQuery(props){
 function RequestBox(props){
     return(
         <div className='requestBox'>
-            <RequestTicketBox
-                tickets={props.requestTickets}
-                onTicketClick={props.onTicketClick}
-            />
-            <div className='graphingButtonContainer'>
-                <input
-                    type='submit'
-                    id='startGraphingButton'
-                    value='Graph!'
-                    onClick={props.onGraphStartClick}
+            <div className='requestTicketsContainer'>
+                <RequestTicketBox
+                    tickets={props.requestTickets}
+                    onTicketClick={props.onTicketClick}
                 />
             </div>
         </div>

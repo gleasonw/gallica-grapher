@@ -1,6 +1,12 @@
 html, body, #root {
     margin: 0;
     height: 100%;
+    background-position-x: 0;
+    background-position-y: 0;
+    background: rgb(22, 21, 18) linear-gradient(rgb(46, 42, 36), rgb(22, 21, 18) 116px) no-repeat scroll;
+    background-size: auto;
+    background-origin: padding-box;
+    background-clip: border-box;
 }
 
 .horizontal-slider {
@@ -58,7 +64,7 @@ header{
     justify-content: space-between;
     align-items: center;
 }
-.mainTitle {
+.mainTitle{
     padding: 0 40px 40px;
     width: 548px;
     display: flex;
@@ -70,24 +76,26 @@ header{
     margin-right: auto;
     color: #bababa
 }
-.inputBody{
-    height: 100%;
+.inputFormAndRequestBoxContainer{
+    min-height: 100%;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .inputUI{
-    background-position-x: 0;
-    background-position-y: 0;
-    background: rgb(22, 21, 18) linear-gradient(rgb(46, 42, 36), rgb(22, 21, 18) 116px) no-repeat scroll;
-    background-size: auto;
-    background-origin: padding-box;
-    background-clip: border-box;
-    height: 75%;
+    height: 100%;
+}
+.inputBody{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
 }
 @media screen and (max-width: 748px){
-    .userInputForm{
+    .userInputForm, .requestBox{
         width: 100%;
         max-width: 648px;
-        padding: 0 16px;
     }
     .ticketBox{
         max-height: 100px;
@@ -99,16 +107,17 @@ header{
     }
 }
 .userInputForm{
-    margin-top: 15px;
-}
-.userInputForm{
     width: 100%;
     max-width: 748px;
     margin-top: 15px;
+    background-color: #262421;
+    padding: 10px 20px 10px 20px;
+    border-radius: 10px;
 }
-.userInputForm{
-    margin-left: auto;
-    margin-right: auto;
+.requestBox{
+    min-height: 100px;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 .dateInputs{
     display: flex;
@@ -117,7 +126,6 @@ header{
     align-items: center;
     width: 100%;
     max-width: 748px;
-    margin-top: 15px;
     margin-bottom: 30px;
     color: #bababa;
 }
@@ -125,21 +133,30 @@ header{
     color: green;
 }
 .requestBox{
-    margin-left: auto;
-    margin-right: auto;
-    float: right;
-    display: none;
+    width: 100%;
+    max-width: 748px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.bubblesContainer{
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    background-color: rgba(186,186,186,0.05);
+    border-radius: 8px;
+    padding: 4px 8px;
+    color: #bababa;
 }
 .bubbleItem{
-    padding: 3px 5px 3px 10px;
-    margin: 3px 5px 3px 0;
-    box-shadow: inset 0 0 4px 0 #dcd1c7;
-    border: 1px solid #cbc6c3;
-    color: #242527;
-    max-height: 30px;
-    max-width: 250px;
-    line-height: 1.4;
-    display: flex;
+    align-items: center;
+    background-color: #bababa;
+    border-radius: 30px;
+    box-shadow: 0 1px 6px rgba(167,182,194,.5);
+    display: inline-flex;
+    max-width: 100%;
+    padding: 8px 12px;
 }
 .bubbleText{
     overflow: hidden;
@@ -148,6 +165,29 @@ header{
     margin: auto;
     text-align: center;
     white-space: nowrap;
+    font-weight: 700;
+    line-height: 1;
+}
+.bubbleDeleteButton{
+    align-items: center;
+    appearance: none;
+    background: #d64f00;
+    border: none;
+    border-radius: 50%;
+    display: inline-flex;
+    flex: none;
+    font-size: 14px;
+    height: 1em;
+    justify-content: center;
+    line-height: 1;
+    margin: 0 0 0 8px;
+    padding: 0;
+    width: 1em;
+}
+.deleteButton{
+    fill: #fff;
+    height: 10px;
+    width: 10px;
 }
 .ticket{
     margin: 5px;
@@ -188,21 +228,34 @@ input[type='text']{
     flex: 1;
     margin: 5px;
 }
-.graphingButtonContainer{
-    border: solid;
-}
 .ticketBox{
     display: flex;
     flex-wrap: wrap;
     overflow-y: scroll;
     max-width: 500px;
 }
+.createTicketAndGraphButtonContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 748px;
+    margin-top: 30px;
+}
 
-#createTicketButton{
-    margin: 30px auto;
-    display: block;
-    padding: 12px 20px 10px;
-    border: none;
+#createTicketButton, #graphButton{
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #404040;
+    background: rgba(186,186,186,0.05);
+    color: #bababa;
+    transition: all 150ms;
+    border-radius: 10px;
+    font-size: 40px;
+    padding: 10px;
+    width: 100%;
 }
 
 .inputContainer{
@@ -211,18 +264,47 @@ input[type='text']{
     padding: 12px 20px;
     outline: none;
     appearance: none;
-    box-shadow: 0 0 3pt 2pt gray;
+
+    box-shadow: 0 1px 6px rgba(167,182,194,.25);
     border-radius: 5px;
     margin: 10px;
     background-color: rgb(42, 41, 38);
 }
+.requestTicketsContainer{
+    width: 100%;
+    height: 100px;
+    background-color: #262421;
+    padding: 10px 20px 10px 20px;
+    border-radius: 10px;
+}
 .paperInputAndDropdown{
     display: block;
+}
+.seeExamplesButton{
+    height: 162px;
+    align-items: center;
+    display: flex;
+    cursor: pointer;
+    align-self: center;
+}
+.seeExamplesText{
+    color: #bababa;
+    font-size: 20px;
+    margin-left: 10px;
+}
+.exampleBox{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: white;
+    height: 500px;
 }
 .exampleQuery{
     width: calc(50% - 20px);
     padding: 24px;
-    max-height: 500px;
+    max-height: 200px;
 }
 .exampleQuery:hover{
     box-shadow: 0 8px 10px 1px rgba(0,0,0,.07),0 3px 14px 3px rgba(0,0,0,.06),0 4px 5px 0 rgba(0,0,0,.1);
@@ -250,16 +332,6 @@ label[for="papers"],label[for="searchTerm"]{
     display: none;
 }
 
-.bubblesContainer{
-    display: flex;
-    float: left;
-    overflow-x: scroll;
-    max-height: 34px;
-    height: 34px;
-    width: 100%;
-    border: 1px dashed #e0e0e0;
-    border-radius: inherit;
-}
 
 .selectedPaper,.selectedTerm{
     overflow: hidden;
@@ -314,7 +386,7 @@ label[for="papers"],label[for="searchTerm"]{
     color: white;
 }
 
-.queryProgressUI, .ticketResultsContainer, .exampleBox{
+.queryProgressUI, .ticketResultsContainer{
     max-width: 90vw;
     min-height: 80vh;
     margin-left: auto;
