@@ -1,8 +1,35 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 function UserInputForm(props){
+    const [showTicketReminder, setShowTicketReminder] = useState(false);
+    const noTicketReminder =
+        <div>
+            <div className='noTicketReminder'>
+                <span className='noTicketReminderText'>
+                    You have no tickets.
+                </span>
+            </div>
+        </div>
+
+    function handleSubmit(e){
+        e.preventDefault();
+        if (props.thereAreTickets){
+            props.onGraphStartClick(e);
+        }else{
+            setShowTicketReminder(true);
+        }
+    }
+
+    function handleCreateTicketClick(){
+        setShowTicketReminder(false);
+        props.onCreateTicketClick();
+    }
+
     return(
-        <form onSubmit={props.onSubmit} className='userInputForm'>
+        <form
+            onSubmit={handleSubmit}
+            className='userInputForm'
+        >
             <TermInputBox
                 value={props.termInputValue}
                 onChange={props.onTermChange}
@@ -28,20 +55,23 @@ function UserInputForm(props){
                 lowYear={props.lowYearValue}
                 highYear={props.highYearValue}
             />
-            <div className='createTicketAndGraphButtonContainer'>
-                <input
-                    type='button'
-                    id='graphButton'
-                    value='Graph 📊'
-                    onClick={props.onInputSubmit}
-                />
-                <input
-                    type='button'
-                    id='createTicketButton'
-                    value='Add query +'
-                    onClick={props.onCreateTicketClick}
-                />
+            <div className='graphWarningBoxBoundary'>
+                {showTicketReminder && !props.thereAreTickets ? noTicketReminder : null}
+                <div className='createTicketAndGraphButtonContainer'>
+                    <input
+                        type='submit'
+                        id='graphButton'
+                        value='Graph 📊'
+                    />
+                    <input
+                        type='button'
+                        id='createTicketButton'
+                        value='Add query +'
+                        onClick={handleCreateTicketClick}
+                    />
+                </div>
             </div>
+
 
         </form>
     )

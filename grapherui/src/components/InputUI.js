@@ -12,6 +12,7 @@ class InputUI extends React.Component {
             papers: [],
             dateBoundary: [1499, 2020],
             currentDateRange: ['', ''],
+            showNoTicketReminder: false
         };
         this.handleLowDateChange = this.handleLowDateChange.bind(this);
         this.handleHighDateChange = this.handleHighDateChange.bind(this);
@@ -104,11 +105,12 @@ class InputUI extends React.Component {
                             deletePaperBubble={this.deletePaperBubble}
                             minYear={this.state.dateBoundary[0]}
                             maxYear={this.state.dateBoundary[1]}
+                            onGraphStartClick={this.props.onInputSubmit}
+                            thereAreTickets={this.props.thereAreTickets}
                         />
                         <RequestBox
                             requestTickets={this.props.requestTickets}
                             onTicketClick={this.props.onTicketClick}
-                            onGraphStartClick={this.props.onInputSubmit}
                         />
                     </div>
                     <div className='seeExamplesButton'>

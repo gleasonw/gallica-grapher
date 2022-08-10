@@ -144,19 +144,23 @@ header{
     display: flex;
     flex-grow: 1;
     flex-direction: row;
-    background-color: rgba(186,186,186,0.05);
     border-radius: 8px;
     padding: 4px 8px;
     color: #bababa;
 }
 .bubbleItem{
-    align-items: center;
-    background-color: #bababa;
-    border-radius: 30px;
-    box-shadow: 0 1px 6px rgba(167,182,194,.5);
     display: inline-flex;
     max-width: 100%;
     padding: 8px 12px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #404040;
+    background: rgba(186,186,186,0.05);
+    color: #bababa;
+    transition: all 150ms;
+    border-radius: 10px;
+    font-size: 40px;
 }
 .bubbleText{
     overflow: hidden;
@@ -197,6 +201,14 @@ header{
     display: flex;
     flex-wrap: wrap;
 }
+.requestBubble{
+    max-width: 200px;
+    max-height: 200px;
+    color: #999;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(to bottom, #3c3934, #33312e 100%);
+}
 
 .selectionBubble{
     padding: 3px 5px 3px 10px;
@@ -234,6 +246,9 @@ input[type='text']{
     overflow-y: scroll;
     max-width: 500px;
 }
+.graphWarningBoxBoundary{
+    margin-top: 30px;
+}
 .createTicketAndGraphButtonContainer{
     display: flex;
     flex-direction: row;
@@ -241,9 +256,10 @@ input[type='text']{
     align-items: center;
     width: 100%;
     max-width: 748px;
-    margin-top: 30px;
 }
-
+.noTicketReminderText{
+    color: #d64f00;
+}
 #createTicketButton, #graphButton{
     justify-content: center;
     align-items: center;
