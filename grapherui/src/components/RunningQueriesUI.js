@@ -35,15 +35,14 @@ function TicketProgressContainer(props){
             const currentTicketProgress = await fetch("progress/" + props.requestid);
             currentTicketProgress.json().then(data => {
                 const progress = data["progress"]
-                setProgressStats(progress)
+                setProgressStats(progress ? progress : initProgressStats)
                 if (data["state"] === "SUCCESS") {
                     props.onFinish()
                 }
             });
         }
         setTimeout(updateProgress, 1000)
-    }, [props, progressStats]);
-
+    }, [props, progressStats, initProgressStats]);
     return(
         <div className='queryProgressUI'>
             {Object.keys(props.tickets).map(key => (
@@ -67,18 +66,20 @@ function TicketProgressBox(props){
                 papers={props.papers}
                 dateRange={props.dateRange}
             />
-            <div className='progressStats'>
-                <ProgressBar
-                    animated
-                    now={props.progressStats.progress}
-                />
-                <div className='progressStatsText'>
-                    {props.progressStats.numResultsRetrieved} of {props.progressStats.numResultsDiscovered} results retrieved
+            {props.progressStats &&
+                <div className='progressStats'>
+                    <ProgressBar
+                        animated
+                        now={props.progressStats.progress}
+                    />
+                    <div className='progressStatsText'>
+                        {props.progressStats.numResultsRetrieved} of {props.progressStats.numResultsDiscovered} results retrieved
+                    </div>
+                    <div className='progressStatsText'>
+                        {props.progressStats.randomPaper}
+                    </div>
                 </div>
-                <div className='progressStatsText'>
-                    {props.progressStats.randomPaper}
-                </div>
-            </div>
+            }
         </div>
     )
 }

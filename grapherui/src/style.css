@@ -143,6 +143,7 @@ header{
     align-items: center;
     display: flex;
     flex-grow: 1;
+    flex-wrap: wrap;
     flex-direction: row;
     border-radius: 8px;
     padding: 4px 8px;
@@ -150,7 +151,7 @@ header{
 }
 .bubbleItem{
     display: inline-flex;
-    max-width: 100%;
+    max-width: 200px;
     padding: 8px 12px;
     justify-content: center;
     align-items: center;
@@ -242,9 +243,10 @@ input[type='text']{
 }
 .ticketBox{
     display: flex;
-    flex-wrap: wrap;
-    overflow-y: scroll;
-    max-width: 500px;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
 }
 .graphWarningBoxBoundary{
     margin-top: 30px;
@@ -287,6 +289,11 @@ input[type='text']{
     background-color: rgb(42, 41, 38);
 }
 .requestTicketsContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
     width: 100%;
     height: 100px;
     background-color: #262421;
@@ -411,12 +418,23 @@ label[for="papers"],label[for="searchTerm"]{
     flex-wrap: wrap;
     margin-top: 30px;
     justify-content: center;
+    align-items: center;
 }
-.ticketProgressBox, .groupedStat{
+.groupedStat{
     border: solid;
     width: calc(100% - 40px);
     max-width: 800px;
     margin: 20px;
+}
+.ticketProgressBox{
+    width: 100%;
+    border: 1px solid #404040;
+    background: rgba(186,186,186,0.05);
+    color: #bababa;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 500px;
+    max-height: 500px;
 
 }
 .ticketResults{

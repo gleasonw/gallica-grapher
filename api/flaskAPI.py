@@ -31,7 +31,10 @@ def getProgress(taskID):
             'progress': task.info.get('progress')
         }
     else:
-        response = {'state': task.state}
+        response = {
+            'state': task.state,
+            'progress': None
+        }
     return response
 
 
