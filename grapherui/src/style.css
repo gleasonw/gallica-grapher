@@ -146,8 +146,11 @@ header{
     flex-wrap: wrap;
     flex-direction: row;
     border-radius: 8px;
-    padding: 4px 8px;
     color: #bababa;
+}
+.bubblesLabel{
+    height: 32px;
+    margin-right: 10px;
 }
 .bubbleItem{
     display: inline-flex;
@@ -232,7 +235,6 @@ input[type='text']{
     font-size: 16px;
     width: 100%;
     float: bottom;
-    padding-left: 5px;
     background-color: inherit;
     color: #bababa;
 }
@@ -465,12 +467,11 @@ tr:hover{
     justify-content: center;
     flex-direction: column;
 }
-.graphGroupButton{
-    margin-left: auto;
-    margin-right: auto;
-}
 .groupedLabelBar{
     display: flex;
+    background-color: #262421;
+    padding: 10px 20px 10px 20px;
+    border-radius: 10px;
 }
 .ticketLabel{
     flex: 1;
@@ -488,9 +489,13 @@ tr:hover{
 }
 .groupedStatBar, .groupedLabelBar{
     display: flex;
-    border: solid;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
+    background-color: #262421;
+    padding: 10px 20px 10px 20px;
+    border-radius: 10px;
+    color: #bababa;
 }
 .groupedLabel{
     flex: 1;

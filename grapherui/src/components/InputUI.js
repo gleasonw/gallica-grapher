@@ -94,7 +94,11 @@ class InputUI extends React.Component {
                                 {
                                     'terms': this.state.terms,
                                     'papersAndCodes': this.state.papers,
-                                    'dateRange': this.state.currentDateRange
+                                    'dateRange':
+                                        this.state.currentDateRange[0] &&
+                                        this.state.currentDateRange[1] ?
+                                            this.state.currentDateRange :
+                                            [1499, 2020]
                                 }
                             )}
                             onPaperDropItemClick={this.handleClick}

@@ -12,14 +12,10 @@ class TicketLabel extends React.Component{
     }
 }
 function TicketTermRow(props){
-    return(
-        props.terms.length > 1 ?
-            props.terms.map(
-                term => "'" + term + "'"
-            ).join(', ')
-        :
-            "'" + props.terms[0] + "'"
-    )
+    const quotedTerms = props.terms.map(
+        term => "'" + term + "'"
+    ).join(', ')
+    return(renderRow(quotedTerms))
 }
 function TicketPaperRow(props){
     const papers = props.papers

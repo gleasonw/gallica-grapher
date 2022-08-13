@@ -17,7 +17,7 @@ function RunningQueriesUI(props) {
 }
 
 function TicketProgressContainer(props){
-    const initProgressStats = {}
+    let initProgressStats = {}
 
     Object.keys(props.tickets).map(key => (
         initProgressStats[key] = {
@@ -35,14 +35,17 @@ function TicketProgressContainer(props){
             const currentTicketProgress = await fetch("progress/" + props.requestid);
             currentTicketProgress.json().then(data => {
                 const progress = data["progress"]
-                setProgressStats(progress ? progress : initProgressStats)
+                console.log(progress)
+                if(progress){
+                    setProgressStats(progress)
+                }
                 if (data["state"] === "SUCCESS") {
                     props.onFinish()
                 }
             });
         }
         setTimeout(updateProgress, 1000)
-    }, [props, progressStats, initProgressStats]);
+    }, [props, progressStats]);
     return(
         <div className='queryProgressUI'>
             {Object.keys(props.tickets).map(key => (
