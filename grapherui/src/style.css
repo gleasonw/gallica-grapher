@@ -3,7 +3,7 @@ html, body, #root {
     height: 100%;
     background-position-x: 0;
     background-position-y: 0;
-    background: rgb(22, 21, 18) linear-gradient(rgb(46, 42, 36), rgb(22, 21, 18) 116px) no-repeat scroll;
+    background: #edebe9 linear-gradient(to bottom, #dbd7d1, #edebe9 116px) no-repeat;
     background-size: auto;
     background-origin: padding-box;
     background-clip: border-box;
@@ -74,7 +74,7 @@ header{
     line-height: 56px;
     margin-left: auto;
     margin-right: auto;
-    color: #bababa
+    color: #4d4d4d
 }
 .inputFormAndRequestBoxContainer{
     min-height: 100%;
@@ -110,9 +110,11 @@ header{
     width: 100%;
     max-width: 748px;
     margin-top: 15px;
-    background-color: #262421;
+    background: #fff;
     padding: 10px 20px 10px 20px;
     border-radius: 10px;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
+
 }
 .requestBox{
     min-height: 100px;
@@ -127,7 +129,6 @@ header{
     width: 100%;
     max-width: 748px;
     margin-bottom: 30px;
-    color: #bababa;
 }
 .dateInput{
     color: green;
@@ -146,7 +147,6 @@ header{
     flex-wrap: wrap;
     flex-direction: row;
     border-radius: 8px;
-    color: #bababa;
 }
 .bubblesLabel{
     height: 32px;
@@ -161,7 +161,7 @@ header{
     cursor: pointer;
     border: 1px solid #404040;
     background: rgba(186,186,186,0.05);
-    color: #bababa;
+    color: #4d4d4d;
     transition: all 150ms;
     border-radius: 10px;
     font-size: 40px;
@@ -208,10 +208,10 @@ header{
 .requestBubble{
     max-width: 200px;
     max-height: 200px;
-    color: #999;
+    color: #4d4d4d;
     border-radius: 10px;
-    border: none;
-    background: linear-gradient(to bottom, #3c3934, #33312e 100%);
+    border: 1px solid #404040;
+    background: rgba(186,186,186,0.05);
 }
 
 .selectionBubble{
@@ -236,7 +236,7 @@ input[type='text']{
     width: 100%;
     float: bottom;
     background-color: inherit;
-    color: #bababa;
+    color: #4d4d4d;
 }
 .requestBubble{
     border: 1px solid #e0e0e0;
@@ -268,10 +268,10 @@ input[type='text']{
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border: 1px solid #404040;
-    background: rgba(186,186,186,0.05);
-    color: #bababa;
+    background: linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%);
+    text-shadow: 0 1px 0 #fff;
     transition: all 150ms;
+    color: #4d4d4d;
     border-radius: 10px;
     font-size: 40px;
     padding: 10px;
@@ -279,16 +279,18 @@ input[type='text']{
 }
 
 .inputContainer{
-    border: 0;
     font-size: large;
     padding: 12px 20px;
     outline: none;
     appearance: none;
-
-    box-shadow: 0 1px 6px rgba(167,182,194,.25);
-    border-radius: 5px;
-    margin: 10px;
-    background-color: rgb(42, 41, 38);
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #d9d9d9;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+    color: #4d4d4d;
+    transition: all 150ms;
 }
 .requestTicketsContainer{
     display: flex;
@@ -297,10 +299,12 @@ input[type='text']{
     flex-wrap: nowrap;
     overflow-x: scroll;
     width: 100%;
+    max-width: 100%;
     height: 100px;
-    background-color: #262421;
+    background-color: rgb(255, 255, 255);
     padding: 10px 20px 10px 20px;
     border-radius: 10px;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
 }
 .paperInputAndDropdown{
     display: block;
@@ -313,7 +317,7 @@ input[type='text']{
     align-self: center;
 }
 .seeExamplesText{
-    color: #bababa;
+    color: #4d4d4d;
     font-size: 20px;
     margin-left: 10px;
 }
@@ -432,7 +436,7 @@ label[for="papers"],label[for="searchTerm"]{
     width: 100%;
     border: 1px solid #404040;
     background: rgba(186,186,186,0.05);
-    color: #bababa;
+    color: #4d4d4d;
     border-radius: 10px;
     padding: 10px;
     max-width: 500px;
@@ -492,10 +496,11 @@ tr:hover{
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    background-color: #262421;
     padding: 10px 20px 10px 20px;
     border-radius: 10px;
-    color: #bababa;
+    border: 1px solid #d9d9d9;
+    background: rgba(255,255,255,0.5);
+    color: #4d4d4d;
 }
 .groupedLabel{
     flex: 1;
