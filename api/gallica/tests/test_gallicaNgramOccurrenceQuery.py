@@ -1,9 +1,9 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from gallica.db import DB
-from gallica.keywordQuery import KeywordQuery
-from gallica.keywordQuery import KeywordQueryAllPapers
-from gallica.keywordQuery import KeywordQuerySelectPapers
+from gallica.gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQuery
+from gallica.gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQueryAllPapers
+from gallica.gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQuerySelectPapers
 from gallica.gallicaSession import GallicaSession
 from DBtester import DBtester
 import os
@@ -11,7 +11,7 @@ import os
 here = os.path.dirname(__file__)
 
 
-class TestKeywordQuery(TestCase):
+class TestGallicaNgramOccurrenceQuery(TestCase):
 
     @staticmethod
     def cleanUpHoldingResults():
@@ -23,13 +23,13 @@ class TestKeywordQuery(TestCase):
                 """)
         dbConnection.close()
 
-    @patch('record.Record')
+    @patch('gallicaRecord.GallicaRecord')
     def getMockBatchOf5KeywordRecords(self, mock_record):
         mock_record.return_value = mock_record
         mock_record.parsePaperCodeFromXML = MagicMock(return_value="123")
         mock_record.parseURLFromXML = MagicMock(return_value="http://example.com")
 
-        payload = KeywordQuery(
+        payload = GallicaNgramOccurrenceQuery(
             'term!',
             [],
             'id!',
@@ -50,7 +50,7 @@ class TestKeywordQuery(TestCase):
         return payload
 
     def test_establish_year_range(self):
-        noRangeQuery = KeywordQuery(
+        noRangeQuery = GallicaNgramOccurrenceQuery(
             '',
             [],
             '1234',
@@ -58,7 +58,7 @@ class TestKeywordQuery(TestCase):
             MagicMock,
             MagicMock
         )
-        rangeQuery = KeywordQuery(
+        rangeQuery = GallicaNgramOccurrenceQuery(
             '',
             [1, 1],
             '1234',
@@ -70,7 +70,7 @@ class TestKeywordQuery(TestCase):
         self.assertTrue(rangeQuery.isYearRange)
 
     def test_build_no_year_range_query(self):
-        noRangeQuery = KeywordQuery(
+        noRangeQuery = GallicaNgramOccurrenceQuery(
             '',
             [],
             '1234',
@@ -85,7 +85,7 @@ class TestKeywordQuery(TestCase):
         self.assertTrue(noRangeQuery.buildDatelessQuery.called)
 
     def test_build_year_range_query(self):
-        rangeQuery = KeywordQuery(
+        rangeQuery = GallicaNgramOccurrenceQuery(
             '',
             [1, 1],
             '1234',
@@ -100,7 +100,7 @@ class TestKeywordQuery(TestCase):
         self.assertTrue(rangeQuery.buildYearRangeQuery.called)
 
     def test_run_search(self):
-        testQuery = KeywordQuery(
+        testQuery = GallicaNgramOccurrenceQuery(
             '',
             [],
             '1234',
@@ -118,7 +118,7 @@ class TestKeywordQuery(TestCase):
         self.assertFalse(testQuery.moveRecordsToDB.called)
 
     def test_do_threaded_search(self):
-        testQuery = KeywordQuery(
+        testQuery = GallicaNgramOccurrenceQuery(
             '',
             [],
             '1234',
@@ -142,7 +142,7 @@ class TestKeywordQuery(TestCase):
         )
 
     def test_move_records_to_db(self):
-        testQuery = KeywordQuery('', [], '1234', MagicMock, MagicMock(cursor=MagicMock), MagicMock)
+        testQuery = GallicaNgramOccurrenceQuery('', [], '1234', MagicMock, MagicMock(cursor=MagicMock), MagicMock)
         testQuery.moveRecordsToHoldingResultsDB = MagicMock()
         testQuery.moveRecordsToFinalTable = MagicMock()
         testQuery.addMissingPapers = MagicMock()
@@ -214,10 +214,10 @@ class TestKeywordQuery(TestCase):
         except Exception as e:
             self.fail(e)
         finally:
-            TestKeywordQuery.cleanUpHoldingResults()
+            TestGallicaNgramOccurrenceQuery.cleanUpHoldingResults()
             dbConnection.close()
 
-    @patch('gallica.keywordQuery.Newspaper')
+    @patch('gallica.gallicaNgramOccurrenceQuery.Newspaper')
     def test_add_missing_papers(self, mock_paper):
         mock_paper = mock_paper.return_value
         mock_paper.sendTheseGallicaPapersToDB = MagicMock()
@@ -229,7 +229,7 @@ class TestKeywordQuery(TestCase):
         self.assertTrue(payload.getMissingPapers.called)
         self.assertTrue(mock_paper.sendTheseGallicaPapersToDB.called)
 
-    @patch('gallica.keywordQuery.Newspaper')
+    @patch('gallica.gallicaNgramOccurrenceQuery.Newspaper')
     def test_add_missing_papers_when_no_missing_papers(self, mock_paper):
         mock_paper = mock_paper.return_value
         mock_paper.sendTheseGallicaPapersToDB = MagicMock()
@@ -273,12 +273,12 @@ class TestKeywordQuery(TestCase):
             dbTester.deleteTestPapers()
 
 
-class TestKeywordQueryAllPapers(TestCase):
+class TestGallicaNgramOccurrenceQueryAllPapers(TestCase):
 
     def test_build_year_range_query(self):
-        KeywordQueryAllPapers.fetchNumTotalResults = MagicMock(return_value=3)
+        GallicaNgramOccurrenceQueryAllPapers.fetchNumTotalResults = MagicMock(return_value=3)
 
-        query = KeywordQueryAllPapers(
+        query = GallicaNgramOccurrenceQueryAllPapers(
             'brazza',
             [1850, 1900],
             '1234',
@@ -295,9 +295,9 @@ class TestKeywordQueryAllPapers(TestCase):
             'sortby dc.date/sort.ascending')
 
     def test_build_dateless_query(self):
-        KeywordQueryAllPapers.fetchNumTotalResults = MagicMock(return_value=3)
+        GallicaNgramOccurrenceQueryAllPapers.fetchNumTotalResults = MagicMock(return_value=3)
 
-        query = KeywordQueryAllPapers(
+        query = GallicaNgramOccurrenceQueryAllPapers(
             'brazza',
             [],
             '1234',
@@ -312,11 +312,11 @@ class TestKeywordQueryAllPapers(TestCase):
             'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending')
 
-    @patch('gallica.keywordQuery.RecordBatch')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaRecordBatch')
     def test_fetch_num_total_results(self, mock_batch):
         mock_batch = mock_batch.return_value
         mock_batch.getNumResults = MagicMock(return_value=3)
-        query = KeywordQueryAllPapers(
+        query = GallicaNgramOccurrenceQueryAllPapers(
             'brazza',
             [1850, 1900],
             '1234',
@@ -327,14 +327,14 @@ class TestKeywordQueryAllPapers(TestCase):
 
         self.assertEqual(query.fetchNumTotalResults(), 3)
 
-    @patch('gallica.keywordQuery.RecordBatch')
-    @patch('gallica.keywordQuery.KeywordRecordBatch')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaRecordBatch')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaKeywordRecordBatch')
     def test_do_search_chunk(self, mock_keyword_batch, mock_record_batch):
         mock_keyword_batch = mock_keyword_batch.return_value
         mock_record_batch = mock_record_batch.return_value
         mock_record_batch.getNumResults = MagicMock(return_value=3)
         mock_keyword_batch.getRecords = MagicMock(return_value='batch!')
-        query = KeywordQueryAllPapers(
+        query = GallicaNgramOccurrenceQueryAllPapers(
             'brazza',
             [1850, 1900],
             '1234',
@@ -345,9 +345,9 @@ class TestKeywordQueryAllPapers(TestCase):
 
         self.assertEqual(query.doSearchChunk(1), mock_keyword_batch)
 
-    @patch('gallica.keywordQuery.KeywordQueryAllPapers.fetchNumTotalResults')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQueryAllPapers.fetchNumTotalResults')
     def test_generate_work_chunks(self, mock_total_results):
-        query = KeywordQueryAllPapers(
+        query = GallicaNgramOccurrenceQueryAllPapers(
             'brazza',
             [1850, 1900],
             '1234',
@@ -365,7 +365,7 @@ class TestKeywordQueryAllPapers(TestCase):
         )
 
 
-class TestKeywordQuerySelectPapers(TestCase):
+class TestGallicaNgramOccurrenceQuerySelectPapers(TestCase):
 
     def buildDummyDict(self):
         with open(os.path.join(here, "resources/dummy_newspaper_choice_dicts")) as f:
@@ -379,10 +379,10 @@ class TestKeywordQuerySelectPapers(TestCase):
             return choiceDict
 
     def test_build_year_range_query(self):
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
+        GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
 
         choiceDict = self.buildDummyDict()
-        query = KeywordQuerySelectPapers(
+        query = GallicaNgramOccurrenceQuerySelectPapers(
             'brazza',
             choiceDict,
             [1850, 1900],
@@ -399,12 +399,12 @@ class TestKeywordQuerySelectPapers(TestCase):
             'and (gallica all "brazza") '
             'sortby dc.date/sort.ascending')
 
-    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumberResultsInPaper')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumberResultsInPaper')
     def test_build_dateless_query(self, mock_fetch):
         mock_fetch.return_value = ['a', 1]
         choiceDict = self.buildDummyDict()
 
-        query = KeywordQuerySelectPapers(
+        query = GallicaNgramOccurrenceQuerySelectPapers(
             'brazza',
             choiceDict,
             [],
@@ -419,12 +419,12 @@ class TestKeywordQuerySelectPapers(TestCase):
             'and (gallica all "brazza") '
             'sortby dc.date/sort.ascending')
 
-    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumberResultsInPaper')
-    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumberResultsInPaper')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults')
     def test_set_num_results_for_each_paper(self, mock_fetch, mock_fetch_paper):
         mock_fetch_paper.return_value = ['b', 1]
 
-        query = KeywordQuerySelectPapers(
+        query = GallicaNgramOccurrenceQuerySelectPapers(
             'brazza',
             [{'name': 'a', 'code': 'b'}],
             [],
@@ -437,12 +437,12 @@ class TestKeywordQuerySelectPapers(TestCase):
 
         self.assertDictEqual(query.paperCodeWithNumResults, {'b': 1})
 
-    @patch('gallica.keywordQuery.RecordBatch.fetchXML')
-    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults')
-    @patch('gallica.keywordQuery.RecordBatch.getNumResults', return_value=3)
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaRecordBatch.fetchXML')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaRecordBatch.getNumResults', return_value=3)
     def test_fetch_number_results_in_paper(self, mock_getNumResults, mock_fetch, mock_fetch_xml):
         choiceDict = self.buildDummyDict()
-        query = KeywordQuerySelectPapers(
+        query = GallicaNgramOccurrenceQuerySelectPapers(
             'brazza',
             choiceDict,
             [],
@@ -457,10 +457,10 @@ class TestKeywordQuerySelectPapers(TestCase):
             resultTest,
             ('a', 3))
 
-    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults')
     def test_sum_up_paper_results_for_total_estimate(self, mock_fetch):
         choiceDict = self.buildDummyDict()
-        query = KeywordQuerySelectPapers(
+        query = GallicaNgramOccurrenceQuerySelectPapers(
             'brazza',
             choiceDict,
             [],
@@ -477,8 +477,8 @@ class TestKeywordQuerySelectPapers(TestCase):
 
     def test_generate_work_chunks(self):
         choiceDict = self.buildDummyDict()
-        KeywordQuerySelectPapers.fetchNumTotalResults = MagicMock()
-        query = KeywordQuerySelectPapers(
+        GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults = MagicMock()
+        query = GallicaNgramOccurrenceQuerySelectPapers(
             'brazza',
             choiceDict,
             [],
@@ -498,12 +498,12 @@ class TestKeywordQuerySelectPapers(TestCase):
             ]
         )
 
-    @patch('gallica.keywordQuery.KeywordRecordBatch')
-    @patch('gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaKeywordRecordBatch')
+    @patch('gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults')
     def test_do_search_chunk(self, mock_total_results, mock_record_batch):
         choiceDict = self.buildDummyDict()
         mockedSession = MagicMock()
-        query = KeywordQuerySelectPapers(
+        query = GallicaNgramOccurrenceQuerySelectPapers(
             'brazza',
             choiceDict,
             [],

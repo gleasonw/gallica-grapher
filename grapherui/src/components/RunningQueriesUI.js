@@ -24,7 +24,8 @@ function TicketProgressContainer(props){
             progress: 0,
             numResultsDiscovered: 0,
             numResultsRetrieved: 0,
-            randomPaper: ''
+            randomPaper: '',
+            estimateSecondsToCompletion: 0
         }
     ))
 
@@ -62,6 +63,12 @@ function TicketProgressContainer(props){
 
 }
 function TicketProgressBox(props){
+    const secondsToCompletion = props.progressStats.estimateSecondsToCompletion
+    const minutesToCompletion = Math.floor(secondsToCompletion / 60)
+    const hoursToCompletion = Math.floor(minutesToCompletion / 60)
+    const remainingSeconds = Math.floor(secondsToCompletion % 60)
+    const remainingMinutes = minutesToCompletion % 60
+    const timeEstimate = hoursToCompletion + "h " + remainingMinutes + "m " + remainingSeconds + "s"
     return(
         <div className='ticketProgressBox'>
             <TicketLabel
@@ -80,6 +87,9 @@ function TicketProgressBox(props){
                     </div>
                     <div className='progressStatsText'>
                         {props.progressStats.randomPaper}
+                    </div>
+                    <div className='progressStatsText'>
+                        {timeEstimate} approximate time to completion
                     </div>
                 </div>
             }

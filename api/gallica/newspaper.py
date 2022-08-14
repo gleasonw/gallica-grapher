@@ -5,7 +5,7 @@ from requests_toolbelt import sessions
 from gallica.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 from gallica.db import DB
 
-from gallica.recordBatch import PaperRecordBatch
+from gallica.gallicaRecordBatch import GallicaPaperRecordBatch
 
 
 class Newspaper:
@@ -34,7 +34,7 @@ class Newspaper:
     def fetchTheseMax20PaperRecords(self, paperCodes):
         formattedPaperCodes = [f"{paperCode[0]}_date" for paperCode in paperCodes]
         self.query = 'arkPress all "' + '" or arkPress all "'.join(formattedPaperCodes) + '"'
-        batch = PaperRecordBatch(
+        batch = GallicaPaperRecordBatch(
             self.query,
             self.session,
             numRecords=20)
@@ -56,7 +56,7 @@ class Newspaper:
                     self.paperRecords.extend(batch)
 
     def fetchBatchPapersAtIndex(self, index):
-        batch = PaperRecordBatch(
+        batch = GallicaPaperRecordBatch(
             self.query,
             self.session,
             startRecord=index)
@@ -65,7 +65,7 @@ class Newspaper:
 
     def getNumPapersOnGallica(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
-        tempBatch = PaperRecordBatch(
+        tempBatch = GallicaPaperRecordBatch(
             self.query,
             self.session,
             numRecords=1)

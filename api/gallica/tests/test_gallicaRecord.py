@@ -2,9 +2,9 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from lxml import etree
 import os
-from gallica.record import Record
-from gallica.record import KeywordRecord
-from gallica.record import PaperRecord
+from gallica.gallicaRecord import GallicaRecord
+from gallica.gallicaRecord import GallicaKeywordRecord
+from gallica.gallicaRecord import GallicaPaperRecord
 from gallica.gallicaSession import GallicaSession
 
 
@@ -15,7 +15,7 @@ class TestRecord(TestCase):
         dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        dummyRecord = Record(dummyRecordXML)
+        dummyRecord = GallicaRecord(dummyRecordXML)
 
         self.assertEqual(
             dummyRecord.getPaperCode(),
@@ -26,7 +26,7 @@ class TestRecord(TestCase):
         dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        dummyRecord = Record(dummyRecordXML)
+        dummyRecord = GallicaRecord(dummyRecordXML)
 
         self.assertEqual(
             dummyRecord.getUrl(),
@@ -36,8 +36,8 @@ class TestRecord(TestCase):
         here = os.path.dirname(__file__)
         dummyRoot = etree.parse(os.path.join(here, 'resources/dummyKeywordRecords.xml'))
         dummys = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
-        malformedDateRecord = KeywordRecord(dummys[1])
-        absentCodeRecord = KeywordRecord(dummys[2])
+        malformedDateRecord = GallicaKeywordRecord(dummys[1])
+        absentCodeRecord = GallicaKeywordRecord(dummys[2])
 
         self.assertTrue(malformedDateRecord.isValid())
         self.assertFalse(absentCodeRecord.isValid())
@@ -50,8 +50,8 @@ class TestPaperRecord(TestCase):
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         firstRecord = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
 
-        with patch.object(PaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
-            paperRecord = PaperRecord(firstRecord, MagicMock)
+        with patch.object(GallicaPaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
+            paperRecord = GallicaPaperRecord(firstRecord, MagicMock)
 
         self.assertTrue(paperRecord.isValid())
 
@@ -63,7 +63,7 @@ class TestPaperRecord(TestCase):
         dummyRoot = etree.parse(os.path.join(here, 'resources/dummyNewspaperRecords.xml'))
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         firstRecord = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
-        paperRecord = PaperRecord(firstRecord, GallicaSession().getSession())
+        paperRecord = GallicaPaperRecord(firstRecord, GallicaSession().getSession())
 
         self.assertEqual(
             paperRecord.getDate(),
@@ -76,9 +76,9 @@ class TestPaperRecord(TestCase):
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
 
-        with patch.object(PaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
-            continuousPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
-            sporadicPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
+        with patch.object(GallicaPaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
+            continuousPaperRecord = GallicaPaperRecord(dummyRecordXML, MagicMock)
+            sporadicPaperRecord = GallicaPaperRecord(dummyRecordXML, MagicMock)
             continuousPaperRecord.publishingYears = [1918, 1919, 1920]
             sporadicPaperRecord.publishingYears = [1918, 1919, 2020, 2021]
             continuousPaperRecord.checkIfYearsContinuous()
@@ -93,9 +93,9 @@ class TestPaperRecord(TestCase):
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
 
-        with patch.object(PaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
-            continuousPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
-            sporadicPaperRecord = PaperRecord(dummyRecordXML, MagicMock)
+        with patch.object(GallicaPaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
+            continuousPaperRecord = GallicaPaperRecord(dummyRecordXML, MagicMock)
+            sporadicPaperRecord = GallicaPaperRecord(dummyRecordXML, MagicMock)
             continuousPaperRecord.publishingYears = [1918, 1919, 1920]
             sporadicPaperRecord.publishingYears = [1918, 1919, 2020, 2021]
             continuousPaperRecord.generatePublishingRange()
@@ -116,8 +116,8 @@ class TestPaperRecord(TestCase):
         dummyRecordXML = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
         dummyRecordXML = dummyRecordXML.find('{http://www.loc.gov/zing/srw/}record')
 
-        with patch.object(PaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
-            record = PaperRecord(dummyRecordXML, MagicMock)
+        with patch.object(GallicaPaperRecord, 'fetchYearsPublished', return_value=None) as mock_fetch_published:
+            record = GallicaPaperRecord(dummyRecordXML, MagicMock)
 
         self.assertEqual(
             record.getPaperTitle(),

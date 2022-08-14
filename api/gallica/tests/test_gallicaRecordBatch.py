@@ -1,13 +1,13 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
-from gallica.recordBatch import RecordBatch
-from gallica.recordBatch import KeywordRecordBatch
-from gallica.recordBatch import PaperRecordBatch
+from gallica.gallicaRecordBatch import GallicaRecordBatch
+from gallica.gallicaRecordBatch import GallicaKeywordRecordBatch
+from gallica.gallicaRecordBatch import GallicaPaperRecordBatch
 from gallica.gallicaSession import GallicaSession
 
 import os
 
-from record import KeywordRecord
+from gallicaRecord import GallicaKeywordRecord
 
 here = os.path.dirname(__file__)
 
@@ -22,7 +22,7 @@ class TestRecordBatch(TestCase):
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_get_num_results(self, mock_get):
         mock_get.return_value = self.get_request_mock()
-        batch = RecordBatch(
+        batch = GallicaRecordBatch(
             '',
             GallicaSession().getSession()
         )
@@ -31,7 +31,7 @@ class TestRecordBatch(TestCase):
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_fetch_xml(self, mock_get):
         mock_get.return_value = self.get_request_mock()
-        batch = RecordBatch(
+        batch = GallicaRecordBatch(
             '',
             GallicaSession().getSession()
         )
@@ -52,7 +52,7 @@ class TestPaperRecordBatch(TestCase):
         with open(os.path.join(here, 'resources/dummyNewspaperRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
 
-        batch = PaperRecordBatch(
+        batch = GallicaPaperRecordBatch(
             '',
             GallicaSession().getSession()
         )
@@ -75,7 +75,7 @@ class TestKeywordRecordBatch(TestCase):
         with open(os.path.join(here, 'resources/dummyKeywordRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
 
-        batch = KeywordRecordBatch(
+        batch = GallicaKeywordRecordBatch(
             '',
             GallicaSession().getSession()
         )
@@ -86,9 +86,9 @@ class TestKeywordRecordBatch(TestCase):
         self.assertEqual(len(batch.batch), 5)
         self.assertEqual(batch.numPurgedResults, 1)
 
-    @patch('gallica.recordBatch.RecordBatch.fetchXML')
+    @patch('gallica.gallicaRecordBatch.GallicaRecordBatch.fetchXML')
     def test_record_is_unique(self, mock_fetch):
-        batch = KeywordRecordBatch(
+        batch = GallicaKeywordRecordBatch(
             '',
             MagicMock
         )
@@ -104,7 +104,7 @@ class TestKeywordRecordBatch(TestCase):
         with open(os.path.join(here, 'resources/dummyKeywordRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
 
-        batch = KeywordRecordBatch(
+        batch = GallicaKeywordRecordBatch(
             '',
             GallicaSession().getSession())
 
@@ -112,8 +112,8 @@ class TestKeywordRecordBatch(TestCase):
         self.assertCountEqual(batch.batch, [])
         xmlWithDuplicateEndCouple = [xml for xml in batch.xmlRoot.iter(
             "{http://www.loc.gov/zing/srw/}record")]
-        secondToLastRecord = KeywordRecord(xmlWithDuplicateEndCouple[-2])
-        lastRecord = KeywordRecord(xmlWithDuplicateEndCouple[-1])
+        secondToLastRecord = GallicaKeywordRecord(xmlWithDuplicateEndCouple[-2])
+        lastRecord = GallicaKeywordRecord(xmlWithDuplicateEndCouple[-1])
 
         self.assertTrue(batch.recordIsUnique(secondToLastRecord))
         batch.batch.append(secondToLastRecord)

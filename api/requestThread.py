@@ -37,7 +37,8 @@ class RequestThread(threading.Thread):
                 'progress': 0,
                 'numResultsDiscovered': 0,
                 'numResultsRetrieved': 0,
-                'randomPaper': None
+                'randomPaper': None,
+                'estimateSecondsToCompletion': 0
             }
         return progressDict
 
@@ -52,7 +53,8 @@ class RequestThread(threading.Thread):
             'progress': 100,
             'numResultsDiscovered': self.numResultsDiscovered,
             'numResultsRetrieved': self.numResultsRetrieved,
-            'randomPaper': None
+            'randomPaper': None,
+            'estimateSecondsToCompletion': 0
         })
 
     def getProgressStats(self):
@@ -69,16 +71,3 @@ class RequestThread(threading.Thread):
 
     def getNumActuallyRetrieved(self):
         return self.numResultsRetrieved
-
-
-if __name__ == "__main__":
-    request = RequestThread(
-        {
-            '2': {
-                'terms': ['brazza'],
-                'papersAndCodes': [{'code': 'cb32895690j', 'paper': 'Gallica'}],
-                'dateRange': []
-                }
-        }
-    )
-    request.run()

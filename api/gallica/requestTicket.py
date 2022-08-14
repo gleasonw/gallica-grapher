@@ -1,7 +1,7 @@
 from math import ceil
 
-from .keywordQuery import KeywordQueryAllPapers
-from .keywordQuery import KeywordQuerySelectPapers
+from .gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQueryAllPapers
+from .gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQuerySelectPapers
 
 
 class RequestTicket:
@@ -25,6 +25,7 @@ class RequestTicket:
         self.totalResults = 0
         self.numBatchesRetrieved = 0
         self.numBatches = 0
+        self.averageResponseTime = None
 
     def run(self):
         if self.papersAndCodes:
@@ -36,26 +37,26 @@ class RequestTicket:
 
     def initQueryObjects(self, generator):
         for keyword in self.keywords:
-            keywordQuery = generator(keyword)
-            self.keywordQueries.append(keywordQuery)
+            gallicaNgramOccurrenceQuery = generator(keyword)
+            self.keywordQueries.append(gallicaNgramOccurrenceQuery)
 
     def genSelectPaperQuery(self, keyword):
-        query = KeywordQuerySelectPapers(
+        query = GallicaNgramOccurrenceQuerySelectPapers(
             keyword,
             self.papersAndCodes,
             self.yearRange,
             self.ticketID,
-            self.updateProgressStatsAndIncludeRandomPaper,
+            self.updateProgressStats,
             self.connectionToDB,
             self.session)
         return query
 
     def genAllPaperQuery(self, keyword):
-        query = KeywordQueryAllPapers(
+        query = GallicaNgramOccurrenceQueryAllPapers(
             keyword,
             self.yearRange,
             self.ticketID,
-            self.updateProgressStatsAndIncludeRandomPaper,
+            self.updateProgressStats,
             self.connectionToDB,
             self.session)
         return query
@@ -70,15 +71,30 @@ class RequestTicket:
         for query in self.keywordQueries:
             query.runSearch()
 
-    def updateProgressStatsAndIncludeRandomPaper(self, randomPaper):
+    def updateProgressStats(self, randomPaper, requestTime):
         self.numBatchesRetrieved += 1
-        progressPercent = self.numBatchesRetrieved/self.numBatches
-        progressPercent *= 100
-        progressPercent = int(progressPercent)
+        self.updateAverageResponseTime(requestTime)
         ticketProgressStats = {
-            'progress': progressPercent,
+            'progress': self.getPercentProgress(),
             'numResultsDiscovered': self.totalResults,
             'numResultsRetrieved': self.numBatchesRetrieved*50,
-            'randomPaper': randomPaper
+            'randomPaper': randomPaper,
+            'estimateSecondsToCompletion': self.getEstimateSecondsToCompletion()
         }
         self.progressThread.setTicketProgressStats(self.ticketID, ticketProgressStats)
+
+    def updateAverageResponseTime(self, requestTime):
+        if self.averageResponseTime:
+            self.averageResponseTime += requestTime
+            self.averageResponseTime /= 2
+        else:
+            self.averageResponseTime = requestTime
+
+    def getPercentProgress(self):
+        progressPercent = ceil(self.numBatchesRetrieved / self.numBatches * 100)
+        return progressPercent
+
+    def getEstimateSecondsToCompletion(self):
+        estimate = self.averageResponseTime * (self.numBatches - self.numBatchesRetrieved)
+        return estimate
+

@@ -1,10 +1,11 @@
 from lxml import etree
-from gallica.record import KeywordRecord
-from gallica.record import PaperRecord
+from gallica.gallicaRecord import GallicaKeywordRecord
+from gallica.gallicaRecord import GallicaPaperRecord
 from gallica.gallicaSession import GallicaSession
+import time
 
 
-class RecordBatch:
+class GallicaRecordBatch:
     def __init__(self,
                  query,
                  session,
@@ -18,6 +19,7 @@ class RecordBatch:
         self.numPurgedResults = 0
         self.session = session
         self.xmlRoot = None
+        self.elapsedTime = None
         self.params = {
             "version": 1.2,
             "operation": "searchRetrieve",
@@ -49,6 +51,7 @@ class RecordBatch:
             params=self.params,
             timeout=15)
         self.xmlRoot = etree.fromstring(response.content)
+        self.elapsedTime = response.elapsed.total_seconds()
 
     def parseRecordsFromXML(self):
         pass
@@ -60,7 +63,7 @@ class RecordBatch:
         return lastPaperTitle
 
 
-class KeywordRecordBatch(RecordBatch):
+class GallicaKeywordRecordBatch(GallicaRecordBatch):
 
     def __init__(self,
                  query,
@@ -76,7 +79,7 @@ class KeywordRecordBatch(RecordBatch):
 
     def parseRecordsFromXML(self):
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
-            record = KeywordRecord(result)
+            record = GallicaKeywordRecord(result)
             if record.isValid():
                 self.batch.append(record)
             else:
@@ -97,7 +100,7 @@ class KeywordRecordBatch(RecordBatch):
             return False
 
 
-class PaperRecordBatch(RecordBatch):
+class GallicaPaperRecordBatch(GallicaRecordBatch):
 
     def __init__(
             self,
@@ -119,7 +122,7 @@ class PaperRecordBatch(RecordBatch):
             "https://gallica.bnf.fr/services/Issues").getSession()
         for result in self.xmlRoot.iter(
                 "{http://www.loc.gov/zing/srw/}record"):
-            record = PaperRecord(
+            record = GallicaPaperRecord(
                 result,
                 gallicaSessionForPaperYears)
             if record.isValid():

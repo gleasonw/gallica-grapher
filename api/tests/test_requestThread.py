@@ -24,10 +24,11 @@ class TestRequestThread(TestCase):
         self.assertEqual(
             testThread.ticketProgressStats['1'],
             {
-                'progress': 0,
+                'progress': 100,
                 'numResultsDiscovered': 0,
                 'numResultsRetrieved': 0,
-                'randomPaper': None
+                'randomPaper': None,
+                'estimateSecondsToCompletion': 0
             }
         )
 
@@ -39,7 +40,7 @@ class TestRequestThread(TestCase):
         self.assertEqual(testThread.ticketProgressStats['1'], 10)
 
     def test_get_progress(self):
-        testThread = RequestThread({'1':{}})
+        testThread = RequestThread({'1': {}})
 
         self.assertEqual(
             testThread.getProgressStats()['1'],
@@ -47,7 +48,8 @@ class TestRequestThread(TestCase):
                 'progress': 0,
                 'numResultsDiscovered': 0,
                 'numResultsRetrieved': 0,
-                'randomPaper': None
+                'randomPaper': None,
+                'estimateSecondsToCompletion': 0
             }
         )
 

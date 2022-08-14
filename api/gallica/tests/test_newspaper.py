@@ -47,6 +47,25 @@ class TestNewspaper(TestCase):
         newspaper.copyPapersToDB.assert_called_once()
         newspaper.fetchPapersDataInBatches.assert_called_with(tupledPaperCodes)
 
+    @patch('gallica.newspaper.DB')
+    @patch('gallica.newspaper.Newspaper.fetchAllPapersFromGallica')
+    @patch('gallica.newspaper.Newspaper.copyPapersToDB')
+    def test_send_all_gallica_papers_to_db(self, mock_copy, mock_fetch, mock_db):
+        mock_db.return_value = mock_db
+        mock_db.getConn.return_value = mock_db
+        mock_db.close = MagicMock()
+        newspaper = Newspaper(MagicMock())
+
+        newspaper.sendAllGallicaPapersToDB()
+
+        self.assertEqual(
+            'dc.type all "fascicule" and ocrquality > "050.00"',
+            newspaper.query
+        )
+        mock_copy.assert_called_once()
+        mock_fetch.assert_called_once()
+        mock_db.close.assert_called_once()
+
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_fetched_paper_record_validity(self, mock_get):
         with open(os.path.join(here, 'resources/20PaperRecords.xml'), "rb") as f:
@@ -67,7 +86,6 @@ class TestNewspaper(TestCase):
         assert newspaper.copyPapersToDB.called
 
     def test_fetch_papers_data_in_batches(self):
-
         def boomerangBatchForTesting(batchItems):
             return [i for i in range(len(batchItems))]
 
@@ -94,22 +112,8 @@ class TestNewspaper(TestCase):
             1
         )
 
-    def test_get_records_and_copy_to_db(self):
-        TestNewspaper.deleteDummyPapersForTesting()
-        testerPaper = Newspaper()
-        paperCodes = TestNewspaper.getPaperCodes()
-        tupledPaperCodes = [(code,) for code in paperCodes]
-        testerPaper.sendTheseGallicaPapersToDB(tupledPaperCodes)
-
-        hopefullyReplacedPapers = DBtester().getTesterPapers()
-
-        self.assertEqual(
-            len(hopefullyReplacedPapers),
-            10
-        )
-
-    @patch('record.PaperRecord')
-    @patch('record.Record')
+    @patch('gallicaRecord.GallicaPaperRecord')
+    @patch('gallicaRecord.GallicaRecord')
     def test_generate_csv_stream(self, mock_record, mock_paper_record):
         newspaper = Newspaper()
         mock_record.return_value = mock_record
@@ -122,7 +126,7 @@ class TestNewspaper(TestCase):
         mock_paper_record.parseYears = MagicMock(return_value=["range"])
         mock_paper_record.checkIfYearsContinuous = MagicMock(return_value=True)
         mock_paper_record.generatePublishingRange = MagicMock(return_value=["range"])
-        mock_paper_record.getDate = MagicMock(return_value=[1,2])
+        mock_paper_record.getDate = MagicMock(return_value=[1, 2])
         mock_paper_record.getPaperTitle = MagicMock(return_value="title")
         mock_paper_record.isContinuous = MagicMock(return_value=True)
         mock_paper_record.getPaperCode = MagicMock(return_value="123")
@@ -160,7 +164,7 @@ class TestNewspaper(TestCase):
         numPapers = newspaper.getNumPapersOnGallica()
         self.assertEqual(numPapers, 18509)
 
-    @patch('gallica.newspaper.PaperRecordBatch')
+    @patch('gallica.newspaper.GallicaPaperRecordBatch')
     def test_fetch_max_20_paper_records(self, mock_paper_record_batch):
         mock_paper_record_batch.return_value = mock_paper_record_batch
         mock_paper_record_batch.getRecords = MagicMock(return_value=[])
@@ -170,5 +174,3 @@ class TestNewspaper(TestCase):
         newspaper.fetchTheseMax20PaperRecords(testCodes)
 
         self.assertEqual(len(newspaper.paperRecords), 0)
-
-

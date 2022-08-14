@@ -70,8 +70,8 @@ class TestRequestTicket(TestCase):
         ticket.initQueryObjects(MagicMock(return_value=MagicMock()))
         self.assertEqual(len(ticket.keywordQueries), 3)
 
-    @patch("gallica.keywordQuery.KeywordQuerySelectPapers.buildQuery")
-    @patch("gallica.keywordQuery.KeywordQuerySelectPapers.fetchNumTotalResults")
+    @patch("gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.buildQuery")
+    @patch("gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults")
     def test_gen_select_paper_query(self, mock_build, mock_fetch):
         ticket = RequestTicket(
             {
@@ -86,14 +86,14 @@ class TestRequestTicket(TestCase):
 
         testQuery = ticket.genSelectPaperQuery(ticket.keywords[0])
 
-        self.assertIsInstance(testQuery, gallica.requestTicket.KeywordQuerySelectPapers)
+        self.assertIsInstance(testQuery, gallica.requestTicket.GallicaNgramOccurrenceQuerySelectPapers)
         self.assertEqual(testQuery.keyword, 'test')
         self.assertDictEqual(testQuery.papers, {"paper": "", "code": 'test'})
         self.assertFalse(testQuery.isYearRange)
         self.assertEqual(testQuery.ticketID, '')
 
-    @patch("gallica.keywordQuery.KeywordQueryAllPapers.buildQuery")
-    @patch("gallica.keywordQuery.KeywordQueryAllPapers.fetchNumTotalResults")
+    @patch("gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQueryAllPapers.buildQuery")
+    @patch("gallica.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQueryAllPapers.fetchNumTotalResults")
     def test_gen_all_paper_query(self, mock_build, mock_fetch):
         ticket = RequestTicket(
             {
@@ -108,7 +108,7 @@ class TestRequestTicket(TestCase):
 
         testQuery = ticket.genAllPaperQuery(ticket.keywords[0])
 
-        self.assertIsInstance(testQuery, gallica.requestTicket.KeywordQueryAllPapers)
+        self.assertIsInstance(testQuery, gallica.requestTicket.GallicaNgramOccurrenceQueryAllPapers)
         self.assertEqual(testQuery.keyword, 'test')
         self.assertFalse(testQuery.isYearRange)
         self.assertEqual(testQuery.ticketID, '')
@@ -174,7 +174,7 @@ class TestRequestTicket(TestCase):
         ticket.numBatchesRetrieved = 2
         ticket.numBatches = 10
 
-        ticket.updateProgressStatsAndIncludeRandomPaper('the seattle times')
+        ticket.updateProgressStats('the seattle times', 10)
 
         ticket.progressThread.setTicketProgressStats.assert_called_with(
             "",
@@ -182,7 +182,21 @@ class TestRequestTicket(TestCase):
                 'progress': 30,
                 'numResultsDiscovered': 0,
                 'numResultsRetrieved': 150,
-                'randomPaper': 'the seattle times'
+                'randomPaper': 'the seattle times',
+                'estimateSecondsToCompletion': 70
+            }
+        )
+
+        ticket.updateProgressStats('le figaro', 90)
+
+        ticket.progressThread.setTicketProgressStats.assert_called_with(
+            "",
+            {
+                'progress': 40,
+                'numResultsDiscovered': 0,
+                'numResultsRetrieved': 200,
+                'randomPaper': 'le figaro',
+                'estimateSecondsToCompletion': 300.0
             }
         )
 

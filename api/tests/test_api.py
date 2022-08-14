@@ -11,7 +11,7 @@ class TestAPI(unittest.TestCase):
         self.app = flaskAPI.app.test_client()
 
     @patch("api.flaskAPI.spawnRequestThread.delay")
-    def test_init(self,mock_spawnRequestThread):
+    def test_init(self, mock_spawnRequestThread):
         mock_spawnRequestThread.return_value = MagicMock(id="test")
         response = self.app.post(
             '/init',
@@ -50,16 +50,65 @@ class TestAPI(unittest.TestCase):
         query = 'graphData?keys=test&averageWindow=test&timeBin=test&continuous=test&dateRange=test'
         response = self.app.get(query)
 
-        self.assertEqual(response.status_code,200)
-        self.assertEqual(response.data,b'{"series":[]}\n')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b'{"series":[]}\n')
 
     @patch("api.flaskAPI.TopPapers")
     def test_getTopPapersFromID(self, mock_topPapers):
         mockedTopPapers = mock_topPapers.return_value
         mockedTopPapers.getTopPapers.return_value = []
-        query='topPapers?id=test&continuous=test&dateRange=test'
+        query = 'topPapers?id=test&continuous=test&dateRange=test'
         testTopPapersFromID = self.app.get(query)
 
         assert testTopPapersFromID.status_code == 200
-        self.assertEqual(testTopPapersFromID.data,b'{"topPapers":[]}\n')
+        self.assertEqual(testTopPapersFromID.data, b'{"topPapers":[]}\n')
+
+    @patch("api.flaskAPI.spawnRequestThread")
+    def test_getProgress(self, mock_celery_task):
+        mock_celery_task.return_value = mock_celery_task
+        mock_celery_task.AsyncResult.return_value = mock_celery_task
+        mock_celery_task.info = MagicMock(
+            get=MagicMock(
+                return_value={
+                    'progress': 0,
+                    'numResultsDiscovered': 0,
+                    'numResultsRetrieved': 0,
+                    'randomPaper': None,
+                    'estimateSecondsToCompletion': 0
+                }
+            ))
+        mock_celery_task.state = "PENDING"
+
+        response = self.app.get('/progress/test')
+
+        self.assertEqual(
+            {
+                "state": "PENDING",
+                "progress": {
+                    'progress': 0,
+                    'numResultsDiscovered': 0,
+                    'numResultsRetrieved': 0,
+                    'randomPaper': None,
+                    'estimateSecondsToCompletion': 0
+                }
+            },
+            response.json
+        )
+
+    @patch("api.flaskAPI.spawnRequestThread")
+    def test_getProgress_when_task_null(self, mock_celery_task):
+        mock_celery_task.return_value = mock_celery_task
+        mock_celery_task.AsyncResult.return_value = mock_celery_task
+        mock_celery_task.info = None
+        mock_celery_task.state = "PENDING"
+
+        response = self.app.get('/progress/test')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            {
+                "state": "PENDING",
+                'progress': None
+            },
+            response.json)
 

@@ -4,12 +4,12 @@ from lxml import etree
 
 from .newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
-from .recordBatch import KeywordRecordBatch
-from .recordBatch import RecordBatch
+from .gallicaRecordBatch import GallicaKeywordRecordBatch
+from .gallicaRecordBatch import GallicaRecordBatch
 
 
 # TODO: use ors to combine keywords within single ticket
-class KeywordQuery:
+class GallicaNgramOccurrenceQuery:
 
     def __init__(self,
                  searchTerm,
@@ -36,9 +36,6 @@ class KeywordQuery:
         self.gallicaHttpSession = session
         self.buildQuery()
         self.fetchNumTotalResults()
-
-    def doSearchChunk(self, chunk):
-        return KeywordRecordBatch(self.gallicaHttpSession, chunk)
 
     def generateWorkChunks(self):
         pass
@@ -80,15 +77,19 @@ class KeywordQuery:
             self.moveRecordsToDB()
 
     def doThreadedSearch(self):
-        with ThreadPoolExecutor(max_workers=75) as executor:
+        with ThreadPoolExecutor(max_workers=50) as executor:
             for recordBatch in executor.map(self.doSearchChunk, self.workChunks):
                 recordsForIndex = recordBatch.getRecords()
                 if recordsForIndex:
                     randomPaper = recordBatch.getRandomPaper()
-                    self.progressTracker(randomPaper)
+                    self.progressTracker(randomPaper, recordBatch.elapsedTime)
                     self.keywordRecords.extend(recordsForIndex)
                 else:
+                    # TODO: Ensure there are always records?
                     print("No records for batch")
+
+    def doSearchChunk(self, workChunk):
+        return GallicaKeywordRecordBatch(self.gallicaHttpSession, workChunk)
 
     def moveRecordsToDB(self):
         with self.dbConnection.cursor() as curs:
@@ -172,7 +173,7 @@ class KeywordQuery:
         return csvFileLikeObject
 
 
-class KeywordQueryAllPapers(KeywordQuery):
+class GallicaNgramOccurrenceQueryAllPapers(GallicaNgramOccurrenceQuery):
 
     def __init__(self,
                  searchTerm,
@@ -208,7 +209,7 @@ class KeywordQueryAllPapers(KeywordQuery):
         )
 
     def fetchNumTotalResults(self):
-        tempBatch = RecordBatch(
+        tempBatch = GallicaRecordBatch(
             self.baseQuery,
             self.gallicaHttpSession,
             numRecords=1)
@@ -216,7 +217,7 @@ class KeywordQueryAllPapers(KeywordQuery):
         return self.estimateNumResults
 
     def doSearchChunk(self, index):
-        batch = KeywordRecordBatch(
+        batch = GallicaKeywordRecordBatch(
             self.baseQuery,
             self.gallicaHttpSession,
             startRecord=index)
@@ -227,7 +228,7 @@ class KeywordQueryAllPapers(KeywordQuery):
         self.workChunks = [(i * 50) + 1 for i in range(iterations)]
 
 
-class KeywordQuerySelectPapers(KeywordQuery):
+class GallicaNgramOccurrenceQuerySelectPapers(GallicaNgramOccurrenceQuery):
     def __init__(self,
                  searchTerm,
                  papers,
@@ -274,7 +275,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
         recordStart = recordStartAndCode[0]
         code = recordStartAndCode[1]
         query = self.baseQuery.format(newsKey=code)
-        batch = KeywordRecordBatch(
+        batch = GallicaKeywordRecordBatch(
             query,
             self.gallicaHttpSession,
             startRecord=recordStart)
@@ -307,7 +308,7 @@ class KeywordQuerySelectPapers(KeywordQuery):
     def fetchNumberResultsInPaper(self, paper):
         paperCode = paper["code"]
         numResultQuery = self.baseQuery.format(newsKey=paperCode)
-        batch = RecordBatch(
+        batch = GallicaRecordBatch(
             numResultQuery,
             self.gallicaHttpSession,
             numRecords=1)
