@@ -73,7 +73,10 @@ class RequestTicket:
 
     def updateProgressStats(self, randomPaper, requestTime):
         self.numBatchesRetrieved += 1
-        self.updateAverageResponseTime(requestTime)
+        if self.averageResponseTime:
+            self.updateAverageResponseTime(requestTime)
+        else:
+            self.averageResponseTime = requestTime
         ticketProgressStats = {
             'progress': self.getPercentProgress(),
             'numResultsDiscovered': self.totalResults,
@@ -84,11 +87,11 @@ class RequestTicket:
         self.progressThread.setTicketProgressStats(self.ticketID, ticketProgressStats)
 
     def updateAverageResponseTime(self, requestTime):
-        if self.averageResponseTime:
+        if requestTime < self.averageResponseTime + 10:
             self.averageResponseTime += requestTime
             self.averageResponseTime /= 2
         else:
-            self.averageResponseTime = requestTime
+            self.averageResponseTime += 5
 
     def getPercentProgress(self):
         progressPercent = ceil(self.numBatchesRetrieved / self.numBatches * 100)

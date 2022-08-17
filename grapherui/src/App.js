@@ -34,7 +34,6 @@ function App() {
             tickets: ticksWithIDS
         })
         const taskID = JSON.parse(request.response)["taskid"];
-        console.log(taskID)
         setIDTickets(ticksWithIDS);
         setRequestID(taskID);
         setGettingInput(false);

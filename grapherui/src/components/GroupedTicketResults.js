@@ -18,20 +18,22 @@ export function GroupedTicketResults(props) {
 }
 //TODO: Sync label color with line color
 function GroupedTicketLabelBar(props) {
-    const highChartsSeriesColors = [
-        '#0066ff', '#ff0000', '#ff9900', '#00ff00',
-        '#0000ff', '#ff00ff', '#00ffff', '#ffff00',
-        '#000000'];
-    //TODO: add color to each ticket
+    const settings = useContext(GraphSettingsContext);
     return (
         <div className='groupedLabelBar'>
-            {Object.keys(props.tickets).map(key => (
-                <TicketLabel
-                    terms={props.tickets[key].terms}
-                    papers={props.tickets[key].papersAndCodes}
-                    dateRange={props.tickets[key].dateRange}
-                    key={key}
-                />
+            {
+                Object.keys(props.tickets).map(key => (
+                    <div>
+                        <svg width = "20" height="20">
+                            <circle cx="10" cy="10" r="10" fill={settings[key].color}/>
+                        </svg>
+                        <TicketLabel
+                            terms={props.tickets[key].terms}
+                            papers={props.tickets[key].papersAndCodes}
+                            dateRange={props.tickets[key].dateRange}
+                            key={key}
+                        />
+                    </div>
             ))}
         </div>
     );

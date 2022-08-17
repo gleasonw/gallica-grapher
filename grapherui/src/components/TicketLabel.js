@@ -1,16 +1,16 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {GraphSettingsContext} from "./GraphSettingsContext";
 
-class TicketLabel extends React.Component{
-    render(){
-        return(
-            <div className='ticketLabel'>
-                <TicketTermRow terms={this.props.terms}/>
-                <TicketPaperRow papers={this.props.papers}/>
-                <TicketDateRow dateRange={this.props.dateRange}/>
-            </div>
-        )
-    }
+function TicketLabel(props){
+    return(
+        <div className='ticketLabel'>
+            <TicketTermRow terms={props.terms}/>
+            <TicketPaperRow papers={props.papers}/>
+            <TicketDateRow dateRange={props.dateRange}/>
+        </div>
+    )
 }
+
 function TicketTermRow(props){
     const quotedTerms = props.terms.map(
         term => "'" + term + "'"
