@@ -2,15 +2,15 @@ import React, {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
-import generateOptions from "./generateOptions"
 import TicketStats from "./TicketStats";
-import useData from "./useData";
 
 export function GroupedTicketResults(props) {
     return (
         <div className='groupedResultsUI'>
             <GroupedTicketLabelBar tickets={props.tickets}/>
-            <GroupedChart tickets={props.tickets}/>
+            <Chart
+                tickets={props.tickets}
+                settingsID='group'/>
             <GroupedStatBar tickets={props.tickets}/>
         </div>
 
@@ -38,27 +38,6 @@ function GroupedTicketLabelBar(props) {
         </div>
     );
 }
-function GroupedChart(props) {
-    const settings = useContext(GraphSettingsContext).group;
-    const timeBin = settings.timeBin;
-    const dateRange = getWidestDateRange(props.tickets);
-    const query =
-        "/graphData?keys=" + Object.keys(props.tickets) +
-        "&continuous=" + settings.continuous +
-        "&dateRange=" + dateRange +
-        "&timeBin=" + settings.timeBin +
-        "&averageWindow=" + settings.averageWindow;
-    const series = useData(query);
-
-    return (
-        <div>
-            <Chart
-                options={generateOptions(timeBin, series)}
-                settingsID='group'
-            />
-        </div>
-    )
-}
 
 function GroupedStatBar(props) {
     return (
@@ -73,22 +52,6 @@ function GroupedStatBar(props) {
             ))}
         </div>
     );
-}
-
-function getWidestDateRange(tickets) {
-    let widestDateRange = 0;
-    let widestTicket = null;
-    Object.keys(tickets).forEach(key => {
-        const lowYear = tickets[key].dateRange[0];
-        const highYear = tickets[key].dateRange[1];
-        const thisWidth = highYear - lowYear;
-        if (thisWidth > widestDateRange) {
-            widestDateRange = thisWidth;
-            widestTicket = key;
-        }
-    }
-    )
-    return tickets[widestTicket].dateRange;
 }
 
 export default GroupedTicketResults;

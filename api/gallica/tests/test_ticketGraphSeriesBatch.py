@@ -1,8 +1,6 @@
-import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from gallica.db import DB
 from ticketGraphSeriesBatch import TicketGraphSeries
 from ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from ticketGraphSeriesBatch import parseContinuous

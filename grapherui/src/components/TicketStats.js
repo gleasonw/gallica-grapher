@@ -14,9 +14,8 @@ export default function TicketStats(props){
             />
             {!props.grouped &&
                 <Chart
-                    options={props.options}
-                    settingsID={props.ticketID}
-                />
+                    tickets={[props.ticket]}
+                    settingsID={props.ticketID}/>
             }
             <TicketPapers
                 ticketID={props.ticketID}

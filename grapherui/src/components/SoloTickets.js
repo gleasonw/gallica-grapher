@@ -19,26 +19,11 @@ function SoloTickets(props) {
 }
 
 function SoloTicketResult(props) {
-    const settings = useContext(
-        GraphSettingsContext)[props.ticketID];
-    const query =
-        "/graphData?keys=" + props.ticketID +
-        "&continuous=" + settings.continuous +
-        "&dateRange=" + props.ticket.dateRange +
-        "&timeBin=" + settings.timeBin +
-        "&averageWindow=" + settings.averageWindow;
-
-    const graphData = useData(query);
-    const options = generateOptions(
-        settings.timeBin,
-        graphData)
-
     return (
         <TicketStats
             ticket={props.ticket}
             ticketID={props.ticketID}
             grouped={false}
-            options={options}
         />
     )
 }

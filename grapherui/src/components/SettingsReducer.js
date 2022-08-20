@@ -48,6 +48,15 @@ export function settingsReducer(graphSettings, action) {
                 [action.key]: action.settings
             }
         }
+        case 'setColor': {
+            return {
+                ...graphSettings,
+                [action.key]: {
+                    ...graphSettings[action.key],
+                    color: action.color
+                }
+            }
+        }
         default:
             throw Error("Unknown action: " + action.type);
     }

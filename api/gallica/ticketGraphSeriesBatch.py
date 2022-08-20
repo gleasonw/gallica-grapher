@@ -2,6 +2,7 @@ from db import DB
 import datetime
 import ciso8601
 
+
 # TODO: tests with continuous settings
 class TicketGraphSeriesBatch:
 
@@ -10,6 +11,7 @@ class TicketGraphSeriesBatch:
         self.dataBatches = []
         self.settings = settings
         self.requestIDs = settings["ticketIDs"].split(",")
+
         self.selectAllSeriesFromDB()
 
     # TODO: rewrite to avoid confusing list--> dict
@@ -318,5 +320,3 @@ class TicketGraphSeries:
                 self.data.append(
                     (dateToTimestamp(date), frequency)
                 )
-
-

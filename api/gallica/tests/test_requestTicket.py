@@ -196,7 +196,7 @@ class TestRequestTicket(TestCase):
                 'numResultsDiscovered': 0,
                 'numResultsRetrieved': 200,
                 'randomPaper': 'le figaro',
-                'estimateSecondsToCompletion': 300.0
+                'estimateSecondsToCompletion': 60
             }
         )
 

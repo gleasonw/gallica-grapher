@@ -49,7 +49,7 @@ function ResultUI(props){
                 (indexForColorAssignment + 1) %
                 highChartsSeriesColors.length;
         }
-        initialGraphSettings["group"] = initSetting
+        initialGraphSettings["group"] = initSetting;
         return initialGraphSettings
     }
 
