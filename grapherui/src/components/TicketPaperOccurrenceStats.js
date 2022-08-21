@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 
-export function TicketPapers(props) {
+export function TicketPaperOccurrenceStats(props) {
     const [topPapers, setTopPapers] = useState([]);
     const settings = useContext(GraphSettingsContext);
     const ticketSettings = props.grouped ? settings.group : settings[props.ticketID];
@@ -43,4 +43,4 @@ export function TicketPapers(props) {
     )
 }
 
-export default TicketPapers;
+export default TicketPaperOccurrenceStats;

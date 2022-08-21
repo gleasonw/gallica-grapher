@@ -2,16 +2,18 @@ import React, {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
-import TicketStats from "./TicketStats";
+import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 
 export function GroupedTicketResults(props) {
     return (
         <div className='groupedResultsUI'>
-            <GroupedTicketLabelBar tickets={props.tickets}/>
+            <GroupedTicketLabelBar
+                tickets={props.tickets}/>
             <Chart
                 tickets={props.tickets}
                 settingsID='group'/>
-            <GroupedStatBar tickets={props.tickets}/>
+            <GroupedStatBar
+                tickets={props.tickets}/>
         </div>
 
     )
@@ -43,11 +45,11 @@ function GroupedStatBar(props) {
     return (
         <div className='groupedStatBar'>
             {Object.keys(props.tickets).map(key => (
-                <TicketStats
+                <TicketPaperOccurrenceStats
                     key={key}
-                    ticket={props.tickets[key]}
                     ticketID={key}
-                    grouped={true}
+                    dateRange={props.tickets[key].dateRange}
+                    grouped={false}
                 />
             ))}
         </div>

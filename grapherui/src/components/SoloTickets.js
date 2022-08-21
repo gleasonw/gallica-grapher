@@ -1,8 +1,7 @@
-import generateOptions from "./generateOptions";
-import React, {useContext, useState} from "react";
-import {GraphSettingsContext} from "./GraphSettingsContext";
-import TicketStats from "./TicketStats";
-import useData from "./useData";
+import React from "react";
+import TicketLabel from "./TicketLabel";
+import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
+import Chart from "./Chart";
 
 function SoloTickets(props) {
     return (
@@ -20,11 +19,21 @@ function SoloTickets(props) {
 
 function SoloTicketResult(props) {
     return (
-        <TicketStats
-            ticket={props.ticket}
-            ticketID={props.ticketID}
-            grouped={false}
-        />
+        <div className='ticketResults'>
+            <TicketLabel
+                terms={props.ticket.terms}
+                papers={props.ticket.papersAndCodes}
+                dateRange={props.ticket.dateRange}
+            />
+            <Chart
+                tickets={[props.ticket]}
+                settingsID={props.ticketID}/>
+            <TicketPaperOccurrenceStats
+                ticketID={props.ticketID}
+                dateRange={props.ticket.dateRange}
+                grouped={false}
+            />
+        </div>
     )
 }
 
