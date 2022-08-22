@@ -174,7 +174,7 @@ class TestRequestTicket(TestCase):
         ticket.numBatchesRetrieved = 2
         ticket.numBatches = 10
 
-        ticket.updateProgressStats('the seattle times', 10)
+        ticket.updateProgressStats('the seattle times', 10, 50)
 
         ticket.progressThread.setTicketProgressStats.assert_called_with(
             "",
@@ -187,7 +187,7 @@ class TestRequestTicket(TestCase):
             }
         )
 
-        ticket.updateProgressStats('le figaro', 90)
+        ticket.updateProgressStats('le figaro', 90, 50)
 
         ticket.progressThread.setTicketProgressStats.assert_called_with(
             "",

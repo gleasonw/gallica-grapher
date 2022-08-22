@@ -11,6 +11,7 @@ class InputUI extends React.Component {
             terms: [],
             papers: [],
             dateBoundary: [1499, 2020],
+            dateBoundaryPlaceholder: [1499, 2020],
             currentDateRange: ['', ''],
             showNoTicketReminder: false
         };
@@ -18,7 +19,7 @@ class InputUI extends React.Component {
         this.handleHighDateChange = this.handleHighDateChange.bind(this);
         this.handlePaperChange = this.handlePaperChange.bind(this);
         this.handleTermChange = this.handleTermChange.bind(this);
-        this.handleClick = this.handleClick.bind(this);
+        this.handlePaperDropdownClick = this.handlePaperDropdownClick.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.deletePaperBubble = this.deletePaperBubble.bind(this);
         this.deleteTermBubble = this.deleteTermBubble.bind(this);
@@ -26,6 +27,7 @@ class InputUI extends React.Component {
     deletePaperBubble(bubbleIndex){
         const papers = this.state.papers.slice()
         papers.splice(bubbleIndex, 1)
+        this.updateDateBoundaryPlaceholder(papers)
         this.setState({papers: papers})
     }
     deleteTermBubble(bubbleIndex){
@@ -33,8 +35,8 @@ class InputUI extends React.Component {
         terms.splice(bubbleIndex, 1)
         this.setState({terms: terms})
     }
-    handleClick(paperAndCode){
-        this.makePaperBubble(paperAndCode)
+    handlePaperDropdownClick(paper){
+        this.makePaperBubble(paper)
     }
     handleLowDateChange(event){
         const range = this.state.currentDateRange.slice()
@@ -60,11 +62,13 @@ class InputUI extends React.Component {
             }
         }
     }
-    makePaperBubble(paperAndCode){
+    makePaperBubble(paper){
         const papers = this.state.papers.slice();
-        papers.push(paperAndCode)
+        papers.push(paper)
+        this.updateDateBoundaryPlaceholder(papers)
         this.setState({papers: papers})
     }
+
     makeTermBubble(term){
         if(term){
             const terms = this.state.terms.slice();
@@ -72,6 +76,20 @@ class InputUI extends React.Component {
             this.setState({terms: terms, termInputValue: ''})
         }
     }
+
+    updateDateBoundaryPlaceholder(papers){
+        let minYear = 1499
+        let maxYear = 2020
+        if(papers.length > 0){
+            const paperLowYears = papers.map(paper => paper["startDate"])
+            const paperHighYears = papers.map(paper => paper["endDate"])
+            minYear = Math.min(...paperLowYears)
+            maxYear = Math.max(...paperHighYears)
+        }
+        console.log(minYear, maxYear)
+        this.setState({dateBoundaryPlaceholder: [minYear, maxYear]})
+    }
+
     render() {
         return (
             <div className='inputBody'>
@@ -101,7 +119,7 @@ class InputUI extends React.Component {
                                             [1499, 2020]
                                 }
                             )}
-                            onPaperDropItemClick={this.handleClick}
+                            onPaperDropItemClick={this.handlePaperDropdownClick}
                             onKeyDown={this.handleKeyDown}
                             selectedTerms={this.state.terms}
                             selectedPapers={this.state.papers}
@@ -109,6 +127,8 @@ class InputUI extends React.Component {
                             deletePaperBubble={this.deletePaperBubble}
                             minYear={this.state.dateBoundary[0]}
                             maxYear={this.state.dateBoundary[1]}
+                            minYearPlaceholder={this.state.dateBoundaryPlaceholder[0]}
+                            maxYearPlaceholder={this.state.dateBoundaryPlaceholder[1]}
                             onGraphStartClick={this.props.onInputSubmit}
                             thereAreTickets={this.props.thereAreTickets}
                         />

@@ -52,6 +52,8 @@ function UserInputForm(props){
                 onHighDateChange={props.onHighDateChange}
                 minYear={props.minYear}
                 maxYear={props.maxYear}
+                minYearPlaceholder={props.minYearPlaceholder}
+                maxYearPlaceholder={props.maxYearPlaceholder}
                 lowYear={props.lowYearValue}
                 highYear={props.highYearValue}
             />
@@ -139,7 +141,7 @@ class PaperInputBox extends React.Component{
     }
     render() {
         const paperNames = [];
-        this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['paper']))
+        this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['title']))
         return(
             <div>
                 <div className='inputContainer'>
@@ -177,11 +179,11 @@ function Dropdown(props){
     }else if(props.papers){
         return (
             <ul className='paperDropdown'>
-                {props.papers.map(paperAndCode => (
+                {props.papers.map(paper => (
                     <DropdownItem
-                        key={paperAndCode['code']}
-                        paper={paperAndCode['paper']}
-                        onClick={() => props.onClick(paperAndCode)}
+                        key={paper['code']}
+                        paper={paper['title']}
+                        onClick={() => props.onClick(paper)}
                     />
                 ))}
             </ul>
@@ -253,7 +255,7 @@ function DateInputBox(props){
                 type='text'
                 value={props.lowYear}
                 onChange={props.onLowDateChange}
-                placeholder='1499'
+                placeholder={props.minYearPlaceholder}
             />
             </div>
             to
@@ -263,7 +265,7 @@ function DateInputBox(props){
                 type='text'
                 value={props.highYear}
                 onChange={props.onHighDateChange}
-                placeholder='2020'
+                placeholder={props.maxYearPlaceholder}
             />
             </div>
         </div>

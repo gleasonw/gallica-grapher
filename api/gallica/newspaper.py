@@ -10,7 +10,7 @@ from gallica.gallicaRecordBatch import GallicaPaperRecordBatch
 
 class Newspaper:
 
-    #TODO: split into multiple classes
+    # TODO: split into multiple classes
     def __init__(self, gallicaSession=None):
         self.query = ''
         self.papersSimilarToKeyword = []
@@ -98,27 +98,36 @@ class Newspaper:
             ))) + '\n')
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
-#TODO: return the paper's publishing years alongside the title
+
+    # TODO: return the paper's publishing years alongside the title
     def getPapersSimilarToKeyword(self, keyword):
+
+        def paperDataToJSON(similarPapers):
+            papers = []
+            for paperData in similarPapers:
+                title = paperData[0]
+                code = paperData[1]
+                startDate = paperData[2]
+                endDate = paperData[3]
+                paper = {
+                    'title': title,
+                    'code': code,
+                    'startDate': startDate,
+                    'endDate': endDate
+                }
+                papers.append(paper)
+            return {'paperNameCodes': papers}
+
         with self.dbConnection.cursor() as curs:
             keyword = keyword.lower()
             curs.execute("""
-                SELECT title, code
+                SELECT title, code, startdate, enddate
                     FROM papers 
                     WHERE LOWER(title) LIKE %(paperNameSearchString)s
                     ORDER BY title LIMIT 20;
             """, {'paperNameSearchString': '%' + keyword + '%'})
-            self.papersSimilarToKeyword = curs.fetchall()
-            return self.nameCodeDataToJSON()
-
-    def nameCodeDataToJSON(self):
-        namedPaperCodes = []
-        for paperTuple in self.papersSimilarToKeyword:
-            paper = paperTuple[0]
-            code = paperTuple[1]
-            namedPair = {'paper': paper, 'code': code}
-            namedPaperCodes.append(namedPair)
-        return {'paperNameCodes': namedPaperCodes}
+            papersSimilarToKeyword = curs.fetchall()
+            return paperDataToJSON(papersSimilarToKeyword)
 
     def initGallicaSession(self):
         self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")

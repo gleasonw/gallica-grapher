@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from .gallicaRecordBatch import GallicaKeywordRecordBatch
 from .gallicaRecordBatch import GallicaRecordBatch
 
-
+NUM_WORKERS = 50
 # TODO: use ors to combine keywords within single ticket
 class GallicaNgramOccurrenceQuery:
 
@@ -77,12 +77,16 @@ class GallicaNgramOccurrenceQuery:
             self.moveRecordsToDB()
 
     def doThreadedSearch(self):
-        with ThreadPoolExecutor(max_workers=50) as executor:
+        with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
             for recordBatch in executor.map(self.doSearchChunk, self.workChunks):
                 recordsForIndex = recordBatch.getRecords()
                 if recordsForIndex:
                     randomPaper = recordBatch.getRandomPaper()
-                    self.progressTracker(randomPaper, recordBatch.elapsedTime)
+                    self.progressTracker(
+                        randomPaper,
+                        recordBatch.elapsedTime,
+                        NUM_WORKERS
+                    )
                     self.keywordRecords.extend(recordsForIndex)
                 else:
                     # TODO: Ensure there are always records?

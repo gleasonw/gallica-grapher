@@ -71,7 +71,7 @@ class RequestTicket:
         for query in self.keywordQueries:
             query.runSearch()
 
-    def updateProgressStats(self, randomPaper, requestTime):
+    def updateProgressStats(self, randomPaper, requestTime, numWorkers):
         self.numBatchesRetrieved += 1
         if self.averageResponseTime:
             self.updateAverageResponseTime(requestTime)
@@ -82,23 +82,20 @@ class RequestTicket:
             'numResultsDiscovered': self.totalResults,
             'numResultsRetrieved': self.numBatchesRetrieved*50,
             'randomPaper': randomPaper,
-            'estimateSecondsToCompletion': self.getEstimateSecondsToCompletion()
+            'estimateSecondsToCompletion': self.getEstimateSecondsToCompletion(numWorkers)
         }
         self.progressThread.setTicketProgressStats(self.ticketID, ticketProgressStats)
 
-#TODO: rework to take concurrency into account
     def updateAverageResponseTime(self, requestTime):
-        if self.averageResponseTime < requestTime < self.averageResponseTime + 10:
-            self.averageResponseTime += requestTime
-            self.averageResponseTime /= 2
-        elif requestTime < self.averageResponseTime:
-            self.averageResponseTime = requestTime
+        self.averageResponseTime = (self.averageResponseTime + requestTime) / 2
+        return self.averageResponseTime
 
     def getPercentProgress(self):
         progressPercent = ceil(self.numBatchesRetrieved / self.numBatches * 100)
         return progressPercent
 
-    def getEstimateSecondsToCompletion(self):
-        estimate = self.averageResponseTime * (self.numBatches - self.numBatchesRetrieved)
-        return estimate
+    def getEstimateSecondsToCompletion(self, numWorkers):
+        numCycles = (self.numBatches - self.numBatchesRetrieved) / numWorkers
+        estimateSecondsToCompletion = self.averageResponseTime * numCycles
+        return estimateSecondsToCompletion
 
