@@ -1,15 +1,10 @@
-export function syncColors(seriesToSync, settings, tickets) {
-    const keyColorPairs = Object.keys(tickets).map(key => {
-        return {
-            key: key,
+function syncColors(seriesToSync, settings) {
+    return Object.keys(seriesToSync).map(key => (
+        {
+            ...seriesToSync[key],
             color: settings[key].color
         }
-    });
-    return seriesToSync.map(key => {
-        const color = keyColorPairs.find(pair => pair.key === key.key).color;
-        return {
-            ...seriesToSync[key],
-            color: color
-        }
-    });
+    ));
 }
+
+module.exports = syncColors;

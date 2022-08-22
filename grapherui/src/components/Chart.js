@@ -8,9 +8,9 @@ import Button from '@mui/material/Button'
 import Switch from "@mui/material/Switch";
 import Slider from '@mui/material/Slider';
 import useData from "./useData";
-import {syncColors} from "../utils/syncColors";
-import {generateOptions} from "../utils/generateOptions";
-import {getWidestDateRange} from "../utils/getWidestDateRange";
+const syncColors = require("../utils/syncColors");
+const generateOptions = require("../utils/generateOptions");
+const getWidestDateRange = require("../utils/getDateRangeSpan");
 
 //TODO: write tests for component and utils
 function Chart(props) {
