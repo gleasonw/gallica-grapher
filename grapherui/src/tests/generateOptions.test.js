@@ -1,15 +1,15 @@
 const generateOptions = require('../utils/generateOptions');
-let testSettings = {timeBin: 'year'}
-let testSeries = {
-    '1234':
+
+describe('generatedOptions', () => {
+    const testSeries = [
         {
             name: 'neat',
             data: [[1,2],[3,4]],
             color: 'red'
-        }}
-
-describe('generatedOptions', () => {
+        }
+    ]
     test('generate year grouped options when timebin is year', () => {
+        let testSettings = {timeBin: 'year'}
         let options = generateOptions(testSeries, testSettings);
         expect(options.xAxis.type).toEqual('line');
         expect(options.plotOptions.line.marker.enabled).toEqual(false);
@@ -18,7 +18,7 @@ describe('generatedOptions', () => {
         expect(options.series[0].color).toEqual('red');
     });
     test('generate month grouped options when timebin is month', () => {
-        testSettings.timeBin = 'month';
+        let testSettings = {timeBin: 'month'}
         let options = generateOptions(testSeries, testSettings);
         expect(options.xAxis.type).toEqual('datetime');
         expect(options.xAxis.dateTimeLabelFormats.month).toEqual('%b');
@@ -28,7 +28,7 @@ describe('generatedOptions', () => {
         expect(options.series[0].color).toEqual('red');
     });
     test('generate day grouped options when timebin is day', () => {
-        testSettings.timeBin = 'day';
+        let testSettings = {timeBin: 'day'}
         let options = generateOptions(testSeries, testSettings);
         expect(options.xAxis.type).toEqual('datetime');
     });

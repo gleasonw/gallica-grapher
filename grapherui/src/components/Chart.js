@@ -10,13 +10,13 @@ import Slider from '@mui/material/Slider';
 import useData from "./useData";
 const syncColors = require("../utils/syncColors");
 const generateOptions = require("../utils/generateOptions");
-const getWidestDateRange = require("../utils/getDateRangeSpan");
+const getWidestDateSpan = require("../utils/getDateRangeSpan");
 
 //TODO: write tests for component and utils
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
-    const dateRange = getWidestDateRange(props.tickets);
+    const dateRange = getWidestDateSpan(props.tickets);
     const query =
         "/graphData?keys=" + Object.keys(props.tickets) +
         "&continuous=" + chartSettings.continuous +
@@ -26,8 +26,7 @@ function Chart(props) {
     const series = useData(query);
     const graphDataWithSyncedColors = syncColors(
         series,
-        allSettings,
-        props.tickets);
+        allSettings);
     const highchartsOptions = generateOptions(
         graphDataWithSyncedColors,
         chartSettings);
