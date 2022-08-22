@@ -18,14 +18,14 @@ export function GroupedTicketResults(props) {
 
     )
 }
-//TODO: Sync label color with line color
+
 function GroupedTicketLabelBar(props) {
     const settings = useContext(GraphSettingsContext);
     return (
         <div className='groupedLabelBar'>
             {
                 Object.keys(props.tickets).map(key => (
-                    <div>
+                    <div key={key}>
                         <svg width = "20" height="20">
                             <circle cx="10" cy="10" r="10" fill={settings[key].color}/>
                         </svg>
@@ -33,7 +33,6 @@ function GroupedTicketLabelBar(props) {
                             terms={props.tickets[key].terms}
                             papers={props.tickets[key].papersAndCodes}
                             dateRange={props.tickets[key].dateRange}
-                            key={key}
                         />
                     </div>
             ))}

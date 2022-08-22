@@ -1,4 +1,4 @@
-export function initGraphSettings(tickets) {
+function initGraphSettings(tickets) {
     const highChartsSeriesColors = [
         '#7cb5ec',
         '#434348',
@@ -14,7 +14,7 @@ export function initGraphSettings(tickets) {
     const initSetting = {
         timeBin: 'year',
         averageWindow: '0',
-        continuous: 'false'
+        continuous: false
     }
     let initialGraphSettings = {}
     for (let key in tickets) {
@@ -29,3 +29,5 @@ export function initGraphSettings(tickets) {
     initialGraphSettings["group"] = initSetting;
     return initialGraphSettings
 }
+
+module.exports = initGraphSettings;

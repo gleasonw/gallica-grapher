@@ -5,14 +5,12 @@ import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSetting
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button'
-import Switch from "@mui/material/Switch";
-import Slider from '@mui/material/Slider';
 import useData from "./useData";
+import {MenuItem, Select} from "@mui/material";
 const syncColors = require("../utils/syncColors");
 const generateOptions = require("../utils/generateOptions");
 const getWidestDateSpan = require("../utils/getDateRangeSpan");
 
-//TODO: write tests for component and utils
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
@@ -24,26 +22,27 @@ function Chart(props) {
         "&timeBin=" + chartSettings.timeBin +
         "&averageWindow=" + chartSettings.averageWindow;
     const series = useData(query);
-    const graphDataWithSyncedColors = syncColors(
-        series,
-        allSettings);
-    const highchartsOptions = generateOptions(
-        graphDataWithSyncedColors,
-        chartSettings);
+    if(series){
+        const graphDataWithSyncedColors = syncColors(
+            series,
+            allSettings);
+        const highchartsOptions = generateOptions(
+            graphDataWithSyncedColors,
+            chartSettings);
+        return (
+            <div>
+                <ChartSettings settingsID={props.settingsID}/>
+                <HighchartsReact
+                    highcharts={Highcharts}
+                    options={highchartsOptions}
+                />
+            </div>
+        );
+    }else{
+        return null;
+    }
 
-    return (
-        <div>
-            <HighchartsReact
-                highcharts={Highcharts}
-                options={highchartsOptions}
-            />
-            <ChartSettings
-                settingsID={props.settingsID}
-            />
-        </div>
 
-
-    );
 }
 //TODO: labels
 function ChartSettings(props){
@@ -51,54 +50,23 @@ function ChartSettings(props){
     const settingsForID = settings[props.settingsID];
     const dispatch = useContext(GraphSettingsDispatchContext)
     return(
-        <div>
-            <ToggleButtonGroup
-              value={settingsForID.timeBin}
-              exclusive
-              onChange={e => {
-                dispatch({
-                    type: 'setTimeBin',
-                    key: props.settingsID,
-                    timeBin: e.target.value
-                })
-              }}
-              aria-label="Time bin size selection"
+        <div className={'graphSettingsNavBar'}>
+            <Select
+                value={settingsForID.timeBin}
+                onChange={(event) => {
+                    dispatch({
+                        type: 'setTimeBin',
+                        key: props.settingsID,
+                        timeBin: event.target.value
+                    })
+                }}
             >
-
-                <ToggleButton
-                    value="year"
-                    aria-label="year-grouped"
-                    name='timeBin'
-                >
-                    year
-                </ToggleButton>
-
-                <ToggleButton
-                    value="month"
-                    aria-label="month-grouped"
-                    name='timeBin'
-                >
-                    month
-                </ToggleButton>
-
-                <ToggleButton
-                    value="day"
-                    aria-label="day-grouped"
-                    name='timeBin'
-                >
-                    day
-                </ToggleButton>
-
-            </ToggleButtonGroup>
-            <Slider
-                aria-label="averageWindow"
-                defaultValue={0}
-                valueLabelDisplay="auto"
-                step={1}
-                marks={true}
-                min={0}
-                max={31}
-                track={false}
+                <MenuItem value={'year'}>Year</MenuItem>
+                <MenuItem value={'month'}>Month</MenuItem>
+                <MenuItem value={'day'}>Day</MenuItem>
+            </Select>
+            <Select
+                label="Smoothing"
                 value={settingsForID.averageWindow}
                 onChange={e => {
                     dispatch({
@@ -107,19 +75,37 @@ function ChartSettings(props){
                         averageWindow: e.target.value,
                     });
                 }}
-            />
-            <Switch
-                checked={settingsForID.continuous}
-                onChange={e => {
+            >
+                <MenuItem value={0}>0</MenuItem>
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+                <MenuItem value={4}>4</MenuItem>
+                <MenuItem value={5}>5</MenuItem>
+                <MenuItem value={6}>6</MenuItem>
+                <MenuItem value={7}>7</MenuItem>
+                <MenuItem value={8}>8</MenuItem>
+                <MenuItem value={9}>9</MenuItem>
+                <MenuItem value={10}>10</MenuItem>
+                <MenuItem value={11}>20</MenuItem>
+                <MenuItem value={12}>30</MenuItem>
+                <MenuItem value={13}>40</MenuItem>
+                <MenuItem value={14}>50</MenuItem>
+            </Select>
+            <ToggleButton
+                value="Exclude sporadic papers"
+                selected={settingsForID.continuous}
+                onChange={() => {
                     dispatch({
                         type: 'setContinuous',
                         key: props.settingsID,
-                        continuous: e.target.checked,
+                        continuous: !settingsForID.continuous,
                     })
                 }}
                 label='require continuous newspapers'
-            />
-
+            >
+                Exclude sporadic papers
+            </ToggleButton>
             <Button variant="text">
                 Download PNG
             </Button>

@@ -86,6 +86,7 @@ class RequestTicket:
         }
         self.progressThread.setTicketProgressStats(self.ticketID, ticketProgressStats)
 
+#TODO: rework to take concurrency into account
     def updateAverageResponseTime(self, requestTime):
         if self.averageResponseTime < requestTime < self.averageResponseTime + 10:
             self.averageResponseTime += requestTime

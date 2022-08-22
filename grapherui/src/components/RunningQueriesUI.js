@@ -36,7 +36,6 @@ function TicketProgressContainer(props){
             const currentTicketProgress = await fetch("progress/" + props.requestid);
             currentTicketProgress.json().then(data => {
                 const progress = data["progress"]
-                console.log(progress)
                 if(progress){
                     setProgressStats(progress)
                 }

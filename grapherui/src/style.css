@@ -442,6 +442,12 @@ label[for="papers"],label[for="searchTerm"]{
 .ticketResults{
     flex: 1;
 }
+.graphSettingsNavBar{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
 .topPaperTable{
     width: 100%;
     max-width: 800px;
