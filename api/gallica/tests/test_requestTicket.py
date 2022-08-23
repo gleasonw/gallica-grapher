@@ -8,7 +8,7 @@ import gallica.requestTicket
 class TestRequestTicket(TestCase):
 
     @patch("gallica.requestTicket.RequestTicket.initQueryObjects")
-    @patch("gallica.requestTicket.RequestTicket.sumResultsOfEachTicket")
+    @patch("gallica.requestTicket.RequestTicket.sumResultsOfEachQuery")
     @patch("gallica.requestTicket.RequestTicket.startQueries")
     def test_run_all_paper_ticket(
             self,
@@ -32,7 +32,7 @@ class TestRequestTicket(TestCase):
         mock_startQueries.assert_called_once()
 
     @patch("gallica.requestTicket.RequestTicket.initQueryObjects")
-    @patch("gallica.requestTicket.RequestTicket.sumResultsOfEachTicket")
+    @patch("gallica.requestTicket.RequestTicket.sumResultsOfEachQuery")
     @patch("gallica.requestTicket.RequestTicket.startQueries")
     def test_run_select_paper_ticket(
             self,
@@ -132,7 +132,7 @@ class TestRequestTicket(TestCase):
             MagicMock(getEstimateNumResults=
                       MagicMock(return_value=12))
         ]
-        ticket.sumResultsOfEachTicket()
+        ticket.sumResultsOfEachQuery()
 
         self.assertEqual(ticket.totalResults, 33)
 
@@ -183,7 +183,7 @@ class TestRequestTicket(TestCase):
                 'numResultsDiscovered': 0,
                 'numResultsRetrieved': 150,
                 'randomPaper': 'the seattle times',
-                'estimateSecondsToCompletion': 70
+                'estimateSecondsToCompletion': 7 / 50 * 10
             }
         )
 
@@ -196,7 +196,7 @@ class TestRequestTicket(TestCase):
                 'numResultsDiscovered': 0,
                 'numResultsRetrieved': 200,
                 'randomPaper': 'le figaro',
-                'estimateSecondsToCompletion': 60
+                'estimateSecondsToCompletion': 6 / 50 * 50
             }
         )
 

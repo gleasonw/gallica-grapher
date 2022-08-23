@@ -54,15 +54,18 @@ html, body, #root {
     align-content: center;
 }
 header{
-    height: 10%;
+    height: 60px;
 }
 .infoAndHomeBar{
-    height: 90%;
-    width: 100%;
+    width: 100vw;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    font-size: 20px;
+}
+.gallicaGrapherHome:hover{
+    cursor: pointer;
+    color: cornflowerblue;
 }
 .mainTitle{
     padding: 0 40px 40px;
@@ -116,8 +119,6 @@ header{
 .requestBox{
     display: flex;
     flex-direction: column;
-    margin-top: 15px;
-    margin-bottom: 15px;
     padding: 10px 20px 10px 20px;
 }
 .requestBoxLabel{
@@ -294,7 +295,7 @@ input[type='text']{
     display: block;
 }
 #seeExamplesButton{
-    height: 80px;
+    height: 150px;
     font-size: 20px;
     background: none;
     align-items: center;
@@ -322,8 +323,7 @@ input[type='text']{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    flex-wrap: nowrap;
-    overflow-x: scroll;
+    flex-wrap: wrap;
     width: 100%;
     max-width: 100%;
     padding: 10px 20px 10px 20px;
@@ -335,10 +335,15 @@ input[type='text']{
     padding: 24px;
     height: 192px;
     background: linear-gradient(to bottom, #d1e4f6 0%, #c5d8e9 100%);
+    margin: 10px;
 }
 .exampleRequest:hover{
     box-shadow: 0 8px 10px 1px rgba(0,0,0,.07),0 3px 14px 3px rgba(0,0,0,.06),0 4px 5px 0 rgba(0,0,0,.1);
     cursor: pointer;
+}
+.exampleTicket{
+    background: rgba(255,255,255,0.5);
+    margin: 5px;
 }
 
 .delete{

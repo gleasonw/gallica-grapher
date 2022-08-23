@@ -98,8 +98,7 @@ class InputUI extends React.Component {
     render() {
         return (
             <div className='inputBody'>
-                <div className='inputUI'>
-                    {this.props.header}
+                <div className='inputUI' ref={this.props.formRef}>
                     <div className="mainTitle">
                         Enter a word or phrase to query Gallica then graph the results.
                     </div>
@@ -144,7 +143,11 @@ class InputUI extends React.Component {
                     value='Or try some examples ↓'
                     />
                 </div>
-            <ExampleBox exampleBoxRef={this.exampleBoxRef}/>
+            <ExampleBox
+                exampleBoxRef={this.exampleBoxRef}
+                formRef={this.props.formRef}
+                onExampleRequestClick={this.props.onExampleRequestClick}
+            />
             </div>
 
 
@@ -152,8 +155,9 @@ class InputUI extends React.Component {
     }
 
 }
+//TODO: Cache the examples.
 function ExampleBox(props){
-    const exampleTickets = [
+    const exampleRequests = [
         [
             {"terms":["chicago"],"papersAndCodes":[{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":["1863","1944"]},
             {"terms":["new york"],"papersAndCodes":[{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":["1863","1944"]},
@@ -176,9 +180,10 @@ function ExampleBox(props){
             ref={props.exampleBoxRef}
         >
             <div className='exampleRequestsContainer'>
-                {exampleTickets.map((ticket, index) => (
+                {exampleRequests.map((request, index) => (
                     <ExampleRequest
-                        ticket={ticket}
+                        request={request}
+                        onClick={() => props.onExampleRequestClick(request)}
                         key={index}
                     />
                 ))}
@@ -190,8 +195,11 @@ function ExampleBox(props){
 }
 function ExampleRequest(props){
     return(
-        <div className='exampleRequest'>
-            {props.ticket.map((ticket, index) => (
+        <div
+            className='exampleRequest'
+            onClick={() => props.onClick(props.request)}
+        >
+            {props.request.map((ticket, index) => (
                 <div
                     className='exampleTicket'
                     key={index}

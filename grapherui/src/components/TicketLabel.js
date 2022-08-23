@@ -12,10 +12,7 @@ function TicketLabel(props){
 }
 
 function TicketTermRow(props){
-    const quotedTerms = props.terms.map(
-        term => "'" + term + "'"
-    ).join(', ')
-    return(renderRow(quotedTerms))
+    return(renderRow(props.terms))
 }
 function TicketPaperRow(props){
     const papers = props.papers
@@ -26,10 +23,13 @@ function TicketPaperRow(props){
     return(renderRow(paperNames))
 }
 function renderRow(items){
+    const quotedItems= items.map(
+        term => "'" + term + "'"
+    ).join(', ')
     if(items.length !== 0){
         return(
             <div className='bubbleText'>
-                {items}
+                {quotedItems}
             </div>
         )
     }

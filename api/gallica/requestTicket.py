@@ -32,7 +32,7 @@ class RequestTicket:
             self.initQueryObjects(self.genSelectPaperQuery)
         else:
             self.initQueryObjects(self.genAllPaperQuery)
-        self.sumResultsOfEachTicket()
+        self.sumResultsOfEachQuery()
         self.startQueries()
 
     def initQueryObjects(self, generator):
@@ -61,7 +61,7 @@ class RequestTicket:
             self.session)
         return query
 
-    def sumResultsOfEachTicket(self):
+    def sumResultsOfEachQuery(self):
         for query in self.keywordQueries:
             numResultsForKeyword = query.getEstimateNumResults()
             self.totalResults += numResultsForKeyword

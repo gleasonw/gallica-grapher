@@ -14,7 +14,7 @@ function UserInputForm(props){
 
     function handleSubmit(e){
         e.preventDefault();
-        if (props.thereAreTickets){
+        if (props.tickets && props.tickets.length > 0){
             props.onGraphStartClick(e);
         }else{
             setShowTicketReminder(true);
@@ -281,7 +281,6 @@ function RequestBox(props){
     return(
         <div className={'requestBoxContainer'}>
             <div className='requestBox'>
-                <span className={'requestBoxLabel'}>Tickets</span>
                 <RequestTicketBox
                     tickets={props.tickets}
                     onTicketClick={props.onTicketClick}
