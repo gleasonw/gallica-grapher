@@ -104,7 +104,7 @@ function ChartSettings(props){
                 }}
                 label='require continuous newspapers'
             >
-                Exclude sporadic papers
+                Exclude papers incomplete over range
             </ToggleButton>
             <Button variant="text">
                 Download PNG

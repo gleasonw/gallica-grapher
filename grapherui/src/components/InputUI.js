@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useRef} from "react";
 import UserInputForm from './UserInputForm';
 import TicketLabel from "./TicketLabel";
 
 class InputUI extends React.Component {
     constructor(props) {
         super(props);
+        this.exampleBoxRef = React.createRef();
         this.state = {
             termInputValue: '',
             paperInputValue: '',
@@ -21,6 +22,7 @@ class InputUI extends React.Component {
         this.handleTermChange = this.handleTermChange.bind(this);
         this.handlePaperDropdownClick = this.handlePaperDropdownClick.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleSeeExamplesClick = this.handleSeeExamplesClick.bind(this);
         this.deletePaperBubble = this.deletePaperBubble.bind(this);
         this.deleteTermBubble = this.deleteTermBubble.bind(this);
     }
@@ -61,6 +63,9 @@ class InputUI extends React.Component {
                 this.makeTermBubble(event.target.value)
             }
         }
+    }
+    handleSeeExamplesClick(){
+        this.exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
     }
     makePaperBubble(paper){
         const papers = this.state.papers.slice();
@@ -135,15 +140,17 @@ class InputUI extends React.Component {
                         <RequestBox
                             requestTickets={this.props.requestTickets}
                             onTicketClick={this.props.onTicketClick}
+                            thereAreTickets={this.props.thereAreTickets}
+                        />
+                        <input
+                        id='seeExamplesButton'
+                        type='button'
+                        onClick={this.handleSeeExamplesClick}
+                        value='Try example queries ↓'
                         />
                     </div>
-                    <div className='seeExamplesButton'>
-                        <div className='seeExamplesText'>
-                            Try example queries ↓
-                        </div>
-                    </div>
                 </div>
-            <ExampleBox/>
+            <ExampleBox exampleBoxRef={this.exampleBoxRef}/>
             </div>
 
 
@@ -153,25 +160,30 @@ class InputUI extends React.Component {
 }
 function ExampleBox(props){
     return(
-        <div className='exampleBox'>
-            Or, try an example.
-            <ExampleQuery
-                terms={['Jules Verne']}
-                papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
-                dateRange={['1850', '1860']}
-            />
-            <ExampleQuery
-                terms={['Jules Verne']}
-                papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
-                dateRange={['1850', '1860']}
-            />
+        <div
+            className='exampleBox'
+            ref={props.exampleBoxRef}
+        >
+            <div className='exampleRequestsContainer'>
+                <ExampleRequest
+                    terms={['Jules Verne']}
+                    papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
+                    dateRange={['1850', '1860']}
+                />
+                <ExampleRequest
+                    terms={['Jules Verne']}
+                    papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
+                    dateRange={['1850', '1860']}
+                />
+            </div>
+
         </div>
 
     )
 }
-function ExampleQuery(props){
+function ExampleRequest(props){
     return(
-        <div className='exampleQuery'>
+        <div className='exampleRequest'>
             <TicketLabel
                 terms={props.terms}
                 papers={props.papers}
@@ -182,29 +194,41 @@ function ExampleQuery(props){
 }
 function RequestBox(props){
     return(
-        <div className='requestBox'>
-            <div className='requestTicketsContainer'>
-                <RequestTicketBox
-                    tickets={props.requestTickets}
-                    onTicketClick={props.onTicketClick}
-                />
+        <div className={'requestBoxContainer'}>
+            <div className='requestBox'>
+                <span className={'requestBoxLabel'}>Tickets</span>
+                <div className='requestTicketsContainer'>
+                    <RequestTicketBox
+                        tickets={props.requestTickets}
+                        onTicketClick={props.onTicketClick}
+                        thereAreTickets={props.thereAreTickets}
+                    />
+                </div>
             </div>
         </div>
     );
 
 }
 function RequestTicketBox(props){
-    return(
-        <div className="ticketBox">
-            {props.tickets.map((ticket, index) => (
-                <RequestTicket
-                    ticket={ticket}
-                    onClick={() => props.onTicketClick(index)}
-                    key={index}
-                />
-            ))}
-        </div>
+    if(props.thereAreTickets){
+        return(
+            <div className="ticketBox">
+                {props.tickets.map((ticket, index) => (
+                    <RequestTicket
+                        ticket={ticket}
+                        onClick={() => props.onTicketClick(index)}
+                        key={index}
+                    />
+                ))}
+            </div>
+            )
+    }else{
+        return(
+            <div className="ticketBox">
+                <div id='placeHolderTicket'/>
+            </div>
         )
+    }
 }
 function RequestTicket(props){
     const terms = props.ticket['terms']

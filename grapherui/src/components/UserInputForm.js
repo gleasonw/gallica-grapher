@@ -61,15 +61,15 @@ function UserInputForm(props){
                 {showTicketReminder && !props.thereAreTickets ? noTicketReminder : null}
                 <div className='createTicketAndGraphButtonContainer'>
                     <input
-                        type='submit'
-                        id='graphButton'
-                        value='Graph 📊'
-                    />
-                    <input
                         type='button'
                         id='createTicketButton'
                         value='Add query +'
                         onClick={handleCreateTicketClick}
+                    />
+                    <input
+                        type='submit'
+                        id='graphButton'
+                        value='Graph 📊'
                     />
                 </div>
             </div>

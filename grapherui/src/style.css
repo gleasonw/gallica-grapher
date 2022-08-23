@@ -76,21 +76,15 @@ header{
     margin-right: auto;
     color: #4d4d4d
 }
+.inputBody{
+    padding: 0 32px;
+}
 .inputFormAndRequestBoxContainer{
-    min-height: 100%;
+    height: 100vh;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-.inputUI{
-    height: 100%;
-}
-.inputBody{
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: scroll;
 }
 @media screen and (max-width: 748px){
     .userInputForm, .requestBox{
@@ -110,12 +104,18 @@ header{
     width: 100%;
     max-width: 748px;
     margin-top: 15px;
-    padding: 10px 20px 10px 20px;
+}
+.requestBoxContainer{
+    border-radius: 10px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
 }
 .requestBox{
-    min-height: 100px;
+    display: flex;
+    flex-direction: column;
     margin-top: 15px;
     margin-bottom: 15px;
+    padding: 10px 20px 10px 20px;
 }
 .dateInputs{
     display: flex;
@@ -202,12 +202,19 @@ header{
     flex-wrap: wrap;
 }
 .requestBubble{
-    max-width: 200px;
-    max-height: 200px;
+    width: 100px;
+    height: 100px;
     color: #4d4d4d;
     border-radius: 10px;
     border: 1px solid #404040;
     background: rgba(186,186,186,0.05);
+}
+#placeHolderTicket{
+    width: 100px;
+    height: 100px;
+    color: #4d4d4d;
+    border-radius: 10px;
+    border: 1px dashed #404040;
 }
 
 .selectionBubble{
@@ -227,12 +234,9 @@ header{
 input[type='text']{
     height: 100%;
     border: 0;
-    outline: none;
     font-size: 16px;
     width: 100%;
-    float: bottom;
-    background-color: inherit;
-    color: #4d4d4d;
+    background: #f5f5f5;
 }
 .requestBubble{
     border: 1px solid #e0e0e0;
@@ -296,42 +300,56 @@ input[type='text']{
     overflow-x: scroll;
     width: 100%;
     max-width: 100%;
-    height: 100px;
-    background-color: rgb(255, 255, 255);
     padding: 10px 20px 10px 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
 }
 .paperInputAndDropdown{
     display: block;
 }
-.seeExamplesButton{
-    height: 162px;
+#seeExamplesButton{
+    height: 80px;
+    font-size: 20px;
+    background: none;
     align-items: center;
+    justify-content: center;
     display: flex;
-    cursor: pointer;
     align-self: center;
+    width: 100%;
+    border: none;
 }
 .seeExamplesText{
     color: #4d4d4d;
     font-size: 20px;
-    margin-left: 10px;
 }
 .exampleBox{
+    width: 100%;
+    height: 50vh;
+}
+
+.exampleBoxTitle{
+    font-size: 40px;
+    color: #4d4d4d;
+    margin-bottom: 10px;
+}
+
+.exampleRequestsContainer{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
     width: 100%;
-    background-color: white;
-    height: 500px;
+    max-width: 100%;
+    height: 100px;
+    padding: 10px 20px 10px 20px;
 }
-.exampleQuery{
+
+.exampleRequest{
     width: calc(50% - 20px);
     padding: 24px;
-    max-height: 200px;
+    height: 192px;
+    background-color: rgb(255, 255, 255);
 }
-.exampleQuery:hover{
+.exampleRequest:hover{
     box-shadow: 0 8px 10px 1px rgba(0,0,0,.07),0 3px 14px 3px rgba(0,0,0,.06),0 4px 5px 0 rgba(0,0,0,.1);
     cursor: pointer;
 }
