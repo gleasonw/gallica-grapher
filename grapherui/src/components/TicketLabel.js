@@ -21,7 +21,7 @@ function TicketPaperRow(props){
     const papers = props.papers
     const paperNames = []
     papers.map(paperAndCode => (
-        paperNames.push(paperAndCode['paper'])
+        paperNames.push(paperAndCode['title'])
     ));
     return(renderRow(paperNames))
 }

@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React from "react";
 import UserInputForm from './UserInputForm';
 import TicketLabel from "./TicketLabel";
 
@@ -98,57 +98,51 @@ class InputUI extends React.Component {
     render() {
         return (
             <div className='inputBody'>
-                <div className='inputFormAndRequestBoxContainer'>
-                    <div className='inputUI'>
-                        {this.props.header}
-                        <div className="mainTitle">
-                            Enter a word or phrase to query Gallica then graph the results.
-                        </div>
-                        <UserInputForm
-                            termInputValue={this.state.termInputValue}
-                            paperInputValue={this.state.paperInputValue}
-                            lowYearValue={this.state.currentDateRange[0]}
-                            highYearValue={this.state.currentDateRange[1]}
-                            onLowDateChange={this.handleLowDateChange}
-                            onHighDateChange={this.handleHighDateChange}
-                            onPaperChange={this.handlePaperChange}
-                            onTermChange={this.handleTermChange}
-                            onCreateTicketClick={() => this.props.onCreateTicketClick(
-                                {
-                                    'terms': this.state.terms,
-                                    'papersAndCodes': this.state.papers,
-                                    'dateRange':
-                                        this.state.currentDateRange[0] &&
-                                        this.state.currentDateRange[1] ?
-                                            this.state.currentDateRange :
-                                            [1499, 2020]
-                                }
-                            )}
-                            onPaperDropItemClick={this.handlePaperDropdownClick}
-                            onKeyDown={this.handleKeyDown}
-                            selectedTerms={this.state.terms}
-                            selectedPapers={this.state.papers}
-                            deleteTermBubble={this.deleteTermBubble}
-                            deletePaperBubble={this.deletePaperBubble}
-                            minYear={this.state.dateBoundary[0]}
-                            maxYear={this.state.dateBoundary[1]}
-                            minYearPlaceholder={this.state.dateBoundaryPlaceholder[0]}
-                            maxYearPlaceholder={this.state.dateBoundaryPlaceholder[1]}
-                            onGraphStartClick={this.props.onInputSubmit}
-                            thereAreTickets={this.props.thereAreTickets}
-                        />
-                        <RequestBox
-                            requestTickets={this.props.requestTickets}
-                            onTicketClick={this.props.onTicketClick}
-                            thereAreTickets={this.props.thereAreTickets}
-                        />
-                        <input
-                        id='seeExamplesButton'
-                        type='button'
-                        onClick={this.handleSeeExamplesClick}
-                        value='Try example queries ↓'
-                        />
+                <div className='inputUI'>
+                    {this.props.header}
+                    <div className="mainTitle">
+                        Enter a word or phrase to query Gallica then graph the results.
                     </div>
+                    <UserInputForm
+                        termInputValue={this.state.termInputValue}
+                        paperInputValue={this.state.paperInputValue}
+                        lowYearValue={this.state.currentDateRange[0]}
+                        highYearValue={this.state.currentDateRange[1]}
+                        onLowDateChange={this.handleLowDateChange}
+                        onHighDateChange={this.handleHighDateChange}
+                        onPaperChange={this.handlePaperChange}
+                        onTermChange={this.handleTermChange}
+                        onCreateTicketClick={() => this.props.onCreateTicketClick(
+                            {
+                                'terms': this.state.terms,
+                                'papersAndCodes': this.state.papers,
+                                'dateRange':
+                                    this.state.currentDateRange[0] &&
+                                    this.state.currentDateRange[1] ?
+                                        this.state.currentDateRange :
+                                        [1499, 2020]
+                            }
+                        )}
+                        onPaperDropItemClick={this.handlePaperDropdownClick}
+                        onKeyDown={this.handleKeyDown}
+                        selectedTerms={this.state.terms}
+                        selectedPapers={this.state.papers}
+                        deleteTermBubble={this.deleteTermBubble}
+                        deletePaperBubble={this.deletePaperBubble}
+                        minYear={this.state.dateBoundary[0]}
+                        maxYear={this.state.dateBoundary[1]}
+                        minYearPlaceholder={this.state.dateBoundaryPlaceholder[0]}
+                        maxYearPlaceholder={this.state.dateBoundaryPlaceholder[1]}
+                        onGraphStartClick={this.props.onInputSubmit}
+                        onTicketClick={this.props.onTicketClick}
+                        tickets={this.props.requestTickets}
+                    />
+                    <input
+                    id='seeExamplesButton'
+                    type='button'
+                    onClick={this.handleSeeExamplesClick}
+                    value='Or try some examples ↓'
+                    />
                 </div>
             <ExampleBox exampleBoxRef={this.exampleBoxRef}/>
             </div>
@@ -159,22 +153,35 @@ class InputUI extends React.Component {
 
 }
 function ExampleBox(props){
+    const exampleTickets = [
+        [
+            {"terms":["chicago"],"papersAndCodes":[{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":["1863","1944"]},
+            {"terms":["new york"],"papersAndCodes":[{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":["1863","1944"]},
+            {"terms":["londres"],"papersAndCodes":[{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":["1863","1944"]}
+        ],
+        [
+            {"terms":["boeuf"],"papersAndCodes":[{"code":"cb344287435","endDate":1925,"startDate":1883,"title":"L'Art culinaire (Société des cuisiniers français)"}],"dateRange":["1883","1925"]}
+        ],
+        [
+            {"terms":["colonies","algerie","congo","conquete"],"papersAndCodes":[{"code":"cb32757974m","endDate":1921,"startDate":1871,"title":"Le XIXe siècle (Paris. 1871)"},{"code":"cb328066631","endDate":1940,"startDate":1865,"title":"La Liberté"},{"code":"cb328123058","endDate":1944,"startDate":1884,"title":"Le Matin (Paris. 1884)"},{"code":"cb34355551z","endDate":1951,"startDate":1854,"title":"Le Figaro (Paris. 1854)"},{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":[1499,2020]}
+        ],
+        [
+            {"terms":["guerre","souffrance","sang"],"papersAndCodes":[{"code":"cb32757974m","endDate":1921,"startDate":1871,"title":"Le XIXe siècle (Paris. 1871)"}],"dateRange":["1871","1921"]},
+            {"terms":["paix","accord","amitie"],"papersAndCodes":[{"code":"cb32757974m","endDate":1921,"startDate":1871,"title":"Le XIXe siècle (Paris. 1871)"}],"dateRange":["1871","1921"]}
+        ]
+    ]
     return(
         <div
             className='exampleBox'
             ref={props.exampleBoxRef}
         >
             <div className='exampleRequestsContainer'>
-                <ExampleRequest
-                    terms={['Jules Verne']}
-                    papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
-                    dateRange={['1850', '1860']}
-                />
-                <ExampleRequest
-                    terms={['Jules Verne']}
-                    papers={[{'paper': 'Le Livre de la jungle', 'code': 'LJN'}]}
-                    dateRange={['1850', '1860']}
-                />
+                {exampleTickets.map((ticket, index) => (
+                    <ExampleRequest
+                        ticket={ticket}
+                        key={index}
+                    />
+                ))}
             </div>
 
         </div>
@@ -184,71 +191,20 @@ function ExampleBox(props){
 function ExampleRequest(props){
     return(
         <div className='exampleRequest'>
-            <TicketLabel
-                terms={props.terms}
-                papers={props.papers}
-                dateRange={props.dateRange}
-            />
-        </div>
-    )
-}
-function RequestBox(props){
-    return(
-        <div className={'requestBoxContainer'}>
-            <div className='requestBox'>
-                <span className={'requestBoxLabel'}>Tickets</span>
-                <div className='requestTicketsContainer'>
-                    <RequestTicketBox
-                        tickets={props.requestTickets}
-                        onTicketClick={props.onTicketClick}
-                        thereAreTickets={props.thereAreTickets}
+            {props.ticket.map((ticket, index) => (
+                <div
+                    className='exampleTicket'
+                    key={index}
+                >
+                    <TicketLabel
+                        terms={ticket["terms"]}
+                        papers={ticket["papersAndCodes"]}
+                        dateRange={ticket["dateRange"]}
                     />
                 </div>
-            </div>
+            ))}
         </div>
-    );
-
-}
-function RequestTicketBox(props){
-    if(props.thereAreTickets){
-        return(
-            <div className="ticketBox">
-                {props.tickets.map((ticket, index) => (
-                    <RequestTicket
-                        ticket={ticket}
-                        onClick={() => props.onTicketClick(index)}
-                        key={index}
-                    />
-                ))}
-            </div>
-            )
-    }else{
-        return(
-            <div className="ticketBox">
-                <div id='placeHolderTicket'/>
-            </div>
-        )
-    }
-}
-function RequestTicket(props){
-    const terms = props.ticket['terms']
-    const papers = props.ticket['papersAndCodes']
-    const dateRange = props.ticket['dateRange']
-    return(
-        <button
-            type="button"
-            className='requestBubble'
-            onClick={props.onClick}
-        >
-            <div className="ticket">
-                <TicketLabel
-                    terms={terms}
-                    papers={papers}
-                    dateRange={dateRange}
-                />
-            </div>
-        </button>
-    );
+    )
 }
 
 export default InputUI;

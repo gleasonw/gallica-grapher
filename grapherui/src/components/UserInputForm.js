@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import TicketLabel from "./TicketLabel";
 
 function UserInputForm(props){
     const [showTicketReminder, setShowTicketReminder] = useState(false);
@@ -58,20 +59,24 @@ function UserInputForm(props){
                 highYear={props.highYearValue}
             />
             <div className='graphWarningBoxBoundary'>
-                {showTicketReminder && !props.thereAreTickets ? noTicketReminder : null}
+                {showTicketReminder && props.tickets.length === 0 ? noTicketReminder : null}
                 <div className='createTicketAndGraphButtonContainer'>
                     <input
                         type='button'
                         id='createTicketButton'
-                        value='Add query +'
+                        value='Add series +'
                         onClick={handleCreateTicketClick}
                     />
                     <input
                         type='submit'
                         id='graphButton'
-                        value='Graph 📊'
+                        value='Fetch and graph 📊'
                     />
                 </div>
+                <RequestBox
+                    tickets={props.tickets}
+                    onTicketClick={props.onTicketClick}
+                />
             </div>
 
 
@@ -270,6 +275,62 @@ function DateInputBox(props){
             </div>
         </div>
     )
+}
+
+function RequestBox(props){
+    return(
+        <div className={'requestBoxContainer'}>
+            <div className='requestBox'>
+                <span className={'requestBoxLabel'}>Tickets</span>
+                <RequestTicketBox
+                    tickets={props.tickets}
+                    onTicketClick={props.onTicketClick}
+                />
+            </div>
+        </div>
+    );
+
+}
+function RequestTicketBox(props){
+    if(props.tickets && props.tickets.length > 0){
+        return(
+            <div className="ticketBubbleContainer">
+                {props.tickets.map((ticket, index) => (
+                    <RequestTicket
+                        ticket={ticket}
+                        onClick={() => props.onTicketClick(index)}
+                        key={index}
+                    />
+                ))}
+            </div>
+            )
+    }else{
+        return(
+            <div className="ticketBubbleContainer">
+                <div id='placeHolderTicket'/>
+            </div>
+        )
+    }
+}
+function RequestTicket(props){
+    const terms = props.ticket['terms']
+    const papers = props.ticket['papersAndCodes']
+    const dateRange = props.ticket['dateRange']
+    return(
+        <button
+            type="button"
+            className='requestBubble'
+            onClick={props.onClick}
+        >
+            <div className="ticket">
+                <TicketLabel
+                    terms={terms}
+                    papers={papers}
+                    dateRange={dateRange}
+                />
+            </div>
+        </button>
+    );
 }
 
 export default UserInputForm;

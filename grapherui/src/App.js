@@ -82,7 +82,6 @@ function App() {
                     onCreateTicketClick={handleCreateTicketClick}
                     onTicketClick={handleTicketClick}
                     header={header}
-                    thereAreTickets={tickets.length > 0}
                 />
             </div>
         )

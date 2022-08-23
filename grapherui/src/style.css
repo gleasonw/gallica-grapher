@@ -74,13 +74,13 @@ header{
     line-height: 56px;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 30px;
     color: #4d4d4d
 }
 .inputBody{
     padding: 0 32px;
 }
-.inputFormAndRequestBoxContainer{
-    height: 100vh;
+.inputUI{
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -91,7 +91,7 @@ header{
         width: 100%;
         max-width: 648px;
     }
-    .ticketBox{
+    .ticketBubbleContainer{
         max-height: 100px;
     }
     .mainTitle{
@@ -99,15 +99,18 @@ header{
         line-height: 34px;
         width: 248px;
     }
+    #createTicketButton, #graphButton{
+        font-size: 20px !important;
+    }
 }
 .userInputForm{
     width: 100%;
     max-width: 748px;
     margin-top: 15px;
 }
-.requestBoxContainer{
+.graphWarningBoxBoundary{
     border-radius: 10px;
-    background-color: rgb(255, 255, 255);
+    background: rgba(255,255,255,0.5);
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
 }
 .requestBox{
@@ -116,6 +119,9 @@ header{
     margin-top: 15px;
     margin-bottom: 15px;
     padding: 10px 20px 10px 20px;
+}
+.requestBoxLabel{
+    align-self: center;
 }
 .dateInputs{
     display: flex;
@@ -128,13 +134,6 @@ header{
 }
 .dateInput{
     color: green;
-}
-.requestBox{
-    width: 100%;
-    max-width: 748px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
 }
 .bubblesContainer{
     align-items: center;
@@ -193,13 +192,10 @@ header{
     height: 10px;
     width: 10px;
 }
-.ticket{
-    margin: 5px;
-    flex: 1;
-}
-.requestBubbleContainer{
+.ticketBubbleContainer{
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
+    overflow-x: scroll;
 }
 .requestBubble{
     width: 100px;
@@ -208,6 +204,7 @@ header{
     border-radius: 10px;
     border: 1px solid #404040;
     background: rgba(186,186,186,0.05);
+    margin: 10px;
 }
 #placeHolderTicket{
     width: 100px;
@@ -215,6 +212,7 @@ header{
     color: #4d4d4d;
     border-radius: 10px;
     border: 1px dashed #404040;
+    margin: 10px;
 }
 
 .selectionBubble{
@@ -237,18 +235,7 @@ input[type='text']{
     font-size: 16px;
     width: 100%;
     background: #f5f5f5;
-}
-.requestBubble{
-    border: 1px solid #e0e0e0;
-    flex: 1;
-    margin: 5px;
-}
-.ticketBox{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    overflow-x: scroll;
+    outline: none;
 }
 .graphWarningBoxBoundary{
     margin-top: 30px;
@@ -273,9 +260,10 @@ input[type='text']{
     transition: all 150ms;
     color: #4d4d4d;
     border-radius: 10px;
-    font-size: 40px;
+    font-size: 30px;
     padding: 10px;
     width: 100%;
+    margin: 10px;
 }
 
 .inputContainer{
@@ -322,7 +310,6 @@ input[type='text']{
 }
 .exampleBox{
     width: 100%;
-    height: 50vh;
 }
 
 .exampleBoxTitle{
@@ -339,15 +326,15 @@ input[type='text']{
     overflow-x: scroll;
     width: 100%;
     max-width: 100%;
-    height: 100px;
     padding: 10px 20px 10px 20px;
+    margin-bottom: 20px;
 }
 
 .exampleRequest{
     width: calc(50% - 20px);
     padding: 24px;
     height: 192px;
-    background-color: rgb(255, 255, 255);
+    background: linear-gradient(to bottom, #d1e4f6 0%, #c5d8e9 100%);
 }
 .exampleRequest:hover{
     box-shadow: 0 8px 10px 1px rgba(0,0,0,.07),0 3px 14px 3px rgba(0,0,0,.06),0 4px 5px 0 rgba(0,0,0,.1);
@@ -391,7 +378,7 @@ label[for="papers"],label[for="searchTerm"]{
     max-width: 600px;
     position: relative;
     z-index: 5;
-    bottom: 20px;
+    bottom: 0px;
 }
 .paperDropdown {
     background-color: white;
@@ -409,8 +396,7 @@ label[for="papers"],label[for="searchTerm"]{
     position: absolute;
 }
 .paperDropdown > *:hover{
-    background-color: blue;
-    color: white;
+    background: linear-gradient(to bottom, #d1e4f6 0%, #c5d8e9 100%);
 }
 .paperDropdownItem{
     display: block;
