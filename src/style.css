@@ -1,0 +1,539 @@
+html, body, #root {
+    margin: 0;
+    height: 100%;
+    background-position-x: 0;
+    background-position-y: 0;
+    background: #edebe9 linear-gradient(to bottom, #dbd7d1, #edebe9 116px) no-repeat;
+    background-size: auto;
+    background-origin: padding-box;
+    background-clip: border-box;
+}
+
+.horizontal-slider {
+    width: 100%;
+    height: 50px;
+}
+*{
+    box-sizing: border-box;
+}
+.example-thumb {
+  cursor: pointer;
+  position: absolute;
+  z-index: 100;
+  background: #ffffff;
+  border: 5px solid #3774ff;
+  border-radius: 100%;
+  display: block;
+  box-shadow: 0 0 2px 0 rgb(0 0 0 / 44%);
+}
+.example-thumb.active {
+  background-color: grey;
+}
+.example-track {
+  position: relative;
+  background: #ddd;
+}
+.example-track.example-track-1 {
+  background: #83a9ff;
+}
+.example-track {
+  top: 20px;
+  height: 4px;
+}
+.horizontal-slider .example-thumb {
+  top: 12px;
+  width: 10px;
+  outline: none;
+  height: 10px;
+  line-height: 38px;
+}
+.App{
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-content: center;
+}
+header{
+    height: 60px;
+}
+.infoAndHomeBar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 30px;
+    margin: 20px 20px 0 20px;
+}
+.gallicaGrapherHome:hover{
+    cursor: pointer;
+    color: cornflowerblue;
+}
+.mainTitle{
+    padding: 0 40px 40px;
+    width: 548px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 44px;
+    line-height: 56px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    color: #4d4d4d
+}
+.inputBody{
+    padding: 0 32px;
+}
+.inputUI{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+@media screen and (max-width: 748px){
+    .userInputForm, .requestBox{
+        width: 100%;
+        max-width: 648px;
+    }
+    .ticketBubbleContainer{
+        max-height: 100px;
+    }
+    .mainTitle{
+        font-size: 24px;
+        line-height: 34px;
+        width: 248px;
+    }
+    #createTicketButton, #graphButton{
+        font-size: 20px !important;
+    }
+}
+.userInputForm{
+    width: 100%;
+    max-width: 748px;
+    margin-top: 15px;
+}
+.graphWarningBoxBoundary{
+    border-radius: 10px;
+    background: rgba(255,255,255,0.5);
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
+}
+.requestBox{
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px 10px 20px;
+}
+.requestBoxLabel{
+    align-self: center;
+}
+.dateInputs{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 748px;
+    margin-bottom: 30px;
+}
+.dateInput{
+    color: green;
+}
+.bubblesContainer{
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    flex-direction: row;
+    border-radius: 8px;
+}
+.bubblesLabel{
+    height: 32px;
+    margin-right: 10px;
+}
+.bubbleItem{
+    display: inline-flex;
+    max-width: 200px;
+    padding: 8px 12px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #404040;
+    background: rgba(186,186,186,0.05);
+    color: #4d4d4d;
+    transition: all 150ms;
+    border-radius: 10px;
+    font-size: 40px;
+}
+.bubbleText{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    margin: auto;
+    text-align: center;
+    white-space: nowrap;
+    font-weight: 700;
+    line-height: 1;
+}
+.bubbleDeleteButton{
+    align-items: center;
+    appearance: none;
+    background: #d64f00;
+    border: none;
+    border-radius: 50%;
+    display: inline-flex;
+    flex: none;
+    font-size: 14px;
+    height: 1em;
+    justify-content: center;
+    line-height: 1;
+    margin: 0 0 0 8px;
+    padding: 0;
+    width: 1em;
+}
+.deleteButton{
+    fill: #fff;
+    height: 10px;
+    width: 10px;
+}
+.ticketBubbleContainer{
+    display: flex;
+    flex-direction: row;
+    overflow-x: scroll;
+}
+.requestBubble{
+    width: 100px;
+    height: 100px;
+    color: #4d4d4d;
+    border-radius: 10px;
+    border: 1px solid #404040;
+    background: rgba(186,186,186,0.05);
+    margin: 10px;
+}
+#placeHolderTicket{
+    width: 100px;
+    height: 100px;
+    color: #4d4d4d;
+    border-radius: 10px;
+    border: 1px dashed #404040;
+    margin: 10px;
+}
+
+.selectionBubble{
+    padding: 3px 5px 3px 10px;
+    box-shadow: inset 0 0 4px 0 #dcd1c7;
+    border: 1px solid #cbc6c3;
+    color: #242527;
+    max-height: 30px;
+    max-width: 250px;
+    cursor: pointer;
+    line-height: 1.4;
+    display: flex;
+    font-size: 16px;
+    margin: 0 10px 10px 0;
+}
+
+input[type='text']{
+    height: 100%;
+    border: 0;
+    font-size: 16px;
+    width: 100%;
+    background: #f5f5f5;
+    outline: none;
+}
+.graphWarningBoxBoundary{
+    margin-top: 30px;
+}
+.createTicketAndGraphButtonContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 748px;
+}
+.noTicketReminderText{
+    color: #d64f00;
+}
+#createTicketButton, #graphButton{
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%);
+    text-shadow: 0 1px 0 #fff;
+    transition: all 150ms;
+    color: #4d4d4d;
+    border-radius: 10px;
+    font-size: 30px;
+    padding: 10px;
+    width: 100%;
+    margin: 10px;
+}
+
+.inputContainer{
+    font-size: large;
+    padding: 12px 20px;
+    outline: none;
+    appearance: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #d9d9d9;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+    color: #4d4d4d;
+    transition: all 150ms;
+}
+.requestTicketsContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+    width: 100%;
+    max-width: 100%;
+    padding: 10px 20px 10px 20px;
+}
+.paperInputAndDropdown{
+    display: block;
+}
+#seeExamplesButton{
+    height: 150px;
+    font-size: 20px;
+    background: none;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    align-self: center;
+    width: 100%;
+    border: none;
+}
+.seeExamplesText{
+    color: #4d4d4d;
+    font-size: 20px;
+}
+.exampleBox{
+    width: 100%;
+}
+
+.exampleBoxTitle{
+    font-size: 40px;
+    color: #4d4d4d;
+    margin-bottom: 10px;
+}
+
+.exampleRequestsContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 100%;
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 20px;
+}
+
+.exampleRequest{
+    width: calc(50% - 20px);
+    padding: 24px;
+    height: 192px;
+    background: linear-gradient(to bottom, #d1e4f6 0%, #c5d8e9 100%);
+    margin: 10px;
+}
+.exampleRequest:hover{
+    box-shadow: 0 8px 10px 1px rgba(0,0,0,.07),0 3px 14px 3px rgba(0,0,0,.06),0 4px 5px 0 rgba(0,0,0,.1);
+    cursor: pointer;
+}
+.exampleTicket{
+    background: rgba(255,255,255,0.5);
+    margin: 5px;
+}
+
+.delete{
+    font-size: large;
+    margin-right: 8px;
+    font-family: Arial, sans-serif;
+    font-weight: lighter;
+}
+.delete:hover{
+    color: gray;
+}
+input#papers,input#searchTerm{
+    height: 100%;
+    border: 0;
+    font-size: 16px;
+    width: 100%;
+    float: bottom;
+}
+
+label[for="papers"],label[for="searchTerm"]{
+    display: none;
+}
+
+
+.selectedPaper,.selectedTerm{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: medium;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.searchLabel{
+    font-size: large;
+}
+.dropdownContainer{
+    max-width: 600px;
+    position: relative;
+    z-index: 5;
+    bottom: 0px;
+}
+.paperDropdown {
+    background-color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    max-height: 300px;
+    display: block;
+    overflow-y: scroll;
+    font-size: 16px;
+    width: 100%;
+    border-color: slategray;
+    box-sizing: border-box;
+    box-shadow: 0 4px 5px rgba(0,0,0,.15);
+    position: absolute;
+}
+.paperDropdown > *:hover{
+    background: linear-gradient(to bottom, #d1e4f6 0%, #c5d8e9 100%);
+}
+.paperDropdownItem{
+    display: block;
+    list-style: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    background-color: white;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.dropdown > *:hover{
+    background-color: blue;
+    color: white;
+}
+
+.queryProgressUI, .ticketResultsContainer{
+    max-width: 90vw;
+    min-height: 80vh;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    justify-content: center;
+    align-items: center;
+}
+.groupedStat{
+    border: solid;
+    width: calc(100% - 40px);
+    max-width: 800px;
+    margin: 20px;
+}
+.ticketProgressBox{
+    width: 100%;
+    border: 1px solid #404040;
+    background: rgba(186,186,186,0.05);
+    color: #4d4d4d;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 500px;
+    max-height: 500px;
+
+}
+.ticketResults{
+    flex: 1;
+    margin: 20px;
+    background: white;
+    border-radius: 10px;
+}
+.ticketStats{
+    max-width: 800px;
+    border: 1px solid #404040;
+    background: rgba(186,186,186,0.05);
+    padding: 20px;
+}
+.graphSettingsNavBar{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+.topPaperTable{
+    width: 100%;
+    max-width: 800px;
+}
+td{
+    max-width: 100px;
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+td:hover{
+    overflow: visible;
+    white-space: normal;
+    height: auto;
+}
+tr:hover{
+    background-color: lightblue;
+}
+tr:nth-child(even){
+    background-color: #f2f2f2;
+}
+.resultUI{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.groupedLabelBar{
+    display: flex;
+    background-color: #262421;
+    padding: 10px 20px 10px 20px;
+    border-radius: 10px;
+}
+.ticketLabel{
+    flex: 1;
+}
+.ticketLabel *{
+    font-size: 16px;
+}
+.groupedResultsUI{
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white;
+    margin: 20px;
+}
+.groupedResultsUI > div{
+    margin: 20px;
+}
+.groupedStatBar, .groupedLabelBar{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 10px 20px 10px 20px;
+    border-radius: 10px;
+    border: 1px solid #d9d9d9;
+    background: rgba(255,255,255,0.5);
+    color: #4d4d4d;
+}
+.groupedLabel{
+    flex: 1;
+}
+.groupedStat{
+    border: solid;
+    padding: 30px;
+}
+.groupedLabel *{
+    font-size: 16px;
+}
