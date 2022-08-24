@@ -25,11 +25,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "grapherui/node_modules/.bin/react-scripts start",
-    "start-api": "cd api && flask run --no-debugger",
-    "build": "grapherui/node_modules/.bin/react-scripts build",
-    "test": "grapherui/node_modules/.bin/jest",
-    "eject": "grapherui/node_modules/.bin/react-scripts eject"
+    "start": "node_modules/.bin/react-scripts start",
+    "build": "node_modules/.bin/react-scripts build",
+    "test": "node_modules/.bin/jest",
+    "eject": "node_modules/.bin/react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

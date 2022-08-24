@@ -67,6 +67,9 @@ header{
     cursor: pointer;
     color: cornflowerblue;
 }
+.info:hover{
+    cursor: pointer;
+}
 .mainTitle{
     padding: 0 40px 40px;
     width: 548px;
@@ -455,9 +458,7 @@ label[for="papers"],label[for="searchTerm"]{
     border-radius: 10px;
 }
 .ticketStats{
-    max-width: 800px;
-    border: 1px solid #404040;
-    background: rgba(186,186,186,0.05);
+    width: auto;
     padding: 20px;
 }
 .graphSettingsNavBar{
@@ -468,10 +469,8 @@ label[for="papers"],label[for="searchTerm"]{
 }
 .topPaperTable{
     width: 100%;
-    max-width: 800px;
 }
 td{
-    max-width: 100px;
     padding: 5px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -481,9 +480,6 @@ td:hover{
     overflow: visible;
     white-space: normal;
     height: auto;
-}
-tr:hover{
-    background-color: lightblue;
 }
 tr:nth-child(even){
     background-color: #f2f2f2;

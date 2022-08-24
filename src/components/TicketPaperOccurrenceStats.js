@@ -26,7 +26,7 @@ export function TicketPaperOccurrenceStats(props) {
                 <tbody>
                     <tr>
                         <th>Paper</th>
-                        <th>Count</th>
+                        <th>Total Occurrences</th>
                     </tr>
                     {topPapers.map(paperCount => (
                         <tr key={paperCount[0]}>

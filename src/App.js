@@ -15,6 +15,7 @@ function App() {
     const [requestID, setRequestID] = useState('');
     const [gettingInput, setGettingInput] = useState(true);
     const [fetchingData, setFetchingData] = useState(false);
+    const [infoPage, setInfoPage] = useState(false);
     const formRef = useRef(null);
 
     const header =
@@ -26,7 +27,10 @@ function App() {
                 >
                     Graphing Gallica
                 </div>
-                <div className="info">
+                <div
+                    className="info"
+                    onClick={handleInfoClick}
+                >
                     <InfoIcon/>
                 </div>
             </div>
@@ -84,6 +88,7 @@ function App() {
     }
 
     function handleHomeClick(){
+        setInfoPage(false)
         setGettingInput(true);
         setFetchingData(false);
         setTickets([]);
@@ -91,7 +96,19 @@ function App() {
         setRequestID('');
     }
 
-    if(gettingInput){
+    function handleInfoClick(){
+        setInfoPage(true);
+    }
+    if(infoPage) {
+        return(
+            <div>
+                {header}
+                <div className={'infoText'}>
+                    This is a graphing tool.
+                </div>
+            </div>
+        )
+    }else if(gettingInput){
         return (
             <div className="App">
                 {header}

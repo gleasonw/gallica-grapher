@@ -1,5 +1,4 @@
-import React, {useContext} from 'react';
-import {GraphSettingsContext} from "./GraphSettingsContext";
+import React from 'react';
 
 function TicketLabel(props){
     return(

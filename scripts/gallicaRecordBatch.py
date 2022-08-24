@@ -2,7 +2,6 @@ from lxml import etree
 from scripts.gallicaRecord import GallicaKeywordRecord
 from scripts.gallicaRecord import GallicaPaperRecord
 from scripts.gallicaSession import GallicaSession
-import time
 
 
 class GallicaRecordBatch:
