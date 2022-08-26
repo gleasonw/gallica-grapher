@@ -11,18 +11,26 @@ from scripts.topPapers import TopPapers
 
 retrievingThreads = {}
 exceptionBucket = queue.Queue()
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder='../frontend/build',
+    static_url_path='/')
 CORS(app)
 
 
-@app.route('/init', methods=['POST'])
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
+
+
+@app.route('/api/init', methods=['POST'])
 def init():
     tickets = request.get_json()["tickets"]
     task = spawnRequestThread.delay(tickets)
     return {"taskid": task.id}
 
 
-@app.route('/progress/<taskID>')
+@app.route('/api/progress/<taskID>')
 def getProgress(taskID):
     task = spawnRequestThread.AsyncResult(taskID)
     if task.info:
@@ -38,21 +46,21 @@ def getProgress(taskID):
     return response
 
 
-@app.route('/paperchartjson')
+@app.route('/api/paperchartjson')
 def paperChart():
     with open(os.path.join(os.path.dirname(__file__), 'static/paperJSON.json'), 'r') as outFile:
         paperChartJSON = outFile.read()
     return paperChartJSON
 
 
-@app.route('/papers/<query>')
+@app.route('/api/papers/<query>')
 def papers(query):
     newspapers = Newspaper()
     availablePapers = newspapers.getPapersSimilarToKeyword(query)
     return availablePapers
 
 
-@app.route('/graphData')
+@app.route('/api/graphData')
 def getGraphData():
     settings = {
         'ticketIDs': request.args["keys"],
@@ -66,7 +74,7 @@ def getGraphData():
     return items
 
 
-@app.route('/topPapers')
+@app.route('/api/topPapers')
 def getTopPapersFromID():
     topPapers = TopPapers(
         request.args["id"],
