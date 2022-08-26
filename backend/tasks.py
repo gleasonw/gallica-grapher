@@ -1,5 +1,5 @@
 from celery import Celery
-from requestThread import RequestThread
+from scripts.requestThread import RequestThread
 
 celery = Celery(
     'api.tasks',

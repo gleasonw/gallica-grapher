@@ -11,16 +11,13 @@ from scripts.topPapers import TopPapers
 
 retrievingThreads = {}
 exceptionBucket = queue.Queue()
-app = Flask(
-    __name__,
-    static_folder='../frontend/build',
-    static_url_path='/')
+app = Flask(__name__)
 CORS(app)
 
 
 @app.route('/')
 def index():
-    return app.send_static_file('index.html')
+    return 'ok'
 
 
 @app.route('/api/init', methods=['POST'])

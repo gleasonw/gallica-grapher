@@ -1,4 +1,4 @@
-from db import DB
+from scripts.db import DB
 
 
 class TopPapers:
