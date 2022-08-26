@@ -1,4 +1,4 @@
-function getDateRangeSpan(tickets) {
+export default function getDateRangeSpan(tickets) {
     if(Object.keys(tickets).length === 1) {
         return tickets[Object.keys(tickets)[0]].dateRange;
     }else{
@@ -16,5 +16,3 @@ function getDateRangeSpan(tickets) {
     }
 
 }
-
-module.exports = getDateRangeSpan;

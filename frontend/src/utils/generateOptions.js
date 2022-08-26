@@ -1,4 +1,4 @@
-function generateOptions(series, settings) {
+export default function generateOptions(series, settings) {
     let options = {
         chart: {
             zoomType: 'x'
@@ -56,5 +56,3 @@ function generateOptions(series, settings) {
 
     return options;
 }
-
-module.exports = generateOptions;

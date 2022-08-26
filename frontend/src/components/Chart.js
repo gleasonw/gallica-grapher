@@ -8,14 +8,14 @@ import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button'
 import useData from "./useData";
 import {MenuItem, Select} from "@mui/material";
-const syncColors = require("../utils/syncColors");
-const generateOptions = require("../utils/generateOptions");
-const getWidestDateSpan = require("../utils/getDateRangeSpan");
+import syncColors from  "../utils/syncColors";
+import generateOptions from "../utils/generateOptions";
+import getDateRangeSpan from "../utils/getDateRangeSpan";
 
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
-    const dateRange = getWidestDateSpan(props.tickets);
+    const dateRange = getDateRangeSpan(props.tickets);
     const query =
         "/graphData?keys=" + Object.keys(props.tickets) +
         "&continuous=" + chartSettings.continuous +

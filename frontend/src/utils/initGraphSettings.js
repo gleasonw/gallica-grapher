@@ -1,4 +1,4 @@
-function initGraphSettings(tickets) {
+export default function initGraphSettings(tickets) {
     const highChartsSeriesColors = [
         '#7cb5ec',
         '#434348',
@@ -29,5 +29,3 @@ function initGraphSettings(tickets) {
     initialGraphSettings["group"] = initSetting;
     return initialGraphSettings
 }
-
-module.exports = initGraphSettings;
