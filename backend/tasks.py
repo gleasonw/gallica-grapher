@@ -3,7 +3,7 @@ from scripts.requestThread import RequestThread
 
 celery = Celery(
     'api.tasks',
-    broker='amqp://',
+    broker='redis://localhost',
     backend='redis://localhost')
 
 

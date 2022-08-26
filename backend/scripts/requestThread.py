@@ -1,13 +1,13 @@
 import threading
 from scripts.requestTicket import RequestTicket
-from scripts.db import DB
+from scripts.psqlconn import PSQLconn
 from scripts.gallicaSession import GallicaSession
 
 
 class RequestThread(threading.Thread):
     def __init__(self, tickets):
         self.session = GallicaSession().getSession()
-        self.DBconnection = DB().getConn()
+        self.DBconnection = PSQLconn().getConn()
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.topPapersForTerms = []

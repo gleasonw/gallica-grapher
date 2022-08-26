@@ -1,4 +1,4 @@
-from scripts.db import DB
+from scripts.psqlconn import PSQLconn
 
 
 class TopPapers:
@@ -9,7 +9,7 @@ class TopPapers:
             continuous,
             dateRange=None):
 
-        self.conn = DB().getConn()
+        self.conn = PSQLconn().getConn()
         self.ticketID = ticketID
         self.continuous = continuous.lower() == "true"
         if self.continuous:

@@ -10,7 +10,7 @@ export function TicketPaperOccurrenceStats(props) {
     useEffect(() => {
         let updatedPapers = [];
         fetch(
-            "/topPapers?id="+props.ticketID+
+            "/api/topPapers?id="+props.ticketID+
             "&continuous="+ticketSettings.continuous+
             "&dateRange="+props.dateRange)
             .then(res => res.json())

@@ -1,5 +1,5 @@
 import json
-from scripts.db import DB
+from scripts.psqlconn import PSQLconn
 
 
 class PaperYearGraphData:
@@ -19,7 +19,7 @@ class PaperYearGraphData:
         self.generateJSONfileForGraphing()
 
     def getPaperMetadata(self):
-        conn = DB().getConn()
+        conn = PSQLconn().getConn()
         try:
             cursor = conn.cursor()
             cursor.execute("SELECT MIN(startdate) FROM papers WHERE continuous;")

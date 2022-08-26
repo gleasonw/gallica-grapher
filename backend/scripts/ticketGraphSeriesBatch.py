@@ -1,4 +1,4 @@
-from scripts.db import DB
+from scripts.psqlconn import PSQLconn
 import datetime
 import ciso8601
 
@@ -7,7 +7,7 @@ import ciso8601
 class TicketGraphSeriesBatch:
 
     def __init__(self, settings):
-        self.dbConnection = DB().getConn()
+        self.dbConnection = PSQLconn().getConn()
         self.dataBatches = []
         self.settings = settings
         self.requestIDs = settings["ticketIDs"].split(",")

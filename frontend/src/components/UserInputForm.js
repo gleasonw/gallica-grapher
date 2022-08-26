@@ -129,7 +129,7 @@ class PaperInputBox extends React.Component{
         }
     }
     getPaperDropdownItems(searchString){
-        fetch("/papers/" + searchString)
+        fetch("/api/papers/" + searchString)
             .then(res => res.json())
             .then(
                 (result) => {

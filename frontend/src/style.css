@@ -383,10 +383,10 @@ label[for="papers"],label[for="searchTerm"]{
     font-size: large;
 }
 .dropdownContainer{
-    max-width: 600px;
+    width: 100%;
     position: relative;
     z-index: 5;
-    bottom: 0px;
+    bottom: 0;
 }
 .paperDropdown {
     background-color: white;

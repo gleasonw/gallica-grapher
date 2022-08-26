@@ -1,24 +1,20 @@
 import psycopg2
 import time
-import os
-import json
+from settings import DATABASES
 
 
-postgresConfig = open(os.path.join(os.path.dirname(__file__), '../postgresconfig.json'), 'r')
-postgresConfig = json.loads(postgresConfig.read())
-
-
-class DB:
+class PSQLconn:
 
     def __init__(self):
         retries = 5
         while retries > 0:
             try:
                 self.conn = psycopg2.connect(
-                    host=postgresConfig["host"],
-                    database=postgresConfig["database"],
-                    user=postgresConfig["user"],
-                    password=postgresConfig["password"]
+                    host=DATABASES['default']['HOST'],
+                    database=DATABASES['default']['NAME'],
+                    user=DATABASES['default']['USER'],
+                    password=DATABASES['default']['PASSWORD'],
+                    port=DATABASES['default']['PORT']
                 )
                 break
             except psycopg2.OperationalError:

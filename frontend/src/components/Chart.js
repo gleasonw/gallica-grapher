@@ -17,7 +17,7 @@ function Chart(props) {
     const chartSettings = allSettings[props.settingsID];
     const dateRange = getDateRangeSpan(props.tickets);
     const query =
-        "/graphData?keys=" + Object.keys(props.tickets) +
+        "/api/graphData?keys=" + Object.keys(props.tickets) +
         "&continuous=" + chartSettings.continuous +
         "&dateRange=" + dateRange +
         "&timeBin=" + chartSettings.timeBin +

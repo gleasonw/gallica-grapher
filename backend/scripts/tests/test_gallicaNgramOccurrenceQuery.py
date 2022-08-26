@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
-from scripts.db import DB
+from scripts.psqlconn import PSQLconn
 from scripts.gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQuery
 from scripts.gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQueryAllPapers
 from scripts.gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQuerySelectPapers
@@ -15,7 +15,7 @@ class TestGallicaNgramOccurrenceQuery(TestCase):
 
     @staticmethod
     def cleanUpHoldingResults():
-        dbConnection = DB().getConn()
+        dbConnection = PSQLconn().getConn()
         with dbConnection.cursor() as curs:
             curs.execute(
                 """
@@ -154,7 +154,7 @@ class TestGallicaNgramOccurrenceQuery(TestCase):
         self.assertTrue(testQuery.addMissingPapers.called)
 
     def test_move_records_to_holding_db(self):
-        dbConnection = DB().getConn()
+        dbConnection = PSQLconn().getConn()
         payload = self.getMockBatchOf5KeywordRecords()
         payload.dbConnection = dbConnection
         payload.addMissingPapers = MagicMock
@@ -196,7 +196,7 @@ class TestGallicaNgramOccurrenceQuery(TestCase):
 
     # TODO: test cases insufficient... check null case
     def test_get_missing_papers(self):
-        dbConnection = DB().getConn()
+        dbConnection = PSQLconn().getConn()
         payload = self.getMockBatchOf5KeywordRecords()
         payload.dbConnection = dbConnection
         payload.moveRecordsToFinalTable = MagicMock
@@ -242,7 +242,7 @@ class TestGallicaNgramOccurrenceQuery(TestCase):
         self.assertFalse(mock_paper.sendTheseGallicaPapersToDB.called)
 
     def test_move_records_to_final_table(self):
-        dbConnection = DB().getConn()
+        dbConnection = PSQLconn().getConn()
         payload = self.getMockBatchOf5KeywordRecords()
         payload.dbConnection = dbConnection
         dbTester = DBtester()

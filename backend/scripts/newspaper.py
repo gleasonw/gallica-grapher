@@ -3,7 +3,7 @@ import io
 
 from requests_toolbelt import sessions
 from scripts.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
-from scripts.db import DB
+from scripts.psqlconn import PSQLconn
 
 from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
 
@@ -15,7 +15,7 @@ class Newspaper:
         self.query = ''
         self.papersSimilarToKeyword = []
         self.paperRecords = []
-        self.dbConnection = DB().getConn()
+        self.dbConnection = PSQLconn().getConn()
         if not gallicaSession:
             self.initGallicaSession()
         else:

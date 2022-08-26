@@ -1,6 +1,6 @@
 import os
 
-from db import DB
+from psqlconn import PSQLconn
 from ticketGraphSeriesBatch import TicketGraphSeries
 from topPapers import TopPapers
 
@@ -8,7 +8,7 @@ from topPapers import TopPapers
 class DBtester:
 
     def __init__(self):
-        self.conn = DB().getConn()
+        self.conn = PSQLconn().getConn()
 
     def getTestSeries(self, timeBin, continuous, averageWindow):
         self.copyTestResults()
