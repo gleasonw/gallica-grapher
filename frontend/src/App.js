@@ -39,7 +39,7 @@ function App() {
     async function handleInputSubmit(event){
         event.preventDefault();
         const ticksWithIDS = generateTicketIDs();
-        const {request} = await axios.post('/init', {
+        const {request} = await axios.post('/api/init', {
             tickets: ticksWithIDS
         })
         const taskID = JSON.parse(request.response)["taskid"];

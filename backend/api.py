@@ -6,6 +6,7 @@ from flask_cors import CORS
 
 from scripts.newspaper import Newspaper
 from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
+from tasks import celery
 from tasks import spawnRequestThread
 from scripts.topPapers import TopPapers
 
@@ -23,7 +24,7 @@ def index():
 @app.route('/api/init', methods=['POST'])
 def init():
     tickets = request.get_json()["tickets"]
-    task = spawnRequestThread.delay(tickets)
+    task = celery.send_task('tasks.spawnRequestThread', args=[tickets])
     return {"taskid": task.id}
 
 

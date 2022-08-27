@@ -1,10 +1,12 @@
 from celery import Celery
 from scripts.requestThread import RequestThread
 
+#TODO: rethink celery
+
 celery = Celery(
     'api.tasks',
-    broker='redis://localhost',
-    backend='redis://localhost')
+    broker='redis://redisforcelery.romsqk.ng.0001.usw1.cache.amazonaws.com:6379/0',
+    backend='redis://redisforcelery.romsqk.ng.0001.usw1.cache.amazonaws.com:6379/0')
 
 
 @celery.task(bind=True)
