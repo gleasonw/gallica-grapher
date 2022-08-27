@@ -33,7 +33,7 @@ function TicketProgressContainer(props){
 
     useEffect(() => {
         async function updateProgress() {
-            const currentTicketProgress = await fetch("progress/" + props.requestid);
+            const currentTicketProgress = await fetch("/api/progress/" + props.requestid);
             currentTicketProgress.json().then(data => {
                 const progress = data["progress"]
                 if(progress){

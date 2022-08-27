@@ -23,6 +23,7 @@ function Chart(props) {
         "&timeBin=" + chartSettings.timeBin +
         "&averageWindow=" + chartSettings.averageWindow;
     const series = useData(query);
+    console.log(series)
     if(series){
         const graphDataWithSyncedColors = syncColors(
             series,

@@ -396,7 +396,7 @@ class TestGallicaNgramOccurrenceQuerySelectPapers(TestCase):
             'arkPress adj "{newsKey}_date" '
             'and dc.date >= "1850" '
             'and dc.date <= "1900" '
-            'and (scripts all "brazza") '
+            'and (gallica all "brazza") '
             'sortby dc.date/sort.ascending')
 
     @patch('scripts.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumberResultsInPaper')
@@ -416,7 +416,7 @@ class TestGallicaNgramOccurrenceQuerySelectPapers(TestCase):
         self.assertEqual(
             query.baseQuery,
             'arkPress adj "{newsKey}_date" '
-            'and (scripts all "brazza") '
+            'and (gallica all "brazza") '
             'sortby dc.date/sort.ascending')
 
     @patch('scripts.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumberResultsInPaper')
@@ -516,7 +516,7 @@ class TestGallicaNgramOccurrenceQuerySelectPapers(TestCase):
 
         mock_record_batch.assert_called_with(
             'arkPress adj "a_date" '
-            'and (scripts all "brazza") '
+            'and (gallica all "brazza") '
             'sortby dc.date/sort.ascending',
             mockedSession,
             startRecord=1
