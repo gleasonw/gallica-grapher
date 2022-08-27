@@ -14,8 +14,8 @@ else:
     DATABASES = {
         'default': {
             'NAME': 'gallicagrapher',
-            'USER': 'postgres',
-            'PASSWORD': 'postgres',
+            'USER': 'wgleason',
+            'PASSWORD': 'ilike2play',
             'HOST': 'localhost',
             'PORT': '5432',
         }

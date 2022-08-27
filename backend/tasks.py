@@ -3,13 +3,11 @@ from scripts.requestThread import RequestThread
 
 #TODO: rethink celery
 
-celery = Celery(
-    'api.tasks',
-    broker='redis://redisforcelery.romsqk.ng.0001.usw1.cache.amazonaws.com:6379/0',
-    backend='redis://redisforcelery.romsqk.ng.0001.usw1.cache.amazonaws.com:6379/0')
+app = Celery()
+app.config_from_object('celery_settings')
 
 
-@celery.task(bind=True)
+@app.task(bind=True)
 def spawnRequestThread(self, tickets):
     gallicaRequest = RequestThread(tickets)
     gallicaRequest.start()
