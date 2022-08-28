@@ -1,6 +1,8 @@
 import os
-import ssl
 
-redis_backend_use_ssl = {'ssl_cert_reqs': ssl.CERT_NONE}
-result_backend = os.environ.get('UPSTASH_REDIS_URL', 'redis://localhost:6379/0')
-broker_url = os.environ.get('CLOUDAMQP_URL', 'amqp://guest:guest@localhost:5672//')
+result_backend = os.environ.get(
+    'REDIS_URL',
+    "localhost:6379")
+broker_url = os.environ.get(
+    'CLOUDAMQP_URL',
+    'amqps://ajcbnuig:9K8W9c8J1z1w3f7Js-evF2yMlo_wCLrk@stingray.rmq.cloudamqp.com/ajcbnuig')
