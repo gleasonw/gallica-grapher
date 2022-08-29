@@ -8,7 +8,6 @@ from .gallicaRecordBatch import GallicaKeywordRecordBatch
 from .gallicaRecordBatch import GallicaRecordBatch
 
 NUM_WORKERS = 50
-# TODO: use ors to combine keywords within single ticket
 class GallicaNgramOccurrenceQuery:
 
     def __init__(self,

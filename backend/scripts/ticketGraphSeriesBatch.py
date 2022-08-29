@@ -37,13 +37,6 @@ class TicketGraphSeriesBatch:
         return [requestID, series.getSeries()]
 
 
-def parseContinuous(cont):
-    if cont.lower() == "true":
-        return True
-    else:
-        return False
-
-
 class TicketGraphSeries:
 
     def __init__(self,
@@ -51,7 +44,7 @@ class TicketGraphSeries:
                  settings,
                  dbConnection):
 
-        self.continuous = parseContinuous(settings["continuous"])
+        self.continuous = settings["continuous"].lower() == "true"
         self.requestID = requestid
         self.averageWindow = int(settings["averageWindow"])
         self.timeBin = settings["groupBy"]
