@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8aeb1e77-4da8-4ea3-803e-4a937ffda77b" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="highchartsDownloads" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="ProjectId" id="2AwDPK0MonerhExzM4p86q1Y8oX" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="mysql&#10;postgresql" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/api/gallica/gallicaRecordBatch.py" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="nodejs.jest.jest_package" value="$PROJECT_DIR$/grapherui/node_modules/react-scripts" />
+    <property name="nodejs_interpreter_path" value="$APPLICATION_CONFIG_DIR$/node/node-v14.15.0-win-x64/node" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="es6.move.members.recent.items">
+      <recent name="C:\Users\wglea\PycharmProjects\gallica\Gallica-Grapher\grapherui\src\utils\initGraphSettings.js" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\wglea\PycharmProjects\gallica\Gallica-Grapher\frontend\src\components\hooks" />
+      <recent name="C:\Users\wglea\PycharmProjects\gallica\Gallica-Grapher\frontend" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.api">
+    <configuration name="generatedOptions.generate month grouped options when timebin is month" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/grapherui/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$/grapherui" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/grapherui/src/tests/generateOptions.test.js" />
+      <test-names>
+        <test-name value="generatedOptions" />
+        <test-name value="generate month grouped options when timebin is month" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="api" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="\\wsl$\Ubuntu/usr/bin/python3.8" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/api.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unittests for test_newspaper.TestNewspaper.test_generate_csv_stream" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <module name="Gallica-Grapher" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/api/gallica/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_newspaper.TestNewspaper.test_generate_csv_stream&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unittests for test_newspaper.TestNewspaper.test_get_records_and_copy_to_db" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <module name="Gallica-Grapher" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/api/gallica/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_newspaper.TestNewspaper.test_get_records_and_copy_to_db&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unittests in C:/Users/wglea/PycharmProjects/gallica/Gallica-Grapher/api/gallica/tests" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <module name="Gallica-Grapher" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/api/gallica/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/api/gallica/tests&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Jest.generatedOptions.generate month grouped options when timebin is month" />
+      <item itemvalue="Python.api" />
+      <item itemvalue="Python tests.Unittests for test_newspaper.TestNewspaper.test_generate_csv_stream" />
+      <item itemvalue="Python tests.Unittests for test_newspaper.TestNewspaper.test_get_records_and_copy_to_db" />
+      <item itemvalue="Python tests.Unittests in C:/Users/wglea/PycharmProjects/gallica/Gallica-Grapher/api/gallica/tests" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.api" />
+        <item itemvalue="Jest.generatedOptions.generate month grouped options when timebin is month" />
+        <item itemvalue="Python tests.Unittests in C:/Users/wglea/PycharmProjects/gallica/Gallica-Grapher/api/gallica/tests" />
+        <item itemvalue="Python tests.Unittests for test_newspaper.TestNewspaper.test_get_records_and_copy_to_db" />
+        <item itemvalue="Python tests.Unittests for test_newspaper.TestNewspaper.test_generate_csv_stream" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8aeb1e77-4da8-4ea3-803e-4a937ffda77b" name="Changes" comment="" />
+      <created>1655911729356</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1655911729356</updated>
+      <workItem from="1655911733308" duration="1520000" />
+      <workItem from="1655927255753" duration="3860000" />
+      <workItem from="1655935365090" duration="3690000" />
+      <workItem from="1656017457481" duration="6478000" />
+      <workItem from="1656135989561" duration="26162000" />
+      <workItem from="1656348681090" duration="9693000" />
+      <workItem from="1658452230987" duration="395000" />
+      <workItem from="1658611152984" duration="265000" />
+      <workItem from="1661121912573" duration="424000" />
+      <workItem from="1661122503162" duration="148000" />
+      <workItem from="1661190364841" duration="2162000" />
+      <workItem from="1661203881330" duration="2133000" />
+      <workItem from="1661618242590" duration="1411000" />
+      <workItem from="1661798850303" duration="769000" />
+      <workItem from="1661800190351" duration="5225000" />
+      <workItem from="1661815776468" duration="285000" />
+      <workItem from="1661816395402" duration="38000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_record_TestKeywordRecord_test_get_jstimestamp.coverage" NAME="Unittests for test_record.TestKeywordRecord.test_get_jstimestamp Coverage Results" MODIFIED="1656280689140" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_day_binned_request.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_day_binned_request Coverage Results" MODIFIED="1656193120490" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_month_binned_request.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_month_binned_request Coverage Results" MODIFIED="1656193458803" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$flaskAPI.coverage" NAME="flaskAPI Coverage Results" MODIFIED="1661191351968" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_keywordQuery_TestKeywordQuery_test_generate_result_CSV_stream.coverage" NAME="Unittests for test_keywordQuery.TestKeywordQuery.test_generate_result_CSV_stream Coverage Results" MODIFIED="1656285885859" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_topPapers_TestTopPapers.coverage" NAME="Unittests for test_topPapers.TestTopPapers Coverage Results" MODIFIED="1656280782927" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_newspaper_TestNewspaper_test_fetch_papers_data_in_batches.coverage" NAME="Unittests for test_newspaper.TestNewspaper.test_fetch_papers_data_in_batches Coverage Results" MODIFIED="1656283977642" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_api_TestAPI_test_init.coverage" NAME="Unittests for test_api.TestAPI.test_init Coverage Results" MODIFIED="1656361382459" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_recordBatch_TestKeywordRecordBatch_test_record_is_unique.coverage" NAME="Unittests for test_recordBatch.TestKeywordRecordBatch.test_record_is_unique Coverage Results" MODIFIED="1658334690719" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_month_binned_continuous_request.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_month_binned_continuous_request Coverage Results" MODIFIED="1656193566275" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_in_test_ticketGraphSeriesBatch_py.coverage" NAME="Unittests in test_ticketGraphSeriesBatch.py Coverage Results" MODIFIED="1656277565379" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_record_TestRecord.coverage" NAME="Unittests for test_record.TestRecord Coverage Results" MODIFIED="1656280640929" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_rolling_average.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_rolling_average Coverage Results" MODIFIED="1656195572291" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_record_TestKeywordRecord.coverage" NAME="Unittests for test_record.TestKeywordRecord Coverage Results" MODIFIED="1656280647164" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_year_binned_continuous_request.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_year_binned_continuous_request Coverage Results" MODIFIED="1656193734492" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_newspaper_TestNewspaper_test_get_records_and_copy_to_db.coverage" NAME="Unittests for test_newspaper.TestNewspaper.test_get_records_and_copy_to_db Coverage Results" MODIFIED="1658421279572" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_topPapers_TestTopPapers_test_get_top_papers.coverage" NAME="Unittests for test_topPapers.TestTopPapers.test_get_top_papers Coverage Results" MODIFIED="1656296091060" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_api_TestAPI.coverage" NAME="Unittests for test_api.TestAPI Coverage Results" MODIFIED="1656361390850" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_recordBatch_TestKeywordRecordBatch.coverage" NAME="Unittests for test_recordBatch.TestKeywordRecordBatch Coverage Results" MODIFIED="1656280884689" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$test_recordBatch.coverage" NAME="test_recordBatch Coverage Results" MODIFIED="1658334322656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_date_TestDate_test_get_jstimestamp.coverage" NAME="Unittests for test_date.TestDate.test_get_jstimestamp Coverage Results" MODIFIED="1656279464388" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_topPapers_TestTopPapers_test_init_top_papers.coverage" NAME="Unittests for test_topPapers.TestTopPapers.test_init_top_papers Coverage Results" MODIFIED="1656295685991" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_newspaper_TestNewspaper_test_fetch_record_data_from_code_strings.coverage" NAME="Unittests for test_newspaper.TestNewspaper.test_fetch_record_data_from_code_strings Coverage Results" MODIFIED="1656279785601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_in_tests__1_.coverage" NAME="Unittests in tests (1) Coverage Results" MODIFIED="1656905108539" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_build_query_for_series.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_build_query_for_series Coverage Results" MODIFIED="1656194640867" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$requestThread.coverage" NAME="requestThread Coverage Results" MODIFIED="1657413056496" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_topPapers_TestTopPapers_test_select_top_continuous_papers.coverage" NAME="Unittests for test_topPapers.TestTopPapers.test_select_top_continuous_papers Coverage Results" MODIFIED="1656297956764" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_in_tests.coverage" NAME="Unittests in tests Coverage Results" MODIFIED="1658422858633" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeriesBatch_test_select_one_series.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeriesBatch.test_select_one_series Coverage Results" MODIFIED="1656277526374" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_newspaper_TestNewspaper_test_copy_papers_to_db.coverage" NAME="Unittests for test_newspaper.TestNewspaper.test_copy_papers_to_db Coverage Results" MODIFIED="1656300904868" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_recordBatch_TestRecordBatch.coverage" NAME="Unittests for test_recordBatch.TestRecordBatch Coverage Results" MODIFIED="1656280874313" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_get_series.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_get_series Coverage Results" MODIFIED="1655959649096" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$test_newspaper.coverage" NAME="test_newspaper Coverage Results" MODIFIED="1658420576394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_parse_continuous.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_parse_continuous Coverage Results" MODIFIED="1655959660929" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_in_test_date_py.coverage" NAME="Unittests in test_date.py Coverage Results" MODIFIED="1656279422062" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$.coverage" NAME=" Coverage Results" MODIFIED="1655912100776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_api_TestAPI_test_getProgress.coverage" NAME="Unittests for test_api.TestAPI.test_getProgress Coverage Results" MODIFIED="1656361154919" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_newspaper_TestNewspaper.coverage" NAME="Unittests for test_newspaper.TestNewspaper Coverage Results" MODIFIED="1656279800696" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_make_series.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_make_series Coverage Results" MODIFIED="1655959631652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_topPapers_TestTopPapers_test_select_top_papers.coverage" NAME="Unittests for test_topPapers.TestTopPapers.test_select_top_papers Coverage Results" MODIFIED="1656297893377" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries Coverage Results" MODIFIED="1656297213419" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_day_binned_continuous_request.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_day_binned_continuous_request Coverage Results" MODIFIED="1656193370694" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_keywordQuery_TestKeywordQuerySelectPapers_test_fetch_number_results_in_paper.coverage" NAME="Unittests for test_keywordQuery.TestKeywordQuerySelectPapers.test_fetch_number_results_in_paper Coverage Results" MODIFIED="1658335465685" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeriesBatch.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeriesBatch Coverage Results" MODIFIED="1656195921128" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeriesBatch_test_select_all_series_from_db.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeriesBatch.test_select_all_series_from_db Coverage Results" MODIFIED="1655933080725" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeriesBatch_test_get_series_batch.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeriesBatch.test_get_series_batch Coverage Results" MODIFIED="1655928608274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_api_TestAPI_test_getTopPapersFromID.coverage" NAME="Unittests for test_api.TestAPI.test_getTopPapersFromID Coverage Results" MODIFIED="1656360791076" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$newspaper.coverage" NAME="newspaper Coverage Results" MODIFIED="1657408547020" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_keywordQuery_TestKeywordQuerySelectPapers_test_set_num_results_for_each_paper.coverage" NAME="Unittests for test_keywordQuery.TestKeywordQuerySelectPapers.test_set_num_results_for_each_paper Coverage Results" MODIFIED="1657409355697" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_keywordQuery_TestKeywordQuerySelectPapers_test_sum_up_paper_results_for_total_estimate.coverage" NAME="Unittests for test_keywordQuery.TestKeywordQuerySelectPapers.test_sum_up_paper_results_for_total_estimate Coverage Results" MODIFIED="1657409406271" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_newspaper_TestNewspaper_test_generate_csv_stream.coverage" NAME="Unittests for test_newspaper.TestNewspaper.test_generate_csv_stream Coverage Results" MODIFIED="1658420588264" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_ticketGraphSeriesBatch_TestTicketGraphSeries_test_year_binned_request.coverage" NAME="Unittests for test_ticketGraphSeriesBatch.TestTicketGraphSeries.test_year_binned_request Coverage Results" MODIFIED="1656193739762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_requestTicket_TestRequestTicket.coverage" NAME="Unittests for test_requestTicket.TestRequestTicket Coverage Results" MODIFIED="1656280896176" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_recordBatch_TestPaperRecordBatch.coverage" NAME="Unittests for test_recordBatch.TestPaperRecordBatch Coverage Results" MODIFIED="1656280879056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+    <SUITE FILE_PATH="coverage/Gallica_Grapher$Unittests_for_test_newspaper_TestNewspaper_test_send_these_gallica_papers_to_db.coverage" NAME="Unittests for test_newspaper.TestNewspaper.test_send_these_gallica_papers_to_db Coverage Results" MODIFIED="1656284420108" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api/gallica/tests" />
+  </component>
+</project>
