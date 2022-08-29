@@ -1,5 +1,6 @@
 from celery import Celery
 from scripts.requestThread import RequestThread
+from scripts.psqlconn import PSQLconn
 
 app = Celery()
 app.config_from_object('celery_settings')

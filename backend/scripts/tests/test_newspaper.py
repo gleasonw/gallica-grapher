@@ -47,7 +47,7 @@ class TestNewspaper(TestCase):
         newspaper.copyPapersToDB.assert_called_once()
         newspaper.fetchPapersDataInBatches.assert_called_with(tupledPaperCodes)
 
-    @patch('scripts.newspaper.DB')
+    @patch('scripts.newspaper.PSQLconn')
     @patch('scripts.newspaper.Newspaper.fetchAllPapersFromGallica')
     @patch('scripts.newspaper.Newspaper.copyPapersToDB')
     def test_send_all_gallica_papers_to_db(self, mock_copy, mock_fetch, mock_db):

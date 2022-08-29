@@ -262,7 +262,7 @@ class TestGallicaNgramOccurrenceQuery(TestCase):
                     10,
                     1,
                     'term!',
-                    'a',
+                    'd',
                     'id!'
                 ]
             )
@@ -290,7 +290,7 @@ class TestGallicaNgramOccurrenceQueryAllPapers(TestCase):
         self.assertEqual(
             query.baseQuery,
             'dc.date >= "1850" and dc.date <= "1900" '
-            'and (scripts all "brazza") '
+            'and (gallica all "brazza") '
             'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending')
 
@@ -308,7 +308,7 @@ class TestGallicaNgramOccurrenceQueryAllPapers(TestCase):
 
         self.assertEqual(
             query.baseQuery,
-            '(scripts all "brazza") '
+            '(gallica all "brazza") '
             'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending')
 

@@ -9,8 +9,7 @@ from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from tasks import spawnRequestThread
 from scripts.topPapers import TopPapers
 
-retrievingThreads = {}
-exceptionBucket = queue.Queue()
+
 app = Flask(__name__)
 CORS(app)
 
