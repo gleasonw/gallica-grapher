@@ -38,10 +38,7 @@ class TicketGraphSeriesBatch:
 
 
 def parseContinuous(cont):
-    if cont.lower() == "true":
-        return True
-    else:
-        return False
+    return cont.lower() == "true":
 
 
 class TicketGraphSeries:
