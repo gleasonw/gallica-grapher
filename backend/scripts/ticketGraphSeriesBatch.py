@@ -3,7 +3,6 @@ import datetime
 import ciso8601
 
 
-# TODO: tests with continuous settings
 class TicketGraphSeriesBatch:
 
     def __init__(self, settings):
@@ -14,7 +13,6 @@ class TicketGraphSeriesBatch:
 
         self.selectAllSeriesFromDB()
 
-    # TODO: rewrite to avoid confusing list--> dict
     def getSeriesBatch(self):
         dataBatchesDict = {}
         for dataBatch in self.dataBatches:

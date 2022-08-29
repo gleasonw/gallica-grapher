@@ -1,0 +1,4 @@
+* csv, png downloads
+* aws cloudfront cache GET query strings
+* beautify
+* click on highcharts year to get links to sample records for each series

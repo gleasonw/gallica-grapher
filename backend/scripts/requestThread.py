@@ -2,7 +2,9 @@ import threading
 from scripts.requestTicket import RequestTicket
 from scripts.psqlconn import PSQLconn
 from scripts.gallicaSession import GallicaSession
-#TODO: move all db operations and total record count here.
+
+
+# TODO: move all db operations and total record count here.
 # If there are a bajillion records, warn the user, and don't put them in the db
 
 class RequestThread(threading.Thread):

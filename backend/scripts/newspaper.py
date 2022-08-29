@@ -99,7 +99,6 @@ class Newspaper:
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
 
-    # TODO: return the paper's publishing years alongside the title
     def getPapersSimilarToKeyword(self, keyword):
 
         def paperDataToJSON(similarPapers):

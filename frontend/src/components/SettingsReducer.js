@@ -1,4 +1,3 @@
-//TODO: Async updates.
 export function settingsReducer(graphSettings, action) {
     switch (action.type) {
         case 'setSeries' : {
