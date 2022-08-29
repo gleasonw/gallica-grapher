@@ -66,9 +66,9 @@ class TestRequestTicket(TestCase):
             MagicMock(),
             MagicMock(),
             MagicMock())
-        ticket.keywords = [MagicMock, MagicMock, MagicMock]
+        ticket.terms = [MagicMock, MagicMock, MagicMock]
         ticket.initQueryObjects(MagicMock(return_value=MagicMock()))
-        self.assertEqual(len(ticket.keywordQueries), 3)
+        self.assertEqual(len(ticket.termQueries), 3)
 
     @patch("scripts.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.buildQuery")
     @patch("scripts.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults")
@@ -84,7 +84,7 @@ class TestRequestTicket(TestCase):
             MagicMock(),
             MagicMock())
 
-        testQuery = ticket.genSelectPaperQuery(ticket.keywords[0])
+        testQuery = ticket.genSelectPaperQuery(ticket.terms[0])
 
         self.assertIsInstance(testQuery, scripts.requestTicket.GallicaNgramOccurrenceQuerySelectPapers)
         self.assertEqual(testQuery.keyword, 'test')
@@ -106,7 +106,7 @@ class TestRequestTicket(TestCase):
             MagicMock(),
             MagicMock())
 
-        testQuery = ticket.genAllPaperQuery(ticket.keywords[0])
+        testQuery = ticket.genAllPaperQuery(ticket.terms[0])
 
         self.assertIsInstance(testQuery, scripts.requestTicket.GallicaNgramOccurrenceQueryAllPapers)
         self.assertEqual(testQuery.keyword, 'test')
@@ -124,7 +124,7 @@ class TestRequestTicket(TestCase):
             MagicMock(),
             MagicMock(),
             MagicMock())
-        ticket.keywordQueries=[
+        ticket.termQueries=[
             MagicMock(getEstimateNumResults=
                       MagicMock(return_value=10)),
             MagicMock(getEstimateNumResults=
@@ -147,7 +147,7 @@ class TestRequestTicket(TestCase):
             MagicMock(),
             MagicMock(),
             MagicMock())
-        ticket.keywordQueries = [
+        ticket.termQueries = [
             MagicMock(runSearch=MagicMock()),
             MagicMock(runSearch=MagicMock()),
             MagicMock(runSearch=MagicMock())
@@ -157,7 +157,7 @@ class TestRequestTicket(TestCase):
         ticket.startQueries()
 
         self.assertEqual(ticket.numBatches, 11)
-        for query in ticket.keywordQueries:
+        for query in ticket.termQueries:
             query.runSearch.assert_called_once()
 
     def test_update_progress(self):

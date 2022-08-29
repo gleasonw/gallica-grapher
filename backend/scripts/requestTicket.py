@@ -13,19 +13,23 @@ class RequestTicket:
                  dbconnection,
                  session):
 
-        self.keywords = ticket["terms"]
+        self.terms = ticket["terms"]
         self.papersAndCodes = ticket["papersAndCodes"]
-        self.yearRange = ticket["dateRange"]
+        self.dateRange = ticket["dateRange"]
         self.ticketID = key
         self.progressThread = progresstrack
         self.connectionToDB = dbconnection
         self.session = session
-        self.keywordQueries = []
+        self.termQueries = []
         self.topPapers = []
         self.totalResults = 0
         self.numBatchesRetrieved = 0
         self.numBatches = 0
         self.averageResponseTime = None
+        self.records = []
+
+    def getRecords(self):
+        return self.records
 
     def run(self):
         if self.papersAndCodes:
@@ -36,15 +40,15 @@ class RequestTicket:
         self.startQueries()
 
     def initQueryObjects(self, generator):
-        for keyword in self.keywords:
+        for keyword in self.terms:
             gallicaNgramOccurrenceQuery = generator(keyword)
-            self.keywordQueries.append(gallicaNgramOccurrenceQuery)
+            self.termQueries.append(gallicaNgramOccurrenceQuery)
 
     def genSelectPaperQuery(self, keyword):
         query = GallicaNgramOccurrenceQuerySelectPapers(
             keyword,
             self.papersAndCodes,
-            self.yearRange,
+            self.dateRange,
             self.ticketID,
             self.updateProgressStats,
             self.connectionToDB,
@@ -54,7 +58,7 @@ class RequestTicket:
     def genAllPaperQuery(self, keyword):
         query = GallicaNgramOccurrenceQueryAllPapers(
             keyword,
-            self.yearRange,
+            self.dateRange,
             self.ticketID,
             self.updateProgressStats,
             self.connectionToDB,
@@ -62,14 +66,24 @@ class RequestTicket:
         return query
 
     def sumResultsOfEachQuery(self):
-        for query in self.keywordQueries:
+        for query in self.termQueries:
             numResultsForKeyword = query.getEstimateNumResults()
             self.totalResults += numResultsForKeyword
 
     def startQueries(self):
         self.numBatches = ceil(self.totalResults / 50)
-        for query in self.keywordQueries:
+        for query in self.termQueries:
             query.runSearch()
+            completedRecords = self.addKeywordAndTicketIDToRecords(
+                query.getRecords(),
+                query.getKeyword())
+            self.records.extend(completedRecords)
+
+    def addKeywordAndTicketIDToRecords(self, records, keyword):
+        for record in records:
+            record.setKeyword(keyword)
+            record.setTicketID(self.ticketID)
+        return records
 
     def updateProgressStats(self, randomPaper, requestTime, numWorkers):
         self.numBatchesRetrieved += 1

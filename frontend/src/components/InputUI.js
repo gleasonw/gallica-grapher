@@ -199,7 +199,7 @@ function ExampleRequest(props){
         >
             {props.request.map((ticket, index) => (
                 <div
-                    className='exampleTicket'
+                    className='requestBubble'
                     key={index}
                 >
                     <TicketLabel

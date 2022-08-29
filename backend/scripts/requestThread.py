@@ -1,3 +1,4 @@
+import io
 import threading
 from scripts.requestTicket import RequestTicket
 from scripts.psqlconn import PSQLconn
@@ -17,10 +18,24 @@ class RequestThread(threading.Thread):
         self.tickets = tickets
         self.finished = False
         self.ticketProgressStats = self.initProgressStats()
+        self.records = []
 
         super().__init__()
 
     def run(self):
+        requestTickets = self.generateRequestTickets()
+        estimate = self.getEstimateNumberRecordsForAllTickets(requestTickets)
+        if self.estimateIsUnderRecordLimit(estimate):
+            for ticket in requestTickets:
+                ticket.run()
+                self.records.extend(ticket.getRecords())
+            self.moveRecordsToDB()
+            self.finished = True
+        else:
+            self.warnUserOfLargeRequest()
+
+    def generateRequestTickets(self):
+        requestTickets = []
         for key, ticket in self.tickets.items():
             requestToRun = RequestTicket(
                 ticket,
@@ -28,10 +43,14 @@ class RequestThread(threading.Thread):
                 self,
                 self.DBconnection,
                 self.session)
-            requestToRun.run()
-            self.setTicketProgressTo100AndMarkAsDone(key)
-        self.finished = True
-        self.DBconnection.close()
+            requestTickets.append(requestToRun)
+        return requestTickets
+
+    def estimateIsUnderRecordLimit(self):
+        return True
+
+    def warnUserOfLargeRequest(self):
+        pass
 
     def initProgressStats(self):
         progressDict = {}
@@ -59,6 +78,87 @@ class RequestThread(threading.Thread):
             'randomPaper': None,
             'estimateSecondsToCompletion': 0
         })
+
+    def moveRecordsToDB(self):
+        with self.dbConnection.cursor() as curs:
+            self.moveRecordsToHoldingResultsDB(curs)
+            self.addMissingPapers(curs)
+            self.moveRecordsToFinalTable(curs)
+
+    # TODO: move state up? Why is keyword query doing this?
+    def moveRecordsToHoldingResultsDB(self, curs):
+        csvStream = self.generateResultCSVstream()
+        curs.copy_from(
+            csvStream,
+            'holdingresults',
+            sep='|',
+            columns=(
+                'identifier',
+                'year',
+                'month',
+                'day',
+                'searchterm',
+                'paperid',
+                'requestid')
+        )
+
+    def addMissingPapers(self, curs):
+        paperGetter = Newspaper(self.gallicaHttpSession)
+        missingPapers = self.getMissingPapers(curs)
+        if missingPapers:
+            paperGetter.sendTheseGallicaPapersToDB(missingPapers)
+
+    def getMissingPapers(self, curs):
+        curs.execute(
+            """
+            WITH papersInResults AS 
+                (SELECT DISTINCT paperid 
+                FROM holdingResults 
+                WHERE requestid = %s)
+
+            SELECT paperid FROM papersInResults
+            WHERE paperid NOT IN 
+                (SELECT code FROM papers);
+            """
+            , (self.ticketID,))
+        return curs.fetchall()
+
+    def moveRecordsToFinalTable(self, curs):
+        curs.execute(
+            """
+            WITH resultsForRequest AS (
+                DELETE FROM holdingresults
+                WHERE requestid = %s
+                RETURNING identifier, year, month, day, searchterm, paperid, requestid
+            )
+
+            INSERT INTO results (identifier, year, month, day, searchterm, paperid, requestid)
+                (SELECT DISTINCT identifier, year, month, day , searchterm, paperid, requestid FROM resultsForRequest);
+            """
+            , (self.ticketID,))
+
+    def generateResultCSVstream(self):
+
+        def cleanCSVvalue(value):
+            if value is None:
+                return r'\N'
+            return str(value).replace('|', '\\|')
+
+        csvFileLikeObject = io.StringIO()
+        for record in self.records:
+            yearMonDay = record.getDate()
+            csvFileLikeObject.write(
+                "|".join(map(cleanCSVvalue, (
+                    record.getUrl(),
+                    yearMonDay[0],
+                    yearMonDay[1],
+                    yearMonDay[2],
+                    record.getKeyword(),
+                    record.getPaperCode(),
+                    record.getTicketID()
+                ))) + '\n')
+        csvFileLikeObject.seek(0)
+        return csvFileLikeObject
 
     def getProgressStats(self):
         return self.ticketProgressStats

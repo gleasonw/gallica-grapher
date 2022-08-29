@@ -3,7 +3,6 @@ from unittest.mock import patch, MagicMock
 
 from ticketGraphSeriesBatch import TicketGraphSeries
 from ticketGraphSeriesBatch import TicketGraphSeriesBatch
-from ticketGraphSeriesBatch import parseContinuous
 from DBtester import DBtester
 
 
@@ -61,12 +60,6 @@ class TestTicketGraphSeries(TestCase):
             },
             MagicMock()
         )
-
-    def test_parse_continuous(self):
-        self.assertFalse(parseContinuous(""))
-        self.assertFalse(parseContinuous("false"))
-        self.assertTrue(parseContinuous("true"))
-        self.assertTrue(parseContinuous("TruE"))
 
     @patch("ticketGraphSeriesBatch.TicketGraphSeries.makeSeries")
     def test_get_series(self, mock_make):

@@ -11,6 +11,8 @@ class GallicaRecord:
         self.date = None
         self.url = ''
         self.paperTitle = None
+        self.keyword = None
+        self.ticketID = None
 
         self.parsePaperCodeFromXML()
         self.parseURLFromXML()
@@ -29,6 +31,12 @@ class GallicaRecord:
 
     def getPaperTitle(self):
         return self.paperTitle
+
+    def setKeyword(self, keyword):
+        self.keyword = keyword
+
+    def setTicketID(self, ticketID):
+        self.ticketID = ticketID
 
     def parsePaperCodeFromXML(self):
         paperCodeElement = self.recordData.find(

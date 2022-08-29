@@ -72,9 +72,12 @@ function App() {
     }
 
     function createTicketFromInput(items){
-        let updatedTickets = tickets.slice();
-        updatedTickets.push(items);
-        setTickets(updatedTickets)
+        if(items.terms.length > 0){
+            let updatedTickets = tickets.slice();
+            updatedTickets.push(items);
+            setTickets(updatedTickets)
+        }
+
     }
 
     function deleteTicketAtIndex(index){

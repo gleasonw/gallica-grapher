@@ -11,11 +11,8 @@ function TicketLabel(props){
 }
 
 function TicketTermRow(props){
-    return (
-        <div>
-            Ngrams: {renderRow(props.terms)}
-        </div>
-        )
+    const quotedTerms = addQuotesAndCommasAroundItems(props.terms)
+    return renderRow(quotedTerms, 'Ngrams:')
 }
 function TicketPaperRow(props){
     const papers = props.papers
@@ -23,35 +20,35 @@ function TicketPaperRow(props){
     papers.map(paperAndCode => (
         paperNames.push(paperAndCode['title'])
     ));
-    return(<div>
-        In Periodicals: {renderRow(paperNames)}
-    </div>
-    )
+    const quotedItems= addQuotesAndCommasAroundItems(paperNames)
+    return renderRow(quotedItems, 'In papers:')
 }
-function renderRow(items){
-    const quotedItems= items.map(
+function addQuotesAndCommasAroundItems(items){
+    return items.map(
         term => "'" + term + "'"
     ).join(', ')
-    if(items.length !== 0){
+}
+function renderRow(item, label){
+    if(item){
         return(
-            <div className='bubbleText'>
-                {quotedItems}
+            <div className={'ticketRow'}>
+                <span className={'ticketRowLabel'}>{label}</span>
+                <div className={'bubblesContainer'}>
+                    <div className='bubbleItem'>
+                        <div className={'bubbleText'}>
+                            {item}
+                        </div>
+                    </div>
+
+                </div>
             </div>
         )
     }
 }
 function TicketDateRow(props){
     const dateRange = props.dateRange
-    if(dateRange){
-        return(
-            <div>
-                Over range:
-                <div className={'bubbleText'}>
-                    {dateRange[0]} to {dateRange[1]}
-                </div>
-            </div>
-        )
-    }
+    const rangeString = dateRange[0] + ' to ' + dateRange[1]
+    return renderRow(rangeString, 'Over range:')
 }
 
 export default TicketLabel;

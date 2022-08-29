@@ -8,6 +8,8 @@ from .gallicaRecordBatch import GallicaKeywordRecordBatch
 from .gallicaRecordBatch import GallicaRecordBatch
 
 NUM_WORKERS = 50
+
+
 class GallicaNgramOccurrenceQuery:
 
     def __init__(self,
@@ -51,6 +53,9 @@ class GallicaNgramOccurrenceQuery:
     def getKeyword(self):
         return self.keyword
 
+    def getRecords(self):
+        return self.keywordRecords
+
     def getEstimateNumResults(self):
         return self.estimateNumResults
 
@@ -72,8 +77,6 @@ class GallicaNgramOccurrenceQuery:
         self.generateWorkChunks()
         with self.gallicaHttpSession:
             self.doThreadedSearch()
-        if self.keywordRecords:
-            self.moveRecordsToDB()
 
     def doThreadedSearch(self):
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
@@ -93,88 +96,6 @@ class GallicaNgramOccurrenceQuery:
 
     def doSearchChunk(self, workChunk):
         return GallicaKeywordRecordBatch(self.gallicaHttpSession, workChunk)
-
-    def moveRecordsToDB(self):
-        with self.dbConnection.cursor() as curs:
-            self.moveRecordsToHoldingResultsDB(curs)
-            self.addMissingPapers(curs)
-            self.moveRecordsToFinalTable(curs)
-
-    # TODO: move state up? Why is keyword query doing this?
-    def moveRecordsToHoldingResultsDB(self, curs):
-        csvStream = self.generateResultCSVstream()
-        curs.copy_from(
-            csvStream,
-            'holdingresults',
-            sep='|',
-            columns=(
-                'identifier',
-                'year',
-                'month',
-                'day',
-                'searchterm',
-                'paperid',
-                'requestid')
-        )
-
-    def addMissingPapers(self, curs):
-        paperGetter = Newspaper(self.gallicaHttpSession)
-        missingPapers = self.getMissingPapers(curs)
-        if missingPapers:
-            paperGetter.sendTheseGallicaPapersToDB(missingPapers)
-
-    def getMissingPapers(self, curs):
-        curs.execute(
-            """
-            WITH papersInResults AS 
-                (SELECT DISTINCT paperid 
-                FROM holdingResults 
-                WHERE requestid = %s)
-
-            SELECT paperid FROM papersInResults
-            WHERE paperid NOT IN 
-                (SELECT code FROM papers);
-            """
-            , (self.ticketID,))
-        return curs.fetchall()
-
-    def moveRecordsToFinalTable(self, curs):
-        curs.execute(
-            """
-            WITH resultsForRequest AS (
-                DELETE FROM holdingresults
-                WHERE requestid = %s
-                RETURNING identifier, year, month, day, searchterm, paperid, requestid
-            )
-            
-            INSERT INTO results (identifier, year, month, day, searchterm, paperid, requestid)
-                (SELECT DISTINCT identifier, year, month, day , searchterm, paperid, requestid FROM resultsForRequest);
-            """
-            , (self.ticketID,))
-
-    def generateResultCSVstream(self):
-
-        def cleanCSVvalue(value):
-            if value is None:
-                return r'\N'
-            return str(value).replace('|', '\\|')
-
-        csvFileLikeObject = io.StringIO()
-        for record in self.keywordRecords:
-            yearMonDay = record.getDate()
-            csvFileLikeObject.write(
-                "|".join(map(cleanCSVvalue, (
-                    record.getUrl(),
-                    yearMonDay[0],
-                    yearMonDay[1],
-                    yearMonDay[2],
-                    self.keyword,
-                    record.getPaperCode(),
-                    self.ticketID
-                ))) + '\n')
-        csvFileLikeObject.seek(0)
-        return csvFileLikeObject
-
 
 class GallicaNgramOccurrenceQueryAllPapers(GallicaNgramOccurrenceQuery):
 
