@@ -23,7 +23,6 @@ function Chart(props) {
         "&timeBin=" + chartSettings.timeBin +
         "&averageWindow=" + chartSettings.averageWindow;
     const series = useData(query);
-    console.log(series)
     if(series){
         const graphDataWithSyncedColors = syncColors(
             series,
@@ -33,7 +32,10 @@ function Chart(props) {
             chartSettings);
         return (
             <div>
-                <ChartSettings settingsID={props.settingsID}/>
+                <ChartSettings
+                    settingsID={props.settingsID}
+                    showExcludePapers={props.showExcludePapers}
+                />
                 <HighchartsReact
                     highcharts={Highcharts}
                     options={highchartsOptions}
@@ -102,20 +104,22 @@ function ChartSettings(props){
                     <MenuItem value={14}>50</MenuItem>
                 </Select>
             </FormControl>
-            <ToggleButton
-                value="Exclude sporadic papers"
-                selected={settingsForID.continuous}
-                onChange={() => {
-                    dispatch({
-                        type: 'setContinuous',
-                        key: props.settingsID,
-                        continuous: !settingsForID.continuous,
-                    })
-                }}
-                label='require continuous newspapers'
-            >
-                Exclude papers incomplete over range
-            </ToggleButton>
+            {props.showExcludePapers &&
+                <ToggleButton
+                    value="Exclude sporadic papers"
+                    selected={settingsForID.continuous}
+                    onChange={() => {
+                        dispatch({
+                            type: 'setContinuous',
+                            key: props.settingsID,
+                            continuous: !settingsForID.continuous,
+                        })
+                    }}
+                    label='require continuous newspapers'
+                >
+                    Exclude papers incomplete over range
+                </ToggleButton>
+            }
             <Button variant="text">
                 Download PNG
             </Button>

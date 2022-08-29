@@ -4,14 +4,18 @@ function TicketLabel(props){
     return(
         <div className='ticketLabel'>
             <TicketTermRow terms={props.terms}/>
-            <TicketPaperRow papers={props.papers}/>
+            {props.papers.length > 0 && <TicketPaperRow papers={props.papers}/>}
             <TicketDateRow dateRange={props.dateRange}/>
         </div>
     )
 }
 
 function TicketTermRow(props){
-    return(renderRow(props.terms))
+    return (
+        <div>
+            Ngrams: {renderRow(props.terms)}
+        </div>
+        )
 }
 function TicketPaperRow(props){
     const papers = props.papers
@@ -19,7 +23,10 @@ function TicketPaperRow(props){
     papers.map(paperAndCode => (
         paperNames.push(paperAndCode['title'])
     ));
-    return(renderRow(paperNames))
+    return(<div>
+        In Periodicals: {renderRow(paperNames)}
+    </div>
+    )
 }
 function renderRow(items){
     const quotedItems= items.map(
@@ -37,8 +44,11 @@ function TicketDateRow(props){
     const dateRange = props.dateRange
     if(dateRange){
         return(
-            <div className='bubbleText'>
-                {dateRange[0]} - {dateRange[1]}
+            <div>
+                Over range:
+                <div className={'bubbleText'}>
+                    {dateRange[0]} to {dateRange[1]}
+                </div>
             </div>
         )
     }

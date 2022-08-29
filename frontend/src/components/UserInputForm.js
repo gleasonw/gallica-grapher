@@ -51,8 +51,6 @@ function UserInputForm(props){
             <DateInputBox
                 onLowDateChange={props.onLowDateChange}
                 onHighDateChange={props.onHighDateChange}
-                minYear={props.minYear}
-                maxYear={props.maxYear}
                 minYearPlaceholder={props.minYearPlaceholder}
                 maxYearPlaceholder={props.maxYearPlaceholder}
                 lowYear={props.lowYearValue}
@@ -119,7 +117,7 @@ class PaperInputBox extends React.Component{
         if (event.target.value){
             this.setState({
                 timerForSpacingAjaxRequests:
-                setTimeout(() => {this.getPaperDropdownItems(event.target.value)}, 1000)
+                setTimeout(() => {this.getPaperDropdownItems(event.target.value)}, 500)
                 }
             );
         }else{

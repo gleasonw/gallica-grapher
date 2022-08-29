@@ -11,7 +11,6 @@ class InputUI extends React.Component {
             paperInputValue: '',
             terms: [],
             papers: [],
-            dateBoundary: [1499, 2020],
             dateBoundaryPlaceholder: [1499, 2020],
             currentDateRange: ['', ''],
             showNoTicketReminder: false
@@ -95,6 +94,19 @@ class InputUI extends React.Component {
         this.setState({dateBoundaryPlaceholder: [minYear, maxYear]})
     }
 
+    trimDateRangeToPaperBoundary(){
+        const range = this.state.currentDateRange.slice()
+        const minYear = this.state.dateBoundaryPlaceholder[0]
+        const maxYear = this.state.dateBoundaryPlaceholder[1]
+        if(range[0] < minYear || range[0] === ''){
+            range[0] = minYear
+        }
+        if(range[1] > maxYear || range[1] === ''){
+            range[1] = maxYear
+        }
+        return range
+    }
+
     render() {
         return (
             <div className='inputBody'>
@@ -115,11 +127,7 @@ class InputUI extends React.Component {
                             {
                                 'terms': this.state.terms,
                                 'papersAndCodes': this.state.papers,
-                                'dateRange':
-                                    this.state.currentDateRange[0] &&
-                                    this.state.currentDateRange[1] ?
-                                        this.state.currentDateRange :
-                                        [1499, 2020]
+                                'dateRange': this.trimDateRangeToPaperBoundary()
                             }
                         )}
                         onPaperDropItemClick={this.handlePaperDropdownClick}
@@ -128,8 +136,6 @@ class InputUI extends React.Component {
                         selectedPapers={this.state.papers}
                         deleteTermBubble={this.deleteTermBubble}
                         deletePaperBubble={this.deletePaperBubble}
-                        minYear={this.state.dateBoundary[0]}
-                        maxYear={this.state.dateBoundary[1]}
                         minYearPlaceholder={this.state.dateBoundaryPlaceholder[0]}
                         maxYearPlaceholder={this.state.dateBoundaryPlaceholder[1]}
                         onGraphStartClick={this.props.onInputSubmit}

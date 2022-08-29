@@ -34,7 +34,7 @@ function ResultUI(props){
                                         onChange={handleGroupToggle}
                                     />
                                 }
-                                label={grouped ? 'Ungroup' : 'Group'}
+                                label={grouped ? 'Ungroup series' : 'Group series'}
                             />
                         </FormGroup>
                     }

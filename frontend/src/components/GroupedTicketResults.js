@@ -7,11 +7,11 @@ import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 export function GroupedTicketResults(props) {
     return (
         <div className='groupedResultsUI'>
-            <GroupedTicketLabelBar
-                tickets={props.tickets}/>
             <Chart
                 tickets={props.tickets}
-                settingsID='group'/>
+                settingsID='group'
+                showExcludePapers={true}
+            />
             <GroupedStatBar
                 tickets={props.tickets}/>
         </div>
@@ -19,37 +19,29 @@ export function GroupedTicketResults(props) {
     )
 }
 
-function GroupedTicketLabelBar(props) {
-    const settings = useContext(GraphSettingsContext);
-    return (
-        <div className='groupedLabelBar'>
-            {
-                Object.keys(props.tickets).map(key => (
-                    <div key={key}>
-                        <svg width = "20" height="20">
-                            <circle cx="10" cy="10" r="10" fill={settings[key].color}/>
-                        </svg>
-                        <TicketLabel
-                            terms={props.tickets[key].terms}
-                            papers={props.tickets[key].papersAndCodes}
-                            dateRange={props.tickets[key].dateRange}
-                        />
-                    </div>
-            ))}
-        </div>
-    );
-}
-
 function GroupedStatBar(props) {
+    const settings = useContext(GraphSettingsContext);
     return (
         <div className='groupedStatBar'>
             {Object.keys(props.tickets).map(key => (
-                <TicketPaperOccurrenceStats
+                <div
+                    className='groupedStatBarEntry'
                     key={key}
-                    ticketID={key}
-                    dateRange={props.tickets[key].dateRange}
-                    grouped={false}
-                />
+                >
+                    <svg width = "20" height="20">
+                        <circle cx="10" cy="10" r="10" fill={settings[key].color}/>
+                    </svg>
+                    <TicketLabel
+                        terms={props.tickets[key].terms}
+                        papers={props.tickets[key].papersAndCodes}
+                        dateRange={props.tickets[key].dateRange}
+                    />
+                    <TicketPaperOccurrenceStats
+                        ticketID={key}
+                        dateRange={props.tickets[key].dateRange}
+                        grouped={false}
+                    />
+                </div>
             ))}
         </div>
     );

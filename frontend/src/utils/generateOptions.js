@@ -1,13 +1,16 @@
 export default function generateOptions(series, settings) {
     let options = {
         chart: {
-            zoomType: 'x'
+            zoomType: 'x',
         },
         legend: {
             dateTimeLabelFormats: {
                 month: '%b',
                 year: '%Y'
-            }
+            },
+            align: 'left',
+            verticalAlign: 'top',
+            borderWidth: 0
         },
         title: {
             text: null
@@ -17,7 +20,11 @@ export default function generateOptions(series, settings) {
                 text: 'Mentions'
             }
         },
-        series: series
+        series: series,
+        tooltip: {
+            shared: true,
+            crosshairs: true,
+        },
     }
     if (settings.timeBin === 'year') {
         formatYearOptions()

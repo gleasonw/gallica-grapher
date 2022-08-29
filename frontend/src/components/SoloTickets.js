@@ -27,7 +27,9 @@ function SoloTicketResult(props) {
             />
             <Chart
                 tickets={{[props.ticketID]: props.ticket}}
-                settingsID={props.ticketID}/>
+                settingsID={props.ticketID}
+                showExcludePapers={false}
+            />
             <TicketPaperOccurrenceStats
                 ticketID={props.ticketID}
                 dateRange={props.ticket.dateRange}
