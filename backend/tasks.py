@@ -1,6 +1,6 @@
 from celery import Celery
 from scripts.requestThread import RequestThread
-
+#TODO: add beat task to delete old DB records
 app = Celery()
 app.config_from_object('celery_settings')
 
