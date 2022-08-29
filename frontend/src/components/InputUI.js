@@ -7,8 +7,6 @@ class InputUI extends React.Component {
         super(props);
         this.exampleBoxRef = React.createRef();
         this.state = {
-            termInputValue: '',
-            paperInputValue: '',
             terms: [],
             papers: [],
             dateBoundaryPlaceholder: [1499, 2020],
@@ -17,55 +15,51 @@ class InputUI extends React.Component {
         };
         this.handleLowDateChange = this.handleLowDateChange.bind(this);
         this.handleHighDateChange = this.handleHighDateChange.bind(this);
-        this.handlePaperChange = this.handlePaperChange.bind(this);
-        this.handleTermChange = this.handleTermChange.bind(this);
         this.handlePaperDropdownClick = this.handlePaperDropdownClick.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleSeeExamplesClick = this.handleSeeExamplesClick.bind(this);
         this.deletePaperBubble = this.deletePaperBubble.bind(this);
         this.deleteTermBubble = this.deleteTermBubble.bind(this);
     }
+
     deletePaperBubble(bubbleIndex){
         const papers = this.state.papers.slice()
         papers.splice(bubbleIndex, 1)
         this.updateDateBoundaryPlaceholder(papers)
         this.setState({papers: papers})
     }
+
     deleteTermBubble(bubbleIndex){
         const terms = this.state.terms.slice()
         terms.splice(bubbleIndex, 1)
         this.setState({terms: terms})
     }
+
     handlePaperDropdownClick(paper){
         this.makePaperBubble(paper)
     }
+
     handleLowDateChange(event){
         const range = this.state.currentDateRange.slice()
         range[0] = event.target.value
         this.setState({currentDateRange: range})
     }
+
     handleHighDateChange(event){
         const range = this.state.currentDateRange.slice()
         range[1] = event.target.value
         this.setState({currentDateRange: range})
     }
-    handlePaperChange(event){
-        this.setState({paperInputValue: event.target.value})
-    }
-    handleTermChange(event){
-        this.setState({termInputValue: event.target.value})
-    }
+
     handleKeyDown(event){
-        if(event.key === 'Enter'){
-            event.preventDefault()
-            if(event.target.name === 'terms'){
-                this.makeTermBubble(event.target.value)
-            }
-        }
+        event.preventDefault()
+        this.makeTermBubble(event.target.value)
     }
+
     handleSeeExamplesClick(){
         this.exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
     }
+
     makePaperBubble(paper){
         const papers = this.state.papers.slice();
         papers.push(paper)
@@ -77,7 +71,7 @@ class InputUI extends React.Component {
         if(term){
             const terms = this.state.terms.slice();
             terms.push(term)
-            this.setState({terms: terms, termInputValue: ''})
+            this.setState({terms: terms})
         }
     }
 
@@ -115,8 +109,6 @@ class InputUI extends React.Component {
                         Enter a word or phrase to query Gallica then graph the results.
                     </div>
                     <UserInputForm
-                        termInputValue={this.state.termInputValue}
-                        paperInputValue={this.state.paperInputValue}
                         lowYearValue={this.state.currentDateRange[0]}
                         highYearValue={this.state.currentDateRange[1]}
                         onLowDateChange={this.handleLowDateChange}

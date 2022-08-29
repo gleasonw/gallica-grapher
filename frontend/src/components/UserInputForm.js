@@ -32,7 +32,6 @@ function UserInputForm(props){
             className='userInputForm'
         >
             <TermInputBox
-                value={props.termInputValue}
                 onChange={props.onTermChange}
                 onKeyDown={props.onKeyDown}
                 selectedTerms={props.selectedTerms}
@@ -42,10 +41,8 @@ function UserInputForm(props){
             <PaperInputBox
                 onClick={props.onPaperDropItemClick}
                 onChange={props.onPaperChange}
-                onKeyDown={props.onKeyDown}
                 selectedPapers={props.selectedPapers}
                 deletePaperBubble={props.deletePaperBubble}
-                value={props.paperInputValue}
             />
             <br />
             <DateInputBox
@@ -82,6 +79,19 @@ function UserInputForm(props){
     )
 }
 function TermInputBox(props){
+    const [termInput, setTermInput] = useState('');
+
+    function handleTermChange(event){
+        setTermInput(event.target.value)
+    }
+
+    function handleKeyDown(event){
+        if(event.key === 'Enter'){
+            props.onKeyDown(event);
+            setTermInput('');
+        }
+    }
+
     return(
         <div className='inputContainer'>
             <SelectionBox
@@ -91,11 +101,11 @@ function TermInputBox(props){
             />
             <input
                 type="text"
-                value={props.value}
+                value={termInput}
                 name="terms"
                 placeholder="Enter a term..."
-                onChange={props.onChange}
-                onKeyDown={props.onKeyDown}
+                onChange={handleTermChange}
+                onKeyDown={handleKeyDown}
                 autoComplete="off"
             />
         </div>
@@ -109,9 +119,17 @@ class PaperInputBox extends React.Component{
             timerForSpacingAjaxRequests: null,
             papersForDropdown:[],
             dropdownError: null,
+            paperInputValue: '',
         }
         this.handleKeyUp = this.handleKeyUp.bind(this);
+        this.handleDropdownClick = this.handleDropdownClick.bind(this);
+        this.handlePaperChange = this.handlePaperChange.bind(this);
     }
+
+    handlePaperChange(event){
+        this.setState({paperInputValue: event.target.value})
+    }
+
     handleKeyUp(event){
         clearTimeout(this.state.timerForSpacingAjaxRequests);
         if (event.target.value){
@@ -126,6 +144,7 @@ class PaperInputBox extends React.Component{
             })
         }
     }
+
     getPaperDropdownItems(searchString){
         fetch("/api/papers/" + searchString)
             .then(res => res.json())
@@ -142,6 +161,15 @@ class PaperInputBox extends React.Component{
                 }
             )
     }
+
+    handleDropdownClick(paperNameCode){
+        this.props.onClick(paperNameCode);
+        this.setState({
+            papersForDropdown: [],
+            paperInputValue: '',
+        })
+    }
+
     render() {
         const paperNames = [];
         this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['title']))
@@ -155,12 +183,11 @@ class PaperInputBox extends React.Component{
                     />
                     <input
                         type="text"
-                        value={this.props.paperInputValue}
+                        value={this.state.paperInputValue}
                         name="papers"
                         placeholder="Search for a paper to restrict search..."
                         onKeyUp={this.handleKeyUp}
-                        onKeyDown={this.props.onKeyDown}
-                        onChange={this.props.onChange}
+                        onChange={this.handlePaperChange}
                         autoComplete="off"
                     />
                 </div>
@@ -168,7 +195,7 @@ class PaperInputBox extends React.Component{
                     <Dropdown
                         papers={this.state.papersForDropdown['paperNameCodes']}
                         error={this.state.dropdownError}
-                        onClick={this.props.onClick}
+                        onClick={this.handleDropdownClick}
                     />
                 </div>
             </div>

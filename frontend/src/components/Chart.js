@@ -5,12 +5,12 @@ import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSetting
 import ToggleButton from '@mui/material/ToggleButton';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button'
-import useData from "./useData";
+import useData from "./hooks/useData";
 import {MenuItem, Select} from "@mui/material";
 import syncColors from  "../utils/syncColors";
 import generateOptions from "../utils/generateOptions";
 import getDateRangeSpan from "../utils/getDateRangeSpan";
+import useScript from "./hooks/useScript"
 
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
@@ -23,6 +23,8 @@ function Chart(props) {
         "&timeBin=" + chartSettings.timeBin +
         "&averageWindow=" + chartSettings.averageWindow;
     const series = useData(query);
+    useScript('https://code.highcharts.com/modules/exporting.js')
+    useScript('https://code.highcharts.com/modules/export-data.js')
     if(series){
         const graphDataWithSyncedColors = syncColors(
             series,
@@ -120,9 +122,6 @@ function ChartSettings(props){
                     Exclude papers incomplete over range
                 </ToggleButton>
             }
-            <Button variant="text">
-                Download PNG
-            </Button>
 
         </div>
 

@@ -1,5 +1,16 @@
 export default function generateOptions(series, settings) {
     let options = {
+        exporting: {
+            enabled: true,
+            buttons: {
+                contextButton: {
+                    menuItems: [
+                        'downloadSVG',
+                        'downloadCSV'
+                    ]
+                }
+            }
+        },
         chart: {
             zoomType: 'x',
         },

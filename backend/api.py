@@ -70,6 +70,18 @@ def getGraphData():
     return items
 
 
+# @app.route('/api/csv')
+# def getCSV():
+#     settings = {
+#         'ticketIDs': request.args["keys"],
+#         'continuous': request.args["continuous"],
+#         'dateRange': request.args["dateRange"]
+#     }
+#     csv = TicketSeriesCSV(setttings)
+#     items = {'csv': csv.getCSV()}
+#     return items
+
+
 @app.route('/api/topPapers')
 def getTopPapersFromID():
     topPapers = TopPapers(
