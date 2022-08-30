@@ -7,7 +7,7 @@ from flask_cors import CORS
 from scripts.newspaper import Newspaper
 from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from tasks import spawnRequestThread
-from scripts.topPapers import TopPapers
+from scripts.topPapersForTicket import TopPapersForTicket
 
 
 app = Flask(__name__)
@@ -84,7 +84,7 @@ def getGraphData():
 
 @app.route('/api/topPapers')
 def getTopPapersFromID():
-    topPapers = TopPapers(
+    topPapers = TopPapersForTicket(
         request.args["id"],
         continuous=request.args["continuous"],
         dateRange=request.args["dateRange"]

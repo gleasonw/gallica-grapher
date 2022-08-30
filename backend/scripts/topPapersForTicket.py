@@ -1,7 +1,7 @@
 from psqlconn import PSQLconn
 
 
-class TopPapers:
+class TopPapersForTicket:
 
     def __init__(
             self,
@@ -29,7 +29,7 @@ class TopPapers:
     
             SELECT papers.title, count(paperid) AS papercount
                 FROM (SELECT paperid 
-                        FROM results WHERE requestid = %s) 
+                        FROM results WHERE ticketid = %s) 
                         AS ticket
                 INNER JOIN papers ON ticket.paperid = papers.code 
                 GROUP BY papers.title
@@ -47,7 +47,7 @@ class TopPapers:
                 FROM 
                 (SELECT paperid FROM results 
                     WHERE 
-                        requestid = %s)
+                        ticketid = %s)
                 AS ticket
                 INNER JOIN 
                 (SELECT code, title FROM papers 

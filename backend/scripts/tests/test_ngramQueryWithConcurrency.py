@@ -13,42 +13,6 @@ here = os.path.dirname(__file__)
 
 class TestNgramQueryWithConcurrency(TestCase):
 
-    @staticmethod
-    def cleanUpHoldingResults():
-        dbConnection = PSQLconn().getConn()
-        with dbConnection.cursor() as curs:
-            curs.execute(
-                """
-                DELETE FROM holdingresults WHERE requestid = 'id!';
-                """)
-        dbConnection.close()
-
-    @patch('record.Record')
-    def getMockBatchOf5KeywordRecords(self, mock_record):
-        mock_record.return_value = mock_record
-        mock_record.parsePaperCodeFromXML = MagicMock(return_value="123")
-        mock_record.parseURLFromXML = MagicMock(return_value="http://example.com")
-
-        payload = NgramQueryWithConcurrency(
-            'term!',
-            [],
-            'id!',
-            MagicMock,
-            MagicMock,
-            MagicMock
-        )
-        codes = ['a', 'b', 'c', 'd', 'e']
-        for i in range(5):
-            mockRecord = MagicMock()
-            mockRecord.getDate = MagicMock(return_value=[1920, 10, 1])
-            mockRecord.getUrl = MagicMock(return_value='1234.com')
-            mockRecord.getPaperCode = MagicMock(return_value=codes[i])
-            mockRecord.parseDateFromXML = MagicMock()
-            mockRecord.checkIfValid = MagicMock()
-            payload.keywordRecords.append(mockRecord)
-
-        return payload
-
     def test_establish_year_range(self):
         noRangeQuery = NgramQueryWithConcurrency(
             '',

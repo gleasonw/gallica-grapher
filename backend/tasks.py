@@ -1,5 +1,5 @@
 from celery import Celery
-from scripts.requestThread import RequestThread
+from scripts.request import Request
 
 app = Celery()
 app.config_from_object('celery_settings')
@@ -7,7 +7,7 @@ app.config_from_object('celery_settings')
 
 @app.task(bind=True)
 def spawnRequestThread(self, tickets):
-    gallicaRequest = RequestThread(tickets, self.id)
+    gallicaRequest = Request(tickets, self.id)
     gallicaRequest.start()
     while not gallicaRequest.isFinished():
         self.update_state(

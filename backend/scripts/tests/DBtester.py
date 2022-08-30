@@ -2,7 +2,7 @@ import os
 
 from psqlconn import PSQLconn
 from ticketGraphSeriesBatch import TicketGraphSeries
-from topPapers import TopPapers
+from topPapersForTicket import TopPapersForTicket
 
 
 class DBtester:
@@ -10,10 +10,10 @@ class DBtester:
     def __init__(self):
         self.conn = PSQLconn().getConn()
 
-    def getTestSeries(self, timeBin, continuous, averageWindow):
+    def runSeriesQueryUnderTest(self, timeBin, continuous, averageWindow):
         self.copyDummyDataIntoResultsTable()
         series = TicketGraphSeries(
-            "bestticket",
+            "testticket",
             {
                 "averageWindow": averageWindow,
                 "groupBy": timeBin,
@@ -27,8 +27,8 @@ class DBtester:
 
     def getTestTopPapers(self, continuous, dateRange):
         self.copyDummyDataIntoResultsTable()
-        topPapers = TopPapers(
-            ticketID='id!',
+        topPapers = TopPapersForTicket(
+            ticketID='testticket',
             continuous=continuous,
             dateRange=dateRange)
         testResults = topPapers.getTopPapers()
@@ -53,8 +53,17 @@ class DBtester:
         with self.conn.cursor() as curs:
             curs.execute("""
             DELETE FROM results
-            WHERE requestid = 'id!';
+            WHERE requestid = 'testrequest';
             """)
+
+    def deleteTestResultsFromHolding(self):
+        with self.conn.cursor() as curs:
+            curs.execute(
+                """
+                DELETE FROM holdingresults
+                WHERE requestid = 'testrequest';
+                """
+            )
 
     def deleteAndReturnPaper(self, id):
         with self.conn.cursor() as curs:
@@ -122,8 +131,8 @@ class DBtester:
             curs.execute(
                 """
                 DELETE FROM holdingresults
-                WHERE requestid = 'id!'
-                RETURNING identifier, year, month, day, searchterm, paperid, requestid;
+                WHERE requestid = 'testrequest'
+                RETURNING identifier, year, month, day, searchterm, paperid, ticketid, requestid;
                 """
             )
             postedResults = curs.fetchall()
@@ -134,8 +143,8 @@ class DBtester:
             curs.execute(
                 """
                 DELETE FROM results
-                WHERE requestid = 'id!'
-                RETURNING identifier, year, month, day, searchterm, paperid, requestid;
+                WHERE requestid = 'testrequest'
+                RETURNING identifier, year, month, day, searchterm, paperid, ticketid, requestid;
                 """
             )
             postedResults = curs.fetchall()

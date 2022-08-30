@@ -38,6 +38,12 @@ class Record:
     def setTicketID(self, ticketID):
         self.ticketID = ticketID
 
+    def getKeyword(self):
+        return self.keyword
+
+    def getTicketID(self):
+        return self.ticketID
+
     def parsePaperCodeFromXML(self):
         paperCodeElement = self.recordData.find(
             '{http://purl.org/dc/elements/1.1/}relation')

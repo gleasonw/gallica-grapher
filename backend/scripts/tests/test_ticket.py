@@ -1,17 +1,17 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
-from scripts.requestTicket import RequestTicket
+from scripts.ticket import Ticket
 
-import scripts.requestTicket
-
-
-class TestRequestTicket(TestCase):
+import scripts.ticket
 
 
-    @patch('scripts.requestTicket.RequestTicket.initQueryObjects')
-    @patch('scripts.requestTicket.RequestTicket.sumResultsOfEachQuery')
+class TestTicket(TestCase):
+
+
+    @patch('scripts.ticket.Ticket.initQueryObjects')
+    @patch('scripts.ticket.Ticket.sumResultsOfEachQuery')
     def test_getEstimateNumberRecords(self, mock_sum_results, mock_init):
-        ticket = RequestTicket(
+        ticket = Ticket(
             {
                 'terms': ['test'],
                 'papersAndCodes': [],
@@ -27,10 +27,10 @@ class TestRequestTicket(TestCase):
         mock_sum_results.assert_called_once()
         mock_init.assert_called_with(ticket.genAllPaperQuery)
 
-    @patch('scripts.requestTicket.RequestTicket.initQueryObjects')
-    @patch('scripts.requestTicket.RequestTicket.sumResultsOfEachQuery')
+    @patch('scripts.ticket.Ticket.initQueryObjects')
+    @patch('scripts.ticket.Ticket.sumResultsOfEachQuery')
     def test_get_Estimate_Number_Records_Paper_Ticket(self, mock_sum_results, mock_init):
-        ticket = RequestTicket(
+        ticket = Ticket(
             {
                 'terms': ['test'],
                 'papersAndCodes': ['test'],
@@ -46,9 +46,9 @@ class TestRequestTicket(TestCase):
         mock_sum_results.assert_called_once()
         mock_init.assert_called_with(ticket.genSelectPaperQuery)
 
-    @patch("scripts.requestTicket.RequestTicket.addKeywordAndTicketIDToRecords")
+    @patch("scripts.ticket.Ticket.addKeywordAndTicketIDToRecords")
     def test_run(self, mock_add):
-        ticket = RequestTicket(
+        ticket = Ticket(
             {
                 'terms': ['test'],
                 'papersAndCodes': [],
@@ -74,8 +74,34 @@ class TestRequestTicket(TestCase):
         mock_add.assert_called()
         self.assertListEqual(ticket.records, [1, 2, 3, 1, 2, 3, 1, 2, 3])
 
+    def test_add_keyword_and_ticket_id_to_records(self):
+        testTicket = Ticket(
+            {
+                'terms': ['test'],
+                'papersAndCodes': [],
+                'dateRange': []
+            },
+            "",
+            MagicMock(),
+            MagicMock(),
+            MagicMock())
+        testTicket.ticketID = 'testTicketID'
+        mockRecord = MagicMock(
+            setKeyword=MagicMock(),
+            setTicketID=MagicMock())
+        testRecords = [mockRecord, mockRecord, mockRecord]
+
+        modifiedRecords = testTicket.addKeywordAndTicketIDToRecords(testRecords, 'test')
+
+        mockRecord.setKeyword.assert_called_with('test')
+        mockRecord.setTicketID.assert_called_with('testTicketID')
+        self.assertEqual(len(modifiedRecords), 3)
+
+
+
+
     def test_init_query_objects(self):
-        ticket = RequestTicket(
+        ticket = Ticket(
             {
                 'terms': ['test'],
                 'papersAndCodes': ['test'],
@@ -92,7 +118,7 @@ class TestRequestTicket(TestCase):
     @patch("scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.buildQuery")
     @patch("scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.fetchNumTotalResults")
     def test_gen_select_paper_query(self, mock_build, mock_fetch):
-        ticket = RequestTicket(
+        ticket = Ticket(
             {
                 'terms': ['test'],
                 'papersAndCodes': {"paper": "", "code": 'test'},
@@ -105,7 +131,7 @@ class TestRequestTicket(TestCase):
 
         testQuery = ticket.genSelectPaperQuery(ticket.terms[0])
 
-        self.assertIsInstance(testQuery, scripts.requestTicket.NgramQueryWithConcurrencySelectPapers)
+        self.assertIsInstance(testQuery, scripts.ticket.NgramQueryWithConcurrencySelectPapers)
         self.assertEqual(testQuery.keyword, 'test')
         self.assertDictEqual(testQuery.papers, {"paper": "", "code": 'test'})
         self.assertFalse(testQuery.isYearRange)
@@ -114,7 +140,7 @@ class TestRequestTicket(TestCase):
     @patch("scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencyAllPapers.buildQuery")
     @patch("scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencyAllPapers.fetchNumTotalResults")
     def test_gen_all_paper_query(self, mock_build, mock_fetch):
-        ticket = RequestTicket(
+        ticket = Ticket(
             {
                 'terms': ['test'],
                 'papersAndCodes': [],
@@ -127,13 +153,13 @@ class TestRequestTicket(TestCase):
 
         testQuery = ticket.genAllPaperQuery(ticket.terms[0])
 
-        self.assertIsInstance(testQuery, scripts.requestTicket.NgramQueryWithConcurrencyAllPapers)
+        self.assertIsInstance(testQuery, scripts.ticket.NgramQueryWithConcurrencyAllPapers)
         self.assertEqual(testQuery.keyword, 'test')
         self.assertFalse(testQuery.isYearRange)
         self.assertEqual(testQuery.ticketID, '')
 
     def test_sum_results_of_each_ticket(self):
-        ticket = RequestTicket(
+        ticket = Ticket(
             {
                 'terms': ['test'],
                 'papersAndCodes': [],
@@ -156,7 +182,7 @@ class TestRequestTicket(TestCase):
         self.assertEqual(ticket.totalResults, 33)
 
     def test_update_progress(self):
-        ticket = RequestTicket(
+        ticket = Ticket(
             {
                 'terms': ['test'],
                 'papersAndCodes': [],

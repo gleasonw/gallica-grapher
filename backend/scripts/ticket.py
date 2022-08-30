@@ -4,7 +4,7 @@ from .ngramQueryWithConcurrency import NgramQueryWithConcurrencyAllPapers
 from .ngramQueryWithConcurrency import NgramQueryWithConcurrencySelectPapers
 
 
-class RequestTicket:
+class Ticket:
 
     def __init__(self,
                  ticket,
@@ -48,6 +48,12 @@ class RequestTicket:
                 query.getKeyword())
             self.records.extend(completedRecords)
 
+    def addKeywordAndTicketIDToRecords(self, records, keyword):
+        for record in records:
+            record.setKeyword(keyword)
+            record.setTicketID(self.ticketID)
+        return records
+
     def initQueryObjects(self, generator):
         for keyword in self.terms:
             gallicaNgramOccurrenceQuery = generator(keyword)
@@ -79,11 +85,6 @@ class RequestTicket:
             numResultsForKeyword = query.getEstimateNumResults()
             self.totalResults += numResultsForKeyword
 
-    def addKeywordAndTicketIDToRecords(self, records, keyword):
-        for record in records:
-            record.setKeyword(keyword)
-            record.setTicketID(self.ticketID)
-        return records
 
     def updateProgressStats(self, randomPaper, requestTime, numWorkers):
         self.numBatchesRetrieved += 1

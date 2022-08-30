@@ -1,19 +1,19 @@
 import io
 import threading
-from scripts.requestTicket import RequestTicket
+from scripts.ticket import Ticket
 from psqlconn import PSQLconn
 from utils.gallicaSession import GallicaSession
 from newspaper import Newspaper
 
 
-class RequestThread(threading.Thread):
+class Request(threading.Thread):
     def __init__(self, tickets, requestID):
         self.session = GallicaSession().getSession()
         self.DBconnection = PSQLconn().getConn()
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.topPapersForTerms = []
-        self.tickets = tickets
+        self.ticketDicts = tickets
         self.finished = False
         self.tooManyRecords = False
         self.ticketProgressStats = self.initProgressStats()
@@ -42,16 +42,16 @@ class RequestThread(threading.Thread):
             self.tooManyRecords = True
 
     def generateRequestTickets(self):
-        requestTickets = []
-        for key, ticket in self.tickets.items():
-            requestToRun = RequestTicket(
+        tickets = []
+        for key, ticket in self.ticketDicts.items():
+            requestToRun = Ticket(
                 ticket,
                 key,
                 self,
                 self.DBconnection,
                 self.session)
-            requestTickets.append(requestToRun)
-        return requestTickets
+            tickets.append(requestToRun)
+        return tickets
 
     def estimateIsUnderRecordLimit(self, estimate):
         limit = 10000000 - self.getNumberRowsInAllTables() - 10000
@@ -70,7 +70,7 @@ class RequestThread(threading.Thread):
 
     def initProgressStats(self):
         progressDict = {}
-        for key, ticket in self.tickets.items():
+        for key, ticket in self.ticketDicts.items():
             progressDict[key] = {
                 'progress': 0,
                 'numResultsDiscovered': 0,

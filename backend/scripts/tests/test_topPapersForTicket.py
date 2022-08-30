@@ -1,13 +1,13 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from scripts.topPapers import TopPapers
+from scripts.topPapersForTicket import TopPapersForTicket
 from DBtester import DBtester
 
 
 class TestTopPapers(TestCase):
 
     def test_init_top_papers(self):
-        cleanTopTest = TopPapers(
+        cleanTopTest = TopPapersForTicket(
             ticketID="1",
             dateRange="1900,2000",
             continuous="true")
@@ -17,7 +17,7 @@ class TestTopPapers(TestCase):
         self.assertEqual(cleanTopTest.lowYear, "1900")
         self.assertEqual(cleanTopTest.highYear, "2000")
 
-        messyTopTest = TopPapers(
+        messyTopTest = TopPapersForTicket(
             ticketID="1",
             dateRange="",
             continuous="truee")
@@ -26,11 +26,11 @@ class TestTopPapers(TestCase):
         self.assertEqual(messyTopTest.continuous, False)
 
     def test_get_top_papers(self):
-        continuousTopTest = TopPapers(
+        continuousTopTest = TopPapersForTicket(
             ticketID="1",
             dateRange="1900,2000",
             continuous="true")
-        sporadicTopTest = TopPapers(
+        sporadicTopTest = TopPapersForTicket(
             ticketID="1",
             dateRange="1900,2000",
             continuous="false"
