@@ -11,6 +11,7 @@ function RunningQueriesUI(props) {
                 tickets={props.tickets}
                 requestid={props.requestID}
                 onFinish={props.onFinish}
+                onTooManyRecords={props.onTooManyRecords}
             />
         </div>
     )
@@ -35,12 +36,18 @@ function TicketProgressContainer(props){
         async function updateProgress() {
             const currentTicketProgress = await fetch("/api/progress/" + props.requestid);
             currentTicketProgress.json().then(data => {
-                const progress = data["progress"]
-                if(progress){
+                if(data["state"] === "PROGRESS") {
+                    const progress = data["progress"]
                     setProgressStats(progress)
-                }
-                if (data["state"] === "SUCCESS") {
-                    props.onFinish()
+                }else if (data["state"] === "SUCCESS") {
+                    console.log(data)
+                    if(data["numTooManyRecords"]) {
+                        props.onTooManyRecords(data['numTooManyRecords'])
+                    }else{
+                        props.onFinish()
+                    }
+                }else{
+                    console.log("Error: unknown state")
                 }
             });
         }

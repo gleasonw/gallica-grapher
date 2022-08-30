@@ -22,10 +22,11 @@ function Chart(props) {
         "&dateRange=" + dateRange +
         "&timeBin=" + chartSettings.timeBin +
         "&averageWindow=" + chartSettings.averageWindow;
-    const series = useData(query);
+    const result = useData(query);
     useScript('https://code.highcharts.com/modules/exporting.js')
     useScript('https://code.highcharts.com/modules/export-data.js')
-    if(series){
+    if(result){
+        const series = result['series'];
         const graphDataWithSyncedColors = syncColors(
             series,
             allSettings);
@@ -36,7 +37,6 @@ function Chart(props) {
             <div>
                 <ChartSettings
                     settingsID={props.settingsID}
-                    showExcludePapers={props.showExcludePapers}
                 />
                 <HighchartsReact
                     highcharts={Highcharts}
@@ -106,22 +106,20 @@ function ChartSettings(props){
                     <MenuItem value={14}>50</MenuItem>
                 </Select>
             </FormControl>
-            {props.showExcludePapers &&
-                <ToggleButton
-                    value="Exclude sporadic papers"
-                    selected={settingsForID.continuous}
-                    onChange={() => {
-                        dispatch({
-                            type: 'setContinuous',
-                            key: props.settingsID,
-                            continuous: !settingsForID.continuous,
-                        })
-                    }}
-                    label='require continuous newspapers'
-                >
-                    Exclude papers incomplete over range
-                </ToggleButton>
-            }
+            <ToggleButton
+                value="Exclude sporadic papers"
+                selected={settingsForID.continuous}
+                onChange={() => {
+                    dispatch({
+                        type: 'setContinuous',
+                        key: props.settingsID,
+                        continuous: !settingsForID.continuous,
+                    })
+                }}
+                label='require continuous newspapers'
+            >
+                Exclude papers incomplete over range
+            </ToggleButton>
 
         </div>
 

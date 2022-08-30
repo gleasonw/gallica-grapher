@@ -14,8 +14,9 @@ function App() {
     const [idTickets, setIDTickets] = useState({});
     const [requestID, setRequestID] = useState('');
     const [gettingInput, setGettingInput] = useState(true);
-    const [fetchingData, setFetchingData] = useState(false);
+    const [runningQueries, setRunningQueries] = useState(false);
     const [infoPage, setInfoPage] = useState(false);
+    const [tooManyRecordsWarning, setTooManyRecordsWarning] = useState(false);
     const formRef = useRef(null);
 
     const header =
@@ -46,7 +47,7 @@ function App() {
         setIDTickets(ticksWithIDS);
         setRequestID(taskID);
         setGettingInput(false);
-        setFetchingData(true);
+        setRunningQueries(true);
     }
 
     function handleCreateTicketClick(items){
@@ -87,16 +88,22 @@ function App() {
     }
 
     function handleTicketFinish(){
-        setFetchingData(false);
+        setRunningQueries(false);
     }
 
     function handleHomeClick(){
         setInfoPage(false)
         setGettingInput(true);
-        setFetchingData(false);
+        setRunningQueries(false);
         setTickets([]);
         setIDTickets({});
         setRequestID('');
+        setTooManyRecordsWarning(false)
+    }
+
+    function handleTooManyRecords(){
+        setRunningQueries(false);
+        setTooManyRecordsWarning(true);
     }
 
     function handleInfoClick(){
@@ -125,7 +132,7 @@ function App() {
                 />
             </div>
         )
-    }else if(fetchingData){
+    }else if(runningQueries){
           return (
             <div className="App">
                 {header}
@@ -133,9 +140,24 @@ function App() {
                     tickets={idTickets}
                     onFinish={handleTicketFinish}
                     requestID={requestID}
+                    onTooManyRecords={handleTooManyRecords}
                 />
             </div>
           )
+    }else if(tooManyRecordsWarning){
+        return (
+            <div className="App">
+                {header}
+                <span className={'tooManyRecordsWarning'}>
+                    Your curiosity exceeds my server's capacity. Please try a different
+                    search that returns less records. You could restrict the ngram search to a
+                    few papers, limit the date range, or search for a more specific term.
+                </span>
+                <span className={'tooManyRecordsWarning'}>
+                    Click on the GallicaGrapher logo to return to the home page.
+                </span>
+            </div>
+        )
     }else{
         return (
             <div className="App">

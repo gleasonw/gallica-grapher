@@ -1,7 +1,7 @@
 from lxml import etree
 from scripts.record import KeywordRecord
 from scripts.record import PaperRecord
-from utils.gallicaSession import GallicaSession
+from scripts.utils.gallicaSession import GallicaSession
 
 
 class GallicaRecordBatch:

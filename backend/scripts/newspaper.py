@@ -2,8 +2,8 @@ import concurrent.futures
 import io
 
 from requests_toolbelt import sessions
-from utils.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
-from psqlconn import PSQLconn
+from scripts.utils.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from scripts.utils.psqlconn import PSQLconn
 
 from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
 
@@ -123,7 +123,7 @@ class Newspaper:
                 SELECT title, code, startdate, enddate
                     FROM papers 
                     WHERE LOWER(title) LIKE %(paperNameSearchString)s
-                    ORDER BY title LIMIT 20;
+                    ORDER BY title DESC LIMIT 20;
             """, {'paperNameSearchString': '%' + keyword + '%'})
             papersSimilarToKeyword = curs.fetchall()
             return paperDataToJSON(papersSimilarToKeyword)

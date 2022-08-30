@@ -1,9 +1,9 @@
 import io
 import threading
 from scripts.ticket import Ticket
-from psqlconn import PSQLconn
-from utils.gallicaSession import GallicaSession
-from newspaper import Newspaper
+from scripts.utils.psqlconn import PSQLconn
+from scripts.utils.gallicaSession import GallicaSession
+from scripts.newspaper import Newspaper
 
 
 class Request(threading.Thread):
@@ -19,6 +19,7 @@ class Request(threading.Thread):
         self.ticketProgressStats = self.initProgressStats()
         self.records = []
         self.requestID = requestID
+        self.estimateNumRecords = 0
 
         super().__init__()
 
@@ -39,6 +40,7 @@ class Request(threading.Thread):
             self.moveRecordsToDB()
             self.finished = True
         else:
+            self.estimateNumRecords = estimate
             self.tooManyRecords = True
 
     def generateRequestTickets(self):
@@ -55,7 +57,8 @@ class Request(threading.Thread):
 
     def estimateIsUnderRecordLimit(self, estimate):
         limit = 10000000 - self.getNumberRowsInAllTables() - 10000
-        return estimate < limit
+        return False
+        # return estimate < limit
 
     def getNumberRowsInAllTables(self):
         with self.DBconnection.cursor() as curs:

@@ -53,7 +53,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, b'{"series":[]}\n')
 
-    @patch("backend.api.TopPapers")
+    @patch("backend.api.TopPapersForTicket")
     def test_getTopPapersFromID(self, mock_topPapers):
         mockedTopPapers = mock_topPapers.return_value
         mockedTopPapers.getTopPapers.return_value = []

@@ -1,4 +1,4 @@
-from psqlconn import PSQLconn
+from scripts.utils.psqlconn import PSQLconn
 
 
 class TopPapersForTicket:
@@ -52,7 +52,7 @@ class TopPapersForTicket:
                 INNER JOIN 
                 (SELECT code, title FROM papers 
                     WHERE 
-                        papers.startdate < %s AND papers.enddate > %s
+                        papers.startdate <= %s AND papers.enddate >= %s
                             AND
                         continuous IS TRUE) 
                 AS continuousPapersForRange

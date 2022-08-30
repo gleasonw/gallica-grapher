@@ -10,7 +10,6 @@ export function GroupedTicketResults(props) {
             <Chart
                 tickets={props.tickets}
                 settingsID='group'
-                showExcludePapers={true}
             />
             <GroupedStatBar
                 tickets={props.tickets}/>
@@ -39,7 +38,7 @@ function GroupedStatBar(props) {
                     <TicketPaperOccurrenceStats
                         ticketID={key}
                         dateRange={props.tickets[key].dateRange}
-                        grouped={false}
+                        grouped={true}
                     />
                 </div>
             ))}
