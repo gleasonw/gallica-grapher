@@ -21,29 +21,40 @@ class TestRequestThread(TestCase):
             mock_check_estimate,
             mock_move_records
     ):
-        mock_ticket = MagicMock(
-            run=MagicMock(return_value=MagicMock()),
-            getEstimateNumberRecords=MagicMock(return_value=10)
-        )
+        mock_ticket.run = MagicMock()
+        mock_ticket.getEstimateNumberRecords = MagicMock(return_value=10)
         mock_generate.return_value=[mock_ticket]
         testThread = RequestThread({'1': {}}, 'myrequestid')
-        mock_check_estimate = MagicMock(return_value=True)
 
         testThread.run()
 
         mock_check_estimate.assert_called_with(10)
-        mock_ticket.return_value.run.assert_called_once()
+        mock_ticket.run.assert_called_once()
         mock_move_records.assert_called_once()
 
+    def test_generate_request_tickets(self):
+        self.fail()
+
+    @patch('requestThread.RequestThread.getNumberRowsInAllTables')
+    def test_estimate_is_under_record_limit(self, mock_get):
+        testThread = RequestThread({}, '1')
+        mock_get.return_value = 1000000
+
+        self.assertTrue(testThread.estimateIsUnderRecordLimit(100))
+        self.assertFalse(testThread.estimateIsUnderRecordLimit(100000000))
+
+    def test_get_number_rows_in_all_tables(self):
+        self.fail()
+
     def test_set_progress(self):
-        testThread = RequestThread({})
+        testThread = RequestThread({}, '1')
 
         testThread.setTicketProgressStats('1', 10)
 
         self.assertEqual(testThread.ticketProgressStats['1'], 10)
 
     def test_get_progress(self):
-        testThread = RequestThread({'1': {}})
+        testThread = RequestThread({'1': {}}, '1')
 
         self.assertEqual(
             testThread.getProgressStats()['1'],
@@ -57,26 +68,26 @@ class TestRequestThread(TestCase):
         )
 
     def test_set_num_discovered(self):
-        testThread = RequestThread({})
+        testThread = RequestThread({}, '1')
 
         testThread.setNumDiscovered(10)
 
         self.assertEqual(testThread.numResultsDiscovered, 10)
 
     def test_get_num_discovered(self):
-        testThread = RequestThread({})
+        testThread = RequestThread({}, '1')
 
         self.assertEqual(testThread.getNumDiscovered(), 0)
 
     def test_set_num_actually_retrieved(self):
-        testThread = RequestThread({})
+        testThread = RequestThread({}, '1')
 
         testThread.setNumActuallyRetrieved(10)
 
         self.assertEqual(testThread.numResultsRetrieved, 10)
 
     def test_get_num_actually_retrieved(self):
-        testThread = RequestThread({})
+        testThread = RequestThread({}, '1')
 
         self.assertEqual(testThread.getNumActuallyRetrieved(), 0)
 
