@@ -1,7 +1,7 @@
 from lxml import etree
-from scripts.gallicaRecord import GallicaKeywordRecord
-from scripts.gallicaRecord import GallicaPaperRecord
-from scripts.gallicaSession import GallicaSession
+from scripts.record import KeywordRecord
+from scripts.record import PaperRecord
+from utils.gallicaSession import GallicaSession
 
 
 class GallicaRecordBatch:
@@ -78,7 +78,7 @@ class GallicaKeywordRecordBatch(GallicaRecordBatch):
 
     def parseRecordsFromXML(self):
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
-            record = GallicaKeywordRecord(result)
+            record = KeywordRecord(result)
             if record.isValid():
                 self.batch.append(record)
             else:
@@ -121,7 +121,7 @@ class GallicaPaperRecordBatch(GallicaRecordBatch):
             "https://gallica.bnf.fr/services/Issues").getSession()
         for result in self.xmlRoot.iter(
                 "{http://www.loc.gov/zing/srw/}record"):
-            record = GallicaPaperRecord(
+            record = PaperRecord(
                 result,
                 gallicaSessionForPaperYears)
             if record.isValid():

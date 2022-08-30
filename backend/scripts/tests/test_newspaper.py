@@ -112,8 +112,8 @@ class TestNewspaper(TestCase):
             1
         )
 
-    @patch('gallicaRecord.GallicaPaperRecord')
-    @patch('gallicaRecord.GallicaRecord')
+    @patch('record.PaperRecord')
+    @patch('record.Record')
     def test_generate_csv_stream(self, mock_record, mock_paper_record):
         newspaper = Newspaper()
         mock_record.return_value = mock_record

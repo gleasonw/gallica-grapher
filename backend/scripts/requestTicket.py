@@ -1,7 +1,7 @@
 from math import ceil
 
-from .gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQueryAllPapers
-from .gallicaNgramOccurrenceQuery import GallicaNgramOccurrenceQuerySelectPapers
+from .ngramQueryWithConcurrency import NgramQueryWithConcurrencyAllPapers
+from .ngramQueryWithConcurrency import NgramQueryWithConcurrencySelectPapers
 
 
 class RequestTicket:
@@ -31,13 +31,22 @@ class RequestTicket:
     def getRecords(self):
         return self.records
 
-    def run(self):
+    def getEstimateNumberRecords(self):
         if self.papersAndCodes:
             self.initQueryObjects(self.genSelectPaperQuery)
         else:
             self.initQueryObjects(self.genAllPaperQuery)
         self.sumResultsOfEachQuery()
-        self.startQueries()
+        return self.totalResults
+
+    def run(self):
+        self.numBatches = ceil(self.totalResults / 50)
+        for query in self.termQueries:
+            query.runSearch()
+            completedRecords = self.addKeywordAndTicketIDToRecords(
+                query.getRecords(),
+                query.getKeyword())
+            self.records.extend(completedRecords)
 
     def initQueryObjects(self, generator):
         for keyword in self.terms:
@@ -45,7 +54,7 @@ class RequestTicket:
             self.termQueries.append(gallicaNgramOccurrenceQuery)
 
     def genSelectPaperQuery(self, keyword):
-        query = GallicaNgramOccurrenceQuerySelectPapers(
+        query = NgramQueryWithConcurrencySelectPapers(
             keyword,
             self.papersAndCodes,
             self.dateRange,
@@ -56,7 +65,7 @@ class RequestTicket:
         return query
 
     def genAllPaperQuery(self, keyword):
-        query = GallicaNgramOccurrenceQueryAllPapers(
+        query = NgramQueryWithConcurrencyAllPapers(
             keyword,
             self.dateRange,
             self.ticketID,
@@ -69,15 +78,6 @@ class RequestTicket:
         for query in self.termQueries:
             numResultsForKeyword = query.getEstimateNumResults()
             self.totalResults += numResultsForKeyword
-
-    def startQueries(self):
-        self.numBatches = ceil(self.totalResults / 50)
-        for query in self.termQueries:
-            query.runSearch()
-            completedRecords = self.addKeywordAndTicketIDToRecords(
-                query.getRecords(),
-                query.getKeyword())
-            self.records.extend(completedRecords)
 
     def addKeywordAndTicketIDToRecords(self, records, keyword):
         for record in records:

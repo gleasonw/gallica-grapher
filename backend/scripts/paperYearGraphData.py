@@ -1,5 +1,5 @@
 import json
-from scripts.psqlconn import PSQLconn
+from psqlconn import PSQLconn
 
 
 class PaperYearGraphData:
@@ -49,7 +49,7 @@ class PaperYearGraphData:
 
     def generateJSONfileForGraphing(self):
         self.JSONData = json.dumps({'data': self.yearFreqList})
-        with open('../static/paperJSON.json', 'w') as outFile:
+        with open('backend/static/paperJSON.json', 'w') as outFile:
             outFile.write(self.JSONData)
 
 if __name__ == "__main__":

@@ -2,8 +2,8 @@ import concurrent.futures
 import io
 
 from requests_toolbelt import sessions
-from scripts.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
-from scripts.psqlconn import PSQLconn
+from utils.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
+from psqlconn import PSQLconn
 
 from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
 

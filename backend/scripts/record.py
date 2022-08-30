@@ -2,7 +2,7 @@ from lxml import etree
 from scripts.date import Date
 
 
-class GallicaRecord:
+class Record:
     def __init__(self, root):
         record = root[2]
         self.recordData = record[0]
@@ -61,7 +61,7 @@ class GallicaRecord:
             self.valid = True
 
 
-class GallicaKeywordRecord(GallicaRecord):
+class KeywordRecord(Record):
 
     def __init__(self, root):
         super().__init__(root)
@@ -78,7 +78,7 @@ class GallicaKeywordRecord(GallicaRecord):
             self.date = Date(dateElement.text)
 
 
-class GallicaPaperRecord(GallicaRecord):
+class PaperRecord(Record):
 
     def __init__(self, root, gallicaSession):
         super().__init__(root)

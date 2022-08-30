@@ -3,11 +3,11 @@ from unittest.mock import MagicMock, patch
 from scripts.gallicaRecordBatch import GallicaRecordBatch
 from scripts.gallicaRecordBatch import GallicaKeywordRecordBatch
 from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
-from scripts.gallicaSession import GallicaSession
+from utils.gallicaSession import GallicaSession
 
 import os
 
-from gallicaRecord import GallicaKeywordRecord
+from record import KeywordRecord
 
 here = os.path.dirname(__file__)
 
@@ -112,8 +112,8 @@ class TestKeywordRecordBatch(TestCase):
         self.assertCountEqual(batch.batch, [])
         xmlWithDuplicateEndCouple = [xml for xml in batch.xmlRoot.iter(
             "{http://www.loc.gov/zing/srw/}record")]
-        secondToLastRecord = GallicaKeywordRecord(xmlWithDuplicateEndCouple[-2])
-        lastRecord = GallicaKeywordRecord(xmlWithDuplicateEndCouple[-1])
+        secondToLastRecord = KeywordRecord(xmlWithDuplicateEndCouple[-2])
+        lastRecord = KeywordRecord(xmlWithDuplicateEndCouple[-1])
 
         self.assertTrue(batch.recordIsUnique(secondToLastRecord))
         batch.batch.append(secondToLastRecord)

@@ -1,4 +1,4 @@
-from scripts.psqlconn import PSQLconn
+from psqlconn import PSQLconn
 
 
 class TopPapers:

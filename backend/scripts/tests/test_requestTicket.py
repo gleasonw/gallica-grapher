@@ -7,15 +7,11 @@ import scripts.requestTicket
 
 class TestRequestTicket(TestCase):
 
-    @patch("scripts.requestTicket.RequestTicket.initQueryObjects")
-    @patch("scripts.requestTicket.RequestTicket.sumResultsOfEachQuery")
-    @patch("scripts.requestTicket.RequestTicket.startQueries")
-    def test_run_all_paper_ticket(
-            self,
-            mock_startQueries,
-            mock_getNumResults,
-            mock_initQueryObjects):
-        allPaperTicket = RequestTicket(
+
+    @patch('scripts.requestTicket.RequestTicket.initQueryObjects')
+    @patch('scripts.requestTicket.RequestTicket.sumResultsOfEachQuery')
+    def test_getEstimateNumberRecords(self, mock_sum_results, mock_init):
+        ticket = RequestTicket(
             {
                 'terms': ['test'],
                 'papersAndCodes': [],
@@ -25,21 +21,16 @@ class TestRequestTicket(TestCase):
             MagicMock(),
             MagicMock(),
             MagicMock())
-        allPaperTicket.run()
+        ticket.totalResults = 512
 
-        mock_initQueryObjects.assert_called_with(allPaperTicket.genAllPaperQuery)
-        mock_getNumResults.assert_called_once()
-        mock_startQueries.assert_called_once()
+        self.assertEqual(ticket.getEstimateNumberRecords(), 512)
+        mock_sum_results.assert_called_once()
+        mock_init.assert_called_with(ticket.genAllPaperQuery)
 
-    @patch("scripts.requestTicket.RequestTicket.initQueryObjects")
-    @patch("scripts.requestTicket.RequestTicket.sumResultsOfEachQuery")
-    @patch("scripts.requestTicket.RequestTicket.startQueries")
-    def test_run_select_paper_ticket(
-            self,
-            mock_startQueries,
-            mock_getNumResults,
-            mock_initQueryObjects):
-        selectPaperTicket = RequestTicket(
+    @patch('scripts.requestTicket.RequestTicket.initQueryObjects')
+    @patch('scripts.requestTicket.RequestTicket.sumResultsOfEachQuery')
+    def test_get_Estimate_Number_Records_Paper_Ticket(self, mock_sum_results, mock_init):
+        ticket = RequestTicket(
             {
                 'terms': ['test'],
                 'papersAndCodes': ['test'],
@@ -49,11 +40,39 @@ class TestRequestTicket(TestCase):
             MagicMock(),
             MagicMock(),
             MagicMock())
-        selectPaperTicket.run()
+        ticket.totalResults = 512
 
-        mock_initQueryObjects.assert_called_with(selectPaperTicket.genSelectPaperQuery)
-        mock_getNumResults.assert_called_once()
-        mock_startQueries.assert_called_once()
+        self.assertEqual(ticket.getEstimateNumberRecords(), 512)
+        mock_sum_results.assert_called_once()
+        mock_init.assert_called_with(ticket.genSelectPaperQuery)
+
+    @patch("scripts.requestTicket.RequestTicket.addKeywordAndTicketIDToRecords")
+    def test_run(self, mock_add):
+        ticket = RequestTicket(
+            {
+                'terms': ['test'],
+                'papersAndCodes': [],
+                'dateRange': []
+            },
+            "",
+            MagicMock(),
+            MagicMock(),
+            MagicMock())
+        ticket.termQueries = [
+            MagicMock(runSearch=MagicMock()),
+            MagicMock(runSearch=MagicMock()),
+            MagicMock(runSearch=MagicMock())
+        ]
+        ticket.totalResults = 512
+        mock_add.return_value = [1, 2, 3]
+
+        ticket.run()
+
+        self.assertEqual(ticket.numBatches, 11)
+        for query in ticket.termQueries:
+            query.runSearch.assert_called_once()
+        mock_add.assert_called()
+        self.assertListEqual(ticket.records, [1, 2, 3, 1, 2, 3, 1, 2, 3])
 
     def test_init_query_objects(self):
         ticket = RequestTicket(
@@ -70,8 +89,8 @@ class TestRequestTicket(TestCase):
         ticket.initQueryObjects(MagicMock(return_value=MagicMock()))
         self.assertEqual(len(ticket.termQueries), 3)
 
-    @patch("scripts.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.buildQuery")
-    @patch("scripts.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQuerySelectPapers.fetchNumTotalResults")
+    @patch("scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.buildQuery")
+    @patch("scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.fetchNumTotalResults")
     def test_gen_select_paper_query(self, mock_build, mock_fetch):
         ticket = RequestTicket(
             {
@@ -86,14 +105,14 @@ class TestRequestTicket(TestCase):
 
         testQuery = ticket.genSelectPaperQuery(ticket.terms[0])
 
-        self.assertIsInstance(testQuery, scripts.requestTicket.GallicaNgramOccurrenceQuerySelectPapers)
+        self.assertIsInstance(testQuery, scripts.requestTicket.NgramQueryWithConcurrencySelectPapers)
         self.assertEqual(testQuery.keyword, 'test')
         self.assertDictEqual(testQuery.papers, {"paper": "", "code": 'test'})
         self.assertFalse(testQuery.isYearRange)
         self.assertEqual(testQuery.ticketID, '')
 
-    @patch("scripts.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQueryAllPapers.buildQuery")
-    @patch("scripts.gallicaNgramOccurrenceQuery.GallicaNgramOccurrenceQueryAllPapers.fetchNumTotalResults")
+    @patch("scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencyAllPapers.buildQuery")
+    @patch("scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencyAllPapers.fetchNumTotalResults")
     def test_gen_all_paper_query(self, mock_build, mock_fetch):
         ticket = RequestTicket(
             {
@@ -108,7 +127,7 @@ class TestRequestTicket(TestCase):
 
         testQuery = ticket.genAllPaperQuery(ticket.terms[0])
 
-        self.assertIsInstance(testQuery, scripts.requestTicket.GallicaNgramOccurrenceQueryAllPapers)
+        self.assertIsInstance(testQuery, scripts.requestTicket.NgramQueryWithConcurrencyAllPapers)
         self.assertEqual(testQuery.keyword, 'test')
         self.assertFalse(testQuery.isYearRange)
         self.assertEqual(testQuery.ticketID, '')
@@ -135,30 +154,6 @@ class TestRequestTicket(TestCase):
         ticket.sumResultsOfEachQuery()
 
         self.assertEqual(ticket.totalResults, 33)
-
-    def test_start_queries(self):
-        ticket = RequestTicket(
-            {
-                'terms': ['test'],
-                'papersAndCodes': [],
-                'dateRange': []
-            },
-            "",
-            MagicMock(),
-            MagicMock(),
-            MagicMock())
-        ticket.termQueries = [
-            MagicMock(runSearch=MagicMock()),
-            MagicMock(runSearch=MagicMock()),
-            MagicMock(runSearch=MagicMock())
-        ]
-        ticket.totalResults = 512
-
-        ticket.startQueries()
-
-        self.assertEqual(ticket.numBatches, 11)
-        for query in ticket.termQueries:
-            query.runSearch.assert_called_once()
 
     def test_update_progress(self):
         ticket = RequestTicket(

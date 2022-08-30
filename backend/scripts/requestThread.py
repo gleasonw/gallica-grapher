@@ -1,15 +1,13 @@
 import io
 import threading
 from scripts.requestTicket import RequestTicket
-from scripts.psqlconn import PSQLconn
-from scripts.gallicaSession import GallicaSession
+from psqlconn import PSQLconn
+from utils.gallicaSession import GallicaSession
+from newspaper import Newspaper
 
-
-# TODO: move all db operations and total record count here.
-# If there are a bajillion records, warn the user, and don't put them in the db
 
 class RequestThread(threading.Thread):
-    def __init__(self, tickets):
+    def __init__(self, tickets, requestID):
         self.session = GallicaSession().getSession()
         self.DBconnection = PSQLconn().getConn()
         self.numResultsDiscovered = 0
@@ -17,14 +15,23 @@ class RequestThread(threading.Thread):
         self.topPapersForTerms = []
         self.tickets = tickets
         self.finished = False
+        self.tooManyRecords = False
         self.ticketProgressStats = self.initProgressStats()
         self.records = []
+        self.requestID = requestID
 
         super().__init__()
 
     def run(self):
+
+        def sumEstimateNumberRecordsForAllTickets(tickets):
+            total = 0
+            for tick in tickets:
+                total += tick.getEstimateNumberRecords()
+            return total
+
         requestTickets = self.generateRequestTickets()
-        estimate = self.getEstimateNumberRecordsForAllTickets(requestTickets)
+        estimate = sumEstimateNumberRecordsForAllTickets(requestTickets)
         if self.estimateIsUnderRecordLimit(estimate):
             for ticket in requestTickets:
                 ticket.run()
@@ -32,7 +39,7 @@ class RequestThread(threading.Thread):
             self.moveRecordsToDB()
             self.finished = True
         else:
-            self.warnUserOfLargeRequest()
+            self.tooManyRecords = True
 
     def generateRequestTickets(self):
         requestTickets = []
@@ -46,11 +53,20 @@ class RequestThread(threading.Thread):
             requestTickets.append(requestToRun)
         return requestTickets
 
-    def estimateIsUnderRecordLimit(self):
-        return True
+    def estimateIsUnderRecordLimit(self, estimate):
+        limit = 10000000 - self.getNumberRowsInAllTables() - 10000
+        return estimate < limit
 
-    def warnUserOfLargeRequest(self):
-        pass
+    def getNumberRowsInAllTables(self):
+        with self.DBconnection.cursor() as curs:
+            curs.execute(
+                """
+                SELECT sum(reltuples)::bigint AS estimate
+                FROM pg_class
+                WHERE relname IN ('results', 'papers');
+                """
+            )
+            return curs.fetchone()[0]
 
     def initProgressStats(self):
         progressDict = {}
@@ -80,7 +96,7 @@ class RequestThread(threading.Thread):
         })
 
     def moveRecordsToDB(self):
-        with self.dbConnection.cursor() as curs:
+        with self.DBconnection.cursor() as curs:
             self.moveRecordsToHoldingResultsDB(curs)
             self.addMissingPapers(curs)
             self.moveRecordsToFinalTable(curs)
@@ -99,11 +115,13 @@ class RequestThread(threading.Thread):
                 'day',
                 'searchterm',
                 'paperid',
-                'requestid')
+                'ticketid',
+                'requestid',
+            )
         )
 
     def addMissingPapers(self, curs):
-        paperGetter = Newspaper(self.gallicaHttpSession)
+        paperGetter = Newspaper(self.session)
         missingPapers = self.getMissingPapers(curs)
         if missingPapers:
             paperGetter.sendTheseGallicaPapersToDB(missingPapers)
@@ -120,22 +138,24 @@ class RequestThread(threading.Thread):
             WHERE paperid NOT IN 
                 (SELECT code FROM papers);
             """
-            , (self.ticketID,))
+            , (self.requestID,))
         return curs.fetchall()
 
+    #TODO: talk to gallica about the indexing weirdness. Shouldn't need the select distinct.
     def moveRecordsToFinalTable(self, curs):
         curs.execute(
             """
             WITH resultsForRequest AS (
                 DELETE FROM holdingresults
                 WHERE requestid = %s
-                RETURNING identifier, year, month, day, searchterm, paperid, requestid
+                RETURNING identifier, year, month, day, searchterm, paperid, ticketid, requestid
             )
 
-            INSERT INTO results (identifier, year, month, day, searchterm, paperid, requestid)
-                (SELECT DISTINCT identifier, year, month, day , searchterm, paperid, requestid FROM resultsForRequest);
+            INSERT INTO results (identifier, year, month, day, searchterm, paperid, ticketid, requestid)
+                (SELECT DISTINCT 
+                identifier, year, month, day , searchterm, paperid, ticketid, requestid FROM resultsForRequest);
             """
-            , (self.ticketID,))
+            , (self.requestID,))
 
     def generateResultCSVstream(self):
 
@@ -155,7 +175,8 @@ class RequestThread(threading.Thread):
                     yearMonDay[2],
                     record.getKeyword(),
                     record.getPaperCode(),
-                    record.getTicketID()
+                    record.getTicketID(),
+                    self.requestID
                 ))) + '\n')
         csvFileLikeObject.seek(0)
         return csvFileLikeObject

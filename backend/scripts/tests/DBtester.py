@@ -11,23 +11,22 @@ class DBtester:
         self.conn = PSQLconn().getConn()
 
     def getTestSeries(self, timeBin, continuous, averageWindow):
-        self.copyTestResults()
+        self.copyDummyDataIntoResultsTable()
         series = TicketGraphSeries(
-            "id!",
+            "bestticket",
             {
                 "averageWindow": averageWindow,
                 "groupBy": timeBin,
                 "dateRange": "1900, 1907",
                 "continuous": continuous
             },
-            self.conn
-        )
+            self.conn)
         testSeries = series.getSeries()
         self.deleteTestResultsFromFinal()
         return testSeries
 
     def getTestTopPapers(self, continuous, dateRange):
-        self.copyTestResults()
+        self.copyDummyDataIntoResultsTable()
         topPapers = TopPapers(
             ticketID='id!',
             continuous=continuous,
@@ -36,7 +35,7 @@ class DBtester:
         self.deleteTestResultsFromFinal()
         return testResults
 
-    def copyTestResults(self):
+    def copyDummyDataIntoResultsTable(self):
         with open(os.path.join(os.path.dirname(__file__), 'resources/dummyResults')) as f:
             with self.conn.cursor() as curs:
                 curs.copy_from(f, 'results', sep=',', columns=(
@@ -46,7 +45,9 @@ class DBtester:
                     'day',
                     'searchterm',
                     'paperid',
-                    'requestid'))
+                    'ticketid',
+                    'requestid'
+                ))
 
     def deleteTestResultsFromFinal(self):
         with self.conn.cursor() as curs:

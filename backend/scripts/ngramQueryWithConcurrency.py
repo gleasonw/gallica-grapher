@@ -10,7 +10,7 @@ from .gallicaRecordBatch import GallicaRecordBatch
 NUM_WORKERS = 50
 
 
-class GallicaNgramOccurrenceQuery:
+class NgramQueryWithConcurrency:
 
     def __init__(self,
                  searchTerm,
@@ -97,7 +97,8 @@ class GallicaNgramOccurrenceQuery:
     def doSearchChunk(self, workChunk):
         return GallicaKeywordRecordBatch(self.gallicaHttpSession, workChunk)
 
-class GallicaNgramOccurrenceQueryAllPapers(GallicaNgramOccurrenceQuery):
+
+class NgramQueryWithConcurrencyAllPapers(NgramQueryWithConcurrency):
 
     def __init__(self,
                  searchTerm,
@@ -152,7 +153,7 @@ class GallicaNgramOccurrenceQueryAllPapers(GallicaNgramOccurrenceQuery):
         self.workChunks = [(i * 50) + 1 for i in range(iterations)]
 
 
-class GallicaNgramOccurrenceQuerySelectPapers(GallicaNgramOccurrenceQuery):
+class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
     def __init__(self,
                  searchTerm,
                  papers,

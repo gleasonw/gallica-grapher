@@ -3,3 +3,4 @@
 * info page
 * beautify
 * click on highcharts year to get links to sample records for each series
+* French translation

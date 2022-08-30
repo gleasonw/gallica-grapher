@@ -5,7 +5,7 @@ from ticketGraphSeriesBatch import TicketGraphSeries
 from ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from DBtester import DBtester
 
-
+#TODO: make tests more complete, not granular enough
 class TestTicketGraphSeriesBatch(TestCase):
 
     @patch("psycopg2.connect")
@@ -51,7 +51,7 @@ class TestTicketGraphSeries(TestCase):
 
     def setUp(self):
         self.testInstance = TicketGraphSeries(
-            "1",
+            "bestticket",
             {
                 "averageWindow": 5,
                 "groupBy": 'day',
@@ -80,9 +80,10 @@ class TestTicketGraphSeries(TestCase):
             {'name':[],'data':[]}
         )
 
+    @patch('ticketGraphSeriesBatch.TicketGraphSeries.calculateJStime')
     @patch("ticketGraphSeriesBatch.TicketGraphSeries.buildQueryForSeries")
     @patch("ticketGraphSeriesBatch.TicketGraphSeries.runQuery")
-    def test_make_series(self, mock_run, mock_build):
+    def test_make_series(self, mock_run, mock_build, mock_jstime):
         testSeries = TicketGraphSeries(
             "neat",
             {
@@ -95,6 +96,7 @@ class TestTicketGraphSeries(TestCase):
         )
         mock_run.assert_called_once()
         mock_build.assert_called_once()
+        mock_jstime.assert_called_once()
 
     @patch("ticketGraphSeriesBatch.TicketGraphSeries.initDayRequest")
     @patch("ticketGraphSeriesBatch.TicketGraphSeries.initMonthRequest")
@@ -149,7 +151,10 @@ class TestTicketGraphSeries(TestCase):
 
     def test_day_binned_request(self):
 
-        testSeries = DBtester().getTestSeries('day', 'false', 0)
+        testSeries = DBtester().getTestSeries(
+            timeBin='day',
+            continuous='false',
+            averageWindow=0)
 
         self.assertIsNotNone(testSeries["name"])
         self.assertIsNotNone(testSeries["data"])
