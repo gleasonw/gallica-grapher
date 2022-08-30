@@ -154,7 +154,7 @@ function App() {
                     few papers, limit the date range, or search for a more specific term.
                 </span>
                 <span className={'tooManyRecordsWarning'}>
-                    Click on the GallicaGrapher logo to return to the home page.
+                    Click on Graphing Gallica to return to the home page.
                 </span>
             </div>
         )

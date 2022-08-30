@@ -56,9 +56,9 @@ class Request(threading.Thread):
         return tickets
 
     def estimateIsUnderRecordLimit(self, estimate):
-        limit = 10000000 - self.getNumberRowsInAllTables() - 10000
-        return False
-        # return estimate < limit
+        dbSpaceRemainingWithBuffer = 10000000 - self.getNumberRowsInAllTables() - 10000
+        absoluteLimit = 3000000
+        return estimate < min(dbSpaceRemainingWithBuffer, absoluteLimit)
 
     def getNumberRowsInAllTables(self):
         with self.DBconnection.cursor() as curs:
