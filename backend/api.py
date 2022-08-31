@@ -33,13 +33,15 @@ def getProgress(taskID):
             'state': task.state,
             'progress': task.info.get('progress')
         }
-    elif task.state == 'SUCCESS':
-        response = {
-            'state': task.state,
-            'numTooManyRecords': task.result.get('numTooManyRecords', 0)
-        }
     else:
-        response = {'state': task.state}
+        if task.state == 'FAILURE':
+            response = {
+                'state': task.state,
+                'numTooManyRecords': task.info.get('numTooManyRecords', 0),
+            }
+        else:
+            response = {'state': task.state}
+        task.forget()
     return response
 
 
