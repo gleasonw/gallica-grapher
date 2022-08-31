@@ -150,10 +150,14 @@ function App() {
           )
     }else if(tooManyRecordsWarning){
         const markdown =
-            `## Your curiosity exceeds my capacity. 
+            `
+            
+            ## Your curiosity exceeds my capacity. 
             
             Your request returned ${numRecords} records. Try restricting your search to a few periodicals, 
             shortening the year range, or using a more precise ngram. 
+            
+            
             `
         return (
             <div className="App">

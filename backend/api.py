@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 from scripts.newspaper import Newspaper
 from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
-from tasks import spawnRequestThread
+from tasks import spawnRequest
 from scripts.topPapersForTicket import TopPapersForTicket
 
 
@@ -21,13 +21,13 @@ def index():
 @app.route('/api/init', methods=['POST'])
 def init():
     tickets = request.get_json()["tickets"]
-    task = spawnRequestThread.delay(tickets)
+    task = spawnRequest.delay(tickets)
     return {"taskid": task.id}
 
 
 @app.route('/api/progress/<taskID>')
 def getProgress(taskID):
-    task = spawnRequestThread.AsyncResult(taskID)
+    task = spawnRequest.AsyncResult(taskID)
     if task.state == 'PROGRESS':
         response = {
             'state': task.state,
