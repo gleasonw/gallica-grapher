@@ -149,21 +149,16 @@ function App() {
             </div>
           )
     }else if(tooManyRecordsWarning){
-        const markdown =
-            `
-            
-            ## Your curiosity exceeds my capacity. 
-            
-            Your request returned ${numRecords} records. Try restricting your search to a few periodicals, 
-            shortening the year range, or using a more precise ngram. 
-            
-            
-            `
         return (
             <div className="App">
                 {header}
                 <div className={'tooManyRecordsWarningBox'}>
-                    <ReactMarkdown className={'tooManyRecordsWarning'}>{markdown}</ReactMarkdown>
+                    <h1>Your curiosity exceeds my capacity.</h1>
+                    <span>
+            Your request returned {numRecords.toLocaleString()} records from Gallica's archive. This number is either
+                        greater than my limit, or I don't have enough space for it right now. Try restricting your search to a few periodicals,
+            shortening the year range, or using a more precise ngram. Click on Graphing Gallica to return to home.
+                    </span>
                 </div>
             </div>
         )

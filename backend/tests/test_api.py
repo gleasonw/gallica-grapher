@@ -10,7 +10,7 @@ class TestAPI(unittest.TestCase):
         flaskAPI.app.config['TESTING'] = True
         self.app = flaskAPI.app.test_client()
 
-    @patch("backend.api.spawnRequestThread.delay")
+    @patch("backend.api.spawnRequest.delay")
     def test_init(self, mock_spawnRequestThread):
         mock_spawnRequestThread.return_value = MagicMock(id="test")
         response = self.app.post(
@@ -19,17 +19,6 @@ class TestAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['taskid'], "test")
-
-    @patch("backend.api.spawnRequestThread.AsyncResult")
-    def test_get_pending_state(self, mock_task):
-        mock_task.return_value = MagicMock(
-            state="PENDING",
-            info={"progress": 0, "currentID": ""}
-        )
-        response = self.app.get('/api/progress/test')
-        jsonResponse = json.loads(response.data)
-
-        self.assertEqual(jsonResponse["state"], "PENDING")
 
     def test_paperChart(self):
         testJSON = self.app.get('/api/paperchartjson')
@@ -96,13 +85,35 @@ class TestAPI(unittest.TestCase):
         )
 
     @patch("backend.api.spawnRequest")
-    def test_getProgress_when_task_null(self, mock_celery_task):
+    def test_getProgress_when_task_success_result_null(self, mock_celery_task):
         mock_celery_task.return_value = mock_celery_task
         mock_celery_task.AsyncResult.return_value = mock_celery_task
-        mock_celery_task.info = None
+        mock_celery_task.state = "SUCCESS"
 
         response = self.app.get('/api/progress/test')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual({"state": "SUCCESS"}, response.json)
+
+    @patch("backend.api.spawnRequest")
+    def test_getProgress_when_too_many_records(self, mock_celery_task):
+        mock_celery_task.return_value = mock_celery_task
+        mock_celery_task.AsyncResult.return_value = mock_celery_task
+        mock_celery_task.state = "SUCCESS"
+        mock_celery_task.result = {
+            "status": "Too many records!",
+            "numRecords": 100
+        }
+
+        response = self.app.get('/api/progress/test')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            {
+                'state': 'TOO_MANY_RECORDS',
+                'numRecords': 100
+            },
+            response.json
+        )
+
 
