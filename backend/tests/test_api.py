@@ -63,8 +63,8 @@ class TestAPI(unittest.TestCase):
         assert testTopPapersFromID.status_code == 200
         self.assertEqual(testTopPapersFromID.data, b'{"topPapers":[]}\n')
 
-    @patch("backend.api.spawnRequestThread")
-    def test_getProgress(self, mock_celery_task):
+    @patch("backend.api.spawnRequest")
+    def test_getProgress_when_task_in_progress(self, mock_celery_task):
         mock_celery_task.return_value = mock_celery_task
         mock_celery_task.AsyncResult.return_value = mock_celery_task
         mock_celery_task.info = MagicMock(
@@ -77,13 +77,13 @@ class TestAPI(unittest.TestCase):
                     'estimateSecondsToCompletion': 0
                 }
             ))
-        mock_celery_task.state = "PENDING"
+        mock_celery_task.state = "PROGRESS"
 
         response = self.app.get('/api/progress/test')
 
         self.assertEqual(
             {
-                "state": "PENDING",
+                "state": "PROGRESS",
                 "progress": {
                     'progress': 0,
                     'numResultsDiscovered': 0,
@@ -95,20 +95,14 @@ class TestAPI(unittest.TestCase):
             response.json
         )
 
-    @patch("backend.api.spawnRequestThread")
+    @patch("backend.api.spawnRequest")
     def test_getProgress_when_task_null(self, mock_celery_task):
         mock_celery_task.return_value = mock_celery_task
         mock_celery_task.AsyncResult.return_value = mock_celery_task
         mock_celery_task.info = None
-        mock_celery_task.state = "PENDING"
 
         response = self.app.get('/api/progress/test')
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            {
-                "state": "PENDING",
-                'progress': None
-            },
-            response.json)
+        self.assertEqual({"state": "SUCCESS"}, response.json)
 

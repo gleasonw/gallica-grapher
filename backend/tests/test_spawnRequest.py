@@ -32,21 +32,6 @@ class TestSpawnRequest(TestCase):
         mock_request.return_value = mock_request
         mock_request.finished = False
         mock_request.tooManyRecords = False
-        mock_request.getProgressStats.return_value = {
-            "progress": 0,
-            "numResultsDiscovered": 0,
-            "numResultsRetrieved": 0,
-            "randomPaper": None,
-            "estimateSecondsToCompletion": 0
-        }
 
-        returnTest = spawnRequest("test")
-
-        self.assertEqual(returnTest["status"], "PROGRESS")
-        self.assertEqual(returnTest["meta"]["progress"], {
-            "progress": 0,
-            "numResultsDiscovered": 0,
-            "numResultsRetrieved": 0,
-            "randomPaper": None,
-            "estimateSecondsToCompletion": 0
-        })
+        with self.assertRaises(TypeError):
+            spawnRequest("test")
