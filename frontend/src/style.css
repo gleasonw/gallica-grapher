@@ -534,3 +534,13 @@ tr:nth-child(even){
 .groupedLabel *{
     font-size: 16px;
 }
+.tooManyRecordsWarningBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white;
+    margin: 100px;
+}

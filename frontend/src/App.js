@@ -1,8 +1,8 @@
 import React, {useState, useRef} from 'react';
-import ReactMarkdown from 'react-markdown';
 import {v4 as uuidv4} from 'uuid';
 import InputUI from "./components/InputUI";
 import RunningQueriesUI from "./components/RunningQueriesUI";
+import ReactMarkdown from 'react-markdown';
 import ResultUI from "./components/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -18,6 +18,7 @@ function App() {
     const [runningQueries, setRunningQueries] = useState(false);
     const [infoPage, setInfoPage] = useState(false);
     const [tooManyRecordsWarning, setTooManyRecordsWarning] = useState(false);
+    const [numRecords, setNumRecords] = useState(0);
     const formRef = useRef(null);
 
     const header =
@@ -99,12 +100,14 @@ function App() {
         setTickets([]);
         setIDTickets({});
         setRequestID('');
-        setTooManyRecordsWarning(false)
+        setTooManyRecordsWarning(false);
+        setNumRecords(0);
     }
 
-    function handleTooManyRecords(){
+    function handleTooManyRecords(numRecords){
         setRunningQueries(false);
         setTooManyRecordsWarning(true);
+        setNumRecords(numRecords);
     }
 
     function handleInfoClick(){
@@ -146,17 +149,18 @@ function App() {
             </div>
           )
     }else if(tooManyRecordsWarning){
+        const markdown =
+            `## Your curiosity exceeds my capacity. 
+            
+            Your request returned ${numRecords} records. Try restricting your search to a few periodicals, 
+            shortening the year range, or using a more precise ngram. 
+            `
         return (
             <div className="App">
                 {header}
-                <ReactMarkdown>
-                    ## Your curiosity exceeds my capacity.
-
-                    Please try a different search that returns less records. You could restrict the ngram search to a
-                    few papers, limit the year range, or search for a more specific term.
-
-                    Click on the GallicaGrapher logo to return to the home page.
-                </ReactMarkdown>
+                <div className={'tooManyRecordsWarningBox'}>
+                    <ReactMarkdown className={'tooManyRecordsWarning'}>{markdown}</ReactMarkdown>
+                </div>
             </div>
         )
     }else{

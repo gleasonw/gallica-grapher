@@ -40,14 +40,11 @@ function TicketProgressContainer(props){
                     const progress = data["progress"]
                     setProgressStats(progress)
                 }else if (data["state"] === "SUCCESS") {
-                    console.log(data)
-                    if(data["numTooManyRecords"]) {
-                        props.onTooManyRecords(data['numTooManyRecords'])
-                    }else{
-                        props.onFinish()
-                    }
+                    props.onFinish()
+                }else if (data["state"] === "TOO_MANY_RECORDS") {
+                    props.onTooManyRecords(data["numRecords"])
                 }else{
-                    console.log("Error: unknown state")
+                    console.log("Unknown state: " + data["state"])
                 }
             });
         }

@@ -83,9 +83,6 @@ class Request(threading.Thread):
             }
         return progressDict
 
-    def isFinished(self):
-        return self.finished
-
     def setTicketProgressStats(self, ticketKey, progressStats):
         self.ticketProgressStats[ticketKey] = progressStats
 

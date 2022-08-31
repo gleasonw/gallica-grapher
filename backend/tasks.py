@@ -1,6 +1,6 @@
-from celery import Celery, states
+from celery import Celery
 from scripts.request import Request
-from celery.exceptions import Ignore
+import time
 
 app = Celery()
 app.config_from_object('celery_settings')
@@ -11,17 +11,22 @@ def spawnRequestThread(self, tickets):
     gallicaRequest = Request(tickets, spawnRequestThread.request.id)
     gallicaRequest.start()
     while True:
-        if gallicaRequest.tooManyRecords:
-            self.update_state(
-                state=states.FAILURE,
-                meta={'numTooManyRecords': gallicaRequest.estimateNumRecords}
-            )
-            raise Ignore()
-        elif gallicaRequest.isFinished:
+        if gallicaRequest.finished:
             self.update_state(state="SUCCESS")
             return {'status': 'Complete!', 'result': 42}
+        elif gallicaRequest.tooManyRecords:
+            self.update_state(state="TOO_MANY_RECORDS")
+            return {
+                'status': 'Too many records!',
+                'numRecords': gallicaRequest.estimateNumRecords
+            }
         else:
             self.update_state(
                 state="PROGRESS",
                 meta={'progress': gallicaRequest.getProgressStats()})
+            time.sleep(1)
+
+
+class TooManyRecordsFailure(Exception):
+    pass
 

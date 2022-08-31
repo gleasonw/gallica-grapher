@@ -23,8 +23,6 @@ function Chart(props) {
         "&timeBin=" + chartSettings.timeBin +
         "&averageWindow=" + chartSettings.averageWindow;
     const result = useData(query);
-    useScript('https://code.highcharts.com/modules/exporting.js')
-    useScript('https://code.highcharts.com/modules/export-data.js')
     if(result){
         const series = result['series'];
         const graphDataWithSyncedColors = syncColors(
