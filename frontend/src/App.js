@@ -1,4 +1,5 @@
 import React, {useState, useRef} from 'react';
+import ReactMarkdown from 'react-markdown';
 import {v4 as uuidv4} from 'uuid';
 import InputUI from "./components/InputUI";
 import RunningQueriesUI from "./components/RunningQueriesUI";
@@ -148,14 +149,14 @@ function App() {
         return (
             <div className="App">
                 {header}
-                <span className={'tooManyRecordsWarning'}>
-                    Your curiosity exceeds my server's capacity. Please try a different
-                    search that returns less records. You could restrict the ngram search to a
-                    few papers, limit the date range, or search for a more specific term.
-                </span>
-                <span className={'tooManyRecordsWarning'}>
+                <ReactMarkdown>
+                    ## Your curiosity exceeds my capacity.
+
+                    Please try a different search that returns less records. You could restrict the ngram search to a
+                    few papers, limit the year range, or search for a more specific term.
+
                     Click on the GallicaGrapher logo to return to the home page.
-                </span>
+                </ReactMarkdown>
             </div>
         )
     }else{

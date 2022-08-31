@@ -28,16 +28,18 @@ def init():
 @app.route('/api/progress/<taskID>')
 def getProgress(taskID):
     task = spawnRequestThread.AsyncResult(taskID)
-    if task.info:
+    if task.state == 'PROGRESS':
         response = {
             'state': task.state,
             'progress': task.info.get('progress')
         }
-    else:
+    elif task.state == 'SUCCESS':
         response = {
             'state': task.state,
-            'progress': None
+            'numTooManyRecords': task.result.get('numTooManyRecords', 0)
         }
+    else:
+        response = {'state': task.state}
     return response
 
 
