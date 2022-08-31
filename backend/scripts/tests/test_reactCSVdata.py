@@ -23,7 +23,7 @@ class TestReactCSVdata(unittest.TestCase):
             """
             SELECT searchterm, identifier, year, month, day 
             FROM results 
-            WHERE ticketid IN (%s)
+            WHERE ticketid IN %s
             """,
             (['test'],)
         )

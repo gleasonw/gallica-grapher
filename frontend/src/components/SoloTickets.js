@@ -2,6 +2,7 @@ import React from "react";
 import TicketLabel from "./TicketLabel";
 import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import Chart from "./Chart";
+import DownloadCSVButton from "./DownloadCSVButton";
 
 function SoloTickets(props) {
     return (
@@ -34,6 +35,7 @@ function SoloTicketResult(props) {
                 dateRange={props.ticket.dateRange}
                 grouped={false}
             />
+            <DownloadCSVButton tickets={{[props.ticketID]: ''}}/>
         </div>
     )
 }

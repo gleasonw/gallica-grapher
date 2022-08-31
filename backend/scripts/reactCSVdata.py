@@ -9,14 +9,15 @@ class ReactCSVdata:
         self.csvData = None
 
     def getCSVData(self, ticketIDs):
+        tupledTickets = tuple(ticketIDs.split(','))
         with self.conn.cursor() as cur:
             cur.execute("""
             SELECT searchterm, identifier, year, month, day 
             FROM results 
-            WHERE ticketid IN (%s)
-            """, (ticketIDs,))
+            WHERE ticketid IN %s
+            """, (tupledTickets,))
             self.csvData = cur.fetchall()
         rowLabels = ['ngram', 'identifier', 'year', 'month', 'day']
-        csvDatainReactFormat = self.csvData.insert(0, rowLabels)
-        return csvDatainReactFormat
+        self.csvData.insert(0, rowLabels)
+        return self.csvData
 

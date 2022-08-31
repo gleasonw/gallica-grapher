@@ -3,7 +3,7 @@ import {GraphSettingsContext} from "./GraphSettingsContext";
 import TicketLabel from "./TicketLabel";
 import Chart from "./Chart";
 import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
-import Button from "@mui/material/Button";
+import DownloadCSVButton from "./DownloadCSVButton";
 
 export function GroupedTicketResults(props) {
     return (
@@ -22,22 +22,10 @@ export function GroupedTicketResults(props) {
 function GroupedStatBar(props) {
     const settings = useContext(GraphSettingsContext);
 
-    function downloadGroupCSV() {
-        console.log(Object.keys(props.tickets))
-        const ticketIDs = Object.keys(props.tickets);
-        const query = "/api/getcsv?tickets=" + ticketIDs.join(",");
-        window.open(query, "_blank");
-    }
 
     return (
         <div className='groupedStatBar'>
-            <Button
-                variant="contained"
-                className={'downloadGroupCSVbutton'}
-                onClick={() => downloadGroupCSV(props.tickets)}
-            >
-                Download Grouped CSV
-            </Button>
+            <DownloadCSVButton tickets={props.tickets}/>
             {Object.keys(props.tickets).map(key => (
                 <div
                     className='groupedStatBarEntry'
