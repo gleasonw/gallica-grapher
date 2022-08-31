@@ -7,6 +7,7 @@ from scripts.newspaper import Newspaper
 from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from tasks import spawnRequest
 from scripts.topPapersForTicket import TopPapersForTicket
+from scripts.reactCSVdata import ReactCSVdata
 
 
 app = Flask(__name__)
@@ -82,6 +83,14 @@ def getTopPapersFromID():
     )
     items = {"topPapers": topPapers.getTopPapers()}
     return items
+
+
+@app.route('/api/getcsv')
+def getCSV():
+    tickets = request.args["tickets"]
+    csvData = ReactCSVdata().getCSVData(tickets)
+    return {"csvData": csvData}
+
 
 
 if __name__ == "__main__":

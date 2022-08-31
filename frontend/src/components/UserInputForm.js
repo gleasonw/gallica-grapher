@@ -96,7 +96,7 @@ function TermInputBox(props){
         <div className='inputContainer'>
             <SelectionBox
                 items={props.selectedTerms}
-                bubblesLabel={'Terms:'}
+                bubblesLabel={'N-grams:'}
                 onClick={props.deleteTermBubble}
             />
             <input
@@ -179,7 +179,7 @@ class PaperInputBox extends React.Component{
                 <div className='inputContainer'>
                     <SelectionBox
                         items={paperNames}
-                        bubblesLabel={'In Papers:'}
+                        bubblesLabel={'In paper(s):'}
                         onClick={this.props.deletePaperBubble}
                     />
                     <input

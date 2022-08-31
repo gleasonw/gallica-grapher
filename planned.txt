@@ -1,4 +1,5 @@
 * csv, png downloads
+* easier periodical options (continuous publishers -- how many, specific papers, all papers *warning*)
 * aws cloudfront cache GET query strings
 * info page
 * beautify
