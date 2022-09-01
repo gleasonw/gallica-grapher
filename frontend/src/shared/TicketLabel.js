@@ -1,4 +1,5 @@
 import React from 'react';
+import PrettyTextOverflow from "./PrettyTextOverflow";
 
 function TicketLabel(props){
     return(
@@ -31,17 +32,16 @@ function addQuotesAndCommasAroundItems(items){
 function renderRow(item, label){
     if(item){
         return(
-            <div className={'ticketRow'}>
-                <span className={'ticketRowLabel'}>{label}</span>
+            <section className={'ticketItems'}>
+                <h2 className={'ticketRowLabel'}>
+                    {label}
+                </h2>
                 <div className={'bubblesContainer'}>
-                    <div className='bubbleItem'>
-                        <div className={'bubbleText'}>
-                            {item}
-                        </div>
-                    </div>
-
+                    <PrettyTextOverflow>
+                        {item}
+                    </PrettyTextOverflow>
                 </div>
-            </div>
+            </section>
         )
     }
 }

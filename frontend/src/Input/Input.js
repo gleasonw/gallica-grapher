@@ -1,8 +1,10 @@
 import React from "react";
-import UserInputForm from './UserInputForm';
-import TicketLabel from "./TicketLabel";
+import TicketForm from './TicketForm';
+import TicketLabel from "../shared/TicketLabel";
+import DecorativeTicket from "../shared/DecorativeTicket";
+import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 
-class InputUI extends React.Component {
+class Input extends React.Component {
     constructor(props) {
         super(props);
         this.exampleBoxRef = React.createRef();
@@ -108,7 +110,7 @@ class InputUI extends React.Component {
                     <div className="mainTitle">
                         Enter a word or phrase to query Gallica then graph the results.
                     </div>
-                    <UserInputForm
+                    <TicketForm
                         lowYearValue={this.state.currentDateRange[0]}
                         highYearValue={this.state.currentDateRange[1]}
                         onLowDateChange={this.handleLowDateChange}
@@ -133,6 +135,7 @@ class InputUI extends React.Component {
                         onGraphStartClick={this.props.onInputSubmit}
                         onTicketClick={this.props.onTicketClick}
                         tickets={this.props.requestTickets}
+                        exampleBoxRef={this.exampleBoxRef}
                     />
                     <input
                     id='seeExamplesButton'
@@ -143,7 +146,6 @@ class InputUI extends React.Component {
                 </div>
             <ExampleBox
                 exampleBoxRef={this.exampleBoxRef}
-                formRef={this.props.formRef}
                 onExampleRequestClick={this.props.onExampleRequestClick}
             />
             </div>
@@ -155,62 +157,44 @@ class InputUI extends React.Component {
 }
 //TODO: Cache the examples.
 function ExampleBox(props){
-    const exampleRequests = [
-        [
-            {"terms":["chicago"],"papersAndCodes":[{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":["1863","1944"]},
-            {"terms":["new york"],"papersAndCodes":[{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":["1863","1944"]},
-            {"terms":["londres"],"papersAndCodes":[{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":["1863","1944"]}
-        ],
-        [
-            {"terms":["boeuf"],"papersAndCodes":[{"code":"cb344287435","endDate":1925,"startDate":1883,"title":"L'Art culinaire (Société des cuisiniers français)"}],"dateRange":["1883","1925"]}
-        ],
-        [
-            {"terms":["colonies","algerie","congo","conquete"],"papersAndCodes":[{"code":"cb32757974m","endDate":1921,"startDate":1871,"title":"Le XIXe siècle (Paris. 1871)"},{"code":"cb328066631","endDate":1940,"startDate":1865,"title":"La Liberté"},{"code":"cb328123058","endDate":1944,"startDate":1884,"title":"Le Matin (Paris. 1884)"},{"code":"cb34355551z","endDate":1951,"startDate":1854,"title":"Le Figaro (Paris. 1854)"},{"code":"cb32895690j","endDate":1944,"startDate":1863,"title":"Le Petit journal (Paris. 1863)"}],"dateRange":[1499,2020]}
-        ],
-        [
-            {"terms":["guerre","souffrance","sang"],"papersAndCodes":[{"code":"cb32757974m","endDate":1921,"startDate":1871,"title":"Le XIXe siècle (Paris. 1871)"}],"dateRange":["1871","1921"]},
-            {"terms":["paix","accord","amitie"],"papersAndCodes":[{"code":"cb32757974m","endDate":1921,"startDate":1871,"title":"Le XIXe siècle (Paris. 1871)"}],"dateRange":["1871","1921"]}
-        ]
-    ]
+    const exampleJSONdata = require('./exampleRequests.json')
+    const exampleRequests = exampleJSONdata["requests"]
     return(
         <div
             className='exampleBox'
             ref={props.exampleBoxRef}
         >
-            <div className='exampleRequestsContainer'>
-                {exampleRequests.map((request, index) => (
-                    <ExampleRequest
-                        request={request}
-                        onClick={() => props.onExampleRequestClick(request)}
-                        key={index}
-                    />
-                ))}
-            </div>
-
+            {Object.keys(exampleRequests).map(requestName => (
+                <ExampleRequest
+                    title={requestName}
+                    request={exampleRequests[requestName]}
+                    onClick={props.onExampleRequestClick}
+                    key={requestName}
+                />
+            ))}
         </div>
 
     )
 }
 function ExampleRequest(props){
+    const tickets = props.request["tickets"]
     return(
-        <div
-            className='exampleRequest'
-            onClick={() => props.onClick(props.request)}
-        >
-            {props.request.map((ticket, index) => (
-                <div
-                    className='requestBubble'
-                    key={index}
-                >
-                    <TicketLabel
-                        terms={ticket["terms"]}
-                        papers={ticket["papersAndCodes"]}
-                        dateRange={ticket["dateRange"]}
-                    />
-                </div>
-            ))}
-        </div>
+        <ImportantButtonWrap onClick={() => props.onClick(tickets)}>
+            <h1>{props.title}</h1>
+            <div className={'exampleRequest'}>
+                {tickets.map((ticket, index) => (
+                    <DecorativeTicket key={index}>
+                        <TicketLabel
+                            terms={ticket["terms"]}
+                            papers={ticket["papersAndCodes"]}
+                            dateRange={ticket["dateRange"]}
+                        />
+                    </DecorativeTicket>
+                ))}
+
+            </div>
+        </ImportantButtonWrap>
     )
 }
 
-export default InputUI;
+export default Input;

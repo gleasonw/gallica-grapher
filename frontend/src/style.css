@@ -136,13 +136,9 @@ header{
     max-width: 748px;
     margin-bottom: 30px;
 }
-.dateInput{
-    color: green;
-}
 .bubblesContainer{
     align-items: center;
     display: flex;
-    flex-grow: 1;
     flex-wrap: wrap;
     flex-direction: row;
     border-radius: 8px;
@@ -207,7 +203,6 @@ header{
     background-color: white;
 }
 .ticketRowLabel{
-    width: 100%;
     background: linear-gradient(to bottom, #d1e4f6 0%, #c5d8e9 100%);
 }
 #placeHolderTicket{
@@ -255,34 +250,14 @@ input[type='text']{
 .noTicketReminderText{
     color: #d64f00;
 }
-#createTicketButton, #graphButton{
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    background: linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%);
-    text-shadow: 0 1px 0 #fff;
-    transition: all 150ms;
-    color: #4d4d4d;
-    border-radius: 10px;
-    font-size: 30px;
-    padding: 10px;
-    width: 100%;
-    margin: 10px;
-}
-
-.inputContainer{
-    font-size: large;
-    padding: 12px 20px;
-    outline: none;
-    appearance: none;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: 1px solid #d9d9d9;
-    background: rgba(255,255,255,0.5);
-    border-radius: 10px;
-    color: #4d4d4d;
-    transition: all 150ms;
+button, input[type="submit"], input[type="button"] {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
 }
 .requestTicketsContainer{
     display: flex;
@@ -313,7 +288,16 @@ input[type='text']{
     font-size: 20px;
 }
 .exampleBox{
-    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    width: calc(100% - 500px);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 100%;
+    padding: 10px 20px 10px 20px;
+    margin-bottom: 20px;
 }
 
 .exampleBoxTitle{
@@ -322,27 +306,9 @@ input[type='text']{
     margin-bottom: 10px;
 }
 
-.exampleRequestsContainer{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    width: 100%;
-    max-width: 100%;
-    padding: 10px 20px 10px 20px;
-    margin-bottom: 20px;
-}
 
 .exampleRequest{
-    width: calc(50% - 20px);
-    padding: 24px;
-    height: 192px;
-    background: linear-gradient(to bottom, #d1e4f6 0%, #c5d8e9 100%);
-    margin: 10px;
-}
-.exampleRequest:hover{
-    box-shadow: 0 8px 10px 1px rgba(0,0,0,.07),0 3px 14px 3px rgba(0,0,0,.06),0 4px 5px 0 rgba(0,0,0,.1);
-    cursor: pointer;
+    display: flex;
 }
 .exampleTicket{
     background: rgba(255,255,255,0.5);

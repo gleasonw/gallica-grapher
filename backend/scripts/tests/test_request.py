@@ -244,9 +244,9 @@ class TestRequest(TestCase):
                     1920,
                     10,
                     1,
-                    'term',
-                    'd',
-                    '4',
+                    't',
+                    'a',
+                    '1',
                     'testrequest'
                 ]
             )

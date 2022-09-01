@@ -1,7 +1,10 @@
 import React, {useState} from 'react';
-import TicketLabel from "./TicketLabel";
+import TicketLabel from "../shared/TicketLabel";
+import TextInputBubble from "./TextInputBubble";
+import DecorativeTicket from "../shared/DecorativeTicket";
+import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 
-function UserInputForm(props){
+function TicketForm(props){
     const [showTicketReminder, setShowTicketReminder] = useState(false);
     const noTicketReminder =
         <div>
@@ -56,17 +59,19 @@ function UserInputForm(props){
             <div className='graphWarningBoxBoundary'>
                 {showTicketReminder && props.tickets.length === 0 ? noTicketReminder : null}
                 <div className='createTicketAndGraphButtonContainer'>
-                    <input
-                        type='button'
-                        id='createTicketButton'
-                        value='Add series +'
-                        onClick={handleCreateTicketClick}
-                    />
-                    <input
-                        type='submit'
-                        id='graphButton'
-                        value='Fetch and graph 📊'
-                    />
+                    <ImportantButtonWrap>
+                        <input
+                            type='button'
+                            value='Add series +'
+                            onClick={handleCreateTicketClick}
+                        />
+                    </ImportantButtonWrap>
+                    <ImportantButtonWrap>
+                        <input
+                            type='submit'
+                            value='Fetch and graph 📊'
+                        />
+                    </ImportantButtonWrap>
                 </div>
                 <RequestBox
                     tickets={props.tickets}
@@ -93,7 +98,7 @@ function TermInputBox(props){
     }
 
     return(
-        <div className='inputContainer'>
+        <TextInputBubble>
             <SelectionBox
                 items={props.selectedTerms}
                 bubblesLabel={'N-grams:'}
@@ -108,7 +113,7 @@ function TermInputBox(props){
                 onKeyDown={handleKeyDown}
                 autoComplete="off"
             />
-        </div>
+        </TextInputBubble>
     )
 }
 
@@ -176,7 +181,7 @@ class PaperInputBox extends React.Component{
         this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['title']))
         return(
             <div>
-                <div className='inputContainer'>
+                <TextInputBubble>
                     <SelectionBox
                         items={paperNames}
                         bubblesLabel={'In paper(s):'}
@@ -191,7 +196,7 @@ class PaperInputBox extends React.Component{
                         onChange={this.handlePaperChange}
                         autoComplete="off"
                     />
-                </div>
+                </TextInputBubble>
                 <div className='dropdownContainer'>
                     <Dropdown
                         papers={this.state.papersForDropdown['paperNameCodes']}
@@ -280,25 +285,25 @@ function SelectionBox(props){
 function DateInputBox(props){
     return(
         <div className='dateInputs'>
-            <div className='inputContainer'>
-            <input
-                id="lowYear"
-                type='text'
-                value={props.lowYear}
-                onChange={props.onLowDateChange}
-                placeholder={props.minYearPlaceholder}
-            />
-            </div>
+            <TextInputBubble>
+                <input
+                    id="lowYear"
+                    type='text'
+                    value={props.lowYear}
+                    onChange={props.onLowDateChange}
+                    placeholder={props.minYearPlaceholder}
+                />
+            </TextInputBubble>
             to
-            <div className='inputContainer'>
-            <input
-                id="highYear"
-                type='text'
-                value={props.highYear}
-                onChange={props.onHighDateChange}
-                placeholder={props.maxYearPlaceholder}
-            />
-            </div>
+            <TextInputBubble>
+                <input
+                    id="highYear"
+                    type='text'
+                    value={props.highYear}
+                    onChange={props.onHighDateChange}
+                    placeholder={props.maxYearPlaceholder}
+                />
+            </TextInputBubble>
         </div>
     )
 }
@@ -321,11 +326,12 @@ function RequestTicketBox(props){
         return(
             <div className="ticketBubbleContainer">
                 {props.tickets.map((ticket, index) => (
-                    <RequestTicket
-                        ticket={ticket}
-                        onClick={() => props.onTicketClick(index)}
-                        key={index}
-                    />
+                    <DecorativeTicket key={index}>
+                        <RequestTicket
+                            ticket={ticket}
+                            onClick={() => props.onTicketClick(index)}
+                        />
+                    </DecorativeTicket>
                 ))}
             </div>
             )
@@ -344,7 +350,6 @@ function RequestTicket(props){
     return(
         <button
             type="button"
-            className='requestBubble'
             onClick={props.onClick}
         >
             <div className="ticket">
@@ -358,4 +363,4 @@ function RequestTicket(props){
     );
 }
 
-export default UserInputForm;
+export default TicketForm;

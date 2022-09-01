@@ -1,5 +1,4 @@
 import React from "react";
-import Button from "@mui/material/Button";
 import {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import useData from "./hooks/useData";
@@ -31,9 +30,6 @@ export function TicketPaperOccurrenceStats(props) {
                         ))}
                     </tbody>
                 </table>
-                <Button variant='text'>
-                    Download full result CSV
-                </Button>
             </div>
         )
     }else{

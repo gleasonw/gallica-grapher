@@ -1,4 +1,3 @@
-# class to fetch ticketid data from db, ensure it is in react-csv format.
 from scripts.utils.psqlconn import PSQLconn
 
 

@@ -5,7 +5,7 @@ from scripts.reactCSVdata import ReactCSVdata
 
 class TestReactCSVdata(unittest.TestCase):
 
-    @patch("scripts.reactcsvdata.PSQLconn")
+    @patch("scripts.reactCSVdata.PSQLconn")
     def setUp(self, mock_conn):
         mock_conn.return_value = mock_conn
         mock_conn.getConn.return_value = mock_conn
@@ -17,15 +17,16 @@ class TestReactCSVdata(unittest.TestCase):
             fetchall=MagicMock(return_value=[('test', 'test.com', '2021', '01', '15')])
         )
         self.reactCSVdata.conn.cursor.return_value.__enter__.return_value = mock_cursor_context
-        self.reactCSVdata.getCSVData(['test'])
+        self.reactCSVdata.getCSVData('test')
 
         mock_cursor_context.execute.assert_called_once_with(
             """
             SELECT searchterm, identifier, year, month, day 
             FROM results 
             WHERE ticketid IN %s
+            ORDER BY year, month, day
             """,
-            (['test'],)
+            ((('test'),),)
         )
         mock_cursor_context.fetchall.assert_called_once()
         self.assertEqual(

@@ -1,6 +1,7 @@
 import React from "react";
 import useData from "./hooks/useData";
 import {CSVDownload} from "react-csv";
+import LesserButton from "../shared/LesserButton";
 
 
 function DownloadCSVButton(props) {
@@ -16,11 +17,12 @@ function DownloadCSVButton(props) {
 
     return (
         <div>
-            <input
+            <LesserButton
                 type={'button'}
-                value={'Export all records (CSV)'}
                 onClick={handleDownloadCSVclick}
-            />
+            >
+                Export all records (CSV)
+            </LesserButton>
             {downloadCSV && <ExportCSV
                 tickets={props.tickets}
                 onClose={handleDownloadCSVclose}
@@ -37,7 +39,11 @@ function ExportCSV(props) {
     if (response) {
         const csvData = response['csvData'];
         props.onClose();
-        return <CSVDownload data={csvData} target="_blank"/>;
+        return <CSVDownload
+            data={csvData}
+            target="_blank"
+            filename='allRecordsExport.csv'
+        />;
     } else {
         return 'Loading...';
     }

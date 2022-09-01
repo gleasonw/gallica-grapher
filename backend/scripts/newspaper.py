@@ -137,7 +137,7 @@ class Newspaper:
                     AND enddate >= %s
                     AND continuous;
                 """, (startYear, endYear,))
-            papersContinuousOverRange = cursor.fetchall()
+            papersContinuousOverRange = curs.fetchall()
             return paperDataToJSON(papersContinuousOverRange)
 
     def initGallicaSession(self):

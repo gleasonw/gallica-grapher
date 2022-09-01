@@ -1,4 +1,4 @@
-const getWidestDateRangeTest = require('../utils/getDateRangeSpan');
+const getWidestDateRangeTest = require('../Result/chartUtils/getDateRangeSpan');
 
 describe('The date range span function', () => {
     it('returns the lowest and highest dates out of many tickets', () => {

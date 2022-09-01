@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
-import TicketLabel from "./TicketLabel";
+import TicketLabel from "../shared/TicketLabel";
 import Chart from "./Chart";
 import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import DownloadCSVButton from "./DownloadCSVButton";
@@ -12,8 +12,8 @@ export function GroupedTicketResults(props) {
                 tickets={props.tickets}
                 settingsID='group'
             />
-            <GroupedStatBar
-                tickets={props.tickets}/>
+            <GroupedStatBar tickets={props.tickets}/>
+            <DownloadCSVButton tickets={props.tickets}/>
         </div>
 
     )
@@ -25,7 +25,6 @@ function GroupedStatBar(props) {
 
     return (
         <div className='groupedStatBar'>
-            <DownloadCSVButton tickets={props.tickets}/>
             {Object.keys(props.tickets).map(key => (
                 <div
                     className='groupedStatBarEntry'

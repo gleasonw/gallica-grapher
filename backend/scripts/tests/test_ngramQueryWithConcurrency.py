@@ -125,7 +125,7 @@ class TestNgramQueryWithConcurrencyAllPapers(TestCase):
         self.assertEqual(
             query.baseQuery,
             'dc.date >= "1850" and dc.date <= "1900" '
-            'and (gallica all "brazza") '
+            'and (gallica adj "brazza") '
             'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending')
 
@@ -143,7 +143,7 @@ class TestNgramQueryWithConcurrencyAllPapers(TestCase):
 
         self.assertEqual(
             query.baseQuery,
-            '(gallica all "brazza") '
+            '(gallica adj "brazza") '
             'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending')
 
@@ -231,7 +231,7 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
             'arkPress adj "{newsKey}_date" '
             'and dc.date >= "1850" '
             'and dc.date <= "1900" '
-            'and (gallica all "brazza") '
+            'and (gallica adj "brazza") '
             'sortby dc.date/sort.ascending')
 
     @patch('scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.fetchNumberResultsInPaper')
@@ -251,7 +251,7 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
         self.assertEqual(
             query.baseQuery,
             'arkPress adj "{newsKey}_date" '
-            'and (gallica all "brazza") '
+            'and (gallica adj "brazza") '
             'sortby dc.date/sort.ascending')
 
     @patch('scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.fetchNumberResultsInPaper')
@@ -351,7 +351,7 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
 
         mock_record_batch.assert_called_with(
             'arkPress adj "a_date" '
-            'and (gallica all "brazza") '
+            'and (gallica adj "brazza") '
             'sortby dc.date/sort.ascending',
             mockedSession,
             startRecord=1

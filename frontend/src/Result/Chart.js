@@ -7,10 +7,12 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import useData from "./hooks/useData";
 import {MenuItem, Select} from "@mui/material";
-import syncColors from  "../utils/syncColors";
-import generateOptions from "../utils/generateOptions";
-import getDateRangeSpan from "../utils/getDateRangeSpan";
+import syncColors from "./chartUtils/syncColors";
+import generateOptions from "./chartUtils/generateOptions";
+import getDateRangeSpan from "./chartUtils/getDateRangeSpan";
 import {CSVDownload} from "react-csv";
+import LesserButton from "../shared/LesserButton";
+import NavBarWrap from "./NavBarWrap";
 
 require("highcharts/modules/exporting")(Highcharts);
 require("highcharts/modules/export-data")(Highcharts);
@@ -63,7 +65,7 @@ function ChartSettings(props){
     const settingsForID = settings[props.settingsID];
     const dispatch = useContext(GraphSettingsDispatchContext)
     return(
-        <div className={'graphSettingsNavBar'}>
+        <NavBarWrap>
             <FormControl sx={{m: 1,minWidth: 120}}>
                 <InputLabel id='timeBinLabel'>Group By</InputLabel>
                 <Select
@@ -127,8 +129,7 @@ function ChartSettings(props){
             >
                 Exclude papers incomplete over range
             </ToggleButton>
-
-        </div>
+        </NavBarWrap>
 
     )
 }
@@ -149,7 +150,7 @@ function ChartExports(props){
     }
 
     return(
-        <div className={'graphExports'}>
+        <NavBarWrap>
             <SVGexport chartRef={props.chartRef}/>
             <CSVexport
                 chartRef={props.chartRef}
@@ -157,44 +158,39 @@ function ChartExports(props){
                 csvData={csvData}
                 onExportGraphCSVclose={handleExportGraphCSVclose}
             />
-        </div>
+        </NavBarWrap>
     )
 }
 
 function SVGexport(props){
     return(
-        <button
-            className={'graphExportButton'}
+        <LesserButton
             onClick={() => {
                 props.chartRef.current.chart.exportChart({
                     type: 'image/svg+xml',
-                    filename: 'graph',
+                    filename: 'chart',
                 });
             }}
         >
             Export SVG
-        </button>
+        </LesserButton>
     )
 }
 
 function CSVexport(props){
     if(props.csvData){
-        console.log(props.csvData)
         props.onExportGraphCSVclose();
         return(
             <CSVDownload
                 data={props.csvData}
-                filename={'graph.csv'}
+                filename='chartData.csv'
             />
         )
     }else{
         return(
-            <button
-                className={'graphExportButton'}
-                onClick={props.onExportGraphCSVclick}
-            >
+            <LesserButton onClick={props.onExportGraphCSVclick}>
                 Export Chart CSV
-            </button>
+            </LesserButton>
         )
     }
 }

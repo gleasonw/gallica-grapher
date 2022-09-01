@@ -1,4 +1,4 @@
-const generateOptions = require('../utils/generateOptions');
+const generateOptions = require('../Result/chartUtils/generateOptions');
 
 describe('generatedOptions', () => {
     const testSeries = [

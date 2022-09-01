@@ -1,5 +1,5 @@
 import React from "react";
-import TicketLabel from "./TicketLabel";
+import TicketLabel from "../shared/TicketLabel";
 import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import Chart from "./Chart";
 import DownloadCSVButton from "./DownloadCSVButton";

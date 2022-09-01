@@ -37,6 +37,7 @@ class Request(threading.Thread):
             for ticket in requestTickets:
                 ticket.run()
                 self.records.extend(ticket.getRecords())
+                self.setTicketProgressTo100AndMarkAsDone(ticket)
             self.moveRecordsToDB()
             self.finished = True
         else:
@@ -86,11 +87,12 @@ class Request(threading.Thread):
     def setTicketProgressStats(self, ticketKey, progressStats):
         self.ticketProgressStats[ticketKey] = progressStats
 
-    def setTicketProgressTo100AndMarkAsDone(self, ticketKey):
-        self.setTicketProgressStats(ticketKey, {
+    def setTicketProgressTo100AndMarkAsDone(self, ticket):
+        numRetrieved = len(ticket.getRecords())
+        self.setTicketProgressStats(ticket.ticketID, {
             'progress': 100,
-            'numResultsDiscovered': self.numResultsDiscovered,
-            'numResultsRetrieved': self.numResultsRetrieved,
+            'numResultsDiscovered': numRetrieved,
+            'numResultsRetrieved': numRetrieved,
             'randomPaper': None,
             'estimateSecondsToCompletion': 0
         })

@@ -1,4 +1,4 @@
-const syncColorsTest = require('../utils/syncColors');
+const syncColorsTest = require('../Result/chartUtils/syncColors');
 
 describe('The function that syncs user color settings with a highcharts series', () => {
     it('should add the color of a ticket to its series', () => {

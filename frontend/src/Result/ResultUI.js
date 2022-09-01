@@ -6,7 +6,7 @@ import Switch from "@mui/material/Switch";
 import SoloTickets from "./SoloTickets";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 import {settingsReducer} from "./SettingsReducer";
-import initGraphSettings from "../utils/initGraphSettings";
+import initGraphSettings from "./chartUtils/initGraphSettings";
 
 function ResultUI(props){
 

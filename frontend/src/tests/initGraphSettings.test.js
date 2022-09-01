@@ -1,4 +1,4 @@
-const initGraphSettingsTest = require('../utils/initGraphSettings');
+const initGraphSettingsTest = require('../Result/chartUtils/initGraphSettings');
 
 describe('The function that initializes graph settings', () => {
     const testTickets = {

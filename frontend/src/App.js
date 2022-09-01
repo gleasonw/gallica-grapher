@@ -1,9 +1,9 @@
-import React, {useState, useRef} from 'react';
+import React, {useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
-import InputUI from "./components/InputUI";
-import RunningQueriesUI from "./components/RunningQueriesUI";
+import Input from "./Input/Input";
+import RunningQueriesUI from "./Running/RunningQueries";
 import ReactMarkdown from 'react-markdown';
-import ResultUI from "./components/ResultUI";
+import ResultUI from "./Result/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
@@ -19,7 +19,6 @@ function App() {
     const [infoPage, setInfoPage] = useState(false);
     const [tooManyRecordsWarning, setTooManyRecordsWarning] = useState(false);
     const [numRecords, setNumRecords] = useState(0);
-    const formRef = useRef(null);
 
     const header =
         <header className="header">
@@ -61,7 +60,7 @@ function App() {
     }
 
     function handleExampleRequestClick(request){
-        formRef.current.scrollIntoView({behavior: 'smooth'});
+        window.scrollTo(0, 0);
         setTickets(request);
     }
 
@@ -126,13 +125,12 @@ function App() {
         return (
             <div className="App">
                 {header}
-                <InputUI
+                <Input
                     requestTickets={tickets}
                     onInputSubmit={handleInputSubmit}
                     onCreateTicketClick={handleCreateTicketClick}
                     onTicketClick={handleTicketClick}
                     onExampleRequestClick={handleExampleRequestClick}
-                    formRef={formRef}
                 />
             </div>
         )

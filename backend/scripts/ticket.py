@@ -85,7 +85,6 @@ class Ticket:
             numResultsForKeyword = query.getEstimateNumResults()
             self.totalResults += numResultsForKeyword
 
-
     def updateProgressStats(self, randomPaper, requestTime, numWorkers):
         self.numBatchesRetrieved += 1
         if self.averageResponseTime:
