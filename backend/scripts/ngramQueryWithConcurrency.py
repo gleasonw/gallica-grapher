@@ -1,13 +1,9 @@
 from math import ceil
-import io
-from lxml import etree
-
-from .newspaper import Newspaper
 from concurrent.futures import ThreadPoolExecutor
 from .gallicaRecordBatch import GallicaKeywordRecordBatch
 from .gallicaRecordBatch import GallicaRecordBatch
 
-NUM_WORKERS = 50
+NUM_WORKERS = 55
 
 
 class NgramQueryWithConcurrency:
@@ -121,14 +117,14 @@ class NgramQueryWithConcurrencyAllPapers(NgramQueryWithConcurrency):
         self.baseQuery = (
             f'dc.date >= "{lowYear}" '
             f'and dc.date <= "{highYear}" '
-            f'and (gallica all "{self.keyword}") '
+            f'and (gallica adj "{self.keyword}") '
             'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending'
         )
 
     def buildDatelessQuery(self):
         self.baseQuery = (
-            f'(gallica all "{self.keyword}") '
+            f'(gallica adj "{self.keyword}") '
             'and (dc.type adj "fascicule") '
             'sortby dc.date/sort.ascending'
         )
@@ -181,14 +177,14 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
             'arkPress adj "{newsKey}_date" '
             f'and dc.date >= "{lowYear}" '
             f'and dc.date <= "{highYear}" '
-            f'and (gallica all "{self.keyword}") '
+            f'and (gallica adj "{self.keyword}") '
             'sortby dc.date/sort.ascending'
         )
 
     def buildDatelessQuery(self):
         self.baseQuery = (
             'arkPress adj "{newsKey}_date" '
-            f'and (gallica all "{self.keyword}") '
+            f'and (gallica adj "{self.keyword}") '
             'sortby dc.date/sort.ascending'
         )
 

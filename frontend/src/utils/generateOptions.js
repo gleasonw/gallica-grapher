@@ -11,9 +11,6 @@ export default function generateOptions(series, settings) {
                 }
             }
         },
-        chart: {
-            zoomType: 'x',
-        },
         legend: {
             dateTimeLabelFormats: {
                 month: '%b',

@@ -1,6 +1,6 @@
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
-import React, {useContext} from "react";
+import React, {useContext, useRef} from "react";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 import ToggleButton from '@mui/material/ToggleButton';
 import InputLabel from '@mui/material/InputLabel';
@@ -10,12 +10,16 @@ import {MenuItem, Select} from "@mui/material";
 import syncColors from  "../utils/syncColors";
 import generateOptions from "../utils/generateOptions";
 import getDateRangeSpan from "../utils/getDateRangeSpan";
-import useScript from "./hooks/useScript"
+import {CSVDownload} from "react-csv";
+
+require("highcharts/modules/exporting")(Highcharts);
+require("highcharts/modules/export-data")(Highcharts);
 
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
     const dateRange = getDateRangeSpan(props.tickets);
+    const chartRef = useRef(null);
     const query =
         "/api/graphData?keys=" + Object.keys(props.tickets) +
         "&continuous=" + chartSettings.continuous +
@@ -39,6 +43,11 @@ function Chart(props) {
                 <HighchartsReact
                     highcharts={Highcharts}
                     options={highchartsOptions}
+                    ref={chartRef}
+                    constructorType={'chart'}
+                />
+                <ChartExports
+                    chartRef={chartRef}
                 />
             </div>
         );
@@ -122,6 +131,72 @@ function ChartSettings(props){
         </div>
 
     )
+}
+
+function ChartExports(props){
+    const chartRef = props.chartRef;
+    const [csvData, setCSVData] = React.useState(null);
+
+    function handleExportGraphCSVclick(){
+        const chart = chartRef.current.chart;
+        const data = chart.downloadCSV();
+        console.log(data)
+        setCSVData(data);
+    }
+
+    function handleExportGraphCSVclose(){
+        setCSVData(null);
+    }
+
+    return(
+        <div className={'graphExports'}>
+            <SVGexport chartRef={props.chartRef}/>
+            <CSVexport
+                chartRef={props.chartRef}
+                onExportGraphCSVclick={handleExportGraphCSVclick}
+                csvData={csvData}
+                onExportGraphCSVclose={handleExportGraphCSVclose}
+            />
+        </div>
+    )
+}
+
+function SVGexport(props){
+    return(
+        <button
+            className={'graphExportButton'}
+            onClick={() => {
+                props.chartRef.current.chart.exportChart({
+                    type: 'image/svg+xml',
+                    filename: 'graph',
+                });
+            }}
+        >
+            Export SVG
+        </button>
+    )
+}
+
+function CSVexport(props){
+    if(props.csvData){
+        console.log(props.csvData)
+        props.onExportGraphCSVclose();
+        return(
+            <CSVDownload
+                data={props.csvData}
+                filename={'graph.csv'}
+            />
+        )
+    }else{
+        return(
+            <button
+                className={'graphExportButton'}
+                onClick={props.onExportGraphCSVclick}
+            >
+                Export Chart CSV
+            </button>
+        )
+    }
 }
 
 export default Chart;

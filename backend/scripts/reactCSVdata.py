@@ -15,6 +15,7 @@ class ReactCSVdata:
             SELECT searchterm, identifier, year, month, day 
             FROM results 
             WHERE ticketid IN %s
+            ORDER BY year, month, day
             """, (tupledTickets,))
             self.csvData = cur.fetchall()
         rowLabels = ['ngram', 'identifier', 'year', 'month', 'day']

@@ -141,7 +141,6 @@ class Request(threading.Thread):
             , (self.requestID,))
         return curs.fetchall()
 
-    #TODO: talk to gallica about the indexing weirdness. Shouldn't need the select distinct.
     def moveRecordsToFinalTable(self, curs):
         curs.execute(
             """
@@ -152,8 +151,8 @@ class Request(threading.Thread):
             )
 
             INSERT INTO results (identifier, year, month, day, searchterm, paperid, ticketid, requestid)
-                (SELECT DISTINCT 
-                identifier, year, month, day , searchterm, paperid, ticketid, requestid FROM resultsForRequest);
+                (SELECT identifier, year, month, day , searchterm, paperid, ticketid, requestid 
+                FROM resultsForRequest);
             """
             , (self.requestID,))
 

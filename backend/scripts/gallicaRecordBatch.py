@@ -20,13 +20,13 @@ class GallicaRecordBatch:
         self.xmlRoot = None
         self.elapsedTime = None
         self.params = {
-            "version": 1.2,
             "operation": "searchRetrieve",
-            "query": self.query,
-            "exactSearch": "False",
+            "exactSearch": "True",
+            "version": 1.2,
             "startRecord": startRecord,
             "maximumRecords": numRecords,
-            "collapsing": collapsing
+            "collapsing": collapsing,
+            "query": self.query,
         }
         self.fetchXML()
 

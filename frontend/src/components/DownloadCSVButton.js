@@ -10,14 +10,21 @@ function DownloadCSVButton(props) {
         setDownloadCSV(true);
     }
 
+    function handleDownloadCSVclose() {
+        setDownloadCSV(false);
+    }
+
     return (
         <div>
             <input
                 type={'button'}
-                value={'Download CSV'}
+                value={'Export all records (CSV)'}
                 onClick={handleDownloadCSVclick}
             />
-            {downloadCSV && <ExportCSV tickets={props.tickets}/>}
+            {downloadCSV && <ExportCSV
+                tickets={props.tickets}
+                onClose={handleDownloadCSVclose}
+            />}
         </div>
     );
 }
@@ -29,6 +36,7 @@ function ExportCSV(props) {
 
     if (response) {
         const csvData = response['csvData'];
+        props.onClose();
         return <CSVDownload data={csvData} target="_blank"/>;
     } else {
         return 'Loading...';
