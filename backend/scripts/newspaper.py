@@ -100,7 +100,7 @@ class Newspaper:
         return csvFileLikeObject
 
     def getPapersSimilarToKeyword(self, keyword):
-
+        
         def paperDataToJSON(similarPapers):
             papers = []
             for paperData in similarPapers:
@@ -127,6 +127,18 @@ class Newspaper:
             """, {'paperNameSearchString': '%' + keyword + '%'})
             papersSimilarToKeyword = curs.fetchall()
             return paperDataToJSON(papersSimilarToKeyword)
+    
+    def getPapersContinuousOverRange(self, startYear, endYear):
+        with self.dbConnection.cursor() as curs:
+            curs.execute("""
+                SELECT title, code, startdate, enddate
+                    FROM papers
+                    WHERE startdate <= %s
+                    AND enddate >= %s
+                    AND continuous;
+                """, (startYear, endYear,))
+            papersContinuousOverRange = cursor.fetchall()
+            return paperDataToJSON(papersContinuousOverRange)
 
     def initGallicaSession(self):
         self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
