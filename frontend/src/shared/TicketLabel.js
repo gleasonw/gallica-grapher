@@ -33,9 +33,9 @@ function renderRow(item, label){
     if(item){
         return(
             <section className={'ticketItems'}>
-                <h2 className={'ticketRowLabel'}>
+                <h3 className={'ticketRowLabel'}>
                     {label}
-                </h2>
+                </h3>
                 <div className={'bubblesContainer'}>
                     <PrettyTextOverflow>
                         {item}
