@@ -101,6 +101,7 @@ class Newspaper:
 
     def getPapersSimilarToKeyword(self, keyword):
 
+        #TODO: move to utils
         def paperDataToJSON(similarPapers):
             papers = []
             for paperData in similarPapers:
