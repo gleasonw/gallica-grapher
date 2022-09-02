@@ -2,6 +2,7 @@ from math import ceil
 from concurrent.futures import ThreadPoolExecutor
 from .gallicaRecordBatch import GallicaKeywordRecordBatch
 from .gallicaRecordBatch import GallicaRecordBatch
+from scripts.cqlSelectStringForPapers import CQLSelectStringForPapers
 
 NUM_WORKERS = 50
 CHUNK_SIZE = 600

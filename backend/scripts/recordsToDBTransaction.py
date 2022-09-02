@@ -17,7 +17,7 @@ class RecordsToDBTransaction:
             raise ValueError('Invalid target table')
 
     def insertPapers(self, records):
-        csvStream = generateResultCSVstream(
+        csvStream = generateRecordCSVstream(
             records,
             getPaperRecordRowIterable
         )
@@ -28,7 +28,7 @@ class RecordsToDBTransaction:
         )
 
     def insertNgramOccurrenceRecords(self, records):
-        csvStream = generateResultCSVstream(
+        csvStream = generateRecordCSVstream(
             records,
             getKeywordRecordRowIterable
         )
@@ -103,7 +103,7 @@ def getKeywordRecordRowIterable(keywordRecord, requestid):
     )
 
 
-def generateResultCSVstream(records, getRowIterable):
+def generateRecordCSVstream(records, getRowIterable):
 
     def cleanCSVrow(value):
         if value is None:
