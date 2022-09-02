@@ -17,28 +17,28 @@ class RecordsToDBTransaction:
             raise ValueError('Invalid target table')
 
     def insertPapers(self, records):
-        csvStream = generateRecordCSVstream(
+        csvStream = generateResultCSVstream(
             records,
             getPaperRecordRowIterable
         )
-        self.conn.copy_from(
-            csvStream,
-            'papers',
-            sep='|'
-        )
+        self.copyCSVstreamToTable(csvStream, 'papers')
 
     def insertNgramOccurrenceRecords(self, records):
-        csvStream = generateRecordCSVstream(
+        csvStream = generateResultCSVstream(
             records,
             getKeywordRecordRowIterable
         )
-        self.conn.copy_from(
-            csvStream,
-            'holdingresults',
-            sep='|',
-            null=r'\N')
+        self.copyCSVstreamToTable(csvStream, 'holdingResults')
         self.addMissingPapers()
         self.moveRecordsToFinalTable()
+
+    def copyCSVstreamToTable(self, csvStream, targetTable):
+        self.conn.copy_from(
+            csvStream,
+            targetTable,
+            sep='|',
+            null=r'\N'
+        )
 
     def addMissingPapers(self):
         paperGetter = PaperRecordFetch()
@@ -103,7 +103,7 @@ def getKeywordRecordRowIterable(keywordRecord, requestid):
     )
 
 
-def generateRecordCSVstream(records, getRowIterable):
+def generateResultCSVstream(records, getRowIterable):
 
     def cleanCSVrow(value):
         if value is None:

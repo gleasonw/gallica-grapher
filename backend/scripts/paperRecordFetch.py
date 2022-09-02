@@ -4,6 +4,7 @@ from requests_toolbelt import sessions
 from scripts.utils.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 
 from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
+from scripts.cqlSelectStringForPapers import CQLSelectStringForPapers
 
 
 class PaperRecordFetch:
@@ -25,8 +26,7 @@ class PaperRecordFetch:
         return paperRecords
 
     def fetchTheseMax20PaperRecords(self, paperCodes):
-        formattedPaperCodes = [f"{paperCode[0]}_date" for paperCode in paperCodes]
-        self.query = 'arkPress all "' + '" or arkPress all "'.join(formattedPaperCodes) + '"'
+        self.query = CQLSelectStringForPapers(paperCodes).cqlSelectStrings
         batch = GallicaPaperRecordBatch(
             self.query,
             self.session,

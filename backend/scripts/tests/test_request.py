@@ -9,34 +9,6 @@ from DBtester import DBtester
 
 class TestRequest(TestCase):
 
-    def setUp(self):
-        self.dbTester = DBtester()
-        self.dbTester.deleteTestResultsFromHolding()
-        self.dbTester.deleteTestResultsFromFinal()
-        self.dbTester.deleteTestPapers()
-
-    def tearDown(self):
-        self.dbTester.deleteTestResultsFromHolding()
-        self.dbTester.deleteTestResultsFromFinal()
-        self.dbTester.deleteTestPapers()
-        self.dbTester.conn.close()
-
-    def getRequestWith5MockRecords(self):
-        payload = Request({}, 'testrequest')
-        ngrams = ['t', 'te', 'ter', 'term', 'term!']
-        codes = ['a', 'b', 'c', 'd', 'e']
-        ticketIDs = ['1', '2', '3', '4', '5']
-        for i in range(5):
-            mockRecord = MagicMock()
-            mockRecord.getDate = MagicMock(return_value=[1920, 10, 1])
-            mockRecord.getUrl = MagicMock(return_value='1234.com')
-            mockRecord.getKeyword = MagicMock(return_value=ngrams[i])
-            mockRecord.getPaperCode = MagicMock(return_value=codes[i])
-            mockRecord.getTicketID = MagicMock(return_value=ticketIDs[i])
-            payload.records.append(mockRecord)
-
-        return payload
-
     def test_init(self):
         testThread = Request({}, '1')
         self.assertIsInstance(testThread, Request)

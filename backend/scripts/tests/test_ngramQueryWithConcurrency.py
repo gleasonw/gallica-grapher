@@ -44,7 +44,7 @@ class TestNgramQueryWithConcurrency(TestCase):
         )
         noRangeQuery.buildDatelessQuery = MagicMock()
 
-        noRangeQuery.buildQuery()
+        noRangeQuery.buildBaseQuery()
 
         self.assertTrue(noRangeQuery.buildDatelessQuery.called)
 
@@ -59,7 +59,7 @@ class TestNgramQueryWithConcurrency(TestCase):
         )
         rangeQuery.buildYearRangeQuery = MagicMock()
 
-        rangeQuery.buildQuery()
+        rangeQuery.buildBaseQuery()
 
         self.assertTrue(rangeQuery.buildYearRangeQuery.called)
 

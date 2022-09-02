@@ -38,16 +38,24 @@ class DBtester:
     def copyDummyDataIntoResultsTable(self):
         with open(os.path.join(os.path.dirname(__file__), 'resources/dummyResults')) as f:
             with self.conn.cursor() as curs:
-                curs.copy_from(f, 'results', sep=',', columns=(
-                    'identifier',
-                    'year',
-                    'month',
-                    'day',
-                    'searchterm',
-                    'paperid',
-                    'ticketid',
-                    'requestid'
-                ))
+                self.copyDummyData('results', f)
+
+    def copyDummyDataIntoHoldingResultsTable(self):
+        with open(os.path.join(os.path.dirname(__file__), 'resources/dummyResults')) as f:
+            self.copyDummyData('holdingresults', f)
+
+    def copyDummyData(self, table, file):
+        with self.conn.cursor() as curs:
+            curs.copy_from(file, table, sep=',', columns=(
+                'identifier',
+                'year',
+                'month',
+                'day',
+                'searchterm',
+                'paperid',
+                'ticketid',
+                'requestid'
+            ))
 
     def deleteTestResultsFromFinal(self):
         with self.conn.cursor() as curs:
