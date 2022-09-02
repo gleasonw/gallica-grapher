@@ -268,7 +268,7 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
             MagicMock(),
             MagicMock())
 
-        query.setNumResultsForEachPaper()
+        query.sumResultsForEachPaperQuery()
 
         self.assertDictEqual(query.paperCodeWithNumResults, {'b': 1})
 
@@ -286,7 +286,7 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
             MagicMock(),
             MagicMock())
 
-        resultTest = query.fetchNumberResultsInPaper({'code': 'a'})
+        resultTest = query.fetchNumResultsForQuery({'code': 'a'})
 
         self.assertEqual(
             resultTest,
@@ -304,7 +304,7 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
             MagicMock(),
             MagicMock())
         query.paperCodeWithNumResults = {'a': 1, 'b': 2}
-        query.sumUpPaperResultsForTotalEstimate()
+        query.sumUpQueryResultsForTotalEstimate()
 
         self.assertEqual(
             query.estimateNumResults,

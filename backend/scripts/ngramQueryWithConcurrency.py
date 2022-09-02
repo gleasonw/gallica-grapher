@@ -4,6 +4,7 @@ from .gallicaRecordBatch import GallicaKeywordRecordBatch
 from .gallicaRecordBatch import GallicaRecordBatch
 
 NUM_WORKERS = 50
+CHUNK_SIZE = 600
 
 
 class NgramQueryWithConcurrency:
@@ -68,12 +69,12 @@ class NgramQueryWithConcurrency:
             self.buildYearRangeQuery()
         else:
             self.buildDatelessQuery()
-    #TODO: implement this
+
     def runSearch(self):
         indecesToFetch = self.generateWorkChunks()
-        indecesInChunks = self.splitWorkChunks(indecesToFetch)
+        chunkedIndeces = self.splitWorkChunks(indecesToFetch)
         with self.gallicaHttpSession:
-            for chunk in indecesInChunks
+            for chunk in indecesInChunks:
                 recordsForChunk = self.doThreadedSearch(chunk)
                 dbTranscation = DBTransaction()
                 dbTransaction.insert(
@@ -81,6 +82,15 @@ class NgramQueryWithConcurrency:
                     'results', 
                     self.requestid
                 )
+
+    def splitWorkChunks(self, indecesToFetch):
+        numChunks = ceil(len(indecesToFetch) / CHUNK_SIZE)
+        chunks = []
+        for i in range(numChunks):
+            chunks.append(
+                indecesToFetch[i * CHUNK_SIZE:(i + 1) * CHUNK_SIZE]
+            )
+        return chunks
                 
 
     def doThreadedSearch(self):
@@ -155,21 +165,23 @@ class NgramQueryWithConcurrencyAllPapers(NgramQueryWithConcurrency):
 
     def generateWorkChunks(self):
         iterations = ceil(self.estimateNumResults / 50)
-        self.workChunks = [(i * 50) + 1 for i in range(iterations)]
+        workChunks = [(i * 50) + 1 for i in range(iterations)]
+        return workChunks
 
-#TODO: rework to chunk papers into one query, instead of discovering num results in each paper first then fetching.
+
 class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
     def __init__(self,
                  searchTerm,
-                 papers,
+                 paperCodes,
                  yearRange,
                  ticketID,
                  progressTracker,
                  dbConnection,
                  session):
 
-        self.papers = papers
-        self.paperCodeWithNumResults = {}
+        self.paperCodes = paperCodes
+        self.numResultsInQuery = {}
+        self.baseQueries = []
         self.batchQueryStrings = []
 
         super().__init__(searchTerm,
@@ -183,7 +195,7 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
         lowYear = str(self.lowYear)
         highYear = str(self.highYear)
         self.baseQuery = (
-            'arkPress adj "{newsKey}_date" '
+            '({formattedCodeString}) '
             f'and dc.date >= "{lowYear}" '
             f'and dc.date <= "{highYear}" '
             f'and (gallica adj "{self.keyword}") '
@@ -192,14 +204,14 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
 
     def buildDatelessQuery(self):
         self.baseQuery = (
-            'arkPress adj "{newsKey}_date" '
+            '({formattedCodeString}) '
             f'and (gallica adj "{self.keyword}") '
             'sortby dc.date/sort.ascending'
         )
 
     def fetchNumTotalResults(self):
-        self.setNumResultsForEachPaper()
-        self.sumUpPaperResultsForTotalEstimate()
+        self.setNumResultsForQueries()
+        self.sumUpQueryResultsForTotalEstimate()
 
     def doSearchChunk(self, recordStartAndCode):
         recordStart = recordStartAndCode[0]
@@ -219,32 +231,43 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
         return False
 
     def generateWorkChunks(self):
-        for paperCode, count in self.paperCodeWithNumResults.items():
-            numBatches = ceil(count / 50)
-            self.appendBatchQueryStringsForPaper(numBatches, paperCode)
+        paperCQLStrings = self.generatePaperCQLWithMax20CodesEach()
+        completeCQLStrings = [self.baseQuery.format(formattedCodeString=codeString) for codeString in paperCQLStrings]
+        workChunks = self.generateIndicesForCQLQueries(completeCQLStrings)
+        indexQueryPairs = []
+        for chunk in workChunks:
+            indexQueryPairs.extend(chunk)
+        return indexQueryPairs
 
-    def appendBatchQueryStringsForPaper(self, numBatches, code):
-        for i in range(numBatches):
-            recordAndCode = [1 + 50 * i, code]
-            self.workChunks.append(recordAndCode)
+    def generatePaperCQLWithMax20CodesEach(self):
+        for i in range(0, len(self.paperCodes), 20):
+            codes = self.paperCodes[i:i + 20]
+            formattedCodes = [f"{code[0]}_date" for code in codes]
+            urlPaperString = 'arkPress all "' + '" or arkPress all "'.join(formattedCodes) + '"'
+            yield urlPaperString
 
-    def setNumResultsForEachPaper(self):
+    def generateIndicesForCQLQueries(self, query):
+        indexCodePairs = []
+        for i in range(1, self.numResultsInQuery[query], 50):
+            recordAndCode = (i, query)
+            indexCodePairs.append(recordAndCode)
+        yield indexCodePairs
+
+    def setNumResultsForQueries(self):
         with ThreadPoolExecutor(max_workers=10) as executor:
-            for paperCode, numResults in executor.map(
-                    self.fetchNumberResultsInPaper,
-                    self.papers):
-                self.paperCodeWithNumResults[paperCode] = numResults
+            for numResults, query in executor.map(
+                    self.fetchNumResultsForQuery,
+                    self.baseQueries):
+                self.numResultsInQuery[query] = numResults
 
-    def fetchNumberResultsInPaper(self, paper):
-        paperCode = paper["code"]
-        numResultQuery = self.baseQuery.format(newsKey=paperCode)
+    def fetchNumResultsForQuery(self, query):
         batch = GallicaRecordBatch(
-            numResultQuery,
+            query,
             self.gallicaHttpSession,
             numRecords=1)
         numResults = batch.getNumResults()
-        return paperCode, numResults
+        return numResults, query
 
-    def sumUpPaperResultsForTotalEstimate(self):
-        for paperCode, count in self.paperCodeWithNumResults.items():
+    def sumUpQueryResultsForTotalEstimate(self):
+        for query, count in self.numResultsInQuery.items():
             self.estimateNumResults += count

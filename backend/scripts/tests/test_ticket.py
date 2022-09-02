@@ -133,7 +133,7 @@ class TestTicket(TestCase):
 
         self.assertIsInstance(testQuery, scripts.ticket.NgramQueryWithConcurrencySelectPapers)
         self.assertEqual(testQuery.keyword, 'test')
-        self.assertDictEqual(testQuery.papers, {"paper": "", "code": 'test'})
+        self.assertDictEqual(testQuery.paperCodes, {"paper": "", "code": 'test'})
         self.assertFalse(testQuery.isYearRange)
         self.assertEqual(testQuery.ticketID, '')
 

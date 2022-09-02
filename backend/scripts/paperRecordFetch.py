@@ -6,9 +6,8 @@ from scripts.utils.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
 
 
-class PaperUpdate:
+class PaperRecordFetch:
 
-    # TODO: split into multiple classes
     def __init__(self, gallicaSession=None):
         self.query = ''
         if not gallicaSession:
@@ -16,15 +15,14 @@ class PaperUpdate:
         else:
             self.session = gallicaSession
 
-    def sendTheseGallicaPapersToDB(self, paperCodes):
+    #TODO: use this logic for select paper search
+    def fetchRecordDataForCodes(self, paperCodes):
+        paperRecords = []
         with self.session:
-            self.fetchPapersDataInBatches(paperCodes)
-        self.copyPapersToDB()
-
-    def fetchPapersDataInBatches(self, paperCodes):
-        for i in range(0, len(paperCodes), 20):
-            batchOf20 = self.fetchTheseMax20PaperRecords(paperCodes[i:i + 20])
-            self.paperRecords.extend(batchOf20)
+            for i in range(0, len(paperCodes), 20):
+                batchOf20 = self.fetchTheseMax20PaperRecords(paperCodes[i:i + 20])
+                paperRecords.extend(batchOf20)
+        return paperRecords
 
     def fetchTheseMax20PaperRecords(self, paperCodes):
         formattedPaperCodes = [f"{paperCode[0]}_date" for paperCode in paperCodes]
@@ -35,20 +33,21 @@ class PaperUpdate:
             numRecords=20)
         return batch.getRecords()
 
-    def sendAllGallicaPapersToDB(self):
+    def fetchAllPaperRecordsOnGallica(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
-        self.fetchAllPapersFromGallica()
-        self.copyPapersToDB()
-        self.dbConnection.close()
+        allRecords = self.fetchAllPapersFromGallica()
+        return allRecords
 
     def fetchAllPapersFromGallica(self):
+        records = []
         with self.session:
             numPapers = self.getNumPapersOnGallica()
             with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
                 for batch in executor.map(
                         self.fetchBatchPapersAtIndex,
                         range(1, numPapers, 50)):
-                    self.paperRecords.extend(batch)
+                    records.extend(batch)
+        return records
 
     def fetchBatchPapersAtIndex(self, index):
         batch = GallicaPaperRecordBatch(

@@ -40,12 +40,12 @@ class TestNewspaper(TestCase):
         tupledPaperCodes = [(code,) for code in paperCodes]
         newspaper = Newspaper()
         newspaper.copyPapersToDB = MagicMock()
-        newspaper.fetchPapersDataInBatches = MagicMock()
+        newspaper.fetchRecordDataForCodes = MagicMock()
 
         newspaper.sendTheseGallicaPapersToDB(tupledPaperCodes)
 
         newspaper.copyPapersToDB.assert_called_once()
-        newspaper.fetchPapersDataInBatches.assert_called_with(tupledPaperCodes)
+        newspaper.fetchRecordDataForCodes.assert_called_with(tupledPaperCodes)
 
     @patch('scripts.newspaper.PSQLconn')
     @patch('scripts.newspaper.Newspaper.fetchAllPapersFromGallica')
@@ -56,7 +56,7 @@ class TestNewspaper(TestCase):
         mock_db.close = MagicMock()
         newspaper = Newspaper(MagicMock())
 
-        newspaper.sendAllGallicaPapersToDB()
+        newspaper.fetchAllPaperRecordsOnGallica()
 
         self.assertEqual(
             'dc.type all "fascicule" and ocrquality > "050.00"',
@@ -95,7 +95,7 @@ class TestNewspaper(TestCase):
             side_effect=boomerangBatchForTesting
         )
 
-        newspaper.fetchPapersDataInBatches(paperCodes20)
+        newspaper.fetchRecordDataForCodes(paperCodes20)
 
         self.assertEqual(
             len(newspaper.paperRecords),
@@ -105,7 +105,7 @@ class TestNewspaper(TestCase):
         oneMissingPaper = Newspaper(MagicMock())
         oneMissingPaper.fetchTheseMax20PaperRecords = MagicMock(
             side_effect=boomerangBatchForTesting)
-        oneMissingPaper.fetchPapersDataInBatches(["12345"])
+        oneMissingPaper.fetchRecordDataForCodes(["12345"])
 
         self.assertEqual(
             len(oneMissingPaper.paperRecords),

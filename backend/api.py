@@ -3,8 +3,7 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS
 
-from paperLocalSearch import getPapersSimilarToKeyword
-from scripts.newspaper import Newspaper
+from scripts.paperLocalSearch import PaperLocalSearch
 from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from tasks import spawnRequest
 from scripts.topPapersForTicket import TopPapersForTicket
@@ -54,11 +53,31 @@ def paperChart():
     return paperChartJSON
 
 
-@app.route('/api/papers/<query>')
-def papers(query):
-    newspapers = Newspaper()
-    availablePapers = getPapersSimilarToKeyword(newspapers.dbConnection, query)
-    return availablePapers
+@app.route('/api/papers/<keyword>')
+def papers(keyword):
+    search = PaperLocalSearch()
+    similarPapers = search.selectPapersSimilarToKeyword(keyword)
+    return similarPapers
+
+
+@app.route('/api/numPapersOverRange/<startYear>/<endYear>')
+def numPapersOverRange(startYear, endYear):
+    search = PaperLocalSearch()
+    numPapers = search.getNumPapersInRange(
+        startYear,
+        endYear
+    )
+    return {'numPapersOverRange': numPapers}
+
+
+@app.route('/api/continuousPapers/<startYear>/<endYear>')
+def continuousPapers(startYear, endYear):
+    search = PaperLocalSearch()
+    selectPapers = search.selectPapersContinuousOverRange(
+        startYear,
+        endYear
+    )
+    return selectPapers
 
 
 @app.route('/api/graphData')

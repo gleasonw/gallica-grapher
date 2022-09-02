@@ -7,7 +7,7 @@ class PaperLocalSearch:
         self.dbConnection = PSQLconn().getConn()
         self.cursor = self.dbConnection.cursor()
 
-    def getPapersContinuousOverRange(self, startYear, endYear):
+    def selectPapersContinuousOverRange(self, startYear, endYear):
         with self.dbConnection.cursor() as curs:
             curs.execute("""
                 SELECT title, code, startdate, enddate
@@ -19,7 +19,7 @@ class PaperLocalSearch:
             papersContinuousOverRange = curs.fetchall()
             return paperDataToJSON(papersContinuousOverRange)
 
-    def getPapersSimilarToKeyword(self, keyword):
+    def selectPapersSimilarToKeyword(self, keyword):
         with self.dbConnection.cursor() as curs:
             keyword = keyword.lower()
             curs.execute("""
