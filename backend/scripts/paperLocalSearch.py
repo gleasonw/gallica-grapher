@@ -31,6 +31,16 @@ class PaperLocalSearch:
             papersSimilarToKeyword = curs.fetchall()
             return paperDataToJSON(papersSimilarToKeyword)
 
+    def getNumPapersInRange(self, startYear, endYear):
+        with self.dbConnection.cursor() as curs:
+            curs.execute("""
+                SELECT COUNT(*) FROM papers
+                    WHERE startdate BETWEEN %s AND %s
+                    OR enddate BETWEEN %s AND %s;
+                """, (startYear, endYear, startYear, endYear))
+            numPapersOverRange = curs.fetchone()
+            return numPapersOverRange[0]
+
 
 def paperDataToJSON(similarPapers):
     papers = []
