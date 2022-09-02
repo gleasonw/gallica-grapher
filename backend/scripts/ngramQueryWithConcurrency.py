@@ -68,11 +68,20 @@ class NgramQueryWithConcurrency:
             self.buildYearRangeQuery()
         else:
             self.buildDatelessQuery()
-
+    #TODO: implement this
     def runSearch(self):
-        self.generateWorkChunks()
+        indecesToFetch = self.generateWorkChunks()
+        indecesInChunks = self.splitWorkChunks(indecesToFetch)
         with self.gallicaHttpSession:
-            self.doThreadedSearch()
+            for chunk in indecesInChunks
+                recordsForChunk = self.doThreadedSearch(chunk)
+                dbTranscation = DBTransaction()
+                dbTransaction.insert(
+                    recordsForChunk, 
+                    'results', 
+                    self.requestid
+                )
+                
 
     def doThreadedSearch(self):
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
