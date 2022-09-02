@@ -3,6 +3,7 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS
 
+from paperLocalSearch import getPapersSimilarToKeyword
 from scripts.newspaper import Newspaper
 from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from tasks import spawnRequest
@@ -56,7 +57,7 @@ def paperChart():
 @app.route('/api/papers/<query>')
 def papers(query):
     newspapers = Newspaper()
-    availablePapers = newspapers.getPapersSimilarToKeyword(query)
+    availablePapers = getPapersSimilarToKeyword(newspapers.dbConnection, query)
     return availablePapers
 
 
