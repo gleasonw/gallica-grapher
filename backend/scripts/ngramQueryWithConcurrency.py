@@ -148,7 +148,7 @@ class NgramQueryWithConcurrencyAllPapers(NgramQueryWithConcurrency):
         iterations = ceil(self.estimateNumResults / 50)
         self.workChunks = [(i * 50) + 1 for i in range(iterations)]
 
-
+#TODO: rework to chunk papers into one query, instead of discovering num results in each paper first then fetching.
 class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
     def __init__(self,
                  searchTerm,
