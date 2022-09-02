@@ -1,25 +1,11 @@
 from utils.psqlconn import PSQLconn
 
+
 class PaperLocalSearch:
 
-    def __init__(self, paper):
+    def __init__(self):
         self.dbConnection = PSQLconn().getConn()
-
-    def paperDataToJSON(self, similarPapers):
-        papers = []
-        for paperData in similarPapers:
-            title = paperData[0]
-            code = paperData[1]
-            startDate = paperData[2]
-            endDate = paperData[3]
-            paper = {
-                'title': title,
-                'code': code,
-                'startDate': startDate,
-                'endDate': endDate
-            }
-            papers.append(paper)
-        return {'paperNameCodes': papers}
+        self.cursor = self.dbConnection.cursor()
 
     def getPapersContinuousOverRange(self, startYear, endYear):
         with self.dbConnection.cursor() as curs:
@@ -44,3 +30,30 @@ class PaperLocalSearch:
             """, {'paperNameSearchString': '%' + keyword + '%'})
             papersSimilarToKeyword = curs.fetchall()
             return paperDataToJSON(papersSimilarToKeyword)
+
+    def getNumPapersInRange(self, startYear, endYear):
+        with self.dbConnection.cursor() as curs:
+            curs.execute("""
+                SELECT COUNT(*) FROM papers
+                    WHERE startdate BETWEEN %s AND %s
+                    OR enddate BETWEEN %s AND %s;
+                """, (startYear, endYear, startYear, endYear))
+            numPapersOverRange = curs.fetchone()
+            return numPapersOverRange[0]
+
+
+def paperDataToJSON(similarPapers):
+    papers = []
+    for paperData in similarPapers:
+        title = paperData[0]
+        code = paperData[1]
+        startDate = paperData[2]
+        endDate = paperData[3]
+        paper = {
+            'title': title,
+            'code': code,
+            'startDate': startDate,
+            'endDate': endDate
+        }
+        papers.append(paper)
+    return {'paperNameCodes': papers}
