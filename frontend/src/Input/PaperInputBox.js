@@ -1,9 +1,8 @@
 import React from "react";
 import TextInputBubble from "./TextInputBubble";
-import {SelectionBox} from "./SelectionBox";
-import {Dropdown} from "./Dropdown";
-import PaperOptionWrap from "./PaperOptionWrap";
-import useData from "../shared/hooks/useData";
+import {ContinuousTrendInput} from "./ContinuousTrendInput";
+import {PaperArrayInput} from "./PaperArrayInput";
+import {FullSearchInput} from "./FullSearchInput";
 
 export class PaperInputBox extends React.Component {
     constructor(props) {
@@ -76,7 +75,7 @@ export class PaperInputBox extends React.Component {
             selectedInput: newSelectedInput
         })
     }
-
+    //TODO: reduce duplication in paperinput options
     render() {
         const paperNames = [];
         this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['title']))
@@ -85,12 +84,14 @@ export class PaperInputBox extends React.Component {
                 padding={"0"}
             >
                 <ContinuousTrendInput
-                    lowYear={this.props.lowYear}
-                    highYear={this.props.highYear}
+                    yearRange={this.props.dateRanges[0]}
                     selected={this.state.selectedInput[0]}
                     onPaperSelectClick={this.handlePaperSelectClick}
+                    onLowDateChange={this.props.onLowDateChange}
+                    onHighDateChange={this.props.onHighDateChange}
                 />
                 <PaperArrayInput
+                    yearRange={this.props.dateRanges[1]}
                     paperNames={paperNames}
                     deletePaperBubble={this.props.deletePaperBubble}
                     paperInputValue={this.state.paperInputValue}
@@ -102,97 +103,18 @@ export class PaperInputBox extends React.Component {
                     onDropdownClick={this.handleDropdownClick}
                     selected={this.state.selectedInput[1]}
                     onPaperSelectClick={this.handlePaperSelectClick}
+                    onLowDateChange={this.props.onLowDateChange}
+                    onHighDateChange={this.props.onHighDateChange}
                 />
                 <FullSearchInput
-                    lowYear={this.props.lowYear}
-                    highYear={this.props.highYear}
+                    yearRange={this.props.dateRanges[2]}
                     selected={this.state.selectedInput[2]}
                     onPaperSelectClick={this.handlePaperSelectClick}
+                    onLowDateChange={this.props.onLowDateChange}
+                    onHighDateChange={this.props.onHighDateChange}
                 />
             </TextInputBubble>
         )
     }
 }
 
-function ContinuousTrendInput(props) {
-    const [limit, setLimit] = React.useState(5000);
-    const urlForContinuousPapers =
-        "/api/continuousPapers" +
-        "?limit=" + limit +
-        "&startYear=" + props.lowYear +
-        "&endYear=" + props.highYear;
-    const result = useData(urlForContinuousPapers);
-    let continuousPapers;
-    if (result) {
-        continuousPapers = result['paperNameCodes'];
-    }else{
-        continuousPapers = [];
-    }
-    console.log(continuousPapers)
-    return (
-        <PaperOptionWrap
-            selected={props.selected}
-            onClick={() => props.onPaperSelectClick(0)}
-        >
-            <h5>
-                In {continuousPapers.length ? continuousPapers.length : 0} periodicals publishing
-                every year between {props.lowYear} and {props.highYear}.
-            </h5>
-        </PaperOptionWrap>
-    )
-}
-
-function PaperArrayInput(props) {
-    return (
-        <PaperOptionWrap
-            selected={props.selected}
-            onClick={() => props.onPaperSelectClick(1)}
-        >
-            <SelectionBox
-                items={props.paperNames}
-                bubblesLabel={'In these periodicals:'}
-                onClick={props.deletePaperBubble}
-            />
-            <input
-                type="text"
-                value={props.paperInputValue}
-                name="papers"
-                placeholder="Enter a paper to restrict search..."
-                onKeyUp={props.onKeyUp}
-                onChange={props.onPaperChange}
-                autoComplete="off"
-            />
-            <div className='dropdownContainer'>
-                <Dropdown
-                    papers={props.papersForDropdown['paperNameCodes']}
-                    error={props.dropdownError}
-                    onClick={props.onDropdownClick}
-                />
-            </div>
-        </PaperOptionWrap>
-
-    )
-}
-
-function FullSearchInput(props) {
-    const urlForPapersInRange = "/api/numPapersOverRange/" + props.lowYear + "/" + props.highYear;
-    const result = useData(urlForPapersInRange);
-    let numPapersOverRange;
-    if (result) {
-        numPapersOverRange = result['numPapersOverRange'];
-    }else{
-        numPapersOverRange = "...";
-    }
-    return (
-        <PaperOptionWrap
-            selected={props.selected}
-            borderBottom={'none'}
-            onClick={() => props.onPaperSelectClick(2)}
-        >
-            <h5>
-                In {numPapersOverRange} periodicals publishing
-                at any point between {props.lowYear} and {props.highYear}.
-            </h5>
-        </PaperOptionWrap>
-    )
-}

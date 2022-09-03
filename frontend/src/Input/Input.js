@@ -11,8 +11,12 @@ class Input extends React.Component {
         this.state = {
             terms: [],
             papers: [],
-            dateBoundaryPlaceholder: [1499, 2020],
-            currentDateRange: ['', ''],
+            paperArrayDateBoundary: [1499, 2020],
+            dateRanges: [
+                ['',''],
+                ['',''],
+                ['',''],
+            ],
             showNoTicketReminder: false
         };
         this.handleLowDateChange = this.handleLowDateChange.bind(this);
@@ -41,21 +45,25 @@ class Input extends React.Component {
         this.makePaperBubble(paper)
     }
 
-    handleLowDateChange(event){
+    handleLowDateChange(event, optionIndex){
         const inputLowDate = event.target.value;
         if(this.isNumeric(inputLowDate) || inputLowDate === '') {
-            const range = this.state.currentDateRange.slice()
-            range[0] = event.target.value
-            this.setState({currentDateRange: range})
+            const updatedRanges = this.state.dateRanges.slice()
+            const thisRange = updatedRanges[optionIndex].slice()
+            thisRange[0] = event.target.value
+            updatedRanges[optionIndex] = thisRange
+            this.setState({dateRanges: updatedRanges})
         }
     }
 
-    handleHighDateChange(event){
+    handleHighDateChange(event, optionIndex){
         const inputHighDate = event.target.value;
         if(this.isNumeric(inputHighDate) || inputHighDate === '') {
-            const range = this.state.currentDateRange.slice()
-            range[1] = event.target.value
-            this.setState({currentDateRange: range})
+            const updatedRanges = this.state.dateRanges.slice()
+            const thisRange = updatedRanges[optionIndex].slice()
+            thisRange[1] = event.target.value
+            updatedRanges[optionIndex] = thisRange
+            this.setState({dateRanges: updatedRanges})
         }
     }
 
@@ -92,14 +100,13 @@ class Input extends React.Component {
             minYear = Math.min(...paperLowYears)
             maxYear = Math.max(...paperHighYears)
         }
-        console.log(minYear, maxYear)
-        this.setState({dateBoundaryPlaceholder: [minYear, maxYear]})
+        this.setState({paperArrayDateBoundary: [minYear, maxYear]})
     }
 
     trimDateRangeToPaperBoundary(){
-        const range = this.state.currentDateRange.slice()
-        const minYear = this.state.dateBoundaryPlaceholder[0]
-        const maxYear = this.state.dateBoundaryPlaceholder[1]
+        const range = this.state.dateRanges.slice()
+        const minYear = this.state.paperArrayDateBoundary[0]
+        const maxYear = this.state.paperArrayDateBoundary[1]
         if(range[0] < minYear || range[0] === ''){
             range[0] = minYear
         }
@@ -122,8 +129,7 @@ class Input extends React.Component {
                         Enter a word or phrase to query Gallica then graph the results.
                     </div>
                     <TicketForm
-                        lowYearValue={this.state.currentDateRange[0]}
-                        highYearValue={this.state.currentDateRange[1]}
+                        dateRanges={this.state.dateRanges}
                         onLowDateChange={this.handleLowDateChange}
                         onHighDateChange={this.handleHighDateChange}
                         onPaperChange={this.handlePaperChange}
@@ -141,8 +147,8 @@ class Input extends React.Component {
                         selectedPapers={this.state.papers}
                         deleteTermBubble={this.deleteTermBubble}
                         deletePaperBubble={this.deletePaperBubble}
-                        minYearPlaceholder={this.state.dateBoundaryPlaceholder[0]}
-                        maxYearPlaceholder={this.state.dateBoundaryPlaceholder[1]}
+                        minYearPlaceholder={this.state.paperArrayDateBoundary[0]}
+                        maxYearPlaceholder={this.state.paperArrayDateBoundary[1]}
                         onGraphStartClick={this.props.onInputSubmit}
                         onTicketClick={this.props.onTicketClick}
                         tickets={this.props.requestTickets}

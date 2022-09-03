@@ -2,6 +2,8 @@ import styled from 'styled-components';
 
 const TextInputBubble = styled.div`
     font-size: large;
+    max-width: ${props => props.maxWidth || "100%"};
+    height: ${props => props.height || "auto"};
     padding: ${props => props.padding || "12px 20px"};
     outline: none;
     appearance: none;

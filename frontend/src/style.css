@@ -132,9 +132,8 @@ header{
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    max-width: 748px;
-    margin-bottom: 30px;
+    gap: 10px;
+    margin-left: 10px;
 }
 .bubblesContainer{
     align-items: center;
@@ -213,6 +212,12 @@ header{
     border: 1px dashed #404040;
     margin: 10px;
 }
+.paperOptionHeader{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px 0 10px 0;
+}
 
 .selectionBubble{
     padding: 3px 5px 3px 10px;
@@ -233,7 +238,7 @@ input[type='text']{
     border: 0;
     font-size: 16px;
     width: 100%;
-    background: inherit;
+    background-color: inherit;
     outline: none;
     color: inherit;
 }

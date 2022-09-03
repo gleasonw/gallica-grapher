@@ -14,6 +14,9 @@ const ImportantButtonWrap = styled.div`
     max-width: 400px;
     margin: 10px;
     border: 1px solid #c6c6c6;
+    @media screen and (max-width: 748px){
+        font-size: 15px;
+        }
     `;
 
 export default ImportantButtonWrap;

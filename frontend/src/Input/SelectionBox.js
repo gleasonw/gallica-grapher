@@ -3,7 +3,7 @@ import React from "react";
 export function SelectionBox(props) {
     return (
         <div className='bubblesContainer'>
-            <h5 className='bubblesLabel'>
+            <h5>
                 {props.bubblesLabel}
             </h5>
             {props.items.map((item, index) => (

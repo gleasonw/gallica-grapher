@@ -47,17 +47,9 @@ function TicketForm(props){
                 onChange={props.onPaperChange}
                 selectedPapers={props.selectedPapers}
                 deletePaperBubble={props.deletePaperBubble}
-                lowYear={props.lowYearValue ? props.lowYearValue : props.minYearPlaceholder}
-                highYear={props.highYearValue ? props.highYearValue : props.maxYearPlaceholder}
-            />
-            <br />
-            <DateInputBox
+                dateRanges={props.dateRanges}
                 onLowDateChange={props.onLowDateChange}
                 onHighDateChange={props.onHighDateChange}
-                minYearPlaceholder={props.minYearPlaceholder}
-                maxYearPlaceholder={props.maxYearPlaceholder}
-                lowYear={props.lowYearValue}
-                highYear={props.highYearValue}
             />
             <div className='graphWarningBoxBoundary'>
                 {showTicketReminder && props.tickets.length === 0 ? noTicketReminder : null}
@@ -65,7 +57,7 @@ function TicketForm(props){
                     <ImportantButtonWrap>
                         <input
                             type='button'
-                            value='Add series +'
+                            value='Add search ticket +'
                             onClick={handleCreateTicketClick}
                         />
                     </ImportantButtonWrap>

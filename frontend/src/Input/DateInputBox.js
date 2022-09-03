@@ -1,28 +1,31 @@
-import TextInputBubble from "./TextInputBubble";
+import DateInputBubble from './DateInputBubble';
 import React from "react";
 
 export function DateInputBox(props) {
     return (
         <div className='dateInputs'>
-            <TextInputBubble>
+            <DateInputBubble selected={props.selected}>
                 <input
                     id="lowYear"
                     type='text'
+                    name='lowYear'
                     value={props.lowYear}
                     onChange={props.onLowDateChange}
                     placeholder={props.minYearPlaceholder}
                 />
-            </TextInputBubble>
-            to
-            <TextInputBubble>
+            </DateInputBubble>
+            and
+            <DateInputBubble selected={props.selected}>
                 <input
                     id="highYear"
                     type='text'
+                    name='highYear'
                     value={props.highYear}
                     onChange={props.onHighDateChange}
                     placeholder={props.maxYearPlaceholder}
                 />
-            </TextInputBubble>
+            </DateInputBubble>
+            .
         </div>
     )
 }
