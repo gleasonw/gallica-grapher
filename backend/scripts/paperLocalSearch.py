@@ -1,4 +1,4 @@
-from utils.psqlconn import PSQLconn
+from scripts.utils.psqlconn import PSQLconn
 
 
 class PaperLocalSearch:
@@ -7,15 +7,22 @@ class PaperLocalSearch:
         self.dbConnection = PSQLconn().getConn()
         self.cursor = self.dbConnection.cursor()
 
-    def selectPapersContinuousOverRange(self, startYear, endYear):
+    def selectPapersContinuousOverRange(self, startYear, endYear, limit):
+        query = """
+        SELECT title, code, startdate, enddate
+                FROM papers
+                WHERE startdate <= %s
+                AND enddate >= %s
+                AND continuous
+        """
+        if limit:
+            limit = int(limit)
+            query += " LIMIT %s"
+            args = (startYear, endYear, limit,)
+        else:
+            args = (startYear, endYear,)
         with self.dbConnection.cursor() as curs:
-            curs.execute("""
-                SELECT title, code, startdate, enddate
-                    FROM papers
-                    WHERE startdate <= %s
-                    AND enddate >= %s
-                    AND continuous;
-                """, (startYear, endYear,))
+            curs.execute(query, args)
             papersContinuousOverRange = curs.fetchall()
             return paperDataToJSON(papersContinuousOverRange)
 

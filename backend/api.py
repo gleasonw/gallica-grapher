@@ -70,12 +70,16 @@ def numPapersOverRange(startYear, endYear):
     return {'numPapersOverRange': numPapers}
 
 
-@app.route('/api/continuousPapers/<startYear>/<endYear>')
-def getContinuousPapersOverRange(startYear, endYear):
+@app.route('/api/continuousPapers')
+def getContinuousPapersOverRange():
+    limit = request.args.get('limit')
+    startYear = request.args.get('startYear')
+    endYear = request.args.get('endYear')
     search = PaperLocalSearch()
     selectPapers = search.selectPapersContinuousOverRange(
         startYear,
-        endYear
+        endYear,
+        limit
     )
     return {'continuousPapers': selectPapers}
 

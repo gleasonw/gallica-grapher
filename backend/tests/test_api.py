@@ -48,9 +48,9 @@ class TestAPI(unittest.TestCase):
         mock_search.selectPapersContinuousOverRange = MagicMock(return_value=1)
         mock_search.return_value = mock_search
 
-        testContinuousPapersOverRange = self.app.get('/api/continuousPapers/0/100')
+        testContinuousPapersOverRange = self.app.get('/api/continuousPapers?limit=1&startYear=0&endYear=100')
 
-        mock_search.selectPapersContinuousOverRange.assert_called_once_with('0', '100')
+        mock_search.selectPapersContinuousOverRange.assert_called_once_with('0', '100', '1')
         assert testContinuousPapersOverRange.status_code == 200
         self.assertEqual(testContinuousPapersOverRange.json['continuousPapers'], 1)
 
