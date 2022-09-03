@@ -195,7 +195,7 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
                  session):
 
         self.paperCodes = paperCodes
-        self.numResultsInQuery = {}
+        self.numResultsInQueries = {}
         self.baseQueries = []
         self.batchQueryStrings = []
 
@@ -244,7 +244,8 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
             for numResults, query in executor.map(
                     self.fetchNumResultsForQuery,
                     self.baseQueries):
-                self.numResultsInQuery[query] = numResults
+                firstCode = query[14:25]
+                self.numResultsInQueries[firstCode] = numResults
 
     def fetchNumResultsForQuery(self, query):
         batch = GallicaRecordBatch(
@@ -255,7 +256,7 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
         return numResults, query
 
     def sumUpQueryResultsForTotalEstimate(self):
-        for query, count in self.numResultsInQuery.items():
+        for query, count in self.numResultsInQueries.items():
             self.estimateNumResults += count
 
     def generateWorkChunks(self):
@@ -271,7 +272,7 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
 
     def getIndicesForCQLQuery(self, query):
         indexCodePairs = []
-        for i in range(1, self.numResultsInQuery[query], 50):
+        for i in range(1, self.numResultsInQueries[query], 50):
             recordAndCode = [i, query]
             indexCodePairs.append(recordAndCode)
         return indexCodePairs
@@ -279,16 +280,9 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
     def doSearchChunk(self, recordStartAndCode):
         recordStart = recordStartAndCode[0]
         code = recordStartAndCode[1]
-        query = self.baseQuery.format(newsKey=code)
+        query = self.baseQuery.format(formattedCodeString=code)
         batch = GallicaKeywordRecordBatch(
             query,
             self.gallicaHttpSession,
             startRecord=recordStart)
         return batch
-
-    def recordsNotUnique(self, records):
-        for record in records:
-            for priorRecords in self.keywordRecords:
-                if record.getUrl() == priorRecords.getUrl():
-                    return True
-        return False

@@ -16,7 +16,6 @@ class PaperRecordFetch:
         else:
             self.session = gallicaSession
 
-    #TODO: use this logic for select paper search
     def fetchRecordDataForCodes(self, paperCodes):
         paperRecords = []
         with self.session:
@@ -26,7 +25,7 @@ class PaperRecordFetch:
         return paperRecords
 
     def fetchTheseMax20PaperRecords(self, paperCodes):
-        self.query = CQLSelectStringForPapers(paperCodes).cqlSelectStrings
+        self.query = CQLSelectStringForPapers(paperCodes).cqlSelectStrings[0]
         batch = GallicaPaperRecordBatch(
             self.query,
             self.session,
@@ -35,10 +34,10 @@ class PaperRecordFetch:
 
     def fetchAllPaperRecordsOnGallica(self):
         self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
-        allRecords = self.fetchAllPapersFromGallica()
+        allRecords = self.runThreadedPaperFetch()
         return allRecords
 
-    def fetchAllPapersFromGallica(self):
+    def runThreadedPaperFetch(self):
         records = []
         with self.session:
             numPapers = self.getNumPapersOnGallica()

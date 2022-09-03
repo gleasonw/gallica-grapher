@@ -6,10 +6,12 @@ class CQLSelectStringForPapers:
         self.cqlSelectStrings = self.generatePaperCQLWithMax20CodesEach()
 
     def generatePaperCQLWithMax20CodesEach(self):
+        cql20CodeStrings = []
         for i in range(0, len(self.codes), 20):
             codes = self.codes[i:i + 20]
-            formattedCodes = [f"{code[0]}_date" for code in codes]
+            formattedCodes = [f"{code}_date" for code in codes]
             CQLpaperSelectString = 'arkPress all "' + '" or arkPress all "'.join(
                 formattedCodes) + '"'
-            return CQLpaperSelectString
+            cql20CodeStrings.append(CQLpaperSelectString)
+        return cql20CodeStrings
 

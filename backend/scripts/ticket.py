@@ -15,7 +15,10 @@ class Ticket:
                  session):
 
         self.terms = ticket["terms"]
-        self.papersAndCodes = ticket["papersAndCodes"]
+        self.papersAndCodes = list(map(
+            lambda x: (x["code"]),
+            ticket["papersAndCodes"]
+        ))
         self.dateRange = ticket["dateRange"]
         self.ticketID = ticketID
         self.requestID = requestID
