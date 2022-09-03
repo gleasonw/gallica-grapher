@@ -1,5 +1,5 @@
 import React from "react";
-import useData from "./hooks/useData";
+import useData from "../shared/hooks/useData";
 import {CSVDownload} from "react-csv";
 import LesserButton from "../shared/LesserButton";
 

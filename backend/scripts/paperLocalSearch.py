@@ -43,8 +43,16 @@ class PaperLocalSearch:
             curs.execute("""
                 SELECT COUNT(*) FROM papers
                     WHERE startdate BETWEEN %s AND %s
-                    OR enddate BETWEEN %s AND %s;
-                """, (startYear, endYear, startYear, endYear))
+                        OR enddate BETWEEN %s AND %s
+                        OR (startdate < %s AND enddate > %s)
+                    ;
+                """, (
+                startYear,
+                endYear,
+                startYear,
+                endYear,
+                startYear,
+                endYear))
             numPapersOverRange = curs.fetchone()
             return numPapersOverRange[0]
 

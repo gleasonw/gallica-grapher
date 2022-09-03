@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const TextInputBubble = styled.div`
     font-size: large;
-    padding: 12px 20px;
+    padding: ${props => props.padding || "12px 20px"};
     outline: none;
     appearance: none;
     justify-content: center;
@@ -13,6 +13,7 @@ const TextInputBubble = styled.div`
     border-radius: 10px;
     color: #4d4d4d;
     transition: all 150ms;
+    overflow: hidden;
     `;
 
 export default TextInputBubble;

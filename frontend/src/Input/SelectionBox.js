@@ -3,9 +3,9 @@ import React from "react";
 export function SelectionBox(props) {
     return (
         <div className='bubblesContainer'>
-            <span className='bubblesLabel'>
+            <h5 className='bubblesLabel'>
                 {props.bubblesLabel}
-            </span>
+            </h5>
             {props.items.map((item, index) => (
                 <SelectionBubble
                     onClick={() => props.onClick(index)}

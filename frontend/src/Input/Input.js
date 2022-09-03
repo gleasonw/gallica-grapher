@@ -42,15 +42,21 @@ class Input extends React.Component {
     }
 
     handleLowDateChange(event){
-        const range = this.state.currentDateRange.slice()
-        range[0] = event.target.value
-        this.setState({currentDateRange: range})
+        const inputLowDate = event.target.value;
+        if(this.isNumeric(inputLowDate) || inputLowDate === '') {
+            const range = this.state.currentDateRange.slice()
+            range[0] = event.target.value
+            this.setState({currentDateRange: range})
+        }
     }
 
     handleHighDateChange(event){
-        const range = this.state.currentDateRange.slice()
-        range[1] = event.target.value
-        this.setState({currentDateRange: range})
+        const inputHighDate = event.target.value;
+        if(this.isNumeric(inputHighDate) || inputHighDate === '') {
+            const range = this.state.currentDateRange.slice()
+            range[1] = event.target.value
+            this.setState({currentDateRange: range})
+        }
     }
 
     handleKeyDown(event){
@@ -101,6 +107,11 @@ class Input extends React.Component {
             range[1] = maxYear
         }
         return range
+    }
+
+    isNumeric(str){
+        if (typeof str != "string") return false
+        return !isNaN(str) && !isNaN(parseFloat(str))
     }
 
     render() {

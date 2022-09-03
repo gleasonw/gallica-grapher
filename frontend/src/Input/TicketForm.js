@@ -47,6 +47,8 @@ function TicketForm(props){
                 onChange={props.onPaperChange}
                 selectedPapers={props.selectedPapers}
                 deletePaperBubble={props.deletePaperBubble}
+                lowYear={props.lowYearValue ? props.lowYearValue : props.minYearPlaceholder}
+                highYear={props.highYearValue ? props.highYearValue : props.maxYearPlaceholder}
             />
             <br />
             <DateInputBox

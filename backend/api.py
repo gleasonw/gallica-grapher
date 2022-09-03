@@ -81,7 +81,7 @@ def getContinuousPapersOverRange():
         endYear,
         limit
     )
-    return {'continuousPapers': selectPapers}
+    return selectPapers
 
 
 @app.route('/api/graphData')

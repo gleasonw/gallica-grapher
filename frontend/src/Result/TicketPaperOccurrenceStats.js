@@ -1,7 +1,7 @@
 import React from "react";
 import {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
-import useData from "./hooks/useData";
+import useData from "../shared/hooks/useData";
 
 export function TicketPaperOccurrenceStats(props) {
     const settings = useContext(GraphSettingsContext);

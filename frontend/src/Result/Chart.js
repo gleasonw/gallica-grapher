@@ -5,7 +5,7 @@ import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSetting
 import ToggleButton from '@mui/material/ToggleButton';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import useData from "./hooks/useData";
+import useData from "../shared/hooks/useData";
 import {MenuItem, Select} from "@mui/material";
 import syncColors from "./chartUtils/syncColors";
 import generateOptions from "./chartUtils/generateOptions";
