@@ -71,13 +71,13 @@ def numPapersOverRange(startYear, endYear):
 
 
 @app.route('/api/continuousPapers/<startYear>/<endYear>')
-def continuousPapers(startYear, endYear):
+def getContinuousPapersOverRange(startYear, endYear):
     search = PaperLocalSearch()
     selectPapers = search.selectPapersContinuousOverRange(
         startYear,
         endYear
     )
-    return selectPapers
+    return {'continuousPapers': selectPapers}
 
 
 @app.route('/api/graphData')
@@ -110,7 +110,6 @@ def getCSV():
     tickets = request.args["tickets"]
     csvData = ReactCSVdata().getCSVData(tickets)
     return {"csvData": csvData}
-
 
 
 if __name__ == "__main__":

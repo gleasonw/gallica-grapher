@@ -32,11 +32,34 @@ class TestAPI(unittest.TestCase):
         assert testPapersSimilarToKeyword.status_code == 200
         self.assertIsNotNone(testPapersSimilarToKeyword)
 
+    @patch('backend.api.PaperLocalSearch')
+    def test_get_num_papers_over_range(self, mock_search):
+        mock_search.getNumPapersInRange = MagicMock(return_value=1)
+        mock_search.return_value = mock_search
+
+        testNumPapersOverRange = self.app.get('/api/numPapersOverRange/0/100')
+
+        mock_search.getNumPapersInRange.assert_called_once_with('0', '100')
+        assert testNumPapersOverRange.status_code == 200
+        self.assertEqual(testNumPapersOverRange.json['numPapersOverRange'], 1)
+
+    @patch('backend.api.PaperLocalSearch')
+    def test_get_continuous_papers_over_range(self, mock_search):
+        mock_search.selectPapersContinuousOverRange = MagicMock(return_value=1)
+        mock_search.return_value = mock_search
+
+        testContinuousPapersOverRange = self.app.get('/api/continuousPapers/0/100')
+
+        mock_search.selectPapersContinuousOverRange.assert_called_once_with('0', '100')
+        assert testContinuousPapersOverRange.status_code == 200
+        self.assertEqual(testContinuousPapersOverRange.json['continuousPapers'], 1)
+
     @patch("backend.api.TicketGraphSeriesBatch")
     def test_getGraphData(self, mock_series):
         mockedSeries = mock_series.return_value
         mockedSeries.getSeriesBatch.return_value = []
         query = '/api/graphData?keys=test&averageWindow=test&timeBin=test&continuous=test&dateRange=test'
+
         response = self.app.get(query)
 
         self.assertEqual(response.status_code, 200)
@@ -47,10 +70,22 @@ class TestAPI(unittest.TestCase):
         mockedTopPapers = mock_topPapers.return_value
         mockedTopPapers.getTopPapers.return_value = []
         query = '/api/topPapers?id=test&continuous=test&dateRange=test'
+
         testTopPapersFromID = self.app.get(query)
 
         assert testTopPapersFromID.status_code == 200
         self.assertEqual(testTopPapersFromID.data, b'{"topPapers":[]}\n')
+
+    @patch("backend.api.ReactCSVdata")
+    def test_get_csv(self, mock_csv):
+        mock_csv.getCSVData.return_value = []
+        mock_csv.return_value = mock_csv
+        query = '/api/getcsv?tickets=""'
+
+        response = self.app.get(query)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b'{"csvData":[]}\n')
 
     @patch("backend.api.spawnRequest")
     def test_getProgress_when_task_in_progress(self, mock_celery_task):
