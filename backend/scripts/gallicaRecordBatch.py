@@ -66,6 +66,8 @@ class GallicaKeywordRecordBatch(GallicaRecordBatch):
 
     def __init__(self,
                  query,
+                 ticketid,
+                 keyword,
                  session,
                  startRecord=1,
                  numRecords=50):
@@ -75,10 +77,16 @@ class GallicaKeywordRecordBatch(GallicaRecordBatch):
             startRecord=startRecord,
             numRecords=numRecords
         )
+        self.ticketid = ticketid
+        self.keyword = keyword
 
     def parseRecordsFromXML(self):
         for result in self.xmlRoot.iter("{http://www.loc.gov/zing/srw/}record"):
-            record = KeywordRecord(result)
+            record = KeywordRecord(
+                result,
+                self.ticketid,
+                self.keyword
+            )
             if record.isValid():
                 self.batch.append(record)
             else:

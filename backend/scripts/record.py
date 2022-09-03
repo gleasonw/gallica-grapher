@@ -32,18 +32,6 @@ class Record:
     def getPaperTitle(self):
         return self.paperTitle
 
-    def setKeyword(self, keyword):
-        self.keyword = keyword
-
-    def setTicketID(self, ticketID):
-        self.ticketID = ticketID
-
-    def getKeyword(self):
-        return self.keyword
-
-    def getTicketID(self):
-        return self.ticketID
-
     def parsePaperCodeFromXML(self):
         paperCodeElement = self.recordData.find(
             '{http://purl.org/dc/elements/1.1/}relation')
@@ -69,13 +57,21 @@ class Record:
 
 class KeywordRecord(Record):
 
-    def __init__(self, root):
+    def __init__(self, root, ticketid, keyword):
         super().__init__(root)
         self.parseDateFromXML()
         self.checkIfValid()
+        self.ticketID = ticketid
+        self.keyword = keyword
 
     def getDate(self):
         return self.date.getDate()
+
+    def getKeyword(self):
+        return self.keyword
+
+    def getTicketID(self):
+        return self.ticketID
 
     def parseDateFromXML(self):
         dateElement = self.recordData.find(

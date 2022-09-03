@@ -23,8 +23,7 @@ export function TicketProgressBox(props) {
                     now={props.progressStats.progress}
                 />
                 <div className='progressStatsText'>
-                    {props.progressStats.numResultsRetrieved} of {props.progressStats.numResultsDiscovered} results
-                    retrieved
+                    {props.progressStats.numResultsRetrieved.toLocaleString()} of {props.progressStats.numResultsDiscovered.toLocaleString()} results fetched from Paris
                 </div>
                 <div className='progressStatsText'>
                     {props.progressStats.randomPaper}

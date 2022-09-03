@@ -27,14 +27,11 @@ class Ticket:
         self.session = session
         self.termQueries = []
         self.topPapers = []
-        self.totalResults = 0
+        self.estimateTotalResults = 0
+        self.actualTotalResults = 0
         self.numBatchesRetrieved = 0
         self.numBatches = 0
         self.averageResponseTime = None
-        self.records = []
-
-    def getRecords(self):
-        return self.records
 
     def getEstimateNumberRecords(self):
         if self.papersAndCodes:
@@ -42,22 +39,13 @@ class Ticket:
         else:
             self.initQueryObjects(self.genAllPaperQuery)
         self.sumResultsOfEachQuery()
-        return self.totalResults
+        return self.estimateTotalResults
 
     def run(self):
-        self.numBatches = ceil(self.totalResults / 50)
+        self.numBatches = ceil(self.estimateTotalResults / 50)
         for query in self.termQueries:
             query.runSearch()
-            completedRecords = self.addKeywordAndTicketIDToRecords(
-                query.getRecords(),
-                query.getKeyword())
-            self.records.extend(completedRecords)
-
-    def addKeywordAndTicketIDToRecords(self, records, keyword):
-        for record in records:
-            record.setKeyword(keyword)
-            record.setTicketID(self.ticketID)
-        return records
+            self.actualTotalResults += query.getActualNumResults()
 
     def initQueryObjects(self, generator):
         for keyword in self.terms:
@@ -90,7 +78,7 @@ class Ticket:
     def sumResultsOfEachQuery(self):
         for query in self.termQueries:
             numResultsForKeyword = query.getEstimateNumResults()
-            self.totalResults += numResultsForKeyword
+            self.estimateTotalResults += numResultsForKeyword
 
     def updateProgressStats(self, randomPaper, requestTime, numWorkers):
         self.numBatchesRetrieved += 1
@@ -100,7 +88,7 @@ class Ticket:
             self.averageResponseTime = requestTime
         ticketProgressStats = {
             'progress': self.getPercentProgress(),
-            'numResultsDiscovered': self.totalResults,
+            'numResultsDiscovered': self.estimateTotalResults,
             'numResultsRetrieved': self.numBatchesRetrieved*50,
             'randomPaper': randomPaper,
             'estimateSecondsToCompletion': self.getEstimateSecondsToCompletion(numWorkers)

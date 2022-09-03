@@ -1,14 +1,14 @@
-
+NUM_CODES_PER_CQL = 2
 
 class CQLSelectStringForPapers:
     def __init__(self, codes):
         self.codes = codes
-        self.cqlSelectStrings = self.generatePaperCQLWithMax20CodesEach()
+        self.cqlSelectStrings = self.generatePaperCQLWithMaxNUM_CODESCodesEach()
 
-    def generatePaperCQLWithMax20CodesEach(self):
+    def generatePaperCQLWithMaxNUM_CODESCodesEach(self):
         cql20CodeStrings = []
-        for i in range(0, len(self.codes), 20):
-            codes = self.codes[i:i + 20]
+        for i in range(0, len(self.codes), NUM_CODES_PER_CQL):
+            codes = self.codes[i:i + NUM_CODES_PER_CQL]
             formattedCodes = [f"{code}_date" for code in codes]
             CQLpaperSelectString = 'arkPress all "' + '" or arkPress all "'.join(
                 formattedCodes) + '"'

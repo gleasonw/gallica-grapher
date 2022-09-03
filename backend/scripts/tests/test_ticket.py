@@ -20,7 +20,7 @@ class TestTicket(TestCase):
             MagicMock(),
             MagicMock()
         )
-        self.testTicketInstance.totalResults = 512
+        self.testTicketInstance.estimateTotalResults = 512
 
     @patch('scripts.ticket.Ticket.initQueryObjects')
     @patch('scripts.ticket.Ticket.sumResultsOfEachQuery')
@@ -42,36 +42,6 @@ class TestTicket(TestCase):
         self.assertEqual(result, 512)
         mock_sum_results.assert_called_once()
         mock_init.assert_called_with(self.testTicketInstance.genSelectPaperQuery)
-
-    @patch("scripts.ticket.Ticket.addKeywordAndTicketIDToRecords")
-    def test_run(self, mock_add):
-        self.testTicketInstance.termQueries = [
-            MagicMock(runSearch=MagicMock()),
-            MagicMock(runSearch=MagicMock()),
-            MagicMock(runSearch=MagicMock())
-        ]
-        mock_add.return_value = [1, 2, 3]
-
-        self.testTicketInstance.run()
-
-        self.assertEqual(self.testTicketInstance.numBatches, 11)
-        for query in self.testTicketInstance.termQueries:
-            query.runSearch.assert_called_once()
-        mock_add.assert_called()
-        self.assertListEqual(self.testTicketInstance.records, [1, 2, 3, 1, 2, 3, 1, 2, 3])
-
-    def test_add_keyword_and_ticket_id_to_records(self):
-        self.testTicketInstance.ticketID = 'self.testTicketInstanceID'
-        mockRecord = MagicMock(
-            setKeyword=MagicMock(),
-            setTicketID=MagicMock())
-        testRecords = [mockRecord, mockRecord, mockRecord]
-
-        modifiedRecords = self.testTicketInstance.addKeywordAndTicketIDToRecords(testRecords, 'test')
-
-        mockRecord.setKeyword.assert_called_with('test')
-        mockRecord.setTicketID.assert_called_with('self.testTicketInstanceID')
-        self.assertEqual(len(modifiedRecords), 3)
 
     def test_init_query_objects(self):
         self.testTicketInstance.terms = [MagicMock, MagicMock, MagicMock]
@@ -99,7 +69,7 @@ class TestTicket(TestCase):
         self.assertEqual(testQuery.ticketID, '')
 
     def test_sum_results_of_each_ticket(self):
-        self.testTicketInstance.totalResults = 0
+        self.testTicketInstance.estimateTotalResults = 0
         self.testTicketInstance.termQueries = [
             MagicMock(getEstimateNumResults=
                       MagicMock(return_value=10)),
@@ -110,10 +80,10 @@ class TestTicket(TestCase):
         ]
         self.testTicketInstance.sumResultsOfEachQuery()
 
-        self.assertEqual(self.testTicketInstance.totalResults, 33)
+        self.assertEqual(self.testTicketInstance.estimateTotalResults, 33)
 
     def test_update_progress(self):
-        self.testTicketInstance.totalResults = 0
+        self.testTicketInstance.estimateTotalResults = 0
         self.testTicketInstance.numBatchesRetrieved = 2
         self.testTicketInstance.numBatches = 10
 

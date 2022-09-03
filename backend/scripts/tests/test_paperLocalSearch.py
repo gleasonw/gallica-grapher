@@ -11,17 +11,18 @@ class TestPaperLocalSearch(TestCase):
 
     def test_select_papers_continuous_over_range(self):
         self.testSearch.dbConnection.cursor.return_value.__enter__.return_value.execute = MagicMock()
+        expectedQuery = """
+        SELECT title, code, startdate, enddate
+        FROM papers
+        WHERE startdate <= %s
+        AND enddate >= %s
+        AND continuous
+         LIMIT %s"""
 
-        self.testSearch.selectPapersContinuousOverRange(1900, 2000)
+        self.testSearch.selectPapersContinuousOverRange(1900, 2000, 1)
 
-        self.testSearch.dbConnection.cursor.return_value.__enter__.return_value.execute.assert_called_once_with("""
-                SELECT title, code, startdate, enddate
-                    FROM papers
-                    WHERE startdate <= %s
-                    AND enddate >= %s
-                    AND continuous;
-                """, (1900, 2000,)
-        )
+        self.testSearch.dbConnection.cursor.return_value.__enter__.return_value.execute.assert_called_once_with(
+            expectedQuery, (1900, 2000,1))
 
     def test_select_papers_similar_to_keyword(self):
         self.testSearch.dbConnection.cursor.return_value.__enter__.return_value.execute = MagicMock()

@@ -6,7 +6,7 @@ from scripts.cqlSelectStringForPapers import CQLSelectStringForPapers
 from scripts.recordsToDBTransaction import RecordsToDBTransaction
 
 NUM_WORKERS = 50
-CHUNK_SIZE = 600
+CHUNK_SIZE = 300
 
 
 class NgramQueryWithConcurrency:
@@ -38,8 +38,8 @@ class NgramQueryWithConcurrency:
         self.ticketID = ticketID
         self.requestID = requestID
         self.estimateNumResults = 0
+        self.actualNumResults = 0
         self.progress = 0
-        self.keywordRecords = []
         self.progressTracker = progressTracker
         self.dbConnection = dbConnection
 
@@ -61,11 +61,11 @@ class NgramQueryWithConcurrency:
     def getKeyword(self):
         return self.keyword
 
-    def getRecords(self):
-        return self.keywordRecords
-
     def getEstimateNumResults(self):
         return self.estimateNumResults
+
+    def getActualNumResults(self):
+        return self.actualNumResults
 
     def establishYearRange(self, yearRange):
         if len(yearRange) == 2:
@@ -86,17 +86,18 @@ class NgramQueryWithConcurrency:
         chunkedIndices = NgramQueryWithConcurrency.splitIntoCHUNK_SIZEchunks(
             indicesToFetch
         )
-        with self.gallicaHttpSession:
-            for chunk in chunkedIndices:
-                recordsForChunk = self.doThreadedSearch(chunk)
-                dbTransaction = RecordsToDBTransaction(
-                    self.requestID,
-                    self.dbConnection,
-                )
-                dbTransaction.insert(
-                    recordsForChunk, 
-                    'results'
-                )
+        for chunk in chunkedIndices:
+            recordsForChunk = self.doThreadedSearch(chunk)
+            dbTransaction = RecordsToDBTransaction(
+                self.requestID,
+                self.dbConnection,
+            )
+            dbTransaction.insert(
+                'results',
+                recordsForChunk
+            )
+            self.actualNumResults += len(recordsForChunk)
+            del recordsForChunk
 
     def generateWorkChunks(self):
         return []
@@ -173,6 +174,8 @@ class NgramQueryWithConcurrencyAllPapers(NgramQueryWithConcurrency):
     def doSearchChunk(self, index):
         batch = GallicaKeywordRecordBatch(
             self.baseQuery,
+            self.ticketID,
+            self.keyword,
             self.gallicaHttpSession,
             startRecord=index)
         return batch
@@ -272,7 +275,8 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
 
     def getIndicesForCQLQuery(self, query):
         indexCodePairs = []
-        for i in range(1, self.numResultsInQueries[query], 50):
+        firstCodeInQuery = query[14:25]
+        for i in range(1, self.numResultsInQueries[firstCodeInQuery], 50):
             recordAndCode = [i, query]
             indexCodePairs.append(recordAndCode)
         return indexCodePairs
@@ -283,6 +287,8 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
         query = self.baseQuery.format(formattedCodeString=code)
         batch = GallicaKeywordRecordBatch(
             query,
+            self.ticketID,
+            self.keyword,
             self.gallicaHttpSession,
             startRecord=recordStart)
         return batch

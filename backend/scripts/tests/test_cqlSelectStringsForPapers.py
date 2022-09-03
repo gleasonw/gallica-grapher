@@ -9,7 +9,7 @@ class TestCQLSelectStringForPapers(unittest.TestCase):
         self.testInstance = CQLSelectStringForPapers(self.codes)
 
     def test_generate_paper_cql_with_max_20_codes_each(self):
-        result = self.testInstance.generatePaperCQLWithMax20CodesEach()
+        result = self.testInstance.generatePaperCQLWithMaxNUM_CODESCodesEach()
         self.assertListEqual(
             result,
             [

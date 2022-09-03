@@ -80,10 +80,89 @@
       "tickets": [
         {
           "terms": [
-            "colonies",
-            "algerie",
-            "congo",
-            "conquete"
+            "colonies"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32757974m",
+              "endDate": 1921,
+              "startDate": 1871,
+              "title": "Le XIXe siècle (Paris. 1871)"
+            },
+            {
+              "code": "cb328066631",
+              "endDate": 1940,
+              "startDate": 1865,
+              "title": "La Liberté"
+            },
+            {
+              "code": "cb328123058",
+              "endDate": 1944,
+              "startDate": 1884,
+              "title": "Le Matin (Paris. 1884)"
+            },
+            {
+              "code": "cb34355551z",
+              "endDate": 1951,
+              "startDate": 1854,
+              "title": "Le Figaro (Paris. 1854)"
+            },
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "dateRange": [
+            1499,
+            2020
+          ]
+        },
+        {
+          "terms": [
+            "algerie"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32757974m",
+              "endDate": 1921,
+              "startDate": 1871,
+              "title": "Le XIXe siècle (Paris. 1871)"
+            },
+            {
+              "code": "cb328066631",
+              "endDate": 1940,
+              "startDate": 1865,
+              "title": "La Liberté"
+            },
+            {
+              "code": "cb328123058",
+              "endDate": 1944,
+              "startDate": 1884,
+              "title": "Le Matin (Paris. 1884)"
+            },
+            {
+              "code": "cb34355551z",
+              "endDate": 1951,
+              "startDate": 1854,
+              "title": "Le Figaro (Paris. 1854)"
+            },
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "dateRange": [
+            1499,
+            2020
+          ]
+        },
+        {
+          "terms": [
+            "congo"
           ],
           "papersAndCodes": [
             {

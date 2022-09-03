@@ -10,10 +10,10 @@ class PaperLocalSearch:
     def selectPapersContinuousOverRange(self, startYear, endYear, limit):
         query = """
         SELECT title, code, startdate, enddate
-                FROM papers
-                WHERE startdate <= %s
-                AND enddate >= %s
-                AND continuous
+        FROM papers
+        WHERE startdate <= %s
+        AND enddate >= %s
+        AND continuous
         """
         if limit:
             limit = int(limit)

@@ -15,7 +15,6 @@ class Request(threading.Thread):
         self.finished = False
         self.tooManyRecords = False
         self.ticketProgressStats = self.initProgressStats()
-        self.records = []
         self.requestID = requestID
         self.estimateNumRecords = 0
 
@@ -34,7 +33,6 @@ class Request(threading.Thread):
         if self.estimateIsUnderRecordLimit(estimate):
             for ticket in requestTickets:
                 ticket.run()
-                self.records.extend(ticket.getRecords())
                 self.setTicketProgressTo100AndMarkAsDone(ticket)
             self.finished = True
         else:
@@ -45,13 +43,14 @@ class Request(threading.Thread):
     def generateRequestTickets(self):
         tickets = []
         for key, ticket in self.ticketDicts.items():
-            requestToRun = Ticket(
+            ticket = Ticket(
                 ticket,
                 key,
+                self.requestID,
                 self,
                 self.DBconnection,
                 self.session)
-            tickets.append(requestToRun)
+            tickets.append(ticket)
         return tickets
 
     def estimateIsUnderRecordLimit(self, estimate):
@@ -86,7 +85,7 @@ class Request(threading.Thread):
         self.ticketProgressStats[ticketKey] = progressStats
 
     def setTicketProgressTo100AndMarkAsDone(self, ticket):
-        numRetrieved = len(ticket.getRecords())
+        numRetrieved = ticket.actualTotalResults
         self.setTicketProgressStats(ticket.ticketID, {
             'progress': 100,
             'numResultsDiscovered': numRetrieved,

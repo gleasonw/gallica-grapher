@@ -14,7 +14,7 @@ class RecordsToDBTransaction:
         elif targetTable == 'results':
             self.insertNgramOccurrenceRecords(records)
         else:
-            raise ValueError('Invalid target table')
+            raise ValueError(f'Invalid target table: {targetTable}')
 
     def insertPapers(self, records):
         csvStream = generateResultCSVstream(

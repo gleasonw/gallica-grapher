@@ -77,6 +77,8 @@ class TestKeywordRecordBatch(TestCase):
 
         batch = GallicaKeywordRecordBatch(
             '',
+            'ticketid',
+            'keyword',
             GallicaSession().getSession()
         )
 
@@ -90,6 +92,8 @@ class TestKeywordRecordBatch(TestCase):
     def test_record_is_unique(self, mock_fetch):
         batch = GallicaKeywordRecordBatch(
             '',
+            'ticketid',
+            'keyword',
             MagicMock
         )
         batch.currentResultEqualsPrior = MagicMock(return_value=True)
@@ -106,15 +110,24 @@ class TestKeywordRecordBatch(TestCase):
 
         batch = GallicaKeywordRecordBatch(
             '',
+            'ticketid',
+            'keyword',
             GallicaSession().getSession())
 
         batch.fetchXML()
         self.assertCountEqual(batch.batch, [])
         xmlWithDuplicateEndCouple = [xml for xml in batch.xmlRoot.iter(
             "{http://www.loc.gov/zing/srw/}record")]
-        secondToLastRecord = KeywordRecord(xmlWithDuplicateEndCouple[-2])
-        lastRecord = KeywordRecord(xmlWithDuplicateEndCouple[-1])
-
+        secondToLastRecord = KeywordRecord(
+            xmlWithDuplicateEndCouple[-2],
+            'ticketid',
+            'keyword',
+        )
+        lastRecord = KeywordRecord(
+            xmlWithDuplicateEndCouple[-1],
+            'ticketid',
+            'keyword',
+        )
         self.assertTrue(batch.recordIsUnique(secondToLastRecord))
         batch.batch.append(secondToLastRecord)
         self.assertFalse(batch.recordIsUnique(lastRecord))

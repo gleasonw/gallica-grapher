@@ -1,9 +1,14 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 from request import Request
 
 
 class TestRequest(TestCase):
+
+    @patch('request.PSQLconn.getConn')
+    @patch('request.GallicaSession.getSession')
+    def setUp(self, mock_conn, mock_session) -> None:
+        self.testRequest = Request({}, 'myrequestid')
 
     def test_init(self):
         testThread = Request({}, '1')
@@ -31,15 +36,20 @@ class TestRequest(TestCase):
     @patch('request.Ticket')
     def test_generate_request_tickets(self, mock_ticket):
         mock_ticket.return_value = mock_ticket
-        testRequest = Request({}, '1')
-        testRequest.ticketDicts = {
-            '1': {},
-            '2': {}
-        }
+        self.testRequest.ticketDicts= {'1': {}}
 
-        generatedTickets = testRequest.generateRequestTickets()
+        generatedTickets = self.testRequest.generateRequestTickets()
 
-        self.assertEqual(len(generatedTickets), 2)
+        mock_ticket.assert_has_calls([
+            call(
+                {},
+                '1',
+                self.testRequest.requestID,
+                self.testRequest,
+                self.testRequest.DBconnection,
+                self.testRequest.session)
+        ])
+        self.assertEqual(len(generatedTickets), 1)
         self.assertEqual(generatedTickets[0], mock_ticket)
 
     @patch('request.Request.getNumberRowsInAllTables')

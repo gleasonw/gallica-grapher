@@ -36,8 +36,16 @@ class TestRecord(TestCase):
         here = os.path.dirname(__file__)
         dummyRoot = etree.parse(os.path.join(here, 'resources/dummyKeywordRecords.xml'))
         dummys = dummyRoot.find('{http://www.loc.gov/zing/srw/}records')
-        malformedDateRecord = KeywordRecord(dummys[1])
-        absentCodeRecord = KeywordRecord(dummys[2])
+        malformedDateRecord = KeywordRecord(
+            dummys[1],
+            'ticketid',
+            'keyword',
+        )
+        absentCodeRecord = KeywordRecord(
+            dummys[2],
+            'ticketid',
+            'keyword',
+        )
 
         self.assertTrue(malformedDateRecord.isValid())
         self.assertFalse(absentCodeRecord.isValid())
