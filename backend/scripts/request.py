@@ -1,9 +1,7 @@
-import io
 import threading
 from scripts.ticket import Ticket
 from scripts.utils.psqlconn import PSQLconn
 from scripts.utils.gallicaSession import GallicaSession
-from scripts.newspaper import Newspaper
 
 
 class Request(threading.Thread):
@@ -38,11 +36,11 @@ class Request(threading.Thread):
                 ticket.run()
                 self.records.extend(ticket.getRecords())
                 self.setTicketProgressTo100AndMarkAsDone(ticket)
-            self.moveRecordsToDB()
             self.finished = True
         else:
             self.estimateNumRecords = estimate
             self.tooManyRecords = True
+        self.DBconnection.close()
 
     def generateRequestTickets(self):
         tickets = []
@@ -96,91 +94,6 @@ class Request(threading.Thread):
             'randomPaper': None,
             'estimateSecondsToCompletion': 0
         })
-
-    def moveRecordsToDB(self):
-        with self.DBconnection.cursor() as curs:
-            self.moveRecordsToHoldingResultsDB(curs)
-            self.addMissingPapers(curs)
-            self.moveRecordsToFinalTable(curs)
-
-    # TODO: move state up? Why is keyword query doing this?
-    def moveRecordsToHoldingResultsDB(self, curs):
-        csvStream = self.generateResultCSVstream()
-        curs.copy_from(
-            csvStream,
-            'holdingresults',
-            sep='|',
-            columns=(
-                'identifier',
-                'year',
-                'month',
-                'day',
-                'searchterm',
-                'paperid',
-                'ticketid',
-                'requestid',
-            )
-        )
-
-    def addMissingPapers(self, curs):
-        paperGetter = Newspaper(self.session)
-        missingPapers = self.getMissingPapers(curs)
-        if missingPapers:
-            paperGetter.sendTheseGallicaPapersToDB(missingPapers)
-
-    def getMissingPapers(self, curs):
-        curs.execute(
-            """
-            WITH papersInResults AS 
-                (SELECT DISTINCT paperid 
-                FROM holdingResults 
-                WHERE requestid = %s)
-
-            SELECT paperid FROM papersInResults
-            WHERE paperid NOT IN 
-                (SELECT code FROM papers);
-            """
-            , (self.requestID,))
-        return curs.fetchall()
-
-    def moveRecordsToFinalTable(self, curs):
-        curs.execute(
-            """
-            WITH resultsForRequest AS (
-                DELETE FROM holdingresults
-                WHERE requestid = %s
-                RETURNING identifier, year, month, day, searchterm, paperid, ticketid, requestid
-            )
-
-            INSERT INTO results (identifier, year, month, day, searchterm, paperid, ticketid, requestid)
-                (SELECT identifier, year, month, day , searchterm, paperid, ticketid, requestid 
-                FROM resultsForRequest);
-            """
-            , (self.requestID,))
-
-    def generateResultCSVstream(self):
-
-        def cleanCSVvalue(value):
-            if value is None:
-                return r'\N'
-            return str(value).replace('|', '\\|')
-
-        csvFileLikeObject = io.StringIO()
-        for record in self.records:
-            yearMonDay = record.getDate()
-            csvFileLikeObject.write(
-                "|".join(map(cleanCSVvalue, (
-                    record.getUrl(),
-                    yearMonDay[0],
-                    yearMonDay[1],
-                    yearMonDay[2],
-                    record.getKeyword(),
-                    record.getPaperCode(),
-                    record.getTicketID(),
-                    self.requestID
-                ))) + '\n')
-        csvFileLikeObject.seek(0)
-        return csvFileLikeObject
 
     def getProgressStats(self):
         return self.ticketProgressStats

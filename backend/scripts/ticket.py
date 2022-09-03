@@ -8,15 +8,20 @@ class Ticket:
 
     def __init__(self,
                  ticket,
-                 key,
+                 ticketID,
+                 requestID,
                  progresstrack,
                  dbconnection,
                  session):
 
         self.terms = ticket["terms"]
-        self.papersAndCodes = ticket["papersAndCodes"]
+        self.papersAndCodes = list(map(
+            lambda x: (x["code"]),
+            ticket["papersAndCodes"]
+        ))
         self.dateRange = ticket["dateRange"]
-        self.ticketID = key
+        self.ticketID = ticketID
+        self.requestID = requestID
         self.progressThread = progresstrack
         self.connectionToDB = dbconnection
         self.session = session
@@ -65,6 +70,7 @@ class Ticket:
             self.papersAndCodes,
             self.dateRange,
             self.ticketID,
+            self.requestID,
             self.updateProgressStats,
             self.connectionToDB,
             self.session)
@@ -75,6 +81,7 @@ class Ticket:
             keyword,
             self.dateRange,
             self.ticketID,
+            self.requestID,
             self.updateProgressStats,
             self.connectionToDB,
             self.session)

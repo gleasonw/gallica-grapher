@@ -1,6 +1,6 @@
 import os
 
-from psqlconn import PSQLconn
+from utils.psqlconn import PSQLconn
 from ticketGraphSeriesBatch import TicketGraphSeries
 from topPapersForTicket import TopPapersForTicket
 
@@ -38,16 +38,24 @@ class DBtester:
     def copyDummyDataIntoResultsTable(self):
         with open(os.path.join(os.path.dirname(__file__), 'resources/dummyResults')) as f:
             with self.conn.cursor() as curs:
-                curs.copy_from(f, 'results', sep=',', columns=(
-                    'identifier',
-                    'year',
-                    'month',
-                    'day',
-                    'searchterm',
-                    'paperid',
-                    'ticketid',
-                    'requestid'
-                ))
+                self.copyDummyData('results', f)
+
+    def copyDummyDataIntoHoldingResultsTable(self):
+        with open(os.path.join(os.path.dirname(__file__), 'resources/dummyResults')) as f:
+            self.copyDummyData('holdingresults', f)
+
+    def copyDummyData(self, table, file):
+        with self.conn.cursor() as curs:
+            curs.copy_from(file, table, sep=',', columns=(
+                'identifier',
+                'year',
+                'month',
+                'day',
+                'searchterm',
+                'paperid',
+                'ticketid',
+                'requestid'
+            ))
 
     def deleteTestResultsFromFinal(self):
         with self.conn.cursor() as curs:
@@ -163,18 +171,17 @@ class DBtester:
                 """
             )
 
-    def deleteTestPapers(self):
+    def deleteAndReturnTestPapers(self):
         with self.conn.cursor() as curs:
             curs.execute(
                 """
                 DELETE FROM papers 
-                WHERE code = 'a' 
-                OR code = 'b' 
-                OR code = 'c' 
-                OR code = 'd' 
-                OR code = 'e';
+                WHERE code in ('a', 'b', 'c', 'd', 'e')
+                RETURNING code;
                 """
             )
+            results = curs.fetchall()
+        return results
 
     def close(self):
         self.conn.close()
