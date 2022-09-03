@@ -1,7 +1,7 @@
 from scripts.recordsToDBTransaction import RecordsToDBTransaction
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from psqlconn import PSQLconn
+from utils.psqlconn import PSQLconn
 from DBtester import DBtester
 
 
@@ -12,32 +12,6 @@ class TestRecordsToDBTransaction(TestCase):
             'testrequest',
             MagicMock()
         )
-        self.dbTester = DBtester()
-        self.dbTester.deleteTestResultsFromHolding()
-        self.dbTester.deleteTestResultsFromFinal()
-        self.dbTester.deleteTestPapers()
-
-    def tearDown(self):
-        self.dbTester.deleteTestResultsFromHolding()
-        self.dbTester.deleteTestResultsFromFinal()
-        self.dbTester.deleteTestPapers()
-        self.dbTester.conn.close()
-
-    def get5MockRecords(self):
-        payload = []
-        ngrams = ['t', 'te', 'ter', 'term', 'term!']
-        codes = ['a', 'b', 'c', 'd', 'e']
-        ticketIDs = ['1', '2', '3', '4', '5']
-        for i in range(5):
-            mockRecord = MagicMock()
-            mockRecord.getDate = MagicMock(return_value=[1920, 10, 1])
-            mockRecord.getUrl = MagicMock(return_value='1234.com')
-            mockRecord.getKeyword = MagicMock(return_value=ngrams[i])
-            mockRecord.getPaperCode = MagicMock(return_value=codes[i])
-            mockRecord.getTicketID = MagicMock(return_value=ticketIDs[i])
-            payload.append(mockRecord)
-
-        return payload
 
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.insertPapers')
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.insertNgramOccurrenceRecords')
@@ -105,15 +79,74 @@ class TestRecordsToDBTransaction(TestCase):
             ('testrequest',)
         )
 
-
     def test_move_records_to_final_table(self):
-        self.fail()
+        self.testTransaction.conn.cursor.return_value.__enter__.return_value.execute = MagicMock()
 
-    def test_generate_result_csv_stream(self):
-        self.fail()
+        self.testTransaction.moveRecordsToFinalTable()
 
-    def test_get_paper_record_row_iterable(self):
-        self.fail()
+        self.testTransaction.conn.cursor.return_value.__enter__.return_value.execute.assert_called_once_with(
+            """
+                WITH resultsForRequest AS (
+                    DELETE FROM holdingresults
+                    WHERE requestid = %s
+                    RETURNING identifier, year, month, day, searchterm, paperid, ticketid, requestid
+                )
+                INSERT INTO results (identifier, year, month, day, searchterm, paperid, ticketid, requestid)
+                    (SELECT identifier, year, month, day , searchterm, paperid, ticketid, requestid 
+                    FROM resultsForRequest);
+                """,
+            ('testrequest',)
+        )
 
-    def test_get_keyword_record_row_iterable(self):
-        self.fail()
+    @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.addMissingPapers')
+    @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.moveRecordsToFinalTable')
+    def test_move_mock_records_to_holding(self, mock_move, mock_add):
+        self.testTransaction.conn = PSQLconn().getConn()
+        records = self.get5MockKeywordRecords()
+
+        self.testTransaction.insert('results', records)
+
+        testRecords = DBtester().deleteAndReturnTestResultsInHolding()
+
+        self.assertEqual(len(testRecords), 5)
+
+    def test_move_mock_papers_to_papers(self):
+        self.testTransaction.conn = PSQLconn().getConn()
+        records = self.get5MockPaperRecords()
+
+        self.testTransaction.insert('papers', records)
+
+        testRecords = DBtester().deleteAndReturnTestPapers()
+
+        self.assertEqual(len(testRecords), 5)
+
+    @staticmethod
+    def get5MockKeywordRecords():
+        payload = []
+        ngrams = ['t', 'te', 'ter', 'term', 'term!']
+        codes = ['a', 'b', 'c', 'd', 'e']
+        ticketIDs = ['1', '2', '3', '4', '5']
+        for i in range(5):
+            mockRecord = MagicMock()
+            mockRecord.getDate = MagicMock(return_value=[1920, 10, 1])
+            mockRecord.getUrl = MagicMock(return_value='1234.com')
+            mockRecord.getKeyword = MagicMock(return_value=ngrams[i])
+            mockRecord.getPaperCode = MagicMock(return_value=codes[i])
+            mockRecord.getTicketID = MagicMock(return_value=ticketIDs[i])
+            payload.append(mockRecord)
+
+        return payload
+
+    @staticmethod
+    def get5MockPaperRecords():
+        payload = []
+        codes = ['a', 'b', 'c', 'd', 'e']
+        for i in range(5):
+            mockRecord = MagicMock()
+            mockRecord.getPaperCode = MagicMock(return_value=codes[i])
+            mockRecord.getPaperTitle = MagicMock(return_value='test title')
+            mockRecord.isContinuous = MagicMock(return_value=True)
+            mockRecord.getDate = MagicMock(return_value=[1920, 1930])
+            payload.append(mockRecord)
+
+        return payload

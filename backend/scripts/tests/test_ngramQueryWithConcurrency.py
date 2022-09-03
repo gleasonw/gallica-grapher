@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
-from psqlconn import PSQLconn
+from utils.psqlconn import PSQLconn
 from scripts.ngramQueryWithConcurrency import NgramQueryWithConcurrency
 from scripts.ngramQueryWithConcurrency import NgramQueryWithConcurrencyAllPapers
 from scripts.ngramQueryWithConcurrency import NgramQueryWithConcurrencySelectPapers
@@ -18,6 +18,7 @@ class TestNgramQueryWithConcurrency(TestCase):
             '',
             [],
             '1234',
+            'myrequest',
             MagicMock,
             MagicMock,
             MagicMock
@@ -26,6 +27,7 @@ class TestNgramQueryWithConcurrency(TestCase):
             '',
             [1, 1],
             '1234',
+            'myrequest',
             MagicMock,
             MagicMock,
             MagicMock
@@ -38,6 +40,7 @@ class TestNgramQueryWithConcurrency(TestCase):
             '',
             [],
             '1234',
+            'myrequest',
             MagicMock,
             MagicMock,
             MagicMock
@@ -53,6 +56,7 @@ class TestNgramQueryWithConcurrency(TestCase):
             '',
             [1, 1],
             '1234',
+            'myrequest',
             MagicMock,
             MagicMock,
             MagicMock
@@ -63,11 +67,15 @@ class TestNgramQueryWithConcurrency(TestCase):
 
         self.assertTrue(rangeQuery.buildYearRangeQuery.called)
 
-    def test_run_search(self):
+    @patch('scripts.ngramQueryWithConcurrency.RecordsToDBTransaction')
+    @patch('scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrency.splitIntoCHUNK_SIZEchunks')
+    def test_run_search(self, mock_split, mock_transact):
+        mock_split.return_value = [1, 2, 3, 4]
         testQuery = NgramQueryWithConcurrency(
             '',
             [],
             '1234',
+            'myrequest',
             MagicMock,
             MagicMock,
             GallicaSession().getSession())
@@ -78,30 +86,31 @@ class TestNgramQueryWithConcurrency(TestCase):
         testQuery.runSearch()
 
         self.assertTrue(testQuery.generateWorkChunks.called)
-        self.assertTrue(testQuery.doThreadedSearch.called)
         self.assertFalse(testQuery.moveRecordsToDB.called)
+        testQuery.doThreadedSearch.assert_called_with(4)
 
     def test_do_threaded_search(self):
         testQuery = NgramQueryWithConcurrency(
             '',
             [],
             '1234',
+            'myrequest',
             MagicMock,
             MagicMock,
             GallicaSession().getSession())
-        testQuery.workChunks = [1, 2, 3, 4]
+        workChunks = [1, 2, 3, 4]
         testQuery.progressTracker = MagicMock()
         testQuery.doSearchChunk = MagicMock(
             side_effect=lambda x: MagicMock(
                 getRecords=MagicMock(return_value=[x])))
 
-        testQuery.doThreadedSearch()
+        results = testQuery.doThreadedSearch(workChunks)
 
         self.assertTrue(testQuery.doSearchChunk.called)
         self.assertEqual(testQuery.doSearchChunk.call_count, 4)
         self.assertTrue(testQuery.progressTracker.called)
         self.assertListEqual(
-            testQuery.keywordRecords,
+            results,
             [1, 2, 3, 4]
         )
 
@@ -117,6 +126,7 @@ class TestNgramQueryWithConcurrencyAllPapers(TestCase):
             'brazza',
             [1850, 1900],
             '1234',
+            'myrequest',
             progressTracker=MagicMock(),
             dbConnection=MagicMock(),
             session=MagicMock()
@@ -136,6 +146,7 @@ class TestNgramQueryWithConcurrencyAllPapers(TestCase):
             'brazza',
             [],
             '1234',
+            'myrequest',
             progressTracker=MagicMock(),
             dbConnection=MagicMock(),
             session=MagicMock()
@@ -155,6 +166,7 @@ class TestNgramQueryWithConcurrencyAllPapers(TestCase):
             'brazza',
             [1850, 1900],
             '1234',
+            'myrequest',
             progressTracker=MagicMock(),
             dbConnection=MagicMock(),
             session=MagicMock()
@@ -173,6 +185,7 @@ class TestNgramQueryWithConcurrencyAllPapers(TestCase):
             'brazza',
             [1850, 1900],
             '1234',
+            'myrequest',
             progressTracker=MagicMock(),
             dbConnection=MagicMock(),
             session=MagicMock()
@@ -186,16 +199,17 @@ class TestNgramQueryWithConcurrencyAllPapers(TestCase):
             'brazza',
             [1850, 1900],
             '1234',
+            'myrequest',
             progressTracker=MagicMock(),
             dbConnection=MagicMock(),
             session=MagicMock()
         )
         query.estimateNumResults = 123
 
-        query.generateWorkChunks()
+        chunks = query.generateWorkChunks()
 
         self.assertListEqual(
-            query.workChunks,
+            chunks,
             [1, 51, 101]
         )
 
@@ -213,8 +227,10 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
                      'code': nameCode[1].strip()})
             return choiceDict
 
-    def test_build_year_range_query(self):
-        NgramQueryWithConcurrencySelectPapers.fetchNumTotalResults = MagicMock(return_value=3)
+    @patch('scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.buildQueriesForPaperCodes')
+    @patch('scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.fetchNumTotalResults')
+    def test_build_year_range_query(self, mock_fetch, mock_build):
+        mock_fetch.return_value = 3
 
         choiceDict = self.buildDummyDict()
         query = NgramQueryWithConcurrencySelectPapers(
@@ -222,20 +238,22 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
             choiceDict,
             [1850, 1900],
             '1234',
+            'myrequest',
             MagicMock(),
             MagicMock(),
             MagicMock())
 
         self.assertEqual(
             query.baseQuery,
-            'arkPress adj "{newsKey}_date" '
+            '({formattedCodeString}) '
             'and dc.date >= "1850" '
             'and dc.date <= "1900" '
             'and (gallica adj "brazza") '
             'sortby dc.date/sort.ascending')
 
-    @patch('scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.fetchNumberResultsInPaper')
-    def test_build_dateless_query(self, mock_fetch):
+    @patch('scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.buildQueriesForPaperCodes')
+    @patch('scripts.ngramQueryWithConcurrency.NgramQueryWithConcurrencySelectPapers.fetchNumTotalResults')
+    def test_build_dateless_query(self, mock_fetch, mock_build):
         mock_fetch.return_value = ['a', 1]
         choiceDict = self.buildDummyDict()
 
@@ -244,13 +262,14 @@ class TestNgramQueryWithConcurrencySelectPapers(TestCase):
             choiceDict,
             [],
             '1234',
+            'myrequest',
             MagicMock(),
             MagicMock(),
             MagicMock())
 
         self.assertEqual(
             query.baseQuery,
-            'arkPress adj "{newsKey}_date" '
+            '({formattedCodeString}) '
             'and (gallica adj "brazza") '
             'sortby dc.date/sort.ascending')
 

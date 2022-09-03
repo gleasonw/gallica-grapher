@@ -21,24 +21,34 @@ class RecordsToDBTransaction:
             records,
             getPaperRecordRowIterable
         )
-        self.copyCSVstreamToTable(csvStream, 'papers')
+        self.conn.cursor().copy_from(
+            csvStream,
+            'papers',
+            sep='|'
+        )
 
     def insertNgramOccurrenceRecords(self, records):
         csvStream = generateResultCSVstream(
             records,
-            getKeywordRecordRowIterable
+            self.getKeywordRecordRowIterable
         )
-        self.copyCSVstreamToTable(csvStream, 'holdingResults')
+        self.conn.cursor().copy_from(
+            csvStream,
+            'holdingresults',
+            sep='|',
+            columns=(
+                'identifier',
+                'year',
+                'month',
+                'day',
+                'searchterm',
+                'paperid',
+                'ticketid',
+                'requestid',
+            )
+        )
         self.addMissingPapers()
         self.moveRecordsToFinalTable()
-
-    def copyCSVstreamToTable(self, csvStream, targetTable):
-        self.conn.copy_from(
-            csvStream,
-            targetTable,
-            sep='|',
-            null=r'\N'
-        )
 
     def addMissingPapers(self):
         paperGetter = PaperRecordFetch()
@@ -79,27 +89,26 @@ class RecordsToDBTransaction:
                 """
                 , (self.requestID,))
 
+    def getKeywordRecordRowIterable(self, keywordRecord):
+        return (
+            keywordRecord.getUrl(),
+            keywordRecord.getDate()[0],
+            keywordRecord.getDate()[1],
+            keywordRecord.getDate()[2],
+            keywordRecord.getKeyword(),
+            keywordRecord.getPaperCode(),
+            keywordRecord.getTicketID(),
+            self.requestID
+        )
+
 
 def getPaperRecordRowIterable(paperRecord):
     return (
-        paperRecord.getUrl(),
+        paperRecord.getPaperTitle(),
         paperRecord.getDate()[0],
         paperRecord.getDate()[1],
         paperRecord.isContinuous(),
         paperRecord.getPaperCode()
-    )
-
-
-def getKeywordRecordRowIterable(keywordRecord, requestid):
-    return (
-        keywordRecord.getUrl(),
-        keywordRecord.getDate()[0],
-        keywordRecord.getDate()[1],
-        keywordRecord.getDate()[2],
-        keywordRecord.getKeyword(),
-        keywordRecord.getPaperCode(),
-        keywordRecord.getTicketID(),
-        requestid
     )
 
 

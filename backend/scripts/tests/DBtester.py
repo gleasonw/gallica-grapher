@@ -1,6 +1,6 @@
 import os
 
-from psqlconn import PSQLconn
+from utils.psqlconn import PSQLconn
 from ticketGraphSeriesBatch import TicketGraphSeries
 from topPapersForTicket import TopPapersForTicket
 
@@ -171,18 +171,17 @@ class DBtester:
                 """
             )
 
-    def deleteTestPapers(self):
+    def deleteAndReturnTestPapers(self):
         with self.conn.cursor() as curs:
             curs.execute(
                 """
                 DELETE FROM papers 
-                WHERE code = 'a' 
-                OR code = 'b' 
-                OR code = 'c' 
-                OR code = 'd' 
-                OR code = 'e';
+                WHERE code in ('a', 'b', 'c', 'd', 'e')
+                RETURNING code;
                 """
             )
+            results = curs.fetchall()
+        return results
 
     def close(self):
         self.conn.close()

@@ -11,6 +11,16 @@ CHUNK_SIZE = 600
 
 class NgramQueryWithConcurrency:
 
+    @staticmethod
+    def splitIntoCHUNK_SIZEchunks(list):
+        numChunks = ceil(len(list) / CHUNK_SIZE)
+        chunks = []
+        for i in range(numChunks):
+            chunks.append(
+                list[i * CHUNK_SIZE:(i + 1) * CHUNK_SIZE]
+            )
+        return chunks
+
     def __init__(self,
                  searchTerm,
                  yearRange,
@@ -73,7 +83,9 @@ class NgramQueryWithConcurrency:
 
     def runSearch(self):
         indicesToFetch = self.generateWorkChunks()
-        chunkedIndices = splitIndicesIntoCHUNK_SIZEchunks(indicesToFetch)
+        chunkedIndices = NgramQueryWithConcurrency.splitIntoCHUNK_SIZEchunks(
+            indicesToFetch
+        )
         with self.gallicaHttpSession:
             for chunk in chunkedIndices:
                 recordsForChunk = self.doThreadedSearch(chunk)
@@ -280,12 +292,3 @@ class NgramQueryWithConcurrencySelectPapers(NgramQueryWithConcurrency):
                 if record.getUrl() == priorRecords.getUrl():
                     return True
         return False
-
-def splitIndicesIntoCHUNK_SIZEchunks(indicesToFetch):
-    numChunks = ceil(len(indicesToFetch) / CHUNK_SIZE)
-    chunks = []
-    for i in range(numChunks):
-        chunks.append(
-            indicesToFetch[i * CHUNK_SIZE:(i + 1) * CHUNK_SIZE]
-        )
-    return chunks
