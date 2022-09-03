@@ -6,6 +6,8 @@ from scripts.utils.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
 from scripts.cqlSelectStringForPapers import CQLSelectStringForPapers
 
+NUM_WORKERS = 50
+
 
 class PaperRecordFetch:
 
@@ -41,7 +43,7 @@ class PaperRecordFetch:
         records = []
         with self.session:
             numPapers = self.getNumPapersOnGallica()
-            with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
                 for batch in executor.map(
                         self.fetchBatchPapersAtIndex,
                         range(1, numPapers, 50)):

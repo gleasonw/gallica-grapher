@@ -28,23 +28,21 @@ class TestRecordsToDBTransaction(TestCase):
 
     @patch('scripts.recordsToDBTransaction.io')
     def test_insert_papers(self, mock_io):
-        self.testTransaction.conn.copy_from = MagicMock()
         mock_io.StringIO.return_value = MagicMock()
 
         self.testTransaction.insertPapers(MagicMock())
 
-        self.testTransaction.conn.copy_from.assert_called_once()
+        self.testTransaction.conn.cursor.assert_called_once()
 
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.addMissingPapers')
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.moveRecordsToFinalTable')
     @patch('scripts.recordsToDBTransaction.io')
     def test_insert_ngram_occurrence_records(self, mock_io, mock_move, mock_add):
-        self.testTransaction.conn.copy_from = MagicMock()
         mock_io.StringIO.return_value = MagicMock()
 
         self.testTransaction.insertNgramOccurrenceRecords(MagicMock())
 
-        self.testTransaction.conn.copy_from.assert_called_once()
+        self.testTransaction.conn.cursor.assert_called_once()
         mock_add.assert_called_once()
         mock_move.assert_called_once()
 
@@ -53,7 +51,7 @@ class TestRecordsToDBTransaction(TestCase):
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.insert')
     def test_add_missing_papers(self, mock_insert, mock_get, mock_fetch):
         mock_get.return_value = ['testpaperid']
-        mock_fetch.test_fetch_record_data_for_codes.return_value = 'testrecords'
+        mock_fetch.fetchRecordDataForCodes.return_value = 'testrecords'
         mock_fetch.return_value = mock_fetch
 
         self.testTransaction.addMissingPapers()

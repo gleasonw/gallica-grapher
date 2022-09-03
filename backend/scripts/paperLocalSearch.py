@@ -42,7 +42,7 @@ class PaperLocalSearch:
             return numPapersOverRange[0]
 
 
-def paperDataToJSON(similarPapers):
+def paperDataToJSON(similarPapers) -> dict:
     papers = []
     for paperData in similarPapers:
         title = paperData[0]

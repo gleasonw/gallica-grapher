@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 
 class TestRemoveOldResultsFromDB(unittest.TestCase):
 
-    @patch('chartUtils.removeOldResultsFromDB.PSQLconn')
+    @patch('utils.removeOldResultsFromDB.PSQLconn')
     def test_removeOldResultsFromDB(self, mock_conn):
         mock_conn.return_value = mock_conn
         mock_conn.getConn.return_value = mock_conn

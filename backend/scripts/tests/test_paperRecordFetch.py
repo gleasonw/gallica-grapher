@@ -17,47 +17,18 @@ class TestPaperRecordFetch(unittest.TestCase):
         with open(os.path.join(here, 'resources/20PaperRecords.xml'), "rb") as f:
             self.mockedPaperFetch = MagicMock(content=f.read())
 
-    @staticmethod
-    def deleteDummyPapersForTesting():
-        tester = DBtester()
-        tester.deleteAndReturnPaper('cb41459716t')
-        tester.deleteAndReturnPaper('cb32690181n')
-        tester.deleteAndReturnPaper('cb32751426x')
-        tester.deleteAndReturnPaper('cb327808508')
-        tester.deleteAndReturnPaper('cb32750493t')
-        tester.deleteAndReturnPaper('cb32709443d')
-        tester.deleteAndReturnPaper('cb327345882')
-        tester.deleteAndReturnPaper('cb327514189')
-        tester.deleteAndReturnPaper('cb32751344k')
-        tester.deleteAndReturnPaper('cb32802219g')
+    @patch('scripts.paperRecordFetch.PaperRecordFetch.fetchTheseMax20PaperRecords')
+    def test_fetch_record_data_for_codes(self, mock_batch_20_fetch):
+        mock_batch_20_fetch.side_effect = lambda x: x
 
-    def test_fetch_record_data_for_codes(self):
-        def boomerangBatchForTesting(batchItems):
-            return [i for i in range(len(batchItems))]
-
-        paperCodes20 = self.mockPaperCodes
-        self.testInstance.fetchTheseMax20PaperRecords = MagicMock(
-            side_effect=boomerangBatchForTesting
-        )
-
-        newspaper.test_fetch_record_data_for_codes(paperCodes20)
+        records = self.testInstance.fetchRecordDataForCodes(self.mockPaperCodes)
 
         self.assertEqual(
-            len(newspaper.paperRecords),
-            len(paperCodes20)
+            len(records),
+            len(self.mockPaperCodes)
         )
 
-        oneMissingPaper = Newspaper(MagicMock())
-        oneMissingPaper.fetchTheseMax20PaperRecords = MagicMock(
-            side_effect=boomerangBatchForTesting)
-        oneMissingPaper.test_fetch_record_data_for_codes(["12345"])
-
-        self.assertEqual(
-            len(oneMissingPaper.paperRecords),
-            1
-        )
-
-    @patch('scripts.newspaper.GallicaPaperRecordBatch')
+    @patch('scripts.paperRecordFetch.GallicaPaperRecordBatch')
     def test_fetch_max_20_paper_records(self, mock_paper_record_batch):
         mock_paper_record_batch.return_value = mock_paper_record_batch
         mock_paper_record_batch.getRecords = MagicMock(return_value=[])
@@ -67,7 +38,7 @@ class TestPaperRecordFetch(unittest.TestCase):
 
         self.assertEqual(len(records), 0)
 
-    @patch('scripts.paperRecordFetch.PaperRecordFetch.fetchAllPapersFromGallica')
+    @patch('scripts.paperRecordFetch.PaperRecordFetch.fetchAllPaperRecordsOnGallica')
     def test_fetch_all_paper_records_on_gallica(self, mock_fetch):
         mock_fetch.return_value = '1'
 
@@ -78,17 +49,35 @@ class TestPaperRecordFetch(unittest.TestCase):
             '1'
         )
 
-    def test_run_threaded_paper_fetch(self):
-        pass
+    @patch('scripts.paperRecordFetch.PaperRecordFetch.getNumPapersOnGallica')
+    @patch('scripts.paperRecordFetch.PaperRecordFetch.fetchBatchPapersAtIndex')
+    def test_run_threaded_paper_fetch(self, mock_fetch, mock_get):
+        mock_get.return_value = 100
+        mock_fetch.side_effect = lambda x: [x]
 
-    def test_fetch_batch_papers_at_index(self):
-        pass
+        result = self.testInstance.runThreadedPaperFetch()
+
+        self.assertListEqual(
+            result,
+            [1, 51]
+        )
+
+    @patch('scripts.paperRecordFetch.GallicaPaperRecordBatch')
+    def test_fetch_batch_papers_at_index(self, mock_batch):
+        mock_batch.getRecords = MagicMock(return_value='itworks?')
+        mock_batch.return_value = mock_batch
+
+        result = self.testInstance.fetchBatchPapersAtIndex(1)
+
+        self.assertEqual(
+            result,
+            'itworks?'
+        )
 
     @patch('requests_toolbelt.sessions.BaseUrlSession.get')
     def test_get_num_papers_on_gallica(self, mock_get):
         with open(os.path.join(here, 'resources/dummyNewspaperRecords.xml'), "rb") as f:
             mock_get.return_value = MagicMock(content=f.read())
-        newspaper = Newspaper()
-        numPapers = newspaper.getNumPapersOnGallica()
+        numPapers = self.testInstance.getNumPapersOnGallica()
         self.assertEqual(numPapers, 18509)
 
