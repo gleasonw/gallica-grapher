@@ -1,4 +1,4 @@
-NUM_CODES_PER_CQL = 2
+NUM_CODES_PER_CQL = 4
 
 class CQLSelectStringForPapers:
     def __init__(self, codes):

@@ -5,3 +5,4 @@
 * sessions to store prior requests key
 * click on highcharts year to get links to sample records for each series
 * French translation
+* a nice way to pass the time while waiting

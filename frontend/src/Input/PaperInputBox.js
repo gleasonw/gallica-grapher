@@ -2,6 +2,7 @@ import React from "react";
 import TextInputBubble from "./TextInputBubble";
 import {SelectionBox} from "./SelectionBox";
 import {Dropdown} from "./Dropdown";
+import PaperOptionWrap from "./PaperOptionWrap";
 
 export class PaperInputBox extends React.Component {
     constructor(props) {
@@ -70,31 +71,76 @@ export class PaperInputBox extends React.Component {
         const paperNames = [];
         this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['title']))
         return (
-            <div>
-                <TextInputBubble>
-                    <SelectionBox
-                        items={paperNames}
-                        bubblesLabel={'In paper(s):'}
-                        onClick={this.props.deletePaperBubble}
-                    />
-                    <input
-                        type="text"
-                        value={this.state.paperInputValue}
-                        name="papers"
-                        placeholder="Search for a paper to restrict search..."
-                        onKeyUp={this.handleKeyUp}
-                        onChange={this.handlePaperChange}
-                        autoComplete="off"
-                    />
-                </TextInputBubble>
-                <div className='dropdownContainer'>
-                    <Dropdown
-                        papers={this.state.papersForDropdown['paperNameCodes']}
-                        error={this.state.dropdownError}
-                        onClick={this.handleDropdownClick}
-                    />
-                </div>
-            </div>
+            <TextInputBubble>
+                <ContinuousTrendInput/>
+                <PaperArrayInput
+                    paperNames={paperNames}
+                    deletePaperBubble={this.props.deletePaperBubble}
+                    paperInputValue={this.state.paperInputValue}
+                    onKeyUp={this.handleKeyUp}
+                    onChange={this.handlePaperChange}
+                    papersForDropdown={this.state.papersForDropdown}
+                    onClick={this.handleDropdownClick}
+                    error={this.state.dropdownError}
+                    onDropdownClick={this.handleDropdownClick}
+                />
+                <FullSearchInput/>
+            </TextInputBubble>
         )
     }
+}
+
+function ContinuousTrendInput(props) {
+    return (
+        <PaperOptionWrap>
+            <input
+                type='checkbox'
+                name='continuousTrend'
+                id='continuousTrend'
+            />
+            <label htmlFor='continuousTrend'>Continuous trend</label>
+        </PaperOptionWrap>
+    )
+}
+
+function PaperArrayInput(props) {
+    return (
+        <PaperOptionWrap>
+            <SelectionBox
+                items={props.paperNames}
+                bubblesLabel={'In paper(s):'}
+                onClick={props.deletePaperBubble}
+            />
+            <input
+                type="text"
+                value={props.paperInputValue}
+                name="papers"
+                placeholder="Search for a paper to restrict search..."
+                onKeyUp={props.onKeyUp}
+                onChange={props.onPaperChange}
+                autoComplete="off"
+            />
+            <div className='dropdownContainer'>
+                <Dropdown
+                    papers={props.papersForDropdown['paperNameCodes']}
+                    error={props.dropdownError}
+                    onClick={props.onDropdownClick}
+                />
+            </div>
+        </PaperOptionWrap>
+
+    )
+}
+
+function FullSearchInput(props) {
+    return (
+        <PaperOptionWrap>
+            <input
+                type='checkbox'
+                name='fullSearch'
+                id='fullSearch'
+            />
+            <label htmlFor='fullSearch'>Full search</label>
+        </PaperOptionWrap>
+    )
 }

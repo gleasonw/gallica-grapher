@@ -6,7 +6,7 @@ from scripts.cqlSelectStringForPapers import CQLSelectStringForPapers
 from scripts.recordsToDBTransaction import RecordsToDBTransaction
 
 NUM_WORKERS = 50
-CHUNK_SIZE = 300
+CHUNK_SIZE = 200
 
 
 class NgramQueryWithConcurrency:
