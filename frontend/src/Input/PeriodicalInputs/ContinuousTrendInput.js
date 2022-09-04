@@ -7,10 +7,12 @@ export function ContinuousTrendInput(props) {
     const highYearPlaceholder = 1920;
     const lowYear = props.yearRange[0];
     const highYear = props.yearRange[1];
+    const onLowYearChange = props.yearRangeHandler[0];
+    const onHighYearChange = props.yearRangeHandler[1];
     const dateInputs =
         <DateInputBox
-            onLowDateChange={(e) => props.onLowDateChange(e, 0)}
-            onHighDateChange={(e) => props.onHighDateChange(e, 0)}
+            onLowDateChange={onLowYearChange}
+            onHighDateChange={onHighYearChange}
             minYearPlaceholder={lowYearPlaceholder}
             maxYearPlaceholder={highYearPlaceholder}
             lowYear={lowYear}

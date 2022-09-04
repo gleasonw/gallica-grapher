@@ -7,6 +7,8 @@ import {TermInputBox} from "./TermInputBox";
 function TicketForm(props){
     const [selectedPaperInput, setSelectedPaperInput] = useState(1);
     const [showTicketReminder, setShowTicketReminder] = useState(false);
+    const [showNoTermsReminder, setShowNoTermsReminder] = useState(false);
+
     const noTicketReminder =
         <div>
             <div className='noTicketReminder'>
@@ -16,22 +18,44 @@ function TicketForm(props){
             </div>
         </div>
 
+    const noTermsReminder = 
+        <div>
+            <div className='noTermsReminder'>
+                <span className='noTermsReminderText'>
+                    You have no terms.
+                </span>
+            </div>
+        </div>
+
     function handleSubmit(e){
         e.preventDefault();
-        if (props.tickets && props.tickets.length > 0){
+        if (!props.tickets || !props.tickets.length){
+            setShowTicketReminder(true)
+        }
+        if (!props.selectedTerms || !props.selectedTerms.length){
+            setShowNoTermsReminder(true)
+        }
+        else{
             props.onGraphStartClick(e);
-        }else{
-            setShowTicketReminder(true);
         }
     }
 
-    function handleCreateTicketClick(paperInputIndex){
-        setShowTicketReminder(false);
-        props.onCreateTicketClick(selectedPaperInput);
+    function handleCreateTicketClick(){
+        if (!props.selectedTerms || !props.selectedTerms.length){
+            setShowNoTermsReminder(true)
+        }else{
+            setShowTicketReminder(false);
+            props.onCreateTicketClick();
+        }
     }
 
     function handlePaperInputSelectClick(paperInputIndex){
         setSelectedPaperInput(paperInputIndex);
+    }
+
+    function handleCreateTerm(){
+        setShowNoTermsReminder(false);
+        props.onHandleKeyDown();
     }
 
     return(
@@ -40,25 +64,28 @@ function TicketForm(props){
             className='userInputForm'
         >
             <TermInputBox
-                onKeyDown={props.onKeyDown}
+                onKeyDown={handleCreateTerm}
                 selectedTerms={props.selectedTerms}
                 deleteTermBubble={props.deleteTermBubble}
             />
             <br />
             <PaperInputBox
                 onClick={props.onPaperDropItemClick}
-                onPaperInputSelectClick={handlePaperInputSelectClick}
-                paperGroups={props.paperGroups}
                 deletePaperBubble={props.deletePaperBubble}
                 dateRanges={props.dateRanges}
-                onLowDateChange={props.onLowDateChange}
-                onHighDateChange={props.onHighDateChange}
+                dateRangeHandlers={props.dateRangeHandlers}
+                onPaperInputSelectClick={handlePaperInputSelectClick}
                 selectedPaperInput={selectedPaperInput}
                 numContinuousPapers={props.numContinuousPapers}
+                userSelectedPapers={props.userSelectedPapers}
             />
             <div className='graphWarningBoxBoundary'>
-                {showTicketReminder && props.tickets.length === 0 ?
+                {showTicketReminder ?
                     noTicketReminder :
+                    null
+                }
+                {showNoTermsReminder ?
+                    noTermsReminder :
                     null
                 }
                 <div className='createTicketAndGraphButtonContainer'>

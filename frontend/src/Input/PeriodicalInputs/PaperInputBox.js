@@ -69,24 +69,22 @@ export class PaperInputBox extends React.Component {
 
     //TODO: reduce duplication in paperinput options
     render() {
-        const paperArrayBubbles = this.props.paperGroups[1]
-        const paperNames = [];
-        paperArrayBubbles.map(paperAndCode => paperNames.push(paperAndCode['title']))
         return (
             <TextInputBubble
                 padding={"0"}
             >
                 <ContinuousTrendInput
                     yearRange={this.props.dateRanges[0]}
+                    yearRangeHandler={this.props.dateRangeHandlers[0]}
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
-                    onLowDateChange={this.props.onLowDateChange}
-                    onHighDateChange={this.props.onHighDateChange}
                     numContinuousPapers={this.props.numContinuousPapers}
+
                 />
                 <UserSelectPaperInput
                     yearRange={this.props.dateRanges[1]}
-                    paperNames={paperNames}
+                    yearRangeHandler={this.props.dateRangeHandlers[1]}
+                    boundaryYearsForUserPapers={this.props.boundaryYearsForUserPapers}
                     deletePaperBubble={this.props.deletePaperBubble}
                     paperInputValue={this.state.paperInputValue}
                     onKeyUp={this.handleKeyUp}
@@ -97,15 +95,13 @@ export class PaperInputBox extends React.Component {
                     onDropdownClick={this.handleDropdownClick}
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
-                    onLowDateChange={this.props.onLowDateChange}
-                    onHighDateChange={this.props.onHighDateChange}
+                    userSelectedPapers={this.props.userSelectedPapers}
                 />
                 <FullSearchInput
                     yearRange={this.props.dateRanges[2]}
+                    yearRangeHandler={this.props.dateRangeHandlers[2]}
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
-                    onLowDateChange={this.props.onLowDateChange}
-                    onHighDateChange={this.props.onHighDateChange}
                 />
             </TextInputBubble>
         )
