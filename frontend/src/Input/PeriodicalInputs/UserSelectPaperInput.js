@@ -1,10 +1,10 @@
 import PaperOptionWrap from "./PaperOptionWrap";
-import {SelectionBox} from "./SelectionBox";
+import {SelectionBox} from "../SelectionBox";
 import {Dropdown} from "./Dropdown";
 import React from "react";
 import {DateInputBox} from "./DateInputBox";
 
-export function PaperArrayInput(props) {
+export function UserSelectPaperInput(props) {
     const dateInput =
         <DateInputBox
             onLowDateChange={(e) => props.onLowDateChange(e, 1)}
@@ -13,11 +13,11 @@ export function PaperArrayInput(props) {
             maxYearPlaceholder={1920}
             lowYear={props.yearRange[0]}
             highYear={props.yearRange[1]}
-            selected={props.selected}
+            selected={props.selected === 1}
         />
     return (
         <PaperOptionWrap
-            selected={props.selected}
+            selected={props.selected === 1}
             onClick={() => props.onPaperSelectClick(1)}
         >
             <h5 className={'paperOptionHeader'}>

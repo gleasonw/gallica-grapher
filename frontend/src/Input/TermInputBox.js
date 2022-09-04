@@ -20,13 +20,13 @@ export function TermInputBox(props) {
         <TextInputBubble>
             <SelectionBox
                 items={props.selectedTerms}
-                bubblesLabel={'N-grams:'}
+                bubblesLabel={'Graph occurrences of these terms:'}
                 onClick={props.deleteTermBubble}
             />
             <input
                 type="text"
                 value={termInput}
-                name="terms"
+                name="updatedTerms"
                 placeholder="Type here and press 'enter'..."
                 onChange={handleTermChange}
                 onKeyDown={handleKeyDown}

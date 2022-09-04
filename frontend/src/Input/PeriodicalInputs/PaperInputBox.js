@@ -1,7 +1,7 @@
 import React from "react";
-import TextInputBubble from "./TextInputBubble";
+import TextInputBubble from "../TextInputBubble";
 import {ContinuousTrendInput} from "./ContinuousTrendInput";
-import {PaperArrayInput} from "./PaperArrayInput";
+import {UserSelectPaperInput} from "./UserSelectPaperInput";
 import {FullSearchInput} from "./FullSearchInput";
 
 export class PaperInputBox extends React.Component {
@@ -17,7 +17,6 @@ export class PaperInputBox extends React.Component {
         this.handleKeyUp = this.handleKeyUp.bind(this);
         this.handleDropdownClick = this.handleDropdownClick.bind(this);
         this.handlePaperChange = this.handlePaperChange.bind(this);
-        this.handlePaperSelectClick = this.handlePaperSelectClick.bind(this);
     }
 
     handlePaperChange(event) {
@@ -68,29 +67,24 @@ export class PaperInputBox extends React.Component {
         })
     }
 
-    handlePaperSelectClick(index) {
-        const newSelectedInput = [0, 0, 0];
-        newSelectedInput[index] = 1;
-        this.setState({
-            selectedInput: newSelectedInput
-        })
-    }
     //TODO: reduce duplication in paperinput options
     render() {
+        const paperArrayBubbles = this.props.paperGroups[1]
         const paperNames = [];
-        this.props.selectedPapers.map(paperAndCode => paperNames.push(paperAndCode['title']))
+        paperArrayBubbles.map(paperAndCode => paperNames.push(paperAndCode['title']))
         return (
             <TextInputBubble
                 padding={"0"}
             >
                 <ContinuousTrendInput
                     yearRange={this.props.dateRanges[0]}
-                    selected={this.state.selectedInput[0]}
-                    onPaperSelectClick={this.handlePaperSelectClick}
+                    selected={this.props.selectedPaperInput}
+                    onPaperSelectClick={this.props.onPaperInputSelectClick}
                     onLowDateChange={this.props.onLowDateChange}
                     onHighDateChange={this.props.onHighDateChange}
+                    numContinuousPapers={this.props.numContinuousPapers}
                 />
-                <PaperArrayInput
+                <UserSelectPaperInput
                     yearRange={this.props.dateRanges[1]}
                     paperNames={paperNames}
                     deletePaperBubble={this.props.deletePaperBubble}
@@ -101,15 +95,15 @@ export class PaperInputBox extends React.Component {
                     onClick={this.handleDropdownClick}
                     error={this.state.dropdownError}
                     onDropdownClick={this.handleDropdownClick}
-                    selected={this.state.selectedInput[1]}
-                    onPaperSelectClick={this.handlePaperSelectClick}
+                    selected={this.props.selectedPaperInput}
+                    onPaperSelectClick={this.props.onPaperInputSelectClick}
                     onLowDateChange={this.props.onLowDateChange}
                     onHighDateChange={this.props.onHighDateChange}
                 />
                 <FullSearchInput
                     yearRange={this.props.dateRanges[2]}
-                    selected={this.state.selectedInput[2]}
-                    onPaperSelectClick={this.handlePaperSelectClick}
+                    selected={this.props.selectedPaperInput}
+                    onPaperSelectClick={this.props.onPaperInputSelectClick}
                     onLowDateChange={this.props.onLowDateChange}
                     onHighDateChange={this.props.onHighDateChange}
                 />

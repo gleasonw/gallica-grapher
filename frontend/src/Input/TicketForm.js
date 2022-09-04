@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import {RequestBox} from "./RequestBox";
-import {PaperInputBox} from "./PaperInputBox";
-import {DateInputBox} from "./DateInputBox";
+import {PaperInputBox} from "./PeriodicalInputs/PaperInputBox";
 import {TermInputBox} from "./TermInputBox";
 
 function TicketForm(props){
+    const [selectedPaperInput, setSelectedPaperInput] = useState(1);
     const [showTicketReminder, setShowTicketReminder] = useState(false);
     const noTicketReminder =
         <div>
@@ -25,9 +25,13 @@ function TicketForm(props){
         }
     }
 
-    function handleCreateTicketClick(){
+    function handleCreateTicketClick(paperInputIndex){
         setShowTicketReminder(false);
-        props.onCreateTicketClick();
+        props.onCreateTicketClick(selectedPaperInput);
+    }
+
+    function handlePaperInputSelectClick(paperInputIndex){
+        setSelectedPaperInput(paperInputIndex);
     }
 
     return(
@@ -36,7 +40,6 @@ function TicketForm(props){
             className='userInputForm'
         >
             <TermInputBox
-                onChange={props.onTermChange}
                 onKeyDown={props.onKeyDown}
                 selectedTerms={props.selectedTerms}
                 deleteTermBubble={props.deleteTermBubble}
@@ -44,27 +47,32 @@ function TicketForm(props){
             <br />
             <PaperInputBox
                 onClick={props.onPaperDropItemClick}
-                onChange={props.onPaperChange}
-                selectedPapers={props.selectedPapers}
+                onPaperInputSelectClick={handlePaperInputSelectClick}
+                paperGroups={props.paperGroups}
                 deletePaperBubble={props.deletePaperBubble}
                 dateRanges={props.dateRanges}
                 onLowDateChange={props.onLowDateChange}
                 onHighDateChange={props.onHighDateChange}
+                selectedPaperInput={selectedPaperInput}
+                numContinuousPapers={props.numContinuousPapers}
             />
             <div className='graphWarningBoxBoundary'>
-                {showTicketReminder && props.tickets.length === 0 ? noTicketReminder : null}
+                {showTicketReminder && props.tickets.length === 0 ?
+                    noTicketReminder :
+                    null
+                }
                 <div className='createTicketAndGraphButtonContainer'>
+                    <ImportantButtonWrap>
+                        <input
+                            type='submit'
+                            value='Fetch and graph 📊'
+                        />
+                    </ImportantButtonWrap>
                     <ImportantButtonWrap>
                         <input
                             type='button'
                             value='Add search ticket +'
                             onClick={handleCreateTicketClick}
-                        />
-                    </ImportantButtonWrap>
-                    <ImportantButtonWrap>
-                        <input
-                            type='submit'
-                            value='Fetch and graph 📊'
                         />
                     </ImportantButtonWrap>
                 </div>

@@ -1,4 +1,4 @@
-import useData from "../shared/hooks/useData";
+import useData from "../../shared/hooks/useData";
 import PaperOptionWrap from "./PaperOptionWrap";
 import React from "react";
 import {DateInputBox} from "./DateInputBox";
@@ -18,7 +18,7 @@ export function FullSearchInput(props) {
             maxYearPlaceholder={highYearPlaceholder}
             lowYear={lowYear}
             highYear={highYear}
-            selected={props.selected}
+            selected={props.selected === 2}
         />
     const urlForPapersInRange =
         "/api/numPapersOverRange/" + lowYearForDBQuery + "/" + highYearForDBQuery;
@@ -31,7 +31,7 @@ export function FullSearchInput(props) {
     }
     return (
         <PaperOptionWrap
-            selected={props.selected}
+            selected={props.selected === 2}
             borderBottom={'none'}
             onClick={() => props.onPaperSelectClick(2)}
         >

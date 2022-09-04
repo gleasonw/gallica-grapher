@@ -359,6 +359,7 @@ label[for="papers"],label[for="searchTerm"]{
     position: relative;
     z-index: 5;
     bottom: 0;
+    overflow: visible !important;
 }
 .paperDropdown {
     background-color: white;
