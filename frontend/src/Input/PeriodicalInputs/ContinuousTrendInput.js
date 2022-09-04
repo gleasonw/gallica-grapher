@@ -20,7 +20,7 @@ export function ContinuousTrendInput(props) {
             highYear={highYear}
             selected={props.selected}
         />
-    const [limit, setLimit] = React.useState(5000);
+    const limit = 5000
     const urlForContinuousPapers =
         "/api/continuousPapers" +
         "?limit=" + limit +
