@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useRef, useState} from "react";
 import TicketForm from './TicketForm';
 import TicketLabel from "../shared/TicketLabel";
 import DecorativeTicket from "../shared/DecorativeTicket";
@@ -7,13 +7,17 @@ import useData from "../shared/hooks/useData";
 
 function Input(props){
     const exampleBoxRef = useRef(null);
-    const [terms, setTerms] = React.useState([]);
-    const [paperGroups, setPaperGroups] = React.useState([
+    const [terms, setTerms] = useState([]);
+    const [userSelectedPapers, setUserSelectedPapers] = useState([]);
+    const [autoContinuousPapers, setAutoContinuousPapers] = useState([]);
+    const [customPapersDateRange, setCustomPapersDateRange] = useState(['','']);
+    const [autoContinuousDateRange, setAutoContinuousDateRange] = useState(['','']);
+    const [fullSearchDateRange, setFullSearchDateRange] = useState(['',''])
+    const [paperGroups, setPaperGroups] = useState([
         [],
         [],
         []
     ]);
-    const [paperArrayDateBoundary, setPaperArrayDateBoundary] = React.useState([1499,2020]);
     const [dateRanges, setDateRanges] = React.useState([
         ['',''],
         ['',''],
@@ -30,19 +34,12 @@ function Input(props){
         "api/continuousPapers?limit=2000" +
             "&startYear=" + queryYears[0] +
             "&endYear=" + queryYears[1];
+    const lowestStartHighestEndYearsOfUserPapers = setPaperArrayDateBoundary();
 
     const result = useData(queryForContinuousPapers);
     const continuousPapers = result ? result['paperNameCodes'] : [];
 
-    function makePaperBubble(paper){
-        const updatedPapers = paperGroups.slice();
-        const userSelectedPapers = updatedPapers[1].slice();
-        userSelectedPapers.push(paper)
-        updatePaperArrayDateBoundary(userSelectedPapers)
-        updatedPapers[1] = userSelectedPapers
-        setPaperGroups(updatedPapers)
-    }
-
+    
     function makeTermBubble(term){
         if(term){
             const updatedTerms = terms.slice();
@@ -51,19 +48,24 @@ function Input(props){
         }
     }
 
-    function deletePaperBubble(bubbleIndex){
-        const updatedPaperGroups = paperGroups.slice()
-        const bubbleGroup = updatedPaperGroups[1].slice()
-        bubbleGroup.splice(bubbleIndex, 1)
-        updatePaperArrayDateBoundary(bubbleGroup)
-        updatedPaperGroups[1] = bubbleGroup
-        setPaperGroups(updatedPaperGroups)
-    }
-
     function deleteTermBubble(bubbleIndex){
         const newTerms = terms.slice()
         newTerms.splice(bubbleIndex, 1)
         setTerms(newTerms)
+    }
+    
+    function makePaperBubble(paper){
+        const updatedPapers = userSelectedPapers.slice();
+        updatedPapers.push(paper)
+        setPaperArrayDateBoundary(updatedPapers)
+        setUserSelectedPapers(updatedPapers)
+    }
+
+    function deletePaperBubble(bubbleIndex){
+        const updatedPapers = userSelectedPapers.slice();
+        updatedPapers.splice(bubbleIndex, 1)
+        setPaperArrayDateBoundary(updatedPapers)
+        setUserSelectedPapers(updatedPapers)
     }
 
     function handlePaperDropdownClick(paper){
@@ -101,35 +103,78 @@ function Input(props){
         exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
     }
 
-    function updatePaperArrayDateBoundary(papers){
+    function setPaperArrayDateBoundary(){
+        const userPaperChoices = paperGroups[1]
         let minYear = 1499
         let maxYear = 2020
-        if(papers.length > 0){
-            const paperLowYears = papers.map(paper => paper["startDate"])
-            const paperHighYears = papers.map(paper => paper["endDate"])
+        if(userPaperChoices.length > 0){
+            const paperLowYears = userPaperChoices.map(paper => paper["startDate"])
+            const paperHighYears = userPaperChoices.map(paper => paper["endDate"])
             minYear = Math.min(...paperLowYears)
             maxYear = Math.max(...paperHighYears)
         }
-        setPaperArrayDateBoundary([minYear, maxYear])
+        return [minYear, maxYear]
     }
 
     function trimUserSelectedRange(paperInputIndex){
-        if(paperInputIndex === 1){
-            trimUserRangeToActualPaperArrayRange()
+        if(paperInputIndex === 0){
+            return assignNullRangeValuesToPlaceholder(
+                customPapersDateRange, 
+                1890, 
+                2020
+                )
+        }else if(paperInputIndex === 1){
+            let trimmedRange = trimCustomPaperRangeToActualPaperRange()
+            const lowYearDefault = lowestStartHighestEndYearsOfUserPapers[0]
+            const highYearDefault = lowestStartHighestEndYearsOfUserPapers[1]
+            return assignNullRangeValuesToPlaceholder(
+                trimmedRange, 
+                lowYearDefault, 
+                highYearDefault
+            )
+        }else if(paperInputIndex === 2){
+            return assignNullRangeValuesToPlaceholder(
+                fullSearchDateRange,
+                1499,
+                2020
+            )
         }else{
-            minYear
-            const dateRange = dateRanges[paperInputIndex]
-            if(userRange[0] < minYear || userRange[0] === ''){
-                userRange[0] = minYear
-            }
-            if(userRange[1] > maxYear || userRange[1] === ''){
-                userRange[1] = maxYear
-            }
+            throw `Unexpected paper index: ${paperInputIndex}`
         }
-        const userRange = dateRanges[1].slice()
-        const minYear = paperArrayDateBoundary[0]
-        const maxYear = paperArrayDateBoundary[1]
+    }
+
+    function trimCustomPaperRangeToActualPaperRange(){
+        const userRange = customPapersDateRange
+        const minYear = lowestStartHighestEndYearsOfUserPapers[0]
+        const maxYear = lowestStartHighestEndYearsOfUserPapers[1]
+        if(userRange[0] < minYear){
+            userRange[0] = minYear
+        }
+        if(userRange[1] > maxYear){
+            userRange[1] = maxYear
+        }
         return userRange
+    }
+
+    function assignNullRangeValuesToPlaceholder(range, lowDefault, highDefault){
+        if (range[0] === '') {
+            range[0] = lowDefault
+        if (range[1] === '') {
+            range[1] =highDefault
+        }
+        return range
+    }
+
+    function getPapersFor(paperInputIndex){
+        if(paperInputIndex === 0){
+            return continuousPapers
+        }else if(paperInputIndex === 1){
+            return userSelectedPapers
+        }else if(paperInputIndex === 2){
+            return []
+        }else{
+            throw `Unexpected paper index: ${paperInputIndex}`
+        }
     }
 
     function isNumeric(str){
@@ -150,9 +195,7 @@ function Input(props){
                     onCreateTicketClick={(paperInputIndex) => props.onCreateTicketClick(
                         {
                             'terms': terms,
-                            'papersAndCodes': paperInputIndex === 0 ?
-                                continuousPapers :
-                                paperGroups[paperInputIndex],
+                            'papersAndCodes': getPapersFor(paperInputIndex),
                             'dateRange': trimUserSelectedRange(paperInputIndex)
                         }
                     )}
@@ -162,8 +205,8 @@ function Input(props){
                     paperGroups={paperGroups}
                     deleteTermBubble={deleteTermBubble}
                     deletePaperBubble={deletePaperBubble}
-                    minYearPlaceholder={paperArrayDateBoundary[0]}
-                    maxYearPlaceholder={paperArrayDateBoundary[1]}
+                    minYearPlaceholder={lowestStartHighestEndYearsOfUserPapers[0]}
+                    maxYearPlaceholder={lowestStartHighestEndYearsOfUserPapers[1]}
                     onGraphStartClick={props.onInputSubmit}
                     onTicketClick={props.onTicketClick}
                     tickets={props.requestTickets}
@@ -221,7 +264,7 @@ function ExampleRequest(props){
                     <DecorativeTicket key={index}>
                         <TicketLabel
                             terms={ticket["terms"]}
-                            papers={ticket["papersAndCodes"]}
+                            userPaperChoices={ticket["papersAndCodes"]}
                             dateRange={ticket["dateRange"]}
                         />
                     </DecorativeTicket>
