@@ -1,45 +1,23 @@
 import React, {useState} from 'react';
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
-import {RequestBox} from "./RequestBox";
+import {StyledRequestBox} from "./RequestBox";
 import {PaperInputBox} from "./PeriodicalInputs/PaperInputBox";
 import {TermInputBox} from "./TermInputBox";
-import TextInputBubble from "./TextInputBubble";
+import RequestBoxAndFetchButtonWrap from "./RequestBoxAndFetchButtonWrap";
 
 function TicketForm(props){
     const [showNoTermsReminder, setShowNoTermsReminder] = useState(false);
 
 
-    const noTermsReminder = 
-        <div>
-            <div className='noTermsReminder'>
-                <span className='noTermsReminderText'>
-                    You have no terms.
-                </span>
-            </div>
-        </div>
 
     function handleSubmit(e){
         e.preventDefault();
-        if (!props.tickets.length){
-            setShowTicketReminder(true)
+        if (!props.terms || props.terms.length === 0){
+            setShowNoTermsReminder(true)
         } else{
+            props.onCreateTicketClick();
             props.onGraphStartClick(e);
         }
-    }
-
-    function handleCreateTicketClick(){
-        if (!props.selectedTerms || !props.selectedTerms.length){
-            setShowNoTermsReminder(true)
-        }else{
-            setShowTicketReminder(false);
-            props.onCreateTicketClick();
-        }
-    }
-
-    function handleCreateTerm(e){
-        e.preventDefault();
-        setShowNoTermsReminder(false);
-        props.onKeyDown(e);
     }
 
     return(
@@ -47,12 +25,16 @@ function TicketForm(props){
             onSubmit={props.onGraphStartClick}
             className='userInputForm'
         >
+            <label>Chart this term:</label>
             <TermInputBox
-                onKeyDown={handleCreateTerm}
+                onEnterPress={handleSubmit}
                 selectedTerms={props.selectedTerms}
                 deleteTermBubble={props.deleteTermBubble}
+                termInput={props.termInput}
+                handleTermChange={props.handleTermChange}
             />
             <br />
+            <label>in...</label>
             <PaperInputBox
                 onClick={props.onPaperDropItemClick}
                 deletePaperBubble={props.deletePaperBubble}
@@ -64,26 +46,21 @@ function TicketForm(props){
                 userSelectedPapers={props.userSelectedPapers}
                 boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
             />
-            <div className='graphWarningBoxBoundary'>
-                {showTicketReminder ?
-                    noTicketReminder :
-                    null
-                }
-                {showNoTermsReminder ?
-                    noTermsReminder :
-                    null
-                }
-            <ImportantButtonWrap>
-                <input
-                    type='submit'
-                    value='Fetch and graph 📊'
+            <br />
+            <RequestBoxAndFetchButtonWrap>
+                <StyledRequestBox
+                    display={'none'}
                 />
-            </ImportantButtonWrap>
-            </div>
-
-
+                <ImportantButtonWrap>
+                    <input
+                        type='submit'
+                        value='Fetch and graph 📊'
+                    />
+                </ImportantButtonWrap>
+            </RequestBoxAndFetchButtonWrap>
         </form>
     )
 }
+
 
 export default TicketForm;

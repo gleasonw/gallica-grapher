@@ -112,11 +112,6 @@ header{
     max-width: 748px;
     margin-top: 15px;
 }
-.requestBox{
-    display: flex;
-    flex-direction: column;
-    padding: 10px 20px 10px 20px;
-}
 .requestBoxLabel{
     align-self: center;
 }

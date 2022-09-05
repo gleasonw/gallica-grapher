@@ -1,43 +1,24 @@
 import TicketLabel from "../shared/TicketLabel";
 import React from "react";
 import DecorativeTicket from "../shared/DecorativeTicket";
+import styled from "styled-components";
 
-export function RequestBox(props) {
-    return (
-        <div className={'requestBoxContainer'}>
-            <div className='requestBox'>
-                <RequestTicketBox
-                    tickets={props.tickets}
-                    onTicketClick={props.onTicketClick}
-                />
-            </div>
+export const RequestBox = ({className, props}) => (
+        <div className={className}>
+            {props.tickets.map((ticket, index) => (
+                <DecorativeTicket key={index}>
+                    <RequestTicket
+                        ticket={ticket}
+                        onClick={() => props.onTicketClick(index)}
+                    />
+                </DecorativeTicket>
+            ))}
         </div>
     );
 
-}
-
-function RequestTicketBox(props) {
-    if (props.tickets && props.tickets.length > 0) {
-        return (
-            <div className="ticketBubbleContainer">
-                {props.tickets.map((ticket, index) => (
-                    <DecorativeTicket key={index}>
-                        <RequestTicket
-                            ticket={ticket}
-                            onClick={() => props.onTicketClick(index)}
-                        />
-                    </DecorativeTicket>
-                ))}
-            </div>
-        )
-    } else {
-        return (
-            <div className="ticketBubbleContainer">
-                <div id='placeHolderTicket'/>
-            </div>
-        )
-    }
-}
+export const StyledRequestBox = styled(RequestBox)`
+    display: ${props => props.display};
+`;
 
 function RequestTicket(props) {
     const terms = props.ticket['terms']
@@ -58,3 +39,4 @@ function RequestTicket(props) {
         </button>
     );
 }
+

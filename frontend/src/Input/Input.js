@@ -8,6 +8,7 @@ import useData from "../shared/hooks/useData";
 function Input(props){
     const exampleBoxRef = useRef(null);
     const [terms, setTerms] = useState([]);
+    const [termInput, setTermInput] = useState('');
     const [userSelectedPapers, setUserSelectedPapers] = useState([]);
     const [selectedPaperInput, setSelectedPaperInput] = useState(0);
     const [customPapersDateRange, setCustomPapersDateRange] = useState(['','']);
@@ -39,10 +40,13 @@ function Input(props){
         }
         return [minYear, maxYear]
     }
-    
-    function handleKeyDown(event){
-        event.preventDefault()
-        makeTermBubble(event.target.value)
+
+    function handleTermChange(event) {
+        const input = event.target.value
+        const splitCommaTerms = input.split(',')
+        const trimmedTerms = splitCommaTerms.map(term => term.trim())
+        setTermInput(input)
+        setTerms(trimmedTerms)
     }
     
     function handleSeeExamplesClick(){
@@ -108,14 +112,6 @@ function Input(props){
             const updatedFullSearchRange = fullSearchDateRange.slice()
             updatedFullSearchRange[1] = inputHighYear
             setFullSearchDateRange(updatedFullSearchRange)
-        }
-    }
-
-    function makeTermBubble(term){
-        if(term){
-            const updatedTerms = terms.slice();
-            updatedTerms.push(term)
-            setTerms(updatedTerms)
         }
     }
 
@@ -240,8 +236,8 @@ function Input(props){
                         }
                     )}
                     onPaperDropItemClick={handlePaperDropdownClick}
-                    onKeyDown={handleKeyDown}
-                    selectedTerms={terms}
+                    termInput={termInput}
+                    handleTermChange={handleTermChange}
                     userSelectedPapers={userSelectedPapers}
                     deleteTermBubble={deleteTermBubble}
                     deletePaperBubble={deletePaperBubble}
@@ -258,11 +254,11 @@ function Input(props){
                     }
                 />
                 <input
-                id='seeExamplesButton'
-                type='button'
-                aria-label='Scroll to examples'
-                onClick={handleSeeExamplesClick}
-                value='Or try some examples ↓'
+                    id='seeExamplesButton'
+                    type='button'
+                    aria-label='Scroll to examples'
+                    onClick={handleSeeExamplesClick}
+                    value='Or try some examples ↓'
                 />
             </div>
         <ExampleBox
