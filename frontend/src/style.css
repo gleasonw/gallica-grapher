@@ -60,7 +60,7 @@ header{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    font-size: 30px;
+    font-size: 20px;
     margin: 20px 20px 0 20px;
 }
 .gallicaGrapherHome:hover{
@@ -71,16 +71,14 @@ header{
     cursor: pointer;
 }
 .mainTitle{
-    padding: 0 40px 40px;
+    padding-bottom: 20px;
     width: 548px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 44px;
-    line-height: 56px;
+    font-size: 35px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 30px;
     color: #4d4d4d
 }
 .inputBody{
@@ -113,11 +111,6 @@ header{
     width: 100%;
     max-width: 748px;
     margin-top: 15px;
-}
-.graphWarningBoxBoundary{
-    border-radius: 10px;
-    background: rgba(255,255,255,0.5);
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
 }
 .requestBox{
     display: flex;

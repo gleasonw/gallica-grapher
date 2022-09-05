@@ -24,7 +24,7 @@ export function UserSelectPaperInput(props) {
             onClick={() => props.onPaperSelectClick(1)}
         >
             <h5 className={'paperOptionHeader'}>
-                ... in these periodicals between {dateInput}
+                My chosen periodicals between {dateInput}
             </h5>
             <SelectionBox
                 items={paperNames}
@@ -34,7 +34,7 @@ export function UserSelectPaperInput(props) {
                 type="text"
                 value={props.paperInputValue}
                 name="papers"
-                placeholder="Enter a paper to restrict search..."
+                placeholder="Search for a periodical"
                 onKeyUp={props.onKeyUp}
                 onChange={props.onPaperChange}
                 autoComplete="off"

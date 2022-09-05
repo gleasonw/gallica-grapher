@@ -6,17 +6,8 @@ import {TermInputBox} from "./TermInputBox";
 import TextInputBubble from "./TextInputBubble";
 
 function TicketForm(props){
-    const [showTicketReminder, setShowTicketReminder] = useState(false);
     const [showNoTermsReminder, setShowNoTermsReminder] = useState(false);
 
-    const noTicketReminder =
-        <div>
-            <div className='noTicketReminder'>
-                <span className='noTicketReminderText'>
-                    You have no tickets.
-                </span>
-            </div>
-        </div>
 
     const noTermsReminder = 
         <div>
@@ -53,7 +44,7 @@ function TicketForm(props){
 
     return(
         <form
-            onSubmit={handleSubmit}
+            onSubmit={props.onGraphStartClick}
             className='userInputForm'
         >
             <TermInputBox
@@ -82,25 +73,12 @@ function TicketForm(props){
                     noTermsReminder :
                     null
                 }
-                    <div className='createTicketAndGraphButtonContainer'>
-                        <ImportantButtonWrap>
-                            <input
-                                type='submit'
-                                value='Fetch and graph 📊'
-                            />
-                        </ImportantButtonWrap>
-                        <ImportantButtonWrap>
-                            <input
-                                type='button'
-                                value='Add search ticket +'
-                                onClick={handleCreateTicketClick}
-                            />
-                        </ImportantButtonWrap>
-                    </div>
-                    <RequestBox
-                        tickets={props.tickets}
-                        onTicketClick={props.onTicketClick}
-                    />
+            <ImportantButtonWrap>
+                <input
+                    type='submit'
+                    value='Fetch and graph 📊'
+                />
+            </ImportantButtonWrap>
             </div>
 
 

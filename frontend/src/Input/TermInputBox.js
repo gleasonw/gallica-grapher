@@ -20,14 +20,13 @@ export function TermInputBox(props) {
         <TextInputBubble>
             <SelectionBox
                 items={props.selectedTerms}
-                bubblesLabel={'Graph occurrences of these terms:'}
                 onClick={props.deleteTermBubble}
             />
             <input
                 type="text"
                 value={termInput}
                 name="updatedTerms"
-                placeholder="Type here and press 'enter'..."
+                placeholder="Enter a search term"
                 onChange={handleTermChange}
                 onKeyDown={handleKeyDown}
                 autoComplete="off"

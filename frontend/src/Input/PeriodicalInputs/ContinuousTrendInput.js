@@ -25,7 +25,7 @@ export function ContinuousTrendInput(props) {
             onClick={() => props.onPaperSelectClick(0)}
         >
             <h5 className={'paperOptionHeader'}>
-                ... in {props.numContinuousPapers} periodicals publishing
+                {props.numContinuousPapers} continuous periodicals publishing
                 every year between {dateInputs}
             </h5>
         </PaperOptionWrap>
