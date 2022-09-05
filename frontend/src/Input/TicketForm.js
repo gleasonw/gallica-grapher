@@ -29,13 +29,9 @@ function TicketForm(props){
 
     function handleSubmit(e){
         e.preventDefault();
-        if (!props.tickets || !props.tickets.length){
+        if (!props.tickets.length){
             setShowTicketReminder(true)
-        }
-        if (!props.selectedTerms || !props.selectedTerms.length){
-            setShowNoTermsReminder(true)
-        }
-        else{
+        } else{
             props.onGraphStartClick(e);
         }
     }

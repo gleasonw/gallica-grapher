@@ -9,7 +9,7 @@ function Input(props){
     const exampleBoxRef = useRef(null);
     const [terms, setTerms] = useState([]);
     const [userSelectedPapers, setUserSelectedPapers] = useState([]);
-    const [selectedPaperInput, setSelectedPaperInput] = useState(1);
+    const [selectedPaperInput, setSelectedPaperInput] = useState(0);
     const [customPapersDateRange, setCustomPapersDateRange] = useState(['','']);
     const [continuousDateRange, setContinuousDateRange] = useState(['','']);
     const [fullSearchDateRange, setFullSearchDateRange] = useState(['','']);
@@ -260,6 +260,7 @@ function Input(props){
                 <input
                 id='seeExamplesButton'
                 type='button'
+                aria-label='Scroll to examples'
                 onClick={handleSeeExamplesClick}
                 value='Or try some examples ↓'
                 />
@@ -298,7 +299,10 @@ function ExampleBox(props){
 function ExampleRequest(props){
     const tickets = props.request["tickets"]
     return(
-        <ImportantButtonWrap onClick={() => props.onClick(tickets)}>
+        <ImportantButtonWrap
+            onClick={() => props.onClick(tickets)}
+            aria-label={`Load example request: ${props.title}`}
+        >
             <h1>{props.title}</h1>
             <div className={'exampleRequest'}>
                 {tickets.map((ticket, index) => (

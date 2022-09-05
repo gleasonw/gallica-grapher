@@ -22,18 +22,20 @@ function App() {
     const header =
         <header className="header">
             <div className="infoAndHomeBar">
-                <div
+                <button
                     className={'gallicaGrapherHome'}
                     onClick={handleHomeClick}
+                    aria-label="Home page button"
                 >
                     Graphing Gallica
-                </div>
-                <div
+                </button>
+                <button
                     className="info"
                     onClick={handleInfoClick}
+                    aria-label="Information page button"
                 >
                     <InfoIcon/>
-                </div>
+                </button>
             </div>
         </header>
 
@@ -114,7 +116,7 @@ function App() {
     }
     if(infoPage) {
         return(
-            <div>
+            <div className="App">
                 {header}
                 <div className={'infoText'}>
                     This is a graphing tool.
