@@ -38,7 +38,7 @@ export function FullSearchInput(props) {
             onClick={() => props.onPaperSelectClick(2)}
         >
             <h5 className={'paperOptionHeader'}>
-                In {numPapersOverRange} periodicals publishing
+                ... in {numPapersOverRange} periodicals publishing
                 at any point between {dateInputs}
             </h5>
         </PaperOptionWrap>

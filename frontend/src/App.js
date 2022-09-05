@@ -74,6 +74,7 @@ function App() {
     }
 
     function createTicketFromInput(items){
+        console.log(items)
         if(items.terms.length > 0){
             let updatedTickets = tickets.slice();
             updatedTickets.push(items);

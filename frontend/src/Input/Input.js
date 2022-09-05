@@ -152,7 +152,7 @@ function Input(props){
     function getDateRangeFor(paperInputIndex){
         if(paperInputIndex === 0){
             return assignNullRangeValuesToPlaceholder(
-                customPapersDateRange, 
+                continuousDateRange,
                 1890, 
                 2020
                 )
@@ -190,6 +190,7 @@ function Input(props){
     }
 
     function assignNullRangeValuesToPlaceholder(range, lowDefault, highDefault){
+        console.log(lowDefault)
         if (range[0] === '') {
             range[0] = lowDefault
         }

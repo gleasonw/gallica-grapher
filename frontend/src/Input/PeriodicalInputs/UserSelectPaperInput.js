@@ -24,7 +24,7 @@ export function UserSelectPaperInput(props) {
             onClick={() => props.onPaperSelectClick(1)}
         >
             <h5 className={'paperOptionHeader'}>
-                In these periodicals between {dateInput}
+                ... in these periodicals between {dateInput}
             </h5>
             <SelectionBox
                 items={paperNames}
