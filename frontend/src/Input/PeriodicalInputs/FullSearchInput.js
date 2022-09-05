@@ -8,12 +8,14 @@ export function FullSearchInput(props) {
     const highYearPlaceholder = 2020;
     const lowYear = props.yearRange[0];
     const highYear = props.yearRange[1];
-    const lowYearForDBQuery = lowYear ? lowYear : lowYearPlaceholder;
-    const highYearForDBQuery = highYear ? highYear : highYearPlaceholder;
+    let lowYearForDBQuery = lowYear ? lowYear : lowYearPlaceholder;
+    let highYearForDBQuery = highYear ? highYear : highYearPlaceholder;
+    const onLowDateChange = props.yearRangeHandler[0];
+    const onHighDateChange = props.yearRangeHandler[1];
     const dateInputs =
         <DateInputBox
-            onLowDateChange={(e) => props.onLowDateChange(e, 2)}
-            onHighDateChange={(e) => props.onHighDateChange(e, 2)}
+            onLowDateChange={onLowDateChange}
+            onHighDateChange={onHighDateChange}
             minYearPlaceholder={lowYearPlaceholder}
             maxYearPlaceholder={highYearPlaceholder}
             lowYear={lowYear}

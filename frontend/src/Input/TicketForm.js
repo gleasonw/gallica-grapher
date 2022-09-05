@@ -3,9 +3,9 @@ import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import {RequestBox} from "./RequestBox";
 import {PaperInputBox} from "./PeriodicalInputs/PaperInputBox";
 import {TermInputBox} from "./TermInputBox";
+import TextInputBubble from "./TextInputBubble";
 
 function TicketForm(props){
-    const [selectedPaperInput, setSelectedPaperInput] = useState(1);
     const [showTicketReminder, setShowTicketReminder] = useState(false);
     const [showNoTermsReminder, setShowNoTermsReminder] = useState(false);
 
@@ -49,13 +49,10 @@ function TicketForm(props){
         }
     }
 
-    function handlePaperInputSelectClick(paperInputIndex){
-        setSelectedPaperInput(paperInputIndex);
-    }
-
-    function handleCreateTerm(){
+    function handleCreateTerm(e){
+        e.preventDefault();
         setShowNoTermsReminder(false);
-        props.onHandleKeyDown();
+        props.onKeyDown(e);
     }
 
     return(
@@ -74,10 +71,11 @@ function TicketForm(props){
                 deletePaperBubble={props.deletePaperBubble}
                 dateRanges={props.dateRanges}
                 dateRangeHandlers={props.dateRangeHandlers}
-                onPaperInputSelectClick={handlePaperInputSelectClick}
-                selectedPaperInput={selectedPaperInput}
+                onPaperInputSelectClick={props.onPaperInputClick}
+                selectedPaperInput={props.selectedPaperInput}
                 numContinuousPapers={props.numContinuousPapers}
                 userSelectedPapers={props.userSelectedPapers}
+                boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
             />
             <div className='graphWarningBoxBoundary'>
                 {showTicketReminder ?
@@ -88,25 +86,25 @@ function TicketForm(props){
                     noTermsReminder :
                     null
                 }
-                <div className='createTicketAndGraphButtonContainer'>
-                    <ImportantButtonWrap>
-                        <input
-                            type='submit'
-                            value='Fetch and graph 📊'
-                        />
-                    </ImportantButtonWrap>
-                    <ImportantButtonWrap>
-                        <input
-                            type='button'
-                            value='Add search ticket +'
-                            onClick={handleCreateTicketClick}
-                        />
-                    </ImportantButtonWrap>
-                </div>
-                <RequestBox
-                    tickets={props.tickets}
-                    onTicketClick={props.onTicketClick}
-                />
+                    <div className='createTicketAndGraphButtonContainer'>
+                        <ImportantButtonWrap>
+                            <input
+                                type='submit'
+                                value='Fetch and graph 📊'
+                            />
+                        </ImportantButtonWrap>
+                        <ImportantButtonWrap>
+                            <input
+                                type='button'
+                                value='Add search ticket +'
+                                onClick={handleCreateTicketClick}
+                            />
+                        </ImportantButtonWrap>
+                    </div>
+                    <RequestBox
+                        tickets={props.tickets}
+                        onTicketClick={props.onTicketClick}
+                    />
             </div>
 
 

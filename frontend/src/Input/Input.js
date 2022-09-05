@@ -9,6 +9,7 @@ function Input(props){
     const exampleBoxRef = useRef(null);
     const [terms, setTerms] = useState([]);
     const [userSelectedPapers, setUserSelectedPapers] = useState([]);
+    const [selectedPaperInput, setSelectedPaperInput] = useState(1);
     const [customPapersDateRange, setCustomPapersDateRange] = useState(['','']);
     const [continuousDateRange, setContinuousDateRange] = useState(['','']);
     const [fullSearchDateRange, setFullSearchDateRange] = useState(['','']);
@@ -22,22 +23,17 @@ function Input(props){
         1890 : continuousDateRange[0];
         let queryHighYear = continuousDateRange[1] === '' ?
             1920 : continuousDateRange[1];
-        let queryYears = queryLowYear < queryHighYear ?
-        [queryLowYear, queryHighYear] : [0,0];
-
-        const queryForContinuousPapers = "api/continuousPapers?limit=2000" +
-            "&startYear=" + queryYears[0] +
-            "&endYear=" + queryYears[1];
-
-        return queryForContinuousPapers
+        return "api/continuousPapers?limit=2000" +
+            "&startYear=" + queryLowYear +
+            "&endYear=" + queryHighYear;
     }
 
     function setUserPapersYearBoundary(){
         let minYear = 1499
         let maxYear = 2020
-        if(userPaperChoices.length > 0){
-            const paperLowYears = userPaperChoices.map(paper => paper["startDate"])
-            const paperHighYears = userPaperChoices.map(paper => paper["endDate"])
+        if(userSelectedPapers.length > 0){
+            const paperLowYears = userSelectedPapers.map(paper => paper["startDate"])
+            const paperHighYears = userSelectedPapers.map(paper => paper["endDate"])
             minYear = Math.min(...paperLowYears)
             maxYear = Math.max(...paperHighYears)
         }
@@ -57,23 +53,30 @@ function Input(props){
         makePaperBubble(paper)
     }
 
-    function handleContinuousLowYearChange(inputLowDate){
-        if(isNumeric(inputLowDate) || inputLowDate === '') {
+    function handlePaperInputSelectClick(paperInputIndex){
+        setSelectedPaperInput(paperInputIndex);
+    }
+
+    function handleContinuousLowYearChange(event){
+        const inputLowYear = event.target.value
+        if(isNumeric(inputLowYear) || inputLowYear === '') {
             const updatedContinousRange = continuousDateRange.slice()
-            updatedContinousRange[0] = inputLowDate
+            updatedContinousRange[0] = inputLowYear
             setContinuousDateRange(updatedContinousRange)
         }
     }
 
-    function handleContinuousHighYearChange(inputHighDate){
-        if(isNumeric(inputHighDate) || inputHighDate === '') {
+    function handleContinuousHighYearChange(event){
+        const inputHighYear = event.target.value
+        if(isNumeric(inputHighYear) || inputHighYear === '') {
             const updatedContinousRange = continuousDateRange.slice()
-            updatedContinousRange[1] = inputHighDate
+            updatedContinousRange[1] = inputHighYear
             setContinuousDateRange(updatedContinousRange)
         }
     }
 
-    function handleCustomLowYearChange(inputLowYear){
+    function handleCustomLowYearChange(event){
+        const inputLowYear = event.target.value
         if(isNumeric(inputLowYear) || inputLowYear === '') {
             const updatedCustomRange = customPapersDateRange.slice()
             updatedCustomRange[0] = inputLowYear
@@ -81,7 +84,8 @@ function Input(props){
         }
     }
     
-    function handleCustomHighYearChange(inputHighYear){
+    function handleCustomHighYearChange(event){
+        const inputHighYear = event.target.value
         if(isNumeric(inputHighYear) || inputHighYear === '') {
             const updatedCustomRange = customPapersDateRange.slice()
             updatedCustomRange[1] = inputHighYear
@@ -89,7 +93,8 @@ function Input(props){
         }
     }
 
-    function handleFullSearchLowYearChange(inputLowYear){
+    function handleFullSearchLowYearChange(event){
+        const inputLowYear = event.target.value
         if(isNumeric(inputLowYear) || inputLowYear === '') {
             const updatedFullSearchRange = fullSearchDateRange.slice()
             updatedFullSearchRange[0] = inputLowYear
@@ -97,15 +102,15 @@ function Input(props){
         }
     }
     
-    function handleFullSearchHighYearChange(inputHighYear){
+    function handleFullSearchHighYearChange(event){
+        const inputHighYear = event.target.value
         if(isNumeric(inputHighYear) || inputHighYear === '') {
             const updatedFullSearchRange = fullSearchDateRange.slice()
             updatedFullSearchRange[1] = inputHighYear
             setFullSearchDateRange(updatedFullSearchRange)
         }
     }
-    
-    
+
     function makeTermBubble(term){
         if(term){
             const updatedTerms = terms.slice();
@@ -140,7 +145,7 @@ function Input(props){
         }else if(paperInputIndex === 2){
             return []
         }else{
-            throw `Unexpected paper index: ${paperInputIndex}`
+            throw Error(`Unexpected paper index: ${paperInputIndex}`)
         }
     }
 
@@ -167,7 +172,7 @@ function Input(props){
                 2020
             )
         }else{
-            throw `Unexpected paper index: ${paperInputIndex}`
+            throw Error(`Unexpected paper index: ${paperInputIndex}`)
         }
     }
 
@@ -187,6 +192,7 @@ function Input(props){
     function assignNullRangeValuesToPlaceholder(range, lowDefault, highDefault){
         if (range[0] === '') {
             range[0] = lowDefault
+        }
         if (range[1] === '') {
             range[1] =highDefault
         }
@@ -225,11 +231,11 @@ function Input(props){
                             handleFullSearchHighYearChange
                         ]
                     ]}
-                    onCreateTicketClick={(paperInputIndex) => props.onCreateTicketClick(
+                    onCreateTicketClick={() => props.onCreateTicketClick(
                         {
                             'terms': terms,
-                            'papersAndCodes': getPapersFor(paperInputIndex),
-                            'dateRange': getDateRangeFor(paperInputIndex)
+                            'papersAndCodes': getPapersFor(selectedPaperInput),
+                            'dateRange': getDateRangeFor(selectedPaperInput)
                         }
                     )}
                     onPaperDropItemClick={handlePaperDropdownClick}
@@ -243,6 +249,8 @@ function Input(props){
                     onTicketClick={props.onTicketClick}
                     tickets={props.requestTickets}
                     exampleBoxRef={exampleBoxRef}
+                    onPaperInputClick={handlePaperInputSelectClick}
+                    selectedPaperInput={selectedPaperInput}
                     numContinuousPapers={continuousPapers ?
                         continuousPapers.length :
                         '...'
@@ -296,7 +304,7 @@ function ExampleRequest(props){
                     <DecorativeTicket key={index}>
                         <TicketLabel
                             terms={ticket["terms"]}
-                            userPaperChoices={ticket["papersAndCodes"]}
+                            papers={ticket["papersAndCodes"]}
                             dateRange={ticket["dateRange"]}
                         />
                     </DecorativeTicket>

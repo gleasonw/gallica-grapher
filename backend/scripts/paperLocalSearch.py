@@ -7,7 +7,9 @@ class PaperLocalSearch:
         self.dbConnection = PSQLconn().getConn()
         self.cursor = self.dbConnection.cursor()
 
-    def selectPapersContinuousOverRange(self, startYear, endYear, limit):
+    def selectPapersContinuousOverRange(self, firstInputYear, secondInputYear, limit):
+        biggerYear = max(firstInputYear, secondInputYear)
+        smallerYear = min(firstInputYear, secondInputYear)
         query = """
         SELECT title, code, startdate, enddate
         FROM papers
@@ -18,9 +20,9 @@ class PaperLocalSearch:
         if limit:
             limit = int(limit)
             query += " LIMIT %s"
-            args = (startYear, endYear, limit,)
+            args = (smallerYear, biggerYear, limit,)
         else:
-            args = (startYear, endYear,)
+            args = (smallerYear, biggerYear,)
         with self.dbConnection.cursor() as curs:
             curs.execute(query, args)
             papersContinuousOverRange = curs.fetchall()

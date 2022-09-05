@@ -5,16 +5,19 @@ import React from "react";
 import {DateInputBox} from "./DateInputBox";
 
 export function UserSelectPaperInput(props) {
+    const onLowDateChange = props.yearRangeHandler[0];
+    const onHighDateChange = props.yearRangeHandler[1];
     const dateInput =
         <DateInputBox
-            onLowDateChange={(e) => props.onLowDateChange(e, 1)}
-            onHighDateChange={(e) => props.onHighDateChange(e, 1)}
-            minYearPlaceholder={1890}
-            maxYearPlaceholder={1920}
+            onLowDateChange={onLowDateChange}
+            onHighDateChange={onHighDateChange}
+            minYearPlaceholder={props.boundaryYearsForUserPapers[0]}
+            maxYearPlaceholder={props.boundaryYearsForUserPapers[1]}
             lowYear={props.yearRange[0]}
             highYear={props.yearRange[1]}
             selected={props.selected === 1}
         />
+    const paperNames = props.userSelectedPapers.map(paper => paper.title);
     return (
         <PaperOptionWrap
             selected={props.selected === 1}
@@ -24,7 +27,7 @@ export function UserSelectPaperInput(props) {
                 In these periodicals between {dateInput}
             </h5>
             <SelectionBox
-                items={props.paperNames}
+                items={paperNames}
                 onClick={props.deletePaperBubble}
             />
             <input
