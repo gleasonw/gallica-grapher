@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import Input from "./Input/Input";
 import RunningQueriesUI from "./Running/RunningQueries";
-import ReactMarkdown from 'react-markdown';
 import ResultUI from "./Result/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -153,11 +152,11 @@ function App() {
                 {header}
                 <div className={'tooManyRecordsWarningBox'}>
                     <h1>Your curiosity exceeds my capacity.</h1>
-                    <span>
+                    <section>
             Your request returned {numRecords.toLocaleString()} records from Gallica's archive. This number is either
                         greater than my limit, or I don't have enough space for it right now. Try restricting your search to a few periodicals,
-            shortening the year range, or using a more precise ngram. Click on Graphing Gallica to return to home.
-                    </span>
+            shortening the year range, or using a more precise term. Click on Graphing Gallica to return to home.
+                    </section>
                 </div>
             </div>
         )
