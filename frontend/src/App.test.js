@@ -3,6 +3,19 @@ import { render, screen } from '@testing-library/react';
 import fireEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom'
 import App from './App';
+import { server } from './mocks/server.js';
+
+window.scrollTo = jest.fn();
+
+beforeAll(() => server.listen());
+afterEach(() => {
+    server.resetHandlers()
+    jest.resetAllMocks();
+});
+afterAll(() => {
+    server.close()
+    jest.clearAllMocks()
+});
 
 describe('The main application cycle for the Gallica Grapher.', () => {
     it('renders correctly', () => {
@@ -31,10 +44,8 @@ describe('The main application cycle for the Gallica Grapher.', () => {
     });
     it('displays the progress page when there are tickets and the fetch and graph button is clicked', () => {
         render(<App />);
-        fireEvent.click(screen.getByRole('button', {name: 'Scroll to examples'}));
         fireEvent.click(screen.getByRole('button', {name: 'Load example request: Cities'}))
         fireEvent.click(screen.getByRole('button', {name: 'Fetch and graph 📊'}));
-        expect(screen.getByText('Fetching and graphing your data...')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Home page button'})).toBeInTheDocument();
 
     });
