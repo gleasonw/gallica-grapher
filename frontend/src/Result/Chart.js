@@ -1,5 +1,7 @@
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
+import Exporting from 'highcharts/modules/exporting';
+import Export_data from 'highcharts/modules/export-data';
 import React, {useContext, useRef} from "react";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 import ToggleButton from '@mui/material/ToggleButton';
@@ -13,9 +15,6 @@ import getDateRangeSpan from "./chartUtils/getDateRangeSpan";
 import {CSVDownload} from "react-csv";
 import LesserButton from "../shared/LesserButton";
 import NavBarWrap from "./NavBarWrap";
-
-require("highcharts/modules/exporting")(Highcharts);
-require("highcharts/modules/export-data")(Highcharts);
 
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
