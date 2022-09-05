@@ -31,8 +31,8 @@
   "scripts": {
     "start": "node_modules/.bin/react-scripts start",
     "build": "node_modules/.bin/react-scripts build",
-    "test": "node_modules/.bin/jest",
-    "eject": "node_modules/.bin/react-scripts eject"
+    "eject": "node_modules/.bin/react-scripts eject",
+    "test": "react-scripts test --env=jsdom"
   },
   "eslintConfig": {
     "extends": [
@@ -56,13 +56,17 @@
   "devDependencies": {
     "@babel/core": "^7.18.13",
     "@babel/eslint-parser": "^7.18.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.18.6",
+    "@babel/preset-react": "^7.18.6",
     "eslint": "8.22.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.2.5",
     "eslint-plugin-promise": "^6.0.1",
     "eslint-plugin-react": "^7.31.6",
-    "jest": "^28.1.3"
+    "jest": "^28.1.3",
+    "jest-transform-stub": "^2.0.0",
+    "react-test-renderer": "^18.2.0"
   },
   "homepage": "."
 }

@@ -47,7 +47,6 @@ function ResultUI(props){
                             tickets={props.tickets}
                         />
                     )}
-                    }
                 </div>
             </GraphSettingsDispatchContext.Provider>
         </GraphSettingsContext.Provider>

@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import Input from "./Input/Input";
 import RunningQueriesUI from "./Running/RunningQueries";
-import ReactMarkdown from 'react-markdown';
 import ResultUI from "./Result/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
