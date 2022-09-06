@@ -17,7 +17,7 @@ CREATE TABLE results (
     jstime int,
     searchTerm text,
     paperID text,
-    requestID text,
+    requestIDForGettingProgress text,
     created timestamp,
     FOREIGN KEY (paperID) REFERENCES papers(code)
 );
@@ -31,9 +31,9 @@ CREATE TABLE holdingResults (
     jstime int,
     searchTerm text,
     paperID text,
-    requestID text
+    requestIDForGettingProgress text
 );
 
 CREATE INDEX ON holdingResults (
-    requestID
+    requestIDForGettingProgress
 );

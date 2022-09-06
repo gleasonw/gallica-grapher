@@ -7,11 +7,11 @@ export function RequestBox(props, className) {
     return (
         <div className={className}>
             {props.tickets ?
-                props.tickets.map((ticket, index) => (
-                    <DecorativeTicket key={index}>
+                Object.keys(props.tickets).map(ticketID => (
+                    <DecorativeTicket key={ticketID}>
                         <RequestTicket
-                            ticket={ticket}
-                            onClick={() => props.onTicketClick(index)}
+                            ticket={props.tickets[ticketID]}
+                            onClick={() => props.onTicketClick(ticketID)}
                         />
                     </DecorativeTicket>
                     ))

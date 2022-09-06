@@ -8,6 +8,7 @@ const PaperOptionWrap = styled.div`
     text-align: left;
     cursor: pointer;
     transition: all 150ms;
+    border-radius: ${props => props.borderRadius ? props.borderRadius : "0px"};
     `;
 
 export default PaperOptionWrap;

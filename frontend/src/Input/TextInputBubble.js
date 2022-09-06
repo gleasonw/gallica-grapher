@@ -13,7 +13,6 @@ const TextInputBubble = styled.div`
     border-radius: 10px;
     color: #4d4d4d;
     transition: all 150ms;
-    overflow: hidden;
     `;
 
 export default TextInputBubble;

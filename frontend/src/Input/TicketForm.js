@@ -8,11 +8,12 @@ import RequestBoxAndFetchButtonWrap from "./RequestBoxAndFetchButtonWrap";
 function TicketForm(props){
     const [showNoTermsReminder, setShowNoTermsReminder] = useState(false);
 
-
-
     function handleSubmit(e){
         e.preventDefault();
-        if (!props.terms || props.terms.length === 0){
+        if ((!props.tickets || props.tickets.length === 0)
+            &&
+            (!props.terms || props.terms.length === 0))
+        {
             setShowNoTermsReminder(true)
         } else{
             props.onSubmit(e);
@@ -50,6 +51,7 @@ function TicketForm(props){
                 <StyledRequestBox
                     display={'flex'}
                     tickets={props.tickets}
+                    onTicketClick={props.onTicketClick}
                 />
                 <ImportantButtonWrap>
                     <input

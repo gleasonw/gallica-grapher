@@ -12,12 +12,12 @@ CHUNK_SIZE = 200
 class NgramQueryWithConcurrency:
 
     @staticmethod
-    def splitIntoCHUNK_SIZEchunks(list):
-        numChunks = ceil(len(list) / CHUNK_SIZE)
+    def splitIntoCHUNK_SIZEchunks(items):
+        numChunks = ceil(len(items) / CHUNK_SIZE)
         chunks = []
         for i in range(numChunks):
             chunks.append(
-                list[i * CHUNK_SIZE:(i + 1) * CHUNK_SIZE]
+                items[i * CHUNK_SIZE:(i + 1) * CHUNK_SIZE]
             )
         return chunks
 

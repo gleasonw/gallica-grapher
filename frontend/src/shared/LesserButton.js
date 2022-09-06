@@ -9,9 +9,7 @@ const LesserButton = styled.div`
     color: #4d4d4d;
     border-radius: 3px;
     font-size: 15px;
-    padding: 2px;
     max-width: 200px;
-    margin: 10px;
     padding: 10px;
     border: 1px solid #c6c6c6;
     `;

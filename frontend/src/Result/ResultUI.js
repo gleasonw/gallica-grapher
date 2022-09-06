@@ -9,7 +9,6 @@ import {settingsReducer} from "./SettingsReducer";
 import initGraphSettings from "./chartUtils/initGraphSettings";
 
 function ResultUI(props){
-
     const [grouped, setGrouped] = useState(true);
     const [graphSettings, dispatch] = useReducer(
         settingsReducer,

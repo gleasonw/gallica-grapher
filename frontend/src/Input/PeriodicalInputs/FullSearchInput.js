@@ -36,11 +36,12 @@ export function FullSearchInput(props) {
             selected={props.selected === 2}
             borderBottom={'none'}
             onClick={() => props.onPaperSelectClick(2)}
+            borderRadius={'0 0 10px 10px'}
         >
-            <h5 className={'paperOptionHeader'}>
+            <span className={'paperOptionHeader'}>
                 {numPapersOverRange} periodicals publishing
                 at any point between {dateInputs}
-            </h5>
+            </span>
         </PaperOptionWrap>
     )
 }

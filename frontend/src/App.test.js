@@ -42,11 +42,4 @@ describe('The main application cycle for the Gallica Grapher.', () => {
         expect(screen.getByRole('button', {name: 'Scroll to examples'})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Fetch and graph 📊'})).toBeInTheDocument();
     });
-    it('displays the progress page when there are tickets and the fetch and graph button is clicked', () => {
-        render(<App />);
-        fireEvent.click(screen.getByRole('button', {name: 'Load example request: Cities'}))
-        fireEvent.click(screen.getByRole('button', {name: 'Fetch and graph 📊'}));
-        expect(screen.getByRole('button', {name: 'Home page button'})).toBeInTheDocument();
-
-    });
 });

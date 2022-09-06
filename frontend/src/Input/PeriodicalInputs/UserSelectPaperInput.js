@@ -3,6 +3,7 @@ import {SelectionBox} from "../SelectionBox";
 import {Dropdown} from "./Dropdown";
 import React from "react";
 import {DateInputBox} from "./DateInputBox";
+import TextInputBubble from "../TextInputBubble";
 
 export function UserSelectPaperInput(props) {
     const onLowDateChange = props.yearRangeHandler[0];
@@ -23,22 +24,24 @@ export function UserSelectPaperInput(props) {
             selected={props.selected === 1}
             onClick={() => props.onPaperSelectClick(1)}
         >
-            <h5 className={'paperOptionHeader'}>
+            <span className={'paperOptionHeader'}>
                 My chosen periodicals between {dateInput}
-            </h5>
+            </span>
             <SelectionBox
                 items={paperNames}
                 onClick={props.deletePaperBubble}
             />
-            <input
-                type="text"
-                value={props.paperInputValue}
-                name="papers"
-                placeholder="Search for a periodical"
-                onKeyUp={props.onKeyUp}
-                onChange={props.onPaperChange}
-                autoComplete="off"
-            />
+            <div className={'paperSelectInputWrap'}>
+                <input
+                    type="text"
+                    value={props.paperInputValue}
+                    name="papers"
+                    placeholder="Search for a periodical"
+                    onKeyUp={props.onKeyUp}
+                    onChange={props.onPaperChange}
+                    autoComplete="off"
+                />
+            </div>
             <div className='dropdownContainer'>
                 <Dropdown
                     papers={props.papersForDropdown['paperNameCodes']}

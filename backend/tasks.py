@@ -8,6 +8,7 @@ app.config_from_object('celery_settings')
 
 @app.task(bind=True)
 def spawnRequest(self, tickets):
+    print(tickets)
     gallicaRequest = Request(tickets, spawnRequest.request.id)
     gallicaRequest.start()
     while True:

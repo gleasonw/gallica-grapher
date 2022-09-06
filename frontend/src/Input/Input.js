@@ -5,12 +5,7 @@ import DecorativeTicket from "../shared/DecorativeTicket";
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import useData from "../shared/hooks/useData";
 
-// When the user presses the enter key, send the current ticket up to App.
-// In App, update the ticket, then start the graphing process. The crux is in
-// the actions happening sequentially. Not sure if state functions like that.
-// A hack: add a bool that flips when the user presses enter. That way, on the state
-// update, we'll proceed to the next screen with a new ticket on the next re-render.
-
+//TODO: add a reducer
 function Input(props){
     const exampleBoxRef = useRef(null);
     const [terms, setTerms] = useState([]);
@@ -55,8 +50,8 @@ function Input(props){
         event.preventDefault();
         const ticket = {
             terms: terms,
-            papersAndCodes: userSelectedPapers,
-            dateRange: continuousDateRange
+            papersAndCodes: getPapersFor(selectedPaperInput),
+            dateRange: getDateRangeFor(selectedPaperInput)
         }
         props.onTicketSubmit(ticket);
     }
@@ -211,7 +206,6 @@ function Input(props){
         return range
     }
 
-
     function isNumeric(str){
         if (typeof str != "string") return false
         return !isNaN(str) && !isNaN(parseFloat(str))
@@ -259,9 +253,9 @@ function Input(props){
                     deletePaperBubble={deletePaperBubble}
                     boundaryYearsForUserPapers={boundaryYearsForUserPapers}
                     onSubmit={handleSubmit}
-                    onGraphStartClick={props.onInputSubmit}
+                    onGraphStartClick={handleSubmit}
                     onTicketClick={props.onTicketClick}
-                    tickets={props.requestTickets}
+                    tickets={props.tickets}
                     exampleBoxRef={exampleBoxRef}
                     onPaperInputClick={handlePaperInputSelectClick}
                     selectedPaperInput={selectedPaperInput}

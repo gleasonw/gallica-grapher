@@ -5,14 +5,13 @@ import RunningQueriesUI from "./Running/RunningQueries";
 import ResultUI from "./Result/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from "axios";
 import InfoIcon from '@mui/icons-material/Info';
+import axios from "axios";
 
 
 function App() {
-    const [tickets, setTickets] = useState([]);
-    const [idTickets, setIDTickets] = useState({});
-    const [requestID, setRequestID] = useState('');
+    const [tickets, setTickets] = useState({});
+    const [requestID, setRequestID] = useState(null);
     const [gettingInput, setGettingInput] = useState(true);
     const [runningQueries, setRunningQueries] = useState(false);
     const [infoPage, setInfoPage] = useState(false);
@@ -39,60 +38,50 @@ function App() {
             </div>
         </header>
 
-    function handleTicketSubmit(ticket){
-        setTickets([...tickets, ticket]);
-        setGettingInput(false);
+    async function handleTicketSubmit(ticket){
+        const newTicketID = uuidv4();
+        const updatedTickets = {
+            ...tickets,
+            [newTicketID]: ticket
+        };
+        const requestID = await initRequest(updatedTickets);
+        setTickets(updatedTickets);
+        setRequestID(requestID);
         setRunningQueries(true);
+        setGettingInput(false);
     }
 
-    //Move this function to running queries component.
-    async function handleInputSubmit(event){
-        event.preventDefault();
-        const ticksWithIDS = generateTicketIDs();
+    async function initRequest(allUserTickets) {
         const {request} = await axios.post('/api/init', {
-            tickets: ticksWithIDS
+            tickets: allUserTickets
         })
-        const taskID = JSON.parse(request.response)["taskid"];
-        setIDTickets(ticksWithIDS);
-        setRequestID(taskID);
-    }
-
-    function generateTicketIDs(){
-        let ticketsWithID = {};
-        for (let i = 0; i < tickets.length; i++){
-            let id = uuidv4()
-            ticketsWithID[id] = tickets[i]
-        }
-        return ticketsWithID
+        return JSON.parse(request.response)["taskid"];
     }
 
     function handleCreateTicketClick(items){
+
+        function createTicketFromInput(items){
+            let updatedTickets = structuredClone(tickets);
+            const ticketID = uuidv4();
+            updatedTickets[ticketID] = items;
+            setTickets(updatedTickets);
+        }
         createTicketFromInput(items)
     }
 
-    function handleTicketClick(index){
-        deleteTicketAtIndex(index);
+    function handleTicketClick(ticketID){
+
+        function deleteTicket(key){
+            let updatedTickets = structuredClone(tickets);
+            delete updatedTickets[key];
+            setTickets(updatedTickets)
+        }
+        deleteTicket(ticketID);
     }
 
     function handleExampleRequestClick(request){
         window.scrollTo(0, 0);
         setTickets(request);
-    }
-
-
-    function createTicketFromInput(items){
-        if(items.terms.length > 0){
-            let updatedTickets = tickets.slice();
-            updatedTickets.push(items);
-            setTickets(updatedTickets)
-        }
-
-    }
-
-    function deleteTicketAtIndex(index){
-        const updatedTickets = tickets.slice()
-        updatedTickets.splice(index, 1)
-        setTickets(updatedTickets)
     }
 
     function handleTicketFinish(){
@@ -103,9 +92,7 @@ function App() {
         setInfoPage(false)
         setGettingInput(true);
         setRunningQueries(false);
-        setTickets([]);
-        setIDTickets({});
-        setRequestID('');
+        setTickets({});
         setTooManyRecordsWarning(false);
         setNumRecords(0);
     }
@@ -119,6 +106,7 @@ function App() {
     function handleInfoClick(){
         setInfoPage(true);
     }
+
     if(infoPage) {
         return(
             <div className="App">
@@ -133,8 +121,8 @@ function App() {
             <div className="App">
                 {header}
                 <Input
-                    requestTickets={tickets}
-                    onInputSubmit={handleInputSubmit}
+                    tickets={tickets}
+                    onTicketSubmit={handleTicketSubmit}
                     onCreateTicketClick={handleCreateTicketClick}
                     onTicketClick={handleTicketClick}
                     onExampleRequestClick={handleExampleRequestClick}
@@ -142,17 +130,17 @@ function App() {
             </div>
         )
     }else if(runningQueries){
-          return (
+        return (
             <div className="App">
                 {header}
                 <RunningQueriesUI
-                    tickets={idTickets}
+                    tickets={tickets}
+                    taskID={requestID}
                     onFinish={handleTicketFinish}
-                    requestID={requestID}
                     onTooManyRecords={handleTooManyRecords}
                 />
             </div>
-          )
+        )
     }else if(tooManyRecordsWarning){
         return (
             <div className="App">
@@ -171,9 +159,7 @@ function App() {
         return (
             <div className="App">
                 {header}
-                <ResultUI
-                    tickets={idTickets}
-                />
+                <ResultUI tickets={tickets}/>
             </div>
           )
     }

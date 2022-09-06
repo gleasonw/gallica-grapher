@@ -1,25 +1,27 @@
 import React from "react";
+import LesserButton from '../shared/LesserButton';
 
 export function SelectionBox(props) {
+    const bubbles = props.items ?
+        props.items.map((item, index) => (
+            <SelectionBubble
+                onClick={() => props.onClick(index)}
+                key={index}
+                item={item}
+            />
+        )) :
+        <SelectionBubble></SelectionBubble>
+
     return (
         <div className='bubblesContainer'>
-            <h5>
-                {props.bubblesLabel}
-            </h5>
-            {props.items.map((item, index) => (
-                <SelectionBubble
-                    onClick={() => props.onClick(index)}
-                    key={index}
-                    item={item}
-                />
-            ))}
+            {bubbles}
         </div>
     )
 }
 
 function SelectionBubble(props) {
     return (
-        <button
+        <LesserButton
             className='bubbleItem'
             type='button'
             onClick={props.onClick}
@@ -38,6 +40,6 @@ function SelectionBubble(props) {
                     </g>
                 </svg>
             </div>
-        </button>
+        </LesserButton>
     )
 }

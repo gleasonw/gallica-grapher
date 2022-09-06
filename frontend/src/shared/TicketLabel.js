@@ -1,5 +1,5 @@
 import React from 'react';
-import PrettyTextOverflow from "./PrettyTextOverflow";
+import LesserButton from "./LesserButton";
 
 function TicketLabel(props){
     return(
@@ -12,7 +12,7 @@ function TicketLabel(props){
 }
 
 function TicketTermRow(props){
-    const quotedTerms = addQuotesAndCommasAroundItems(props.terms)
+    const quotedTerms = wrapItemsInBubbles(props.terms)
     return renderRow(quotedTerms, 'Ngrams:')
 }
 function TicketPaperRow(props){
@@ -21,13 +21,14 @@ function TicketPaperRow(props){
     papers.map(paperAndCode => (
         paperNames.push(paperAndCode['title'])
     ));
-    const quotedItems= addQuotesAndCommasAroundItems(paperNames)
+    const quotedItems= wrapItemsInBubbles(paperNames)
+    console.log(quotedItems)
     return renderRow(quotedItems, 'In papers:')
 }
-function addQuotesAndCommasAroundItems(items){
-    return items.map(
-        term => "'" + term + "'"
-    ).join(', ')
+function wrapItemsInBubbles(items){
+    return items.map((item) => (
+        <LesserButton>{item}</LesserButton>
+    ));
 }
 function renderRow(item, label){
     if(item){
@@ -37,9 +38,7 @@ function renderRow(item, label){
                     {label}
                 </h3>
                 <div className={'bubblesContainer'}>
-                    <PrettyTextOverflow>
-                        {item}
-                    </PrettyTextOverflow>
+                    {item}
                 </div>
             </section>
         )

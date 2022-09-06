@@ -125,11 +125,16 @@ header{
     margin-left: 10px;
 }
 .bubblesContainer{
+    padding-left: 0;
     align-items: center;
     display: flex;
-    flex-wrap: wrap;
+    overflow: scroll;
     flex-direction: row;
     border-radius: 8px;
+    gap: 10px;
+}
+.paperSelectInputWrap{
+    padding: 20px 0 10px 0;
 }
 .bubblesLabel{
     height: 32px;

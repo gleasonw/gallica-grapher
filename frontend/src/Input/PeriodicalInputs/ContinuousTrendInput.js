@@ -23,11 +23,12 @@ export function ContinuousTrendInput(props) {
         <PaperOptionWrap
             selected={props.selected === 0}
             onClick={() => props.onPaperSelectClick(0)}
+            borderRadius={'10px 10px 0 0'}
         >
-            <h5 className={'paperOptionHeader'}>
+            <span className={'paperOptionHeader'}>
                 {props.numContinuousPapers} continuous periodicals publishing
                 every year between {dateInputs}
-            </h5>
+            </span>
         </PaperOptionWrap>
     )
 }
