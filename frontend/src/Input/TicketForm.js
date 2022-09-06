@@ -13,10 +13,9 @@ function TicketForm(props){
     function handleSubmit(e){
         e.preventDefault();
         if (!props.terms || props.terms.length === 0){
-            console.log('yup')
             setShowNoTermsReminder(true)
         } else{
-            props.onGraphStartClick(e);
+            props.onSubmit(e);
         }
     }
 

@@ -5,6 +5,12 @@ import DecorativeTicket from "../shared/DecorativeTicket";
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import useData from "../shared/hooks/useData";
 
+// When the user presses the enter key, send the current ticket up to App.
+// In App, update the ticket, then start the graphing process. The crux is in
+// the actions happening sequentially. Not sure if state functions like that.
+// A hack: add a bool that flips when the user presses enter. That way, on the state
+// update, we'll proceed to the next screen with a new ticket on the next re-render.
+
 function Input(props){
     const exampleBoxRef = useRef(null);
     const [terms, setTerms] = useState([]);
@@ -41,8 +47,18 @@ function Input(props){
         return [minYear, maxYear]
     }
 
-    function handleEnterPress(event){
+    function handleSeeExamplesClick(){
+        exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
+    }
 
+    function handleSubmit(event){
+        event.preventDefault();
+        const ticket = {
+            terms: terms,
+            papersAndCodes: userSelectedPapers,
+            dateRange: continuousDateRange
+        }
+        props.onTicketSubmit(ticket);
     }
 
     function handleTermChange(event) {
@@ -51,10 +67,6 @@ function Input(props){
         const trimmedTerms = splitCommaTerms.map(term => term.trim())
         setTermInput(input)
         setTerms(trimmedTerms)
-    }
-    
-    function handleSeeExamplesClick(){
-        exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
     }
 
     function handlePaperDropdownClick(paper){
@@ -246,6 +258,7 @@ function Input(props){
                     deleteTermBubble={deleteTermBubble}
                     deletePaperBubble={deletePaperBubble}
                     boundaryYearsForUserPapers={boundaryYearsForUserPapers}
+                    onSubmit={handleSubmit}
                     onGraphStartClick={props.onInputSubmit}
                     onTicketClick={props.onTicketClick}
                     tickets={props.requestTickets}

@@ -39,8 +39,14 @@ function App() {
             </div>
         </header>
 
+    function handleTicketSubmit(ticket){
+        setTickets([...tickets, ticket]);
+        setGettingInput(false);
+        setRunningQueries(true);
+    }
+
+    //Move this function to running queries component.
     async function handleInputSubmit(event){
-        console.log(tickets)
         event.preventDefault();
         const ticksWithIDS = generateTicketIDs();
         const {request} = await axios.post('/api/init', {
@@ -49,8 +55,15 @@ function App() {
         const taskID = JSON.parse(request.response)["taskid"];
         setIDTickets(ticksWithIDS);
         setRequestID(taskID);
-        setGettingInput(false);
-        setRunningQueries(true);
+    }
+
+    function generateTicketIDs(){
+        let ticketsWithID = {};
+        for (let i = 0; i < tickets.length; i++){
+            let id = uuidv4()
+            ticketsWithID[id] = tickets[i]
+        }
+        return ticketsWithID
     }
 
     function handleCreateTicketClick(items){
@@ -66,14 +79,6 @@ function App() {
         setTickets(request);
     }
 
-    function generateTicketIDs(){
-        let ticketsWithID = {};
-        for (let i = 0; i < tickets.length; i++){
-            let id = uuidv4()
-            ticketsWithID[id] = tickets[i]
-        }
-        return ticketsWithID
-    }
 
     function createTicketFromInput(items){
         if(items.terms.length > 0){
