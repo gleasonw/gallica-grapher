@@ -1,53 +1,52 @@
 import React from 'react';
-import LesserButton from "./LesserButton";
+import InlineBubble from './InlineBubble';
+
+//TODO: blurbs should be components
 
 function TicketLabel(props){
     return(
         <div className='ticketLabel'>
-            <TicketTermRow terms={props.terms}/>
-            {props.papers.length > 0 && <TicketPaperRow papers={props.papers}/>}
-            <TicketDateRow dateRange={props.dateRange}/>
+            Occurrences of {TermBlurb(props)} in {PaperBlurb(props)} periodicals from {DateBlurb(props)}
         </div>
     )
 }
 
-function TicketTermRow(props){
-    const quotedTerms = wrapItemsInBubbles(props.terms)
-    return renderRow(quotedTerms, 'Ngrams:')
+function TermBlurb(props){
+    return renderItemsToBlurb(props.terms)
+    
 }
-function TicketPaperRow(props){
+
+function PaperBlurb(props){
     const papers = props.papers
     const paperNames = []
     papers.map(paperAndCode => (
         paperNames.push(paperAndCode['title'])
     ));
-    const quotedItems= wrapItemsInBubbles(paperNames)
-    console.log(quotedItems)
-    return renderRow(quotedItems, 'In papers:')
+    return renderItemsToBlurb(paperNames)
+   
 }
-function wrapItemsInBubbles(items){
-    return items.map((item) => (
-        <LesserButton>{item}</LesserButton>
-    ));
-}
-function renderRow(item, label){
-    if(item){
-        return(
-            <section className={'ticketItems'}>
-                <h3 className={'ticketRowLabel'}>
-                    {label}
-                </h3>
-                <div className={'bubblesContainer'}>
-                    {item}
-                </div>
-            </section>
-        )
-    }
-}
-function TicketDateRow(props){
+
+function DateBlurb(props){
     const dateRange = props.dateRange
-    const rangeString = dateRange[0] + ' to ' + dateRange[1]
-    return renderRow(rangeString, 'Over range:')
+    const rangeString = `${dateRange[0]} to ${dateRange[1]}`
+    return <span>{rangeString}</span>
+}
+
+function renderItemsToBlurb(items){
+    console.log(items)
+    let blurb;
+    if(items.length > 1){
+        const numItemsAfterFirst = items.length - 1
+        blurb = <span>
+
+            <span>"{items[0]}"</span> + {numItemsAfterFirst} more
+        </span>
+    }else{
+        blurb = <span>"{items[0]}"</span>
+    }
+    return <InlineBubble selected={true}>{blurb}</InlineBubble>
+
+
 }
 
 export default TicketLabel;

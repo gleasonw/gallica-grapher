@@ -1,30 +1,32 @@
-import DateInputBubble from './DateInputBubble';
+import InlineBubble from '../../shared/InlineBubble';
 import React from "react";
 
 export function DateInputBox(props) {
     return (
         <div className='dateInputs'>
-            <DateInputBubble selected={props.selected}>
+            <InlineBubble selected={props.selected}>
                 <input
                     id="lowYear"
                     type='text'
                     name='lowYear'
+                    className='dateInput'
                     value={props.lowYear}
                     onChange={props.onLowDateChange}
                     placeholder={props.minYearPlaceholder}
                 />
-            </DateInputBubble>
+            </InlineBubble>
             and
-            <DateInputBubble selected={props.selected}>
+            <InlineBubble selected={props.selected}>
                 <input
                     id="highYear"
                     type='text'
                     name='highYear'
+                    className='dateInput'
                     value={props.highYear}
                     onChange={props.onHighDateChange}
                     placeholder={props.maxYearPlaceholder}
                 />
-            </DateInputBubble>
+            </InlineBubble>
             .
         </div>
     )

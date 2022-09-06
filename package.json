@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5"
+    "@testing-library/jest-dom": "^5.16.5",
+    "mdx.macro": "^0.2.9"
   }
 }

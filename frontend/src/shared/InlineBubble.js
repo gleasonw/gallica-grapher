@@ -1,14 +1,11 @@
 import styled from 'styled-components';
 
-const DateInputBubble = styled.div`
+const InlineBubble = styled.div`
     font-size: large;
-    max-width: 65px;
     height: 40px;
-    padding: 0px 10px;
+    padding: 10px;
     outline: none;
     appearance: none;
-    justify-content: center;
-    align-items: center;
     cursor: pointer;
     color: ${props => props.selected ? "#4d4d4d" : "#d9d9d9"};
     border: ${props => props.selected ? "1px solid #4d4d4d" : "1px solid #d9d9d9"};
@@ -18,4 +15,4 @@ const DateInputBubble = styled.div`
     overflow: hidden;
     `;
 
-export default DateInputBubble;
+export default InlineBubble;
