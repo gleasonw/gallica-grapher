@@ -10,8 +10,6 @@ const ImportantButtonWrap = styled.button`
     border-radius: 10px;
     font-size: 30px;
     padding: 20px;
-    width: 100%;
-    max-width: 400px;
     margin: 10px;
     border: 1px solid #c6c6c6;
     @media screen and (max-width: 748px){

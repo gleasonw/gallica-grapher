@@ -18,6 +18,7 @@ function Input(props){
     const queryForContinuousPapers = getContinuousPaperQuery();
     const result = useData(queryForContinuousPapers);
     const continuousPapers = result ? result['paperNameCodes'] : [];
+    console.log(`${continuousPapers.length} for date range ${continuousDateRange[0]} to ${continuousDateRange[1]}`)
     const boundaryYearsForUserPapers = setUserPapersYearBoundary();
 
     function getContinuousPaperQuery(){
@@ -126,6 +127,16 @@ function Input(props){
         }
     }
 
+    function handleCreateTicketClick(){
+        props.onCreateTicketClick({
+            'terms': terms,
+            'papersAndCodes': getPapersFor(selectedPaperInput),
+            'dateRange': getDateRangeFor(selectedPaperInput)
+        });
+        setTermInput('');
+        setTerms([]);
+    }
+
     function deleteTermBubble(bubbleIndex){
         const newTerms = terms.slice()
         newTerms.splice(bubbleIndex, 1)
@@ -161,7 +172,7 @@ function Input(props){
             return assignNullRangeValuesToPlaceholder(
                 continuousDateRange,
                 1890, 
-                2020
+                1920
                 )
         }else if(paperInputIndex === 1){
             let trimmedRange = trimCustomPaperRangeToActualPaperRange()
@@ -237,13 +248,7 @@ function Input(props){
                             handleFullSearchHighYearChange
                         ]
                     ]}
-                    onCreateTicketClick={() => props.onCreateTicketClick(
-                        {
-                            'terms': terms,
-                            'papersAndCodes': getPapersFor(selectedPaperInput),
-                            'dateRange': getDateRangeFor(selectedPaperInput)
-                        }
-                    )}
+                    onCreateTicketClick={handleCreateTicketClick}
                     onPaperDropItemClick={handlePaperDropdownClick}
                     terms={terms}
                     termInput={termInput}
@@ -305,6 +310,7 @@ function ExampleBox(props){
 }
 function ExampleRequest(props){
     const tickets = props.request["tickets"]
+    console.log(tickets)
     return(
         <ImportantButtonWrap
             onClick={() => props.onClick(tickets)}
@@ -312,12 +318,12 @@ function ExampleRequest(props){
         >
             <h1>{props.title}</h1>
             <div className={'exampleRequest'}>
-                {tickets.map((ticket, index) => (
-                    <DecorativeTicket key={index}>
+                {Object.keys(tickets).map((ticket) => (
+                    <DecorativeTicket key={ticket}>
                         <TicketLabel
-                            terms={ticket["terms"]}
-                            papers={ticket["papersAndCodes"]}
-                            dateRange={ticket["dateRange"]}
+                            terms={tickets[ticket]["terms"]}
+                            papers={tickets[ticket]["papersAndCodes"]}
+                            dateRange={tickets[ticket]["dateRange"]}
                         />
                     </DecorativeTicket>
                 ))}

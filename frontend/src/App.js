@@ -61,9 +61,11 @@ function App() {
     function handleCreateTicketClick(items){
 
         function createTicketFromInput(items){
-            let updatedTickets = structuredClone(tickets);
             const ticketID = uuidv4();
-            updatedTickets[ticketID] = items;
+            let updatedTickets = {
+                ...tickets,
+                [ticketID]: items
+            };
             setTickets(updatedTickets);
         }
         createTicketFromInput(items)
@@ -72,7 +74,7 @@ function App() {
     function handleTicketClick(ticketID){
 
         function deleteTicket(key){
-            let updatedTickets = structuredClone(tickets);
+            let updatedTickets = {...tickets}
             delete updatedTickets[key];
             setTickets(updatedTickets)
         }

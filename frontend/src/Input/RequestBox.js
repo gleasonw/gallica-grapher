@@ -2,28 +2,33 @@ import TicketLabel from "../shared/TicketLabel";
 import React from "react";
 import DecorativeTicket from "../shared/DecorativeTicket";
 import styled from 'styled-components';
+import LesserButton from "../shared/LesserButton";
 
-export function RequestBox(props, className) {
-    return (
-        <div className={className}>
-            {props.tickets ?
-                Object.keys(props.tickets).map(ticketID => (
-                    <DecorativeTicket key={ticketID}>
-                        <RequestTicket
-                            ticket={props.tickets[ticketID]}
-                            onClick={() => props.onTicketClick(ticketID)}
-                        />
-                    </DecorativeTicket>
-                    ))
-                : null
-            }
-
-        </div>
-    )
+export function RequestBox(props) {
+    if(Object.keys(props.tickets).length > 0){
+        return (
+        Object.keys(props.tickets).map(ticketID => (
+            <DecorativeTicket key={ticketID}>
+                <RequestTicket
+                    ticket={props.tickets[ticketID]}
+                    onClick={() => props.onTicketClick(ticketID)}
+                />
+            </DecorativeTicket>
+            ))
+        )
+    }else{
+        return(
+        <LesserButton onClick={props.onCreateTicketClick}>
+            Add a ticket to search
+        </LesserButton>
+            )
+    }
 }
 
 export const StyledRequestBox = styled(RequestBox)`
-    display: ${props => props.display};
+    display: flex;
+    flex-direction: row;
+    transition: all 150ms;
     
 `;
 

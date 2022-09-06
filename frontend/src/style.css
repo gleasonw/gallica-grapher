@@ -294,10 +294,9 @@ button, input[type="submit"], input[type="button"] {
 .exampleBox{
     margin-left: auto;
     margin-right: auto;
-    width: calc(100% - 500px);
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     flex-wrap: wrap;
     max-width: 100%;
     padding: 10px 20px 10px 20px;
@@ -313,6 +312,10 @@ button, input[type="submit"], input[type="button"] {
 
 .exampleRequest{
     display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 .exampleTicket{
     background: rgba(255,255,255,0.5);
