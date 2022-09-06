@@ -40,6 +40,7 @@ function App() {
         </header>
 
     async function handleInputSubmit(event){
+        console.log(tickets)
         event.preventDefault();
         const ticksWithIDS = generateTicketIDs();
         const {request} = await axios.post('/api/init', {
@@ -75,7 +76,6 @@ function App() {
     }
 
     function createTicketFromInput(items){
-        console.log(items)
         if(items.terms.length > 0){
             let updatedTickets = tickets.slice();
             updatedTickets.push(items);

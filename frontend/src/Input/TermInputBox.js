@@ -2,6 +2,7 @@ import React from "react";
 import TextInputBubble from "./TextInputBubble";
 
 export function TermInputBox(props) {
+
     function handleKeyDown(event) {
         if (event.key === 'Enter') {
             props.onEnterPress(event)

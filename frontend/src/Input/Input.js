@@ -41,6 +41,10 @@ function Input(props){
         return [minYear, maxYear]
     }
 
+    function handleEnterPress(event){
+
+    }
+
     function handleTermChange(event) {
         const input = event.target.value
         const splitCommaTerms = input.split(',')
@@ -186,7 +190,6 @@ function Input(props){
     }
 
     function assignNullRangeValuesToPlaceholder(range, lowDefault, highDefault){
-        console.log(lowDefault)
         if (range[0] === '') {
             range[0] = lowDefault
         }
@@ -236,6 +239,7 @@ function Input(props){
                         }
                     )}
                     onPaperDropItemClick={handlePaperDropdownClick}
+                    terms={terms}
                     termInput={termInput}
                     handleTermChange={handleTermChange}
                     userSelectedPapers={userSelectedPapers}
