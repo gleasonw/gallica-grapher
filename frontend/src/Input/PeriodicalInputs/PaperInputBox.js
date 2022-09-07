@@ -67,7 +67,6 @@ export class PaperInputBox extends React.Component {
         })
     }
 
-    //TODO: reduce duplication in paperinput options
     render() {
         return (
             <TextInputBubble

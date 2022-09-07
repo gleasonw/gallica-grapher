@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import InlineBubble from './InlineBubble';
 import styled from 'styled-components';
-
-//TODO: blurbs should be components
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 function TicketLabel(props){
     const termBlurb = <TermBlurb terms={props.terms}></TermBlurb>
@@ -16,52 +16,53 @@ function TicketLabel(props){
 }
 
 function TermBlurb(props){
-    return renderItemsToBlurb(props.terms)
-    
+    return (
+        <div className={props.className}>
+            {generateBlurb(props.terms)}
+        </div>
+    )
+
 }
 
 function PaperBlurb(props){
     const papers = props.papers
-    let paperNames = []
-    papers.map(paperAndCode => (
-        paperNames.push(paperAndCode['title'])
-    ));
-    if (paperNames.length === 0){
-        paperNames = ['all papers']
+    if(papers.length === 0){
+        return (
+            <InlineBubble selected={true}>
+                all papers
+            </InlineBubble>
+        )
+    }else{
+        let paperNames = []
+        papers.map(paperAndCode => (
+            paperNames.push(paperAndCode['title'])
+        ));
+        return (
+            <div className={props.className}>
+                {generateBlurb(paperNames)}
+            </div>
+        )
     }
-    return renderItemsToBlurb(paperNames)
-   
 }
 
 function DateBlurb(props){
     const dateRange = props.dateRange
     const rangeString = `${dateRange[0]} to ${dateRange[1]}`
-    return <InlineBubble selected={true}>
-        <BlurbText>{rangeString}</BlurbText>
-    </InlineBubble>
+    return <BlurbText>{rangeString}</BlurbText>
 }
 
-function renderItemsToBlurb(items){
-    let blurb;
-    if(items.length > 1){
-        const highestIndex = getHighestIndexTo28CharactersCombined(items)
-        const numItemsAfterHighest = items.length - highestIndex - 1
-        const itemsToShow = items.slice(0, highestIndex + 1)
-        const quotedItems = itemsToShow.map(item => `"${item}"`)
-        const commaSeparatedItems = quotedItems.join(', ')
-        blurb =
-                numItemsAfterHighest > 0 ?
-                    <span>
-                    <BlurbText>{commaSeparatedItems}</BlurbText> + {numItemsAfterHighest} more
-                    </span>
-                :
-                    <span>
-                    <BlurbText>{commaSeparatedItems}</BlurbText>
-                    </span>
+function generateBlurb(items){
+    const highestIndexBefore28Characters = getHighestIndexTo28CharactersCombined(items)
+    const numItemsRemaining = items.length - highestIndexBefore28Characters - 1
+    if(numItemsRemaining > 0){
+        return generateExpandableBlurb(
+            items,
+            highestIndexBefore28Characters,
+            numItemsRemaining
+        )
     }else{
-        blurb = <BlurbText>"{items[0]}"</BlurbText>
+        return generateFixedBlurb(items)
     }
-    return <InlineBubble selected={true}>{blurb}</InlineBubble>
 }
 
 function getHighestIndexTo28CharactersCombined(items){
@@ -76,11 +77,51 @@ function getHighestIndexTo28CharactersCombined(items){
     return highestIndex
 }
 
+function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining){
+    const itemsToShow = items.slice(0, indexToStopAt + 1)
+    const quotedItems = itemsToShow.map(item => `"${item}"`)
+    const commaSeparatedItems = quotedItems.join(', ')
+    return <span><ExpandableBlurbText>{commaSeparatedItems}</ExpandableBlurbText> + {numItemsRemaining} more</span>
+}
+
+function generateFixedBlurb(items){
+    const quotedItems = items.map(item => `"${item}"`)
+    const commaSeparatedItems = quotedItems.join(', ')
+    return <BlurbText>{commaSeparatedItems}</BlurbText>
+}
+
+
 const BlurbText = styled.span`
     max-width: 110px;
     max-height: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 10px;
 `
+
+function ExpandableBlurbText(props){
+    const [expanded, setExpanded] = useState(false);
+    const [arrow, setArrow] = useState(<ExpandMoreIcon/>);
+
+    function handleClick(){
+        setArrow(expanded ? <ExpandMoreIcon/> : <ExpandLessIcon/>)
+        setExpanded(!expanded)
+    }
+
+    return(
+        <button
+            className={props.className}
+            onClick={handleClick}
+        >
+            {props.children}
+            {arrow}
+        </button>
+    )
+}
+
+const StyledExpandableBlurbText = styled(ExpandableBlurbText)`
+    
+`
+
 
 export default TicketLabel;
