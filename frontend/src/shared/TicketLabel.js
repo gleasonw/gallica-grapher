@@ -37,11 +37,7 @@ function PaperBlurb(props){
         papers.map(paperAndCode => (
             paperNames.push(paperAndCode['title'])
         ));
-        return (
-            <div className={props.className}>
-                {generateBlurb(paperNames)}
-            </div>
-        )
+        return generateBlurb(paperNames)
     }
 }
 
@@ -52,7 +48,7 @@ function DateBlurb(props){
 }
 
 function generateBlurb(items){
-    const highestIndexBefore28Characters = getHighestIndexTo28CharactersCombined(items)
+    const highestIndexBefore28Characters = getHighestIndexBefore28CharactersCombined(items)
     const numItemsRemaining = items.length - highestIndexBefore28Characters - 1
     if(numItemsRemaining > 0){
         return generateExpandableBlurb(
@@ -65,22 +61,11 @@ function generateBlurb(items){
     }
 }
 
-function getHighestIndexTo28CharactersCombined(items){
-    let combinedLength = 0
-    let highestIndex = 0
-    items.map((item, index) => {
-        combinedLength += item.length
-        if(combinedLength < 28){
-            highestIndex = index
-        }
-    })
-    return highestIndex
-}
-
 function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining){
     const quotedItems = items.map(item => `"${item}"`)
+    let shortenedItems = quotedItems.slice(0, indexToStopAt + 1)
     const allItems = quotedItems.join(', ')
-    const shortenedItems = allItems.slice(0, indexToStopAt + 1)
+    shortenedItems = shortenedItems.join(', ')
     return(
         <ExpandableBlurbControl
             numItemsRemaining={numItemsRemaining}
@@ -90,20 +75,6 @@ function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining){
     )
 }
 
-function generateFixedBlurb(items){
-    const quotedItems = items.map(item => `"${item}"`)
-    const commaSeparatedItems = quotedItems.join(', ')
-    return <BlurbText>{commaSeparatedItems}</BlurbText>
-}
-
-
-const BlurbText = styled.span`
-    max-width: 110px;
-    max-height: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 10px;
-`
 
 function ExpandableBlurbControl(props){
     const [expanded, setExpanded] = useState(false);
@@ -120,20 +91,49 @@ function ExpandableBlurbControl(props){
     return(
         <button onClick={handleClick}>
             {expanded ?
-                <StyledExpandedText children={props.allItems}/> :
-                <BlurbText>
-                    {props.shortenedItems} + {props.numItemsRemaining} more
-                </BlurbText>
+                <BlurbText expanded={expanded}>{props.allItems}</BlurbText>:
+                <span>
+                    <BlurbText>
+                        {props.shortenedItems}
+                    </BlurbText>
+                        + {props.numItemsRemaining} more
+                </span>
             }
             {arrow}
         </button>
     )
 }
 
-const StyledExpandedText = styled.section`
-    width: 100%;
-    height: 100%;
-`;
+function generateFixedBlurb(items){
+    const quotedItems = items.map(item => `"${item}"`)
+    const commaSeparatedItems = quotedItems.join(', ')
+    return <BlurbText>{commaSeparatedItems}</BlurbText>
+}
 
+const BlurbText = styled.section`
+    max-width: ${props => props.expanded ? '100%' : '150px'};
+    max-height: 180px;
+    overflow: ${props => props.expanded ? 'scroll' : 'hidden'};
+    text-overflow: ellipsis;
+    white-space: ${props => props.expanded ? 'wrap' : 'nowrap'};
+    padding: 10px;
+    border-radius: 3px;
+    font-size: 20px;
+    background: linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%);
+`
+
+function getHighestIndexBefore28CharactersCombined(items) {
+    let combinedLength = 0
+    let highestIndex = 0
+    items.map((item, index) => {
+        combinedLength += item.length
+        if (combinedLength < 28) {
+            highestIndex = index
+        } else {
+            return highestIndex
+        }
+    })
+    return highestIndex
+}
 
 export default TicketLabel;

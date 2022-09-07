@@ -2,8 +2,10 @@ import React, {useRef, useState} from "react";
 import TicketForm from './TicketForm';
 import TicketLabel from "../shared/TicketLabel";
 import DecorativeTicket from "../shared/DecorativeTicket";
-import ImportantButtonWrap from "../shared/ImportantButtonWrap";
+import ClassicUIBox from "../shared/ClassicUIBox";
+import SmallIconStyle from "../shared/SmallIconStyle";
 import useData from "../shared/hooks/useData";
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 //TODO: add a reducer
 function Input(props){
@@ -310,13 +312,16 @@ function ExampleBox(props){
 }
 function ExampleRequest(props){
     const tickets = props.request["tickets"]
-    console.log(tickets)
     return(
-        <ImportantButtonWrap
-            onClick={() => props.onClick(tickets)}
+        <ClassicUIBox
             aria-label={`Load example request: ${props.title}`}
         >
-            <h1>{props.title}</h1>
+            <h1>
+                {props.title}
+            </h1>
+            <SmallIconStyle onClick={() => props.onClick(tickets)}>
+                <AddBoxIcon/>
+            </SmallIconStyle>
             <div className={'exampleRequest'}>
                 {Object.keys(tickets).map((ticket) => (
                     <DecorativeTicket key={ticket}>
@@ -329,7 +334,7 @@ function ExampleRequest(props){
                 ))}
 
             </div>
-        </ImportantButtonWrap>
+        </ClassicUIBox>
     )
 }
 

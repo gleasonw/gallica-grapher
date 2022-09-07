@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const ImportantButtonWrap = styled.button`
+const ImportantButtonWrap = styled.div`
     text-align: center;
     align-self: center;
     background: linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%);
