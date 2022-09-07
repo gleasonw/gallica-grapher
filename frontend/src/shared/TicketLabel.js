@@ -78,10 +78,16 @@ function getHighestIndexTo28CharactersCombined(items){
 }
 
 function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining){
-    const itemsToShow = items.slice(0, indexToStopAt + 1)
-    const quotedItems = itemsToShow.map(item => `"${item}"`)
-    const commaSeparatedItems = quotedItems.join(', ')
-    return <span><ExpandableBlurbText>{commaSeparatedItems}</ExpandableBlurbText> + {numItemsRemaining} more</span>
+    const quotedItems = items.map(item => `"${item}"`)
+    const allItems = quotedItems.join(', ')
+    const shortenedItems = allItems.slice(0, indexToStopAt + 1)
+    return(
+        <ExpandableBlurbControl
+            numItemsRemaining={numItemsRemaining}
+            allItems={allItems}
+            shortenedItems={shortenedItems}
+        />
+    )
 }
 
 function generateFixedBlurb(items){
@@ -99,29 +105,35 @@ const BlurbText = styled.span`
     padding: 10px;
 `
 
-function ExpandableBlurbText(props){
+function ExpandableBlurbControl(props){
     const [expanded, setExpanded] = useState(false);
     const [arrow, setArrow] = useState(<ExpandMoreIcon/>);
 
     function handleClick(){
-        setArrow(expanded ? <ExpandMoreIcon/> : <ExpandLessIcon/>)
+        setArrow(expanded ?
+            <ExpandMoreIcon/> :
+            <ExpandLessIcon/>
+        )
         setExpanded(!expanded)
     }
 
     return(
-        <button
-            className={props.className}
-            onClick={handleClick}
-        >
-            {props.children}
+        <button onClick={handleClick}>
+            {expanded ?
+                <StyledExpandedText children={props.allItems}/> :
+                <BlurbText>
+                    {props.shortenedItems} + {props.numItemsRemaining} more
+                </BlurbText>
+            }
             {arrow}
         </button>
     )
 }
 
-const StyledExpandableBlurbText = styled(ExpandableBlurbText)`
-    
-`
+const StyledExpandedText = styled.section`
+    width: 100%;
+    height: 100%;
+`;
 
 
 export default TicketLabel;
