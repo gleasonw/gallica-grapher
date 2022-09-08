@@ -11,6 +11,7 @@ const DecorativeTicket = styled.div`
         border-radius: 10px;
         border: 1px solid #d9d9d9;
         position: relative;
+        overflow: visible;
     `;
 
 export default DecorativeTicket;

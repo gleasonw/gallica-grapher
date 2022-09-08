@@ -8,9 +8,9 @@ const TextInputBubble = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border: 1px solid #d9d9d9;
+    border: ${props => props.noTermsReminder ?  "1px solid #ff0000": "1px solid #d9d9d9"};
     background-color: ${props => props.backgroundColor || "#ffffff"};
-    border-radius: 10px;
+    border-radius: ${props => props.borderRadius || "10px"};
     color: #4d4d4d;
     transition: all 150ms;
     `;

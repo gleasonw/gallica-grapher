@@ -35,7 +35,7 @@ function TicketForm(props){
 
     return(
         <form
-            onSubmit={props.onGraphStartClick}
+            onSubmit={handleSubmit}
             className='userInputForm'
         >
             <label>Graph this term:</label>
@@ -60,14 +60,14 @@ function TicketForm(props){
                 userSelectedPapers={props.userSelectedPapers}
                 boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
             />
+            <StyledRequestBox
+                tickets={props.tickets}
+                onTicketClick={props.onTicketClick}
+                className={'requestBox'}
+                onCreateTicketClick={handleCreateTicketClick}
+            />
             <br />
             <RequestBoxAndFetchButtonWrap>
-                <StyledRequestBox
-                    tickets={props.tickets}
-                    onTicketClick={props.onTicketClick}
-                    className={'requestBox'}
-                    onCreateTicketClick={handleCreateTicketClick}
-                />
                 <ImportantButtonWrap>
                     <input
                         type='submit'

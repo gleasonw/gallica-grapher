@@ -20,7 +20,6 @@ function Input(props){
     const queryForContinuousPapers = getContinuousPaperQuery();
     const result = useData(queryForContinuousPapers);
     const continuousPapers = result ? result['paperNameCodes'] : [];
-    console.log(`${continuousPapers.length} for date range ${continuousDateRange[0]} to ${continuousDateRange[1]}`)
     const boundaryYearsForUserPapers = setUserPapersYearBoundary();
 
     function getContinuousPaperQuery(){
@@ -51,6 +50,7 @@ function Input(props){
 
     function handleSubmit(event){
         event.preventDefault();
+        console.log('fired')
         if(!props.tickets || props.tickets.length === 0) {
             const ticket = {
                 terms: terms,

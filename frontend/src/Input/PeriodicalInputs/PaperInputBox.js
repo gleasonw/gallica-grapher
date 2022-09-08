@@ -72,6 +72,7 @@ export class PaperInputBox extends React.Component {
             <TextInputBubble
                 padding={"0"}
                 backgroundColor={"#f5f5f5"}
+                borderRadius={"10px 10px 0 0"}
             >
                 <ContinuousTrendInput
                     yearRange={this.props.dateRanges[0]}

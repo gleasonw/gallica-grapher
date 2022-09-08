@@ -15,7 +15,7 @@ export function TermInputBox(props) {
                 type="text"
                 value={props.termInput}
                 name="updatedTerms"
-                placeholder={props.noTermsReminder ? "ENTER A TERM" : "Enter a search term"}
+                placeholder={props.noTermsReminder ? "Please enter a term" : "Enter a search term"}
                 onChange={props.handleTermChange}
                 onKeyDown={handleKeyDown}
                 autoComplete="off"

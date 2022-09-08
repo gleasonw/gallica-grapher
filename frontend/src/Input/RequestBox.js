@@ -5,35 +5,52 @@ import styled from 'styled-components';
 import LesserButton from "../shared/LesserButton";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import SmallIconStyle from "../shared/SmallIconStyle";
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 export function RequestBox(props) {
-    if(Object.keys(props.tickets).length > 0){
-        return (
-        Object.keys(props.tickets).map(ticketID => (
-            <DecorativeTicket key={ticketID}>
-                <SmallIconStyle onClick={() => props.onTicketClick(ticketID)}>
-                    <RemoveCircleIcon/>
-                </SmallIconStyle>
-                <RequestTicket
-                    ticket={props.tickets[ticketID]}
-                />
-            </DecorativeTicket>
-            ))
-        )
-    }else{
-        return(
-        <LesserButton onClick={props.onCreateTicketClick}>
-            Add a ticket to search
-        </LesserButton>
-            )
-    }
+    return(
+        <StyledTicketRow>
+            <OverflowScrollTicketRow>
+                {Object.keys(props.tickets).map(ticketID => (
+                    <DecorativeTicket key={ticketID}>
+                        <SmallIconStyle onClick={() => props.onTicketClick(ticketID)}>
+                            <RemoveCircleIcon/>
+                        </SmallIconStyle>
+                        <RequestTicket
+                            ticket={props.tickets[ticketID]}
+                        />
+                    </DecorativeTicket>
+                ))}
+            </OverflowScrollTicketRow>
+            {Object.keys(props.tickets).length < 5 &&
+            <LesserButton
+                onClick={props.onCreateTicketClick}
+                borderRadius="0px 0px 10px 10px"
+            >
+                <AddBoxIcon/>
+                Compare
+            </LesserButton>
+            }
+        </StyledTicketRow>
+    )
 }
+
+const StyledTicketRow = styled.div`
+    display: flex;
+    flex-direction: row;
+    overflow: visible;
+`;
+
+const OverflowScrollTicketRow = styled(StyledTicketRow)`
+    overflow-x: scroll;
+    overflow-y: visible;
+`;
 
 export const StyledRequestBox = styled(RequestBox)`
     display: flex;
     flex-direction: row;
     transition: all 150ms;
-    
+    overflow: visible;
 `;
 
 function RequestTicket(props) {
