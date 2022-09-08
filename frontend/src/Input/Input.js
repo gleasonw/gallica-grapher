@@ -51,12 +51,16 @@ function Input(props){
 
     function handleSubmit(event){
         event.preventDefault();
-        const ticket = {
-            terms: terms,
-            papersAndCodes: getPapersFor(selectedPaperInput),
-            dateRange: getDateRangeFor(selectedPaperInput)
+        if(!props.tickets || props.tickets.length === 0) {
+            const ticket = {
+                terms: terms,
+                papersAndCodes: getPapersFor(selectedPaperInput),
+                dateRange: getDateRangeFor(selectedPaperInput)
+            }
+            props.onTicketSubmit(ticket);
+        }else{
+            props.onTicketSubmit();
         }
-        props.onTicketSubmit(ticket);
     }
 
     function handleTermChange(event) {

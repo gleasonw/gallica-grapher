@@ -82,6 +82,7 @@ function App() {
     }
 
     function handleExampleRequestClick(request){
+        window.scrollTo(0, 0);
         setTickets(request);
     }
 

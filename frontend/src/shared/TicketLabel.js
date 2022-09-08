@@ -10,7 +10,12 @@ function TicketLabel(props){
     const dateBlurb = <DateBlurb dateRange={props.dateRange}></DateBlurb>
     return(
         <div className='ticketLabel'>
-            Occurrences of {termBlurb} in {paperBlurb} from {dateBlurb}
+            <span>Occurrences of</span>
+            {termBlurb}
+            <span>in</span>
+            {paperBlurb}
+            <span>from</span>
+            {dateBlurb}
         </div>
     )
 }
@@ -28,9 +33,9 @@ function PaperBlurb(props){
     const papers = props.papers
     if(papers.length === 0){
         return (
-            <InlineBubble selected={true}>
+            <BlurbText>
                 all papers
-            </InlineBubble>
+            </BlurbText>
         )
     }else{
         let paperNames = []
@@ -114,6 +119,7 @@ const BlurbText = styled.section`
     max-width: ${props => props.expanded ? '100%' : '150px'};
     max-height: 180px;
     overflow: ${props => props.expanded ? 'scroll' : 'hidden'};
+    position: ${props => props.expanded ? 'absolute' : 'relative'};
     text-overflow: ellipsis;
     white-space: ${props => props.expanded ? 'wrap' : 'nowrap'};
     padding: 10px;

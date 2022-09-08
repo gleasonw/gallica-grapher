@@ -10,12 +10,12 @@ export function TermInputBox(props) {
     }
 
     return (
-        <TextInputBubble>
+        <TextInputBubble noTermsReminder={props.noTermsReminder}>
             <input
                 type="text"
                 value={props.termInput}
                 name="updatedTerms"
-                placeholder="Enter a search term"
+                placeholder={props.noTermsReminder ? "ENTER A TERM" : "Enter a search term"}
                 onChange={props.handleTermChange}
                 onKeyDown={handleKeyDown}
                 autoComplete="off"

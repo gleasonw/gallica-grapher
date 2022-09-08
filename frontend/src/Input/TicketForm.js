@@ -10,14 +10,27 @@ function TicketForm(props){
 
     function handleSubmit(e){
         e.preventDefault();
-        if ((!props.tickets || props.tickets.length === 0)
+        if ((!props.tickets || Object.keys(props.tickets).length === 0)
             &&
-            (!props.terms || props.terms.length === 0))
+            (props.termInput === ''))
         {
             setShowNoTermsReminder(true)
-        } else{
+        }else{
             props.onSubmit(e);
         }
+    }
+
+    function handleCreateTicketClick(){
+        if(props.termInput !== '') {
+            props.onCreateTicketClick();
+        }else{
+            setShowNoTermsReminder(true);
+        }
+    }
+
+    function handleTermChange(e){
+        setShowNoTermsReminder(false);
+        props.handleTermChange(e);
     }
 
     return(
@@ -31,7 +44,8 @@ function TicketForm(props){
                 selectedTerms={props.selectedTerms}
                 deleteTermBubble={props.deleteTermBubble}
                 termInput={props.termInput}
-                handleTermChange={props.handleTermChange}
+                handleTermChange={handleTermChange}
+                noTermsReminder={showNoTermsReminder}
             />
             <br />
             <label>in...</label>
@@ -52,7 +66,7 @@ function TicketForm(props){
                     tickets={props.tickets}
                     onTicketClick={props.onTicketClick}
                     className={'requestBox'}
-                    onCreateTicketClick={props.onCreateTicketClick}
+                    onCreateTicketClick={handleCreateTicketClick}
                 />
                 <ImportantButtonWrap>
                     <input
