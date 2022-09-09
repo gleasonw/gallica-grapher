@@ -1,6 +1,6 @@
 from scripts.paperRecordFetch import PaperRecordFetch
 import io
-
+from scripts.utils.psqlconn import PSQLconn
 
 class RecordsToDBTransaction:
 
@@ -127,3 +127,10 @@ def generateResultCSVstream(records, getRowIterable):
         )) + '\n')
     csvFileLikeObject.seek(0)
     return csvFileLikeObject
+
+
+if __name__ == '__main__':
+    fetcher = PaperRecordFetch()
+    paperRecords = fetcher.fetchAllPaperRecords()
+    dbInsert = RecordsToDBTransaction('papers', PSQLconn().getConn())
+    dbInsert.insertPapers(paperRecords)

@@ -6,7 +6,7 @@ from scripts.utils.timeoutAndRetryHTTPAdapter import TimeoutAndRetryHTTPAdapter
 from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
 from scripts.cqlSelectStringForPapers import CQLSelectStringForPapers
 
-NUM_WORKERS = 50
+NUM_WORKERS = 100
 
 
 class PaperRecordFetch:
