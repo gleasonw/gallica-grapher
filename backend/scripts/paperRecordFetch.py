@@ -18,36 +18,27 @@ class PaperRecordFetch:
         else:
             self.session = gallicaSession
 
-    def fetchRecordDataForCodes(self, paperCodes):
-        paperRecords = []
-        with self.session:
-            for i in range(0, len(paperCodes), 20):
-                batchOf20 = self.fetchTheseMax20PaperRecords(paperCodes[i:i + 20])
-                paperRecords.extend(batchOf20)
+    def fetchPaperRecordsForCodes(self, paperCodes):
+        batchedQueries = CQLSelectStringForPapers(paperCodes).cqlSelectStrings
+        queryIndices = [(query, 1) for query in batchedQueries]
+        paperRecords = self.fetchPapersConcurrently(queryIndices)
         return paperRecords
 
-    def fetchTheseMax20PaperRecords(self, paperCodes):
-        self.query = CQLSelectStringForPapers(paperCodes).cqlSelectStrings[0]
-        batch = GallicaPaperRecordBatch(
-            self.query,
-            self.session,
-            numRecords=20)
-        return batch.getRecords()
-
-    def fetchAllPaperRecordsOnGallica(self):
-        self.query = 'dc.type all "fascicule" and ocrquality > "050.00"'
-        allRecords = self.runThreadedPaperFetch()
+    def fetchAllPaperRecords(self):
+        query = 'dc.type all "fascicule" and ocrquality > "050.00"'
+        numPapers = self.getNumPapersOnGallica()
+        indices = range(1, numPapers, 50)
+        queryIndices = [(query, index) for index in indices]
+        allRecords = self.fetchPapersConcurrently(queryIndices)
         return allRecords
 
-    def runThreadedPaperFetch(self):
+    def fetchPapersConcurrently(self, queryIndices):
         records = []
-        with self.session:
-            numPapers = self.getNumPapersOnGallica()
-            with concurrent.futures.ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-                for batch in executor.map(
-                        self.fetchBatchPapersAtIndex,
-                        range(1, numPapers, 50)):
-                    records.extend(batch)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
+            for batch in executor.map(
+                    self.fetchBatchPapersAtIndex,
+                    queryIndices):
+                records.extend(batch)
         return records
 
     def fetchBatchPapersAtIndex(self, index):
