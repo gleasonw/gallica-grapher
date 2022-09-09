@@ -1,8 +1,7 @@
-* add warning when term not selected
-* easier periodical options (continuous publishers -- how many, specific papers, all papers *warning*)
-* aws cloudfront cache GET query strings
-* info page
-* sessions to store prior requests key
 * click on highcharts year to get links to sample records for each series
+* info page
+* ui pass
+* aws cloudfront cache GET query strings
+* sessions to store prior requests key
 * French translation
 * a nice way to pass the time while waiting
