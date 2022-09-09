@@ -41,11 +41,12 @@ class PaperRecordFetch:
                 records.extend(batch)
         return records
 
-    def fetchBatchPapersAtIndex(self, index):
+    def fetchBatchPapersAtIndex(self, queryIndex):
+        print(f'fetching query {queryIndex[0]} at index {queryIndex[1]}')
         batch = GallicaPaperRecordBatch(
-            self.query,
-            self.session,
-            startRecord=index)
+            query=queryIndex[0],
+            session=self.session,
+            startRecord=queryIndex[1])
         records = batch.getRecords()
         return records
 
