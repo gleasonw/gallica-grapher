@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
-from scripts.gallicaRecordBatch import GallicaRecordBatch
-from scripts.gallicaRecordBatch import GallicaKeywordRecordBatch
-from scripts.gallicaRecordBatch import GallicaPaperRecordBatch
+from gallicaRecordBatch import GallicaRecordBatch
+from gallicaRecordBatch import GallicaKeywordRecordBatch
+from gallicaRecordBatch import GallicaPaperRecordBatch
 from utils.gallicaSession import GallicaSession
 
 import os

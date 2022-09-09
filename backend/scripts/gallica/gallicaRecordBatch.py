@@ -1,6 +1,6 @@
 from lxml import etree
-from scripts.record import KeywordRecord
-from scripts.record import PaperRecord
+from record import KeywordRecord
+from record import PaperRecord
 from scripts.utils.gallicaSession import GallicaSession
 
 
@@ -48,7 +48,7 @@ class GallicaRecordBatch:
         response = self.session.get(
             "",
             params=self.params,
-            timeout=15)
+            timeout=(30, 240))
         self.xmlRoot = etree.fromstring(response.content)
         self.elapsedTime = response.elapsed.total_seconds()
 

@@ -1,5 +1,5 @@
 from lxml import etree
-from scripts.date import Date
+from date import Date
 
 
 class Record:
@@ -102,12 +102,13 @@ class PaperRecord(Record):
     def getDate(self):
         return self.publishingRange
 
+    #TODO: move all concurrent fetches to a single class
     def fetchYearsPublished(self):
         paramsForArk = {'ark': f'ark:/12148/{self.paperCode}/date'}
         response = self.session.get(
             "",
             params=paramsForArk,
-            timeout=15)
+            timeout=(30, 240))
         try:
             root = etree.fromstring(response.content)
             for yearElement in root.iter("year"):

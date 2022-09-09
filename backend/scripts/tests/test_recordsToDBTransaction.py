@@ -13,6 +13,9 @@ class TestRecordsToDBTransaction(TestCase):
             MagicMock()
         )
 
+    def tearDown(self) -> None:
+        pass
+
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.insertPapers')
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.insertNgramOccurrenceRecords')
     def test_insert(self, mock_insert_ngram, mock_insert_papers):
@@ -40,7 +43,7 @@ class TestRecordsToDBTransaction(TestCase):
     def test_insert_ngram_occurrence_records(self, mock_io, mock_move, mock_add):
         mock_io.StringIO.return_value = MagicMock()
 
-        self.testTransaction.insertNgramOccurrenceRecords(MagicMock())
+        self.testTransaction.insertResults(MagicMock())
 
         self.testTransaction.conn.cursor.assert_called_once()
         mock_add.assert_called_once()
@@ -51,7 +54,7 @@ class TestRecordsToDBTransaction(TestCase):
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.insert')
     def test_add_missing_papers(self, mock_insert, mock_get, mock_fetch):
         mock_get.return_value = ['testpaperid']
-        mock_fetch.fetchRecordDataForCodes.return_value = 'testrecords'
+        mock_fetch.fetchPaperRecordsForCodes.return_value = 'testrecords'
         mock_fetch.return_value = mock_fetch
 
         self.testTransaction.addMissingPapers()
@@ -75,6 +78,23 @@ class TestRecordsToDBTransaction(TestCase):
                     (SELECT code FROM papers);
                 """,
             ('testrequest',)
+        )
+
+    def test_integration_test_get_missing_papers(self):
+        self.testTransaction.conn = PSQLconn().getConn()
+        self.testTransaction.requestID = 'testrequest'
+        self.testTransaction.conn.cursor().execute(
+            "INSERT INTO holdingresults "
+            "(identifier, year, month, day, searchterm, paperid, ticketid, requestid) "
+            "VALUES "
+            "('testid', 2019, 1, 1, 'testterm', 'testpaperid', 'testticketid', 'testrequest');"
+        )
+
+        missingPapers = self.testTransaction.getMissingPapers()
+
+        self.assertListEqual(
+            missingPapers,
+            [('testpaperid',)]
         )
 
     def test_move_records_to_final_table(self):

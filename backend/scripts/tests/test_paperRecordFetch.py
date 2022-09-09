@@ -21,7 +21,7 @@ class TestPaperRecordFetch(unittest.TestCase):
     def test_fetch_record_data_for_codes(self, mock_batch_20_fetch):
         mock_batch_20_fetch.side_effect = lambda x: x
 
-        records = self.testInstance.fetchRecordDataForCodes(self.mockPaperCodes)
+        records = self.testInstance.fetchPaperRecordsForCodes(self.mockPaperCodes)
 
         self.assertEqual(
             len(records),
@@ -42,7 +42,7 @@ class TestPaperRecordFetch(unittest.TestCase):
     def test_fetch_all_paper_records_on_gallica(self, mock_fetch):
         mock_fetch.return_value = '1'
 
-        result = self.testInstance.fetchAllPaperRecordsOnGallica()
+        result = self.testInstance.fetchAllPaperRecords()
 
         self.assertEqual(
             result,
@@ -55,7 +55,7 @@ class TestPaperRecordFetch(unittest.TestCase):
         mock_get.return_value = 100
         mock_fetch.side_effect = lambda x: [x]
 
-        result = self.testInstance.runThreadedPaperFetch()
+        result = self.testInstance.fetchPapersConcurrently()
 
         self.assertListEqual(
             result,

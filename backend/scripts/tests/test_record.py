@@ -2,9 +2,9 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from lxml import etree
 import os
-from scripts.record import Record
-from scripts.record import KeywordRecord
-from scripts.record import PaperRecord
+from record import Record
+from record import KeywordRecord
+from record import PaperRecord
 from utils.gallicaSession import GallicaSession
 
 

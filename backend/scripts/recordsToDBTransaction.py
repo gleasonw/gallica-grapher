@@ -8,14 +8,6 @@ class RecordsToDBTransaction:
         self.requestID = requestID
         self.conn = conn
 
-    def insert(self, targetTable, records):
-        if targetTable == 'papers':
-            self.insertPapers(records)
-        elif targetTable == 'results':
-            self.insertNgramOccurrenceRecords(records)
-        else:
-            raise ValueError(f'Invalid target table: {targetTable}')
-
     def insertPapers(self, records):
         csvStream = generateResultCSVstream(
             records,
@@ -27,7 +19,7 @@ class RecordsToDBTransaction:
             sep='|'
         )
 
-    def insertNgramOccurrenceRecords(self, records):
+    def insertResults(self, records):
         csvStream = generateResultCSVstream(
             records,
             self.getKeywordRecordRowIterable
@@ -54,10 +46,10 @@ class RecordsToDBTransaction:
         paperGetter = PaperRecordFetch()
         missingPaperCodes = self.getMissingPapers()
         if missingPaperCodes:
-            missingPaperRecords = paperGetter.fetchRecordDataForCodes(
+            missingPaperRecords = paperGetter.fetchPaperRecordsForCodes(
                 missingPaperCodes
             )
-            self.insert('papers', missingPaperRecords)
+            self.insertPapers(missingPaperRecords)
 
     def getMissingPapers(self):
         with self.conn.cursor() as curs:
@@ -72,7 +64,8 @@ class RecordsToDBTransaction:
                     (SELECT code FROM papers);
                 """
                 , (self.requestID,))
-            return curs.fetchall()
+            formattedCodes = [code[0] for code in curs.fetchall()]
+            return formattedCodes
 
     def moveRecordsToFinalTable(self):
         with self.conn.cursor() as curs:

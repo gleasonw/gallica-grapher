@@ -1,11 +1,11 @@
 from math import ceil
 from concurrent.futures import ThreadPoolExecutor
-from .gallicaRecordBatch import GallicaKeywordRecordBatch
-from .gallicaRecordBatch import GallicaRecordBatch
+from gallicaRecordBatch import GallicaKeywordRecordBatch
+from gallicaRecordBatch import GallicaRecordBatch
 from scripts.cqlSelectStringForPapers import CQLSelectStringForPapers
 from scripts.recordsToDBTransaction import RecordsToDBTransaction
 
-NUM_WORKERS = 50
+NUM_WORKERS = 100
 CHUNK_SIZE = 200
 
 
@@ -92,10 +92,7 @@ class NgramQueryWithConcurrency:
                 self.requestID,
                 self.dbConnection,
             )
-            dbTransaction.insert(
-                'results',
-                recordsForChunk
-            )
+            dbTransaction.insertResults(recordsForChunk)
             self.actualNumResults += len(recordsForChunk)
             del recordsForChunk
 

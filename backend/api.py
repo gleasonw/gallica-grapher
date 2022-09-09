@@ -116,5 +116,14 @@ def getCSV():
     return {"csvData": csvData}
 
 
+@app.route('/getIssueLinks')
+def getIssueLinks():
+    tickets = request.args["tickets"]
+    startDate = request.args["startDate"]
+    endDate = request.args["endDate"]
+    paperLinks = ReactCSVdata().getIssueLinks(tickets, startDate, endDate)
+    return {"paperLinks": paperLinks}
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
