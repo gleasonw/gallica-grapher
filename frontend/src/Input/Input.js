@@ -1,7 +1,5 @@
 import React, {useRef, useState} from "react";
 import TicketForm from './TicketForm';
-import TicketLabel from "../shared/TicketLabel";
-import DecorativeTicket from "../shared/DecorativeTicket";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import SmallIconStyle from "../shared/SmallIconStyle";
 import useData from "../shared/hooks/useData";
@@ -234,7 +232,7 @@ function Input(props){
         <div className='inputBody'>
             <div className='inputUI'>
                 <div className="mainTitle">
-                    Query the Gallica periodical archive and graph the results.
+                    Graph word trends in the French National Library's periodical archive.
                 </div>
                 <TicketForm
                     dateRanges = {[
