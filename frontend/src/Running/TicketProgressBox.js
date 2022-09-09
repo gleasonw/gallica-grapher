@@ -1,6 +1,8 @@
 import TicketLabel from "../shared/TicketLabel";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import React from "react";
+import styled from "styled-components";
+import ClassicUIBox from "../shared/ClassicUIBox";
 
 export function TicketProgressBox(props) {
     const secondsToCompletion = props.progressStats.estimateSecondsToCompletion
@@ -10,14 +12,14 @@ export function TicketProgressBox(props) {
     const remainingMinutes = minutesToCompletion % 60
     const timeEstimate = hoursToCompletion + "h " + remainingMinutes + "m " + remainingSeconds + "s"
     return (
-        <div className='ticketProgressBox'>
+        <ClassicUIBox>
             <TicketLabel
                 terms={props.terms}
                 papers={props.papers}
                 dateRange={props.dateRange}
             />
             {props.progressStats &&
-            <div className='progressStats'>
+            <StyledProgressStats>
                 <ProgressBar
                     animated
                     now={props.progressStats.progress}
@@ -31,8 +33,15 @@ export function TicketProgressBox(props) {
                 <div className='progressStatsText'>
                     {timeEstimate} approximate time to completion
                 </div>
-            </div>
+            </StyledProgressStats>
             }
-        </div>
+        </ClassicUIBox>
     )
 }
+
+const StyledProgressStats = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 20px;
+    `;

@@ -4,17 +4,19 @@ import TicketLabel from "../shared/TicketLabel";
 import Chart from "./Chart";
 import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import DownloadCSVButton from "./DownloadCSVButton";
+import ClassicUIBox from "../shared/ClassicUIBox";
+import styled from "styled-components";
 
 export function GroupedTicketResults(props) {
     return (
-        <div className='groupedResultsUI'>
+        <ClassicUIBox>
             <Chart
                 tickets={props.tickets}
                 settingsID='group'
             />
             <GroupedStatBar tickets={props.tickets}/>
             <DownloadCSVButton tickets={props.tickets}/>
-        </div>
+        </ClassicUIBox>
 
     )
 }
@@ -24,7 +26,7 @@ function GroupedStatBar(props) {
 
 
     return (
-        <div className='groupedStatBar'>
+        <StyledStatBar>
             {Object.keys(props.tickets).map(key => (
                 <div
                     className='groupedStatBarEntry'
@@ -45,8 +47,13 @@ function GroupedStatBar(props) {
                     />
                 </div>
             ))}
-        </div>
+        </StyledStatBar>
     );
 }
+
+const StyledStatBar = styled.div`
+    display: flex;
+    flex-direction: row;
+`;
 
 export default GroupedTicketResults;

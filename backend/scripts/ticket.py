@@ -41,6 +41,11 @@ class Ticket:
         self.sumResultsOfEachQuery()
         return self.estimateTotalResults
 
+    def sumResultsOfEachQuery(self):
+        for query in self.termQueries:
+            numResultsForKeyword = query.getEstimateNumResults()
+            self.estimateTotalResults += numResultsForKeyword
+
     def run(self):
         self.numBatches = ceil(self.estimateTotalResults / 50)
         for query in self.termQueries:
@@ -75,10 +80,6 @@ class Ticket:
             self.session)
         return query
 
-    def sumResultsOfEachQuery(self):
-        for query in self.termQueries:
-            numResultsForKeyword = query.getEstimateNumResults()
-            self.estimateTotalResults += numResultsForKeyword
 
     def updateProgressStats(self, randomPaper, requestTime, numWorkers):
         self.numBatchesRetrieved += 1

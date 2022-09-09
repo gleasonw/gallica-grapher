@@ -6,6 +6,7 @@ import ClassicUIBox from "../shared/ClassicUIBox";
 import SmallIconStyle from "../shared/SmallIconStyle";
 import useData from "../shared/hooks/useData";
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import Ticket from "./Ticket";
 
 //TODO: add a reducer
 function Input(props){
@@ -50,16 +51,17 @@ function Input(props){
 
     function handleSubmit(event){
         event.preventDefault();
-        console.log('fired')
-        if(!props.tickets || props.tickets.length === 0) {
+        const numTickets = Object.keys(props.tickets).length
+        if(numTickets === 0) {
             const ticket = {
                 terms: terms,
                 papersAndCodes: getPapersFor(selectedPaperInput),
                 dateRange: getDateRangeFor(selectedPaperInput)
             }
-            props.onTicketSubmit(ticket);
+            console.log(ticket)
+            props.onLoadedSubmit(ticket);
         }else{
-            props.onTicketSubmit();
+            props.onUnloadedSubmit();
         }
     }
 
@@ -316,6 +318,7 @@ function ExampleBox(props){
 }
 function ExampleRequest(props){
     const tickets = props.request["tickets"]
+    const numTickets = Object.keys(tickets).length
     return(
         <ClassicUIBox
             aria-label={`Load example request: ${props.title}`}
@@ -327,14 +330,14 @@ function ExampleRequest(props){
                 <AddBoxIcon/>
             </SmallIconStyle>
             <div className={'exampleRequest'}>
-                {Object.keys(tickets).map((ticket) => (
-                    <DecorativeTicket key={ticket}>
-                        <TicketLabel
-                            terms={tickets[ticket]["terms"]}
-                            papers={tickets[ticket]["papersAndCodes"]}
-                            dateRange={tickets[ticket]["dateRange"]}
-                        />
-                    </DecorativeTicket>
+                {Object.keys(tickets).map((ticket, index) => (
+                    <Ticket
+                        ticket={tickets[ticket]}
+                        key={ticket}
+                        ticketID={ticket}
+                        firstInRow={index === 0}
+                        lastInRow={index === numTickets - 1}
+                    />
                 ))}
 
             </div>

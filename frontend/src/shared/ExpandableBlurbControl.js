@@ -47,20 +47,19 @@ export function ExpandableBlurbControl(props) {
 }
 
 const BlurbExpand = styled.div`
-    width: 100%;
-    height: 100%;
     position: absolute;
     background-color: white;
+    overflow: visible;
+    `;
+
+const OverflowYScrollTable = styled(BlurbExpand)`
     border: 1px solid #d9d9d9;
     z-index: 1;
     tr:nth-child(even) {
         background-color: #;
     }
-    `;
-
-const OverflowYScrollTable = styled(BlurbExpand)`
+    position: absolute;
     max-height: 500px;
     max-width: 500px;
     overflow-y: scroll;
-    position: relative;
     `;

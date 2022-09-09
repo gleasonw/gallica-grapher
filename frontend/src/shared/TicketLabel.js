@@ -1,21 +1,52 @@
 import React from 'react';
 import {ExpandableBlurbControl} from "./ExpandableBlurbControl";
 import {BlurbText} from "./BlurbText";
+import styled from "styled-components";
 
 function TicketLabel(props){
-    const paperNames = getPaperNames(props.papers)
+    const paperBlurb = props.papers.length > 0 ?
+        generateBlurb(getPaperNames(props.papers))
+        :
+        <BlurbText>all papers</BlurbText>
     const dateString = `${props.dateRange[0]} to ${props.dateRange[1]}`
-    return(
-        <div className='ticketLabel'>
-            <span>Occurrences of</span>
-            {generateBlurb(props.terms)}
-            <span>in</span>
-            {generateBlurb(paperNames)}
-            <span>from</span>
-            <BlurbText>{dateString}</BlurbText>
-        </div>
-    )
+    if(props.compact){
+        return(
+            <StyledCompactTicketLabel>
+                Occurrences of
+                {generateBlurb(props.terms)}
+                in
+                {paperBlurb}
+                from
+                <BlurbText>{dateString}</BlurbText>
+            </StyledCompactTicketLabel>
+        )
+    }else{
+        return(
+            <StyledTicketLabel>
+                Occurrences of
+                {generateBlurb(props.terms)}
+                in
+                {paperBlurb}
+                from
+                <BlurbText>{dateString}</BlurbText>
+            </StyledTicketLabel>
+        )
+    }
 }
+
+const StyledTicketLabel = styled.div`
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+`;
+
+const StyledCompactTicketLabel = styled.div`
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+`;
 
 function generateBlurb(items){
     const highestIndexBefore28Characters = getHighestIndexBefore28CharactersCombined(items)
@@ -36,7 +67,6 @@ function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining){
     let shortenedItemString = quotedItems.slice(0, indexToStopAt + 1)
     const itemString = quotedItems.join(', ')
     shortenedItemString = shortenedItemString.join(', ')
-    console.log(items)
     return(
         <ExpandableBlurbControl
             numItemsRemaining={numItemsRemaining}
@@ -55,15 +85,11 @@ function generateFixedBlurb(items){
 }
 
 function getPaperNames(papers){
-    if(papers.length === 0){
-        return('all papers')
-    }else{
-        let paperNames = []
-        papers.map(paperAndCode => (
-            paperNames.push(paperAndCode['title'])
-        ));
-        return paperNames
-    }
+    let paperNames = []
+    papers.map(paperAndCode => (
+        paperNames.push(paperAndCode['title'])
+    ));
+    return paperNames
 }
 
 function getHighestIndexBefore28CharactersCombined(items) {

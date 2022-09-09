@@ -3,6 +3,7 @@ import TicketLabel from "../shared/TicketLabel";
 import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import Chart from "./Chart";
 import DownloadCSVButton from "./DownloadCSVButton";
+import ClassicUIBox from "../shared/ClassicUIBox";
 
 function SoloTickets(props) {
     return (
@@ -20,7 +21,7 @@ function SoloTickets(props) {
 
 function SoloTicketResult(props) {
     return (
-        <div className='ticketResults'>
+        <ClassicUIBox resize={'both'}>
             <TicketLabel
                 terms={props.ticket.terms}
                 papers={props.ticket.papersAndCodes}
@@ -36,7 +37,7 @@ function SoloTicketResult(props) {
                 grouped={false}
             />
             <DownloadCSVButton tickets={{[props.ticketID]: ''}}/>
-        </div>
+        </ClassicUIBox>
     )
 }
 

@@ -1,7 +1,6 @@
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
-import Exporting from 'highcharts/modules/exporting';
-import Export_data from 'highcharts/modules/export-data';
+import styled from 'styled-components';
 import React, {useContext, useRef} from "react";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 import ToggleButton from '@mui/material/ToggleButton';
@@ -15,6 +14,9 @@ import getDateRangeSpan from "./chartUtils/getDateRangeSpan";
 import {CSVDownload} from "react-csv";
 import LesserButton from "../shared/LesserButton";
 import NavBarWrap from "./NavBarWrap";
+
+require("highcharts/modules/exporting")(Highcharts);
+require("highcharts/modules/export-data")(Highcharts);
 
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
@@ -37,7 +39,7 @@ function Chart(props) {
             graphDataWithSyncedColors,
             chartSettings);
         return (
-            <div>
+            <StyledChartUI>
                 <ChartSettings
                     settingsID={props.settingsID}
                 />
@@ -50,14 +52,18 @@ function Chart(props) {
                 <ChartExports
                     chartRef={chartRef}
                 />
-            </div>
+            </StyledChartUI>
         );
     }else{
         return null;
     }
-
-
 }
+const StyledChartUI = styled.div`
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+`;
+
 function ChartSettings(props){
     const settings = useContext(GraphSettingsContext);
     const settingsForID = settings[props.settingsID];
@@ -113,20 +119,6 @@ function ChartSettings(props){
                     <MenuItem value={14}>50</MenuItem>
                 </Select>
             </FormControl>
-            <ToggleButton
-                value="Exclude sporadic papers"
-                selected={settingsForID.continuous}
-                onChange={() => {
-                    dispatch({
-                        type: 'setContinuous',
-                        key: props.settingsID,
-                        continuous: !settingsForID.continuous,
-                    })
-                }}
-                label='require continuous newspapers'
-            >
-                Exclude papers incomplete over range
-            </ToggleButton>
         </NavBarWrap>
 
     )

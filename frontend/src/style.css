@@ -399,31 +399,19 @@ label[for="papers"],label[for="searchTerm"]{
 }
 
 .queryProgressUI, .ticketResultsContainer{
-    max-width: 90vw;
-    min-height: 80vh;
-    margin-left: auto;
-    margin-right: auto;
     display: flex;
     flex-wrap: wrap;
     margin-top: 30px;
     justify-content: center;
     align-items: center;
+    gap: 20px;
+    padding: 25px;
 }
 .groupedStat{
     border: solid;
     width: calc(100% - 40px);
     max-width: 800px;
     margin: 20px;
-}
-.ticketProgressBox{
-    width: 100%;
-    background: white;
-    color: #4d4d4d;
-    border-radius: 10px;
-    padding: 10px;
-    max-width: 500px;
-    max-height: 500px;
-
 }
 .ticketResults{
     flex: 1;
@@ -462,6 +450,7 @@ tr:nth-child(even){
     display: flex;
     justify-content: center;
     flex-direction: column;
+    padding: 0 50px 50px 50px;
 }
 .groupedLabelBar{
     display: flex;
@@ -471,14 +460,12 @@ tr:nth-child(even){
 }
 .ticketLabel{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: wrap;
-    font-size: 18px;
-    gap: 3px;
+    align-items: center;
+    gap: 20px;
 }
-.ticketLabel *{
-    font-size: 16px;
-}
+
 .groupedResultsUI{
     display: flex;
     flex-direction: column;

@@ -38,24 +38,28 @@ function App() {
             </div>
         </header>
 
-    async function handleTicketSubmit(ticket){
+    async function handleLoadedSubmit(ticket){
         const newTicketID = uuidv4();
         const updatedTickets = {
             ...tickets,
             [newTicketID]: ticket
         };
-        const requestID = await initRequest(updatedTickets);
         setTickets(updatedTickets);
-        setRequestID(requestID);
-        setRunningQueries(true);
-        setGettingInput(false);
+        await initRequest(updatedTickets);
+    }
+
+    async function handleUnloadedSubmit(){
+        await initRequest(tickets);
     }
 
     async function initRequest(allUserTickets) {
         const {request} = await axios.post('/api/init', {
             tickets: allUserTickets
         })
-        return JSON.parse(request.response)["taskid"];
+        const requestID = JSON.parse(request.response)["taskid"];
+        setRequestID(requestID);
+        setRunningQueries(true);
+        setGettingInput(false);
     }
 
     function handleCreateTicketClick(items){
@@ -78,6 +82,7 @@ function App() {
             delete updatedTickets[key];
             setTickets(updatedTickets)
         }
+        console.log('deleting ticket: ' + ticketID)
         deleteTicket(ticketID);
     }
 
@@ -124,7 +129,8 @@ function App() {
                 {header}
                 <Input
                     tickets={tickets}
-                    onTicketSubmit={handleTicketSubmit}
+                    onLoadedSubmit={handleLoadedSubmit}
+                    onUnloadedSubmit={handleUnloadedSubmit}
                     onCreateTicketClick={handleCreateTicketClick}
                     onTicketClick={handleTicketClick}
                     onExampleRequestClick={handleExampleRequestClick}
@@ -149,9 +155,10 @@ function App() {
                 {header}
                 <div className={'tooManyRecordsWarningBox'}>
                     <h1>Your curiosity exceeds my capacity.</h1>
+                    <br/>
+                    <h3>{numRecords.toLocaleString()} records in your request.</h3>
                     <section>
-            Your request returned {numRecords.toLocaleString()} records from Gallica's archive. This number is either
-                        greater than my limit, or I don't have enough space for it right now. Try restricting your search to a few periodicals,
+            This number is either greater than my limit, or I don't have enough space for it right now. Try restricting your search to a few periodicals,
             shortening the year range, or using a more precise term. Click on Graphing Gallica to return to home.
                     </section>
                 </div>
