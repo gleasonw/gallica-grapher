@@ -1,7 +1,7 @@
 from math import ceil
 
-from .ngramQueryWithConcurrency import NgramQueryWithConcurrencyAllPapers
-from .ngramQueryWithConcurrency import NgramQueryWithConcurrencySelectPapers
+from .ngramOccurences import NgramQueryWithConcurrencyAllPapers
+from .ngramOccurences import NgramQueryWithConcurrencySelectPapers
 
 
 class Ticket:

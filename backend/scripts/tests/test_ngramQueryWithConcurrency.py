@@ -1,9 +1,9 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 from utils.psqlconn import PSQLconn
-from scripts.ngramQueryWithConcurrency import NgramQueryWithConcurrency
-from scripts.ngramQueryWithConcurrency import NgramQueryWithConcurrencyAllPapers
-from scripts.ngramQueryWithConcurrency import NgramQueryWithConcurrencySelectPapers
+from scripts.ngramOccurences import NgramQueryWithConcurrency
+from scripts.ngramOccurences import NgramQueryWithConcurrencyAllPapers
+from scripts.ngramOccurences import NgramQueryWithConcurrencySelectPapers
 from utils.gallicaSession import GallicaSession
 from DBtester import DBtester
 import os

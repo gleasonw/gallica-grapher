@@ -3,7 +3,8 @@ from record import KeywordRecord
 from record import PaperRecord
 from scripts.utils.gallicaSession import GallicaSession
 
-
+#Refactor so this is a driver passed around, rather
+#than newly instantiated with each request
 class GallicaRecordBatch:
     def __init__(self,
                  query,

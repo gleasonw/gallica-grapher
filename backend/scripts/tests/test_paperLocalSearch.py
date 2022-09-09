@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from scripts.paperLocalSearch import PaperLocalSearch
+from scripts.localPaperSearch import PaperLocalSearch
 
 
 class TestPaperLocalSearch(TestCase):
