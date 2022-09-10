@@ -42,3 +42,10 @@ class XMLParser:
         else:
             return 0
 
+    def getYearsPublished(self):
+        for yearElement in self.xml.iter("year"):
+            if yearElement is not None:
+                year = yearElement.text
+                if year.isdigit():
+                    yield int(year)
+

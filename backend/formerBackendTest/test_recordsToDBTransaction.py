@@ -54,7 +54,7 @@ class TestRecordsToDBTransaction(TestCase):
     @patch('scripts.recordsToDBTransaction.RecordsToDBTransaction.insert')
     def test_add_missing_papers(self, mock_insert, mock_get, mock_fetch):
         mock_get.return_value = ['testpaperid']
-        mock_fetch.fetchPaperRecordsForCodes.return_value = 'testrecords'
+        mock_fetch.fetchRecordsFromCodes.return_value = 'testrecords'
         mock_fetch.return_value = mock_fetch
 
         self.testTransaction.addMissingPapers()

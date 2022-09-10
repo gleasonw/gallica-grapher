@@ -15,7 +15,7 @@ class OccurrenceFetchDriver:
             progressTracker
     ):
         self.options = options
-        self.parseToRecords = parse
+        self.parse = parse
         self.getUrlsForOptions = getURLsForOptions
         self.makeQuery = makeQuery
         self.fetchNoTrack = fetchNoTrack
@@ -23,22 +23,23 @@ class OccurrenceFetchDriver:
         self.insertRecords = insertRecords
         self.progressTracker = progressTracker
 
-    def runFetchAndInsertRecords(self):
-        urls = self.getUrlsForOptions(self.options)
-        numResultsForUrls = self.getNumResultsForURLs(urls)
-        indexedQueries = self.generateIndexedQueries(numResultsForUrls)
-        chunkedQueries = self.splitIntoCHUNK_SIZEchunks(indexedQueries)
-        for chunk in chunkedQueries:
-            xml = self.fetchAndTrack(chunk, self.progressTracker)
-            records = self.parseToRecords(self, xml)
-            records = self.removeDuplicateRecords(records)
-            self.insertRecords(records)
+    def parse(self, xml):
+        return self.parse.occurrences(xml)
+
+    def insert(self, records):
+        self.insertRecords(records)
+
+    def prepareRecordsForInsert(self, records):
+        return self.removeDuplicateRecords(records)
+
+    def fetch(self, queries):
+        return self.fetchAndTrack(queries, self.progressTracker)
 
     def getNumResultsForURLs(self, urls):
         numResultsQueries = self.generateNumResultsQueries(urls)
         responses = self.fetchNoTrack(numResultsQueries)
         for response in responses:
-            numResults = self.parseToRecords.numRecords(response["recordXML"])
+            numResults = self.parse.numRecords(response["recordXML"])
             url = response["url"]
             yield url, numResults
 
@@ -50,30 +51,6 @@ class OccurrenceFetchDriver:
                 numRecords=1,
                 collapsing=False
             )
-
-    def generateIndexedQueries(self, numResultsForUrls):
-        for url, numResults in numResultsForUrls:
-            yield self.buildIndex(url, numResults)
-
-    def buildIndex(self, url, numResults):
-        for i in range(1, numResults, 50):
-            yield self.makeQuery(
-                url=url,
-                startIndex=i,
-                numRecords=50,
-                collapsing=False
-            )
-
-    def splitIntoCHUNK_SIZEchunks(self, indexedQueries):
-        allChunks = []
-        chunk = []
-        for query in indexedQueries:
-            if len(chunk) < CHUNK_SIZE:
-                chunk.append(query)
-            else:
-                allChunks.append(chunk)
-                chunk = [query]
-        return allChunks
 
     def removeDuplicateRecords(self, records):
         seen = set()

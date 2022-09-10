@@ -11,3 +11,5 @@ class Query:
         self.startIndex = startIndex
         self.numRecords = numRecords
         self.collapsing = collapsing
+        self.responseXML = None
+        self.elapsedTime = None

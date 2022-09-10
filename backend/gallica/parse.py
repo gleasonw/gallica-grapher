@@ -17,7 +17,7 @@ class Parse:
         self.makeOccurrenceRecord = makeOccurrenceRecord
         self.xmlParser = xmlParser
 
-    def parse(self, fetchDriver, xml) -> list:
+    def records(self, fetchDriver, xml) -> list:
         xmlRoot = etree.fromstring(xml)
         recordRoots = xmlRoot.findall(
             "{http://www.loc.gov/zing/srw/}record")
@@ -53,4 +53,9 @@ class Parse:
         xmlRoot = etree.fromstring(xml)
         self.xmlParser.setXML(xmlRoot)
         return self.xmlParser.getNumRecords()
+
+    def yearsPublished(self, xml) -> list:
+        xmlRoot = etree.fromstring(xml)
+        self.xmlParser.setXML(xmlRoot)
+        return self.xmlParser.getYearsPublished()
 

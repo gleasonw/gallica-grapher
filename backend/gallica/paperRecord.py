@@ -5,6 +5,5 @@ class PaperRecord:
         self.title = None
         self.url = None
         self.publishingYears = []
-        self.publishingRange = [None, None]
         self.continuousRange = False
 

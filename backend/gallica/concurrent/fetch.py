@@ -25,39 +25,24 @@ class Fetch:
 
     def fetchAll(self, queries):
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            for result in executor.map(self.fetchNoTrack, queries):
+            for result in executor.map(self.fetch, queries):
                 yield result
 
     def fetchAllAndTrackProgress(self, queries, tracker):
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            for result in executor.map(self.fetchAndTrack, queries):
+            for result in executor.map(self.fetch, queries):
                 tracker(result, NUM_WORKERS)
                 yield result
 
-    def fetchNoTrack(self, query):
-        response = self.sendGet(query)
-        return {
-            "recordXML": response.data,
-            "url": query.url,
-        }
-
-    def fetchAndTrack(self, query):
-        response = self.sendGet(query)
-        elapsedTime = response.elapsed.total_seconds()
-        return {
-            "recordXML": response.data,
-            "elapsedTime": elapsedTime,
-            "url": query.url,
-        }
-
-    def sendGet(self, query):
+    def fetch(self, query):
         params = self.getParamsFor(query)
         response = http.request(
             "GET",
             self.baseUrl,
             fields=params
         )
-        return response
+        query.responseXML = response.data
+        return query
 
     def getParamsFor(self, query):
         return {
