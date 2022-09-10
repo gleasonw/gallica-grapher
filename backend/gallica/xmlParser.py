@@ -28,9 +28,17 @@ class XMLParser:
             '{http://purl.org/dc/elements/1.1/}title').text
         return paperTitle
 
-    def getDate(self, ):
+    def getDate(self):
         dateElement = self.xml.find(
             '{http://purl.org/dc/elements/1.1/}date')
         if dateElement is not None:
             return self.makeDate(dateElement.text)
+
+    def getNumRecords(self):
+        numResults = self.xml.find(
+            "{http://www.loc.gov/zing/srw/}numberOfRecords")
+        if numResults is not None:
+            return int(numResults.text)
+        else:
+            return 0
 

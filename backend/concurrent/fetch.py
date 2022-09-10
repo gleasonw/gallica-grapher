@@ -33,7 +33,10 @@ def fetchAllAndTrackProgress(queries, tracker):
 
 def fetchNoTrack(query):
     response = sendGet(query)
-    return {"recordXML": response.data}
+    return {
+        "recordXML": response.data,
+        "url": query.url,
+    }
 
 
 def fetchAndTrack(query):
@@ -42,6 +45,7 @@ def fetchAndTrack(query):
     return {
         "recordXML": response.data,
         "elapsedTime": elapsedTime,
+        "url": query.url,
     }
 
 

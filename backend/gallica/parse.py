@@ -11,8 +11,8 @@ class Parse:
             makeOccurrenceRecord,
             xmlParser
     ):
-        self.paperDriver = paperDriver
-        self.occurrenceDriver = occurrenceDriver
+        self.paperDriverClass = paperDriver
+        self.occurrenceDriverClass = occurrenceDriver
         self.makePaperRecord = makePaperRecord
         self.makeOccurrenceRecord = makeOccurrenceRecord
         self.xmlParser = xmlParser
@@ -22,14 +22,14 @@ class Parse:
         recordRoots = xmlRoot.findall(
             "{http://www.loc.gov/zing/srw/}record")
         recordData = [root[2][0] for root in recordRoots]
-        if fetchDriver == self.paperDriver:
-            return self.parsePapers(recordData)
-        elif fetchDriver == self.occurrenceDriver:
-            return self.parseOccurrence(recordData)
+        if isinstance(fetchDriver, self.paperDriverClass):
+            return self.papers(recordData)
+        elif isinstance(fetchDriver, self.occurrenceDriverClass):
+            return self.occurrences(recordData)
         else:
             raise Exception("Unknown fetch driver type")
 
-    def parsePapers(self, records) -> list:
+    def papers(self, records) -> list:
         for record in records:
             self.xmlParser.setXML(record)
             newRecord = self.makePaperRecord(
@@ -39,7 +39,7 @@ class Parse:
             )
             yield newRecord
 
-    def parseOccurrence(self, records) -> list:
+    def occurrences(self, records) -> list:
         for record in records:
             self.xmlParser.setXML(record)
             newRecord = self.makeOccurrenceRecord(
@@ -48,4 +48,9 @@ class Parse:
                 url=self.xmlParser.getURL()
             )
             yield newRecord
+
+    def numRecords(self, xml) -> int:
+        xmlRoot = etree.fromstring(xml)
+        self.xmlParser.setXML(xmlRoot)
+        return self.xmlParser.getNumRecords()
 

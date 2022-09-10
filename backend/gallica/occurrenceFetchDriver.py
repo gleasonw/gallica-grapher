@@ -1,69 +1,84 @@
+CHUNK_SIZE = 200
+
+
 class OccurrenceFetchDriver:
 
-    #Plan: refactor ngramqueriesallpapers etc to be a simple query builder called by this class.
-    def __init__(self, parse):
-        pass
+    def __init__(
+            self,
+            options,
+            parse,
+            getUrlsForSettings,
+            makeQuery,
+            insertRecords,
+            fetchNoTrack,
+            fetchAndTrack,
+            progressTracker
+    ):
+        self.options = options
+        self.parseToRecords = parse
+        self.getUrlsForOptions = getUrlsForSettings
+        self.makeQuery = makeQuery
+        self.fetchNoTrack = fetchNoTrack
+        self.fetchAndTrack = fetchAndTrack
+        self.insertRecords = insertRecords
+        self.progressTracker = progressTracker
 
-    #general methods
-    @staticmethod
-    def splitIntoCHUNK_SIZEchunks(items):
-        numChunks = ceil(len(items) / CHUNK_SIZE)
-        chunks = []
-        for i in range(numChunks):
-            chunks.append(
-                items[i * CHUNK_SIZE:(i + 1) * CHUNK_SIZE]
+    def runFetchAndInsertRecords(self):
+        urls = self.getUrlsForOptions(self.options)
+        numResultsForUrls = self.getNumResultsForURLs(urls)
+        indexedQueries = self.generateIndexedQueries(numResultsForUrls)
+        chunkedQueries = self.splitIntoCHUNK_SIZEchunks(indexedQueries)
+        for chunk in chunkedQueries:
+            xml = self.fetchAndTrack(chunk, self.progressTracker)
+            records = self.parseToRecords(self, xml)
+            records = self.removeDuplicateRecords(records)
+            self.insertRecords(records)
+
+    def getNumResultsForURLs(self, urls):
+        numResultsQueries = self.generateNumResultsQueries(urls)
+        responses = self.fetchNoTrack(numResultsQueries)
+        for response in responses:
+            numResults = self.parseToRecords.numRecords(response["recordXML"])
+            url = response["url"]
+            yield url, numResults
+
+    def generateNumResultsQueries(self, urls):
+        for url in urls:
+            yield self.makeQuery(
+                url=url,
+                startIndex=1,
+                numRecords=1,
+                collapsing=False
             )
-        return chunks
 
-    #remove duplicates using dict? if key error, remove? o(n)?
-    def removeDuplicateRecords(self):
-        pass
+    def generateIndexedQueries(self, numResultsForUrls):
+        for url, numResults in numResultsForUrls:
+            yield self.buildIndex(url, numResults)
 
-    #all papers methods
+    def buildIndex(self, url, numResults):
+        for i in range(1, numResults, 50):
+            yield self.makeQuery(
+                url=url,
+                startIndex=i,
+                numRecords=50,
+                collapsing=False
+            )
 
-    def fetchNumTotalResults(self):
-        tempBatch = GallicaRecordBatch(
-            self.baseQuery,
-            self.gallicaHttpSession,
-            numRecords=1)
-        self.estimateNumResults = tempBatch.getNumResults()
-        return self.estimateNumResults
+    def splitIntoCHUNK_SIZEchunks(self, indexedQueries):
+        allChunks = []
+        chunk = []
+        for query in indexedQueries:
+            if len(chunk) < CHUNK_SIZE:
+                chunk.append(query)
+            else:
+                allChunks.append(chunk)
+                chunk = [query]
+        return allChunks
 
-    #select papers methods
-
-    def fetchNumTotalResults(self):
-        self.setNumResultsForQueries()
-        self.sumUpQueryResultsForTotalEstimate()
-
-    def setNumResultsForQueries(self):
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            for numResults, query in executor.map(
-                    self.fetchNumResultsForQuery,
-                    self.baseQueries):
-                firstCode = query[14:25]
-                self.numResultsInQueries[firstCode] = numResults
-
-    def fetchNumResultsForQuery(self, query):
-        batch = GallicaRecordBatch(
-            query,
-            self.gallicaHttpSession,
-            numRecords=1)
-        numResults = batch.getNumResults()
-        return numResults, query
-
-    def sumUpQueryResultsForTotalEstimate(self):
-        for query, count in self.numResultsInQueries.items():
-            self.estimateNumResults += count
-
-    def generateIndicesForCQLQueries(self):
-        for query in self.baseQueries:
-            yield self.getIndicesForCQLQuery(query)
-
-    def getIndicesForCQLQuery(self, query):
-        indexCodePairs = []
-        firstCodeInQuery = query[14:25]
-        for i in range(1, self.numResultsInQueries[firstCodeInQuery], 50):
-            recordAndCode = [i, query]
-            indexCodePairs.append(recordAndCode)
-        return indexCodePairs
+    def removeDuplicateRecords(self, records):
+        seen = set()
+        for record in records:
+            if record.uniquenessCheck not in seen:
+                seen.add(record.uniquenessCheck)
+                yield record
 
