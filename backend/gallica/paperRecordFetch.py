@@ -13,10 +13,7 @@ class PaperRecordFetch:
 
     def __init__(self, gallicaSession=None):
         self.query = ''
-        if not gallicaSession:
-            self.initGallicaSession()
-        else:
-            self.session = gallicaSession
+
 
     def fetchPaperRecordsForCodes(self, paperCodes):
         batchedQueries = CQLSelectStringForPapers(paperCodes).cqlSelectStrings
@@ -58,8 +55,3 @@ class PaperRecordFetch:
             numRecords=1)
         numResults = tempBatch.getNumResults()
         return numResults
-
-    def initGallicaSession(self):
-        self.session = sessions.BaseUrlSession("https://gallica.bnf.fr/SRU")
-        adapter = TimeoutAndRetryHTTPAdapter()
-        self.session.mount("https://", adapter)

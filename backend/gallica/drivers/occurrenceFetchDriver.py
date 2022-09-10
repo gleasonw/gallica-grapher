@@ -7,7 +7,7 @@ class OccurrenceFetchDriver:
             self,
             options,
             parse,
-            getUrlsForSettings,
+            getURLsForOptions,
             makeQuery,
             insertRecords,
             fetchNoTrack,
@@ -16,7 +16,7 @@ class OccurrenceFetchDriver:
     ):
         self.options = options
         self.parseToRecords = parse
-        self.getUrlsForOptions = getUrlsForSettings
+        self.getUrlsForOptions = getURLsForOptions
         self.makeQuery = makeQuery
         self.fetchNoTrack = fetchNoTrack
         self.fetchAndTrack = fetchAndTrack

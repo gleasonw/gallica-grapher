@@ -1,12 +1,12 @@
-from paperRecordFetch import PaperRecordFetch
 import io
 
 
 class RecordsToDBTransaction:
 
-    def __init__(self, requestID, conn):
+    def __init__(self, requestID, conn, getPaperRecordsForCodes):
         self.requestID = requestID
         self.conn = conn
+        self.getPaperRecordsForCodes = getPaperRecordsForCodes
 
     def insertPapers(self, records):
         csvStream = generateResultCSVstream(
@@ -43,10 +43,9 @@ class RecordsToDBTransaction:
         self.moveRecordsToFinalTable()
 
     def addMissingPapers(self):
-        paperGetter = PaperRecordFetch()
         missingPaperCodes = self.getMissingPapers()
         if missingPaperCodes:
-            missingPaperRecords = paperGetter.fetchPaperRecordsForCodes(
+            missingPaperRecords = self.getPaperRecordsForCodes(
                 missingPaperCodes
             )
             self.insertPapers(missingPaperRecords)

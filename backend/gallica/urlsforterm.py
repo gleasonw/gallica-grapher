@@ -3,40 +3,37 @@ from cqlSelectStringForPapers import CQLSelectStringForPapers
 
 class UrlsForTerm:
 
-    def __init__(
-            self,
-            searchTerm,
-            startYear=None,
-            endYear=None,
-            paperCodes=None
-    ):
-
-        self.keyword = searchTerm
-        self.startYear = startYear
-        self.endYear = endYear
+    def __init__(self):
+        self.keyword = None
+        self.paperCodes = None
+        self.startYear = None
+        self.endYear = None
         self.baseQueryComponents = []
-        self.paperCodes = paperCodes
-        self.queries = []
-        self.baseQuery = ''
 
-        self.buildBaseQuery()
+    def buildUrls(self, options):
+        self.startYear = options['startYear']
+        self.endYear = options['endYear']
+        self.keyword = options['keyword']
+        self.paperCodes = options['paperCodes']
+        queries = self.generateCQLforOptions()
+        return queries
 
-    def buildBaseQuery(self):
+    def generateCQLforOptions(self):
         if self.startYear and self.endYear:
             self.baseQueryComponents.append(f'dc.date >= "{self.startYear}"')
             self.baseQueryComponents.append(f'dc.date <= "{self.endYear}"')
         self.baseQueryComponents.append(f'(gallica adj "{self.keyword}")')
         self.baseQueryComponents.append('(dc.type adj "fascicule")')
         self.baseQueryComponents.append('sortby dc.date/sort.ascending')
-        self.baseQuery = " and ".join(self.baseQueryComponents)
-        self.queries.append(self.baseQuery)
+        baseQuery = " and ".join(self.baseQueryComponents)
         if self.paperCodes:
             self.baseQueryComponents.insert(0, '({formattedCodeString})')
-            self.buildURLsforPaperCodes()
+            return self.buildURLsforPaperCodes(baseQuery)
+        else:
+            yield baseQuery
 
-    def buildURLsforPaperCodes(self):
+    def buildURLsforPaperCodes(self, baseQuery):
         paperSelectCQLStrings = CQLSelectStringForPapers(self.paperCodes).cqlSelectStrings
-        self.queries = [
-            self.baseQuery.format(formattedCodeString=codeString)
-            for codeString in paperSelectCQLStrings
-        ]
+        for codeString in paperSelectCQLStrings:
+            yield baseQuery.format(formattedCodeString=codeString)
+
