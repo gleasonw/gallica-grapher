@@ -3,11 +3,11 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS
 
-from scripts.localPaperSearch import PaperLocalSearch
-from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
+from localPaperSearch import PaperLocalSearch
+from ticketGraphSeriesBatch import TicketGraphSeriesBatch
 from tasks import spawnRequest
-from scripts.topPapersForTicket import TopPapersForTicket
-from scripts.reactCSVdata import ReactCSVdata
+from topPapersForTicket import TopPapersForTicket
+from reactCSVdata import ReactCSVdata
 
 
 app = Flask(__name__)
