@@ -1,15 +1,16 @@
 CHUNK_SIZE = 200
 
 
-class SearchLauncher:
+class Search:
 
     def getRecordsForOptions(self, driver):
         if isinstance(driver, OccurrenceSearchFulfillment):
             urls = driver.getUrlsForOptions(driver.options)
             numResultsForUrls = driver.getNumResultsForURLs(urls)
+            driver.sendNumResultsToTicket(numResultsForUrls)
         elif isinstance(driver, PaperSearchFulfillment):
             allPaperQuery = driver.getAllPaperQuery()
-            queryWithResponse = driver.fetchNoTrack([allPaperQuery])
+            queryWithResponse = driver.fetch([allPaperQuery])
             responseXML = queryWithResponse[0].responseXML
             numPapers = driver.parse.numRecords(responseXML)
             numResultsForUrls = [(driver.allPaperURL, numPapers)]
@@ -66,15 +67,13 @@ class OccurrenceSearchFulfillment:
             getURLsForOptions,
             makeQuery,
             insertRecords,
-            fetchNoTrack,
-            fetchAndTrack
+            fetcher
     ):
         self.options = options
         self.parse = parse
         self.getUrlsForOptions = getURLsForOptions
         self.makeQuery = makeQuery
-        self.fetchNoTrack = fetchNoTrack
-        self.fetchAndTrack = fetchAndTrack
+        self.fetcher = fetcher
         self.insertRecords = insertRecords
         self.progressTracker = None
         self.numResultsUpdater = None
@@ -84,6 +83,10 @@ class OccurrenceSearchFulfillment:
 
     def setProgressTracker(self, progressTracker):
         self.progressTracker = progressTracker
+
+    def sendNumResultsToTicket(self, resultsForUrls):
+        total = sum(numResults for url, numResults in resultsForUrls)
+        self.numResultsUpdater(total)
 
     def parse(self, xml):
         return self.parse.occurrences(xml)
@@ -95,11 +98,14 @@ class OccurrenceSearchFulfillment:
         return self.removeDuplicateRecords(records)
 
     def fetch(self, queries):
-        return self.fetchAndTrack(queries, self.progressTracker)
+        return self.fetcher.fetchAndTrack(
+            queries,
+            self.progressTrackWithPaper
+        )
 
     def getNumResultsForURLs(self, urls):
         numResultsQueries = self.generateNumResultsQueries(urls)
-        responses = self.fetchNoTrack(numResultsQueries)
+        responses = self.fetcher.fetchNoTrack(numResultsQueries)
         for response in responses:
             numResults = self.parse.numRecords(response["recordXML"])
             url = response["url"]
@@ -121,6 +127,16 @@ class OccurrenceSearchFulfillment:
                 seen.add(record.uniquenessCheck)
                 yield record
 
+    def progressTrackWithPaper(self, query, numWorkers):
+        paper = self.parse.onePaperTitleFromOccurrenceBatch(
+            query.responseXML
+        )
+        self.progressTracker(
+            query,
+            numWorkers,
+            paper
+        )
+
 
 class PaperSearchFulfillment:
 
@@ -129,13 +145,13 @@ class PaperSearchFulfillment:
             parse,
             getCQLstringsFor,
             makeQuery,
-            fetchNoTrack,
+            fetcher,
             insertPapers
     ):
         self.parse = parse
         self.getCQLstringsFor = getCQLstringsFor
         self.makeQuery = makeQuery
-        self.fetchNoTrack = fetchNoTrack
+        self.fetcher = fetcher
         self.insertPapers = insertPapers
         self.allPaperURL = 'dc.type all "fascicule" and ocrquality > "050.00"'
 
@@ -149,7 +165,7 @@ class PaperSearchFulfillment:
         return self.addPublishingYearsToPaperRecord(records)
 
     def fetch(self, queries):
-        return self.fetchNoTrack(queries)
+        return self.fetcher.fetchNoTrack(queries)
 
     def fetchRecordsFromCodes(self, paperCodes):
         batchedURLs = self.getCQLstringsFor(paperCodes)

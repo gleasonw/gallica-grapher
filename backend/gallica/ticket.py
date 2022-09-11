@@ -7,10 +7,11 @@ class Ticket:
             self,
             ticketID,
             requestID,
-            launch,
-            fulfiller
+            search,
+            fulfiller,
+            progressThread
     ):
-        self.launch = launch
+        self.search = search
         self.fulfiller = fulfiller
         self.ticketID = ticketID
         self.requestID = requestID
@@ -19,11 +20,12 @@ class Ticket:
         self.numBatchesRetrieved = 0
         self.numBatches = 0
         self.averageResponseTime = None
+        self.progressThread = progressThread
 
     def run(self):
         self.fulfiller.setProgressTracker(self.updateProgressStats)
         self.fulfiller.setNumResultsUpdater(self.updateNumResults)
-        self.launch.getRecordsForOptions(self.fulfiller)
+        self.search.getRecordsForOptions(self.fulfiller)
 
     def updateNumResults(self, numResults):
         self.estimateTotalResults = numResults
@@ -31,15 +33,15 @@ class Ticket:
 
     def updateProgressStats(
             self,
-            randomPaper,
-            requestTime,
-            numWorkers
+            query,
+            numWorkers,
+            randomPaper
     ):
         self.numBatchesRetrieved += 1
         if self.averageResponseTime:
-            self.updateAverageResponseTime(requestTime)
+            self.updateAverageResponseTime(query.elapsedTime)
         else:
-            self.averageResponseTime = requestTime
+            self.averageResponseTime = query.elapsedTime
         ticketProgressStats = {
             'progress': self.getPercentProgress(),
             'numResultsDiscovered': self.estimateTotalResults,

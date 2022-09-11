@@ -59,3 +59,8 @@ class Parse:
         self.xmlParser.setXML(xmlRoot)
         return self.xmlParser.getYearsPublished()
 
+    def onePaperTitleFromOccurrenceBatch(self, xml) -> str:
+        xmlRoot = etree.fromstring(xml)
+        self.xmlParser.setXML(xmlRoot)
+        return self.xmlParser.getPaperTitle()
+

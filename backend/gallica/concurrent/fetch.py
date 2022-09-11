@@ -42,6 +42,7 @@ class Fetch:
             fields=params
         )
         query.responseXML = response.data
+        query.elapsedTime = response.elapsed.total_seconds()
         return query
 
     def getParamsFor(self, query):

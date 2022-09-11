@@ -1,6 +1,6 @@
 from ticket import Ticket
-from gallica.searchlauncher import SearchLauncher
-from fulfillmentFactory import buildOccurrenceFulfillment
+from gallica.search import Search
+from fulfillerFactory import buildOccurrenceFulfillment
 
 
 
@@ -8,9 +8,10 @@ def buildTicket(
         options,
         ticketID,
         requestID,
-        dbConnection
+        dbConnection,
+        progressThread
 ):
-    driver = SearchLauncher()
+    driver = Search()
     fulfiller = buildOccurrenceFulfillment(
         options,
         requestID,
@@ -21,5 +22,6 @@ def buildTicket(
         ticketID,
         requestID,
         driver,
-        fulfiller
+        fulfiller,
+        progressThread
     )

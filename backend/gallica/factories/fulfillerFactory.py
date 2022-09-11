@@ -1,4 +1,4 @@
-from searchlauncher import OccurrenceSearchFulfillment
+from search import OccurrenceSearchFulfillment
 from parseFactory import buildParser
 from query import Query
 from urlsforticket import UrlsForTicket
@@ -13,6 +13,7 @@ def buildOccurrenceFulfillment(
         dbConnection
 ):
     parse = buildParser()
+    fetcher = Fetch('http://gallica.bnf.fr/SRU')
     insertResults = RecordsToDBTransaction(
         requestID=requestID,
         ticketID=ticketID,
@@ -25,8 +26,7 @@ def buildOccurrenceFulfillment(
         UrlsForTicket().buildUrls,
         Query,
         insertResults,
-        fetchAll,
-        fetchAllAndTrackProgress,
+        fetcher
     )
 
 
