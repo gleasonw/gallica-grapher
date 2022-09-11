@@ -1,13 +1,8 @@
 import threading
-from ticket import Ticket
-from psqlconn import PSQLconn
-from gallicaSession import GallicaSession
 
 
 class Request(threading.Thread):
-    def __init__(self, tickets, requestID):
-        self.session = GallicaSession().getSession()
-        self.DBconnection = PSQLconn().getConn()
+    def __init__(self, tickets, requestID, makeTicket, dbConn):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.topPapersForTerms = []
@@ -17,7 +12,8 @@ class Request(threading.Thread):
         self.ticketProgressStats = self.initProgressStats()
         self.requestID = requestID
         self.estimateNumRecords = 0
-
+        self.makeTicket = makeTicket
+        self.DBconnection = dbConn
         super().__init__()
 
     def run(self):
@@ -28,7 +24,7 @@ class Request(threading.Thread):
                 total += tick.getEstimateNumberRecords()
             return total
 
-        requestTickets = self.generateRequestTickets()
+        requestTickets = self.makeRequestTickets()
         estimate = sumEstimateNumberRecordsForAllTickets(requestTickets)
         if self.estimateIsUnderRecordLimit(estimate):
             for ticket in requestTickets:
@@ -40,16 +36,10 @@ class Request(threading.Thread):
             self.tooManyRecords = True
         self.DBconnection.close()
 
-    def generateRequestTickets(self):
+    def makeRequestTickets(self):
         tickets = []
-        for key, ticket in self.ticketDicts.items():
-            ticket = Ticket(
-                ticket,
-                key,
-                self.requestID,
-                self,
-                self.DBconnection,
-                self.session)
+        for ID, ticket in self.ticketDicts.items():
+            ticket = self.makeTicket(ticket, ID, self)
             tickets.append(ticket)
         return tickets
 

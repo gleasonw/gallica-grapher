@@ -3,20 +3,29 @@ CHUNK_SIZE = 200
 
 class Search:
 
-    def getRecordsForOptions(self, driver):
-        if isinstance(driver, OccurrenceSearchFulfillment):
-            urls = driver.getUrlsForOptions(driver.options)
-            numResultsForUrls = driver.getNumResultsForURLs(urls)
-            driver.sendNumResultsToTicket(numResultsForUrls)
-        elif isinstance(driver, PaperSearchFulfillment):
-            allPaperQuery = driver.getAllPaperQuery()
-            queryWithResponse = driver.fetch([allPaperQuery])
-            responseXML = queryWithResponse[0].responseXML
-            numPapers = driver.parse.numRecords(responseXML)
-            numResultsForUrls = [(driver.allPaperURL, numPapers)]
+    def __init__(self):
+        pass
+
+    def getEstimateSearchSize(self, search):
+        if isinstance(search, OccurrenceSearchFulfillment):
+            urls = search.getUrlsForOptions(search.options)
+            return search.getTotalResults(urls)
+        elif isinstance(search, PaperSearchFulfillment):
+            numPapers = search.getTotalResults()
+            return numPapers
         else:
-            raise TypeError(f'Invalid fetch driver type: {type(driver)}')
-        self.fetchAndInsert(numResultsForUrls, driver)
+            raise TypeError(f'Invalid fetch driver type: {type(search)}')
+
+    def getRecordsForOptions(self, search):
+        if isinstance(search, OccurrenceSearchFulfillment):
+            numResultsForUrls = search.numResultsForUrls
+        elif isinstance(search, PaperSearchFulfillment):
+            numResultsForUrls = [
+                (search.allPaperURL, search.numPapers)
+            ]
+        else:
+            raise TypeError(f'Invalid fetch driver type: {type(search)}')
+        self.fetchAndInsert(numResultsForUrls, search)
 
     def fetchAndInsert(self, numResultsForUrls, driver):
         chunkedQueries = self.buildQueries(numResultsForUrls, driver)
@@ -35,9 +44,9 @@ class Search:
 
     def generateIndexedQueries(self, numResultsForUrls, driver):
         for url, numResults in numResultsForUrls:
-            yield self.buildIndex(url, numResults, driver)
+            yield self.makeQueriesWithIndices(url, numResults, driver)
 
-    def buildIndex(self, url, numResults, driver):
+    def makeQueriesWithIndices(self, url, numResults, driver):
         for i in range(1, numResults, 50):
             yield driver.makeQuery(
                 url=url,
@@ -76,17 +85,22 @@ class OccurrenceSearchFulfillment:
         self.fetcher = fetcher
         self.insertRecords = insertRecords
         self.progressTracker = None
-        self.numResultsUpdater = None
-
-    def setNumResultsUpdater(self, numResultsUpdater):
-        self.numResultsUpdater = numResultsUpdater
+        self.numResultsForUrls = []
 
     def setProgressTracker(self, progressTracker):
         self.progressTracker = progressTracker
 
-    def sendNumResultsToTicket(self, resultsForUrls):
-        total = sum(numResults for url, numResults in resultsForUrls)
-        self.numResultsUpdater(total)
+    def getTotalResults(self, urls):
+        self.numResultsForUrls = self.getNumResultsForURLs(urls)
+        return sum(numResults for url, numResults in self.numResultsForUrls)
+
+    def getNumResultsForURLs(self, urls):
+        numResultsQueries = self.generateNumResultsQueries(urls)
+        responses = self.fetcher.fetchNoTrack(numResultsQueries)
+        for response in responses:
+            numResults = self.parse.numRecords(response["recordXML"])
+            url = response["url"]
+            yield url, numResults
 
     def parse(self, xml):
         return self.parse.occurrences(xml)
@@ -102,14 +116,6 @@ class OccurrenceSearchFulfillment:
             queries,
             self.progressTrackWithPaper
         )
-
-    def getNumResultsForURLs(self, urls):
-        numResultsQueries = self.generateNumResultsQueries(urls)
-        responses = self.fetcher.fetchNoTrack(numResultsQueries)
-        for response in responses:
-            numResults = self.parse.numRecords(response["recordXML"])
-            url = response["url"]
-            yield url, numResults
 
     def generateNumResultsQueries(self, urls):
         for url in urls:
@@ -154,9 +160,17 @@ class PaperSearchFulfillment:
         self.fetcher = fetcher
         self.insertPapers = insertPapers
         self.allPaperURL = 'dc.type all "fascicule" and ocrquality > "050.00"'
+        self.numPapers = 0
 
     def parse(self, xml):
         return self.parse.papers(xml)
+
+    def getTotalResults(self):
+        allPaperQuery = self.getAllPaperQuery()
+        queryWithResponse = self.fetcher.fetchNoTrack([allPaperQuery])
+        responseXML = queryWithResponse[0].responseXML
+        self.numPapers = self.parse.numRecords(responseXML)
+        return self.numPapers
 
     def insert(self, records):
         self.insertPapers(records)
@@ -171,8 +185,8 @@ class PaperSearchFulfillment:
         batchedURLs = self.getCQLstringsFor(paperCodes)
         recordDataQueries = self.generateSelectCodeQueries(batchedURLs)
         publishingRangeQueries = self.generateRangeQueries(paperCodes)
-        queriesWithResponse = self.fetchNoTrack(recordDataQueries)
-        yearQueriesWithResponse = self.fetchNoTrack(publishingRangeQueries)
+        queriesWithResponse = self.fetcher.fetchNoTrack(recordDataQueries)
+        yearQueriesWithResponse = self.fetcher.fetchNoTrack(publishingRangeQueries)
         records = self.getRecordsFromResponses(queriesWithResponse)
         recordsWithPublishingYears = self.addPublishingYearsToPaperRecord(
             records,

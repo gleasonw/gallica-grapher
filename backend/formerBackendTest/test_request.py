@@ -38,7 +38,7 @@ class TestRequest(TestCase):
         mock_ticket.return_value = mock_ticket
         self.testRequest.ticketDicts= {'1': {}}
 
-        generatedTickets = self.testRequest.generateRequestTickets()
+        generatedTickets = self.testRequest.makeRequestTickets()
 
         mock_ticket.assert_has_calls([
             call(

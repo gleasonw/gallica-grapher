@@ -1,11 +1,10 @@
 from cqlSelectStringForPapers import CQLSelectStringForPapers
 
 
-#TODO: build as many urls as there are terms!
-class UrlsForTicket:
+class CQLforTicket:
 
     def __init__(self):
-        self.keyword = None
+        self.terms = None
         self.paperCodes = None
         self.startYear = None
         self.endYear = None
@@ -14,26 +13,32 @@ class UrlsForTicket:
     def buildUrls(self, options):
         self.startYear = options['startYear']
         self.endYear = options['endYear']
-        self.keyword = options['keyword']
+        self.terms = options['terms']
         self.paperCodes = options['paperCodes']
         queries = self.generateCQLforOptions()
         return queries
 
     def generateCQLforOptions(self):
+        for term in self.terms:
+            baseQuery = self.buildCQLforTerm(term)
+            if self.paperCodes:
+                yield from self.buildCQLforPaperCodes(baseQuery)
+            else:
+                yield baseQuery
+
+    def buildCQLforTerm(self, term):
         if self.startYear and self.endYear:
             self.baseQueryComponents.append(f'dc.date >= "{self.startYear}"')
             self.baseQueryComponents.append(f'dc.date <= "{self.endYear}"')
-        self.baseQueryComponents.append(f'(gallica adj "{self.keyword}")')
+        self.baseQueryComponents.append(f'(gallica adj "{term}")')
         self.baseQueryComponents.append('(dc.type adj "fascicule")')
         self.baseQueryComponents.append('sortby dc.date/sort.ascending')
         baseQuery = " and ".join(self.baseQueryComponents)
         if self.paperCodes:
             self.baseQueryComponents.insert(0, '({formattedCodeString})')
-            return self.buildURLsforPaperCodes(baseQuery)
-        else:
-            yield baseQuery
+        return baseQuery
 
-    def buildURLsforPaperCodes(self, baseQuery):
+    def buildCQLforPaperCodes(self, baseQuery):
         paperSelectCQLStrings = CQLSelectStringForPapers(self.paperCodes).cqlSelectStrings
         for codeString in paperSelectCQLStrings:
             yield baseQuery.format(formattedCodeString=codeString)

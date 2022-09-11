@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
-from urlsforticket import UrlsForTicket
-from urlsforticket import QueriesAllPapers
-from urlsforticket import QueriesSelectPapers
+from cqlforticket import CQLforTicket
+from cqlforticket import QueriesAllPapers
+from cqlforticket import QueriesSelectPapers
 from utils.gallicaSession import GallicaSession
 import os
 
@@ -12,7 +12,7 @@ here = os.path.dirname(__file__)
 class TestNgramQueryWithConcurrency(TestCase):
 
     def setUp(self) -> None:
-        self.testQuery = UrlsForTicket(
+        self.testQuery = CQLforTicket(
             '',
             [],
             '1234',
@@ -22,7 +22,7 @@ class TestNgramQueryWithConcurrency(TestCase):
             MagicMock)
 
     def test_establish_year_range(self):
-        noRangeQuery = UrlsForTicket(
+        noRangeQuery = CQLforTicket(
             '',
             [],
             '1234',
@@ -31,7 +31,7 @@ class TestNgramQueryWithConcurrency(TestCase):
             MagicMock,
             MagicMock
         )
-        rangeQuery = UrlsForTicket(
+        rangeQuery = CQLforTicket(
             '',
             [1, 1],
             '1234',
@@ -44,7 +44,7 @@ class TestNgramQueryWithConcurrency(TestCase):
         self.assertTrue(rangeQuery.isYearRange)
 
     def test_build_no_year_range_query(self):
-        noRangeQuery = UrlsForTicket(
+        noRangeQuery = CQLforTicket(
             '',
             [],
             '1234',
@@ -60,7 +60,7 @@ class TestNgramQueryWithConcurrency(TestCase):
         self.assertTrue(noRangeQuery.buildDatelessQuery.called)
 
     def test_build_year_range_query(self):
-        rangeQuery = UrlsForTicket(
+        rangeQuery = CQLforTicket(
             '',
             [1, 1],
             '1234',
@@ -97,7 +97,7 @@ class TestNgramQueryWithConcurrency(TestCase):
         ])
 
     def test_do_threaded_search(self):
-        testQuery = UrlsForTicket(
+        testQuery = CQLforTicket(
             '',
             [],
             '1234',

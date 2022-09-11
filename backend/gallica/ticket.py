@@ -22,14 +22,12 @@ class Ticket:
         self.averageResponseTime = None
         self.progressThread = progressThread
 
+    def getEstimateNumberRecords(self):
+        return self.search.getEstimateSearchSize(self.fulfiller)
+
     def run(self):
         self.fulfiller.setProgressTracker(self.updateProgressStats)
-        self.fulfiller.setNumResultsUpdater(self.updateNumResults)
         self.search.getRecordsForOptions(self.fulfiller)
-
-    def updateNumResults(self, numResults):
-        self.estimateTotalResults = numResults
-        self.numBatches = ceil(numResults / 50)
 
     def updateProgressStats(
             self,
