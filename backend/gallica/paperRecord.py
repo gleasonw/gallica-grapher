@@ -7,3 +7,4 @@ class PaperRecord:
         self.publishingYears = []
         self.continuousRange = False
 
+

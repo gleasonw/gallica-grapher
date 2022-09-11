@@ -1,6 +1,6 @@
 from parse import Parse
-from paperFetchDriver import PaperFetchDriver
-from occurrenceFetchDriver import OccurrenceFetchDriver
+from searchlauncher import PaperSearchFulfillment
+from searchlauncher import OccurrenceSearchFulfillment
 from paperRecord import PaperRecord
 from occurrenceRecord import OccurrenceRecord
 from xmlParser import XMLParser
@@ -9,8 +9,8 @@ from date import Date
 
 def buildParser() -> Parse:
     return Parse(
-        PaperFetchDriver,
-        OccurrenceFetchDriver,
+        PaperSearchFulfillment,
+        OccurrenceSearchFulfillment,
         PaperRecord,
         OccurrenceRecord,
         XMLParser(Date)

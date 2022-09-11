@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
-from urlsforterm import UrlsForTerm
-from urlsforterm import QueriesAllPapers
-from urlsforterm import QueriesSelectPapers
+from urlsforticket import UrlsForTicket
+from urlsforticket import QueriesAllPapers
+from urlsforticket import QueriesSelectPapers
 from utils.gallicaSession import GallicaSession
 import os
 
@@ -12,7 +12,7 @@ here = os.path.dirname(__file__)
 class TestNgramQueryWithConcurrency(TestCase):
 
     def setUp(self) -> None:
-        self.testQuery = UrlsForTerm(
+        self.testQuery = UrlsForTicket(
             '',
             [],
             '1234',
@@ -22,7 +22,7 @@ class TestNgramQueryWithConcurrency(TestCase):
             MagicMock)
 
     def test_establish_year_range(self):
-        noRangeQuery = UrlsForTerm(
+        noRangeQuery = UrlsForTicket(
             '',
             [],
             '1234',
@@ -31,7 +31,7 @@ class TestNgramQueryWithConcurrency(TestCase):
             MagicMock,
             MagicMock
         )
-        rangeQuery = UrlsForTerm(
+        rangeQuery = UrlsForTicket(
             '',
             [1, 1],
             '1234',
@@ -44,7 +44,7 @@ class TestNgramQueryWithConcurrency(TestCase):
         self.assertTrue(rangeQuery.isYearRange)
 
     def test_build_no_year_range_query(self):
-        noRangeQuery = UrlsForTerm(
+        noRangeQuery = UrlsForTicket(
             '',
             [],
             '1234',
@@ -60,7 +60,7 @@ class TestNgramQueryWithConcurrency(TestCase):
         self.assertTrue(noRangeQuery.buildDatelessQuery.called)
 
     def test_build_year_range_query(self):
-        rangeQuery = UrlsForTerm(
+        rangeQuery = UrlsForTicket(
             '',
             [1, 1],
             '1234',
@@ -97,7 +97,7 @@ class TestNgramQueryWithConcurrency(TestCase):
         ])
 
     def test_do_threaded_search(self):
-        testQuery = UrlsForTerm(
+        testQuery = UrlsForTicket(
             '',
             [],
             '1234',

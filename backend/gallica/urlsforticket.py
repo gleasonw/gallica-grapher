@@ -1,7 +1,8 @@
 from cqlSelectStringForPapers import CQLSelectStringForPapers
 
 
-class UrlsForTerm:
+#TODO: build as many urls as there are terms!
+class UrlsForTicket:
 
     def __init__(self):
         self.keyword = None

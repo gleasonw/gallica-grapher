@@ -78,7 +78,7 @@ class TestTicket(TestCase):
             MagicMock(getEstimateNumResults=
                       MagicMock(return_value=12))
         ]
-        self.testTicketInstance.sumResultsOfEachQuery()
+        self.testTicketInstance.getNumRecords()
 
         self.assertEqual(self.testTicketInstance.estimateTotalResults, 33)
 

@@ -3,10 +3,17 @@ import io
 
 class RecordsToDBTransaction:
 
-    def __init__(self, requestID, conn, getPaperRecordsForCodes):
+    def __init__(
+            self,
+            requestID,
+            ticketID,
+            conn,
+            getPaperRecordsForMissingCodes
+    ):
+        self.ticketID = ticketID
         self.requestID = requestID
         self.conn = conn
-        self.getPaperRecordsForCodes = getPaperRecordsForCodes
+        self.getPaperRecordsForCodes = getPaperRecordsForMissingCodes
 
     def insertPapers(self, records):
         csvStream = generateResultCSVstream(
