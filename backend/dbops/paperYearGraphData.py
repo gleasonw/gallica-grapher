@@ -52,6 +52,7 @@ class PaperYearGraphData:
         with open('backend/static/paperJSON.json', 'w') as outFile:
             outFile.write(self.JSONData)
 
+
 if __name__ == "__main__":
     chartMaker = PaperYearGraphData()
     chartMaker.createChartJSON()

@@ -1,5 +1,4 @@
 from celery import Celery
-from request import Request
 from gallica.factory.requestFactory import RequestFactory
 import time
 

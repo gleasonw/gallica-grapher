@@ -11,10 +11,9 @@ retryStrategy = Retry(
 )
 
 http = urllib3.PoolManager(
-    connect=34,
-    read=245,
-    maxsize=100,
+    timeout=urllib3.Timeout(connect=32, read=244),
     retries=retryStrategy,
+    maxsize=NUM_WORKERS
 )
 
 

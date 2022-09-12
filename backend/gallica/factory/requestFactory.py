@@ -11,7 +11,7 @@ from query import Query
 from cqlforticket import CQLforTicket
 from recordsToDBTransaction import RecordsToDBTransaction
 from concurrent.fetch import Fetch
-from backend.request import Request
+from request import Request
 from utils.psqlconn import PSQLconn
 
 

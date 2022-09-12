@@ -14,10 +14,10 @@ class TestReactCSVdata(unittest.TestCase):
     def test_get_csv_data(self):
         mock_cursor_context = MagicMock(
             execute=MagicMock(),
-            fetchall=MagicMock(return_value=[('test', 'test.com', '2021', '01', '15')])
+            fetchall=MagicMock(return_value=[('tests', 'tests.com', '2021', '01', '15')])
         )
         self.reactCSVdata.conn.cursor.return_value.__enter__.return_value = mock_cursor_context
-        self.reactCSVdata.getCSVData('test')
+        self.reactCSVdata.getCSVData('tests')
 
         mock_cursor_context.execute.assert_called_once_with(
             """
@@ -26,20 +26,20 @@ class TestReactCSVdata(unittest.TestCase):
             WHERE ticketid IN %s
             ORDER BY year, month, day
             """,
-            ((('test'),),)
+            ((('tests'),),)
         )
         mock_cursor_context.fetchall.assert_called_once()
         self.assertEqual(
             self.reactCSVdata.csvData,
             [
                 ['ngram', 'identifier', 'year', 'month', 'day'],
-                ('test', 'test.com', '2021', '01', '15')
+                ('tests', 'tests.com', '2021', '01', '15')
             ]
         )
         self.assertEqual(
             self.reactCSVdata.csvData,
             [['ngram', 'identifier', 'year', 'month', 'day'],
-             ('test', 'test.com', '2021', '01', '15')]
+             ('tests', 'tests.com', '2021', '01', '15')]
         )
 
 

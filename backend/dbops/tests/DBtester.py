@@ -36,12 +36,12 @@ class DBtester:
         return testResults
 
     def copyDummyDataIntoResultsTable(self):
-        with open(os.path.join(os.path.dirname(__file__), 'backend/formerBackendTest/resources/dummyResults')) as f:
+        with open(os.path.join(os.path.dirname(__file__), '../../formerBackendTest/resources/dummyResults')) as f:
             with self.conn.cursor() as curs:
                 self.copyDummyData('results', f)
 
     def copyDummyDataIntoHoldingResultsTable(self):
-        with open(os.path.join(os.path.dirname(__file__), 'backend/formerBackendTest/resources/dummyResults')) as f:
+        with open(os.path.join(os.path.dirname(__file__), '../../formerBackendTest/resources/dummyResults')) as f:
             self.copyDummyData('holdingresults', f)
 
     def copyDummyData(self, table, file):

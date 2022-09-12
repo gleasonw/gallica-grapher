@@ -162,7 +162,7 @@ class TestRecordsToDBTransaction(TestCase):
         for i in range(5):
             mockRecord = MagicMock()
             mockRecord.getPaperCode = MagicMock(return_value=codes[i])
-            mockRecord.getPaperTitle = MagicMock(return_value='test title')
+            mockRecord.getPaperTitle = MagicMock(return_value='tests title')
             mockRecord.isContinuous = MagicMock(return_value=True)
             mockRecord.getDate = MagicMock(return_value=[1920, 1930])
             payload.append(mockRecord)
