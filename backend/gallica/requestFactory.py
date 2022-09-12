@@ -3,11 +3,11 @@ from gallica.search import Search
 from parse import Parse
 from search import PaperSearchFulfillment
 from search import OccurrenceSearchFulfillment
-from paperRecord import PaperRecord
-from occurrenceRecord import OccurrenceRecord
+from dto.paperRecord import PaperRecord
+from dto.occurrenceRecord import OccurrenceRecord
 from xmlParser import XMLParser
 from date import Date
-from query import Query
+from dto.query import Query
 from cqlforticket import CQLforTicket
 from recordsToDBTransaction import RecordsToDBTransaction
 from fetch import Fetch
@@ -57,12 +57,11 @@ class RequestFactory:
             getPaperRecordsForMissingCodes=None
         )
         return OccurrenceSearchFulfillment(
-            options,
-            parse,
-            CQLforTicket().buildCQLstrings,
-            Query,
-            transaction.insertResults,
-            fetcher
+            parse=parse,
+            urls=CQLforTicket().buildCQLstrings(options),
+            makeQuery=Query,
+            insertRecords=transaction.insertResults,
+            fetcher=fetcher
         )
 
     def buildPaperFulfillment(self) -> PaperSearchFulfillment:

@@ -7,14 +7,7 @@ class Search:
         pass
 
     def getEstimateSearchSize(self, search):
-        if isinstance(search, OccurrenceSearchFulfillment):
-            urls = search.getUrlsForOptions(search.options)
-            return search.getTotalResults(urls)
-        elif isinstance(search, PaperSearchFulfillment):
-            numPapers = search.getTotalResults()
-            return numPapers
-        else:
-            raise TypeError(f'Invalid fetch driver type: {type(search)}')
+        return search.getTotalResults()
 
     def getRecordsForOptions(self, search):
         if isinstance(search, OccurrenceSearchFulfillment):
@@ -71,36 +64,42 @@ class OccurrenceSearchFulfillment:
 
     def __init__(
             self,
-            options,
             parse,
-            getURLsForOptions,
+            urls,
             makeQuery,
             insertRecords,
             fetcher
     ):
-        self.options = options
         self.parse = parse
-        self.getUrlsForOptions = getURLsForOptions
+        self.urls = urls
         self.makeQuery = makeQuery
         self.fetcher = fetcher
         self.insertRecords = insertRecords
         self.progressTracker = None
-        self.numResultsForUrls = []
+        self.numResultsForUrls = self.getNumResultsForURLs()
 
     def setProgressTracker(self, progressTracker):
         self.progressTracker = progressTracker
 
-    def getTotalResults(self, urls):
-        self.numResultsForUrls = self.getNumResultsForURLs(urls)
+    def getTotalResults(self):
         return sum(numResults for url, numResults in self.numResultsForUrls)
 
-    def getNumResultsForURLs(self, urls):
-        numResultsQueries = self.generateNumResultsQueries(urls)
+    def getNumResultsForURLs(self):
+        numResultsQueries = self.generateNumResultsQueries()
         responses = self.fetcher.fetchNoTrack(numResultsQueries)
         for response in responses:
             numResults = self.parse.numRecords(response["recordXML"])
             url = response["url"]
             yield url, numResults
+
+    def generateNumResultsQueries(self):
+        for url in self.urls:
+            yield self.makeQuery(
+                url=url,
+                startIndex=1,
+                numRecords=1,
+                collapsing=False
+            )
 
     def parse(self, xml):
         return self.parse.occurrences(xml)
@@ -117,14 +116,6 @@ class OccurrenceSearchFulfillment:
             self.progressTrackWithPaper
         )
 
-    def generateNumResultsQueries(self, urls):
-        for url in urls:
-            yield self.makeQuery(
-                url=url,
-                startIndex=1,
-                numRecords=1,
-                collapsing=False
-            )
 
     def removeDuplicateRecords(self, records):
         seen = set()

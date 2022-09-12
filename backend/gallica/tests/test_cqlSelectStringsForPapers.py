@@ -6,7 +6,7 @@ class TestCQLSelectStringForPapers(unittest.TestCase):
 
     def setUp(self) -> None:
         self.codes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-        self.testInstance = CQLSelectStringForPapers(self.codes)
+        self.testInstance = CQLSelectStringForPapers(self.codes, numCodesPerCQL=20)
 
     def test_generate_paper_cql_with_max_20_codes_each(self):
         result = self.testInstance.generatePaperCQLWithMaxNUM_CODESCodesEach()

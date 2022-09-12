@@ -38,9 +38,9 @@ class Request(threading.Thread):
 
     def makeRequestTickets(self):
         tickets = []
-        for ID, ticket in self.ticketDicts.items():
-            ticket = self.makeTicket(ticket, ID, self)
-            tickets.append(ticket)
+        for ID, options in self.ticketDicts.items():
+            options = self.makeTicket(options, ID, self)
+            tickets.append(options)
         return tickets
 
     def estimateIsUnderRecordLimit(self, estimate):
