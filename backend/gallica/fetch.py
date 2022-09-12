@@ -1,6 +1,6 @@
+from concurrent.futures import ThreadPoolExecutor
 import urllib3
 from urllib3.util.retry import Retry
-from concurrent.futures import ThreadPoolExecutor
 
 NUM_WORKERS = 100
 
@@ -10,32 +10,31 @@ retryStrategy = Retry(
     backoff_factor=1
 )
 
-http = urllib3.PoolManager(
-    timeout=urllib3.Timeout(connect=32, read=244),
-    retries=retryStrategy,
-    maxsize=NUM_WORKERS
-)
-
 
 class Fetch:
 
     def __init__(self, baseUrl):
         self.baseUrl = baseUrl
+        self.http = urllib3.PoolManager(
+            timeout=urllib3.Timeout(connect=32, read=244),
+            retries=retryStrategy,
+            maxsize=NUM_WORKERS
+        )
 
     def fetchAll(self, queries):
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            for result in executor.map(self.fetch, queries):
+            for result in executor.map(self.get, queries):
                 yield result
 
     def fetchAllAndTrackProgress(self, queries, tracker):
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            for result in executor.map(self.fetch, queries):
+            for result in executor.map(self.get, queries):
                 tracker(result, NUM_WORKERS)
                 yield result
 
-    def fetch(self, query):
+    def get(self, query):
         params = self.getParamsFor(query)
-        response = http.request(
+        response = self.http.request(
             "GET",
             self.baseUrl,
             fields=params

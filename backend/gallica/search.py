@@ -30,7 +30,7 @@ class Search:
     def fetchAndInsert(self, numResultsForUrls, driver):
         chunkedQueries = self.buildQueries(numResultsForUrls, driver)
         for chunk in chunkedQueries:
-            queriesWithResponseXML = driver.fetch(chunk)
+            queriesWithResponseXML = driver.get(chunk)
             records = yield from (
                 driver.parse(query.responseXML) for query in queriesWithResponseXML
             )

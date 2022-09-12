@@ -10,7 +10,7 @@ from date import Date
 from query import Query
 from cqlforticket import CQLforTicket
 from recordsToDBTransaction import RecordsToDBTransaction
-from concurrent.fetch import Fetch
+from fetch import Fetch
 from request import Request
 from utils.psqlconn import PSQLconn
 

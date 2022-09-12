@@ -1,5 +1,5 @@
 from celery import Celery
-from gallica.factory.requestFactory import RequestFactory
+from requestFactory import RequestFactory
 import time
 
 app = Celery()
