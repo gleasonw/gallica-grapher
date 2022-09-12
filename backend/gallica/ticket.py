@@ -23,7 +23,7 @@ class Ticket:
         self.progressThread = progressThread
 
     def getEstimateNumberRecords(self):
-        return self.search.getEstimateSearchSize(self.fulfiller)
+        return self.fulfiller.getEstimateNumberRecords()
 
     def run(self):
         self.fulfiller.setProgressTracker(self.updateProgressStats)

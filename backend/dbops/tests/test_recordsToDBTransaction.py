@@ -1,4 +1,4 @@
-from dbops.recordsToDBTransaction import RecordsToDBTransaction
+from dbops.tableLink import RecordsToDBTransaction
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from utils.psqlconn import PSQLconn

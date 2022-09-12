@@ -1,5 +1,4 @@
 import unittest
-from cqlSelectStringForPapers import CQLSelectStringForPapers
 
 
 class TestCQLSelectStringForPapers(unittest.TestCase):

@@ -4,7 +4,7 @@ from flask import request
 from flask_cors import CORS
 
 from localPaperSearch import PaperLocalSearch
-from ticketGraphSeriesBatch import TicketGraphSeriesBatch
+from graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
 from topPapersForTicket import TopPapersForTicket
 from reactCSVdata import ReactCSVdata
@@ -93,7 +93,7 @@ def getGraphData():
         'continuous': request.args["continuous"],
         'dateRange': request.args["dateRange"]
     }
-    series = TicketGraphSeriesBatch(settings)
+    series = GraphSeriesBatch(settings)
     items = {'series': series.getSeriesBatch()}
     return items
 

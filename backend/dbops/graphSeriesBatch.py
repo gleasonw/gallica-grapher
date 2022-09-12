@@ -3,7 +3,7 @@ import datetime
 import ciso8601
 
 
-class TicketGraphSeriesBatch:
+class GraphSeriesBatch:
 
     def __init__(self, settings):
         self.dbConnection = PSQLconn().getConn()

@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from dbops.ticketGraphSeriesBatch import TicketGraphSeries
-from dbops.ticketGraphSeriesBatch import TicketGraphSeriesBatch
+from dbops.graphSeriesBatch import TicketGraphSeries
+from dbops.graphSeriesBatch import GraphSeriesBatch
 from DBtester import DBtester
 
 #TODO: make formerBackendTest more complete, not granular enough
@@ -11,7 +11,7 @@ class TestTicketGraphSeriesBatch(TestCase):
     @patch("psycopg2.connect")
     @patch("ticketGraphSeriesBatch.TicketGraphSeriesBatch.selectAllSeriesFromDB")
     def test_get_series_batch(self, mock_select, mock_db):
-        batch = TicketGraphSeriesBatch({"ticketIDs": ''})
+        batch = GraphSeriesBatch({"ticketIDs": ''})
         batch.dataBatches = [
             ['a', [1]],
             ['b', [1]]
@@ -30,7 +30,7 @@ class TestTicketGraphSeriesBatch(TestCase):
     @patch("ticketGraphSeriesBatch.TicketGraphSeriesBatch.selectOneSeries")
     def test_select_all_series_from_db(self, mock_select, mock_connect):
         mock_select.return_value = 'neat'
-        batch = TicketGraphSeriesBatch({"ticketIDs": '1234,4321'})
+        batch = GraphSeriesBatch({"ticketIDs": '1234,4321'})
 
         batch.selectAllSeriesFromDB()
 
@@ -42,7 +42,7 @@ class TestTicketGraphSeriesBatch(TestCase):
     @patch("psycopg2.connect")
     def test_select_one_series(self,mock_connect, mock_select, mock_series):
         mock_series.return_value = MagicMock(getSeries=MagicMock(return_value='nice'))
-        batch = TicketGraphSeriesBatch({"ticketIDs": 'neat'})
+        batch = GraphSeriesBatch({"ticketIDs": 'neat'})
         testSeries = batch.selectOneSeries(batch.requestIDs[0])
         self.assertListEqual(testSeries, ["neat","nice"])
 

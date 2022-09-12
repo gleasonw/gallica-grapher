@@ -1,20 +1,20 @@
 from ticket import Ticket
-from gallica.search import Search
+from gallica.fulfillment import BatchedSearch
 from parse import Parse
-from search import PaperSearchFulfillment
-from search import OccurrenceSearchFulfillment
+from fulfillment import PaperSearchFulfillment
+from fulfillment import Fulfillment
 from dto.paperRecord import PaperRecord
 from dto.occurrenceRecord import OccurrenceRecord
 from xmlParser import XMLParser
 from date import Date
 from dto.query import Query
-from cqlforticket import CQLforTicket
-from recordsToDBTransaction import RecordsToDBTransaction
+from cqlFactory import CQLFactory
+from tableLink import RecordsToDBTransaction
 from fetch import Fetch
 from request import Request
 from utils.psqlconn import PSQLconn
 
-
+#TODO: make queries here based on options
 class RequestFactory:
 
     def __init__(self):
@@ -32,7 +32,7 @@ class RequestFactory:
         )
 
     def buildTicket(self, options, ticketID, progressThread) -> Ticket:
-        driver = Search()
+        driver = BatchedSearch()
         fulfiller = self.buildOccurrenceFulfillment(
             options,
             self.requestID,
@@ -47,8 +47,8 @@ class RequestFactory:
             progressThread
         )
 
-    def buildOccurrenceFulfillment(self, options, requestID, ticketID, dbConnection) -> OccurrenceSearchFulfillment:
-        parse = self.buildParser()
+    def buildOccurrenceFulfillment(self, options, requestID, ticketID, dbConnection) -> Fulfillment:
+        parse = buildParser()
         fetcher = Fetch('https://gallica.bnf.fr/SRU')
         transaction = RecordsToDBTransaction(
             requestID=requestID,
@@ -56,23 +56,18 @@ class RequestFactory:
             conn=dbConnection,
             getPaperRecordsForMissingCodes=None
         )
-        return OccurrenceSearchFulfillment(
+        return Fulfillment(
             parse=parse,
-            urls=CQLforTicket().buildCQLstrings(options),
+            urls=CQLFactory().buildCQLstrings(options),
             makeQuery=Query,
             insertRecords=transaction.insertResults,
             fetcher=fetcher
         )
 
-    def buildPaperFulfillment(self) -> PaperSearchFulfillment:
-        pass
-
-    def buildParser(self) -> Parse:
-        return Parse(
-            PaperSearchFulfillment,
-            OccurrenceSearchFulfillment,
-            PaperRecord,
-            OccurrenceRecord,
-            XMLParser(Date)
-        )
+def buildParser() -> Parse:
+    return Parse(
+        PaperRecord,
+        OccurrenceRecord,
+        XMLParser(Date)
+    )
 

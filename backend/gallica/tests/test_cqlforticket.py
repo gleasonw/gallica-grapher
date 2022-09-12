@@ -1,12 +1,12 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock, call
-from gallica.cqlforticket import CQLforTicket
+from unittest.mock import patch
+from cqlFactory import CQLFactory
 
 
 class TestCQLforTicket(TestCase):
 
     def setUp(self) -> None:
-        self.cqlStringBuilder = CQLforTicket()
+        self.cqlStringBuilder = CQLFactory()
         self.optionsWithSeveralPapersAndTerms = {
             'startYear': '1900',
             'endYear': '1901',

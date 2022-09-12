@@ -31,7 +31,7 @@ class Parse:
             newRecord = self.makeOccurrenceRecord(
                 paperCode=self.xmlParser.getPaperCode(),
                 date=self.xmlParser.getDate(),
-                url=self.xmlParser.getURL()
+                url=self.xmlParser.getURL(),
             )
             yield newRecord
 

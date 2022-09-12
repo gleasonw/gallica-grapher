@@ -1,7 +1,7 @@
 import os
 
 from utils.psqlconn import PSQLconn
-from dbops.ticketGraphSeriesBatch import TicketGraphSeries
+from dbops.graphSeriesBatch import TicketGraphSeries
 from topPapersForTicket import TopPapersForTicket
 
 

@@ -1,5 +1,5 @@
 from celery import Celery
-from requestFactory import RequestFactory
+from factories.requestFactory import RequestFactory
 import time
 
 app = Celery()
