@@ -59,7 +59,7 @@ class RequestFactory:
         return OccurrenceSearchFulfillment(
             options,
             parse,
-            CQLforTicket().buildUrls,
+            CQLforTicket().buildCQLstrings,
             Query,
             transaction.insertResults,
             fetcher

@@ -5,32 +5,17 @@ class Parse:
 
     def __init__(
             self,
-            paperDriver,
-            occurrenceDriver,
             makePaperRecord,
             makeOccurrenceRecord,
             xmlParser
     ):
-        self.paperDriverClass = paperDriver
-        self.occurrenceDriverClass = occurrenceDriver
         self.makePaperRecord = makePaperRecord
         self.makeOccurrenceRecord = makeOccurrenceRecord
         self.xmlParser = xmlParser
 
-    def records(self, fetchDriver, xml) -> list:
-        xmlRoot = etree.fromstring(xml)
-        recordRoots = xmlRoot.findall(
-            "{http://www.loc.gov/zing/srw/}record")
-        recordData = [root[2][0] for root in recordRoots]
-        if isinstance(fetchDriver, self.paperDriverClass):
-            return self.papers(recordData)
-        elif isinstance(fetchDriver, self.occurrenceDriverClass):
-            return self.occurrences(recordData)
-        else:
-            raise Exception("Unknown fetch driver type")
-
     def papers(self, records) -> list:
-        for record in records:
+        elements = etree.fromstring(records)
+        for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             self.xmlParser.setXML(record)
             newRecord = self.makePaperRecord(
                 code=self.xmlParser.getPaperCode(),
@@ -40,7 +25,8 @@ class Parse:
             yield newRecord
 
     def occurrences(self, records) -> list:
-        for record in records:
+        elements = etree.fromstring(records)
+        for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             self.xmlParser.setXML(record)
             newRecord = self.makeOccurrenceRecord(
                 paperCode=self.xmlParser.getPaperCode(),
@@ -61,6 +47,7 @@ class Parse:
 
     def onePaperTitleFromOccurrenceBatch(self, xml) -> str:
         xmlRoot = etree.fromstring(xml)
-        self.xmlParser.setXML(xmlRoot)
+        record = xmlRoot.find("{http://www.loc.gov/zing/srw/}record")
+        self.xmlParser.setXML(record)
         return self.xmlParser.getPaperTitle()
 

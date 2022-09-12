@@ -8,15 +8,14 @@ class CQLforTicket:
         self.paperCodes = None
         self.startYear = None
         self.endYear = None
-        self.baseQueryComponents = []
 
-    def buildUrls(self, options):
+    def buildCQLstrings(self, options):
         self.startYear = options['startYear']
         self.endYear = options['endYear']
         self.terms = options['terms']
         self.paperCodes = options['paperCodes']
-        queries = self.generateCQLforOptions()
-        return queries
+        cql = self.generateCQLforOptions()
+        return cql
 
     def generateCQLforOptions(self):
         for term in self.terms:
@@ -27,15 +26,16 @@ class CQLforTicket:
                 yield baseQuery
 
     def buildCQLforTerm(self, term):
+        baseQueryComponents = []
         if self.startYear and self.endYear:
-            self.baseQueryComponents.append(f'dc.date >= "{self.startYear}"')
-            self.baseQueryComponents.append(f'dc.date <= "{self.endYear}"')
-        self.baseQueryComponents.append(f'(gallica adj "{term}")')
-        self.baseQueryComponents.append('(dc.type adj "fascicule")')
-        self.baseQueryComponents.append('sortby dc.date/sort.ascending')
-        baseQuery = " and ".join(self.baseQueryComponents)
+            baseQueryComponents.append(f'dc.date >= "{self.startYear}"')
+            baseQueryComponents.append(f'dc.date <= "{self.endYear}"')
+        baseQueryComponents.append(f'(gallica adj "{term}")')
+        baseQueryComponents.append('(dc.type adj "fascicule")')
+        baseQueryComponents.append('sortby dc.date/sort.ascending')
+        baseQuery = " and ".join(baseQueryComponents)
         if self.paperCodes:
-            self.baseQueryComponents.insert(0, '({formattedCodeString})')
+            baseQueryComponents.insert(0, '({formattedCodeString})')
         return baseQuery
 
     def buildCQLforPaperCodes(self, baseQuery):
