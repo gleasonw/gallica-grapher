@@ -2,11 +2,11 @@ import threading
 
 
 class Request(threading.Thread):
-    def __init__(self, tickets, requestID, makeTicket, dbConn):
+    def __init__(self, queries, requestID, makeTicket, dbConn):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.topPapersForTerms = []
-        self.ticketDicts = tickets
+        self.keyedQueries = queries
         self.finished = False
         self.tooManyRecords = False
         self.ticketProgressStats = self.initProgressStats()
@@ -38,9 +38,9 @@ class Request(threading.Thread):
 
     def makeRequestTickets(self):
         tickets = []
-        for ID, options in self.ticketDicts.items():
-            options = self.makeTicket(options, ID, self)
-            tickets.append(options)
+        for ID, queries in self.keyedQueries.items():
+            queries = self.makeTicket(queries, ID, self)
+            tickets.append(queries)
         return tickets
 
     def estimateIsUnderRecordLimit(self, estimate):
@@ -61,7 +61,7 @@ class Request(threading.Thread):
 
     def initProgressStats(self):
         progressDict = {}
-        for key, ticket in self.ticketDicts.items():
+        for key, ticket in self.keyedQueries.items():
             progressDict[key] = {
                 'progress': 0,
                 'numResultsDiscovered': 0,

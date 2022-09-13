@@ -1,5 +1,5 @@
 from ticket import Ticket
-from gallica.fulfillment import BatchedSearch
+from gallica.fulfillment import Fulfillment
 from parse import Parse
 from fulfillment import Fulfillment
 from dto.paperRecord import PaperRecord
@@ -7,11 +7,12 @@ from dto.occurrenceRecord import OccurrenceRecord
 from xmlParser import XMLParser
 from date import Date
 from query import Query
-from cqlFactory import CQLFactory
-from tableLink import RecordsToDBTransaction
+from occurrenceQueryFactory import OccurrenceQueryFactory
+from tableLink import TableLink
 from fetch import Fetch
 from request import Request
 from utils.psqlconn import PSQLconn
+
 
 #TODO: pass queries to ticket, not options
 class RequestFactory:
@@ -19,21 +20,24 @@ class RequestFactory:
     def __init__(self):
         self.dbConn = None
         self.requestID = None
+        self.occurrenceQueryFactory = OccurrenceQueryFactory()
 
     def buildRequest(self, keyedOptions, requestid) -> Request:
         self.dbConn = PSQLconn().getConn()
         self.requestID = requestid
+        queries = {}
+        for key, options in keyedOptions:
+            queries[key] = self.occurrenceQueryFactory.buildQueriesForOptions(options)
         return Request(
-            tickets=keyedOptions,
+            queries=queries,
             requestID=requestid,
             makeTicket=self.buildTicket,
             dbConn=self.dbConn
         )
 
-    def buildTicket(self, options, ticketID, progressThread) -> Ticket:
-        driver = BatchedSearch()
-        fulfiller = self.buildOccurrenceFulfillment(
-            options,
+    def buildTicket(self, queries, ticketID, progressThread) -> Ticket:
+        search = self.buildOccurrenceFulfillment(
+            queries,
             self.requestID,
             ticketID,
             self.dbConn
@@ -41,8 +45,7 @@ class RequestFactory:
         return Ticket(
             ticketID,
             self.requestID,
-            driver,
-            fulfiller,
+            search,
             progressThread
         )
 

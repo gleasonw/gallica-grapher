@@ -8,11 +8,9 @@ class Ticket:
             ticketID,
             requestID,
             search,
-            fulfiller,
             progressThread
     ):
         self.search = search
-        self.fulfiller = fulfiller
         self.ticketID = ticketID
         self.requestID = requestID
         self.estimateTotalResults = 0
@@ -26,8 +24,8 @@ class Ticket:
         return self.fulfiller.getEstimateNumberRecords()
 
     def run(self):
-        self.fulfiller.setProgressTracker(self.updateProgressStats)
-        self.search.getRecordsForOptions(self.fulfiller)
+        self.search.setProgressTracker(self.updateProgressStats)
+        self.search.search()
 
     def updateProgressStats(
             self,
