@@ -17,22 +17,14 @@ class Request(threading.Thread):
         super().__init__()
 
     def run(self):
-
-        def sumEstimateNumberRecordsForAllTickets(tickets):
-            total = 0
-            for tick in tickets:
-                total += tick.getEstimateNumberRecords()
-            return total
-
         requestTickets = self.makeRequestTickets()
-        estimate = sumEstimateNumberRecordsForAllTickets(requestTickets)
-        if self.estimateIsUnderRecordLimit(estimate):
-            for ticket in requestTickets:
-                ticket.run()
-                self.setTicketProgressTo100AndMarkAsDone(ticket)
-            self.finished = True
+        estimateRequestResults = sum(
+            [tick.estimateNumResults for tick in requestTickets]
+        )
+        if self.estimateIsUnderLimit(estimateRequestResults):
+            self.doAllSearches(requestTickets)
         else:
-            self.estimateNumRecords = estimate
+            self.estimateNumRecords = estimateRequestResults
             self.tooManyRecords = True
         self.DBconnection.close()
 
@@ -43,7 +35,7 @@ class Request(threading.Thread):
             tickets.append(queries)
         return tickets
 
-    def estimateIsUnderRecordLimit(self, estimate):
+    def estimateIsUnderLimit(self, estimate):
         dbSpaceRemainingWithBuffer = 10000000 - self.getNumberRowsInAllTables() - 10000
         absoluteLimit = 3000000
         return estimate < min(dbSpaceRemainingWithBuffer, absoluteLimit)
@@ -58,6 +50,12 @@ class Request(threading.Thread):
                 """
             )
             return curs.fetchone()[0]
+
+    def doAllSearches(self, requestTickets):
+        for ticket in requestTickets:
+            ticket.run()
+            self.setTicketProgressTo100AndMarkAsDone(ticket)
+        self.finished = True
 
     def initProgressStats(self):
         progressDict = {}

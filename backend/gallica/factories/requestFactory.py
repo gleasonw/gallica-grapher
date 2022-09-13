@@ -1,7 +1,7 @@
-from ticketprogresshandler import TicketProgressHandler
-from gallica.search import Search
+from searchprogress import SearchProgress
+from gallica.papersearch import PaperSearch
 from parse import Parse
-from search import Search
+from ticketsearch import TicketSearch
 from dto.paperRecord import PaperRecord
 from dto.occurrenceRecord import OccurrenceRecord
 from xmlParser import XMLParser
@@ -36,38 +36,47 @@ class RequestFactory:
             dbConn=self.dbConn
         )
 
-    def buildTicketProgressHandler(self, queries, ticketID, progressThread) -> TicketProgressHandler:
+    def buildTicketProgressHandler(self, queryData, ticketID, progressThread) -> SearchProgress:
         search = buildTicketSearch(
-            queries,
+            queryData['queries'],
             self.requestID,
             self.dbConn
         )
-        return TicketProgressHandler(
-            ticketID,
-            search,
-            progressThread
+        return SearchProgress(
+            ticketID=ticketID,
+            searchDriver=search,
+            estimateNumResults=queryData['estimateNumResults'],
+            progressCallback=progressThread
         )
 
 
-def buildTicketSearch(queries, requestID, dbConnection) -> Search:
+def buildTicketSearch(queries, requestID, dbConnection) -> TicketSearch:
     parse = buildParser()
-    fetcher = Fetch('https://gallica.bnf.fr/SRU')
+    sruFetcher = Fetch('https://gallica.bnf.fr/SRU')
     dbLink = TableLink(
         requestID=requestID,
         conn=dbConnection
     )
-    return Search(
+    paperSearch = PaperSearch(
         parse=parse,
-        queries=BatchedQueries(queries, 200).batchedQueries,
-        insertRecords=dbLink.insert,
-        fetcher=fetcher
+        paperQueryFactory=Query,
+        sruFetch=sruFetcher,
+        arkFetch=Fetch('https://gallica.bnf.fr/ark:/12148'),
+        insert=dbLink.insert
+    )
+    return TicketSearch(
+        parse=parse,
+        queries=queries,
+        schemaLink=dbLink,
+        sruFetch=sruFetcher,
+        paperAdd=paperSearch.addRecordDataForTheseCodesToDB
     )
 
 
 def buildParser() -> Parse:
     return Parse(
-        PaperRecord,
-        OccurrenceRecord,
-        XMLParser(Date)
+        makePaperRecord=PaperRecord,
+        makeOccurrenceRecord=OccurrenceRecord,
+        xmlParser=XMLParser(Date)
     )
 

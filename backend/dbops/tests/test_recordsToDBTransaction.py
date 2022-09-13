@@ -33,7 +33,7 @@ class TestRecordsToDBTransaction(TestCase):
     def test_insert_papers(self, mock_io):
         mock_io.StringIO.return_value = MagicMock()
 
-        self.testTransaction.insertPapers(MagicMock())
+        self.testTransaction.insertIntoPapers(MagicMock())
 
         self.testTransaction.conn.cursor.assert_called_once()
 
