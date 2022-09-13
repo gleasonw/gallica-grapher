@@ -1,7 +1,7 @@
-from ticket import Ticket
-from gallica.fulfillment import Fulfillment
+from ticketprogresshandler import TicketProgressHandler
+from gallica.search import Search
 from parse import Parse
-from fulfillment import Fulfillment
+from search import Search
 from dto.paperRecord import PaperRecord
 from dto.occurrenceRecord import OccurrenceRecord
 from xmlParser import XMLParser
@@ -12,6 +12,7 @@ from tableLink import TableLink
 from fetch import Fetch
 from request import Request
 from utils.psqlconn import PSQLconn
+from batchedQueries import BatchedQueries
 
 
 #TODO: pass queries to ticket, not options
@@ -31,40 +32,37 @@ class RequestFactory:
         return Request(
             queries=queries,
             requestID=requestid,
-            makeTicket=self.buildTicket,
+            makeTicket=self.buildTicketProgressHandler,
             dbConn=self.dbConn
         )
 
-    def buildTicket(self, queries, ticketID, progressThread) -> Ticket:
-        search = self.buildOccurrenceFulfillment(
+    def buildTicketProgressHandler(self, queries, ticketID, progressThread) -> TicketProgressHandler:
+        search = buildTicketSearch(
             queries,
             self.requestID,
-            ticketID,
             self.dbConn
         )
-        return Ticket(
+        return TicketProgressHandler(
             ticketID,
-            self.requestID,
             search,
             progressThread
         )
 
-    def buildOccurrenceFulfillment(self, options, requestID, ticketID, dbConnection) -> Fulfillment:
-        parse = buildParser()
-        fetcher = Fetch('https://gallica.bnf.fr/SRU')
-        transaction = RecordsToDBTransaction(
-            requestID=requestID,
-            ticketID=ticketID,
-            conn=dbConnection,
-            getPaperRecordsForMissingCodes=None
-        )
-        return Fulfillment(
-            parse=parse,
-            urls=CQLFactory().buildStringsForOptions(options),
-            makeQuery=Query,
-            insertRecords=transaction.insertResults,
-            fetcher=fetcher
-        )
+
+def buildTicketSearch(queries, requestID, dbConnection) -> Search:
+    parse = buildParser()
+    fetcher = Fetch('https://gallica.bnf.fr/SRU')
+    dbLink = TableLink(
+        requestID=requestID,
+        conn=dbConnection
+    )
+    return Search(
+        parse=parse,
+        queries=BatchedQueries(queries, 200).batchedQueries,
+        insertRecords=dbLink.insert,
+        fetcher=fetcher
+    )
+
 
 def buildParser() -> Parse:
     return Parse(

@@ -2,19 +2,17 @@ CHUNK_SIZE = 200
 
 
 #TODO: move holdingresult logic into this class, search for missing records beforehand
-class Fulfillment:
+class Search:
 
     def __init__(
             self,
             parse,
-            urls,
-            makeQuery,
+            queries,
             insertRecords,
             fetcher
     ):
         self.parse = parse
-        self.urls = urls
-        self.makeQuery = makeQuery
+        self.queries = queries
         self.SRUfetch = fetcher
         self.insertRecords = insertRecords
         self.progressTracker = None
@@ -23,8 +21,7 @@ class Fulfillment:
         self.progressTracker = progressTracker
 
     def search(self):
-        chunkedQueries = self.buildQueries()
-        for chunk in chunkedQueries:
+        for chunk in self.queries:
             queriesWithResponseXML = self.fulfiller.fetcher(chunk)
             records = yield from (
                 self.fulfiller.parse(query.responseXML) for query in queriesWithResponseXML
