@@ -25,23 +25,12 @@ class Fulfillment:
     def search(self):
         chunkedQueries = self.buildQueries()
         for chunk in chunkedQueries:
-            queriesWithResponseXML = self.fulfiller.fetch(chunk)
+            queriesWithResponseXML = self.fulfiller.fetcher(chunk)
             records = yield from (
                 self.fulfiller.parse(query.responseXML) for query in queriesWithResponseXML
             )
             records = self.fulfiller.prepareRecordsForInsert(records)
             self.fulfiller.insert(records)
-
-    def splitIntoCHUNK_SIZEchunks(self, indexedQueries):
-        allChunks = []
-        chunk = []
-        for query in indexedQueries:
-            if len(chunk) < CHUNK_SIZE:
-                chunk.append(query)
-            else:
-                allChunks.append(chunk)
-                chunk = [query]
-        return allChunks
 
     def parse(self, xml):
         return self.parse.occurrences(xml)

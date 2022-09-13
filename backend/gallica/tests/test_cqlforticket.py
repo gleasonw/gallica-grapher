@@ -49,7 +49,7 @@ class TestCQLforTicket(TestCase):
 
     @patch('gallica.cqlforticket.CQLforTicket.generateCQLforOptions')
     def test_buildCQLstrings(self, mock_gen):
-        self.cqlStringBuilder.buildCQLstrings(self.optionsWithSeveralPapersAndTerms)
+        self.cqlStringBuilder.buildStringsForOptions(self.optionsWithSeveralPapersAndTerms)
 
         self.assertEqual(
             self.cqlStringBuilder.startYear,
@@ -72,7 +72,7 @@ class TestCQLforTicket(TestCase):
     @patch('gallica.cqlforticket.CQLforTicket.buildCQLforTerm')
     @patch('gallica.cqlforticket.CQLforTicket.buildCQLforPaperCodes')
     def test_generateCQLforOptions_given_many_terms_no_papers(self, mock_buildCQLforPaperCodes, mock_buildCQLforTerm):
-        test = self.cqlStringBuilder.buildCQLstrings(
+        test = self.cqlStringBuilder.buildStringsForOptions(
             self.optionsWithNoPapersAndSeveralTerms
         )
         results = [yielded for yielded in test]
@@ -83,7 +83,7 @@ class TestCQLforTicket(TestCase):
     @patch('gallica.cqlforticket.CQLforTicket.buildCQLforTerm')
     @patch('gallica.cqlforticket.CQLforTicket.buildCQLforPaperCodes')
     def test_generateCQLforOptions_given_many_terms_many_papers(self, mock_buildCQLforPaperCodes, mock_buildCQLforTerm):
-        test = self.cqlStringBuilder.buildCQLstrings(
+        test = self.cqlStringBuilder.buildStringsForOptions(
             self.optionsWithSeveralPapersAndTerms
         )
 

@@ -8,8 +8,9 @@ class CQLFactory:
         self.codes = None
         self.startYear = None
         self.endYear = None
+        self.cqlForCodes = CQLStringForPaperCodes()
 
-    def buildCQLstrings(self, options):
+    def buildStringsForOptions(self, options):
         self.startYear = options['startYear']
         self.endYear = options['endYear']
         self.terms = options['terms']
@@ -42,27 +43,24 @@ class CQLFactory:
         return baseQuery
 
     def buildCQLforPaperCodes(self, baseQuery):
-        paperSelectCQLStrings = CQLSelectStringForPapers(self.codes).cqlSelectStrings
+        paperSelectCQLStrings = self.cqlForCodes.build(self.codes)
         for codeString in paperSelectCQLStrings:
             yield baseQuery.format(formattedCodeString=codeString)
 
 
-
-class CQLSelectStringForPapers:
-    def __init__(self, codes, numCodesPerCQL=NUM_CODES_PER_CQL):
+class CQLStringForPaperCodes:
+    def __init__(self, numCodesPerCQL=NUM_CODES_PER_CQL):
         self.numCodesPerCQL = numCodesPerCQL
-        self.codes = codes
-        self.cqlSelectStrings = self.generatePaperCQLWithMaxNUM_CODESCodesEach()
 
-    def generatePaperCQLWithMaxNUM_CODESCodesEach(self):
-        cql20CodeStrings = []
-        for i in range(0, len(self.codes), self.numCodesPerCQL):
-            codes = self.codes[i:i + self.numCodesPerCQL]
-            formattedCodes = [f"{code}_date" for code in codes]
+    def build(self, codeChunks):
+        cqlStrings = []
+        for i in range(0, len(codeChunks), self.numCodesPerCQL):
+            codeChunks = codeChunks[i:i + self.numCodesPerCQL]
+            formattedCodes = [f"{code}_date" for code in codeChunks]
             CQLpaperSelectString = 'arkPress all "' + '" or arkPress all "'.join(
                 formattedCodes) + '"'
-            cql20CodeStrings.append(CQLpaperSelectString)
-        return cql20CodeStrings
+            cqlStrings.append(CQLpaperSelectString)
+        return cqlStrings
 
 
 

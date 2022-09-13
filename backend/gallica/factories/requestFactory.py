@@ -1,20 +1,19 @@
 from ticket import Ticket
 from gallica.fulfillment import BatchedSearch
 from parse import Parse
-from fulfillment import PaperSearchFulfillment
 from fulfillment import Fulfillment
 from dto.paperRecord import PaperRecord
 from dto.occurrenceRecord import OccurrenceRecord
 from xmlParser import XMLParser
 from date import Date
-from dto.query import Query
+from query import Query
 from cqlFactory import CQLFactory
 from tableLink import RecordsToDBTransaction
 from fetch import Fetch
 from request import Request
 from utils.psqlconn import PSQLconn
 
-#TODO: make queries here based on options
+#TODO: pass queries to ticket, not options
 class RequestFactory:
 
     def __init__(self):
@@ -58,7 +57,7 @@ class RequestFactory:
         )
         return Fulfillment(
             parse=parse,
-            urls=CQLFactory().buildCQLstrings(options),
+            urls=CQLFactory().buildStringsForOptions(options),
             makeQuery=Query,
             insertRecords=transaction.insertResults,
             fetcher=fetcher
