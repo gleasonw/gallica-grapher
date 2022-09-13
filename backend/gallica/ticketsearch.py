@@ -1,6 +1,3 @@
-CHUNK_SIZE = 200
-
-
 class TicketSearch:
 
     def __init__(

@@ -1,9 +1,10 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from cqlFactory import CQLFactory
+from cqlFactory import CQLStringForPaperCodes
 
 
-class TestCQLforTicket(TestCase):
+class TestCQLFactory(TestCase):
 
     def setUp(self) -> None:
         self.cqlStringBuilder = CQLFactory()
@@ -47,7 +48,7 @@ class TestCQLforTicket(TestCase):
             }]
         }
 
-    @patch('gallica.cqlforticket.CQLforTicket.generateCQLforOptions')
+    @patch('cqlFactory.CQLFactory.generateCQLforOptions')
     def test_buildCQLstrings(self, mock_gen):
         self.cqlStringBuilder.buildStringsForOptions(self.optionsWithSeveralPapersAndTerms)
 
@@ -69,20 +70,20 @@ class TestCQLforTicket(TestCase):
         )
         mock_gen.assert_called_once()
 
-    @patch('gallica.cqlforticket.CQLforTicket.buildCQLforTerm')
-    @patch('gallica.cqlforticket.CQLforTicket.buildCQLforPaperCodes')
-    def test_generateCQLforOptions_given_many_terms_no_papers(self, mock_buildCQLforPaperCodes, mock_buildCQLforTerm):
+    def test_generateCQLforOptions_given_many_terms_no_papers(self):
+        self.cqlStringBuilder.buildCQLforTerm = MagicMock()
+        self.cqlStringBuilder.buildCQLforPaperCodes = MagicMock()
         test = self.cqlStringBuilder.buildStringsForOptions(
             self.optionsWithNoPapersAndSeveralTerms
         )
         results = [yielded for yielded in test]
 
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0], mock_buildCQLforTerm.return_value)
+        self.assertEqual(results[0], self.cqlStringBuilder.buildCQLforTerm.return_value)
 
-    @patch('gallica.cqlforticket.CQLforTicket.buildCQLforTerm')
-    @patch('gallica.cqlforticket.CQLforTicket.buildCQLforPaperCodes')
-    def test_generateCQLforOptions_given_many_terms_many_papers(self, mock_buildCQLforPaperCodes, mock_buildCQLforTerm):
+    def test_generateCQLforOptions_given_many_terms_many_papers(self):
+        self.cqlStringBuilder.buildCQLforTerm = MagicMock()
+        self.cqlStringBuilder.buildCQLforPaperCodes = MagicMock()
         test = self.cqlStringBuilder.buildStringsForOptions(
             self.optionsWithSeveralPapersAndTerms
         )
@@ -113,7 +114,7 @@ class TestCQLforTicket(TestCase):
             '({formattedCodeString}) and dc.date >= "1900" and dc.date <= "1901" and (gallica adj "term1") and (dc.type adj "fascicule") sortby dc.date/sort.ascending'
         )
 
-    @patch('gallica.cqlforticket.CQLSelectStringForPapers')
+    @patch('factories.cqlFactory.CQLStringForPaperCodes.build')
     def test_format_buildCQLforPaperCodes(self, mock_CQLSelectStringForPapers):
         self.cqlStringBuilder.codes = ['code1', 'code2']
         baseQuery = '({formattedCodeString})'
@@ -124,8 +125,26 @@ class TestCQLforTicket(TestCase):
         testResult = [result for result in test]
         self.assertListEqual(
             testResult,
-            ['((arkPress adj "code1") or (arkPress adj "code2"))']
+            ['(arkPress adj "code1_date" or arkPress adj "code2_date")']
         )
+
+
+class TestCQLSelectStringForPapers(TestCase):
+
+    def setUp(self) -> None:
+        self.codes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        self.testInstance = CQLStringForPaperCodes(numCodesPerCQL=20)
+
+    def test_generate_paper_cql_with_max_20_codes_each(self):
+        result = self.testInstance.build(self.codes)
+        self.assertListEqual(
+            result,
+            [
+                'arkPress all "a_date" or arkPress all "b_date" or arkPress all "c_date" or arkPress all "d_date" or arkPress all "e_date" or arkPress all "f_date" or arkPress all "g_date" or arkPress all "h_date" or arkPress all "i_date" or arkPress all "j_date" or arkPress all "k_date" or arkPress all "l_date" or arkPress all "m_date" or arkPress all "n_date" or arkPress all "o_date" or arkPress all "p_date" or arkPress all "q_date" or arkPress all "r_date" or arkPress all "s_date" or arkPress all "t_date"',
+                'arkPress all "u_date" or arkPress all "v_date" or arkPress all "w_date" or arkPress all "x_date" or arkPress all "y_date" or arkPress all "z_date"'
+            ]
+        )
+
 
 
 

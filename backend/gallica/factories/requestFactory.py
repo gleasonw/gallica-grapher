@@ -15,7 +15,6 @@ from utils.psqlconn import PSQLconn
 from batchedQueries import BatchedQueries
 
 
-#TODO: pass queries to ticket, not options
 class RequestFactory:
 
     def __init__(self):
