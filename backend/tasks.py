@@ -1,5 +1,5 @@
 from celery import Celery
-from scripts.request import Request
+from factories.requestFactory import RequestFactory
 import time
 
 app = Celery()
@@ -8,22 +8,25 @@ app.config_from_object('celery_settings')
 
 @app.task(bind=True)
 def spawnRequest(self, tickets):
-    gallicaRequest = Request(tickets, spawnRequest.request.id)
-    gallicaRequest.start()
+    request = RequestFactory().buildRequest(
+        tickets,
+        spawnRequest.request.id
+    )
+    request.start()
     while True:
-        if gallicaRequest.finished:
+        if request.finished:
             return {
                 'status': 'Complete!',
                 'result': 42}
-        elif gallicaRequest.tooManyRecords:
+        elif request.tooManyRecords:
             return {
                 'status': 'Too many records!',
-                'numRecords': gallicaRequest.estimateNumRecords
+                'numRecords': request.estimateNumRecords
             }
         else:
             self.update_state(
                 state="PROGRESS",
-                meta={'progress': gallicaRequest.getProgressStats()})
+                meta={'progress': request.getProgressStats()})
             time.sleep(1)
 
 

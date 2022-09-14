@@ -18,7 +18,7 @@ export const handlers = [
     rest.get('/api/papers/:keyword', (req, res, ctx) => {
         return res(ctx.json({
             'paperNameCodes': [{
-                'title': 'A great test paper',
+                'title': 'A great tests paper',
                 'code': 'code',
                 'startYear': 2000,
                 'endYear': 2001

@@ -10,6 +10,8 @@ const ClassicUIBox = styled.div`
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     padding: 30px;
+    width: ${props => props.width || '100%'};
+    height: ${props => props.height || '100%'};
     resize: ${props => props.resize ? props.resize : 'none'};
     `;
 

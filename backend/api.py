@@ -3,11 +3,11 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS
 
-from scripts.paperLocalSearch import PaperLocalSearch
-from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
+from localPaperSearch import PaperLocalSearch
+from graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
-from scripts.topPapersForTicket import TopPapersForTicket
-from scripts.reactCSVdata import ReactCSVdata
+from topPapersForTicket import TopPapersForTicket
+from reactCSVdata import ReactCSVdata
 
 
 app = Flask(__name__)
@@ -93,7 +93,7 @@ def getGraphData():
         'continuous': request.args["continuous"],
         'dateRange': request.args["dateRange"]
     }
-    series = TicketGraphSeriesBatch(settings)
+    series = GraphSeriesBatch(settings)
     items = {'series': series.getSeriesBatch()}
     return items
 
@@ -114,6 +114,15 @@ def getCSV():
     tickets = request.args["tickets"]
     csvData = ReactCSVdata().getCSVData(tickets)
     return {"csvData": csvData}
+
+
+@app.route('/getIssueLinks')
+def getIssueLinks():
+    tickets = request.args["tickets"]
+    startDate = request.args["startDate"]
+    endDate = request.args["endDate"]
+    paperLinks = ReactCSVdata().getIssueLinks(tickets, startDate, endDate)
+    return {"paperLinks": paperLinks}
 
 
 if __name__ == "__main__":

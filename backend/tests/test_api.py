@@ -12,13 +12,13 @@ class TestAPI(unittest.TestCase):
 
     @patch("backend.api.spawnRequest.delay")
     def test_init(self, mock_spawnRequestThread):
-        mock_spawnRequestThread.return_value = MagicMock(id="test")
+        mock_spawnRequestThread.return_value = MagicMock(id="tests")
         response = self.app.post(
             '/api/init',
             json={'tickets': {}})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json['taskid'], "test")
+        self.assertEqual(response.json['taskid'], "tests")
 
     def test_paperChart(self):
         testJSON = self.app.get('/api/paperchartjson')
@@ -27,7 +27,7 @@ class TestAPI(unittest.TestCase):
         self.assertIsNotNone(testJSON.data)
 
     def test_papers(self):
-        testPapersSimilarToKeyword = self.app.get('/api/papers/test')
+        testPapersSimilarToKeyword = self.app.get('/api/papers/tests')
 
         assert testPapersSimilarToKeyword.status_code == 200
         self.assertIsNotNone(testPapersSimilarToKeyword)
@@ -58,7 +58,7 @@ class TestAPI(unittest.TestCase):
     def test_getGraphData(self, mock_series):
         mockedSeries = mock_series.return_value
         mockedSeries.getSeriesBatch.return_value = []
-        query = '/api/graphData?keys=test&averageWindow=test&timeBin=test&continuous=test&dateRange=test'
+        query = '/api/graphData?keys=tests&averageWindow=tests&timeBin=tests&continuous=tests&dateRange=tests'
 
         response = self.app.get(query)
 
@@ -69,7 +69,7 @@ class TestAPI(unittest.TestCase):
     def test_getTopPapersFromID(self, mock_topPapers):
         mockedTopPapers = mock_topPapers.return_value
         mockedTopPapers.getTopPapers.return_value = []
-        query = '/api/topPapers?id=test&continuous=test&dateRange=test'
+        query = '/api/topPapers?id=tests&continuous=tests&dateRange=tests'
 
         testTopPapersFromID = self.app.get(query)
 
@@ -103,7 +103,7 @@ class TestAPI(unittest.TestCase):
             ))
         mock_celery_task.state = "PROGRESS"
 
-        response = self.app.get('/api/progress/test')
+        response = self.app.get('/api/progress/tests')
 
         self.assertEqual(
             {
@@ -125,7 +125,7 @@ class TestAPI(unittest.TestCase):
         mock_celery_task.AsyncResult.return_value = mock_celery_task
         mock_celery_task.state = "SUCCESS"
 
-        response = self.app.get('/api/progress/test')
+        response = self.app.get('/api/progress/tests')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual({"state": "SUCCESS"}, response.json)
@@ -140,7 +140,7 @@ class TestAPI(unittest.TestCase):
             "numRecords": 100
         }
 
-        response = self.app.get('/api/progress/test')
+        response = self.app.get('/api/progress/tests')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
