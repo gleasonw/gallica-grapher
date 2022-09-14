@@ -8,11 +8,11 @@ from xmlParser import XMLParser
 from date import Date
 from query import Query
 from occurrenceQueryFactory import OccurrenceQueryFactory
+from paperQueryFactory import PaperQueryFactory
 from tableLink import TableLink
 from fetch import Fetch
 from request import Request
 from utils.psqlconn import PSQLconn
-from batchedQueries import BatchedQueries
 
 
 class RequestFactory:
@@ -58,7 +58,7 @@ def buildTicketSearch(queries, requestID, dbConnection) -> TicketSearch:
     )
     paperSearch = PaperSearch(
         parse=parse,
-        paperQueryFactory=Query,
+        paperQueryFactory=PaperQueryFactory(),
         sruFetch=sruFetcher,
         arkFetch=Fetch('https://gallica.bnf.fr/ark:/12148'),
         insert=dbLink.insert

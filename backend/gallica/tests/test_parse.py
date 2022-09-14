@@ -1,11 +1,11 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import MagicMock, call
 from gallica.parse import Parse
 import os
-from lxml import etree
+
 
 class TestParse(TestCase):
-    
+
     def setUp(self) -> None:
         self.parse = Parse(
             makePaperRecord=MagicMock(),
@@ -13,46 +13,38 @@ class TestParse(TestCase):
             xmlParser=MagicMock()
         )
         with open(os.path.join(os.path.dirname(__file__), "resources/dummyOccurrenceRecords.xml"), "rb") as f:
-            self.occurrenceXML = etree.fromstring(f.read())
+            self.occurrenceXML = f.read()
         with open(os.path.join(os.path.dirname(__file__), "resources/dummyPaperRecords.xml"), "rb") as f:
-            self.paperXML = etree.fromstring(f.read())
+            self.paperXML = f.read()
 
     def test_papers(self):
         papers = self.parse.papers(self.paperXML)
-        
+
         yieldedPapers = [paper for paper in papers]
 
         self.assertEqual(
             len(yieldedPapers),
-            13
+            15
         )
-        self.parse.makePaperRecord.assert_has_calls(
-            [
-                call(
-                    self.parse.xmlParser.getPaperCode.return_value,
-                    self.parse.xmlParser.getPaperTitle.return_value,
-                    self.parse.xmlParser.getURL.return_value,
-                    )
-            ]
+        self.parse.makePaperRecord.assert_called_with(
+            code=self.parse.xmlParser.getPaperCode.return_value,
+            title=self.parse.xmlParser.getPaperTitle.return_value,
+            url=self.parse.xmlParser.getURL.return_value,
         )
 
     def test_occurrences(self):
         occurrences = self.parse.occurrences(self.occurrenceXML)
-        
+
         yieldedOccurrences = [occurrence for occurrence in occurrences]
 
         self.assertEqual(
             len(yieldedOccurrences),
             6
         )
-        self.parse.makeOccurrenceRecord.assert_has_calls(
-            [
-                call(
-                    self.parse.xmlParser.getPaperCode.return_value,
-                    self.parse.xmlParser.getDate.return_value,
-                    self.parse.xmlParser.getURL.return_value,
-                    )
-            ]
+        self.parse.makeOccurrenceRecord.assert_called_with(
+            paperCode=self.parse.xmlParser.getPaperCode.return_value,
+            date=self.parse.xmlParser.getDate.return_value,
+            url=self.parse.xmlParser.getURL.return_value,
         )
 
     def test_numRecords(self):
@@ -75,9 +67,3 @@ class TestParse(TestCase):
             self.parse.onePaperTitleFromOccurrenceBatch(self.occurrenceXML),
             "Le Monde"
         )
-
-    
-
-
-        
-    

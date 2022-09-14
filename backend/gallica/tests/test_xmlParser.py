@@ -10,7 +10,7 @@ class TestXMLParser(TestCase):
     def setUp(self) -> None:
         here = os.path.dirname(__file__)
         self.xmlParser = XMLParser(Date)
-        with open(os.path.join(here, 'resources/dummyNewspaperRecords.xml'), 'rb') as f:
+        with open(os.path.join(here, 'backend/gallica/tests/resources/dummyPaperRecords.xml'), 'rb') as f:
             self.paperXML = etree.fromstring(f.read())
         with open(os.path.join(here, 'resources/dummyOccurrenceRecords.xml'), 'rb') as f:
             self.occurrenceXML = etree.fromstring(f.read())

@@ -30,7 +30,7 @@ class PaperSearch:
             self.insertIntoPapers(recordsWithPublishingYears)
 
     def getPublishingYearsForRecords(self, records):
-        recordCodes = [record for record in records]
+        recordCodes = (record.code for record in records)
         publishingRangeQueries = self.queryFactory.buildArkQueriesForCodes(recordCodes)
         yearQueriesWithResponse = self.ARKfetch.fetchNoTrack(publishingRangeQueries)
         recordsWithPublishingYears = self.addPublishingYearsToPaperRecord(

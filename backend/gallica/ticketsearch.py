@@ -22,7 +22,7 @@ class TicketSearch:
                 self.progressTrackWithPaper
             )
             records = (
-                yield self.parse.occurrences(query.responseXML)
+                self.parse.occurrences(query.responseXML)
                 for query in queriesWithResponseXML
             )
             uniqueRecords = self.removeDuplicateRecords(records)
