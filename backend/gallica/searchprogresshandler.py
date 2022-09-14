@@ -1,23 +1,19 @@
 from math import ceil
 
 
-class SearchProgress:
+class SearchProgressHandler:
 
-    def __init__(
-            self,
-            ticketID,
-            searchDriver,
-            estimateNumResults,
-            progressCallback
-    ):
+    def __init__(self, ticket, searchDriver):
         self.search = searchDriver
-        self.ticketID = ticketID
-        self.estimateNumResults = estimateNumResults
+        self.ticket = ticket
         self.actualTotalResults = 0
         self.numBatchesRetrieved = 0
         self.numBatches = 0
         self.averageResponseTime = None
-        self.progressThread = progressCallback
+        self.progressCallback = None
+
+    def setProgressCallback(self, callback):
+        self.progressCallback = callback
 
     def run(self):
         self.search.setProgressTracker(self.updateProgressStats)
@@ -35,7 +31,10 @@ class SearchProgress:
         else:
             self.averageResponseTime = query.elapsedTime
         ticketProgressStats = self.buildProgressStats(randomPaper, numWorkers)
-        self.progressThread.setTicketProgressStats(self.ticketID, ticketProgressStats)
+        self.progressCallback.setTicketProgressStats(
+            self.ticket.key,
+            ticketProgressStats
+        )
 
     def updateAverageResponseTime(self, requestTime):
         self.averageResponseTime = (self.averageResponseTime + requestTime) / 2
@@ -53,7 +52,7 @@ class SearchProgress:
     def buildProgressStats(self, randomPaper, numWorkers):
         return {
             'progress': self.getPercentProgress(),
-            'numResultsDiscovered': self.estimateNumResults,
+            'numResultsDiscovered': self.ticket.estimateNumResults,
             'numResultsRetrieved': self.numBatchesRetrieved * 50,
             'randomPaper': randomPaper,
             'estimateSecondsToCompletion': self.getEstimateSecondsToCompletion(numWorkers)

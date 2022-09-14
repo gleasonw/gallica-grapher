@@ -50,7 +50,7 @@ class TestCQLFactory(TestCase):
 
     @patch('cqlFactory.CQLFactory.generateCQLforOptions')
     def test_buildCQLstrings(self, mock_gen):
-        self.cqlStringBuilder.buildStringsForOptions(self.optionsWithSeveralPapersAndTerms)
+        self.cqlStringBuilder.buildStringsForTicket(self.optionsWithSeveralPapersAndTerms)
 
         self.assertEqual(
             self.cqlStringBuilder.startYear,
@@ -73,7 +73,7 @@ class TestCQLFactory(TestCase):
     def test_generateCQLforOptions_given_many_terms_no_papers(self):
         self.cqlStringBuilder.buildCQLforTerm = MagicMock()
         self.cqlStringBuilder.buildCQLforPaperCodes = MagicMock()
-        test = self.cqlStringBuilder.buildStringsForOptions(
+        test = self.cqlStringBuilder.buildStringsForTicket(
             self.optionsWithNoPapersAndSeveralTerms
         )
         results = [yielded for yielded in test]
@@ -84,7 +84,7 @@ class TestCQLFactory(TestCase):
     def test_generateCQLforOptions_given_many_terms_many_papers(self):
         self.cqlStringBuilder.buildCQLforTerm = MagicMock()
         self.cqlStringBuilder.buildCQLforPaperCodes = MagicMock()
-        test = self.cqlStringBuilder.buildStringsForOptions(
+        test = self.cqlStringBuilder.buildStringsForTicket(
             self.optionsWithSeveralPapersAndTerms
         )
 

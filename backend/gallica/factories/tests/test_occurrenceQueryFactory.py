@@ -16,11 +16,11 @@ class TestOccurrenceQueryFactory(TestCase):
     def test_build_queries_for_options(self):
         options = {'yada yada'}
 
-        test = self.testFactory.buildQueriesForOptions(options)
+        test = self.testFactory.buildQueriesForTicketAndAddNumResults(options)
 
-        self.testFactory.cql.buildStringsForOptions.assert_called_once_with(options)
+        self.testFactory.cql.buildStringsForTicket.assert_called_once_with(options)
         self.testFactory.indexer.buildIndexQueries.assert_called_once_with(
-            self.testFactory.cql.buildStringsForOptions.return_value
+            self.testFactory.cql.buildStringsForTicket.return_value
         )
         self.assertDictEqual(
             test,

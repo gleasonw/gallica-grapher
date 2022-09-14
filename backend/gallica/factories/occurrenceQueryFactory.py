@@ -12,10 +12,8 @@ class OccurrenceQueryFactory:
         self.indexer = QueryIndexer()
         self.queryBatcher = BatchedQueries(batchSize=200).batchQueries
 
-    def buildQueriesForOptions(self, options):
-        cql = self.cql.buildStringsForOptions(options)
+    def buildQueriesForTicketAndAddNumResults(self, ticket):
+        cql = self.cql.buildStringsForTicket(ticket)
         queries = self.indexer.buildIndexQueries(cql)
-        return {
-            'queries': self.queryBatcher(queries),
-            'estimateNumResults': self.indexer.totalResults
-        }
+        ticket.setQueries(queries)
+        ticket.setEstimateNumResults(self.indexer.totalResults)

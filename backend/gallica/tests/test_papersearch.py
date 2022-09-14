@@ -1,5 +1,5 @@
 from unittest import TestCase
-from papersearch import PaperSearch
+from papersearchrunner import PaperSearchRunner
 from unittest.mock import MagicMock, call
 
 
@@ -8,7 +8,7 @@ class TestPaperSearch(TestCase):
     def setUp(self):
         # Create test instance, save instance methods, then mock out.
         # Then, test that the mocked out methods were called with the correct arguments.
-        self.testSearch = PaperSearch(
+        self.testSearch = PaperSearchRunner(
             parse=MagicMock(),
             sruFetch=MagicMock(),
             paperQueryFactory=MagicMock(),

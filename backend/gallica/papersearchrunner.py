@@ -1,4 +1,4 @@
-class PaperSearch:
+class PaperSearchRunner:
 
     def __init__(
             self,

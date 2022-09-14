@@ -1,12 +1,12 @@
 from unittest import TestCase
-from ticketsearch import TicketSearch
+from ticketsearchrunner import TicketSearchRunner
 from unittest.mock import MagicMock, call
 
 
 class TestTicketSearch(TestCase):
 
     def setUp(self) -> None:
-        self.testSearch = TicketSearch(
+        self.testSearch = TicketSearchRunner(
             parse=MagicMock(),
             queries=MagicMock(),
             schemaLink=MagicMock(),

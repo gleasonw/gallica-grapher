@@ -1,7 +1,7 @@
 from parseFactory import buildParser
-from searchprogress import SearchProgress
-from gallica.papersearch import PaperSearch
-from ticketsearch import TicketSearch
+from searchprogresshandler import SearchProgressHandler
+from gallica.papersearchrunner import PaperSearchRunner
+from ticketsearchrunner import TicketSearchRunner
 from occurrenceQueryFactory import OccurrenceQueryFactory
 from paperQueryFactory import PaperQueryFactory
 from tableLink import TableLink
@@ -12,50 +12,44 @@ from utils.psqlconn import PSQLconn
 
 class RequestFactory:
 
-    def __init__(self):
-        self.dbConn = None
-        self.requestID = None
-        self.occurrenceQueryFactory = OccurrenceQueryFactory()
-
-    def buildRequest(self, keyedOptions, requestid) -> Request:
+    def __init__(self, tickets, requestid):
         self.dbConn = PSQLconn().getConn()
         self.requestID = requestid
-        queries = {}
-        for key, options in keyedOptions:
-            queries[key] = self.occurrenceQueryFactory.buildQueriesForOptions(options)
+        self.tickets = tickets
+        self.occurrenceQueryFactory = OccurrenceQueryFactory()
+
+    def build(self) -> Request:
         return Request(
-            queries=queries,
-            requestID=requestid,
-            makeTicket=self.buildTicketProgressHandler,
+            requestID=self.requestID,
+            ticketSearches=map(self.buildTicketSearch, self.tickets),
             dbConn=self.dbConn
         )
 
-    def buildTicketProgressHandler(self, queryData, ticketID, progressThread) -> SearchProgress:
-        search = self.buildTicketSearch(queryData['queries'])
-        return SearchProgress(
-            ticketID=ticketID,
-            searchDriver=search,
-            estimateNumResults=queryData['estimateNumResults'],
-            progressCallback=progressThread
+    def buildTicketSearch(self, ticket) -> SearchProgressHandler:
+        self.occurrenceQueryFactory.buildQueriesForTicketAndAddNumResults(ticket)
+        return SearchProgressHandler(
+            ticket=ticket,
+            searchDriver=self.buildSearchRunner(ticket)
         )
 
-    def buildTicketSearch(self, queries) -> TicketSearch:
+    def buildSearchRunner(self, ticket) -> TicketSearchRunner:
         parse = buildParser()
         sruFetcher = Fetch('https://gallica.bnf.fr/SRU')
         dbLink = TableLink(
             requestID=self.requestID,
             conn=self.dbConn
         )
-        paperSearch = PaperSearch(
+        paperSearch = PaperSearchRunner(
             parse=parse,
             paperQueryFactory=PaperQueryFactory(),
             sruFetch=sruFetcher,
             arkFetch=Fetch('https://gallica.bnf.fr/ark:/12148'),
             insert=dbLink.insertRecordsIntoPapers
         )
-        return TicketSearch(
+        return TicketSearchRunner(
             parse=parse,
-            queries=queries,
+            ticket=ticket,
+            request=self.requestID,
             schemaLink=dbLink,
             sruFetch=sruFetcher,
             paperAdd=paperSearch.addRecordDataForTheseCodesToDB,

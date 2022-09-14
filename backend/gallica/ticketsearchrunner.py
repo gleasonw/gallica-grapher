@@ -1,22 +1,24 @@
-class TicketSearch:
+class TicketSearchRunner:
 
     def __init__(
             self,
             parse,
-            queries,
+            ticket,
+            request,
             schemaLink,
             sruFetch,
             paperAdd
     ):
         self.parse = parse
-        self.queries = queries
+        self.ticket = ticket
+        self.requestID = request
         self.SRUfetch = sruFetch
         self.addTheseCodesToDB = paperAdd
         self.schema = schemaLink
         self.progressTracker = None
 
     def search(self):
-        for chunk in self.queries:
+        for chunk in self.ticket.queries:
             queriesWithResponseXML = self.SRUfetch(
                 chunk,
                 self.progressTrackWithPaper
@@ -28,7 +30,7 @@ class TicketSearch:
             uniqueRecords = self.removeDuplicateRecords(records)
             self.insertMissingPapersToDB(uniqueRecords)
             finalizedRecords = self.finalizeRecords(uniqueRecords)
-            self.schema.insertRecordsIntoResults(uniqueRecords)
+            self.schema.insertRecordsIntoResults(finalizedRecords)
 
     def removeDuplicateRecords(self, records):
         seen = set()
@@ -47,9 +49,9 @@ class TicketSearch:
     def finalizeRecords(self, records):
         for record in records:
             record.addFinalRowElements(
-                self.schema.ticketID,
-                self.schema.requestID,
-                self.schema.keyword
+                ticketID=self.ticket.key,
+                requestID=self.ticket.requestID,
+                term=self.ticket.keyword
             )
             yield record
 
