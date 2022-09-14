@@ -1,62 +1,53 @@
 import io
-from dto.occurrenceRecord import OccurrenceRecord
-from dto.paperRecord import PaperRecord
 
 
 class TableLink:
     def __init__(self, conn, requestID=None):
         self.conn = conn
-        self.records = []
         self.requestID = requestID
+        self.CSVstreamBuilder = CSVStream().generateCSVstreamFromRecords
 
-    def setRecords(self, records):
-        self.records = records
-
-    def insert(self):
-        if len(self.records) > 0:
-            csvStream = self.generateResultCSVstream()
-            if isinstance(self.records[0], PaperRecord):
-                self.insertIntoPapersFrom(csvStream)
-            elif isinstance(self.records[0], OccurrenceRecord):
-                self.insertIntoResultsFrom(csvStream)
-            else:
-                raise Exception(f'Unknown record type: {type(self.records[0])}')
-        else:
-            raise Exception('No records to insert')
-
-    def insertIntoPapersFrom(self, csvStream):
+    def insertRecordsIntoPapers(self, records):
+        csvStream = self.CSVstreamBuilder(records)
         self.conn.cursor().copy_from(
             csvStream,
             'papers',
             sep='|'
         )
 
-    def insertIntoResultsFrom(self, csvStream):
+    def insertRecordsIntoResults(self, records):
+        csvStream = self.CSVstreamBuilder(records)
         self.conn.cursor().copy_from(
             csvStream,
             'results',
             sep='|'
         )
 
-    def generateResultCSVstream(self):
+    def getPaperCodesThatMatch(self, codes):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            'SELECT code FROM papers WHERE code IN %s',
+            (tuple(codes),)
+        )
+        return cursor.fetchall()
 
-        def cleanCSVrow(value):
-            if value is None:
-                return r'\N'
-            return str(value).replace('|', '\\|')
 
+class CSVStream:
+
+    def __init__(self):
+        pass
+
+    def generateCSVstreamFromRecords(self, records):
         csvFileLikeObject = io.StringIO()
-        for record in self.records:
+        for record in records:
             csvFileLikeObject.write("|".join(map(
-                cleanCSVrow,
+                self.cleanCSVrow,
                 record.getRow()
             )) + '\n')
         csvFileLikeObject.seek(0)
         return csvFileLikeObject
 
-    def getPaperCodesThatMatch(self, codes):
-        cursor = self.conn.cursor()
-        cursor.execute(
-            f'SELECT code FROM papers WHERE code IN {codes}'
-        )
-        return cursor.fetchall()
+    def cleanCSVrow(self, value):
+        if value is None:
+            return r'\N'
+        return str(value).replace('|', '\\|')

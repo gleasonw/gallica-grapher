@@ -140,8 +140,8 @@ class TestCQLSelectStringForPapers(TestCase):
         self.assertListEqual(
             result,
             [
-                'arkPress all "a_date" or arkPress all "b_date" or arkPress all "c_date" or arkPress all "d_date" or arkPress all "e_date" or arkPress all "f_date" or arkPress all "g_date" or arkPress all "h_date" or arkPress all "i_date" or arkPress all "j_date" or arkPress all "k_date" or arkPress all "l_date" or arkPress all "m_date" or arkPress all "n_date" or arkPress all "o_date" or arkPress all "p_date" or arkPress all "q_date" or arkPress all "r_date" or arkPress all "s_date" or arkPress all "t_date"',
-                'arkPress all "u_date" or arkPress all "v_date" or arkPress all "w_date" or arkPress all "x_date" or arkPress all "y_date" or arkPress all "z_date"'
+                'arkPress adj "a_date" or arkPress adj "b_date" or arkPress adj "c_date" or arkPress adj "d_date" or arkPress adj "e_date" or arkPress adj "f_date" or arkPress adj "g_date" or arkPress adj "h_date" or arkPress adj "i_date" or arkPress adj "j_date" or arkPress adj "k_date" or arkPress adj "l_date" or arkPress adj "m_date" or arkPress adj "n_date" or arkPress adj "o_date" or arkPress adj "p_date" or arkPress adj "q_date" or arkPress adj "r_date" or arkPress adj "s_date" or arkPress adj "t_date"',
+                'arkPress adj "u_date" or arkPress adj "v_date" or arkPress adj "w_date" or arkPress adj "x_date" or arkPress adj "y_date" or arkPress adj "z_date"'
             ]
         )
 

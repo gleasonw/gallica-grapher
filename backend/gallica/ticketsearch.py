@@ -27,7 +27,8 @@ class TicketSearch:
             )
             uniqueRecords = self.removeDuplicateRecords(records)
             self.insertMissingPapersToDB(uniqueRecords)
-            self.schema.insert(uniqueRecords)
+            finalizedRecords = self.finalizeRecords(uniqueRecords)
+            self.schema.insertRecordsIntoResults(uniqueRecords)
 
     def removeDuplicateRecords(self, records):
         seen = set()
@@ -42,6 +43,15 @@ class TicketSearch:
         missingCodes = codesFromRecords - schemaMatches
         if missingCodes:
             self.addTheseCodesToDB(missingCodes)
+
+    def finalizeRecords(self, records):
+        for record in records:
+            record.addFinalRowElements(
+                self.schema.ticketID,
+                self.schema.requestID,
+                self.schema.keyword
+            )
+            yield record
 
     def setProgressTracker(self, progressTracker):
         self.progressTracker = progressTracker

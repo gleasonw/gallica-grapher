@@ -1,5 +1,5 @@
 from fetch import Fetch
-from requestFactory import buildParser
+from parseFactory import buildParser
 from query import Query
 
 
@@ -9,25 +9,29 @@ class QueryIndexer:
         self.fetch = Fetch('https://gallica.bnf.fr/SRU')
         self.parse = buildParser()
         self.totalResults = 0
+        self.makeQuery = Query
 
     def buildIndexQueries(self, cql):
-        for cqlString in cql:
-            yield from self.makeQueriesWithIndices(cqlString)
+        indexedQueryGeneratorsForCQL = (
+            self.makeQueriesWithIndices(cqlString)
+            for cqlString in cql
+        )
+        return indexedQueryGeneratorsForCQL
 
-    def makeQueriesWithIndices(self, query):
-        numResults = self.getNumResults(query)
+    def makeQueriesWithIndices(self, cqlString):
+        numResults = self.getNumResults(cqlString)
         self.totalResults += numResults
         for i in range(1, numResults, 50):
-            yield Query(
-                url=query.url,
+            yield self.makeQuery(
+                url=cqlString,
                 startIndex=i,
                 numRecords=50,
                 collapsing=False
             )
 
     def getNumResults(self, cqlString):
-        numResultsQuery = Query(
-            url=cqlString.url,
+        numResultsQuery = self.makeQuery(
+            url=cqlString,
             startIndex=1,
             numRecords=1,
             collapsing=False

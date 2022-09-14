@@ -18,16 +18,27 @@ class CQLFactory:
             lambda x: (x['code']),
             options['papersAndCodes']
         ))
-        cql = self.generateCQLforOptions()
+        if self.codes:
+            cql = self.generateCQLforCodesAndTerms()
+        else:
+            cql = self.generateCQLforTerms()
         return cql
 
-    def generateCQLforOptions(self):
+    def generateCQLforCodesAndTerms(self):
+        termCQL = {}
         for term in self.terms:
             baseQuery = self.buildCQLforTerm(term)
-            if self.codes:
-                yield from self.buildCQLforPaperCodes(baseQuery)
-            else:
-                yield baseQuery
+            termCQL[term] = (
+                baseQuery.format(formattedCodeString=code)
+                for code in self.codes
+            )
+        return termCQL
+
+    def generateCQLforTerms(self):
+        termCQL = {}
+        for term in self.terms:
+            termCQL[term] = [self.buildCQLforTerm(term)]
+        return termCQL
 
     def buildCQLforTerm(self, term):
         baseQueryComponents = []

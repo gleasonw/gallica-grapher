@@ -1,5 +1,5 @@
 from cqlFactory import CQLFactory
-from requestFactory import buildParser
+from parseFactory import buildParser
 from queryIndexer import QueryIndexer
 from batchedQueries import BatchedQueries
 

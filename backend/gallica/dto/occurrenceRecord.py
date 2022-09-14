@@ -17,7 +17,7 @@ class OccurrenceRecord:
         self.keyword = term
 
     def getRow(self):
-        return [
+        return (
             self.url,
             self.date.getDate()[0],
             self.date.getDate()[1],
@@ -26,5 +26,4 @@ class OccurrenceRecord:
             self.paperCode,
             self.ticketID,
             self.requestID
-        ]
-
+        )

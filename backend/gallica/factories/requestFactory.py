@@ -1,12 +1,7 @@
+from parseFactory import buildParser
 from searchprogress import SearchProgress
 from gallica.papersearch import PaperSearch
-from parse import Parse
 from ticketsearch import TicketSearch
-from dto.paperRecord import PaperRecord
-from dto.occurrenceRecord import OccurrenceRecord
-from xmlParser import XMLParser
-from date import Date
-from query import Query
 from occurrenceQueryFactory import OccurrenceQueryFactory
 from paperQueryFactory import PaperQueryFactory
 from tableLink import TableLink
@@ -36,11 +31,7 @@ class RequestFactory:
         )
 
     def buildTicketProgressHandler(self, queryData, ticketID, progressThread) -> SearchProgress:
-        search = buildTicketSearch(
-            queryData['queries'],
-            self.requestID,
-            self.dbConn
-        )
+        search = self.buildTicketSearch(queryData['queries'])
         return SearchProgress(
             ticketID=ticketID,
             searchDriver=search,
@@ -48,34 +39,26 @@ class RequestFactory:
             progressCallback=progressThread
         )
 
+    def buildTicketSearch(self, queries) -> TicketSearch:
+        parse = buildParser()
+        sruFetcher = Fetch('https://gallica.bnf.fr/SRU')
+        dbLink = TableLink(
+            requestID=self.requestID,
+            conn=self.dbConn
+        )
+        paperSearch = PaperSearch(
+            parse=parse,
+            paperQueryFactory=PaperQueryFactory(),
+            sruFetch=sruFetcher,
+            arkFetch=Fetch('https://gallica.bnf.fr/ark:/12148'),
+            insert=dbLink.insertRecordsIntoPapers
+        )
+        return TicketSearch(
+            parse=parse,
+            queries=queries,
+            schemaLink=dbLink,
+            sruFetch=sruFetcher,
+            paperAdd=paperSearch.addRecordDataForTheseCodesToDB,
+        )
 
-def buildTicketSearch(queries, requestID, dbConnection) -> TicketSearch:
-    parse = buildParser()
-    sruFetcher = Fetch('https://gallica.bnf.fr/SRU')
-    dbLink = TableLink(
-        requestID=requestID,
-        conn=dbConnection
-    )
-    paperSearch = PaperSearch(
-        parse=parse,
-        paperQueryFactory=PaperQueryFactory(),
-        sruFetch=sruFetcher,
-        arkFetch=Fetch('https://gallica.bnf.fr/ark:/12148'),
-        insert=dbLink.insert
-    )
-    return TicketSearch(
-        parse=parse,
-        queries=queries,
-        schemaLink=dbLink,
-        sruFetch=sruFetcher,
-        paperAdd=paperSearch.addRecordDataForTheseCodesToDB
-    )
-
-
-def buildParser() -> Parse:
-    return Parse(
-        makePaperRecord=PaperRecord,
-        makeOccurrenceRecord=OccurrenceRecord,
-        xmlParser=XMLParser(Date)
-    )
 

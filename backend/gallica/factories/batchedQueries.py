@@ -4,13 +4,8 @@ class BatchedQueries:
         self.batchSize = batchSize
 
     def batchQueries(self, queries):
-        allChunks = []
-        chunk = []
-        for query in queries:
-            if len(chunk) < self.batchSize:
-                chunk.append(query)
-            else:
-                allChunks.append(chunk)
-                chunk = [query]
-        return allChunks
+        chunks = []
+        for i in range(0, len(queries), self.batchSize):
+            chunks.append(queries[i:i + self.batchSize])
+        return chunks
 
