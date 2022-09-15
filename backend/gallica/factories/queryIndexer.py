@@ -5,38 +5,33 @@ from query import Query
 
 class QueryIndexer:
 
-    def __init__(self):
+    def __init__(self, collapsing=False):
         self.fetch = Fetch('https://gallica.bnf.fr/SRU')
         self.parse = buildParser()
-        self.totalResults = 0
+        self.totalResultsForTicket = 0
         self.makeQuery = Query
+        self.collapsing = collapsing
 
-    def buildIndexQueries(self, cql):
-        indexedQueryGeneratorsForCQL = (
-            self.makeQueriesWithIndices(cqlString)
-            for cqlString in cql
-        )
-        return indexedQueryGeneratorsForCQL
+    def makeQueriesIndexedOnNumResultsForBaseCQL(self, cql):
+        baseQueries = self.buildBaseQueriesFromCQL(cql)
+        responseXMLForBaseQueries = self.fetch.fetchAll(baseQueries)
+        for response in responseXMLForBaseQueries:
+            numRecordsForBase = self.parse.numRecords(response)
+            self.totalResultsForTicket += numRecordsForBase
+            for index in range(1, numRecordsForBase, 50):
+                yield Query(
+                    cql=response.cql,
+                    startIndex=index,
+                    numRecords=50,
+                    collapsing=False,
+                    term=response.term
+                )
 
-    def makeQueriesWithIndices(self, cqlString):
-        numResults = self.getNumResults(cqlString)
-        self.totalResults += numResults
-        for i in range(1, numResults, 50):
+    def buildBaseQueriesFromCQL(self, cql):
+        for cqlString in cql:
             yield self.makeQuery(
-                url=cqlString,
-                startIndex=i,
-                numRecords=50,
-                collapsing=False
+                cql=cqlString,
+                startIndex=1,
+                numRecords=1,
+                collapsing=self.collapsing
             )
-
-    def getNumResults(self, cqlString):
-        numResultsQuery = self.makeQuery(
-            url=cqlString,
-            startIndex=1,
-            numRecords=1,
-            collapsing=False
-        )
-        response = self.fetch.fetchAll([numResultsQuery])
-        responseXML = response.responseXML
-        return self.parse.numRecords(responseXML)
-

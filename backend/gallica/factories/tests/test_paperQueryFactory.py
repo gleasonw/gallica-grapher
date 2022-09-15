@@ -27,7 +27,7 @@ class TestPaperQueryFactory(TestCase):
         test = self.productionBuildSRU(codeGenerator)
 
         self.testFactory.cql.build.assert_called_once_with(codeGenerator)
-        self.testFactory.indexer.buildIndexQueries.assert_called_with(
+        self.testFactory.indexer.addQueriesAndNumResultsToTicket.assert_called_with(
             self.testFactory.cql.build.return_value
         )
         self.testFactory.queryBatcher.assert_called_once()
@@ -51,7 +51,7 @@ class TestPaperQueryFactory(TestCase):
     def test_buildAllRecordsQueries(self):
         test = self.productionBuildAllRecords()
 
-        self.testFactory.indexer.buildIndexQueries.assert_called_with(
+        self.testFactory.indexer.addQueriesAndNumResultsToTicket.assert_called_with(
             ['dc.type all "fascicule" and ocrquality > "050.00"']
         )
         self.testFactory.queryBatcher.assert_called_once()

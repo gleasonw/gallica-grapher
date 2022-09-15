@@ -51,5 +51,5 @@ class Fetch:
             "startRecord": query.startIndex,
             "maximumRecords": query.numRecords,
             "collapsing": query.collapsing,
-            "query": query.url,
+            "query": query.cql,
         }

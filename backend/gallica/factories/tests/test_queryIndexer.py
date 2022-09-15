@@ -1,27 +1,27 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, call
-from queryIndexer import QueryIndexer
+from occurrenceQueryBuilder import OccurrenceQueryBuilder
 
 
 class TestQueryIndexer(TestCase):
 
     def setUp(self) -> None:
-        self.testIndexer = QueryIndexer()
+        self.testIndexer = OccurrenceQueryBuilder()
         self.testIndexer.fetch = MagicMock()
         self.testIndexer.parse = MagicMock()
         self.testIndexer.makeQuery = MagicMock()
 
-        self.testIndexer.productionBuildIndexQueries = self.testIndexer.buildIndexQueries
-        self.testIndexer.productionMakeQueriesWithIndices = self.testIndexer.makeQueriesWithIndices
-        self.testIndexer.productionGetNumResults = self.testIndexer.getNumResults
+        self.testIndexer.productionBuildIndexQueries = self.testIndexer.addQueriesAndNumResultsToTicket
+        self.testIndexer.productionMakeQueriesWithIndices = self.testIndexer.makeCQLForTermsAndCodes
+        self.testIndexer.productionGetNumResults = self.testIndexer.getNumResultsForCQL
 
-        self.testIndexer.buildIndexQueries = MagicMock()
-        self.testIndexer.makeQueriesWithIndices = MagicMock()
-        self.testIndexer.getNumResults = MagicMock()
+        self.testIndexer.addQueriesAndNumResultsToTicket = MagicMock()
+        self.testIndexer.makeCQLForTermsAndCodes = MagicMock()
+        self.testIndexer.getNumResultsForCQL = MagicMock()
 
     def test_build_index_queries(self):
         cql = ['cql1', 'cql2']
-        self.testIndexer.makeQueriesWithIndices.side_effect = lambda x: (x for x in [x])
+        self.testIndexer.makeCQLForTermsAndCodes.side_effect = lambda x: (x for x in [x])
 
         result = self.testIndexer.productionBuildIndexQueries(cql)
 
@@ -33,8 +33,8 @@ class TestQueryIndexer(TestCase):
         )
 
     def test_make_queries_with_indices(self):
-        query = 'test url'
-        self.testIndexer.getNumResults.return_value = 100
+        query = 'test cql'
+        self.testIndexer.getNumResultsForCQL.return_value = 100
 
         result = self.testIndexer.productionMakeQueriesWithIndices(query)
 

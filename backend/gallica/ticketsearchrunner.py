@@ -19,18 +19,26 @@ class TicketSearchRunner:
 
     def search(self):
         for chunk in self.ticket.queries:
-            queriesWithResponseXML = self.SRUfetch(
+            queriesWithResponseXML = self.SRUfetch.fetchAllAndTrackProgress(
                 chunk,
                 self.progressTrackWithPaper
             )
-            records = (
-                self.parse.occurrences(query.responseXML)
-                for query in queriesWithResponseXML
-            )
+            records = self.convertQueriesToRecords(queriesWithResponseXML)
             uniqueRecords = self.removeDuplicateRecords(records)
             self.insertMissingPapersToDB(uniqueRecords)
             finalizedRecords = self.finalizeRecords(uniqueRecords)
             self.schema.insertRecordsIntoResults(finalizedRecords)
+
+    def convertQueriesToRecords(self, queries):
+        for query in queries:
+            records = self.parse.occurrenceRecordsFromOccurrenceBatch(query.responseXML)
+            for record in records:
+                record.addFinalRowElements(
+                    ticketID=self.ticket.key,
+                    requestID=self.ticket.requestID,
+                    term=query.term
+                )
+                yield record
 
     def removeDuplicateRecords(self, records):
         seen = set()

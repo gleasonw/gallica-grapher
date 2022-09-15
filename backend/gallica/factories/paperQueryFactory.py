@@ -1,25 +1,25 @@
-from cqlFactory import CQLStringForPaperCodes
+from cqlStringForPaperCodes import CQLStringForPaperCodes
 from queryIndexer import QueryIndexer
-from query import Query
 from batchedQueries import BatchedQueries
+from query import Query
 
 
 class PaperQueryFactory:
 
     def __init__(self):
         self.cql = CQLStringForPaperCodes()
-        self.indexer = QueryIndexer()
+        self.indexer = QueryIndexer(collapsing=True)
         self.queryBatcher = BatchedQueries(batchSize=200).batchQueries
 
-    def buildSRUQueriesForCodes(self, codes) -> list[list[Query]]:
+    def buildSRUQueriesForCodes(self, codes):
         cqlStrings = self.cql.build(codes)
-        queries = self.indexer.buildIndexQueries(cqlStrings)
-        return self.queryBatcher(queries)
+        indexedQueries = self.indexer.makeQueriesIndexedOnNumResultsForBaseCQL(cqlStrings)
+        return indexedQueries
 
-    def buildARKQueriesForCodes(self, codes) -> list[list[Query]]:
+    def buildARKQueriesForCodes(self, codes):
         queries = [
             Query(
-                url=f'/{code}/date',
+                cql=f'/{code}/date',
                 startIndex=1,
                 numRecords=1,
                 collapsing=False
@@ -29,8 +29,9 @@ class PaperQueryFactory:
         return self.queryBatcher(queries)
 
     def buildAllRecordsQueries(self) -> list[list[Query]]:
-        cqlString = 'dc.type all "fascicule" and ocrquality > "050.00"'
-        queries = self.indexer.buildIndexQueries([cqlString])
+        queries = self.indexer.makeQueriesIndexedOnNumResultsForBaseCQL(
+            ['dc.type all "fascicule" and ocrquality > "050.00"']
+        )
         return self.queryBatcher(queries)
 
 

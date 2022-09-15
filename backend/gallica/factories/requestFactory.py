@@ -2,7 +2,7 @@ from parseFactory import buildParser
 from searchprogresshandler import SearchProgressHandler
 from gallica.papersearchrunner import PaperSearchRunner
 from ticketsearchrunner import TicketSearchRunner
-from occurrenceQueryFactory import OccurrenceQueryFactory
+from occurrenceQueryBuilder import OccurrenceQueryBuilder
 from paperQueryFactory import PaperQueryFactory
 from tableLink import TableLink
 from fetch import Fetch
@@ -16,7 +16,7 @@ class RequestFactory:
         self.dbConn = PSQLconn().getConn()
         self.requestID = requestid
         self.tickets = tickets
-        self.occurrenceQueryFactory = OccurrenceQueryFactory()
+        self.occurrenceQueryBuilder = OccurrenceQueryBuilder()
 
     def build(self) -> Request:
         return Request(
@@ -26,7 +26,7 @@ class RequestFactory:
         )
 
     def buildTicketSearch(self, ticket) -> SearchProgressHandler:
-        self.occurrenceQueryFactory.buildQueriesForTicketAndAddNumResults(ticket)
+        self.occurrenceQueryBuilder.addQueriesAndNumResultsToTicket(ticket)
         return SearchProgressHandler(
             ticket=ticket,
             searchDriver=self.buildSearchRunner(ticket)

@@ -2,14 +2,16 @@ class Query:
 
     def __init__(
             self,
-            url,
+            cql,
             startIndex,
             numRecords,
-            collapsing
+            collapsing,
+            term=None
     ):
-        self.url = url
+        self.cql = cql
         self.startIndex = startIndex
         self.numRecords = numRecords
         self.collapsing = collapsing
         self.responseXML = None
         self.elapsedTime = None
+        self.term = term

@@ -9,7 +9,7 @@ class OccurrenceRecord:
         self.ticketID = None
         self.requestID = None
         dateText = f'{date.year}-{date.month}-{date.day}'
-        self.uniquenessCheck = f'{self.paperCode}{dateText}'
+        self.uniquenessCheck = f'{paperCode}{dateText}'
 
     def addFinalRowElements(self, ticketID, requestID, term):
         self.ticketID = ticketID

@@ -43,9 +43,10 @@ class Request(threading.Thread):
             return curs.fetchone()[0]
 
     def doAllSearches(self):
-        for ticket in self.ticketSearches:
-            ticket.run()
-            self.setTicketProgressTo100AndMarkAsDone(ticket)
+        for progressHandler in self.ticketSearches:
+            progressHandler.setProgressCallback(self.setTicketProgressStats)
+            progressHandler.run()
+            self.setTicketProgressTo100AndMarkAsDone(progressHandler)
         self.finished = True
 
     def initProgressStats(self):
