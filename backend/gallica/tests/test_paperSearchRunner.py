@@ -50,9 +50,7 @@ class TestPaperSearchRunner(TestCase):
             self.testSearch.queryFactory.buildSRUqueriesForAllRecords.return_value)
 
     def test_do_search(self):
-        self.testSearch.doSearch = self.productionDoSearch
-
-        self.testSearch.doSearch(['query1', 'query2'])
+        self.productionDoSearch(['query1', 'query2'])
 
         self.testSearch.SRUfetch.fetchNoTrack.assert_has_calls([
             call('query1'),
@@ -78,17 +76,16 @@ class TestPaperSearchRunner(TestCase):
         self.testSearch.addPublishingYearsToPaperRecord.assert_called_once()
 
     def test_add_publishing_years_to_paper_record(self):
-        self.testSearch.addPublishingYearsToPaperRecord = self.productionAddPublishingYears
         testYearQueries = [
-            MagicMock(url='/test1/date'),
-            MagicMock(url='/test2/date')
+            MagicMock(cql='/test1/date'),
+            MagicMock(cql='/test2/date')
         ]
         testRecords = [
             MagicMock(code='test1'),
             MagicMock(code='test2')
         ]
 
-        result = list(self.testSearch.addPublishingYearsToPaperRecord(
+        result = list(self.productionAddPublishingYears(
             testRecords,
             testYearQueries
         ))

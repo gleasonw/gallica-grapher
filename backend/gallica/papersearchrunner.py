@@ -25,8 +25,10 @@ class PaperSearchRunner:
     def doSearch(self, queries):
         for queryBatch in queries:
             queriesWithResponseData = self.SRUfetch.fetchNoTrack(queryBatch)
-            recordsWithPublishingYears = self.getPublishingYearsForRecords(queriesWithResponseData)
-            self.insertIntoPapers(recordsWithPublishingYears)
+            for query in queriesWithResponseData:
+                records = self.parse.papers(query.responseXML)
+                recordsWithPublishingYears = self.getPublishingYearsForRecords(records)
+                self.insertIntoPapers(recordsWithPublishingYears)
 
     def getPublishingYearsForRecords(self, records):
         recordCodes = (record.code for record in records)

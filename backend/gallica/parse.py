@@ -13,8 +13,8 @@ class Parse:
         self.makeOccurrenceRecord = makeOccurrenceRecord
         self.xmlParser = xmlParser
 
-    def papers(self, records) -> list:
-        elements = etree.fromstring(records)
+    def papers(self, responseXML) -> list:
+        elements = etree.fromstring(responseXML)
         for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             self.xmlParser.setXML(record)
             newRecord = self.makePaperRecord(
@@ -24,8 +24,8 @@ class Parse:
             )
             yield newRecord
 
-    def occurrences(self, records) -> list:
-        elements = etree.fromstring(records)
+    def occurrences(self, responseXML) -> list:
+        elements = etree.fromstring(responseXML)
         for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             self.xmlParser.setXML(record)
             newRecord = self.makeOccurrenceRecord(

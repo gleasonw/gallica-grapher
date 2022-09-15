@@ -31,7 +31,7 @@ class TicketSearchRunner:
 
     def convertQueriesToRecords(self, queries):
         for query in queries:
-            records = self.parse.occurrenceRecordsFromOccurrenceBatch(query.responseXML)
+            records = self.parse.occurrences(query.responseXML)
             for record in records:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,

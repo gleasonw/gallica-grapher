@@ -64,7 +64,7 @@ class TestFetch(TestCase):
 
     def test_get_params_for(self):
         query = MagicMock()
-        query.url = 'testUrl'
+        query.cql = 'testUrl'
         query.startIndex = 1
         query.numRecords = 2
         query.collapsing = 'testCollapsing'

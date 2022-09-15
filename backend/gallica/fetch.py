@@ -1,11 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor
 import urllib3
 from urllib3.util.retry import Retry
+from query import Query
+from typing import Generator
 
 NUM_WORKERS = 100
 
 retryStrategy = Retry(
-    total=10,
     status_forcelist=[413, 429, 500, 502, 503, 504],
     backoff_factor=1
 )
@@ -21,18 +22,19 @@ class Fetch:
             maxsize=NUM_WORKERS
         )
 
-    def fetchAll(self, queries):
+    #todo: does a generator mess everything up?
+    def fetchAll(self, queries) -> Generator[Query, None, None]:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
             for result in executor.map(self.get, queries):
                 yield result
 
-    def fetchAllAndTrackProgress(self, queries, tracker):
+    def fetchAllAndTrackProgress(self, queries, tracker) -> Generator[Query, None, None]:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
             for result in executor.map(self.get, queries):
                 tracker(result, NUM_WORKERS)
                 yield result
 
-    def get(self, query):
+    def get(self, query) -> Query:
         params = self.getParamsFor(query)
         response = self.http.request(
             "GET",
@@ -43,7 +45,7 @@ class Fetch:
         query.elapsedTime = response.elapsed.total_seconds()
         return query
 
-    def getParamsFor(self, query):
+    def getParamsFor(self, query) -> dict:
         return {
             "operation": "searchRetrieve",
             "exactSearch": "True",
