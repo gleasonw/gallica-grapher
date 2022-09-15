@@ -1,17 +1,17 @@
 from unittest import TestCase
-from date import Date
+from dateparse import DateParse
 
 
 class TestDate(TestCase):
 
     def test_get_date(self):
-        fullDate = Date("1800-04-02")
-        anotherFullDate = Date("1800-04-02")
-        yearMon = Date("1800-09")
-        yearSingleDigitMon = Date("1888-1")
-        year = Date("1912")
-        nonsense = Date("12??")
-        moreNonsense = Date("")
+        fullDate = DateParse("1800-04-02")
+        anotherFullDate = DateParse("1800-04-02")
+        yearMon = DateParse("1800-09")
+        yearSingleDigitMon = DateParse("1888-1")
+        year = DateParse("1912")
+        nonsense = DateParse("12??")
+        moreNonsense = DateParse("")
         self.assertEqual(
             fullDate.getDate(),
             ['1800', '04', '02']

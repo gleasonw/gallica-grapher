@@ -43,15 +43,19 @@ class TestTicketSearchRunner(TestCase):
 
         self.testSearch.search()
 
-        self.testSearch.SRUfetch.assert_has_calls([
+        self.testSearch.SRUfetch.fetchAllAndTrackProgress.assert_has_calls([
             call(['query1'], self.testSearch.progressTrackWithPaper),
-            call().__iter__(),
             call(['query2'], self.testSearch.progressTrackWithPaper),
-            call().__iter__()
         ])
         self.testSearch.removeDuplicateRecords.assert_called()
         self.testSearch.insertMissingPapersToDB.assert_called()
-        self.testSearch.schema.insert.assert_called()
+        self.testSearch.schema.insertRecordsIntoResults.assert_called()
+        self.testSearch.schema.fetchNumResultsForQueries.assert_called_with(
+            self.testSearch.ticket.key
+        )
+        self.testSearch.ticket.setNumResultsRetrieved.assert_called_once_with(
+            self.testSearch.schema.fetchNumResultsForQueries.return_value
+        )
 
     def test_removeDuplicateRecords(self):
         self.testSearch.removeDuplicateRecords = self.productionRemoveDuplicates
@@ -88,14 +92,14 @@ class TestTicketSearchRunner(TestCase):
         query = MagicMock()
         numWorkers = MagicMock()
         self.testSearch.parse.onePaperTitleFromOccurrenceBatch.return_value = 'paper'
-        self.testSearch.progressTracker = MagicMock()
+        self.testSearch.onUpdateProgress = MagicMock()
         self.testSearch.progressTrackWithPaper(query, numWorkers)
 
         self.testSearch.parse.onePaperTitleFromOccurrenceBatch.assert_called_with(query.responseXML)
-        self.testSearch.progressTracker.assert_called_with(
-            query,
-            numWorkers,
-            'paper'
+        self.testSearch.onUpdateProgress.assert_called_with(
+            query=query,
+            numWorkers=numWorkers,
+            randomPaper='paper'
         )
 
 

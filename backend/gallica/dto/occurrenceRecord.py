@@ -5,7 +5,7 @@ class OccurrenceRecord:
         self.url = url
         self.date = date
         self.paperCode = paperCode
-        self.keyword = None
+        self.term = None
         self.ticketID = None
         self.requestID = None
         dateText = f'{date.year}-{date.month}-{date.day}'
@@ -14,7 +14,7 @@ class OccurrenceRecord:
     def addFinalRowElements(self, ticketID, requestID, term):
         self.ticketID = ticketID
         self.requestID = requestID
-        self.keyword = term
+        self.term = term
 
     def getRow(self):
         return (
@@ -22,7 +22,7 @@ class OccurrenceRecord:
             self.date.getDate()[0],
             self.date.getDate()[1],
             self.date.getDate()[2],
-            self.keyword,
+            self.term,
             self.paperCode,
             self.ticketID,
             self.requestID

@@ -1,7 +1,7 @@
 import re
 
 
-class Date:
+class DateParse:
 
     def __init__(self, dateText):
         self.year = None

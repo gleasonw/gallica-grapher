@@ -1,6 +1,6 @@
 from cqlStringForPaperCodes import CQLStringForPaperCodes
 from queryIndexer import QueryIndexer
-from batchedQueries import BatchedQueries
+from query import NumOccurrencesForTermQuery
 
 
 class OccurrenceQueryBuilder:
@@ -8,33 +8,35 @@ class OccurrenceQueryBuilder:
     def __init__(self):
         self.cql = None
         self.ticket = None
-        self.indexer = None
-        self.queryBatcher = BatchedQueries(batchSize=200).batchQueries
+        self.makeIndexer = lambda queries: QueryIndexer(queries)
+        self.makeCQLFactory = lambda ticket: CQLFactory(ticket)
+        self.makeBaseQuery = lambda cql, term: NumOccurrencesForTermQuery(cql, term)
 
     def addQueriesAndNumResultsToTicket(self, ticket):
         self.ticket = ticket
-        self.indexer = QueryIndexer()
-        self.cql = CQLFactory(ticket)
+        self.cql = self.makeCQLFactory(ticket)
         if self.ticket.codes:
-            cql = self.makeCQLForTermsAndCodes()
+            queries = self.makeBaseQueriesForTermsAndCodes()
         else:
-            cql = self.makeCQLOnlyTerms()
-        indexedQueries = self.indexer.makeQueriesIndexedOnNumResultsForBaseCQL(cql)
-        batchedQueries = self.queryBatcher(indexedQueries)
-        self.ticket.setQueries(batchedQueries)
-        self.ticket.setEstimateNumResults(self.indexer.totalResultsForTicket)
+            queries = self.makeBaseQueriesOnlyTerms()
+        indexer = self.makeIndexer(queries)
+        numResultsForTicket = indexer.fetchNumResultsForQueries()
+        indexedQueries = indexer.makeIndexedQueries()
+        self.ticket.setQueries(indexedQueries)
+        self.ticket.setEstimateNumResults(numResultsForTicket)
 
-    def makeCQLForTermsAndCodes(self):
+    def makeBaseQueriesForTermsAndCodes(self):
         for term in self.ticket.terms:
-            getThisTermCQL = self.cql.buildCQLForTerm(term)
-            forTheseCodesCQL = self.cql.buildCQLForPaperCodes()
+            getThisTermCQL = self.cql.buildCQLforTerm(term)
+            forTheseCodesCQL = self.cql.buildCQLforPaperCodes()
             for codesBunch in forTheseCodesCQL:
                 combinedCQL = getThisTermCQL.format(formattedCodeString=codesBunch)
-                yield combinedCQL
+                yield self.makeBaseQuery(combinedCQL, term)
 
-    def makeCQLOnlyTerms(self):
+    def makeBaseQueriesOnlyTerms(self):
         for term in self.ticket.terms:
-            yield self.cql.buildCQLForTerm(term)
+            cql = self.cql.buildCQLForTerm(term)
+            yield self.makeBaseQuery(cql, term)
 
 
 class CQLFactory:

@@ -20,7 +20,17 @@ class TableLink:
         self.conn.cursor().copy_from(
             csvStream,
             'results',
-            sep='|'
+            sep='|',
+            columns=(
+                'identifier',
+                'year',
+                'month',
+                'day',
+                'searchterm',
+                'paperid',
+                'ticketid',
+                'requestid'
+            )
         )
 
     def getPaperCodesThatMatch(self, codes):
@@ -30,6 +40,14 @@ class TableLink:
             (tuple(codes),)
         )
         return cursor.fetchall()
+
+    def getNumResultsForTicket(self, ticketID):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            'SELECT COUNT(*) FROM results WHERE ticketid = %s',
+            (ticketID,)
+        )
+        return cursor.fetchone()[0]
 
 
 class CSVStream:

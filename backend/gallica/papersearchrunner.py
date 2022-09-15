@@ -15,7 +15,7 @@ class PaperSearchRunner:
         self.insertIntoPapers = insert
 
     def addRecordDataForTheseCodesToDB(self, codes):
-        queries = self.queryFactory.buildSRUqueriesForCodes(codes)
+        queries = self.queryFactory.buildSRUQueriesForCodes(codes)
         self.doSearch(queries)
 
     def addAllFetchableRecordsToDB(self):
@@ -23,11 +23,10 @@ class PaperSearchRunner:
         self.doSearch(queries)
 
     def doSearch(self, queries):
-        for queryBatch in queries:
-            queriesWithResponseData = self.SRUfetch.fetchNoTrack(queryBatch)
-            records = self.convertQueriesToRecords(queriesWithResponseData)
-            recordsWithPublishingYears = self.getPublishingYearsForRecords(records)
-            self.insertIntoPapers(recordsWithPublishingYears)
+        queriesWithResponseData = self.SRUfetch.fetchAll(queries)
+        records = list(self.convertQueriesToRecords(queriesWithResponseData))
+        recordsWithPublishingYears = self.getPublishingYearsForRecords(records)
+        self.insertIntoPapers(recordsWithPublishingYears)
 
     def convertQueriesToRecords(self, queries):
         for query in queries:
@@ -36,18 +35,18 @@ class PaperSearchRunner:
 
     def getPublishingYearsForRecords(self, records):
         recordCodes = (record.code for record in records)
-        publishingRangeQueries = self.queryFactory.buildArkQueriesForCodes(recordCodes)
-        yearQueriesWithResponse = self.ARKfetch.fetchNoTrack(publishingRangeQueries)
+        publishingRangeQueries = self.queryFactory.buildARKQueriesForCodes(recordCodes)
+        yearQueriesWithResponse = self.ARKfetch.fetchAll(publishingRangeQueries)
         recordsWithPublishingYears = self.addPublishingYearsToPaperRecord(
             records,
             yearQueriesWithResponse
         )
-        return recordsWithPublishingYears
+        yield from recordsWithPublishingYears
 
     def addPublishingYearsToPaperRecord(self, records, yearQueriesWithResponse):
         yearData = {}
         for query in yearQueriesWithResponse:
-            code = query.cql.split('/')[-2]
+            code = query.code
             yearData[code] = self.parse.yearsPublished(query.responseXML)
         for record in records:
             record.publishingYears = yearData[record.code]

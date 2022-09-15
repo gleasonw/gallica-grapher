@@ -15,19 +15,23 @@ class TicketSearchRunner:
         self.SRUfetch = sruFetch
         self.addTheseCodesToDB = paperAdd
         self.schema = schemaLink
-        self.progressTracker = None
+        self.onUpdateProgress = None
+        self.numResultsRetrieved = 0
+
+    def setProgressTracker(self, progressTracker):
+        self.onUpdateProgress = progressTracker
 
     def search(self):
-        for chunk in self.ticket.queries:
-            queriesWithResponseXML = self.SRUfetch.fetchAllAndTrackProgress(
-                chunk,
-                self.progressTrackWithPaper
-            )
-            records = self.convertQueriesToRecords(queriesWithResponseXML)
-            uniqueRecords = self.removeDuplicateRecords(records)
-            self.insertMissingPapersToDB(uniqueRecords)
-            finalizedRecords = self.finalizeRecords(uniqueRecords)
-            self.schema.insertRecordsIntoResults(finalizedRecords)
+        queriesWithResponseXML = self.SRUfetch.fetchAllAndTrackProgress(
+            self.ticket.queries,
+            self.progressTrackWithPaper
+        )
+        records = self.convertQueriesToRecords(queriesWithResponseXML)
+        uniqueRecords = self.removeDuplicateRecords(records)
+        recordsWithPapersInDB = self.insertMissingPapersToDB(uniqueRecords)
+        self.schema.insertRecordsIntoResults(recordsWithPapersInDB)
+        self.numResultsRetrieved = self.schema.getNumResultsForTicket(self.ticket.key)
+        self.ticket.setNumResultsRetrieved(self.numResultsRetrieved)
 
     def convertQueriesToRecords(self, queries):
         for query in queries:
@@ -35,43 +39,37 @@ class TicketSearchRunner:
             for record in records:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,
-                    requestID=self.ticket.requestID,
+                    requestID=self.requestID,
                     term=query.term
                 )
                 yield record
 
     def removeDuplicateRecords(self, records):
         seen = set()
+        uniqueRecords = []
         for record in records:
             if record.uniquenessCheck not in seen:
                 seen.add(record.uniquenessCheck)
-                yield record
+                uniqueRecords.append(record)
+            else:
+                print("Hooray, I removed a duplicate.")
+        return uniqueRecords
 
     def insertMissingPapersToDB(self, records):
-        codesFromRecords = set(record.code for record in records)
-        schemaMatches = set(self.schema.getPaperCodesThatMatch(codesFromRecords))
-        missingCodes = codesFromRecords - schemaMatches
+        codesFromRecords = set(record.paperCode for record in records)
+        schemaMatches = self.schema.getPaperCodesThatMatch(codesFromRecords)
+        setOfCodesInDB = set(match[0] for match in schemaMatches)
+        missingCodes = codesFromRecords - setOfCodesInDB
         if missingCodes:
-            self.addTheseCodesToDB(missingCodes)
-
-    def finalizeRecords(self, records):
-        for record in records:
-            record.addFinalRowElements(
-                ticketID=self.ticket.key,
-                requestID=self.ticket.requestID,
-                term=self.ticket.keyword
-            )
-            yield record
-
-    def setProgressTracker(self, progressTracker):
-        self.progressTracker = progressTracker
+            self.addTheseCodesToDB(list(missingCodes))
+        return records
 
     def progressTrackWithPaper(self, query, numWorkers):
         paper = self.parse.onePaperTitleFromOccurrenceBatch(
             query.responseXML
         )
-        self.progressTracker(
-            query,
-            numWorkers,
-            paper
+        self.onUpdateProgress(
+            query=query,
+            numWorkers=numWorkers,
+            randomPaper=paper
         )

@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 import urllib3
 from urllib3.util.retry import Retry
 from query import Query
+import time
 
 NUM_WORKERS = 100
 
@@ -22,35 +23,30 @@ class Fetch:
         )
 
     def fetchAll(self, queries) -> list[Query]:
+        responses = []
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            return list(executor.map(self.get, queries))
+            for result in executor.map(self.get, queries):
+                responses.append(result)
+        yield from responses
 
     def fetchAllAndTrackProgress(self, queries, tracker) -> list[Query]:
+        responses = []
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            responses = []
             for result in executor.map(self.get, queries):
                 tracker(result, NUM_WORKERS)
                 responses.append(result)
-            return responses
+        yield from responses
 
     def get(self, query) -> Query:
-        params = self.getParamsFor(query)
+        start = time.perf_counter()
         response = self.http.request(
             "GET",
             self.baseUrl,
-            fields=params
+            fields=query.getParams()
         )
-        query.responseXML = response.data
-        query.elapsedTime = response.elapsed.total_seconds()
+        end = time.perf_counter()
+        query.handleResponse(
+            data=response.data,
+            elapsed=end - start
+        )
         return query
-
-    def getParamsFor(self, query) -> dict:
-        return {
-            "operation": "searchRetrieve",
-            "exactSearch": "True",
-            "version": 1.2,
-            "startRecord": query.startIndex,
-            "maximumRecords": query.numRecords,
-            "collapsing": query.collapsing,
-            "query": query.cql,
-        }

@@ -12,16 +12,16 @@ class TestQueryIndexer(TestCase):
         self.testIndexer.makeQuery = MagicMock()
 
         self.testIndexer.productionBuildIndexQueries = self.testIndexer.addQueriesAndNumResultsToTicket
-        self.testIndexer.productionMakeQueriesWithIndices = self.testIndexer.makeCQLForTermsAndCodes
+        self.testIndexer.productionMakeQueriesWithIndices = self.testIndexer.makeBaseQueriesForTermsAndCodes
         self.testIndexer.productionGetNumResults = self.testIndexer.getNumResultsForCQL
 
         self.testIndexer.addQueriesAndNumResultsToTicket = MagicMock()
-        self.testIndexer.makeCQLForTermsAndCodes = MagicMock()
+        self.testIndexer.makeBaseQueriesForTermsAndCodes = MagicMock()
         self.testIndexer.getNumResultsForCQL = MagicMock()
 
     def test_build_index_queries(self):
         cql = ['cql1', 'cql2']
-        self.testIndexer.makeCQLForTermsAndCodes.side_effect = lambda x: (x for x in [x])
+        self.testIndexer.makeBaseQueriesForTermsAndCodes.side_effect = lambda x: (x for x in [x])
 
         result = self.testIndexer.productionBuildIndexQueries(cql)
 

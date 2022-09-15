@@ -1,39 +1,80 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
-from occurrenceQueryFactory import OccurrenceQueryFactory
+from unittest.mock import patch, MagicMock, call
+from occurrenceQueryBuilder import OccurrenceQueryBuilder
+from occurrenceQueryBuilder import CQLFactory
+from cqlStringForPaperCodes import CQLStringForPaperCodes
 
 
 class TestOccurrenceQueryBuilder(TestCase):
 
     def setUp(self) -> None:
-        self.testFactory = OccurrenceQueryFactory()
+        self.testBuilder = OccurrenceQueryBuilder()
 
-        self.testFactory.cql = MagicMock()
-        self.testFactory.parser = MagicMock()
-        self.testFactory.builder = MagicMock()
-        self.testFactory.queryBatcher = MagicMock()
-
-    def test_build_queries_for_options(self):
-        options = {'yada yada'}
-
-        test = self.testFactory.setQueriesAndNumResultsForTicket(options)
-
-        self.testFactory.cql.buildStringsForTicket.assert_called_once_with(options)
-        self.testFactory.builder.addQueriesAndNumResultsToTicket.assert_called_once_with(
-            self.testFactory.cql.buildStringsForTicket.return_value
-        )
-        self.assertDictEqual(
-            test,
-            {
-                'queries': self.testFactory.queryBatcher.return_value,
-                'estimateNumResults': self.testFactory.builder.totalResultsForTicket
-            }
+        self.mockTicket = MagicMock(
+            key='testKey',
+            terms=['term1', 'term2'],
+            codes=['code1', 'code2'],
+            startYear='2022',
+            endYear='2023'
         )
 
-from unittest import TestCase
-from unittest.mock import patch, MagicMock
-from cqlFactory import CQLFactory
-from cqlFactory import CQLStringForPaperCodes
+        self.testBuilder.cql = MagicMock()
+        self.testBuilder.parser = MagicMock()
+        self.testBuilder.builder = MagicMock()
+        self.testBuilder.queryBatcher = MagicMock()
+        self.testBuilder.makeIndexer = MagicMock()
+        self.testBuilder.makeCQLFactory = MagicMock()
+
+        self.productionAddQueries = self.testBuilder.addQueriesAndNumResultsToTicket
+        self.productionMakeCQLForTermsAndCodes = self.testBuilder.makeBaseQueriesForTermsAndCodes
+        self.productionMakeCQLOnlyTerms = self.testBuilder.makeBaseQueriesOnlyTerms
+
+        self.testBuilder.addQueriesAndNumResultsToTicket = MagicMock()
+        self.testBuilder.makeBaseQueriesForTermsAndCodes = MagicMock()
+        self.testBuilder.makeBaseQueriesOnlyTerms = MagicMock()
+
+    def test_add_queries_and_num_results_to_ticket_given_ticket_has_codes(self):
+        self.productionAddQueries(self.mockTicket)
+
+        self.testBuilder.makeIndexer.assert_called_once()
+        self.testBuilder.makeCQLFactory.assert_called_once_with(
+            self.mockTicket
+        )
+        self.testBuilder.makeBaseQueriesForTermsAndCodes.assert_called_once()
+        self.testBuilder.indexer.makeQueriesIndexedOnNumResultsForBaseCQL.assert_called_once_with(
+            self.testBuilder.makeBaseQueriesForTermsAndCodes.return_value
+        )
+        self.testBuilder.queryBatcher.assert_called_once_with(
+            self.testBuilder.indexer.makeQueriesIndexedOnNumResultsForBaseCQL.return_value
+        )
+        self.mockTicket.setQueries.assert_called_once_with(
+            self.testBuilder.queryBatcher.return_value
+        )
+        self.mockTicket.setEstimateNumResults.assert_called_once_with(
+            self.testBuilder.indexer.totalResultsForTicket
+        )
+
+    def test_make_cql_for_terms_and_codes(self):
+        self.testBuilder.ticket = self.mockTicket
+        self.testBuilder.cql.buildCQLForPaperCodes.return_value = ['cql1', 'cql2']
+
+        self.productionMakeCQLForTermsAndCodes()
+
+        self.testBuilder.cql.buildCQLForTerm.assert_has_calls([
+            call('term1'),
+            call('term2')
+        ])
+        self.testBuilder.cql.buildCQLForPaperCodes.assert_has_calls([
+            call(),
+            call()
+        ])
+        self.testBuilder.cql.buildCQLForTerm.return_value.format.assert_has_calls([
+            call(formattedCodeString='cql1'),
+            call(formattedCodeString='cql2')
+        ])
+
+    def test_make_cql_only_terms(self):
+        pass
 
 
 class TestCQLFactory(TestCase):

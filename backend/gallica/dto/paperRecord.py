@@ -5,15 +5,20 @@ class PaperRecord:
         self.title = title
         self.url = url
         self.publishingYears = []
-        self.continuousRange = False
 
     def getRow(self):
         return (
             self.title,
-            self.code,
             self.publishingYears[0],
             self.publishingYears[-1],
-            self.continuousRange
+            self.isContinuous(),
+            self.code
         )
+
+    def isContinuous(self):
+        if len(self.publishingYears) > 1:
+            return int(self.publishingYears[-1]) - int(self.publishingYears[0]) + 1 == len(self.publishingYears)
+        else:
+            return True
 
 

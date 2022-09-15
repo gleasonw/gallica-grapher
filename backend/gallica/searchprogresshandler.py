@@ -6,14 +6,19 @@ class SearchProgressHandler:
     def __init__(self, ticket, searchDriver):
         self.search = searchDriver
         self.ticket = ticket
-        self.actualTotalResults = 0
         self.numBatchesRetrieved = 0
-        self.numBatches = 0
+        self.numBatches = ceil(self.ticket.estimateNumResults / 50)
         self.averageResponseTime = None
-        self.progressCallback = None
+        self.onUpdateProgress = None
+
+    def getNumRetrievedForTicket(self):
+        return self.ticket.numResultsRetrieved
+
+    def getEstimateNumResultsForTicket(self):
+        return self.ticket.estimateNumResults
 
     def setProgressCallback(self, callback):
-        self.progressCallback = callback
+        self.onUpdateProgress = callback
 
     def getTicketID(self):
         return self.ticket.key
@@ -34,9 +39,9 @@ class SearchProgressHandler:
         else:
             self.averageResponseTime = query.elapsedTime
         ticketProgressStats = self.buildProgressStats(randomPaper, numWorkers)
-        self.progressCallback.setTicketProgressStats(
-            self.ticket.key,
-            ticketProgressStats
+        self.onUpdateProgress(
+            ticketKey=self.ticket.key,
+            progressStats=ticketProgressStats
         )
 
     def updateAverageResponseTime(self, requestTime):

@@ -21,7 +21,7 @@ class RequestFactory:
     def build(self) -> Request:
         return Request(
             requestID=self.requestID,
-            ticketSearches=map(self.buildTicketSearch, self.tickets),
+            ticketSearches=list(map(self.buildTicketSearch, self.tickets)),
             dbConn=self.dbConn
         )
 
@@ -43,7 +43,7 @@ class RequestFactory:
             parse=parse,
             paperQueryFactory=PaperQueryFactory(),
             sruFetch=sruFetcher,
-            arkFetch=Fetch('https://gallica.bnf.fr/ark:/12148'),
+            arkFetch=Fetch('https://gallica.bnf.fr/services/Issues'),
             insert=dbLink.insertRecordsIntoPapers
         )
         return TicketSearchRunner(
