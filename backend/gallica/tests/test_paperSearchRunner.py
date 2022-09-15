@@ -6,8 +6,6 @@ from unittest.mock import MagicMock, call
 class TestPaperSearchRunner(TestCase):
 
     def setUp(self):
-        # Create test instance, save instance methods, then mock out.
-        # Then, test that the mocked out methods were called with the correct arguments.
         self.testSearch = PaperSearchRunner(
             parse=MagicMock(),
             sruFetch=MagicMock(),
@@ -30,6 +28,9 @@ class TestPaperSearchRunner(TestCase):
 
         self.productionAddPublishingYears = self.testSearch.addPublishingYearsToPaperRecord
         self.testSearch.addPublishingYearsToPaperRecord = MagicMock()
+
+        self.productionConvertQueries = self.testSearch.convertQueriesToRecords
+        self.testSearch.convertQueriesToRecords = MagicMock()
 
     def test_add_record_data_for_these_codes_to_db(self):
         self.testSearch.addRecordDataForTheseCodesToDB = self.productionAddCodes
@@ -56,10 +57,21 @@ class TestPaperSearchRunner(TestCase):
             call('query1'),
             call('query2')
         ])
-        self.testSearch.parse.papers.assert_called_with(self.testSearch.SRUfetch.fetchNoTrack.return_value)
-        self.testSearch.getPublishingYearsForRecords.assert_called_with(self.testSearch.parse.papers.return_value)
+        self.testSearch.getPublishingYearsForRecords.assert_called_with(
+            self.testSearch.convertQueriesToRecords.return_value)
         self.testSearch.insertIntoPapers.assert_called_with(
             self.testSearch.getPublishingYearsForRecords.return_value)
+
+    def test_convert_queries_to_records(self):
+        queries = [
+            MagicMock(responseXML='xml1'),
+            MagicMock(responseXML='xml2')
+            ]
+        self.testSearch.parse.papers.side_effect = lambda x: [x]
+
+        result = list(self.productionConvertQueries(queries))
+
+        self.assertListEqual(result, ['xml1', 'xml2'])
 
     def test_get_publishing_years_for_records(self):
         self.testSearch.getPublishingYearsForRecords = self.productionGetPublishingYears

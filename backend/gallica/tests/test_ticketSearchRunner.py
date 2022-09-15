@@ -8,7 +8,16 @@ class TestTicketSearchRunner(TestCase):
     def setUp(self) -> None:
         self.testSearch = TicketSearchRunner(
             parse=MagicMock(),
-            queries=MagicMock(),
+            ticket=MagicMock(
+                key='testKey',
+                terms=['term1', 'term2'],
+                codes=['code1', 'code2'],
+                startYear='startYear',
+                endYear='endYear',
+                queries=[['query1'], ['query2']],
+                estimateNumResults=2,
+            ),
+            requestID='testRequest',
             schemaLink=MagicMock(),
             sruFetch=MagicMock(),
             paperAdd=MagicMock()

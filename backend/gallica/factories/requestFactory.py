@@ -49,7 +49,7 @@ class RequestFactory:
         return TicketSearchRunner(
             parse=parse,
             ticket=ticket,
-            request=self.requestID,
+            requestID=self.requestID,
             schemaLink=dbLink,
             sruFetch=sruFetcher,
             paperAdd=paperSearch.addRecordDataForTheseCodesToDB,

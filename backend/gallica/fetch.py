@@ -2,7 +2,6 @@ from concurrent.futures import ThreadPoolExecutor
 import urllib3
 from urllib3.util.retry import Retry
 from query import Query
-from typing import Generator
 
 NUM_WORKERS = 100
 
@@ -22,17 +21,17 @@ class Fetch:
             maxsize=NUM_WORKERS
         )
 
-    #todo: does a generator mess everything up?
-    def fetchAll(self, queries) -> Generator[Query, None, None]:
+    def fetchAll(self, queries) -> list[Query]:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            for result in executor.map(self.get, queries):
-                yield result
+            return list(executor.map(self.get, queries))
 
-    def fetchAllAndTrackProgress(self, queries, tracker) -> Generator[Query, None, None]:
+    def fetchAllAndTrackProgress(self, queries, tracker) -> list[Query]:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
+            responses = []
             for result in executor.map(self.get, queries):
                 tracker(result, NUM_WORKERS)
-                yield result
+                responses.append(result)
+            return responses
 
     def get(self, query) -> Query:
         params = self.getParamsFor(query)

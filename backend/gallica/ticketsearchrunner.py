@@ -4,14 +4,14 @@ class TicketSearchRunner:
             self,
             parse,
             ticket,
-            request,
+            requestID,
             schemaLink,
             sruFetch,
             paperAdd
     ):
         self.parse = parse
         self.ticket = ticket
-        self.requestID = request
+        self.requestID = requestID
         self.SRUfetch = sruFetch
         self.addTheseCodesToDB = paperAdd
         self.schema = schemaLink

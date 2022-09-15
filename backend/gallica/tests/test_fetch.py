@@ -15,7 +15,7 @@ class TestFetch(TestCase):
     def test_fetch_all_given_queries_exist(self, mock_get):
         queries = ['test1', 'test2']
         test = self.fetch.fetchAll(queries)
-        self.assertIsInstance(test, types.GeneratorType)
+        self.assertIsInstance(test, list)
         for result in test:
             self.assertEqual(result, mock_get.return_value)
 
@@ -25,7 +25,7 @@ class TestFetch(TestCase):
 
         test = self.fetch.fetchAll(queries)
 
-        self.assertIsInstance(test, types.GeneratorType)
+        self.assertIsInstance(test, list)
 
     @patch('fetch.Fetch.get')
     def test_fetch_all_and_track_progress_given_queries_exist(self, mock_get):
@@ -34,7 +34,7 @@ class TestFetch(TestCase):
 
         test = self.fetch.fetchAllAndTrackProgress(queries, tracker)
 
-        self.assertIsInstance(test, types.GeneratorType)
+        self.assertIsInstance(test, list)
         for result in test:
             self.assertEqual(result, mock_get.return_value)
         tracker.assert_has_calls(
