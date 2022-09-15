@@ -51,7 +51,8 @@ class Request(threading.Thread):
 
     def initProgressStats(self):
         progressDict = {}
-        for key, ticket in self.keyedQueries.items():
+        for search in self.ticketSearches:
+            key = search.getTicketID()
             progressDict[key] = {
                 'progress': 0,
                 'numResultsDiscovered': 0,

@@ -3,7 +3,7 @@ from ticketsearchrunner import TicketSearchRunner
 from unittest.mock import MagicMock, call
 
 
-class TestTicketSearch(TestCase):
+class TestTicketSearchRunner(TestCase):
 
     def setUp(self) -> None:
         self.testSearch = TicketSearchRunner(

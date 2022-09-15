@@ -2,4 +2,6 @@ from unittest import TestCase
 
 
 class TestTicket(TestCase):
-    pass
+
+    def test_something(self):
+        self.fail()

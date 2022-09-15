@@ -1,7 +1,7 @@
 from celery import Celery
 from factories.requestFactory import RequestFactory
 import time
-from gallica.dto.ticket import Ticket
+from ticket import Ticket
 
 app = Celery()
 app.config_from_object('celery_settings')

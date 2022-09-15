@@ -3,7 +3,7 @@ from papersearchrunner import PaperSearchRunner
 from unittest.mock import MagicMock, call
 
 
-class TestPaperSearch(TestCase):
+class TestPaperSearchRunner(TestCase):
 
     def setUp(self):
         # Create test instance, save instance methods, then mock out.

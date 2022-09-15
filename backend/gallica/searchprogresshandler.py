@@ -15,6 +15,9 @@ class SearchProgressHandler:
     def setProgressCallback(self, callback):
         self.progressCallback = callback
 
+    def getTicketID(self):
+        return self.ticket.key
+
     def run(self):
         self.search.setProgressTracker(self.updateProgressStats)
         self.search.search()
