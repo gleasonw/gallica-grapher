@@ -1,5 +1,5 @@
 from unittest import TestCase
-from backend.gallica.recordDataParser import RecordDataParser
+from backend.gallica.recordParse import RecordParse
 import os
 from lxml import etree
 from dateparse import DateParse
@@ -9,7 +9,7 @@ class TestXMLParser(TestCase):
 
     def setUp(self) -> None:
         here = os.path.dirname(__file__)
-        self.xmlParser = RecordDataParser(DateParse)
+        self.xmlParser = RecordParse(DateParse)
         with open(os.path.join(here, 'resources/dummyPaperRecords.xml'), 'rb') as f:
             self.paperXML = etree.fromstring(f.read())
         with open(os.path.join(here, 'resources/dummyOccurrenceRecords.xml'), 'rb') as f:

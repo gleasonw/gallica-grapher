@@ -26,17 +26,21 @@ class OccurrenceQueryBuilder:
         self.ticket.setEstimateNumResults(numResultsForTicket)
 
     def makeBaseQueriesForTermsAndCodes(self):
+        baseQueries = []
         for term in self.ticket.terms:
             getThisTermCQL = self.cql.buildCQLforTerm(term)
             forTheseCodesCQL = self.cql.buildCQLforPaperCodes()
             for codesBunch in forTheseCodesCQL:
                 combinedCQL = getThisTermCQL.format(formattedCodeString=codesBunch)
-                yield self.makeBaseQuery(combinedCQL, term)
+                baseQueries.append(self.makeBaseQuery(combinedCQL, term))
+        return baseQueries
 
     def makeBaseQueriesOnlyTerms(self):
+        baseQueries = []
         for term in self.ticket.terms:
             cql = self.cql.buildCQLForTerm(term)
-            yield self.makeBaseQuery(cql, term)
+            baseQueries.append(self.makeBaseQuery(cql, term))
+        return baseQueries
 
 
 class CQLFactory:

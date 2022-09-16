@@ -22,12 +22,16 @@ class QueryIndexer:
         return totalResults
 
     def makeIndexedQueries(self):
+        queries = []
         for query in self.baseQueries:
             for index in range(1, query.estimateNumRecordsToFetch, 50):
-                yield Query(
-                    cql=query.cql,
-                    startIndex=index,
-                    numRecords=50,
-                    collapsing=False,
-                    term=query.term
+                queries.append(
+                    Query(
+                        cql=query.cql,
+                        startIndex=index,
+                        numRecords=50,
+                        collapsing=False,
+                        term=query.term
+                    )
                 )
+        return queries
