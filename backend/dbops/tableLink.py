@@ -7,6 +7,7 @@ class TableLink:
         self.requestID = requestID
         self.CSVstreamBuilder = CSVStream().generateCSVstreamFromRecords
 
+    #TODO: fix startdate enddate for multiple papers
     def insertRecordsIntoPapers(self, records):
         csvStream = self.CSVstreamBuilder(records)
         self.conn.cursor().copy_from(

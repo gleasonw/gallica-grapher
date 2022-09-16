@@ -71,7 +71,7 @@ class ArkQuery(Query):
 
     def __init__(self, code):
         super().__init__()
-        self.ark = 'ark:/12148/cb32895690j/date'
+        self.ark = f'ark:/12148/{code}/date'
         self.code = code
 
     def getParams(self):
