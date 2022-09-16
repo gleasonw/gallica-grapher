@@ -59,6 +59,9 @@ class Parse:
     def onePaperTitleFromOccurrenceBatch(self, responseXML) -> str:
         elements = etree.fromstring(responseXML)
         recordsRoot = elements.find("{http://www.loc.gov/zing/srw/}records")
+        if recordsRoot is None:
+            print(repr(responseXML))
+            return 'nonsense'
         record = recordsRoot[0]
         recordData = self.getDataFromRecordRoot(record)
         recordParser = self.makeRecordParser(recordData)

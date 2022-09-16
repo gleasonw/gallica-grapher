@@ -62,7 +62,7 @@ class PaperQuery(Query):
         super().__init__(
             cql=cql,
             startIndex=1,
-            numRecords=1,
+            numRecords=50,
             collapsing=True
         )
 
