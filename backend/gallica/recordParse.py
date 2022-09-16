@@ -1,4 +1,4 @@
-from dateparse import DateParse
+from gallica.dateparse import DateParse
 
 
 class RecordParse:

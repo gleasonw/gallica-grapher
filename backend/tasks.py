@@ -1,7 +1,7 @@
 from celery import Celery
-from factories.requestFactory import RequestFactory
+from gallica.factories.requestFactory import RequestFactory
 import time
-from ticket import Ticket
+from gallica.ticket import Ticket
 
 app = Celery()
 app.config_from_object('celery_settings')
@@ -14,8 +14,7 @@ def spawnRequest(self, tickets):
             key=key,
             terms=ticket['terms'],
             codes=ticket['codes'],
-            startYear=ticket['startYear'],
-            endYear=ticket['endYear']
+            dateRange=ticket['dateRange'],
         )
         for key, ticket in tickets.items()
     ]

@@ -1,6 +1,6 @@
-from cqlStringForPaperCodes import CQLStringForPaperCodes
-from queryIndexer import QueryIndexer
-from query import NumOccurrencesForTermQuery
+from gallica.factories.cqlStringForPaperCodes import CQLStringForPaperCodes
+from gallica.factories.queryIndexer import QueryIndexer
+from gallica.query import NumOccurrencesForTermQuery
 
 
 class OccurrenceQueryBuilder:
@@ -38,7 +38,7 @@ class OccurrenceQueryBuilder:
     def makeBaseQueriesOnlyTerms(self):
         baseQueries = []
         for term in self.ticket.terms:
-            cql = self.cql.buildCQLForTerm(term)
+            cql = self.cql.buildCQLforTerm(term)
             baseQueries.append(self.makeBaseQuery(cql, term))
         return baseQueries
 

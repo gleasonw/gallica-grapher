@@ -53,8 +53,17 @@ function App() {
     }
 
     async function initRequest(allUserTickets) {
+        const ticketsWithJustCodes = {}
+        Object.keys(allUserTickets).map((ticketID) => (
+            ticketsWithJustCodes[ticketID] = {
+                    terms: allUserTickets[ticketID].terms,
+                    codes: allUserTickets[ticketID].papersAndCodes.map(
+                        (paperAndCode) => (paperAndCode.code)),
+                    dateRange: allUserTickets[ticketID].dateRange
+            }
+        ))
         const {request} = await axios.post('/api/init', {
-            tickets: allUserTickets
+            tickets: ticketsWithJustCodes
         })
         const requestID = JSON.parse(request.response)["taskid"];
         setRequestID(requestID);
@@ -82,7 +91,6 @@ function App() {
             delete updatedTickets[key];
             setTickets(updatedTickets)
         }
-        console.log('deleting ticket: ' + ticketID)
         deleteTicket(ticketID);
     }
 

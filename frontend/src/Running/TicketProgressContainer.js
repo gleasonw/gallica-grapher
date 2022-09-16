@@ -20,19 +20,23 @@ export function TicketProgressContainer(props) {
         async function updateProgress() {
             const currentTicketProgress = await fetch("/api/progress/" + props.requestid);
             currentTicketProgress.json().then(data => {
-                if (data["state"] === "PROGRESS") {
+                const state = data["state"]
+                if(state === "PENDING"){
+                    console.log("PENDING")
+                    setTimeout(updateProgress, 1000)
+                }
+                if (state === "PROGRESS") {
                     const progress = data["progress"]
                     setProgressStats(progress)
-                } else if (data["state"] === "SUCCESS") {
+                } else if (state === "SUCCESS") {
                     props.onFinish()
-                } else if (data["state"] === "TOO_MANY_RECORDS") {
+                } else if (state === "TOO_MANY_RECORDS") {
                     props.onTooManyRecords(data["numRecords"])
                 } else {
                     console.log("Unknown state: " + data["state"])
                 }
             });
         }
-
         setTimeout(updateProgress, 1000)
     }, [props, progressStats]);
     return (

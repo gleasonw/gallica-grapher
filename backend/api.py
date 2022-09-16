@@ -29,9 +29,12 @@ def init():
 @app.route('/api/progress/<taskID>')
 def getProgress(taskID):
     task = spawnRequest.AsyncResult(taskID)
-    if task.state == 'PROGRESS':
+    state = task.state
+    if state == 'PENDING':
+        response = {'state': state}
+    elif state == 'PROGRESS':
         response = {
-            'state': task.state,
+            'state': state,
             'progress': task.info.get('progress')
         }
     else:

@@ -110,7 +110,7 @@ header{
 }
 .userInputForm{
     width: 100%;
-    max-width: 748px;
+    max-width: 800px;
     margin-top: 15px;
 }
 .requestBoxLabel{
@@ -429,23 +429,6 @@ label[for="papers"],label[for="searchTerm"]{
     align-items: center;
     width: 100%;
 }
-.topPaperTable{
-    width: 100%;
-}
-td{
-    padding: 5px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-td:hover{
-    overflow: visible;
-    white-space: normal;
-    height: auto;
-}
-tr:nth-child(even){
-    background-color: #f2f2f2;
-}
 .resultUI{
     display: flex;
     justify-content: center;
@@ -477,7 +460,7 @@ tr:nth-child(even){
 .groupedResultsUI > div{
     margin: 20px;
 }
-.groupedStatBar, .groupedLabelBar{
+.groupedLabelBar{
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;

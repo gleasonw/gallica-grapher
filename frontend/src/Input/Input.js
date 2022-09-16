@@ -143,6 +143,7 @@ function Input(props){
         setTerms([]);
     }
 
+
     function deleteTermBubble(bubbleIndex){
         const newTerms = terms.slice()
         newTerms.splice(bubbleIndex, 1)
@@ -320,6 +321,8 @@ function ExampleRequest(props){
     return(
         <ClassicUIBox
             aria-label={`Load example request: ${props.title}`}
+            width={'auto'}
+            height={'auto'}
         >
             <h1>
                 {props.title}

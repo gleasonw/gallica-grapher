@@ -58,13 +58,19 @@ class Parse:
     @staticmethod
     def yearsPublished(xml) -> list:
         xmlRoot = etree.fromstring(xml)
-        years = []
-        for yearElement in xmlRoot.iter("year"):
-            if yearElement is not None:
-                year = yearElement.text
-                if year.isdigit():
-                    years.append(year)
-        return years
+        years = [
+            Parse.parseYearFromArk(yearElement)
+            for yearElement in xmlRoot.iter("year")
+        ]
+        return list(filter(None, years))
+
+    @staticmethod
+    def parseYearFromArk(yearElement):
+        if yearElement is not None:
+            year = yearElement.text
+            return year if year.isdigit() else None
+        else:
+            return None
 
     @staticmethod
     def getDataFromRecordRoot(recordRoot):

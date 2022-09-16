@@ -70,9 +70,8 @@ function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining){
     return(
         <ExpandableBlurbControl
             numItemsRemaining={numItemsRemaining}
-            allItems={itemString}
             shortenedItems={shortenedItemString}
-            items={items}
+            items={items.slice(1, items.length)}
         />
     )
 }

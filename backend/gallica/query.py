@@ -1,21 +1,14 @@
 class Query:
 
-    def __init__(
-            self,
-            cql=None,
-            startIndex=None,
-            numRecords=None,
-            collapsing=None,
-            term=None
-    ):
-        self.cql = cql
-        self.startIndex = startIndex
-        self.numRecords = numRecords
-        self.collapsing = collapsing
+    def __init__(self, **kwargs):
+        self.cql = kwargs.get('cql')
+        self.startIndex = kwargs.get('startIndex')
+        self.numRecords = kwargs.get('numRecords')
+        self.collapsing = kwargs.get('collapsing')
+        self.term = kwargs.get('term')
         self.responseXML = None
         self.elapsedTime = None
         self.estimateNumRecordsToFetch = None
-        self.term = term
 
     def handleResponse(self, data, elapsed):
         self.responseXML = data
@@ -44,6 +37,9 @@ class NumOccurrencesForTermQuery(Query):
             term=term
         )
 
+    def __repr__(self):
+        return f'NumOccurrencesForTermQuery({self.cql}, {self.term})'
+
 
 class NumPapersOnGallicaQuery(Query):
 
@@ -55,16 +51,22 @@ class NumPapersOnGallicaQuery(Query):
             collapsing=True
         )
 
+    def __repr__(self):
+        return f'NumPapersOnGallicaQuery({self.cql})'
+
 
 class PaperQuery(Query):
 
-    def __init__(self, cql):
+    def __init__(self, cql, startIndex):
         super().__init__(
             cql=cql,
-            startIndex=1,
+            startIndex=startIndex,
             numRecords=50,
             collapsing=True
         )
+
+    def __repr__(self):
+        return f'PaperQuery({self.cql})'
 
 
 class ArkQuery(Query):
@@ -76,6 +78,9 @@ class ArkQuery(Query):
 
     def getParams(self):
         return {"ark": self.ark}
+
+    def __repr__(self):
+        return f'ArkQuery({self.ark})'
 
 
 

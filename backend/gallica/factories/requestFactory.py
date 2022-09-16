@@ -1,12 +1,12 @@
-from parseFactory import buildParser
-from searchprogresshandler import SearchProgressHandler
+from gallica.factories.parseFactory import buildParser
+from gallica.searchprogresshandler import SearchProgressHandler
 from gallica.papersearchrunner import PaperSearchRunner
-from ticketsearchrunner import TicketSearchRunner
-from occurrenceQueryBuilder import OccurrenceQueryBuilder
-from paperQueryFactory import PaperQueryFactory
-from tableLink import TableLink
-from fetch import Fetch
-from request import Request
+from gallica.ticketsearchrunner import TicketSearchRunner
+from gallica.factories.occurrenceQueryBuilder import OccurrenceQueryBuilder
+from gallica.factories.paperQueryFactory import PaperQueryFactory
+from dbops.tableLink import TableLink
+from gallica.fetch import Fetch
+from gallica.request import Request
 from utils.psqlconn import PSQLconn
 
 

@@ -12,17 +12,16 @@ class Request(threading.Thread):
         self.topPapersForTerms = []
         self.finished = False
         self.tooManyRecords = False
-        self.ticketProgressStats = {}
         self.requestID = requestID
         self.estimateNumRecords = 0
         self.DBconnection = dbConn
+        self.ticketProgressStats = self.initProgressStats()
         super().__init__()
 
     def getProgressStats(self):
         return self.ticketProgressStats
 
     def run(self):
-        self.initProgressStats()
         estimateRequestResults = sum(
             [
                 tick.getEstimateNumResultsForTicket()

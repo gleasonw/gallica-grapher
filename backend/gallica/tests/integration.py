@@ -2,15 +2,17 @@ from ticket import Ticket
 from requestFactory import RequestFactory
 import time
 import psutil
+from papersearchrunner import PaperSearchRunner
+from parseFactory import buildParser
+from fetch import Fetch
+from tableLink import TableLink
+from utils.psqlconn import PSQLconn
+from paperQueryFactory import PaperQueryFactory
 
 
 def runTests():
-    oneTest = getSearchOneTermInOnePaperOverRange()
-    testTicket = getSearchOneTermInTwoPapersOverRange()
-    secondTest = getSearchTwoTermsInTwoPapersOverRange()
-
     try:
-        doTest(oneTest)
+        getAllPapers()
     except Exception as e:
         print("Test failure.")
         raise
@@ -29,21 +31,9 @@ def doTest(ticket):
 def getSearchOneTermInOnePaperOverRange():
     testTicket = Ticket(
         '1234',
-        ['paris'],
-        ['cb328066631'],
-        '1840',
-        '1930'
-    )
-    return testTicket
-
-
-def getSearchOneTermInOnePaperOverRange():
-    testTicket = Ticket(
-        '1234',
-        ['paris'],
-        ['cb328066631'],
-        '1900',
-        '1930'
+        ['brazza'],
+        ['cb32895690j'],
+        '1863,1944'
     )
     return testTicket
 
@@ -53,8 +43,7 @@ def getSearchOneTermInTwoPapersOverRange():
         '1234',
         ['brazza'],
         ['cb328066631', 'cb32895690j'],
-        '1900',
-        '1910'
+        '1900'
     )
     return testTicket
 
@@ -64,10 +53,37 @@ def getSearchTwoTermsInTwoPapersOverRange():
         '1234',
         ['brazza', 'paris'],
         ['cb328066631', 'cb32895690j'],
-        '1900',
-        '1910'
+        '1900'
     )
     return testTicket
+
+
+def getSearchOneTermInAllPapersOverRange():
+    testTicket = Ticket(
+        '1234',
+        ['brazza'],
+        [],
+        '1900'
+    )
+    return testTicket
+
+
+def getAllPapers():
+    parse = buildParser()
+    sruFetcher = Fetch('https://gallica.bnf.fr/SRU')
+    dbLink = TableLink(
+        requestID='',
+        conn=PSQLconn().getConn()
+    )
+    paperSearch = PaperSearchRunner(
+        parse=parse,
+        paperQueryFactory=PaperQueryFactory(),
+        sruFetch=sruFetcher,
+        arkFetch=Fetch('https://gallica.bnf.fr/services/Issues'),
+        insert=dbLink.insertRecordsIntoPapers
+    )
+    paperSearch.addAllFetchableRecordsToDB()
+
 
 
 if __name__ == '__main__':

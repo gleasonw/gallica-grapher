@@ -1,3 +1,6 @@
+from lxml.etree import LxmlError
+
+
 class PaperSearchRunner:
 
     def __init__(
@@ -15,16 +18,16 @@ class PaperSearchRunner:
         self.insertIntoPapers = insert
 
     def addRecordDataForTheseCodesToDB(self, codes):
-        queries = self.queryFactory.buildSRUQueriesForCodes(codes)
+        queries = list(self.queryFactory.buildSRUQueriesForCodes(codes))
         self.doSearch(queries)
 
     def addAllFetchableRecordsToDB(self):
-        queries = self.queryFactory.buildSRUqueriesForAllRecords()
+        queries = self.queryFactory.buildAllRecordsQueries()
         self.doSearch(queries)
 
     def doSearch(self, queries):
         queriesWithResponseData = self.SRUfetch.fetchAll(queries)
-        records = list(self.convertQueriesToRecords(queriesWithResponseData))
+        records = self.convertQueriesToRecords(queriesWithResponseData)
         recordsWithPublishingYears = self.getPublishingYearsForRecords(records)
         self.insertIntoPapers(recordsWithPublishingYears)
 
@@ -34,8 +37,9 @@ class PaperSearchRunner:
             yield from records
 
     def getPublishingYearsForRecords(self, records):
-        recordCodes = (record.code for record in records)
-        publishingRangeQueries = self.queryFactory.buildARKQueriesForCodes(recordCodes)
+        records = list(records)
+        codes = (record.code for record in records)
+        publishingRangeQueries = self.queryFactory.buildARKQueriesForCodes(codes)
         yearQueriesWithResponse = self.ARKfetch.fetchAll(publishingRangeQueries)
         recordsWithPublishingYears = self.addPublishingYearsToPaperRecord(
             records,
@@ -46,8 +50,11 @@ class PaperSearchRunner:
     def addPublishingYearsToPaperRecord(self, records, yearQueriesWithResponse):
         yearData = {}
         for query in yearQueriesWithResponse:
-            code = query.code
-            yearData[code] = self.parse.yearsPublished(query.responseXML)
+            try:
+                code = query.code
+                yearData[code] = self.parse.yearsPublished(query.responseXML)
+            except LxmlError:
+                print("bad years for code: ", query.code)
         for record in records:
-            record.publishingYears = yearData[record.code]
+            record.publishingYears = yearData.get(record.code, [])
             yield record

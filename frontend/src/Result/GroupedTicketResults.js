@@ -6,6 +6,7 @@ import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import DownloadCSVButton from "./DownloadCSVButton";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import styled from "styled-components";
+import DecorativeTicket from "../shared/DecorativeTicket";
 
 export function GroupedTicketResults(props) {
     return (
@@ -28,9 +29,9 @@ function GroupedStatBar(props) {
     return (
         <StyledStatBar>
             {Object.keys(props.tickets).map(key => (
-                <div
-                    className='groupedStatBarEntry'
+                <DecorativeTicket
                     key={key}
+                    height={'100%'}
                 >
                     <svg width = "20" height="20">
                         <circle cx="10" cy="10" r="10" fill={settings[key].color}/>
@@ -45,15 +46,20 @@ function GroupedStatBar(props) {
                         dateRange={props.tickets[key].dateRange}
                         grouped={true}
                     />
-                </div>
+                </DecorativeTicket>
             ))}
         </StyledStatBar>
     );
 }
 
 const StyledStatBar = styled.div`
+    margin-top: 10px;
+    margin-bottom: 10px;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
 `;
 
 export default GroupedTicketResults;

@@ -1,6 +1,4 @@
 import DecorativeTicket from "../shared/DecorativeTicket";
-import SmallIconStyle from "../shared/SmallIconStyle";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import TicketLabel from "../shared/TicketLabel";
 import React from "react";
 

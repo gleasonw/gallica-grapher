@@ -5,14 +5,13 @@ class Ticket:
             key,
             terms,
             codes,
-            startYear,
-            endYear,
+            dateRange
     ):
         self.key = key
         self.terms = terms
         self.codes = codes
-        self.startYear = startYear
-        self.endYear = endYear
+        self.startYear = dateRange[0]
+        self.endYear = dateRange[1]
         self.queries = None
         self.estimateNumResults = 0
         self.numResultsRetrieved = 0

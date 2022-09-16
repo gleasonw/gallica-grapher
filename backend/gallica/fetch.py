@@ -1,10 +1,10 @@
 from concurrent.futures import ThreadPoolExecutor
 import urllib3
 from urllib3.util.retry import Retry
-from query import Query
+from gallica.query import Query
 import time
 
-NUM_WORKERS = 100
+NUM_WORKERS = 60
 
 retryStrategy = Retry(
     status_forcelist=[413, 429, 500, 502, 503, 504],
@@ -12,7 +12,7 @@ retryStrategy = Retry(
 )
 
 
-#TODO: experiment with a DB connection pool, insert results as they arrive.
+#TODO: experiment with a DB connection pool, insert results as they arrive to save memory
 class Fetch:
 
     def __init__(self, baseUrl):
@@ -34,7 +34,6 @@ class Fetch:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
             responses = []
             for result in executor.map(self.get, queries):
-                print("fetching")
                 tracker(result, NUM_WORKERS)
                 responses.append(result)
             return responses

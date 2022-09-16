@@ -2,6 +2,7 @@ import React from "react";
 import {useContext} from "react";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import useData from "../shared/hooks/useData";
+import styled from "styled-components";
 
 export function TicketPaperOccurrenceStats(props) {
     const settings = useContext(GraphSettingsContext);
@@ -16,7 +17,7 @@ export function TicketPaperOccurrenceStats(props) {
         const topPapers = result['topPapers'];
         return (
             <div className='ticketStats'>
-                <table className='topPaperTable'>
+                <StyledOccurrenceTable>
                     <tbody>
                         <tr>
                             <th>Paper</th>
@@ -29,12 +30,29 @@ export function TicketPaperOccurrenceStats(props) {
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </StyledOccurrenceTable>
             </div>
         )
     }else{
         return null;
     }
 }
+
+const StyledOccurrenceTable = styled.table`
+    border-collapse: collapse;
+    table-layout: fixed;
+    max-width: 600px;
+    td{
+        padding: 5px;
+    }
+    td:hover{
+        overflow: visible;
+        white-space: normal;
+        height: auto;
+    }
+    tr:nth-child(even){
+        background-color: #f2f2f2;
+    }
+`;
 
 export default TicketPaperOccurrenceStats;

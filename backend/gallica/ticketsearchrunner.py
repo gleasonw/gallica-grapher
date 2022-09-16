@@ -48,11 +48,9 @@ class TicketSearchRunner:
         seen = set()
         uniqueRecords = []
         for record in records:
-            if record.uniquenessCheck not in seen:
-                seen.add(record.uniquenessCheck)
+            if record.uniqueKey not in seen:
+                seen.add(record.uniqueKey)
                 uniqueRecords.append(record)
-            else:
-                print("Hooray, I removed a duplicate.")
         return uniqueRecords
 
     def insertMissingPapersToDB(self, records):

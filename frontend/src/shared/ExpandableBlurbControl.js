@@ -18,48 +18,56 @@ export function ExpandableBlurbControl(props) {
 
     return (
         <div onClick={handleClick}>
-            {expanded ?
-                <BlurbExpand>
-                    <OverflowYScrollTable>
-                        <tbody>
-                        {props.items.map((item, index) => {
-                            return (
-                                <tr key={index}>
-                                    <td>{item}</td>
-                                </tr>
-                            )
-                        })}
-                        </tbody>
-                    </OverflowYScrollTable>
+            <BlurbText>
+                <TextClipper>
+                {props.shortenedItems}
+                </TextClipper>
+            </BlurbText>
+            {
+                expanded ?
+                <StyledPeriodicalDropdownTable>
+                    <tbody>
+                    {props.items.map((item) => (
+                        <tr key={item}>
+                            <td>{item}</td>
+                        </tr>
+                    ))}
+                    </tbody>
                     {arrow}
-                </BlurbExpand>
-                :
+                </StyledPeriodicalDropdownTable>
+                    :
                 <span>
-                    <BlurbText>
-                        {props.shortenedItems}
-                    </BlurbText>
-                        + {props.numItemsRemaining} more
+                + {props.numItemsRemaining} more
+                {arrow}
                 </span>
+
             }
-            {arrow}
         </div>
     )
 }
 
-const BlurbExpand = styled.div`
+const StyledPeriodicalDropdownTable = styled.table`
+    tr:nth-child(even){
+        background-color: #f2f2f2;
+    }
+    max-width: 600px;
+    max-height: 500px;
+    td:hover{
+        overflow: visible;
+        white-space: normal;
+        height: auto;
+    }
+    border-collapse: collapse;
+    table-layout: fixed;
     position: absolute;
+    z-index: 1;
     background-color: white;
-    overflow: visible;
     `;
 
-const OverflowYScrollTable = styled(BlurbExpand)`
-    border: 1px solid #d9d9d9;
-    z-index: 1;
-    tr:nth-child(even) {
-        background-color: #;
-    }
+const TextClipper = styled.div`
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
     position: absolute;
-    max-height: 500px;
-    max-width: 500px;
-    overflow-y: scroll;
-    `;
+`

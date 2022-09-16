@@ -43,17 +43,16 @@ const StyledTicketRow = styled.div`
     display: flex;
     flex-direction: row;
     overflow: visible;
+    width: 100%;
 `;
 
 const OverflowScrollTicketRow = styled(StyledTicketRow)`
-    overflow-x: scroll;
-    overflow-y: visible;
+    max-width: 100%;
 `;
 
 export const StyledRequestBox = styled(RequestBox)`
     display: flex;
     flex-direction: row;
     transition: all 150ms;
-    overflow: visible;
 `;
 

@@ -8,13 +8,21 @@ class OccurrenceRecord:
         self.term = None
         self.ticketID = None
         self.requestID = None
-        dateText = f'{date.year}-{date.month}-{date.day}'
-        self.uniquenessCheck = f'{paperCode}{dateText}'
+        self.uniqueKey = None
+
+    def __repr__(self):
+        return f'OccurrenceRecord({self.paperCode}, {self.url}, {self.date})'
 
     def addFinalRowElements(self, ticketID, requestID, term):
         self.ticketID = ticketID
         self.requestID = requestID
         self.term = term
+        dateText = f'{self.date.getDate()[0]}-{self.date.getDate()[1]}-{self.date.getDate()[2]}'
+        self.uniqueKey = (
+            self.paperCode,
+            dateText,
+            self.term
+        )
 
     def getRow(self):
         return (

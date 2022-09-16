@@ -1,8 +1,7 @@
-from dateparse import DateParse
-from occurrenceRecord import OccurrenceRecord
-from paperRecord import PaperRecord
-from parse import Parse
-from recordParse import RecordParse
+from gallica.dto.occurrenceRecord import OccurrenceRecord
+from gallica.dto.paperRecord import PaperRecord
+from gallica.parse import Parse
+from gallica.recordParse import RecordParse
 
 
 def buildParser() -> Parse:
