@@ -24,7 +24,8 @@ function TicketLabel(props){
     }else{
         return(
             <StyledTicketLabel>
-                Occurrences of
+                Occurrences
+                <span>of</span>
                 {generateBlurb(props.terms)}
                 in
                 {paperBlurb}
@@ -38,10 +39,12 @@ function TicketLabel(props){
 const StyledTicketLabel = styled.div`
     margin-top: 20px;
     display: flex;
+    font-size: 20px;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 5px;
+    justify-content: space-between;
+    gap: 10px;
 `;
 
 const StyledCompactTicketLabel = styled.div`

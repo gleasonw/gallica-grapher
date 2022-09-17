@@ -41,7 +41,6 @@ export function TicketPaperOccurrenceStats(props) {
 const StyledOccurrenceTable = styled.table`
     border-collapse: collapse;
     table-layout: fixed;
-    max-width: 600px;
     td{
         padding: 5px;
     }
