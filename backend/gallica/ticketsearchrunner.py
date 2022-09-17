@@ -1,3 +1,5 @@
+from lxml.etree import LxmlError
+
 class TicketSearchRunner:
 
     def __init__(
@@ -63,9 +65,12 @@ class TicketSearchRunner:
         return records
 
     def progressTrackWithPaper(self, query, numWorkers):
-        paper = self.parse.onePaperTitleFromOccurrenceBatch(
-            query.responseXML
-        )
+        try:
+            paper = self.parse.onePaperTitleFromOccurrenceBatch(
+                query.responseXML
+            )
+        except LxmlError:
+            paper = 'Gallica hiccup'
         self.onUpdateProgress(
             query=query,
             numWorkers=numWorkers,

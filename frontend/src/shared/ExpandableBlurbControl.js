@@ -3,6 +3,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {BlurbText} from "./BlurbText";
 import styled from "styled-components";
+import {TextClipper} from "./TextClipper";
 
 export function ExpandableBlurbControl(props) {
     const [expanded, setExpanded] = useState(false);
@@ -62,12 +63,9 @@ const StyledPeriodicalDropdownTable = styled.table`
     position: absolute;
     z-index: 1;
     background-color: white;
+    min-width: 140px;
+    border-left: 1px solid #d9d9d9;
+    border-right: 1px solid #d9d9d9;
+    border-bottom: 1px solid #d9d9d9;
     `;
 
-const TextClipper = styled.div`
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-    position: absolute;
-`

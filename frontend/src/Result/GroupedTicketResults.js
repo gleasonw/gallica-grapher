@@ -7,6 +7,7 @@ import DownloadCSVButton from "./DownloadCSVButton";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import styled from "styled-components";
 import DecorativeTicket from "../shared/DecorativeTicket";
+import SeriesColorBubble from "../shared/SeriesColorBubble";
 
 export function GroupedTicketResults(props) {
     return (
@@ -33,9 +34,7 @@ function GroupedStatBar(props) {
                     key={key}
                     height={'100%'}
                 >
-                    <svg width = "20" height="20">
-                        <circle cx="10" cy="10" r="10" fill={settings[key].color}/>
-                    </svg>
+                    <SeriesColorBubble color={settings[key].color}/>
                     <TicketLabel
                         terms={props.tickets[key].terms}
                         papers={props.tickets[key].papersAndCodes}

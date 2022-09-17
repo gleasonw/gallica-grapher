@@ -1,6 +1,7 @@
 import DecorativeTicket from "../shared/DecorativeTicket";
 import TicketLabel from "../shared/TicketLabel";
 import React from "react";
+import SeriesColorBubble from "../shared/SeriesColorBubble";
 
 export default function Ticket(props){
     let borderRadius;
@@ -17,6 +18,7 @@ export default function Ticket(props){
         <DecorativeTicket
             borderRadius={borderRadius}
         >
+            <SeriesColorBubble color={props.color}/>
             {props.actionIcon}
             <TicketLabel
                 terms={props.ticket['terms']}

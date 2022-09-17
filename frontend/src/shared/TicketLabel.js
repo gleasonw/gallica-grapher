@@ -2,6 +2,7 @@ import React from 'react';
 import {ExpandableBlurbControl} from "./ExpandableBlurbControl";
 import {BlurbText} from "./BlurbText";
 import styled from "styled-components";
+import {TextClipper} from "./TextClipper";
 
 function TicketLabel(props){
     const paperBlurb = props.papers.length > 0 ?
@@ -35,6 +36,7 @@ function TicketLabel(props){
 }
 
 const StyledTicketLabel = styled.div`
+    margin-top: 20px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -49,7 +51,8 @@ const StyledCompactTicketLabel = styled.div`
 `;
 
 function generateBlurb(items){
-    const highestIndexBefore28Characters = getHighestIndexBefore28CharactersCombined(items)
+    console.log(items)
+    const highestIndexBefore28Characters = getHighestIndexBeforeLimitCharactersCombined(items)
     const numItemsRemaining = items.length - highestIndexBefore28Characters - 1
     if(numItemsRemaining > 0){
         return generateExpandableBlurb(
@@ -65,13 +68,12 @@ function generateBlurb(items){
 function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining){
     const quotedItems = items.map(item => `"${item}"`)
     let shortenedItemString = quotedItems.slice(0, indexToStopAt + 1)
-    const itemString = quotedItems.join(', ')
     shortenedItemString = shortenedItemString.join(', ')
     return(
         <ExpandableBlurbControl
             numItemsRemaining={numItemsRemaining}
             shortenedItems={shortenedItemString}
-            items={items.slice(1, items.length)}
+            items={items.slice(indexToStopAt + 1, items.length)}
         />
     )
 }
@@ -80,7 +82,7 @@ function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining){
 function generateFixedBlurb(items){
     const quotedItems = items.map(item => `"${item}"`)
     const commaSeparatedItems = quotedItems.join(', ')
-    return <BlurbText>{commaSeparatedItems}</BlurbText>
+    return <BlurbText><TextClipper>{commaSeparatedItems}</TextClipper></BlurbText>
 }
 
 function getPaperNames(papers){
@@ -91,12 +93,12 @@ function getPaperNames(papers){
     return paperNames
 }
 
-function getHighestIndexBefore28CharactersCombined(items) {
+function getHighestIndexBeforeLimitCharactersCombined(items) {
     let combinedLength = 0
     let highestIndex = 0
     items.map((item, index) => {
         combinedLength += item.length
-        if (combinedLength < 28) {
+        if (combinedLength < 15) {
             highestIndex = index
         } else {
             return highestIndex
