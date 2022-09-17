@@ -5,7 +5,7 @@ from gallica.ticketsearchrunner import TicketSearchRunner
 from gallica.factories.occurrenceQueryBuilder import OccurrenceQueryBuilder
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 from dbops.tableLink import TableLink
-from gallica.fetch import Fetch
+from gallica.concurrentfetch import ConcurrentFetch
 from gallica.request import Request
 from utils.psqlconn import PSQLconn
 
@@ -34,7 +34,7 @@ class RequestFactory:
 
     def buildSearchRunner(self, ticket) -> TicketSearchRunner:
         parse = buildParser()
-        sruFetcher = Fetch('https://gallica.bnf.fr/SRU')
+        sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         dbLink = TableLink(
             requestID=self.requestID,
             conn=self.dbConn
@@ -43,7 +43,7 @@ class RequestFactory:
             parse=parse,
             paperQueryFactory=PaperQueryFactory(),
             sruFetch=sruFetcher,
-            arkFetch=Fetch('https://gallica.bnf.fr/services/Issues'),
+            arkFetch=ConcurrentFetch('https://gallica.bnf.fr/services/Issues'),
             insert=dbLink.insertRecordsIntoPapers
         )
         return TicketSearchRunner(

@@ -2,7 +2,6 @@ from celery import Celery
 from gallica.factories.requestFactory import RequestFactory
 import time
 from gallica.ticket import Ticket
-import psutil
 
 app = Celery()
 app.config_from_object('celery_settings')
@@ -25,8 +24,6 @@ def spawnRequest(self, tickets):
     ).build()
     request.start()
     while True:
-        # print memory usage in MB
-        print(psutil.Process().memory_info().rss / 1024 / 1024)
         if request.finished:
             return {
                 'status': 'Complete!',

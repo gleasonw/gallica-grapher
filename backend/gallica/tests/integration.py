@@ -4,7 +4,7 @@ import time
 import psutil
 from papersearchrunner import PaperSearchRunner
 from parseFactory import buildParser
-from fetch import Fetch
+from concurrentfetch import ConcurrentFetch
 from tableLink import TableLink
 from utils.psqlconn import PSQLconn
 from paperQueryFactory import PaperQueryFactory
@@ -73,7 +73,7 @@ def getSearchOneTermInAllPapersOverRange():
 
 def getAllPapers():
     parse = buildParser()
-    sruFetcher = Fetch('https://gallica.bnf.fr/SRU')
+    sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
     dbLink = TableLink(
         requestID='',
         conn=PSQLconn().getConn()
@@ -82,7 +82,7 @@ def getAllPapers():
         parse=parse,
         paperQueryFactory=PaperQueryFactory(),
         sruFetch=sruFetcher,
-        arkFetch=Fetch('https://gallica.bnf.fr/services/Issues'),
+        arkFetch=ConcurrentFetch('https://gallica.bnf.fr/services/Issues'),
         insert=dbLink.insertRecordsIntoPapers
     )
     paperSearch.addAllFetchableRecordsToDB()

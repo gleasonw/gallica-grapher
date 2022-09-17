@@ -1,7 +1,7 @@
 import types
 from unittest import TestCase
-from fetch import Fetch
-from fetch import NUM_WORKERS
+from concurrentfetch import ConcurrentFetch
+from concurrentfetch import NUM_WORKERS
 from unittest.mock import patch, MagicMock, call
 
 
@@ -9,7 +9,7 @@ class TestFetch(TestCase):
 
     def setUp(self) -> None:
         self.numWorkers = NUM_WORKERS
-        self.fetch = Fetch(None)
+        self.fetch = ConcurrentFetch(None)
 
     @patch('fetch.Fetch.get')
     def test_fetch_all_given_queries_exist(self, mock_get):

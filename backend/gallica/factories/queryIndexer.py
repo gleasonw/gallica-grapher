@@ -1,4 +1,4 @@
-from gallica.fetch import Fetch
+from gallica.concurrentfetch import ConcurrentFetch
 from gallica.factories.parseFactory import buildParser
 from gallica.query import Query
 from gallica.query import PaperQuery
@@ -7,7 +7,7 @@ from gallica.query import PaperQuery
 class QueryIndexer:
 
     def __init__(self, baseQueries):
-        self.fetch = Fetch('https://gallica.bnf.fr/SRU')
+        self.fetch = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         self.parse = buildParser()
         self.makeQuery = Query
         self.baseQueries = {query.cql: query for query in baseQueries}

@@ -12,7 +12,7 @@ retryStrategy = Retry(
 )
 
 
-class Fetch:
+class ConcurrentFetch:
 
     def __init__(self, baseUrl):
         self.baseUrl = baseUrl
@@ -31,7 +31,6 @@ class Fetch:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
             for data, _, elapsed, term in executor.map(self.get, queries):
                 tracker(data, elapsed, NUM_WORKERS)
-                print('fetching')
                 yield data, term
 
     def get(self, query) -> tuple:
