@@ -13,9 +13,9 @@ class QueryIndexer:
         self.baseQueries = baseQueries
 
     def fetchNumResultsForQueries(self):
-        self.baseQueries = self.fetch.fetchAll(self.baseQueries)
+        responses = self.fetch.fetchAll(self.baseQueries)
         totalResults = 0
-        for query in self.baseQueries:
+        for data in responses:
             numRecordsForBaseCQL = self.parse.numRecords(query.responseXML)
             totalResults += numRecordsForBaseCQL
             query.estimateNumRecordsToFetch = numRecordsForBaseCQL

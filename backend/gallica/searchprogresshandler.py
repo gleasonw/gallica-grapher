@@ -29,15 +29,15 @@ class SearchProgressHandler:
 
     def updateProgressStats(
             self,
-            query,
+            elapsedTime,
             numWorkers,
             randomPaper
     ):
         self.numBatchesRetrieved += 1
         if self.averageResponseTime:
-            self.updateAverageResponseTime(query.elapsedTime)
+            self.updateAverageResponseTime(elapsedTime)
         else:
-            self.averageResponseTime = query.elapsedTime
+            self.averageResponseTime = elapsedTime
         ticketProgressStats = self.buildProgressStats(randomPaper, numWorkers)
         self.onUpdateProgress(
             ticketKey=self.ticket.key,

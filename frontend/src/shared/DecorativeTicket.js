@@ -10,7 +10,6 @@ const DecorativeTicket = styled.div`
         overflow: hidden;
         height: ${props => props.height ? props.height : '282px'};
         flex: 1;
-        max-width: 300px;
         position: relative;
     `;
 

@@ -25,20 +25,16 @@ class Fetch:
 
     def fetchAll(self, queries) -> list[Query]:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            responses = []
-            for result in executor.map(self.get, queries):
-                responses.append(result)
-            return responses
+            for data, _, _ in executor.map(self.get, queries):
+                yield data
 
     def fetchAllAndTrackProgress(self, queries, tracker) -> list[Query]:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            responses = []
-            for result in executor.map(self.get, queries):
-                tracker(result, NUM_WORKERS)
-                responses.append(result)
-            return responses
+            for data, elapsed, term in executor.map(self.get, queries):
+                tracker(data, elapsed, NUM_WORKERS)
+                yield data, term
 
-    def get(self, query) -> Query:
+    def get(self, query) -> tuple:
         start = time.perf_counter()
         response = self.http.request(
             "GET",
@@ -46,8 +42,4 @@ class Fetch:
             fields=query.getParams()
         )
         end = time.perf_counter()
-        query.handleResponse(
-            data=response.data,
-            elapsed=end - start
-        )
-        return query
+        return response.data, end-start, query.term

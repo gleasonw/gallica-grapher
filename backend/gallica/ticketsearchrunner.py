@@ -24,25 +24,25 @@ class TicketSearchRunner:
         self.onUpdateProgress = progressTracker
 
     def search(self):
-        queriesWithResponseXML = self.SRUfetch.fetchAllAndTrackProgress(
+        responseData = self.SRUfetch.fetchAllAndTrackProgress(
             self.ticket.queries,
             self.progressTrackWithPaper
         )
-        records = self.convertQueriesToRecords(queriesWithResponseXML)
+        records = self.convertResponseToRecords(responseData)
         uniqueRecords = self.removeDuplicateRecords(records)
         recordsWithPapersInDB = self.insertMissingPapersToDB(uniqueRecords)
         self.schema.insertRecordsIntoResults(recordsWithPapersInDB)
         self.numResultsRetrieved = self.schema.getNumResultsForTicket(self.ticket.key)
         self.ticket.setNumResultsRetrieved(self.numResultsRetrieved)
 
-    def convertQueriesToRecords(self, queries):
-        for query in queries:
-            records = self.parse.occurrences(query.responseXML)
+    def convertResponseToRecords(self, returnValues):
+        for data, term in returnValues:
+            records = self.parse.occurrences(data)
             for record in records:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,
                     requestID=self.requestID,
-                    term=query.term
+                    term=term
                 )
                 yield record
 
@@ -64,15 +64,13 @@ class TicketSearchRunner:
             self.addTheseCodesToDB(list(missingCodes))
         return records
 
-    def progressTrackWithPaper(self, query, numWorkers):
+    def progressTrackWithPaper(self, data, elapsed, numWorkers):
         try:
-            paper = self.parse.onePaperTitleFromOccurrenceBatch(
-                query.responseXML
-            )
+            paper = self.parse.onePaperTitleFromOccurrenceBatch(data)
         except LxmlError:
             paper = 'Gallica hiccup'
         self.onUpdateProgress(
-            query=query,
+            elapsedTime=elapsed,
             numWorkers=numWorkers,
             randomPaper=paper
         )
