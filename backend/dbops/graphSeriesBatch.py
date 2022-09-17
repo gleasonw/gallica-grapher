@@ -1,4 +1,4 @@
-from psqlconn import PSQLconn
+from utils.psqlconn import PSQLconn
 import datetime
 import ciso8601
 
