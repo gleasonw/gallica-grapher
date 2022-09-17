@@ -11,8 +11,11 @@ from paperQueryFactory import PaperQueryFactory
 
 
 def runTests():
+
+    ticket = getSearchOneTermInAllPapersOverRange()
+
     try:
-        getAllPapers()
+        doTest(ticket)
     except Exception as e:
         print("Test failure.")
         raise
@@ -53,7 +56,7 @@ def getSearchTwoTermsInTwoPapersOverRange():
         '1234',
         ['brazza', 'paris'],
         ['cb328066631', 'cb32895690j'],
-        '1900'
+        '1900,1930'
     )
     return testTicket
 
@@ -63,7 +66,7 @@ def getSearchOneTermInAllPapersOverRange():
         '1234',
         ['brazza'],
         [],
-        '1900'
+        '1850,1950'
     )
     return testTicket
 

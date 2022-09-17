@@ -1,4 +1,4 @@
-from gallica.dateparse import DateParse
+from gallica.date import Date
 
 
 class RecordParse:
@@ -27,8 +27,8 @@ class RecordParse:
         return paperTitle
 
     @staticmethod
-    def getDate(xml) -> DateParse:
+    def getDate(xml) -> Date:
         dateElement = xml.find(
             '{http://purl.org/dc/elements/1.1/}date')
         if dateElement is not None:
-            return DateParse(dateElement.text)
+            return Date(dateElement.text)

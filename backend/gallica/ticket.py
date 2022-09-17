@@ -10,6 +10,7 @@ class Ticket:
         self.key = key
         self.terms = terms
         self.codes = codes
+        dateRange = dateRange.split(',')
         self.startYear = dateRange[0]
         self.endYear = dateRange[1]
         self.queries = None

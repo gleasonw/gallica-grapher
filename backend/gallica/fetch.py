@@ -12,7 +12,6 @@ retryStrategy = Retry(
 )
 
 
-#TODO: experiment with a DB connection pool, insert results as they arrive to save memory
 class Fetch:
 
     def __init__(self, baseUrl):
@@ -25,13 +24,14 @@ class Fetch:
 
     def fetchAll(self, queries) -> list[Query]:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            for data, _, _ in executor.map(self.get, queries):
-                yield data
+            for data, cql, _, _ in executor.map(self.get, queries):
+                yield data, cql
 
     def fetchAllAndTrackProgress(self, queries, tracker) -> list[Query]:
         with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-            for data, elapsed, term in executor.map(self.get, queries):
+            for data, _, elapsed, term in executor.map(self.get, queries):
                 tracker(data, elapsed, NUM_WORKERS)
+                print('fetching')
                 yield data, term
 
     def get(self, query) -> tuple:
@@ -42,4 +42,4 @@ class Fetch:
             fields=query.getParams()
         )
         end = time.perf_counter()
-        return response.data, end-start, query.term
+        return response.data, query.cql, end-start, query.term

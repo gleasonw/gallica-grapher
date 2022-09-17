@@ -2,14 +2,14 @@ from unittest import TestCase
 from backend.gallica.recordParse import RecordParse
 import os
 from lxml import etree
-from dateparse import DateParse
+from date import Date
 
 
 class TestXMLParser(TestCase):
 
     def setUp(self) -> None:
         here = os.path.dirname(__file__)
-        self.xmlParser = RecordParse(DateParse)
+        self.xmlParser = RecordParse(Date)
         with open(os.path.join(here, 'resources/dummyPaperRecords.xml'), 'rb') as f:
             self.paperXML = etree.fromstring(f.read())
         with open(os.path.join(here, 'resources/dummyOccurrenceRecords.xml'), 'rb') as f:
@@ -115,7 +115,7 @@ class TestXMLParser(TestCase):
             dates.append(date)
         self.assertListEqual(
             dates[4].getDate(),
-            DateParse('1892').getDate()
+            Date('1892').getDate()
         )
 
     def test_getNumRecords_given_occurrence_records(self):

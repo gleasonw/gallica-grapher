@@ -10,31 +10,27 @@ class QueryIndexer:
         self.fetch = Fetch('https://gallica.bnf.fr/SRU')
         self.parse = buildParser()
         self.makeQuery = Query
-        self.baseQueries = baseQueries
+        self.baseQueries = {query.cql: query for query in baseQueries}
 
     def fetchNumResultsForQueries(self):
-        responses = self.fetch.fetchAll(self.baseQueries)
+        responses = self.fetch.fetchAll(self.baseQueries.values())
         totalResults = 0
-        for data in responses:
-            numRecordsForBaseCQL = self.parse.numRecords(query.responseXML)
+        for data, cql in responses:
+            numRecordsForBaseCQL = self.parse.numRecords(data)
             totalResults += numRecordsForBaseCQL
-            query.estimateNumRecordsToFetch = numRecordsForBaseCQL
+            self.baseQueries[cql].estimateNumRecordsToFetch = numRecordsForBaseCQL
         return totalResults
 
     def makeIndexedQueries(self):
-        queries = []
-        for query in self.baseQueries:
+        for query in self.baseQueries.values():
             for index in range(1, query.estimateNumRecordsToFetch, 50):
-                queries.append(
-                    Query(
-                        cql=query.cql,
-                        startIndex=index,
-                        numRecords=50,
-                        collapsing=False,
-                        term=query.term
-                    )
+                yield Query(
+                    cql=query.cql,
+                    startIndex=index,
+                    numRecords=50,
+                    collapsing=False,
+                    term=query.term
                 )
-        return queries
 
     def makeIndexedPaperQueries(self):
         queries = []
