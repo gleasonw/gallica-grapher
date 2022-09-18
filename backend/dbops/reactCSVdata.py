@@ -7,6 +7,7 @@ class ReactCSVdata:
         self.conn = PSQLconn().getConn()
         self.csvData = None
 
+    #TODO I fear this might be horribly inefficient, also, requestID needed
     def getCSVData(self, ticketIDs):
         tupledTickets = tuple(ticketIDs.split(','))
         with self.conn.cursor() as cur:

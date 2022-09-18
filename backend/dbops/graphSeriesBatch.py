@@ -72,6 +72,7 @@ class TicketGraphSeries:
         else:
             raise Exception("Invalid time bin")
 
+    #TODO: rewrite with dictionary routing
     def buildQueryForSeries(self):
         if self.timeBin == "day" and self.continuous:
             self.initDayContinuousPaperRequest()

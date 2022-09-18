@@ -4,7 +4,7 @@ from urllib3.util.retry import Retry
 from gallica.query import Query
 import time
 
-NUM_WORKERS = 60
+NUM_WORKERS = 30
 
 retryStrategy = Retry(
     status_forcelist=[413, 429, 500, 502, 503, 504],

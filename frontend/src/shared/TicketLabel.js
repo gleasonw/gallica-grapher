@@ -43,8 +43,7 @@ const StyledTicketLabel = styled.div`
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 25px;
 `;
 
 const StyledCompactTicketLabel = styled.div`

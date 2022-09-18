@@ -1,20 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {TicketProgressBox} from "./TicketProgressBox";
+import ClassicUIBox from "../shared/ClassicUIBox";
 
 export function TicketProgressContainer(props) {
-    let initProgressStats = {}
-
-    Object.keys(props.tickets).map(key => (
-        initProgressStats[key] = {
-            progress: 0,
-            numResultsDiscovered: 0,
-            numResultsRetrieved: 0,
-            randomPaper: '',
-            estimateSecondsToCompletion: 0
-        }
-    ))
-
-    const [progressStats, setProgressStats] = useState(initProgressStats)
+    const [progressStats, setProgressStats] = useState(null)
 
     useEffect(() => {
         async function updateProgress() {
@@ -22,10 +11,8 @@ export function TicketProgressContainer(props) {
             currentTicketProgress.json().then(data => {
                 const state = data["state"]
                 if(state === "PENDING"){
-                    console.log("PENDING")
                     setTimeout(updateProgress, 1000)
-                }
-                if (state === "PROGRESS") {
+                } if (state === "PROGRESS") {
                     const progress = data["progress"]
                     setProgressStats(progress)
                 } else if (state === "SUCCESS") {
@@ -39,18 +26,25 @@ export function TicketProgressContainer(props) {
         }
         setTimeout(updateProgress, 1000)
     }, [props, progressStats]);
-    return (
-        <div className='queryProgressUI'>
-            {Object.keys(props.tickets).map(key => (
-                <TicketProgressBox
-                    terms={props.tickets[key]['terms']}
-                    papers={props.tickets[key]['papersAndCodes']}
-                    dateRange={props.tickets[key]['dateRange']}
-                    key={key}
-                    progressStats={progressStats[key]}
-                />
-            ))}
-        </div>
-    )
-
+    if(progressStats === null){
+        return(
+            <div className='queryProgressUI'>
+                <ClassicUIBox>Your request has been received. A worker process will begin fetching records shortly...</ClassicUIBox>
+            </div>
+        )
+    }else{
+        return (
+            <div className='queryProgressUI'>
+                {Object.keys(props.tickets).map(key => (
+                    <TicketProgressBox
+                        terms={props.tickets[key]['terms']}
+                        papers={props.tickets[key]['papersAndCodes']}
+                        dateRange={props.tickets[key]['dateRange']}
+                        key={key}
+                        progressStats={progressStats[key]}
+                    />
+                ))}
+            </div>
+        )
+    }
 }
