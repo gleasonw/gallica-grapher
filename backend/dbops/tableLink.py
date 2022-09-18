@@ -36,7 +36,6 @@ class TableLink:
                 )
             )
 
-
     def getPaperCodesThatMatch(self, codes):
         with self.conn.cursor() as curs:
             curs.execute(
@@ -48,8 +47,13 @@ class TableLink:
     def getNumResultsForTicket(self, ticketID):
         with self.conn.cursor() as curs:
             curs.execute(
-                'SELECT COUNT(*) FROM results WHERE ticketid = %s',
-                (ticketID,)
+                """
+                SELECT COUNT(*) 
+                FROM results 
+                WHERE ticketid = %s
+                AND requestid = %s
+                """,
+                (ticketID,self.requestID,)
             )
             return curs.fetchone()[0]
 

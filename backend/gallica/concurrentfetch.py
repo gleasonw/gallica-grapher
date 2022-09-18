@@ -17,7 +17,7 @@ class ConcurrentFetch:
     def __init__(self, baseUrl):
         self.baseUrl = baseUrl
         self.http = urllib3.PoolManager(
-            timeout=urllib3.Timeout(connect=32, read=244),
+            timeout=urllib3.Timeout(connect=32, read=124),
             retries=retryStrategy,
             maxsize=NUM_WORKERS
         )

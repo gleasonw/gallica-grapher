@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const ImportantButtonWrap = styled.div`
+const ImportantButtonWrap = styled.button`
     text-align: center;
     align-self: center;
     cursor: pointer;

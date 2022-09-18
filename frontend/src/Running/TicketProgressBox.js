@@ -13,6 +13,10 @@ export function TicketProgressBox(props) {
     const remainingMinutes = minutesToCompletion % 60
     const timeEstimate = hoursToCompletion + "h " + remainingMinutes + "m " + remainingSeconds + "s"
     const progress = props.progressStats.progress
+    const resultsRetrieved = props.progressStats.numResultsRetrieved
+    const estimateTotal = props.progressStats.numResultsDiscovered
+    console.log(props.active)
+    progress === 100 && props.onFinish()
     return (
         <ClassicUIBox>
             <TicketLabel
@@ -26,18 +30,21 @@ export function TicketProgressBox(props) {
                     now={props.progressStats.progress}
                 />
                 {
-                    progress === 0 &&
-                    <CircularProgress/>
+                    (progress === 0 && props.active) &&
+                    <span>
+                        Establishing a connection to the archive...
+                        <CircularProgress/>
+                    </span>
                 }
                 {
                     progress === 100 &&
-                    <div>{props.progressStats.numResultsRetrieved.toLocaleString()} results retrieved after eliminating duplicates.</div>
+                    <div>{resultsRetrieved.toLocaleString()} results retrieved after eliminating duplicates.</div>
                 }
                 {
-                    (props.progressStats.progress > 0) && (props.progressStats.progress < 100)  &&
+                    (progress > 0) && (progress < 100)  &&
                     <StyledProgressStats>
                         <div className='progressStatsText'>
-                            <div>{props.progressStats.numResultsRetrieved.toLocaleString()} of {props.progressStats.numResultsDiscovered.toLocaleString()} records fetched from Paris</div>
+                            <div>{resultsRetrieved.toLocaleString()} of {estimateTotal.toLocaleString()} records fetched from Paris</div>
                         </div>
                         <div className='progressStatsText'>
                             {props.progressStats.randomPaper}

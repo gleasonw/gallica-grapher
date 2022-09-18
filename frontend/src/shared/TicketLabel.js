@@ -53,7 +53,6 @@ const StyledCompactTicketLabel = styled.div`
 `;
 
 function generateBlurb(items){
-    console.log(items)
     const highestIndexBefore28Characters = getHighestIndexBeforeLimitCharactersCombined(items)
     const numItemsRemaining = items.length - highestIndexBefore28Characters - 1
     if(numItemsRemaining > 0){

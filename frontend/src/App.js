@@ -7,6 +7,7 @@ import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
+import ClassicUIBox from "./shared/ClassicUIBox";
 
 
 function App() {
@@ -44,7 +45,6 @@ function App() {
             ...tickets,
             [newTicketID]: ticket
         };
-        setTickets(updatedTickets);
         await initRequest(updatedTickets);
     }
 
@@ -66,32 +66,25 @@ function App() {
             tickets: ticketsWithJustCodes
         })
         const requestID = JSON.parse(request.response)["taskid"];
+        setTickets(allUserTickets);
         setRequestID(requestID);
         setRunningQueries(true);
         setGettingInput(false);
     }
 
     function handleCreateTicketClick(items){
-
-        function createTicketFromInput(items){
-            const ticketID = uuidv4();
-            let updatedTickets = {
-                ...tickets,
-                [ticketID]: items
-            };
-            setTickets(updatedTickets);
-        }
-        createTicketFromInput(items)
+        const ticketID = uuidv4();
+        let updatedTickets = {
+            ...tickets,
+            [ticketID]: items
+        };
+        setTickets(updatedTickets);
     }
 
     function handleTicketClick(ticketID){
-
-        function deleteTicket(key){
-            let updatedTickets = {...tickets}
-            delete updatedTickets[key];
-            setTickets(updatedTickets)
-        }
-        deleteTicket(ticketID);
+        let updatedTickets = {...tickets}
+        delete updatedTickets[ticketID];
+        setTickets(updatedTickets)
     }
 
     function handleExampleRequestClick(request){
@@ -108,6 +101,7 @@ function App() {
         setGettingInput(true);
         setRunningQueries(false);
         setTickets({});
+        setRequestID(null);
         setTooManyRecordsWarning(false);
         setNumRecords(0);
     }
@@ -151,7 +145,7 @@ function App() {
                 {header}
                 <RunningQueriesUI
                     tickets={tickets}
-                    taskID={requestID}
+                    requestID={requestID}
                     onFinish={handleTicketFinish}
                     onTooManyRecords={handleTooManyRecords}
                 />
@@ -161,7 +155,7 @@ function App() {
         return (
             <div className="App">
                 {header}
-                <div className={'tooManyRecordsWarningBox'}>
+                <ClassicUIBox>
                     <h1>Your curiosity exceeds my capacity.</h1>
                     <br/>
                     <h3>{numRecords.toLocaleString()} records in your request.</h3>
@@ -169,7 +163,7 @@ function App() {
             This number is either greater than my limit, or I don't have enough space for it right now. Try restricting your search to a few periodicals,
             shortening the year range, or using a more precise term. Click on Graphing Gallica to return to home.
                     </section>
-                </div>
+                </ClassicUIBox>
             </div>
         )
     }else{
