@@ -5,18 +5,15 @@ import NavBarWrap from "./NavBarWrap";
 import styled from 'styled-components';
 
 export default function DisplayRecordsTable(props){
-    const [year, setYear] = useState(1905);
-    const [month, setMonth] = useState(0);
-    const [day, setDay] = useState(0);
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
     const recordsQuery =
         "/api/getDisplayRecords?" +
         "tickets=" + Object.keys(props.tickets) +
         "&requestID=" + props.requestID +
-        "&year=" + year +
-        "&month=" + month +
-        "&day=" + day +
+        "&year=" + props.year +
+        "&month=" + props.month +
+        "&day=" + props.day +
         "&limit=" + limit +
         "&offset=" + offset;
     const result = useData(recordsQuery);
@@ -28,27 +25,30 @@ export default function DisplayRecordsTable(props){
                 <label htmlFor='year'>Year</label>
                 <input
                     type={'number'}
-                    value={year}
+                    value={props.year}
                     id={'year'}
-                    onChange={(e) => setYear(parseInt(e.target.value))}
+                    onChange={
+                    (e) => props.onYearChange(parseInt(e.target.value))}
                     />
             </StyledInputAndLabel>
             <StyledInputAndLabel>
                 <label htmlFor='month'>Month</label>
                 <input
                     type={'number'}
-                    value={month}
+                    value={props.month}
                     id={'month'}
-                    onChange={(e) => setMonth(parseInt(e.target.value))}
+                    onChange={
+                    (e) => props.onMonthChange(parseInt(e.target.value))}
                     />
             </StyledInputAndLabel>
             <StyledInputAndLabel>
                 <label htmlFor='day'>Day</label>
                 <input
                     type={'number'}
-                    value={day}
+                    value={props.day}
                     id={'day'}
-                    onChange={(e) => setDay(parseInt(e.target.value))}
+                    onChange={
+                    (e) => props.onDayChange(parseInt(e.target.value))}
                     />
             </StyledInputAndLabel>
             <StyledInputAndLabel>

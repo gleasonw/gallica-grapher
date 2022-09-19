@@ -37,7 +37,9 @@ function Chart(props) {
             allSettings);
         const highchartsOptions = generateOptions(
             graphDataWithSyncedColors,
-            chartSettings);
+            chartSettings,
+            props.onSeriesClick
+        );
         return (
             <StyledChartUI>
                 <ChartSettings

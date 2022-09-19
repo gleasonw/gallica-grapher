@@ -1,14 +1,11 @@
-export default function generateOptions(series, settings) {
+export default function generateOptions(series, settings, onSeriesClick) {
     let options = {
         plotOptions:{
             series: {
                 cursor: 'pointer',
                 point: {
                   events: {
-                    click: function (e) {
-                      console.log(this);
-                      console.log(e);
-                    }
+                    click: (e) => onSeriesClick(e.point)
                   }
                 }
               }
