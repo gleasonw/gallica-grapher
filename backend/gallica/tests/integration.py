@@ -66,7 +66,7 @@ def getSearchOneTermInAllPapersOverRange():
         '1234',
         ['brazza'],
         [],
-        '1850,1950'
+        ['1850','1950']
     )
     return testTicket
 

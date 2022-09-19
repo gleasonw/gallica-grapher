@@ -13,6 +13,7 @@ function SoloTickets(props) {
                     ticket={props.tickets[key]}
                     key={key}
                     ticketID={key}
+                    requestID={props.requestID}
                 />
             ))}
         </div>
@@ -35,6 +36,7 @@ function SoloTicketResult(props) {
                 ticketID={props.ticketID}
                 dateRange={props.ticket.dateRange}
                 grouped={false}
+                requestID={props.requestID}
             />
             <DownloadCSVButton tickets={{[props.ticketID]: ''}}/>
         </ClassicUIBox>

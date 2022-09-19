@@ -26,15 +26,11 @@ class PaperSearchRunner:
         self.doSearch(queries)
 
     def doSearch(self, queries):
-        queriesWithResponseData = self.SRUfetch.fetchAll(queries)
-        records = self.convertQueriesToRecords(queriesWithResponseData)
-        recordsWithPublishingYears = self.getPublishingYearsForRecords(records)
-        self.insertIntoPapers(recordsWithPublishingYears)
-
-    def convertQueriesToRecords(self, queries):
-        for query in queries:
-            records = self.parse.papers(query.responseXML)
-            yield from records
+        response = self.SRUfetch.fetchAll(queries)
+        for data, cql in response:
+            records = self.parse.papers(data)
+            recordsWithPublishingYears = self.getPublishingYearsForRecords(records)
+            self.insertIntoPapers(recordsWithPublishingYears)
 
     def getPublishingYearsForRecords(self, records):
         records = list(records)
@@ -49,12 +45,11 @@ class PaperSearchRunner:
 
     def addPublishingYearsToPaperRecord(self, records, yearQueriesWithResponse):
         yearData = {}
-        for query in yearQueriesWithResponse:
+        for data, code in yearQueriesWithResponse:
             try:
-                code = query.code
-                yearData[code] = self.parse.yearsPublished(query.responseXML)
+                yearData[code] = self.parse.yearsPublished(data)
             except LxmlError:
-                print("bad years for code: ", query.code)
+                print("bad years for code: ", code)
         for record in records:
             record.publishingYears = yearData.get(record.code, [])
             yield record

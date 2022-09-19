@@ -12,11 +12,10 @@ export function TicketProgressBox(props) {
     const remainingSeconds = Math.floor(secondsToCompletion % 60)
     const remainingMinutes = minutesToCompletion % 60
     const timeEstimate = hoursToCompletion + "h " + remainingMinutes + "m " + remainingSeconds + "s"
+    const active = props.progressStats.active
     const progress = props.progressStats.progress
     const resultsRetrieved = props.progressStats.numResultsRetrieved
     const estimateTotal = props.progressStats.numResultsDiscovered
-    console.log(props.active)
-    progress === 100 && props.onFinish()
     return (
         <ClassicUIBox>
             <TicketLabel
@@ -25,21 +24,20 @@ export function TicketProgressBox(props) {
                 dateRange={props.dateRange}
             />
             <StyledProgressStats>
-                <ProgressBar
-                    animated
-                    now={props.progressStats.progress}
-                />
                 {
-                    (progress === 0 && props.active) &&
+                    (progress === 0 && active) ?
                     <span>
-                        Establishing a connection to the archive...
+                        Waiting for a response from the archive...
                         <CircularProgress/>
                     </span>
+                        :
+                        null
                 }
                 {
                     progress === 100 &&
                     <div>{resultsRetrieved.toLocaleString()} results retrieved after eliminating duplicates.</div>
                 }
+                <ProgressBar now={props.progressStats.progress}/>
                 {
                     (progress > 0) && (progress < 100)  &&
                     <StyledProgressStats>

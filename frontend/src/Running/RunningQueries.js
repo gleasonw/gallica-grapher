@@ -1,62 +1,59 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {TicketProgressBox} from "./TicketProgressBox";
-import ClassicUIBox from "../shared/ClassicUIBox";
+import useInterval from "../shared/useInterval";
 
 
 function RunningQueriesUI(props) {
-    const [progressStats, setProgressStats] = useState(null)
-    const [activeTicket, setActiveTicket] = useState(0)
-    console.log(activeTicket)
-
-    useEffect(() => {
-        async function updateProgress() {
-            const currentTicketProgress = await fetch("/api/progress/" + props.requestID);
-            currentTicketProgress.json().then(data => {
-                const state = data["state"]
-                if(state === "PENDING"){
-                    setTimeout(updateProgress, 1000)
-                }else if (state === "PROGRESS") {
-                    const progress = data["progress"]
-                    setProgressStats(progress)
-                } else if (state === "SUCCESS") {
-                    props.onFinish()
-                } else if (state === "TOO_MANY_RECORDS") {
-                    props.onTooManyRecords(data["numRecords"])
-                } else {
-                    console.log("Unknown state: " + data["state"])
-                }
-            });
+    console.log(props.requestID)
+    const [progressStats, setProgressStats] = React.useState({})
+    useInterval(async () => {
+        const requestStateCallbacks = {
+            "PROGRESS": () => setProgressStats(
+                progressJSON['progress'] ?
+                    progressJSON['progress']
+                    :
+                    {}
+            ),
+            "TOO_MANY_RECORDS": props.onTooManyRecords,
+            "SUCCESS": props.onFinish
         }
-        setTimeout(updateProgress, 1000)
-    }, [props, progressStats]);
+        const progress = await fetch("/api/progress/" + props.requestID);
+        const progressJSON = await progress.json();
+        const state = progressJSON["state"]
+        if(requestStateCallbacks.hasOwnProperty(state)){
+            requestStateCallbacks[state]()
+        }else{
+            console.log("Unknown state: " + state)
+        }
 
-    function handleIncrementActiveTicket(){
-        setActiveTicket(activeTicket + 1)
-    }
+    }, 1000);
+    console.log(progressStats)
+    return (
+        <div className='queryProgressUI'>
+            {Object.keys(props.tickets).map((key, index) => (
+                <TicketProgressBox
+                    terms={props.tickets[key]['terms']}
+                    papers={props.tickets[key]['papersAndCodes']}
+                    dateRange={props.tickets[key]['dateRange']}
+                    key={key}
+                    progressStats={
+                        progressStats.hasOwnProperty(key) ?
+                            progressStats[key]
+                            :
+                            {
+                                progress: 0,
+                                numResultsDiscovered: 0,
+                                numResultsRetrieved: 0,
+                                randomPaper: '',
+                                estimateSecondsToCompletion: 0,
+                                active: index === 0 ? 1 : 0
+                            }
 
-    if(progressStats === null){
-        return(
-            <div className='queryProgressUI'>
-                <ClassicUIBox>Your request has been received. A worker process will begin fetching records shortly...</ClassicUIBox>
-            </div>
-        )
-    }else{
-        return (
-            <div className='queryProgressUI'>
-                {Object.keys(props.tickets).map((key, index) => (
-                    <TicketProgressBox
-                        terms={props.tickets[key]['terms']}
-                        papers={props.tickets[key]['papersAndCodes']}
-                        dateRange={props.tickets[key]['dateRange']}
-                        key={key}
-                        active={index === activeTicket}
-                        progressStats={progressStats[key]}
-                        onFinish={handleIncrementActiveTicket}
-                    />
-                ))}
-            </div>
-        )
-    }
+                    }
+                />
+            ))}
+        </div>
+    )
 }
 
 export default RunningQueriesUI;

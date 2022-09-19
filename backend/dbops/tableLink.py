@@ -86,7 +86,6 @@ class TableLink:
             )
 
 
-
 class CSVStream:
 
     def __init__(self):

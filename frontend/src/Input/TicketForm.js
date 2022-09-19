@@ -60,12 +60,14 @@ function TicketForm(props){
                 userSelectedPapers={props.userSelectedPapers}
                 boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
             />
+            <div ref={props.requestBoxRef}>
             <StyledRequestBox
                 tickets={props.tickets}
                 onTicketClick={props.onTicketClick}
                 className={'requestBox'}
                 onCreateTicketClick={handleCreateTicketClick}
             />
+            </div>
             <br />
             <RequestBoxAndFetchButtonWrap>
                 <ImportantButtonWrap>

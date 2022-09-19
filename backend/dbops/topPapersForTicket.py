@@ -6,11 +6,13 @@ class TopPapersForTicket:
     def __init__(
             self,
             ticketID,
+            requestID,
             continuous,
             dateRange=None):
 
         self.conn = PSQLconn().getConn()
         self.ticketID = ticketID
+        self.requestID = requestID
         self.continuous = continuous.lower() == "true"
         if self.continuous:
             self.lowYear, self.highYear = dateRange.split(",")
@@ -42,24 +44,25 @@ class TopPapersForTicket:
     def selectTopContinuousPapers(self):
         with self.conn.cursor() as cursor:
             cursor.execute("""
-
-            SELECT continuousPapersForRange.title, count(paperid) AS papercount
+            WITH ticketPapers AS (
+                SELECT paperid
+                FROM results
+                WHERE ticketid = %s
+                AND requestid = %s
+            ), paperNames AS (
+                SELECT code, title
+                FROM papers
+                WHERE papers.startdate <= %s AND papers.enddate >= %s
+                AND continuous)
+            SELECT title, count(paperid) AS papercount
                 FROM 
-                (SELECT paperid FROM results 
-                    WHERE 
-                        ticketid = %s)
-                AS ticket
-                INNER JOIN 
-                (SELECT code, title FROM papers 
-                    WHERE 
-                        papers.startdate <= %s AND papers.enddate >= %s
-                            AND
-                        continuous IS TRUE) 
-                AS continuousPapersForRange
-                ON ticket.paperid = continuousPapersForRange.code 
-                GROUP BY continuousPapersForRange.title
+                ticketPapers
+                JOIN 
+                paperNames
+                ON ticketPapers.paperid = paperNames.code 
+                GROUP BY title
                 ORDER BY papercount DESC
                 LIMIT 10;
 
-            """, (self.ticketID, self.lowYear, self.highYear,))
+            """, (self.ticketID, self.requestID, self.lowYear, self.highYear,))
             self.topPapers = cursor.fetchall()

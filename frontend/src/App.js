@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import Input from "./Input/Input";
 import RunningQueriesUI from "./Running/RunningQueries";
@@ -18,6 +18,7 @@ function App() {
     const [infoPage, setInfoPage] = useState(false);
     const [tooManyRecordsWarning, setTooManyRecordsWarning] = useState(false);
     const [numRecords, setNumRecords] = useState(0);
+    const requestBoxRef = useRef(null);
 
     const header =
         <header className="header">
@@ -39,37 +40,37 @@ function App() {
             </div>
         </header>
 
-    async function handleLoadedSubmit(ticket){
+    function handleLoadedSubmit(ticket){
         const newTicketID = uuidv4();
         const updatedTickets = {
             ...tickets,
             [newTicketID]: ticket
         };
-        await initRequest(updatedTickets);
+        void initRequest(updatedTickets);
     }
 
-    async function handleUnloadedSubmit(){
-        await initRequest(tickets);
+    function handleUnloadedSubmit(){
+        void initRequest(tickets);
     }
 
-    async function initRequest(allUserTickets) {
+    async function initRequest(tickets){
+        setRunningQueries(true);
+        setGettingInput(false);
+        setTickets(tickets);
         const ticketsWithJustCodes = {}
-        Object.keys(allUserTickets).map((ticketID) => (
+        Object.keys(tickets).map((ticketID) => (
             ticketsWithJustCodes[ticketID] = {
-                    terms: allUserTickets[ticketID].terms,
-                    codes: allUserTickets[ticketID].papersAndCodes.map(
+                    terms: tickets[ticketID].terms,
+                    codes: tickets[ticketID].papersAndCodes.map(
                         (paperAndCode) => (paperAndCode.code)),
-                    dateRange: allUserTickets[ticketID].dateRange
+                    dateRange: tickets[ticketID].dateRange
             }
         ))
         const {request} = await axios.post('/api/init', {
             tickets: ticketsWithJustCodes
         })
         const requestID = JSON.parse(request.response)["taskid"];
-        setTickets(allUserTickets);
         setRequestID(requestID);
-        setRunningQueries(true);
-        setGettingInput(false);
     }
 
     function handleCreateTicketClick(items){
@@ -88,8 +89,12 @@ function App() {
     }
 
     function handleExampleRequestClick(request){
-        window.scrollTo(0, 0);
-        setTickets(request);
+        requestBoxRef.current.scrollIntoView({behavior: 'smooth'});
+        const requestWithUniqueTicketIDs = {}
+        Object.keys(request).map((ticketID) => (
+            requestWithUniqueTicketIDs[uuidv4()] = request[ticketID]
+        ))
+        setTickets(requestWithUniqueTicketIDs);
     }
 
     function handleTicketFinish(){
@@ -136,6 +141,7 @@ function App() {
                     onCreateTicketClick={handleCreateTicketClick}
                     onTicketClick={handleTicketClick}
                     onExampleRequestClick={handleExampleRequestClick}
+                    requestBoxRef={requestBoxRef}
                 />
             </div>
         )
@@ -170,7 +176,10 @@ function App() {
         return (
             <div className="App">
                 {header}
-                <ResultUI tickets={tickets}/>
+                <ResultUI
+                    tickets={tickets}
+                    requestID={requestID}
+                />
             </div>
           )
     }

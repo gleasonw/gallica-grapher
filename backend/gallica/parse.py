@@ -1,4 +1,5 @@
 from lxml import etree
+from gallica.date import Date
 
 
 class Parse:
@@ -6,33 +7,39 @@ class Parse:
     def __init__(
             self,
             makePaperRecord,
-            makeOccurrenceRecord,
-            recordParser
+            makeOccurrenceRecord
     ):
         self.makePaperRecord = makePaperRecord
         self.makeOccurrenceRecord = makeOccurrenceRecord
-        self.parseRecord = recordParser
 
     def papers(self, responseXML) -> list:
         elements = etree.fromstring(responseXML)
         for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             data = self.getDataFromRecordRoot(record)
             newRecord = self.makePaperRecord(
-                code=self.parseRecord.getPaperCode(data),
-                title=self.parseRecord.getPaperTitle(data),
-                url=self.parseRecord.getURL(data),
+                code=self.getPaperCode(data),
+                title=self.getPaperTitle(data),
+                url=self.getURL(data),
             )
             yield newRecord
 
-    def occurrences(self, responseXML) -> list:
-        elements = etree.fromstring(responseXML)
+    def occurrences(self, xml, startYear) -> list:
+        elements = etree.fromstring(xml)
         for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             data = self.getDataFromRecordRoot(record)
+            paperCode = self.getPaperCode(data)
+            if paperCode is None:
+                etree.dump(xml)
+                continue
+            date = self.getDate(data)
+            recordYear = date.getYear()
+            if recordYear and recordYear < startYear:
+                continue
             newRecord = self.makeOccurrenceRecord(
-                paperCode=self.parseRecord.getPaperCode(data),
-                date=self.parseRecord.getDate(data),
-                url=self.parseRecord.getURL(data),
-            )
+                paperCode=paperCode,
+                date=date,
+                url=self.getURL(data),
+                )
             yield newRecord
 
     def onePaperTitleFromOccurrenceBatch(self, responseXML) -> str:
@@ -42,7 +49,7 @@ class Parse:
             return 'nonsense'
         record = recordsRoot[0]
         recordData = self.getDataFromRecordRoot(record)
-        return self.parseRecord.getPaperTitle(recordData)
+        return self.getPaperTitle(recordData)
 
     @staticmethod
     def numRecords(xml) -> int:
@@ -76,6 +83,39 @@ class Parse:
         root = recordRoot[2]
         data = root[0]
         return data
+
+    @staticmethod
+    def getPaperCode(xml) -> str:
+        paperCodeElement = xml.find(
+            '{http://purl.org/dc/elements/1.1/}relation')
+
+        if paperCodeElement is not None:
+            elementText = paperCodeElement.text
+            paperCode = elementText[-11:len(elementText)]
+            return paperCode
+        else:
+            return 'None'
+
+    @staticmethod
+    def getURL(xml) -> str:
+        urlElement = xml.find(
+            '{http://purl.org/dc/elements/1.1/}identifier')
+        if urlElement is not None:
+            url = urlElement.text
+            return url
+
+    @staticmethod
+    def getPaperTitle(xml) -> str:
+        paperTitle = xml.find(
+            '{http://purl.org/dc/elements/1.1/}title').text
+        return paperTitle
+
+    @staticmethod
+    def getDate(xml) -> Date:
+        dateElement = xml.find(
+            '{http://purl.org/dc/elements/1.1/}date')
+        if dateElement is not None:
+            return Date(dateElement.text)
 
 
 

@@ -31,7 +31,10 @@ def getProgress(taskID):
     task = spawnRequest.AsyncResult(taskID)
     state = task.state
     if state == 'PENDING':
-        response = {'state': state}
+        response = {
+            'state': state,
+            'progress': 0
+        }
     elif state == 'PROGRESS':
         response = {
             'state': state,
@@ -104,7 +107,8 @@ def getGraphData():
 @app.route('/api/topPapers')
 def getTopPapersFromID():
     topPapers = TopPapersForTicket(
-        request.args["id"],
+        ticketID=request.args["ticketID"],
+        requestID=request.args["requestID"],
         continuous=request.args["continuous"],
         dateRange=request.args["dateRange"]
     )

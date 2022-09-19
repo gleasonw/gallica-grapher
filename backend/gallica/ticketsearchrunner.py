@@ -24,7 +24,6 @@ class TicketSearchRunner:
     def setProgressTracker(self, progressTracker):
         self.onUpdateProgress = progressTracker
 
-    #TODO: what if there are no records? Check at initial stage. Too many/ none
     def search(self):
         responseData = self.SRUfetch.fetchAllAndTrackProgress(
             self.ticket.queries,
@@ -37,7 +36,13 @@ class TicketSearchRunner:
 
     def pipeRecordsToDB(self, returnValues):
         for data, term in returnValues:
-            records = list(self.parse.occurrences(data))
+            records = list(self.parse.occurrences(
+                xml=data,
+                startYear=self.ticket.startYear
+            ))
+            if records is None:
+                print("Empty records???")
+                continue
             for record in records:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,
@@ -49,9 +54,6 @@ class TicketSearchRunner:
 
     def insertMissingPapersToDB(self, records):
         codesFromRecords = set(record.paperCode for record in records)
-        if not codesFromRecords:
-            print("BIG HICCUP")
-            return records
         schemaMatches = self.schema.getPaperCodesThatMatch(codesFromRecords)
         setOfCodesInDB = set(match[0] for match in schemaMatches)
         missingCodes = codesFromRecords - setOfCodesInDB

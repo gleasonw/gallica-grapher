@@ -9,6 +9,7 @@ class Query:
         self.responseXML = None
         self.elapsedTime = None
         self.estimateNumRecordsToFetch = None
+        self.code = None
 
     def handleResponse(self, data, elapsed):
         self.responseXML = data

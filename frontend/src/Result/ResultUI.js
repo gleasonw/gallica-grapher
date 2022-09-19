@@ -40,10 +40,12 @@ function ResultUI(props){
                     {grouped ? (
                         <GroupedTicketResults
                             tickets={props.tickets}
+                            requestID={props.requestID}
                         />
                     ) : (
                         <SoloTickets
                             tickets={props.tickets}
+                            requestID={props.requestID}
                         />
                     )}
                 </div>

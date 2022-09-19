@@ -8,7 +8,8 @@ export function TicketPaperOccurrenceStats(props) {
     const settings = useContext(GraphSettingsContext);
     const ticketSettings = props.grouped ? settings.group : settings[props.ticketID];
     const query =
-        "/api/topPapers?id="+props.ticketID+
+        "/api/topPapers?ticketID="+props.ticketID+
+        "&requestID="+props.requestID +
         "&continuous="+ticketSettings.continuous+
         "&dateRange="+props.dateRange
 

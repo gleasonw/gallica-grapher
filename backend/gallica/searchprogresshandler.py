@@ -63,6 +63,7 @@ class SearchProgressHandler:
             'numResultsDiscovered': self.ticket.estimateNumResults,
             'numResultsRetrieved': self.numBatchesRetrieved * 50,
             'randomPaper': randomPaper,
-            'estimateSecondsToCompletion': self.getEstimateSecondsToCompletion(numWorkers)
+            'estimateSecondsToCompletion': self.getEstimateSecondsToCompletion(numWorkers),
+            'active': 1
         }
 

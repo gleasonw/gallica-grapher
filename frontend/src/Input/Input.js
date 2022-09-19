@@ -56,7 +56,6 @@ function Input(props){
                 papersAndCodes: getPapersFor(selectedPaperInput),
                 dateRange: getDateRangeFor(selectedPaperInput)
             }
-            console.log(ticket)
             props.onLoadedSubmit(ticket);
         }else{
             props.onUnloadedSubmit();
@@ -275,6 +274,7 @@ function Input(props){
                         continuousPapers.length :
                         '...'
                     }
+                    requestBoxRef={props.requestBoxRef}
                 />
                 <input
                     id='seeExamplesButton'

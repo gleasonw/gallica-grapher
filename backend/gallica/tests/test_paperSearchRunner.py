@@ -29,8 +29,8 @@ class TestPaperSearchRunner(TestCase):
         self.productionAddPublishingYears = self.testSearch.addPublishingYearsToPaperRecord
         self.testSearch.addPublishingYearsToPaperRecord = MagicMock()
 
-        self.productionConvertQueries = self.testSearch.convertQueriesToRecords
-        self.testSearch.convertQueriesToRecords = MagicMock()
+        self.productionConvertQueries = self.testSearch.convertResponseToRecords
+        self.testSearch.convertResponseToRecords = MagicMock()
 
     def test_add_record_data_for_these_codes_to_db(self):
         self.testSearch.addRecordDataForTheseCodesToDB = self.productionAddCodes
@@ -58,7 +58,7 @@ class TestPaperSearchRunner(TestCase):
             call('query2')
         ])
         self.testSearch.getPublishingYearsForRecords.assert_called_with(
-            self.testSearch.convertQueriesToRecords.return_value)
+            self.testSearch.convertResponseToRecords.return_value)
         self.testSearch.insertIntoPapers.assert_called_with(
             self.testSearch.getPublishingYearsForRecords.return_value)
 

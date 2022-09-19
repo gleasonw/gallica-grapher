@@ -44,7 +44,8 @@ class Request(threading.Thread):
                 'numResultsDiscovered': 0,
                 'numResultsRetrieved': 0,
                 'randomPaper': None,
-                'estimateSecondsToCompletion': 0
+                'estimateSecondsToCompletion': 0,
+                'active': 0
             }
         return progressDict
 
@@ -66,9 +67,14 @@ class Request(threading.Thread):
     def doAllSearches(self):
         for progressHandler in self.ticketSearches:
             progressHandler.setProgressCallback(self.setTicketProgressStats)
+            self.setTicketActive(progressHandler)
             progressHandler.run()
             self.setTicketProgressTo100AndMarkAsDone(progressHandler)
         self.finished = True
+
+    def setTicketActive(self, search):
+        ticketID = search.getTicketID()
+        self.ticketProgressStats[ticketID]['active'] = 1
 
     def setTicketProgressStats(self, ticketKey, progressStats):
         self.ticketProgressStats[ticketKey] = progressStats
@@ -81,6 +87,7 @@ class Request(threading.Thread):
             'numResultsDiscovered': numRetrieved,
             'numResultsRetrieved': numRetrieved,
             'randomPaper': None,
-            'estimateSecondsToCompletion': 0
+            'estimateSecondsToCompletion': 0,
+            'active': 0
         })
 

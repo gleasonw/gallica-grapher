@@ -16,7 +16,10 @@ export function GroupedTicketResults(props) {
                 tickets={props.tickets}
                 settingsID='group'
             />
-            <GroupedStatBar tickets={props.tickets}/>
+            <GroupedStatBar
+                tickets={props.tickets}
+                requestID={props.requestID}
+            />
             <DownloadCSVButton tickets={props.tickets}/>
         </ClassicUIBox>
 
@@ -44,6 +47,7 @@ function GroupedStatBar(props) {
                         ticketID={key}
                         dateRange={props.tickets[key].dateRange}
                         grouped={true}
+                        requestID={props.requestID}
                     />
                 </DecorativeTicket>
             ))}
