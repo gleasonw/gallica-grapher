@@ -33,7 +33,7 @@ class Parse:
                 continue
             date = self.getDate(data)
             recordYear = date.getYear()
-            if recordYear and recordYear < startYear:
+            if recordYear and int(recordYear) < int(startYear):
                 continue
             newRecord = self.makeOccurrenceRecord(
                 paperCode=paperCode,
