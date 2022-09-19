@@ -24,7 +24,6 @@ function RunningQueriesUI(props) {
         }else{
             console.log("Unknown state: " + state)
         }
-
     }, 1000);
     return (
         <div className='queryProgressUI'>

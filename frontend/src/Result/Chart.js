@@ -51,9 +51,6 @@ function Chart(props) {
                     ref={chartRef}
                     constructorType={'chart'}
                 />
-                <ChartExports
-                    chartRef={chartRef}
-                />
             </StyledChartUI>
         );
     }else{
