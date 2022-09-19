@@ -7,13 +7,12 @@ import styled from "styled-components";
 export function TicketPaperOccurrenceStats(props) {
     const settings = useContext(GraphSettingsContext);
     const ticketSettings = props.grouped ? settings.group : settings[props.ticketID];
-    const query =
+    const topPapersQuery =
         "/api/topPapers?ticketID="+props.ticketID+
         "&requestID="+props.requestID +
         "&continuous="+ticketSettings.continuous+
         "&dateRange="+props.dateRange
-
-    const result = useData(query);
+    const result = useData(topPapersQuery);
     if(result){
         const topPapers = result['topPapers'];
         return (
@@ -21,12 +20,12 @@ export function TicketPaperOccurrenceStats(props) {
                 <StyledOccurrenceTable>
                     <tbody>
                         <tr>
-                            <th>Paper</th>
+                            <th>Papers with the most occurrences</th>
                             <th>Total Occurrences</th>
                         </tr>
-                        {topPapers.map(paperCount => (
+                        {topPapers.map((paperCount, index) => (
                             <tr key={paperCount[0]}>
-                                <td>{paperCount[0]}</td>
+                                <td><h5>{index+1}.</h5> {paperCount[0]}</td>
                                 <td>{paperCount[1]}</td>
                             </tr>
                         ))}
@@ -53,6 +52,7 @@ const StyledOccurrenceTable = styled.table`
     tr:nth-child(even){
         background-color: #f2f2f2;
     }
+    min-width: 100%;
 `;
 
 export default TicketPaperOccurrenceStats;

@@ -1,13 +1,12 @@
 import io
 
 
-class TableLink:
+class SchemaLinkForSearch:
     def __init__(self, conn, requestID=None):
         self.conn = conn
         self.requestID = requestID
         self.CSVstreamBuilder = CSVStream().generateCSVstreamFromRecords
 
-    #TODO: fix startdate enddate for multiple papers
     def insertRecordsIntoPapers(self, records):
         csvStream = self.CSVstreamBuilder(records)
         with self.conn.cursor() as curs:

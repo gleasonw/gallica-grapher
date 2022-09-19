@@ -7,7 +7,7 @@ from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
 from dbops.topPapersForTicket import TopPapersForTicket
-from dbops.reactCSVdata import ReactCSVdata
+from dbops.recordDataForUser import RecordDataForUser
 
 
 app = Flask(__name__)
@@ -119,17 +119,30 @@ def getTopPapersFromID():
 @app.route('/api/getcsv')
 def getCSV():
     tickets = request.args["tickets"]
-    csvData = ReactCSVdata().getCSVData(tickets)
+    requestID = request.args["requestID"]
+    csvData = RecordDataForUser().getCSVData(tickets, requestID)
     return {"csvData": csvData}
 
 
-@app.route('/getIssueLinks')
-def getIssueLinks():
-    tickets = request.args["tickets"]
-    startDate = request.args["startDate"]
-    endDate = request.args["endDate"]
-    paperLinks = ReactCSVdata().getIssueLinks(tickets, startDate, endDate)
-    return {"paperLinks": paperLinks}
+@app.route('/api/getDisplayRecords')
+def getDisplayRecords():
+    tickets = request.args.get("tickets")
+    requestID = request.args.get("requestID")
+    year = request.args.get("year")
+    month = request.args.get("month")
+    day = request.args.get("day")
+    limit = request.args.get("limit")
+    offset = request.args.get("offset")
+    displayRecords = RecordDataForUser().getRecordsForDisplay(
+        tickets,
+        requestID,
+        year,
+        month,
+        day,
+        limit,
+        offset
+    )
+    return {"displayRecords": displayRecords}
 
 
 if __name__ == "__main__":

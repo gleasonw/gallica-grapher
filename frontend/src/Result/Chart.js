@@ -131,7 +131,6 @@ function ChartExports(props){
     function handleExportGraphCSVclick(){
         const chart = chartRef.current.chart;
         const data = chart.downloadCSV();
-        console.log(data)
         setCSVData(data);
     }
 

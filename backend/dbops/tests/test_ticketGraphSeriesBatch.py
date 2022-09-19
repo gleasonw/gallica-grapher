@@ -5,7 +5,7 @@ from dbops.graphSeriesBatch import TicketGraphSeries
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from DBtester import DBtester
 
-#TODO: make formerBackendTest more complete, not granular enough
+
 class TestTicketGraphSeriesBatch(TestCase):
 
     @patch("psycopg2.connect")

@@ -20,7 +20,10 @@ export function GroupedTicketResults(props) {
                 tickets={props.tickets}
                 requestID={props.requestID}
             />
-            <DownloadCSVButton tickets={props.tickets}/>
+            <DownloadCSVButton
+                tickets={props.tickets}
+                requestID={props.requestID}
+            />
         </ClassicUIBox>
 
     )

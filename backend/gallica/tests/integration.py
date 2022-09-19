@@ -5,7 +5,7 @@ import psutil
 from papersearchrunner import PaperSearchRunner
 from parseFactory import buildParser
 from concurrentfetch import ConcurrentFetch
-from tableLink import TableLink
+from schemaLinkForSearch import SchemaLinkForSearch
 from utils.psqlconn import PSQLconn
 from paperQueryFactory import PaperQueryFactory
 
@@ -74,7 +74,7 @@ def getSearchOneTermInAllPapersOverRange():
 def getAllPapers():
     parse = buildParser()
     sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
-    dbLink = TableLink(
+    dbLink = SchemaLinkForSearch(
         requestID='',
         conn=PSQLconn().getConn()
     )

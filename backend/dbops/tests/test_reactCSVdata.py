@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from dbops.reactCSVdata import ReactCSVdata
+from dbops.recordDataForUser import RecordDataForUser
 
 
 class TestReactCSVdata(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestReactCSVdata(unittest.TestCase):
     def setUp(self, mock_conn):
         mock_conn.return_value = mock_conn
         mock_conn.getConn.return_value = mock_conn
-        self.reactCSVdata = ReactCSVdata()
+        self.reactCSVdata = RecordDataForUser()
 
     def test_get_csv_data(self):
         mock_cursor_context = MagicMock(

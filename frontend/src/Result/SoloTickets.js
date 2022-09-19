@@ -38,7 +38,10 @@ function SoloTicketResult(props) {
                 grouped={false}
                 requestID={props.requestID}
             />
-            <DownloadCSVButton tickets={{[props.ticketID]: ''}}/>
+            <DownloadCSVButton
+                tickets={{[props.ticketID]: ''}}
+                requestID={props.requestID}
+            />
         </ClassicUIBox>
     )
 }

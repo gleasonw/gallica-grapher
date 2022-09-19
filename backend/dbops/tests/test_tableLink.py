@@ -1,16 +1,16 @@
-from dbops.tableLink import TableLink
+from dbops.schemaLinkForSearch import SchemaLinkForSearch
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock, call
 from DBtester import DBtester
 from gallica.dto.paperRecord import PaperRecord
 from gallica.dto.occurrenceRecord import OccurrenceRecord
-from tableLink import CSVStream
+from schemaLinkForSearch import CSVStream
 
 
 class TestTableLink(TestCase):
 
     def setUp(self):
-        self.testTransaction = TableLink(
+        self.testTransaction = SchemaLinkForSearch(
             MagicMock(),
             'testrequest'
         )
