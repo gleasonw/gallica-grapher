@@ -8,7 +8,7 @@ class RecordDataForUser:
     FROM results
     JOIN papers
     ON results.paperid = papers.code
-    WHERE ticketid = %s
+    WHERE ticketid in %s
     AND requestid = %s
     """
 
@@ -44,10 +44,11 @@ class RecordDataForUser:
         with self.conn.cursor() as cur:
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
-            AND year = %s 
+            AND year = %s
             ORDER BY year, month, day
             LIMIT %s
             OFFSET %s
+            ; 
             """, (tupledTickets, requestID, year, limit, offset))
             return cur.fetchall()
 

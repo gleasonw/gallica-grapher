@@ -4,6 +4,7 @@ import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import Chart from "./Chart";
 import DownloadCSVButton from "./DownloadCSVButton";
 import ClassicUIBox from "../shared/ClassicUIBox";
+import DisplayRecordsTable from "./DisplayRecordsTable";
 
 function SoloTickets(props) {
     return (
@@ -31,6 +32,10 @@ function SoloTicketResult(props) {
             <Chart
                 tickets={{[props.ticketID]: props.ticket}}
                 settingsID={props.ticketID}
+            />
+            <DisplayRecordsTable
+                tickets={{[props.ticketID]: props.ticket}}
+                requestID={props.requestID}
             />
             <TicketPaperOccurrenceStats
                 ticketID={props.ticketID}

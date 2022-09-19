@@ -8,19 +8,29 @@ import ClassicUIBox from "../shared/ClassicUIBox";
 import styled from "styled-components";
 import DecorativeTicket from "../shared/DecorativeTicket";
 import SeriesColorBubble from "../shared/SeriesColorBubble";
+import DisplayRecordsTable from "./DisplayRecordsTable";
 
 export function GroupedTicketResults(props) {
+    const settings = useContext(GraphSettingsContext);
+    const timeBin = settings.group.timeBin;
     return (
         <ClassicUIBox>
             <Chart
                 tickets={props.tickets}
                 settingsID='group'
             />
+            <StyledStatBar>
+                <DisplayRecordsTable
+                    tickets={props.tickets}
+                    requestID={props.requestID}
+                    timeBin={timeBin}
+                />
+                <DownloadCSVButton
+                    tickets={props.tickets}
+                    requestID={props.requestID}
+                />
+            </StyledStatBar>
             <GroupedStatBar
-                tickets={props.tickets}
-                requestID={props.requestID}
-            />
-            <DownloadCSVButton
                 tickets={props.tickets}
                 requestID={props.requestID}
             />
@@ -62,10 +72,8 @@ const StyledStatBar = styled.div`
     margin-top: 10px;
     margin-bottom: 10px;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
-    align-items: flex-start;
 `;
 
 export default GroupedTicketResults;

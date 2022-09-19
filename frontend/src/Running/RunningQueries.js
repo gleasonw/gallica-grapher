@@ -4,7 +4,6 @@ import useInterval from "../shared/useInterval";
 
 
 function RunningQueriesUI(props) {
-    console.log(props.requestID)
     const [progressStats, setProgressStats] = React.useState({})
     useInterval(async () => {
         const requestStateCallbacks = {
@@ -27,7 +26,6 @@ function RunningQueriesUI(props) {
         }
 
     }, 1000);
-    console.log(progressStats)
     return (
         <div className='queryProgressUI'>
             {Object.keys(props.tickets).map((key, index) => (

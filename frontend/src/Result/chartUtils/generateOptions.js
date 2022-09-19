@@ -1,5 +1,18 @@
 export default function generateOptions(series, settings) {
     let options = {
+        plotOptions:{
+            series: {
+                cursor: 'pointer',
+                point: {
+                  events: {
+                    click: function (e) {
+                      console.log(this);
+                      console.log(e);
+                    }
+                  }
+                }
+              }
+        },
         legend: {
             dateTimeLabelFormats: {
                 month: '%b',
@@ -22,7 +35,7 @@ export default function generateOptions(series, settings) {
             shared: true,
             crosshairs: true,
         },
-    }
+    };
     if (settings.timeBin === 'year') {
         formatYearOptions()
     } else if (settings.timeBin === 'month') {
@@ -33,6 +46,7 @@ export default function generateOptions(series, settings) {
 
     function formatYearOptions() {
         options.plotOptions = {
+            ...options.plotOptions,
             line: {
                 marker: {
                     enabled: false

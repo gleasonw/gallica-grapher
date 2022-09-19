@@ -129,8 +129,8 @@ def getDisplayRecords():
     tickets = request.args.get("tickets")
     requestID = request.args.get("requestID")
     year = request.args.get("year")
-    month = request.args.get("month")
-    day = request.args.get("day")
+    month = int(request.args.get("month"))
+    day = int(request.args.get("day"))
     limit = request.args.get("limit")
     offset = request.args.get("offset")
     displayRecords = RecordDataForUser().getRecordsForDisplay(

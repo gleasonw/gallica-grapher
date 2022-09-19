@@ -13,6 +13,8 @@ const ClassicUIBox = styled.div`
     width: ${props => props.width || '100%'};
     height: ${props => props.height || '100%'};
     resize: ${props => props.resize ? props.resize : 'none'};
+    display: flex;
+    flex-direction: column;
     `;
 
 export default ClassicUIBox;
