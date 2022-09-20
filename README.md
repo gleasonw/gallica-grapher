@@ -34,8 +34,8 @@ and group occurrences for a given bin size (year, month, or day) to create a tim
 Beneath the chart is a table of the records pulled from Gallica, with links to the scanned periodical. Clicking on
 a point in the chart will list the corresponding records. You can also make direct requests by entering
 a date above the table. I'm still designing this section for better usability -- I think it's the most
-interesting part of the tool. You can visually peruse cultural trends as they arise, then dive into the texts that 
-provide deeper context.
+interesting part of the tool. You can see cultural trends as they arise, then dive into the texts that 
+provide context.
 
 ### A design citation
 
