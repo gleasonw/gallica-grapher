@@ -3,6 +3,7 @@ import useData from "../shared/hooks/useData";
 import {StyledOccurrenceTable} from "../shared/StyledOccurrenceTable";
 import NavBarWrap from "./NavBarWrap";
 import styled from 'styled-components';
+import OCRRecordDisplay from "./OCRRecordDisplay";
 
 export default function DisplayRecordsTable(props){
     const [limit, setLimit] = useState(10);
@@ -95,7 +96,12 @@ export default function DisplayRecordsTable(props){
                         >
                             {record[5]}</a>
                     </td>
-                    <td>Unimplemented</td>
+                    <td>
+                        <OCRRecordDisplay
+                            identifier={record[5]}
+                            term={record[0]}
+                        />
+                    </td>
                 </tr>
             ))
                 :

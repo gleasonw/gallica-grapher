@@ -17,7 +17,6 @@ export default function RecordsViewer(props){
     }
 
     function handleSeriesClick(point){
-        console.log(timeBin)
         seriesClickHandlers[timeBin](point.category);
     }
 
@@ -28,7 +27,6 @@ export default function RecordsViewer(props){
     }
 
     function handleMonthSeriesClick(unix){
-        console.log("clicked on month series")
         const date = new Date(unix);
         setRecordsTableYear(date.getUTCFullYear());
         setRecordsTableMonth(date.getUTCMonth() + 1);
