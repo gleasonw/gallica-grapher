@@ -20,7 +20,8 @@ function RunningQueriesUI(props) {
                     {}
             ),
             "TOO_MANY_RECORDS": props.onTooManyRecords,
-            "SUCCESS": props.onFinish
+            "SUCCESS": props.onFinish,
+            "PENDING": () => null,
         }
         const progress = await fetch("/api/progress/" + props.requestID);
         const progressJSON = await progress.json();

@@ -20,11 +20,8 @@ function SoloTickets(props) {
         </div>
     )
 }
-
+//TODO: sync timebin display with state
 function SoloTicketResult(props) {
-    const settings = useContext(GraphSettingsContext);
-    const ticketSettings = settings[props.ticketID];
-    const timeBin = ticketSettings.timeBin;
     return (
         <ClassicUIBox resize={'both'}>
             <TicketLabel
@@ -35,7 +32,6 @@ function SoloTicketResult(props) {
             <RecordsViewer
                 tickets={{[props.ticketID]: props.ticket}}
                 requestID={props.requestID}
-                timeBin={timeBin}
             />
             <TicketPaperOccurrenceStats
                 ticketID={props.ticketID}

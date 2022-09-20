@@ -16,7 +16,6 @@ export function TicketProgressBox(props) {
     const progress = props.progressStats.progress
     const resultsRetrieved = props.progressStats.numResultsRetrieved
     const estimateTotal = props.progressStats.numResultsDiscovered
-    console.log("TicketProgressBox: " + props.position + " " + props.progressStats.active)
     return (
         <ClassicUIBox display={(active || progress === 100) ? 'flex':'none'}>
             <span>{props.position}</span>

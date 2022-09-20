@@ -1,9 +1,12 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import DisplayRecordsTable from "./DisplayRecordsTable";
 import Chart from "./Chart";
 import DownloadCSVButton from "./DownloadCSVButton";
+import {GraphSettingsContext} from "./GraphSettingsContext";
 
 export default function RecordsViewer(props){
+    const settings = useContext(GraphSettingsContext);
+    const timeBin = settings[props.ticketID || 'group'].timeBin;
     const [recordsTableYear, setRecordsTableYear] = useState(1905);
     const [recordsTableMonth, setRecordsTableMonth] = useState(0);
     const [recordsTableDay, setRecordsTableDay] = useState(0);
@@ -14,7 +17,8 @@ export default function RecordsViewer(props){
     }
 
     function handleSeriesClick(point){
-        seriesClickHandlers[props.timeBin](point.category);
+        console.log(timeBin)
+        seriesClickHandlers[timeBin](point.category);
     }
 
     function handleYearSeriesClick(year){
@@ -24,6 +28,7 @@ export default function RecordsViewer(props){
     }
 
     function handleMonthSeriesClick(unix){
+        console.log("clicked on month series")
         const date = new Date(unix);
         setRecordsTableYear(date.getUTCFullYear());
         setRecordsTableMonth(date.getUTCMonth() + 1);

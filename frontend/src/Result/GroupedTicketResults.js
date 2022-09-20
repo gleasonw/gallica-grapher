@@ -1,26 +1,13 @@
 import React, {useContext, useState} from "react";
-import {GraphSettingsContext} from "./GraphSettingsContext";
-import TicketLabel from "../shared/TicketLabel";
-import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import ClassicUIBox from "../shared/ClassicUIBox";
-import styled from "styled-components";
-import DecorativeTicket from "../shared/DecorativeTicket";
-import SeriesColorBubble from "../shared/SeriesColorBubble";
+import GroupedTicketLabel from "./GroupedTicketLabel";
 import RecordsViewer from "./RecordsViewer";
 
 export function GroupedTicketResults(props) {
-    const settings = useContext(GraphSettingsContext);
-    const groupSettings = settings.group;
-    const timeBin = groupSettings.timeBin;
-
     return (
         <ClassicUIBox>
+            <GroupedTicketLabel tickets={props.tickets}/>
             <RecordsViewer
-                tickets={props.tickets}
-                requestID={props.requestID}
-                timeBin={timeBin}
-            />
-            <GroupedStatBar
                 tickets={props.tickets}
                 requestID={props.requestID}
             />
@@ -28,42 +15,5 @@ export function GroupedTicketResults(props) {
 
     )
 }
-
-function GroupedStatBar(props) {
-    const settings = useContext(GraphSettingsContext);
-
-
-    return (
-        <StyledStatBar>
-            {Object.keys(props.tickets).map(key => (
-                <DecorativeTicket
-                    key={key}
-                    height={'100%'}
-                >
-                    <SeriesColorBubble color={settings[key].color}/>
-                    <TicketLabel
-                        terms={props.tickets[key].terms}
-                        papers={props.tickets[key].papersAndCodes}
-                        dateRange={props.tickets[key].dateRange}
-                    />
-                    <TicketPaperOccurrenceStats
-                        ticketID={key}
-                        dateRange={props.tickets[key].dateRange}
-                        grouped={true}
-                        requestID={props.requestID}
-                    />
-                </DecorativeTicket>
-            ))}
-        </StyledStatBar>
-    );
-}
-
-const StyledStatBar = styled.div`
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-`;
 
 export default GroupedTicketResults;
