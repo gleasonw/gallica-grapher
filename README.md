@@ -5,6 +5,8 @@ a product of the French National archives. I used the API for undergraduate rese
 19th century French culture. Now that I have
 graduated, time is plentiful, and I'm trying my hand at making a website out of it.
 
+www.gallicagrapher.com
+
 ### Do I need to speak French to use it?
 
 Most of the periodicals in the archive are in French, and hence French words are most relevant. There are, though, a sizeable number of international or 
