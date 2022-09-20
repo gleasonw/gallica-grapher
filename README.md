@@ -14,7 +14,7 @@ European editions in English, such as the New York Herald. Play around with it!
 Pour les francophones qui se demandent pourquoi ce site est en anglais : je vais traduire le site bientôt, je me concentre sur le système pour l'instant.
 
 ##
-### How do I began a search?  
+### How do I begin a search?  
 ##  
 1. Enter a term into the search bar;  
 
