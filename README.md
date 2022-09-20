@@ -29,7 +29,7 @@ blasting the French national library's servers, I have erred on a smaller, more 
 ### What do I see on the results page?
 
 The Gallica API returns a record for any occurrence of a term in a periodical issue. I parse these records
-and group occurrences within the same year, month, or on the same day to create a time series for each request.  
+and group occurrences for a given bin size (year, month, or day) to create a time series for each request.  
 
 Beneath the chart is a table of the records pulled from Gallica, with links to the scanned periodical. Clicking on
 a point in the chart will list the corresponding records. You can also make direct requests by entering
