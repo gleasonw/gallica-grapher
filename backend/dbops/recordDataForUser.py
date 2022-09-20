@@ -79,4 +79,12 @@ class RecordDataForUser:
             """, (tupledTickets, requestID, year, month, day, limit, offset))
             return cur.fetchall()
 
+    def clearUserRecordsAfterCancel(self, requestID):
+        with self.conn.cursor() as cur:
+            cur.execute("""
+            DELETE FROM results
+            WHERE requestid = %s
+            """, (requestID,))
+            self.conn.commit()
+
 

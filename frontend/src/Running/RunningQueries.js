@@ -3,6 +3,7 @@ import {TicketProgressBox} from "./TicketProgressBox";
 import useInterval from "../shared/useInterval";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import {CircularProgress} from "@mui/material";
+import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 
 
 function RunningQueriesUI(props) {
@@ -29,11 +30,17 @@ function RunningQueriesUI(props) {
             console.log("Unknown state: " + state)
         }
     }, 1000);
+
     const allDone = Object.keys(progressStats).every(
         key => progressStats[key].progress === 100
     );
-    console.log(allDone)
-    console.log(progressStats)
+
+    function handleCancelRequest(){
+        fetch("/api/revokeTask/" + props.requestID).then(
+            props.onCancelRequest
+        )
+    }
+
     return (
         <div className='queryProgressUI'>
             {
@@ -64,7 +71,15 @@ function RunningQueriesUI(props) {
 
                             }
                         />
-                    ))}
+                    ))
+            }
+            <ImportantButtonWrap
+                background={'#d44e43'}
+                color={'#ffffff'}
+                hover={'none'}
+                onClick={handleCancelRequest}>
+                Cancel
+            </ImportantButtonWrap>
         </div>
     )
 }

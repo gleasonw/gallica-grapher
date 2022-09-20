@@ -4,11 +4,11 @@ const ImportantButtonWrap = styled.button`
     text-align: center;
     align-self: center;
     cursor: pointer;
-    background: linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%);
+    background: ${props => props.background ? props.background : 'linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%)'};
     text-shadow: 0 1px 0 #fff;
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.225);
     transition: all 150ms;
-    color: #4d4d4d;
+    color: ${props => props.color ? props.color: '#4d4d4d'};
     border-radius: 10px;
     font-size: 30px;
     padding: 20px;
@@ -17,10 +17,12 @@ const ImportantButtonWrap = styled.button`
     @media screen and (max-width: 748px){
         font-size: 15px;
         }
-    &:hover{
-        background: linear-gradient(to bottom, #ededed 0%, #f5f5f5 100%);
-        color: #787878;
-        }
+    ${props => props.hover ? props.hover :
+    `&:hover{
+            background: linear-gradient(to bottom, #ededed 0%, #f5f5f5 100%);
+            color: #787878;
+        }`
+    }
     `;
 
 export default ImportantButtonWrap;

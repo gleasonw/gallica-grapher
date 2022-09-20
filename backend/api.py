@@ -12,7 +12,7 @@ from dbops.recordDataForUser import RecordDataForUser
 
 app = Flask(__name__)
 CORS(app)
-
+userData = RecordDataForUser()
 
 @app.route('/')
 def index():
@@ -50,6 +50,14 @@ def getProgress(taskID):
         else:
             response = {'state': "SUCCESS"}
     return response
+
+
+@app.route('/api/revokeTask/<taskID>')
+def revokeTask(taskID):
+    task = spawnRequest.AsyncResult(taskID)
+    task.revoke(terminate=True)
+    userData.clearUserRecordsAfterCancel(taskID)
+    return {'state': "REVOKED"}
 
 
 @app.route('/api/paperchartjson')
@@ -120,7 +128,7 @@ def getTopPapersFromID():
 def getCSV():
     tickets = request.args["tickets"]
     requestID = request.args["requestID"]
-    csvData = RecordDataForUser().getCSVData(tickets, requestID)
+    csvData = userData.getCSVData(tickets, requestID)
     return {"csvData": csvData}
 
 
@@ -133,7 +141,7 @@ def getDisplayRecords():
     day = int(request.args.get("day"))
     limit = request.args.get("limit")
     offset = request.args.get("offset")
-    displayRecords = RecordDataForUser().getRecordsForDisplay(
+    displayRecords = userData.getRecordsForDisplay(
         tickets,
         requestID,
         year,

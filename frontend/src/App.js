@@ -153,6 +153,7 @@ function App() {
                     requestID={requestID}
                     onFinish={handleTicketFinish}
                     onTooManyRecords={handleTooManyRecords}
+                    onCancelRequest={handleHomeClick}
                 />
             </div>
         )
