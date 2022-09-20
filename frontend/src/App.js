@@ -1,6 +1,7 @@
 import React, {useState, useRef} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import Input from "./Input/Input";
+import Info from "./Info";
 import RunningQueriesUI from "./Running/RunningQueries";
 import ResultUI from "./Result/ResultUI";
 import './style.css';
@@ -125,9 +126,7 @@ function App() {
         return(
             <div className="App">
                 {header}
-                <div className={'infoText'}>
-                    This is a graphing tool.
-                </div>
+                <Info/>
             </div>
         )
     }else if(gettingInput){

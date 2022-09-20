@@ -37,7 +37,9 @@ export function TicketProgressBox(props) {
                     progress === 100 &&
                     <div>{resultsRetrieved.toLocaleString()} results retrieved after eliminating duplicates.</div>
                 }
-                <ProgressBar now={props.progressStats.progress}/>
+                <ProgressBar
+                    animated
+                    now={props.progressStats.progress}/>
                 {
                     (progress > 0) && (progress < 100)  &&
                     <StyledProgressStats>
