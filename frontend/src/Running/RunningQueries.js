@@ -7,6 +7,7 @@ import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 
 
 function RunningQueriesUI(props) {
+    const [cancelMessage, setCancelMessage] = React.useState('Cancel');
     const [progressStats, setProgressStats] = React.useState({
         'init': {progress: 0}
     })
@@ -36,6 +37,7 @@ function RunningQueriesUI(props) {
     );
 
     function handleCancelRequest(){
+        setCancelMessage('Cancelling...');
         fetch("/api/revokeTask/" + props.requestID).then(
             props.onCancelRequest
         )
@@ -56,6 +58,7 @@ function RunningQueriesUI(props) {
                             papers={props.tickets[key]['papersAndCodes']}
                             dateRange={props.tickets[key]['dateRange']}
                             key={key}
+                            position={`${index + 1} of ${Object.keys(props.tickets).length}`}
                             progressStats={
                                 progressStats.hasOwnProperty(key) ?
                                     progressStats[key]
@@ -77,9 +80,9 @@ function RunningQueriesUI(props) {
                 background={'#d44e43'}
                 color={'#ffffff'}
                 hover={'none'}
-                onClick={handleCancelRequest}>
-                Cancel
-            </ImportantButtonWrap>
+                onClick={handleCancelRequest}
+                children={cancelMessage}
+            />
         </div>
     )
 }

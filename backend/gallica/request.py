@@ -37,7 +37,7 @@ class Request(threading.Thread):
 
     def initProgressStats(self):
         progressDict = {}
-        for search in self.ticketSearches:
+        for index, search in enumerate(self.ticketSearches):
             key = search.getTicketID()
             progressDict[key] = {
                 'progress': 0,
@@ -45,7 +45,7 @@ class Request(threading.Thread):
                 'numResultsRetrieved': 0,
                 'randomPaper': None,
                 'estimateSecondsToCompletion': 0,
-                'active': 0
+                'active': 1 if index == 0 else 0
             }
         return progressDict
 
