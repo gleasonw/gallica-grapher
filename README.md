@@ -9,7 +9,7 @@ www.gallicagrapher.com
 
 ### Do I need to speak French to use it?
 
-Most of the periodicals in the archive are in French, and hence French words are most relevant. There are, though, a sizeable number of international or 
+Most of the periodicals in the archive are in French, so French words are most relevant. There are, though, a sizeable number of international or 
 European editions in English, such as the New York Herald. Play around with it!  
 
 Pour les francophones qui se demandent pourquoi ce site est en anglais : je vais traduire le site bientôt, je me concentre sur le système pour l'instant.
