@@ -35,10 +35,6 @@ a date above the table. I'm still designing this section for better usability --
 interesting part of the tool. You can visually peruse cultural trends as they arise, then dive into the texts that 
 provide deeper context.
 ## 
-### Can I see the code?
-## 
-Yes! I would appreciate feedback or pull requests. Here's the repository: https://github.com/gleasonw/Gallica-ngram-grapher
-## 
 ### A design citation
 ##
 Much of these pretty boxes and backgrounds exist thanks to inspect source and the good taste of the Lichess.com CSS designer. Merci.
