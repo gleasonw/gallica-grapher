@@ -24,7 +24,7 @@ Pour les francophones qui se demandent pourquoi ce site est en anglais : je vais
 3. If you would like to add a search (another trend line on the graph), click "compare";
 3. Click the 'Fetch and Graph 📊' button;
 4. Watch the results roll in. If your term is especially popular, I would recommend a cup of tea. Requests run concurrently, but to avoid 
-blasting the French national library's servers, I have erred on a smaller, more polite number of worker threads.
+blasting the French national library's servers, I have erred on a smaller number of worker threads.
 
 ### What do I see on the results page?
 
