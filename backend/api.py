@@ -14,6 +14,7 @@ app = Flask(__name__)
 CORS(app)
 userData = RecordDataForUser()
 
+
 @app.route('/')
 def index():
     return 'ok'

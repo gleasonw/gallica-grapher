@@ -8,6 +8,9 @@ html, body, #root {
     background-origin: padding-box;
     background-clip: border-box;
 }
+.highlight{
+    background-color: yellow;
+}
 
 .horizontal-slider {
     width: 100%;

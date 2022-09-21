@@ -1,8 +1,9 @@
-import types
 from unittest import TestCase
-from concurrentfetch import ConcurrentFetch
-from concurrentfetch import NUM_WORKERS
+from fetch.concurrentfetch import ConcurrentFetch
+from fetch.concurrentfetch import NUM_WORKERS
 from unittest.mock import patch, MagicMock, call
+
+from fetch.fetch import get
 
 
 class TestFetch(TestCase):
@@ -53,7 +54,7 @@ class TestFetch(TestCase):
         self.fetch.http.request.return_value.elapsed.total_seconds.return_value = 1.0
         query = MagicMock()
 
-        test = self.fetch.get(query)
+        test = get(self.fetch.http, self.fetch.baseUrl, query)
 
         self.fetch.http.request.assert_has_calls(
             [call('GET', None, fields='testParams')

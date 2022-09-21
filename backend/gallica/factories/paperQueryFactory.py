@@ -1,9 +1,9 @@
 from gallica.factories.cqlStringForPaperCodes import CQLStringForPaperCodes
 from gallica.factories.queryIndexer import QueryIndexer
-from gallica.query import Query
-from gallica.query import ArkQuery
-from gallica.query import PaperQuery
-from gallica.query import NumPapersOnGallicaQuery
+from query import Query
+from query import ArkQueryForNewspaperYears
+from query import PaperQuery
+from query import NumPapersOnGallicaQuery
 
 
 class PaperQueryFactory:
@@ -19,7 +19,7 @@ class PaperQueryFactory:
             yield PaperQuery(cql, startIndex=1)
 
     def buildARKQueriesForCodes(self, codes):
-        queries = [ArkQuery(code) for code in codes]
+        queries = [ArkQueryForNewspaperYears(code) for code in codes]
         return queries
 
     def buildAllRecordsQueries(self) -> list[list[Query]]:

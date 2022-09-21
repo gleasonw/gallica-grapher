@@ -6,14 +6,9 @@ class Query:
         self.numRecords = kwargs.get('numRecords')
         self.collapsing = kwargs.get('collapsing')
         self.term = kwargs.get('term')
-        self.responseXML = None
-        self.elapsedTime = None
         self.estimateNumRecordsToFetch = None
         self.code = None
-
-    def handleResponse(self, data, elapsed):
-        self.responseXML = data
-        self.elapsedTime = elapsed
+        self.ark = None
 
     def getParams(self):
         return{
@@ -70,7 +65,7 @@ class PaperQuery(Query):
         return f'PaperQuery({self.cql})'
 
 
-class ArkQuery(Query):
+class ArkQueryForNewspaperYears(Query):
 
     def __init__(self, code):
         super().__init__()
@@ -82,6 +77,23 @@ class ArkQuery(Query):
 
     def __repr__(self):
         return f'ArkQuery({self.ark})'
+
+
+class OCRQuery(Query):
+
+    def __init__(self, ark, term):
+        super().__init__()
+        self.ark = ark
+        self.term = term
+
+    def getParams(self):
+        return {
+            "ark": self.ark,
+            "query": self.term
+        }
+
+    def __repr__(self):
+        return f'OCRQuery({self.ark}, {self.term})'
 
 
 

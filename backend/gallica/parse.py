@@ -1,7 +1,7 @@
 from lxml import etree
 from gallica.date import Date
 
-
+#TODO: split into multiple classes for each parse use case, switch at factory level
 class Parse:
 
     def __init__(
@@ -50,6 +50,14 @@ class Parse:
         record = recordsRoot[0]
         recordData = self.getDataFromRecordRoot(record)
         return self.getPaperTitle(recordData)
+
+    def OCRtext(self, responseXML) -> tuple:
+        elements = etree.fromstring(responseXML)
+        topLevel = elements.find('.')
+        numResults = topLevel.attrib.get('countResults')
+        items = topLevel[1].findall('item')
+        pagesWithContents = self.getPageAndContent(items)
+        return numResults, pagesWithContents
 
     @staticmethod
     def numRecords(xml) -> int:
@@ -116,6 +124,17 @@ class Parse:
             '{http://purl.org/dc/elements/1.1/}date')
         if dateElement is not None:
             return Date(dateElement.text)
+
+    @staticmethod
+    def getPageAndContent(itemsXML) -> list:
+        items = []
+        for item in itemsXML:
+            page = item.find('p_id')
+            page = page.text if page is not None else None
+            content = item.find('content')
+            content = content.text if content is not None else None
+            items.append((page, content))
+        return items
 
 
 

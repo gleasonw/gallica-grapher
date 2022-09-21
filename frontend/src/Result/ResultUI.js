@@ -9,7 +9,7 @@ import {settingsReducer} from "./SettingsReducer";
 import initGraphSettings from "./chartUtils/initGraphSettings";
 
 function ResultUI(props){
-    const [grouped, setGrouped] = useState(true);
+    const [grouped, setGrouped] = useState(Object.keys(props.tickets).length > 1);
     const [graphSettings, dispatch] = useReducer(
         settingsReducer,
         props.tickets,

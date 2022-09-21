@@ -4,7 +4,7 @@ export default function useData(url) {
   const [result, setResult] = useState(null);
   useEffect(() => {
     let ignore = false;
-    fetch(url)
+    fetch(url, {mode: 'cors'})
       .then(response => response.json())
       .then(json => {
         if (!ignore) {
@@ -17,3 +17,5 @@ export default function useData(url) {
   }, [url]);
   return result;
 }
+
+//Credits Dan Abramov

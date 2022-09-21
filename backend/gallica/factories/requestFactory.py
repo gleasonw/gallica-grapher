@@ -5,7 +5,7 @@ from gallica.ticketsearchrunner import TicketSearchRunner
 from gallica.factories.occurrenceQueryBuilder import OccurrenceQueryBuilder
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
-from gallica.concurrentfetch import ConcurrentFetch
+from fetch.concurrentfetch import ConcurrentFetch
 from gallica.request import Request
 from utils.psqlconn import PSQLconn
 
