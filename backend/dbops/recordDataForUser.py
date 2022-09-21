@@ -1,9 +1,7 @@
-import concurrent.futures
-
 from utils.psqlconn import PSQLconn
-from query import OCRQuery
+from fetchComponents.query import OCRQuery
 from fetchComponents.fetch import Fetch
-from factories.parseFactory import buildParser
+from gallica.factories.parseFactory import buildParser
 
 
 class RecordDataForUser:

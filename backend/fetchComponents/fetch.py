@@ -1,6 +1,6 @@
 import time
 
-from query import *
+from .query import *
 from urllib3.util.retry import Retry
 import urllib3
 
