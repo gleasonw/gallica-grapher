@@ -7,6 +7,7 @@ import SoloTickets from "./SoloTickets";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 import {settingsReducer} from "./SettingsReducer";
 import initGraphSettings from "./chartUtils/initGraphSettings";
+import ImportantButtonWrap from '../shared/ImportantButtonWrap';
 
 function ResultUI(props){
     const [grouped, setGrouped] = useState(Object.keys(props.tickets).length > 1);
@@ -23,6 +24,10 @@ function ResultUI(props){
         <GraphSettingsContext.Provider value={graphSettings}>
             <GraphSettingsDispatchContext.Provider value={dispatch}>
                 <div className='resultUI'>
+                    <ImportantButtonWrap
+                        children={'Make a new request'}
+                        onClick={props.onHomeClick}
+                    />
                     {Object.keys(props.tickets).length > 1  &&
                         <FormGroup>
                             <FormControlLabel

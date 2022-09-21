@@ -179,6 +179,7 @@ function App() {
                 <ResultUI
                     tickets={tickets}
                     requestID={requestID}
+                    onHomeClick={handleHomeClick}
                 />
             </div>
           )
