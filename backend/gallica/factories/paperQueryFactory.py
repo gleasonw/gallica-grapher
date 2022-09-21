@@ -1,9 +1,6 @@
 from gallica.factories.cqlStringForPaperCodes import CQLStringForPaperCodes
 from gallica.factories.queryIndexer import QueryIndexer
-from query import Query
-from query import ArkQueryForNewspaperYears
-from query import PaperQuery
-from query import NumPapersOnGallicaQuery
+from fetchComponents.query import *
 
 
 class PaperQueryFactory:

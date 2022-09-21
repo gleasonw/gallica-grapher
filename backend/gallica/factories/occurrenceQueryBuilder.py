@@ -1,6 +1,6 @@
 from gallica.factories.cqlStringForPaperCodes import CQLStringForPaperCodes
 from gallica.factories.queryIndexer import QueryIndexer
-from query import NumOccurrencesForTermQuery
+from fetchComponents.query import NumOccurrencesForTermQuery
 
 
 class OccurrenceQueryBuilder:

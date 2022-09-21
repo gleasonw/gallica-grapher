@@ -3,21 +3,25 @@ import useData from "../shared/hooks/useData";
 import {StyledOccurrenceTable} from "../shared/StyledOccurrenceTable";
 import NavBarWrap from "./NavBarWrap";
 import styled from 'styled-components';
+import OCRTextBubble from "./OCRTextBubble";
 
 export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
-    const recordsQuery =
+    let recordsQuery =
         "/api/getDisplayRecords?" +
         "tickets=" + Object.keys(props.tickets) +
         "&requestID=" + props.requestID +
         "&year=" + props.year +
-        "&month=" + props.month +
-        "&day=" + props.day +
         "&limit=" + limit +
         "&offset=" + offset;
+    if(props.month) {
+        (recordsQuery += "&month=" + props.month);
+    }
+    if(props.day) {
+        recordsQuery += "&day=" + props.day
+    }
     const result = useData(recordsQuery);
-    console.log(result);
     const displayRecords = result ? result['displayRecords'] : null;
     return (
         <div>
@@ -79,7 +83,6 @@ export default function DisplayRecordsTable(props) {
                     <th>Periodical</th>
                     <th>Date</th>
                     <th>Full text image on Gallica</th>
-                    <th>Number of hits</th>
                     <th>Scanned text (approximate)</th>
                 </tr>
                 {displayRecords ?
@@ -91,8 +94,6 @@ export default function DisplayRecordsTable(props) {
                         let day = record[4];
                         let gallicaLink = record[5];
                         let arkCode = gallicaLink.split('/').pop();
-                        let numHitsInPeriodical = record[6];
-                        let ocrInfo = record[7];
                         return (
                             <tr key={index}>
                                 <td>{index + offset + 1}</td>
@@ -111,26 +112,11 @@ export default function DisplayRecordsTable(props) {
                                     >
                                         {gallicaLink}</a>
                                 </td>
-                                <td>{numHitsInPeriodical}</td>
                                 <td>
-                                    {ocrInfo.map((info) => {
-                                        let pageNumberText = info[0];
-                                        let pageNumber = pageNumberText.split('_').pop();
-                                        let ocrText = info[1];
-                                        let htmlPageLink =`https://gallica.bnf.fr/ark:/12148/${arkCode}.f${pageNumber}.item.texteBrut`
-                                        return (
-                                            <div key={pageNumberText}>
-                                                <a
-                                                    href={htmlPageLink}
-                                                    target='_blank'
-                                                    rel='noopener noreferrer'
-                                                >
-                                                    {pageNumberText}
-                                                </a>
-                                                <div dangerouslySetInnerHTML={{__html: ocrText}}/>
-                                            </div>
-                                            )
-                                    })}
+                                    <OCRTextBubble
+                                        term={term}
+                                        arkCode={arkCode}
+                                    />
                                 </td>
                             </tr>
                         )

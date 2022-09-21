@@ -2,7 +2,7 @@ import concurrent.futures
 
 from utils.psqlconn import PSQLconn
 from query import OCRQuery
-from fetch.fetch import Fetch
+from fetchComponents.fetch import Fetch
 from factories.parseFactory import buildParser
 
 
@@ -37,31 +37,21 @@ class RecordDataForUser:
 
     def getRecordsForDisplay(self, ticketIDs, requestID, year, month, day, limit, offset):
         if year and month and day:
-            records = self.getYearMonthDayRecordsForDisplay(ticketIDs, requestID, year, month, day, limit, offset)
+            return self.getYearMonthDayRecordsForDisplay(ticketIDs, requestID, year, month, day, limit, offset)
         elif year and month:
-            records = self.getYearMonthRecordsForDisplay(ticketIDs, requestID, year, month, limit, offset)
+            return self.getYearMonthRecordsForDisplay(ticketIDs, requestID, year, month, limit, offset)
         elif year:
-            records = self.getYearRecordsForDisplay(ticketIDs, requestID, year, limit, offset)
+            return self.getYearRecordsForDisplay(ticketIDs, requestID, year, limit, offset)
         else:
             return []
-        arkCodesToRecords = {
-            (record[5].split('/').pop()): record
-            for record in records
-        }
-        queries = [
-            OCRQuery(ark=ark, term=record[0])
-            for ark, record in arkCodesToRecords.items()
-        ]
+
+    def getOCRTextForRecord(self, ark, term) -> tuple:
         fetcher = Fetch(
             'https://gallica.bnf.fr/services/ContentSearch',
-            maxSize=len(queries)
+            maxSize=1
         )
-        with concurrent.futures.ThreadPoolExecutor(max_workers=min(45, len(queries))) as executor:
-            for data, ark in executor.map(fetcher.get, queries):
-                numResults, pagesWithContents = self.parse.OCRtext(data)
-                arkRecord = arkCodesToRecords[ark]
-                arkCodesToRecords[ark] = arkRecord + (numResults, pagesWithContents)
-        return list(arkCodesToRecords.values())
+        data = fetcher.get(OCRQuery(ark, term))
+        return self.parse.OCRtext(data)
 
     def getYearRecordsForDisplay(self, ticketIDs, requestID, year, limit, offset):
         tupledTickets = tuple(ticketIDs.split(','))

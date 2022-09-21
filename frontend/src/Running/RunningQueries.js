@@ -23,7 +23,7 @@ function RunningQueriesUI(props) {
             "SUCCESS": props.onFinish,
             "PENDING": () => null,
         }
-        const progress = await fetch("/api/progress/" + props.requestID);
+        const progress = await fetch("/poll/progress/" + props.requestID);
         const progressJSON = await progress.json();
         const state = progressJSON["state"]
         if(requestStateCallbacks.hasOwnProperty(state)){

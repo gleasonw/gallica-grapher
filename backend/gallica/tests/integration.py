@@ -4,7 +4,7 @@ import time
 import psutil
 from papersearchrunner import PaperSearchRunner
 from parseFactory import buildParser
-from fetch.concurrentfetch import ConcurrentFetch
+from fetchComponents.concurrentfetch import ConcurrentFetch
 from schemaLinkForSearch import SchemaLinkForSearch
 from utils.psqlconn import PSQLconn
 from paperQueryFactory import PaperQueryFactory

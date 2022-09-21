@@ -1,7 +1,6 @@
-from fetch.concurrentfetch import ConcurrentFetch
+from fetchComponents.concurrentfetch import ConcurrentFetch
 from gallica.factories.parseFactory import buildParser
-from query import Query
-from query import PaperQuery
+from fetchComponents.query import *
 
 
 class QueryIndexer:

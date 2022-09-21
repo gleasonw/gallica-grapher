@@ -1,9 +1,9 @@
 from unittest import TestCase
-from fetch.concurrentfetch import ConcurrentFetch
-from fetch.concurrentfetch import NUM_WORKERS
+from fetchComponents.concurrentfetch import ConcurrentFetch
+from fetchComponents.concurrentfetch import NUM_WORKERS
 from unittest.mock import patch, MagicMock, call
 
-from fetch.fetch import get
+from fetchComponents.fetch import get
 
 
 class TestFetch(TestCase):
@@ -12,7 +12,7 @@ class TestFetch(TestCase):
         self.numWorkers = NUM_WORKERS
         self.fetch = ConcurrentFetch(None)
 
-    @patch('fetch.Fetch.get')
+    @patch('fetchComponents.Fetch.get')
     def test_fetch_all_given_queries_exist(self, mock_get):
         queries = ['test1', 'test2']
         test = self.fetch.fetchAll(queries)
@@ -20,7 +20,7 @@ class TestFetch(TestCase):
         for result in test:
             self.assertEqual(result, mock_get.return_value)
 
-    @patch('fetch.Fetch.get')
+    @patch('fetchComponents.Fetch.get')
     def test_fetch_all_given_queries_empty(self, mock_get):
         queries = []
 
@@ -28,7 +28,7 @@ class TestFetch(TestCase):
 
         self.assertIsInstance(test, list)
 
-    @patch('fetch.Fetch.get')
+    @patch('fetchComponents.Fetch.get')
     def test_fetch_all_and_track_progress_given_queries_exist(self, mock_get):
         queries = ['test1', 'test2']
         tracker = MagicMock()
@@ -45,7 +45,7 @@ class TestFetch(TestCase):
             ]
         )
 
-    @patch('fetch.Fetch.getParamsFor')
+    @patch('fetchComponents.Fetch.getParamsFor')
     def test_get(self, mock_params):
         mock_params.return_value = 'testParams'
         self.fetch.http = MagicMock()

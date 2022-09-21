@@ -1,11 +1,6 @@
 import time
 
-from query import Query
-from query import NumOccurrencesForTermQuery
-from query import NumPapersOnGallicaQuery
-from query import PaperQuery
-from query import ArkQueryForNewspaperYears
-from query import OCRQuery
+from query import *
 from urllib3.util.retry import Retry
 import urllib3
 
@@ -43,7 +38,7 @@ class Fetch:
             NumPapersOnGallicaQuery: (response.data, query.cql),
             PaperQuery: (response.data, query.cql),
             ArkQueryForNewspaperYears: (response.data, query.code),
-            OCRQuery: (response.data, query.ark)
+            OCRQuery: response.data
         }
         return returnsForQueryType[type(query)]
 

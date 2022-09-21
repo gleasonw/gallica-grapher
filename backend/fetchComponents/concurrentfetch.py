@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
-from query import Query
-from fetch.fetch import Fetch
+from fetchComponents.query import Query
+from fetchComponents.fetch import Fetch
 
 NUM_WORKERS = 45
 

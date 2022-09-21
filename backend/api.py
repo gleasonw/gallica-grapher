@@ -27,7 +27,7 @@ def init():
     return {"taskid": task.id}
 
 
-@app.route('/api/progress/<taskID>')
+@app.route('/poll/progress/<taskID>')
 def getProgress(taskID):
     task = spawnRequest.AsyncResult(taskID)
     state = task.state
@@ -138,8 +138,8 @@ def getDisplayRecords():
     tickets = request.args.get("tickets")
     requestID = request.args.get("requestID")
     year = request.args.get("year")
-    month = int(request.args.get("month"))
-    day = int(request.args.get("day"))
+    month = request.args.get("month")
+    day = request.args.get("day")
     limit = request.args.get("limit")
     offset = request.args.get("offset")
     displayRecords = userData.getRecordsForDisplay(
@@ -152,6 +152,15 @@ def getDisplayRecords():
         offset
     )
     return {"displayRecords": displayRecords}
+
+
+@app.route('/api/ocrtext/<arkCode>/<term>')
+def getOCRtext(arkCode, term):
+    numResults, text = userData.getOCRTextForRecord(
+        arkCode,
+        term
+    )
+    return {"numResults": numResults, "text": text}
 
 
 if __name__ == "__main__":
