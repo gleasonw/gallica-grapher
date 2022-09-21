@@ -1,15 +1,26 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import LesserButton from "../shared/LesserButton";
 
 export default function OCRTextBubble(props) {
+    const [arkCode, setArkCode] = React.useState('')
     const [loaded, setLoaded] = React.useState(false);
     const [ocrInfo, setOcrInfo] = React.useState('');
     const [numResults, setNumResults] = React.useState(0);
     const [buttonText, setButtonText] = React.useState('Get context');
 
+    useEffect(() => {
+        if(props.arkCode !== arkCode) {
+            setArkCode(props.arkCode);
+            setLoaded(false);
+            setOcrInfo('');
+            setNumResults(0);
+            setButtonText('Get context');
+        }
+    }, [props.arkCode, arkCode]);
+
     async function handleClick() {
         setButtonText('Loading...');
-        const ocrText = await fetch(`/api/ocrtext/${props.arkCode}/${props.term}`).then(
+        const ocrText = await fetch(`/api/ocrtext/${arkCode}/${props.term}`).then(
             response => response.json()
         )
         console.log(ocrText);
@@ -23,7 +34,7 @@ export default function OCRTextBubble(props) {
             let pageNumberText = info[0];
             let pageNumber = pageNumberText.split('_').pop();
             let ocrText = info[1];
-            let htmlPageLink =`https://gallica.bnf.fr/ark:/12148/${props.arkCode}.f${pageNumber}.item.texteBrut`
+            let htmlPageLink =`https://gallica.bnf.fr/ark:/12148/${arkCode}.f${pageNumber}.item.texteBrut`
             return (
                 <div key={pageNumberText}>
                     <a

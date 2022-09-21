@@ -15,12 +15,12 @@ class ConcurrentFetch:
             maxSize=numWorkers
         )
 
-    def fetchAll(self, queries) -> list[Query]:
+    def fetchAll(self, queries) -> list:
         with ThreadPoolExecutor(max_workers=self.numWorkers) as executor:
             for response in executor.map(self.fetch.get, queries):
                 yield response
 
-    def fetchAllAndTrackProgress(self, queries, tracker) -> list[Query]:
+    def fetchAllAndTrackProgress(self, queries, tracker) -> list:
         with ThreadPoolExecutor(max_workers=self.numWorkers) as executor:
             for response in executor.map(self.fetch.get, queries):
                 data = response[0]

@@ -62,7 +62,7 @@ class CQLFactory:
         baseQuery = f'{baseQuery} sortby dc.date/sort.ascending'
         return baseQuery
 
-    def buildCQLforPaperCodes(self) -> list[str]:
+    def buildCQLforPaperCodes(self) -> list:
         return self.cqlForCodes.build(self.ticket.codes)
 
 

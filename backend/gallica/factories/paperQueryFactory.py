@@ -19,7 +19,7 @@ class PaperQueryFactory:
         queries = [ArkQueryForNewspaperYears(code) for code in codes]
         return queries
 
-    def buildAllRecordsQueries(self) -> list[list[Query]]:
+    def buildAllRecordsQueries(self) -> list:
         query = self.makeNumPapersQuery(
             'dc.type all "fascicule" and ocrquality > "050.00"'
         )
