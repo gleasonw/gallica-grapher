@@ -9,6 +9,8 @@ const PaperOptionWrap = styled.div`
     cursor: pointer;
     transition: all 150ms;
     border-radius: ${props => props.borderRadius ? props.borderRadius : "0px"};
+    position: relative;
+    padding-bottom: ${props => props.paddingBottom || "12px"};
     `;
 
 export default PaperOptionWrap;

@@ -1,5 +1,5 @@
 import React from "react";
-import TextInputBubble from "../TextInputBubble";
+import styled from 'styled-components';
 import {ContinuousTrendInput} from "./ContinuousTrendInput";
 import {UserSelectPaperInput} from "./UserSelectPaperInput";
 import {FullSearchInput} from "./FullSearchInput";
@@ -12,7 +12,6 @@ export class PaperInputBox extends React.Component {
             papersForDropdown: [],
             dropdownError: null,
             paperInputValue: '',
-            selectedInput: [1, 0, 0],
         }
         this.handleKeyUp = this.handleKeyUp.bind(this);
         this.handleDropdownClick = this.handleDropdownClick.bind(this);
@@ -69,7 +68,7 @@ export class PaperInputBox extends React.Component {
 
     render() {
         return (
-            <TextInputBubble
+            <StyledPaperInput
                 padding={"0"}
                 backgroundColor={"#f5f5f5"}
                 borderRadius={"10px 10px 0 0"}
@@ -104,8 +103,14 @@ export class PaperInputBox extends React.Component {
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
                 />
-            </TextInputBubble>
+            </StyledPaperInput>
         )
     }
 }
+
+const StyledPaperInput = styled.div`
+    border: 2px solid #d9d9d9;
+    border-radius: 10px 10px 0 0;
+
+`;
 

@@ -4,12 +4,17 @@ const InlineBubble = styled.div`
     padding: 5px;
     outline: none;
     appearance: none;
-    cursor: pointer;
     color: ${props => props.selected ? "#4d4d4d" : "#d9d9d9"};
-    border: ${props => props.selected ? "1px solid #4d4d4d" : "1px solid #d9d9d9"};
-    background-color: ${props => props.selected ? "rgba(255,255,255,0.5)" : ""};
+    border: 0.2rem solid #ece9e2;
     border-radius: 5px;
-    transition: all 150ms;
+    transition: all 50ms;
+    ${props => props.focus ? '' : `&:hover{
+        border-color: #c6c6c6;
+        background-color: #e6e6e6;
+    }`}
+    &:focus{
+        background-color: rgba(255,255,255,0.5);
+    }
     `;
 
 export default InlineBubble;

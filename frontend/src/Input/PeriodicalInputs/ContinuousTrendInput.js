@@ -1,6 +1,8 @@
 import React from "react";
 import PaperOptionWrap from "./PaperOptionWrap";
 import {DateInputBox} from "./DateInputBox";
+import {KeyboardArrowDown} from "@mui/icons-material";
+import {StyledArrow} from "./StyledArrow";
 
 export function ContinuousTrendInput(props) {
     const lowYearPlaceholder = 1890;
@@ -29,6 +31,13 @@ export function ContinuousTrendInput(props) {
                 {props.numContinuousPapers} continuous periodicals publishing
                 every year between {dateInputs}
             </span>
+            <StyledArrow
+                bottom={'0'}
+                top={'auto'}
+                right={'0'}
+            >
+                {props.selected === 0 && <KeyboardArrowDown/>}
+            </StyledArrow>
         </PaperOptionWrap>
     )
 }

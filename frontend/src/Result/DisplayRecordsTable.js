@@ -4,6 +4,7 @@ import {StyledOccurrenceTable} from "../shared/StyledOccurrenceTable";
 import NavBarWrap from "./NavBarWrap";
 import styled from 'styled-components';
 import OCRTextBubble from "./OCRTextBubble";
+import InlineBubble from "../shared/InlineBubble";
 
 export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(10);
@@ -15,10 +16,10 @@ export default function DisplayRecordsTable(props) {
         "&year=" + props.year +
         "&limit=" + limit +
         "&offset=" + offset;
-    if(props.month) {
+    if (props.month) {
         (recordsQuery += "&month=" + props.month);
     }
-    if(props.day) {
+    if (props.day) {
         recordsQuery += "&day=" + props.day
     }
     const result = useData(recordsQuery);
@@ -28,51 +29,61 @@ export default function DisplayRecordsTable(props) {
             <NavBarWrap>
                 <StyledInputAndLabel>
                     <label htmlFor='year'>Year</label>
-                    <input
-                        type={'number'}
-                        value={props.year}
-                        id={'year'}
-                        onChange={
-                            (e) => props.onYearChange(parseInt(e.target.value))}
-                    />
+                    <InlineBubble selected>
+                        <input
+                            type={'number'}
+                            value={props.year}
+                            id={'year'}
+                            onChange={
+                                (e) => props.onYearChange(parseInt(e.target.value))}
+                        />
+                    </InlineBubble>
                 </StyledInputAndLabel>
                 <StyledInputAndLabel>
                     <label htmlFor='month'>Month</label>
-                    <input
-                        type={'number'}
-                        value={props.month}
-                        id={'month'}
-                        onChange={
-                            (e) => props.onMonthChange(parseInt(e.target.value))}
-                    />
+                    <InlineBubble selected>
+                        <input
+                            type={'number'}
+                            value={props.month}
+                            id={'month'}
+                            onChange={
+                                (e) => props.onMonthChange(parseInt(e.target.value))}
+                        />
+                    </InlineBubble>
                 </StyledInputAndLabel>
                 <StyledInputAndLabel>
                     <label htmlFor='day'>Day</label>
-                    <input
-                        type={'number'}
-                        value={props.day}
-                        id={'day'}
-                        onChange={
-                            (e) => props.onDayChange(parseInt(e.target.value))}
-                    />
+                    <InlineBubble selected>
+                        <input
+                            type={'number'}
+                            value={props.day}
+                            id={'day'}
+                            onChange={
+                                (e) => props.onDayChange(parseInt(e.target.value))}
+                        />
+                    </InlineBubble>
                 </StyledInputAndLabel>
                 <StyledInputAndLabel>
                     <label htmlFor='limit'>Limit</label>
-                    <input
-                        type={'number'}
-                        value={limit}
-                        id={'limit'}
-                        onChange={(e) => setLimit(parseInt(e.target.value))}
-                    />
+                    <InlineBubble selected>
+                        <input
+                            type={'number'}
+                            value={limit}
+                            id={'limit'}
+                            onChange={(e) => setLimit(parseInt(e.target.value))}
+                        />
+                    </InlineBubble>
                 </StyledInputAndLabel>
                 <StyledInputAndLabel>
                     <label htmlFor='offset'>Offset</label>
-                    <input
-                        type={'number'}
-                        value={offset}
-                        id={'offset'}
-                        onChange={(e) => setOffset(parseInt(e.target.value))}
-                    />
+                    <InlineBubble selected>
+                        <input
+                            type={'number'}
+                            value={offset}
+                            id={'offset'}
+                            onChange={(e) => setOffset(parseInt(e.target.value))}
+                        />
+                    </InlineBubble>
                 </StyledInputAndLabel>
             </NavBarWrap>
             <StyledOccurrenceTable>

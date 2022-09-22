@@ -3,7 +3,10 @@ import {SelectionBox} from "../SelectionBox";
 import {Dropdown} from "./Dropdown";
 import React from "react";
 import {DateInputBox} from "./DateInputBox";
-import TextInputBubble from "../TextInputBubble";
+import {KeyboardArrowDown} from "@mui/icons-material";
+import {StyledArrow} from "./StyledArrow";
+import {KeyboardArrowUp} from "@mui/icons-material";
+import InlineBubble from "../../shared/InlineBubble";
 
 export function UserSelectPaperInput(props) {
     const onLowDateChange = props.yearRangeHandler[0];
@@ -23,7 +26,11 @@ export function UserSelectPaperInput(props) {
         <PaperOptionWrap
             selected={props.selected === 1}
             onClick={() => props.onPaperSelectClick(1)}
+            paddingBottom={'40px'}
         >
+            <StyledArrow>
+                {props.selected === 1 && <KeyboardArrowUp/>}
+            </StyledArrow>
             <span className={'paperOptionHeader'}>
                 My chosen periodicals between {dateInput}
             </span>
@@ -32,15 +39,18 @@ export function UserSelectPaperInput(props) {
                 onClick={props.deletePaperBubble}
             />
             <div className={'paperSelectInputWrap'}>
-                <input
-                    type="text"
-                    value={props.paperInputValue}
-                    name="papers"
-                    placeholder="Search for a periodical"
-                    onKeyUp={props.onKeyUp}
-                    onChange={props.onPaperChange}
-                    autoComplete="off"
-                />
+                <InlineBubble>
+                    <input
+                        type="text"
+                        id={props.selected === 1 ? "selectedPaperInput" : "unselectedPaperInput"}
+                        value={props.paperInputValue}
+                        name="papers"
+                        placeholder="Search for a periodical"
+                        onKeyUp={props.onKeyUp}
+                        onChange={props.onPaperChange}
+                        autoComplete="off"
+                    />
+                </InlineBubble>
             </div>
             <div className='dropdownContainer'>
                 <Dropdown
@@ -49,6 +59,13 @@ export function UserSelectPaperInput(props) {
                     onClick={props.onDropdownClick}
                 />
             </div>
+            <StyledArrow
+                bottom={'0'}
+                top={'auto'}
+                right={'0'}
+            >
+                {props.selected === 1 && <KeyboardArrowDown/>}
+            </StyledArrow>
         </PaperOptionWrap>
 
     )

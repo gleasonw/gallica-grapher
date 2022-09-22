@@ -6,7 +6,7 @@ export default function OCRTextBubble(props) {
     const [loaded, setLoaded] = React.useState(false);
     const [ocrInfo, setOcrInfo] = React.useState('');
     const [numResults, setNumResults] = React.useState(0);
-    const [buttonText, setButtonText] = React.useState('Get context');
+    const [buttonText, setButtonText] = React.useState('View context');
 
     useEffect(() => {
         if(props.arkCode !== arkCode) {
@@ -14,7 +14,7 @@ export default function OCRTextBubble(props) {
             setLoaded(false);
             setOcrInfo('');
             setNumResults(0);
-            setButtonText('Get context');
+            setButtonText('View context');
         }
     }, [props.arkCode, arkCode]);
 
@@ -23,7 +23,6 @@ export default function OCRTextBubble(props) {
         const ocrText = await fetch(`/api/ocrtext/${arkCode}/${props.term}`).then(
             response => response.json()
         )
-        console.log(ocrText);
         setNumResults(ocrText['numResults']);
         setOcrInfo(ocrText['text']);
         setLoaded(true);

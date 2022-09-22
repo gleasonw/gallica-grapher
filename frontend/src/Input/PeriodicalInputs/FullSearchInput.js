@@ -2,6 +2,8 @@ import useData from "../../shared/hooks/useData";
 import PaperOptionWrap from "./PaperOptionWrap";
 import React from "react";
 import {DateInputBox} from "./DateInputBox";
+import {KeyboardArrowUp} from "@mui/icons-material";
+import {StyledArrow} from "./StyledArrow";
 
 export function FullSearchInput(props) {
     const lowYearPlaceholder = 1499;
@@ -36,8 +38,11 @@ export function FullSearchInput(props) {
             selected={props.selected === 2}
             borderBottom={'none'}
             onClick={() => props.onPaperSelectClick(2)}
-            borderRadius={'0 0 10px 10px'}
+            borderRadius={'0'}
         >
+            <StyledArrow>
+                {props.selected === 2 && <KeyboardArrowUp/>}
+            </StyledArrow>
             <span className={'paperOptionHeader'}>
                 {numPapersOverRange} periodicals publishing
                 at any point between {dateInputs}

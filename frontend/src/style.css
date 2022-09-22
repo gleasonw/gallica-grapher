@@ -128,16 +128,13 @@ header{
     margin-left: 10px;
 }
 .bubblesContainer{
-    padding-left: 0;
+    margin-bottom: 10px;
     align-items: center;
     display: flex;
     overflow: scroll;
     flex-direction: row;
     border-radius: 8px;
     gap: 10px;
-}
-.paperSelectInputWrap{
-    padding: 20px 0 10px 0;
 }
 .bubblesLabel{
     height: 32px;
@@ -230,13 +227,16 @@ header{
     margin: 0 10px 10px 0;
 }
 
-input[type='text']{
+input[type='text'],input[type='number']{
     height: 100%;
     border: 0;
     font-size: 16px;
     background-color: inherit;
     outline: none;
     color: inherit;
+}
+input#selectedPaperInput{
+    color: #4d4d4d !important;
 }
 .dateInput{
     max-width: 40px;
@@ -401,7 +401,7 @@ label[for="papers"],label[for="searchTerm"]{
     color: white;
 }
 
-.queryProgressUI, .ticketResultsContainer{
+.queryProgressUI{
     display: flex;
     flex-wrap: wrap;
     margin-top: 30px;
@@ -421,6 +421,11 @@ label[for="papers"],label[for="searchTerm"]{
     margin: 20px;
     background: white;
     border-radius: 10px;
+}
+.ticketResultsContainer{
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
 }
 .ticketStats{
     width: auto;

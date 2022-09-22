@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
 import ClassicUIBox from "./shared/ClassicUIBox";
+import ImportantButtonWrap from "./shared/ImportantButtonWrap";
 
 
 function App() {
@@ -167,8 +168,13 @@ function App() {
                     <h3>{numRecords.toLocaleString()} records in your request.</h3>
                     <section>
             This number is either greater than my limit, or I don't have enough space for it right now. Try restricting your search to a few periodicals,
-            shortening the year range, or using a more precise term. Click on Graphing Gallica to return to home.
+            shortening the year range, or using a more precise term.
                     </section>
+                    <ImportantButtonWrap
+                        onClick={handleHomeClick}
+                        aria-label="Home page button"
+                        children={'Make a new request'}
+                    />
                 </ClassicUIBox>
             </div>
         )

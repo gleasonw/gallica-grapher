@@ -62,6 +62,22 @@ function Input(props){
         }
     }
 
+    function handleKeyDown(event){
+        if(event.key === 'ArrowDown'){
+            event.preventDefault();
+            if(selectedPaperInput < 2){
+                setSelectedPaperInput(selectedPaperInput + 1);
+            }
+        }else if(event.key === 'ArrowUp'){
+            event.preventDefault();
+            if(selectedPaperInput > 0){
+                setSelectedPaperInput(selectedPaperInput - 1);
+            }
+        }else{
+
+        }
+    }
+
     function handleTermChange(event) {
         const input = event.target.value
         const splitCommaTerms = input.split(',')
@@ -229,7 +245,7 @@ function Input(props){
     }
 
     return (
-        <div className='inputBody'>
+        <div className='inputBody' onKeyDown={handleKeyDown}>
             <div className='inputUI'>
                 <div className="mainTitle">
                     Graph word trends in the French National Library's periodical archive.
