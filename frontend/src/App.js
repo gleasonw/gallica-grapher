@@ -10,6 +10,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
 import ClassicUIBox from "./shared/ClassicUIBox";
 import ImportantButtonWrap from "./shared/ImportantButtonWrap";
+import LesserButton from "./shared/LesserButton";
 
 
 function App() {
@@ -22,27 +23,7 @@ function App() {
     const [numRecords, setNumRecords] = useState(0);
     const requestBoxRef = useRef(null);
 
-    const header =
-        <header className="header">
-            <div className="infoAndHomeBar">
-                <button
-                    className={'gallicaGrapherHome'}
-                    onClick={handleHomeClick}
-                    aria-label="Home page button"
-                >
-                    Graphing Gallica
-                </button>
-                <button
-                    className="info"
-                    onClick={handleInfoClick}
-                    aria-label="Information page button"
-                >
-                    <InfoIcon/>
-                </button>
-            </div>
-        </header>
-
-    function handleLoadedSubmit(ticket){
+    function handleLoadedSubmit(ticket) {
         const newTicketID = uuidv4();
         const updatedTickets = {
             ...tickets,
@@ -51,21 +32,21 @@ function App() {
         void initRequest(updatedTickets);
     }
 
-    function handleUnloadedSubmit(){
+    function handleUnloadedSubmit() {
         void initRequest(tickets);
     }
 
-    async function initRequest(tickets){
+    async function initRequest(tickets) {
         setRunningQueries(true);
         setGettingInput(false);
         setTickets(tickets);
         const ticketsWithJustCodes = {}
         Object.keys(tickets).map((ticketID) => (
             ticketsWithJustCodes[ticketID] = {
-                    terms: tickets[ticketID].terms,
-                    codes: tickets[ticketID].papersAndCodes.map(
-                        (paperAndCode) => (paperAndCode.code)),
-                    dateRange: tickets[ticketID].dateRange
+                terms: tickets[ticketID].terms,
+                codes: tickets[ticketID].papersAndCodes.map(
+                    (paperAndCode) => (paperAndCode.code)),
+                dateRange: tickets[ticketID].dateRange
             }
         ))
         const {request} = await axios.post('/api/init', {
@@ -75,7 +56,7 @@ function App() {
         setRequestID(requestID);
     }
 
-    function handleCreateTicketClick(items){
+    function handleCreateTicketClick(items) {
         const ticketID = uuidv4();
         let updatedTickets = {
             ...tickets,
@@ -84,13 +65,13 @@ function App() {
         setTickets(updatedTickets);
     }
 
-    function handleTicketClick(ticketID){
+    function handleTicketClick(ticketID) {
         let updatedTickets = {...tickets}
         delete updatedTickets[ticketID];
         setTickets(updatedTickets)
     }
 
-    function handleExampleRequestClick(request){
+    function handleExampleRequestClick(request) {
         requestBoxRef.current.scrollIntoView({behavior: 'smooth'});
         const requestWithUniqueTicketIDs = {}
         Object.keys(request).map((ticketID) => (
@@ -99,11 +80,11 @@ function App() {
         setTickets(requestWithUniqueTicketIDs);
     }
 
-    function handleTicketFinish(){
+    function handleTicketFinish() {
         setRunningQueries(false);
     }
 
-    function handleHomeClick(){
+    function handleHomeClick() {
         setInfoPage(false)
         setGettingInput(true);
         setRunningQueries(false);
@@ -113,27 +94,33 @@ function App() {
         setNumRecords(0);
     }
 
-    function handleTooManyRecords(numRecords){
+    function handleTooManyRecords(numRecords) {
         setRunningQueries(false);
         setTooManyRecordsWarning(true);
         setNumRecords(numRecords);
     }
 
-    function handleInfoClick(){
+    function handleInfoClick() {
         setInfoPage(true);
     }
 
-    if(infoPage) {
-        return(
+    if (infoPage) {
+        return (
             <div className="App">
-                {header}
+                <Header
+                    onHomeClick={handleHomeClick}
+                    onInfoClick={handleInfoClick}
+                />
                 <Info/>
             </div>
         )
-    }else if(gettingInput){
+    } else if (gettingInput) {
         return (
             <div className="App">
-                {header}
+                <Header
+                    onHomeClick={handleHomeClick}
+                    onInfoClick={handleInfoClick}
+                />
                 <Input
                     tickets={tickets}
                     onLoadedSubmit={handleLoadedSubmit}
@@ -145,10 +132,13 @@ function App() {
                 />
             </div>
         )
-    }else if(runningQueries){
+    } else if (runningQueries) {
         return (
             <div className="App">
-                {header}
+                <Header
+                    onHomeClick={handleHomeClick}
+                    onInfoClick={handleInfoClick}
+                />
                 <RunningQueriesUI
                     tickets={tickets}
                     requestID={requestID}
@@ -158,17 +148,21 @@ function App() {
                 />
             </div>
         )
-    }else if(tooManyRecordsWarning){
+    } else if (tooManyRecordsWarning) {
         return (
             <div className="App">
-                {header}
+                <Header
+                    onHomeClick={handleHomeClick}
+                    onInfoClick={handleInfoClick}
+                />
                 <ClassicUIBox>
                     <h1>Your curiosity exceeds my capacity.</h1>
                     <br/>
                     <h3>{numRecords.toLocaleString()} records in your request.</h3>
                     <section>
-            This number is either greater than my limit, or I don't have enough space for it right now. Try restricting your search to a few periodicals,
-            shortening the year range, or using a more precise term.
+                        This number is either greater than my limit, or I don't have enough space for it right now. Try
+                        restricting your search to a few periodicals,
+                        shortening the year range, or using a more precise term.
                     </section>
                     <ImportantButtonWrap
                         onClick={handleHomeClick}
@@ -178,20 +172,45 @@ function App() {
                 </ClassicUIBox>
             </div>
         )
-    }else{
+    } else {
         return (
             <div className="App">
-                {header}
+                <Header
+                    onHomeClick={handleHomeClick}
+                    onInfoClick={handleInfoClick}
+                    includeGraphAgain
+                />
                 <ResultUI
                     tickets={tickets}
                     requestID={requestID}
                     onHomeClick={handleHomeClick}
                 />
             </div>
-          )
+        )
     }
 }
 
-
+function Header(props) {
+    return (
+        <header className="header">
+            <div className="infoAndHomeBar">
+                <button
+                    className={'gallicaGrapherHome'}
+                    onClick={props.onHomeClick}
+                    aria-label="Home page button"
+                >
+                    Graphing Gallica
+                </button>
+                <button
+                    className="info"
+                    onClick={props.onInfoClick}
+                    aria-label="Information page button"
+                >
+                    <InfoIcon/>
+                </button>
+            </div>
+        </header>
+    )
+}
 
 export default App;

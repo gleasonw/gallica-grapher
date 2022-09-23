@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import NavBarWrap from "./NavBarWrap";
 import OCRTextBubble from "./OCRTextBubble";
 import {ShadowedFocusInput} from "../shared/ShadowedFocusInput";
+import {StyledInputAndLabel, StyledSelect} from "../shared/StyledSelect";
 
 export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(10);
@@ -219,24 +220,8 @@ function RecordRows(props) {
     )
 }
 
-const StyledInputAndLabel = styled.div`
-    display: flex;
-    flex-direction: column;
-    `;
-
 const StyledRecordsViewer = styled.div`
     display: flex;
     flex-direction: column;
     `;
 
-const StyledSelect = styled.select`
-    padding: 5px;
-    outline: none;
-    background-color: inherit;
-    box-shadow: rgba(0, 0, 0, 0.075) 0px 1px 1px 0px inset;
-    cursor: pointer;
-    border: 0.2rem solid #ece9e2;
-    border-radius: 5px;
-    color: #4d4d4d;
-    height: 42px;
-    `;

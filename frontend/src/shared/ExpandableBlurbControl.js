@@ -18,7 +18,7 @@ export function ExpandableBlurbControl(props) {
     }
 
     return (
-        <div onClick={handleClick}>
+        <StyledBlurbAndPlusLabel onClick={handleClick}>
             <BlurbText>
                 <TextClipper>
                 {props.shortenedItems}
@@ -26,16 +26,17 @@ export function ExpandableBlurbControl(props) {
             </BlurbText>
             {
                 expanded ?
-                <StyledPeriodicalDropdownTable>
-                    <tbody>
-                    {props.items.map((item) => (
-                        <tr key={item}>
-                            <td>{item}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                    {arrow}
-                </StyledPeriodicalDropdownTable>
+                    <StyledDrop>
+                        <table>
+                            <StyledPeriodicalDropdownTable>
+                                {props.items.map((item) => (
+                                    <tr key={item}>
+                                        <td>{item}</td>
+                                    </tr>
+                                ))}
+                            </StyledPeriodicalDropdownTable>
+                        </table>
+                    </StyledDrop>
                     :
                 <span>
                 + {props.numItemsRemaining} more
@@ -43,23 +44,38 @@ export function ExpandableBlurbControl(props) {
                 </span>
 
             }
-        </div>
+        </StyledBlurbAndPlusLabel>
     )
 }
 
-const StyledPeriodicalDropdownTable = styled.table`
+const StyledBlurbAndPlusLabel = styled.div`
+    min-height: 72.5px;
+    cursor: pointer;
+`;
+
+const StyledReduceArrow = styled.div`
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    z-index: 2;
+`;
+
+const StyledPeriodicalDropdownTable = styled.tbody`
+    td{
+        padding: 10px;
+    }
     tr:nth-child(even){
         background-color: #f2f2f2;
     }
+    font-size: 14px;
     max-width: 600px;
-    max-height: 500px;
+    overflow-y: scroll;
+    max-height: 300px;
     td:hover{
         overflow: visible;
         white-space: normal;
         height: auto;
     }
-    border-collapse: collapse;
-    table-layout: fixed;
     position: absolute;
     z-index: 1;
     background-color: white;
@@ -67,5 +83,11 @@ const StyledPeriodicalDropdownTable = styled.table`
     border-left: 1px solid #d9d9d9;
     border-right: 1px solid #d9d9d9;
     border-bottom: 1px solid #d9d9d9;
+    cursor: pointer;
     `;
+
+const StyledDrop = styled.div`
+    position: relative;
+    width: 599px;
+`;
 

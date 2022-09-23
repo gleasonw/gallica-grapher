@@ -6,7 +6,7 @@ export const BlurbText = styled.div`
     min-height: 42.5px;
     border-radius: 3px;
     font-size: 15px;
-    background: linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%);
+    background: #ece9e2;
     position: relative;
     background-size: 100% 100%;
 `
