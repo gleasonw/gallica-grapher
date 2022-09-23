@@ -164,32 +164,7 @@ class TicketGraphSeries:
 
     def initMonthContinuousPaperRequest(self):
         self.request = """
-        WITH ticket_results AS
-            (SELECT year, month, paperid
-            FROM results 
-            WHERE ticketid=%s
-                AND month IS NOT NULL),
-                
-            binned_frequencies_only_continuous AS
-                (SELECT year, month, count(*) AS mentions 
-                FROM 
-                    ticket_results
-
-                    JOIN papers 
-                    ON ticket_results.paperid = papers.code
-                        AND papers.startdate <= %s
-                        AND papers.enddate >= %s
-                        AND continuous IS TRUE
-                GROUP BY year, month
-                ORDER BY year, month),
-                
-            averaged_frequencies AS
-                (SELECT year, month, 
-                    AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-                FROM binned_frequencies_only_continuous)
-                
-        SELECT year, month, avgFrequency::float8
-        FROM averaged_frequencies;
+\q
         """
 
     def initYearRequest(self):
