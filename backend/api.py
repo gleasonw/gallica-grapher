@@ -57,11 +57,11 @@ def getProgress(taskID):
     return response
 
 
-@app.route('/api/revokeTask/<taskID>')
-def revokeTask(taskID):
+@app.route('/api/revokeTask/<taskID>/<reqID>')
+def revokeTask(taskID, reqID):
     task = spawnRequest.AsyncResult(taskID)
     task.revoke(terminate=True)
-    userData.clearUserRecordsAfterCancel(taskID)
+    userData.clearUserRecordsAfterCancel(reqID)
     return {'state': "REVOKED"}
 
 

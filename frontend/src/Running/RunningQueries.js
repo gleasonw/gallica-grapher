@@ -39,7 +39,7 @@ function RunningQueriesUI(props) {
 
     function handleCancelRequest(){
         setCancelMessage('Cancelling...');
-        fetch("/api/revokeTask/" + props.progressID).then(
+        fetch(`/api/revokeTask/${props.progressID}/${props.requestID}`).then(
             props.onCancelRequest
         )
     }
