@@ -60,7 +60,7 @@ export default function RecordsViewer(props){
             <ClassicUIBox>
                 <Chart
                     tickets={props.tickets}
-                    settingsID='group'
+                    settingsID={props.settingsID}
                     onSeriesClick={handleSeriesClick}
                     requestID={props.requestID}
                 />

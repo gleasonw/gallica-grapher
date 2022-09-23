@@ -32,6 +32,7 @@ function SoloTicketResult(props) {
             <RecordsViewer
                 tickets={{[props.ticketID]: props.ticket}}
                 requestID={props.requestID}
+                settingsID={props.ticketID}
             />
             <TicketPaperOccurrenceStats
                 ticketID={props.ticketID}

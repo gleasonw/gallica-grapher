@@ -10,6 +10,7 @@ export function GroupedTicketResults(props) {
             <RecordsViewer
                 tickets={props.tickets}
                 requestID={props.requestID}
+                settingsID={'group'}
             />
         </ClassicUIBox>
 

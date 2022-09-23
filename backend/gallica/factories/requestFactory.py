@@ -13,6 +13,7 @@ from utils.psqlconn import PSQLconn
 class RequestFactory:
 
     def __init__(self, tickets, requestid):
+        print(f"tickets: {tickets}")
         self.dbConn = PSQLconn().getConn()
         self.requestID = requestid
         self.tickets = tickets

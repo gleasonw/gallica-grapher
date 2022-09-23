@@ -24,3 +24,6 @@ class Ticket:
 
     def setNumResultsRetrieved(self, numResultsRetrieved):
         self.numResultsRetrieved = numResultsRetrieved
+
+    def __repr__(self):
+        return f"Ticket({self.key}, {self.terms}, {self.codes}, {self.startYear}, {self.endYear})"

@@ -1,5 +1,4 @@
 import React, {useRef, useState} from 'react';
-import {v4 as uuidv4} from 'uuid';
 import Input from "./Input/Input";
 import Info from "./Info";
 import RunningQueriesUI from "./Running/RunningQueries";
@@ -76,8 +75,8 @@ function App() {
     function handleExampleRequestClick(request) {
         requestBoxRef.current.scrollIntoView({behavior: 'smooth'});
         const requestWithUniqueTicketIDs = {}
-        Object.keys(request).map((ticketID) => (
-            requestWithUniqueTicketIDs[uuidv4()] = request[ticketID]
+        Object.keys(request).map((ticketID,index) => (
+            requestWithUniqueTicketIDs[index] = request[ticketID]
         ))
         setTickets(requestWithUniqueTicketIDs);
     }
