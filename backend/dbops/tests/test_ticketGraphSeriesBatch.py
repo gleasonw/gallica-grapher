@@ -34,7 +34,7 @@ class TestTicketGraphSeriesBatch(TestCase):
 
         batch.selectAllSeriesFromDB()
 
-        self.assertListEqual(batch.requestIDs, ['1234', '4321'])
+        self.assertListEqual(batch.ticketIDs, ['1234', '4321'])
         self.assertListEqual(batch.dataBatches, ['neat', 'neat'])
 
     @patch("ticketGraphSeriesBatch.TicketGraphSeries")
@@ -43,7 +43,7 @@ class TestTicketGraphSeriesBatch(TestCase):
     def test_select_one_series(self,mock_connect, mock_select, mock_series):
         mock_series.return_value = MagicMock(getSeries=MagicMock(return_value='nice'))
         batch = GraphSeriesBatch({"ticketIDs": 'neat'})
-        testSeries = batch.selectOneSeries(batch.requestIDs[0])
+        testSeries = batch.selectOneSeries(batch.ticketIDs[0])
         self.assertListEqual(testSeries, ["neat","nice"])
 
 

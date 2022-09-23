@@ -18,7 +18,7 @@ class Fetch:
             backoff_factor=1
         )
         http = urllib3.PoolManager(
-            timeout=urllib3.Timeout(connect=10, read=10),
+            timeout=urllib3.Timeout(connect=30, read=102),
             retries=retryStrategy,
             maxsize=self.maxSize
         )

@@ -62,6 +62,7 @@ export default function RecordsViewer(props){
                     tickets={props.tickets}
                     settingsID='group'
                     onSeriesClick={handleSeriesClick}
+                    requestID={props.requestID}
                 />
             </ClassicUIBox>
             <ClassicUIBox gap={'20px'}>

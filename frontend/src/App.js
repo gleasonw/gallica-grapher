@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import Input from "./Input/Input";
 import Info from "./Info";
@@ -10,12 +10,12 @@ import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
 import ClassicUIBox from "./shared/ClassicUIBox";
 import ImportantButtonWrap from "./shared/ImportantButtonWrap";
-import LesserButton from "./shared/LesserButton";
 
 
 function App() {
     const [tickets, setTickets] = useState({});
     const [requestID, setRequestID] = useState(null);
+    const [progressID, setProgressID] = useState(null);
     const [gettingInput, setGettingInput] = useState(true);
     const [runningQueries, setRunningQueries] = useState(false);
     const [infoPage, setInfoPage] = useState(false);
@@ -24,12 +24,16 @@ function App() {
     const requestBoxRef = useRef(null);
 
     function handleLoadedSubmit(ticket) {
-        const newTicketID = uuidv4();
-        const updatedTickets = {
+        const updatedTickets = getUpdatedTickets(ticket);
+        void initRequest(updatedTickets);
+    }
+
+    function getUpdatedTickets(ticket){
+        const newTicketID = Object.keys(tickets).length;
+        return {
             ...tickets,
             [newTicketID]: ticket
         };
-        void initRequest(updatedTickets);
     }
 
     function handleUnloadedSubmit() {
@@ -52,16 +56,14 @@ function App() {
         const {request} = await axios.post('/api/init', {
             tickets: ticketsWithJustCodes
         })
-        const requestID = JSON.parse(request.response)["taskid"];
+        const progressID = JSON.parse(request.response)["taskid"];
+        const requestID = JSON.parse(request.response)["requestid"];
+        setProgressID(progressID);
         setRequestID(requestID);
     }
 
     function handleCreateTicketClick(items) {
-        const ticketID = uuidv4();
-        let updatedTickets = {
-            ...tickets,
-            [ticketID]: items
-        };
+        const updatedTickets = getUpdatedTickets(items);
         setTickets(updatedTickets);
     }
 
@@ -141,6 +143,7 @@ function App() {
                 />
                 <RunningQueriesUI
                     tickets={tickets}
+                    progressID={progressID}
                     requestID={requestID}
                     onFinish={handleTicketFinish}
                     onTooManyRecords={handleTooManyRecords}

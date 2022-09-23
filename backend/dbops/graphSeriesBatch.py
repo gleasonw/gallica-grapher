@@ -9,7 +9,8 @@ class GraphSeriesBatch:
         self.dbConnection = PSQLconn().getConn()
         self.dataBatches = []
         self.settings = settings
-        self.requestIDs = settings["ticketIDs"].split(",")
+        self.ticketIDs = settings["ticketIDs"].split(",")
+        self.requestID = settings["requestID"]
 
         self.selectAllSeriesFromDB()
 
@@ -24,26 +25,29 @@ class GraphSeriesBatch:
     def selectAllSeriesFromDB(self):
         self.dataBatches = list(map(
             self.selectOneSeries,
-            self.requestIDs))
+            self.ticketIDs))
         self.dbConnection.close()
 
-    def selectOneSeries(self, requestID):
+    def selectOneSeries(self, ticketID):
         series = TicketGraphSeries(
-            requestID,
+            self.requestID,
+            ticketID,
             self.settings,
             self.dbConnection)
-        return [requestID, series.getSeries()]
+        return [ticketID, series.getSeries()]
 
 
 class TicketGraphSeries:
 
     def __init__(self,
+                 requestID,
                  ticketid,
                  settings,
                  dbConnection):
 
         self.continuous = settings["continuous"].lower() == "true"
         self.ticketid = ticketid
+        self.requestID = requestID
         self.averageWindow = int(settings["averageWindow"])
         self.timeBin = settings["groupBy"]
         dateRange = settings["dateRange"].split(",")
@@ -95,9 +99,10 @@ class TicketGraphSeries:
         WITH binned_frequencies AS (
             SELECT year, month, day, count(*) AS mentions 
             FROM results 
-            WHERE ticketid = %s 
-                AND month IS NOT NULL
-                AND day IS NOT NULL
+            WHERE requestid = %s
+            AND ticketid = %s 
+            AND month IS NOT NULL
+            AND day IS NOT NULL
             GROUP BY year, month, day 
             ORDER BY year, month, day),
             
@@ -117,9 +122,10 @@ class TicketGraphSeries:
         WITH ticket_results AS 
             (SELECT year, month, day, paperid
             FROM results 
-            WHERE ticketid=%s
-                AND month IS NOT NULL 
-                AND day IS NOT NULL),
+            WHERE requestid=%s
+            AND ticketid=%s
+            AND month IS NOT NULL 
+            AND day IS NOT NULL),
         
             binned_results_only_continuous AS 
             (SELECT year, month, day, count(*) AS mentions 
@@ -147,11 +153,12 @@ class TicketGraphSeries:
         self.request = """
         WITH binned_frequencies AS
             (SELECT year, month, count(*) AS mentions 
-                    FROM results continuous
-                        WHERE ticketid = %s 
-                            AND month IS NOT NULL
-                    GROUP BY year, month
-                    ORDER BY year,month),
+            FROM results continuous
+            WHERE requestid = %s
+            AND ticketid = %s 
+            AND month IS NOT NULL
+            GROUP BY year, month
+            ORDER BY year,month),
         
             averaged_frequencies AS 
             (SELECT year, month, 
@@ -167,8 +174,9 @@ class TicketGraphSeries:
         WITH ticket_results AS
             (SELECT year, month, paperid
             FROM results 
-            WHERE ticketid=%s
-                AND month IS NOT NULL),
+            WHERE requestid=%s
+            AND ticketid=%s
+            AND month IS NOT NULL),
                 
             binned_frequencies_only_continuous AS
                 (SELECT year, month, count(*) AS mentions 
@@ -197,7 +205,8 @@ class TicketGraphSeries:
         WITH binned_frequencies AS
             (SELECT year, count(*) AS mentions 
             FROM results 
-            WHERE ticketid = %s
+            WHERE requestid=%s
+            AND ticketid = %s
                 AND year IS NOT NULL
             GROUP BY year 
             ORDER BY year),
@@ -216,8 +225,9 @@ class TicketGraphSeries:
         WITH ticket_results AS
             (SELECT year, paperid
             FROM results 
-            WHERE ticketid=%s
-                AND year IS NOT NULL),
+            WHERE requestid=%s
+            AND ticketid=%s
+            AND year IS NOT NULL),
             
             binned_frequencies_only_continuous AS
             (SELECT year, count(*) AS mentions 
@@ -257,6 +267,7 @@ class TicketGraphSeries:
         with self.dbConnection.cursor() as curs:
             if self.continuous:
                 params = (
+                    self.requestID,
                     self.ticketid,
                     self.lowYear,
                     self.highYear,
@@ -264,6 +275,7 @@ class TicketGraphSeries:
                 )
             else:
                 params = (
+                    self.requestID,
                     self.ticketid,
                     self.averageWindow,
                 )

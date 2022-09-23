@@ -13,6 +13,7 @@ from dbops.recordDataForUser import RecordDataForUser
 app = Flask(__name__)
 CORS(app)
 userData = RecordDataForUser()
+requestID = 0
 
 
 @app.route('/')
@@ -22,9 +23,11 @@ def index():
 
 @app.route('/api/init', methods=['POST'])
 def init():
+    global requestID
+    requestID += 1
     tickets = request.get_json()["tickets"]
-    task = spawnRequest.delay(tickets)
-    return {"taskid": task.id}
+    task = spawnRequest.delay(tickets, requestID)
+    return {"taskid": task.id, "requestid": requestID}
 
 
 @app.route('/poll/progress/<taskID>')
@@ -106,7 +109,8 @@ def getGraphData():
         'averageWindow': request.args["averageWindow"],
         'groupBy': request.args["timeBin"],
         'continuous': request.args["continuous"],
-        'dateRange': request.args["dateRange"]
+        'dateRange': request.args["dateRange"],
+        'requestID': request.args["requestID"]
     }
     series = GraphSeriesBatch(settings)
     items = {'series': series.getSeriesBatch()}

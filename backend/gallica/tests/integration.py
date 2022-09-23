@@ -22,7 +22,7 @@ def runTests():
 
 
 def doTest(ticket):
-    testRequestFactory = RequestFactory([ticket], 'testRequest')
+    testRequestFactory = RequestFactory([ticket], '45')
     testRequest = testRequestFactory.build()
     testRequest.start()
     while not testRequest.finished:

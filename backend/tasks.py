@@ -8,7 +8,7 @@ app.config_from_object('celery_settings')
 
 
 @app.task(bind=True)
-def spawnRequest(self, tickets):
+def spawnRequest(self, tickets, requestid):
     ticketOptions = [
         Ticket(
             key=key,
@@ -20,7 +20,7 @@ def spawnRequest(self, tickets):
     ]
     request = RequestFactory(
         ticketOptions,
-        self.request.id
+        requestid
     ).build()
     request.start()
     while True:
