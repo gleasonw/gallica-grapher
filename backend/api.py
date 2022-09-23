@@ -13,6 +13,7 @@ from dbops.recordDataForUser import RecordDataForUser
 app = Flask(__name__)
 CORS(app)
 userData = RecordDataForUser()
+userData.purgeRecords()
 requestID = 0
 
 

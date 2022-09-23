@@ -223,6 +223,20 @@
           ]
         }
       }
+    },
+    "PNW": {
+      "tickets": {
+        "seattle" : {
+          "terms": [
+            "seattle",
+            "washington",
+            "oregon",
+            "portland"
+          ],
+          "papersAndCodes": [],
+          "dateRange": ["1880", "1930"]
+        }
+      }
     }
   }
 }

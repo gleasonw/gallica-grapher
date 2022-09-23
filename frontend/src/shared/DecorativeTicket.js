@@ -8,7 +8,7 @@ const DecorativeTicket = styled.div`
         border-radius: ${props => props.borderRadius ? props.borderRadius : '10px'};
         border: 1px solid #d9d9d9;
         overflow: hidden;
-        height: ${props => props.height ? props.height : '282px'};
+        height: ${props => props.height ? props.height : 'auto'};
         flex: 1;
         position: relative;
     `;
