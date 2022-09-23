@@ -19,7 +19,7 @@ export default function RecordsViewer(props){
     const minYear = Math.min(...minYearsOfTickets);
     const maxYear = Math.max(...maxYearsOfTickets);
     const middleYear = Math.floor((minYear + maxYear) / 2);
-    const timeBin = settings[props.ticketID || 'group'].timeBin;
+    const timeBin = settings[props.settingsID].timeBin;
     const [recordsTableYear, setRecordsTableYear] = useState(middleYear);
     const [recordsTableMonth, setRecordsTableMonth] = useState(null);
     const [recordsTableDay, setRecordsTableDay] = useState(null);
