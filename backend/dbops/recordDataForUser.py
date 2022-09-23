@@ -26,7 +26,6 @@ class RecordDataForUser:
         with self.conn.cursor() as cur:
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
-            ORDER BY year, month, day
             """, (tupledTickets,requestID))
             self.csvData = cur.fetchall()
         rowLabels = ['ngram', 'identifier', 'periodical', 'year', 'month', 'day']
