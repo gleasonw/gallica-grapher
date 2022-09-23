@@ -38,6 +38,8 @@ class RecordDataForUser:
             return self.getYearMonthDayRecordsForDisplay(ticketIDs, requestID, year, month, day, limit, offset)
         elif year and month:
             return self.getYearMonthRecordsForDisplay(ticketIDs, requestID, year, month, limit, offset)
+        elif year and day:
+            return self.getYearDayRecordsForDisplay(ticketIDs, requestID, year, day, limit, offset)
         elif year:
             return self.getYearRecordsForDisplay(ticketIDs, requestID, year, limit, offset)
         else:
@@ -75,6 +77,19 @@ class RecordDataForUser:
             LIMIT %s
             OFFSET %s
             """, (tupledTickets, requestID, year, month, limit, offset))
+            return cur.fetchall()
+
+    def getYearDayRecordsForDisplay(self, ticketIDs, requestID, year, day, limit, offset):
+        tupledTickets = tuple(ticketIDs.split(','))
+        with self.conn.cursor() as cur:
+            cur.execute(f"""
+            {self.ticketResultsWithPaperName}
+            AND year = %s 
+            AND day = %s
+            ORDER BY year, month, day
+            LIMIT %s
+            OFFSET %s
+            """, (tupledTickets, requestID, year, day, limit, offset))
             return cur.fetchall()
 
     def getYearMonthDayRecordsForDisplay(self, ticketIDs, requestID, year, month, day, limit, offset):
