@@ -48,6 +48,7 @@ class TicketGraphSeries:
         self.continuous = settings["continuous"].lower() == "true"
         self.ticketid = ticketid
         self.requestID = requestID
+        print(f"requestID: {self.requestID}")
         self.averageWindow = int(settings["averageWindow"])
         self.timeBin = settings["groupBy"]
         dateRange = settings["dateRange"].split(",")
@@ -257,10 +258,13 @@ class TicketGraphSeries:
 
     def getSearchTerms(self):
         getSearchTerms = """
-        SELECT array_agg(DISTINCT searchterm) FROM results WHERE ticketid = %s;
+        SELECT array_agg(DISTINCT searchterm) 
+        FROM results 
+        WHERE requestid=%s 
+        AND ticketid = %s;
         """
         cursor = self.dbConnection.cursor()
-        cursor.execute(getSearchTerms, (self.ticketid,))
+        cursor.execute(getSearchTerms, (self.requestID, self.ticketid,))
         self.searchTerms = cursor.fetchone()[0]
 
     def executeQuery(self):

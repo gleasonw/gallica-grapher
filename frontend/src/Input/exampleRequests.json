@@ -228,10 +228,7 @@
       "tickets": {
         "seattle" : {
           "terms": [
-            "seattle",
-            "washington",
-            "oregon",
-            "portland"
+            "seattle"
           ],
           "papersAndCodes": [],
           "dateRange": ["1880", "1930"]
