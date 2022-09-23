@@ -92,6 +92,7 @@ function App() {
         setRunningQueries(false);
         setTickets({});
         setRequestID(null);
+        setProgressID(null);
         setTooManyRecordsWarning(false);
         setNumRecords(0);
     }
