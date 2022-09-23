@@ -47,6 +47,10 @@ function Input(props){
         exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
     }
 
+    function handlePaperInputFocus(index){
+        setSelectedPaperInput(index)
+    }
+
     function handleSubmit(event){
         event.preventDefault();
         const numTickets = Object.keys(props.tickets).length
@@ -291,6 +295,7 @@ function Input(props){
                         '...'
                     }
                     requestBoxRef={props.requestBoxRef}
+                    onPaperInputFocus={handlePaperInputFocus}
                 />
                 <input
                     id='seeExamplesButton'

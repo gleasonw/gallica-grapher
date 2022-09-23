@@ -15,6 +15,7 @@ const ClassicUIBox = styled.div`
     resize: ${props => props.resize ? props.resize : 'none'};
     display: ${props => props.display ? props.display : 'flex'};
     flex-direction: column;
+    gap: ${props => props.gap || '0px'};
     `;
 
 export default ClassicUIBox;

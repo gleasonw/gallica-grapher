@@ -39,6 +39,7 @@ export function FullSearchInput(props) {
             borderBottom={'none'}
             onClick={() => props.onPaperSelectClick(2)}
             borderRadius={'0'}
+            onFocus={() => props.onFocus(2)}
         >
             <StyledArrow>
                 {props.selected === 2 && <KeyboardArrowUp/>}

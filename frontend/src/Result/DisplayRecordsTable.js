@@ -5,6 +5,7 @@ import NavBarWrap from "./NavBarWrap";
 import styled from 'styled-components';
 import OCRTextBubble from "./OCRTextBubble";
 import InlineBubble from "../shared/InlineBubble";
+import {ShadowedFocusInput} from "../shared/ShadowedFocusInput";
 
 export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(10);
@@ -29,61 +30,56 @@ export default function DisplayRecordsTable(props) {
             <NavBarWrap>
                 <StyledInputAndLabel>
                     <label htmlFor='year'>Year</label>
-                    <InlineBubble selected>
-                        <input
-                            type={'number'}
-                            value={props.year}
-                            id={'year'}
-                            onChange={
-                                (e) => props.onYearChange(parseInt(e.target.value))}
-                        />
-                    </InlineBubble>
+                    <ShadowedFocusInput
+                        type={'number'}
+                        selected
+                        value={props.year}
+                        id={'year'}
+                        onChange={
+                            (e) => props.onYearChange(parseInt(e.target.value))}
+                    />
                 </StyledInputAndLabel>
                 <StyledInputAndLabel>
                     <label htmlFor='month'>Month</label>
-                    <InlineBubble selected>
-                        <input
-                            type={'number'}
-                            value={props.month}
-                            id={'month'}
-                            onChange={
+                    <ShadowedFocusInput
+                        type={'number'}
+                        selected
+                        value={props.month}
+                        id={'month'}
+                        onChange={
                                 (e) => props.onMonthChange(parseInt(e.target.value))}
-                        />
-                    </InlineBubble>
+                    />
                 </StyledInputAndLabel>
                 <StyledInputAndLabel>
                     <label htmlFor='day'>Day</label>
-                    <InlineBubble selected>
-                        <input
-                            type={'number'}
-                            value={props.day}
-                            id={'day'}
-                            onChange={
+                    <ShadowedFocusInput
+                        type={'number'}
+                        selected
+                        value={props.day}
+                        id={'day'}
+                        onChange={
                                 (e) => props.onDayChange(parseInt(e.target.value))}
-                        />
-                    </InlineBubble>
+                    />
                 </StyledInputAndLabel>
                 <StyledInputAndLabel>
                     <label htmlFor='limit'>Limit</label>
-                    <InlineBubble selected>
-                        <input
-                            type={'number'}
-                            value={limit}
-                            id={'limit'}
-                            onChange={(e) => setLimit(parseInt(e.target.value))}
-                        />
-                    </InlineBubble>
+                    <ShadowedFocusInput
+                        type={'number'}
+                        selected
+                        value={limit}
+                        id={'limit'}
+                        onChange={(e) => setLimit(parseInt(e.target.value))}
+                    />
                 </StyledInputAndLabel>
                 <StyledInputAndLabel>
                     <label htmlFor='offset'>Offset</label>
-                    <InlineBubble selected>
-                        <input
-                            type={'number'}
-                            value={offset}
-                            id={'offset'}
-                            onChange={(e) => setOffset(parseInt(e.target.value))}
-                        />
-                    </InlineBubble>
+                    <ShadowedFocusInput
+                        type={'number'}
+                        selected
+                        value={offset}
+                        id={'offset'}
+                        onChange={(e) => setOffset(parseInt(e.target.value))}
+                    />
                 </StyledInputAndLabel>
             </NavBarWrap>
             <StyledOccurrenceTable>
@@ -97,41 +93,15 @@ export default function DisplayRecordsTable(props) {
                     <th>Scanned text (approximate)</th>
                 </tr>
                 {displayRecords ?
-                    displayRecords.map((record, index) => {
-                        let term = record[0];
-                        let periodical = record[1];
-                        let year = record[2];
-                        let month = record[3];
-                        let day = record[4];
-                        let gallicaLink = record[5];
-                        let arkCode = gallicaLink.split('/').pop();
-                        return (
-                            <tr key={index}>
-                                <td>{index + offset + 1}</td>
-                                <td>{term}</td>
-                                <td>{periodical}</td>
-                                <td>
-                                    {(year && month && day) && `${year}/${month}/${day}`}
-                                    {(year && month && !day) && `${year}/${month}`}
-                                    {(year && !month && !day) && `${year}`}
-                                </td>
-                                <td>
-                                    <a
-                                        href={gallicaLink}
-                                        target='_blank'
-                                        rel='noopener noreferrer'
-                                    >
-                                        {gallicaLink}</a>
-                                </td>
-                                <td>
-                                    <OCRTextBubble
-                                        term={term}
-                                        arkCode={arkCode}
-                                    />
-                                </td>
-                            </tr>
-                        )
-                    })
+                        displayRecords.length > 0 ?
+                        <RecordRows
+                            rows={displayRecords}
+                            offset={offset}
+                        />
+                            :
+                        <tr>
+                            <td colSpan={6}>No records found for these options; clicking on a point in the graph should yield results.</td>
+                        </tr>
                     :
                     <tr>
                         <td>Loading...</td>
@@ -140,6 +110,46 @@ export default function DisplayRecordsTable(props) {
                 </tbody>
             </StyledOccurrenceTable>
         </div>
+    )
+}
+
+function RecordRows(props){
+    return(
+        props.rows.map((record, index) => {
+            let term = record[0];
+            let periodical = record[1];
+            let year = record[2];
+            let month = record[3];
+            let day = record[4];
+            let gallicaLink = record[5];
+            let arkCode = gallicaLink.split('/').pop();
+            return (
+                <tr key={index}>
+                    <td>{index + props.offset + 1}</td>
+                    <td>{term}</td>
+                    <td>{periodical}</td>
+                    <td>
+                        {(year && month && day) && `${year}/${month}/${day}`}
+                        {(year && month && !day) && `${year}/${month}`}
+                        {(year && !month && !day) && `${year}`}
+                    </td>
+                    <td>
+                        <a
+                            href={gallicaLink}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                        >
+                            {gallicaLink}</a>
+                    </td>
+                    <td>
+                        <OCRTextBubble
+                            term={term}
+                            arkCode={arkCode}
+                        />
+                    </td>
+                </tr>
+            )
+        })
     )
 }
 

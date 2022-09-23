@@ -6,7 +6,7 @@ import {DateInputBox} from "./DateInputBox";
 import {KeyboardArrowDown} from "@mui/icons-material";
 import {StyledArrow} from "./StyledArrow";
 import {KeyboardArrowUp} from "@mui/icons-material";
-import InlineBubble from "../../shared/InlineBubble";
+import {ShadowedFocusInput} from "../../shared/ShadowedFocusInput";
 
 export function UserSelectPaperInput(props) {
     const onLowDateChange = props.yearRangeHandler[0];
@@ -22,11 +22,13 @@ export function UserSelectPaperInput(props) {
             selected={props.selected === 1}
         />
     const paperNames = props.userSelectedPapers.map(paper => paper.title);
+    const selected = props.selected === 1;
     return (
         <PaperOptionWrap
-            selected={props.selected === 1}
+            selected={selected}
             onClick={() => props.onPaperSelectClick(1)}
             paddingBottom={'40px'}
+            onFocus={() => props.onFocus(1)}
         >
             <StyledArrow>
                 {props.selected === 1 && <KeyboardArrowUp/>}
@@ -39,18 +41,17 @@ export function UserSelectPaperInput(props) {
                 onClick={props.deletePaperBubble}
             />
             <div className={'paperSelectInputWrap'}>
-                <InlineBubble>
-                    <input
-                        type="text"
-                        id={props.selected === 1 ? "selectedPaperInput" : "unselectedPaperInput"}
-                        value={props.paperInputValue}
-                        name="papers"
-                        placeholder="Search for a periodical"
-                        onKeyUp={props.onKeyUp}
-                        onChange={props.onPaperChange}
-                        autoComplete="off"
-                    />
-                </InlineBubble>
+                <ShadowedFocusInput
+                    type={'text'}
+                    id={selected ? "selectedPaperInput": "unselectedPaperInput"}
+                    name={'papers'}
+                    placeholder={'Enter a periodical name'}
+                    onKeyUp={props.onKeyUp}
+                    onChange={props.onPaperChange}
+                    value={props.paperInputValue}
+                    autoComplete={'off'}
+                    selected={selected}
+                />
             </div>
             <div className='dropdownContainer'>
                 <Dropdown

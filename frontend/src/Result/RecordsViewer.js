@@ -21,8 +21,8 @@ export default function RecordsViewer(props){
     const middleYear = Math.floor((minYear + maxYear) / 2);
     const timeBin = settings[props.ticketID || 'group'].timeBin;
     const [recordsTableYear, setRecordsTableYear] = useState(middleYear);
-    const [recordsTableMonth, setRecordsTableMonth] = useState(0);
-    const [recordsTableDay, setRecordsTableDay] = useState(0);
+    const [recordsTableMonth, setRecordsTableMonth] = useState(null);
+    const [recordsTableDay, setRecordsTableDay] = useState(null);
     const seriesClickHandlers = {
         'year': handleYearSeriesClick,
         'month': handleMonthSeriesClick,
@@ -64,7 +64,7 @@ export default function RecordsViewer(props){
                     onSeriesClick={handleSeriesClick}
                 />
             </ClassicUIBox>
-            <ClassicUIBox>
+            <ClassicUIBox gap={'20px'}>
                 <h4>View occurrences</h4>
                 <DisplayRecordsTable
                         tickets={props.tickets}
@@ -81,7 +81,6 @@ export default function RecordsViewer(props){
                     tickets={props.tickets}
                     requestID={props.requestID}
                 />
-
             </ClassicUIBox>
         </StyledRecordsViewer>
     )

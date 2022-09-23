@@ -59,6 +59,7 @@ function TicketForm(props){
                 numContinuousPapers={props.numContinuousPapers}
                 userSelectedPapers={props.userSelectedPapers}
                 boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
+                onFocus={props.onPaperInputFocus}
             />
             <div ref={props.requestBoxRef}>
             <StyledRequestBox

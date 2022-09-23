@@ -8,16 +8,12 @@ const TextInputBubble = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border: ${props => props.noTermsReminder ?  "1px solid #ff0000": "2px solid #d9d9d9"};
-    background-color: ${props => props.backgroundColor || "#ffffff"};
+    border: ${props => props.noTermsReminder ?  "1px solid #725353": "2px solid #d9d9d9"};
+    background-color: ${props => props.focus ? "white" : props.backgroundColor || "#ffffff"};
     border-radius: ${props => props.borderRadius || "10px"};
     color: #4d4d4d;
     transition: all 150ms;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
-    &:hover{
-        border-color: #c6c6c6;
-        background-color: #e6e6e6;
-        }
+    box-shadow: ${props => props.focus ? "0 0 0 2px #575252" : "rgba(0, 0, 0, 0.075) 0px 1px 1px 0px inset"};
     `;
 
 export default TextInputBubble;
