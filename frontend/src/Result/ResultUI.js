@@ -8,6 +8,7 @@ import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSetting
 import {settingsReducer} from "./SettingsReducer";
 import initGraphSettings from "./chartUtils/initGraphSettings";
 import LesserButton from "../shared/LesserButton";
+import {v4 as uuidv4} from 'uuid';
 
 function ResultUI(props){
     const [grouped, setGrouped] = useState(Object.keys(props.tickets).length > 1);
@@ -15,6 +16,7 @@ function ResultUI(props){
         settingsReducer,
         props.tickets,
         initGraphSettings)
+    const [cacheID, setCacheID] = useState(uuidv4());
 
     function handleGroupToggle(){
         setGrouped(!grouped)
@@ -46,11 +48,13 @@ function ResultUI(props){
                         <GroupedTicketResults
                             tickets={props.tickets}
                             requestID={props.requestID}
+                            cacheID={cacheID}
                         />
                     ) : (
                         <SoloTickets
                             tickets={props.tickets}
                             requestID={props.requestID}
+                            cacheID={cacheID}
                         />
                     )}
                 </div>

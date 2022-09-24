@@ -3,7 +3,6 @@ import TicketLabel from "../shared/TicketLabel";
 import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import RecordsViewer from "./RecordsViewer";
-import {v4 as uuidv4} from 'uuid';
 
 function SoloTickets(props) {
     return (
@@ -14,6 +13,7 @@ function SoloTickets(props) {
                     key={key}
                     ticketID={key}
                     requestID={props.requestID}
+                    cacheID={props.cacheID}
                 />
             ))}
         </div>
@@ -21,7 +21,6 @@ function SoloTickets(props) {
 }
 //TODO: sync timebin display with state
 function SoloTicketResult(props) {
-    const uniqueIDToPreventCaching = uuidv4();
     return (
         <ClassicUIBox resize={'both'}>
             <TicketLabel
@@ -33,13 +32,14 @@ function SoloTicketResult(props) {
                 tickets={{[props.ticketID]: props.ticket}}
                 requestID={props.requestID}
                 settingsID={props.ticketID}
+                cacheID={props.cacheID}
             />
             <TicketPaperOccurrenceStats
                 ticketID={props.ticketID}
                 dateRange={props.ticket.dateRange}
                 grouped={false}
                 requestID={props.requestID}
-                uuid={uniqueIDToPreventCaching}
+                uuid={props.cacheID}
             />
         </ClassicUIBox>
     )

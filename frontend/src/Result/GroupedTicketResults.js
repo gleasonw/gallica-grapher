@@ -11,6 +11,7 @@ export function GroupedTicketResults(props) {
                 tickets={props.tickets}
                 requestID={props.requestID}
                 settingsID={'group'}
+                cacheID={props.cacheID}
             />
         </ClassicUIBox>
 
