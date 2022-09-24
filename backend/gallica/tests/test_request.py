@@ -26,8 +26,8 @@ class TestRequest(TestCase):
         self.productionRun = self.testRequest.run
         self.testRequest.run = MagicMock()
 
-        self.productionEstimateIsUnderLimit = self.testRequest.estimateIsUnderLimit
-        self.testRequest.estimateIsUnderLimit = MagicMock()
+        self.productionEstimateIsUnderLimit = self.testRequest.numResultsUnderLimit
+        self.testRequest.numResultsUnderLimit = MagicMock()
 
         self.productionGetNumberRowsInAllTables = self.testRequest.getNumberRowsStoredInAllTables
         self.testRequest.getNumberRowsStoredInAllTables = MagicMock()
@@ -45,12 +45,12 @@ class TestRequest(TestCase):
         self.testRequest.setTicketProgressStats = MagicMock()
 
     def test_run(self):
-        self.testRequest.estimateIsUnderLimit.return_value=True
+        self.testRequest.numResultsUnderLimit.return_value=True
 
         self.productionRun()
 
         self.testRequest.initProgressStats.assert_called_once()
-        self.testRequest.estimateIsUnderLimit.assert_called_with(5)
+        self.testRequest.numResultsUnderLimit.assert_called_with(5)
         self.testRequest.doAllSearches.assert_called_once()
         self.testRequest.DBconnection.close.assert_called_once()
 

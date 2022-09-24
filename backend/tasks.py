@@ -33,6 +33,11 @@ def spawnRequest(self, tickets, requestid):
                 'status': 'Too many records!',
                 'numRecords': request.estimateNumRecords
             }
+        elif request.noRecords:
+            return {
+                'status': 'No records found!',
+                'numRecords': 0
+            }
         else:
             self.update_state(
                 state="PROGRESS",

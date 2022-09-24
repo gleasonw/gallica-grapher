@@ -12,6 +12,7 @@ class Request(threading.Thread):
         self.topPapersForTerms = []
         self.finished = False
         self.tooManyRecords = False
+        self.noRecords = False
         self.requestID = requestID
         self.estimateNumRecords = 0
         self.DBconnection = dbConn
@@ -22,17 +23,18 @@ class Request(threading.Thread):
         return self.ticketProgressStats
 
     def run(self):
-        estimateRequestResults = sum(
+        self.estimateNumRecords = sum(
             [
                 tick.getEstimateNumResultsForTicket()
                 for tick in self.ticketSearches
             ]
         )
-        if self.estimateIsUnderLimit(estimateRequestResults):
-            self.doAllSearches()
-        else:
-            self.estimateNumRecords = estimateRequestResults
+        if self.estimateNumRecords == 0:
+            self.noRecords = True
+        elif self.numResultsOverLimit():
             self.tooManyRecords = True
+        else:
+            self.doAllSearches()
         self.DBconnection.close()
 
     def initProgressStats(self):
@@ -49,9 +51,9 @@ class Request(threading.Thread):
             }
         return progressDict
 
-    def estimateIsUnderLimit(self, estimate):
+    def numResultsOverLimit(self):
         dbSpaceRemainingWithBuffer = MAX_DB_SIZE - self.getNumberRowsStoredInAllTables() - 10000
-        return estimate < min(dbSpaceRemainingWithBuffer, RECORD_LIMIT)
+        return self.estimateNumRecords > min(dbSpaceRemainingWithBuffer, RECORD_LIMIT)
 
     def getNumberRowsStoredInAllTables(self):
         with self.DBconnection.cursor() as curs:

@@ -53,6 +53,10 @@ def getProgress(taskID):
                 'state': "TOO_MANY_RECORDS",
                 'numRecords': result['numRecords']
             }
+        elif result and result['status'] == 'No records found!':
+            response = {
+                'state': "NO_RECORDS"
+            }
         else:
             response = {'state': "SUCCESS"}
     return response

@@ -20,6 +20,7 @@ function RunningQueriesUI(props) {
                     {}
             ),
             "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON['numRecords']),
+            "NO_RECORDS": props.onNoRecords,
             "SUCCESS": props.onFinish,
             "PENDING": () => null,
         }

@@ -19,6 +19,7 @@ function App() {
     const [runningQueries, setRunningQueries] = useState(false);
     const [infoPage, setInfoPage] = useState(false);
     const [tooManyRecordsWarning, setTooManyRecordsWarning] = useState(false);
+    const [noRecordsWarning, setNoRecordsWarning] = useState(false);
     const [numRecords, setNumRecords] = useState(0);
     const requestBoxRef = useRef(null);
 
@@ -102,6 +103,11 @@ function App() {
         setNumRecords(numRecords);
     }
 
+    function handleNoRecords(){
+        setRunningQueries(false);
+        setNoRecordsWarning(true);
+    }
+
     function handleInfoClick() {
         setInfoPage(true);
     }
@@ -147,6 +153,7 @@ function App() {
                     requestID={requestID}
                     onFinish={handleTicketFinish}
                     onTooManyRecords={handleTooManyRecords}
+                    onNoRecords={handleNoRecords}
                     onCancelRequest={handleHomeClick}
                 />
             </div>
@@ -158,14 +165,15 @@ function App() {
                     onHomeClick={handleHomeClick}
                     onInfoClick={handleInfoClick}
                 />
-                <ClassicUIBox>
+                <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
                     <h1>Your curiosity exceeds my capacity.</h1>
                     <br/>
                     <h3>{numRecords.toLocaleString()} records in your request.</h3>
                     <section>
-                        This number is either greater than my limit, or I don't have enough space for it right now. Try
-                        restricting your search to a few periodicals,
-                        shortening the year range, or using a more precise term.
+                        <br/>
+                        <p>This number is either greater than my limit, or I don't have enough space for it right now.
+                        Try restricting your search to a few periodicals, shortening the year range, or using a more precise term. </p>
+                        <br/>
                     </section>
                     <ImportantButtonWrap
                         onClick={handleHomeClick}
@@ -175,7 +183,27 @@ function App() {
                 </ClassicUIBox>
             </div>
         )
-    } else {
+    } else if (noRecordsWarning) {
+        return (
+            <div className="App">
+                <Header
+                    onHomeClick={handleHomeClick}
+                    onInfoClick={handleInfoClick}
+                />
+                <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
+                    <h1>No records found. </h1>
+                    <p>Try adjusting your year range or periodicals. Some publish only a few times in a year and don&rsquo;t have much text available. </p>
+                    <p>Adjusting your search term might help too, although Gallica is usually good at finding similar spellings. </p>
+                    <ImportantButtonWrap
+                        onClick={handleHomeClick}
+                        aria-label="Home page button"
+                        children={'Make a new request'}
+                    />
+                </ClassicUIBox>
+            </div>
+        )
+    }
+    else {
         return (
             <div className="App">
                 <Header
