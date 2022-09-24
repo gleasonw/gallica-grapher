@@ -28,17 +28,19 @@ class TopPapersForTicket:
     def selectTopPapers(self):
         with self.conn.cursor() as cursor:
             cursor.execute("""
-    
+            WITH ticket AS 
+                (SELECT paperid 
+                FROM results
+                WHERE requestID = %s
+                AND ticketid = %s)
             SELECT papers.title, count(paperid) AS papercount
-                FROM (SELECT paperid 
-                        FROM results WHERE ticketid = %s) 
-                        AS ticket
-                INNER JOIN papers ON ticket.paperid = papers.code 
+                FROM ticket
+                JOIN papers ON ticket.paperid = papers.code 
                 GROUP BY papers.title
                 ORDER BY papercount DESC
                 LIMIT 10;
     
-            """, (self.ticketID,))
+            """, (self.requestID, self.ticketID,))
             self.topPapers = cursor.fetchall()
 
     def selectTopContinuousPapers(self):
