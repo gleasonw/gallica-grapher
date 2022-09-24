@@ -1,8 +1,8 @@
 import os
 import ssl
 
-broker_use_ssl = {'ssl_cert_reqs': ssl.CERT_OPTIONAL}
-redis_backend_use_ssl = {'ssl_cert_reqs': ssl.CERT_OPTIONAL}
+broker_use_ssl = {'ssl_cert_reqs': ssl.CERT_NONE}
+redis_backend_use_ssl = {'ssl_cert_reqs': ssl.CERT_NONE}
 
 result_backend = os.environ.get(
     'REDIS_URL',
