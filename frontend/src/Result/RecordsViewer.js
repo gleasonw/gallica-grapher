@@ -5,6 +5,7 @@ import DownloadCSVButton from "./DownloadCSVButton";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import styled from "styled-components";
+import {v4 as uuidv4} from 'uuid';
 
 export default function RecordsViewer(props){
     const settings = useContext(GraphSettingsContext);
@@ -28,6 +29,7 @@ export default function RecordsViewer(props){
         'month': handleMonthSeriesClick,
         'day': handleDaySeriesClick
     }
+    const uniqueIDToPreventCaching = uuidv4();
 
     function handleSeriesClick(point){
         seriesClickHandlers[timeBin](point.category);
@@ -63,6 +65,7 @@ export default function RecordsViewer(props){
                     settingsID={props.settingsID}
                     onSeriesClick={handleSeriesClick}
                     requestID={props.requestID}
+                    uuid={uniqueIDToPreventCaching}
                 />
             </ClassicUIBox>
             <ClassicUIBox gap={'20px'}>
@@ -77,6 +80,7 @@ export default function RecordsViewer(props){
                         onYearChange={setRecordsTableYear}
                         onMonthChange={setRecordsTableMonth}
                         onDayChange={setRecordsTableDay}
+                        uuid={uniqueIDToPreventCaching}
                     />
                 <DownloadCSVButton
                     tickets={props.tickets}

@@ -25,7 +25,8 @@ function Chart(props) {
         "&continuous=" + chartSettings.continuous +
         "&dateRange=" + dateRange +
         "&timeBin=" + chartSettings.timeBin +
-        "&averageWindow=" + chartSettings.averageWindow;
+        "&averageWindow=" + chartSettings.averageWindow +
+        "&uniqueforcache=" + props.uuid;
     const result = useData(query);
     if (result) {
         const series = result['series'];

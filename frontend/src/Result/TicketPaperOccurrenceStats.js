@@ -10,7 +10,9 @@ export function TicketPaperOccurrenceStats(props) {
         "/api/topPapers?ticketID="+props.ticketID+
         "&requestID="+props.requestID +
         "&continuous="+ticketSettings.continuous+
-        "&dateRange="+props.dateRange
+        "&dateRange="+props.dateRange +
+        "&uuid="+props.uuid;
+
     const result = useData(topPapersQuery);
     if(result){
         const topPapers = result['topPapers'];

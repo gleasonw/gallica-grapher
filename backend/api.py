@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask import request
 from flask_cors import CORS
+import random
 
 from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
@@ -14,7 +15,7 @@ app = Flask(__name__)
 CORS(app)
 userData = RecordDataForUser()
 userData.purgeRecords()
-requestID = 0
+requestID = random.randint(0, 10000)
 
 
 @app.route('/')

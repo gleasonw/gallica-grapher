@@ -8,7 +8,7 @@ const TextInputBubble = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border: ${props => props.noTermsReminder ?  "1px solid #725353": "2px solid #d9d9d9"};
+    border: ${props => props.noTermsReminder ?  "2px solid red": "2px solid #d9d9d9"};
     background-color: ${props => props.focus ? "white" : props.backgroundColor || "#ffffff"};
     border-radius: ${props => props.borderRadius || "10px"};
     color: #4d4d4d;

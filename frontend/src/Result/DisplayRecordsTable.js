@@ -16,7 +16,8 @@ export default function DisplayRecordsTable(props) {
         "&requestID=" + props.requestID +
         "&year=" + props.year +
         "&limit=" + limit +
-        "&offset=" + offset;
+        "&offset=" + offset +
+        "&uniqueforcache=" + props.uuid;
     if (props.month) {
         (recordsQuery += "&month=" + props.month);
     }
