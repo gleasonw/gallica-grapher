@@ -15,20 +15,84 @@ function App() {
     const [tickets, setTickets] = useState({});
     const [requestID, setRequestID] = useState(null);
     const [progressID, setProgressID] = useState(null);
-    const [gettingInput, setGettingInput] = useState(true);
-    const [runningQueries, setRunningQueries] = useState(false);
-    const [infoPage, setInfoPage] = useState(false);
-    const [tooManyRecordsWarning, setTooManyRecordsWarning] = useState(false);
-    const [noRecordsWarning, setNoRecordsWarning] = useState(false);
+    const [currentPage, setCurrentPage] = useState('input');
     const [numRecords, setNumRecords] = useState(0);
     const requestBoxRef = useRef(null);
+    const pages = {
+        'input':
+            <Input
+                tickets={tickets}
+                onLoadedSubmit={handleLoadedSubmit}
+                onUnloadedSubmit={handleUnloadedSubmit}
+                onCreateTicketClick={handleCreateTicketClick}
+                onTicketClick={handleTicketClick}
+                onExampleRequestClick={handleExampleRequestClick}
+                requestBoxRef={requestBoxRef}
+            />,
+        'running':
+            <RunningQueriesUI
+                tickets={tickets}
+                progressID={progressID}
+                requestID={requestID}
+                onFinish={() => setCurrentPage('result')}
+                onTooManyRecords={handleTooManyRecords}
+                onNoRecords={() => setCurrentPage('noRecords')}
+                onCancelRequest={handleResetValuesAndGoHome}
+                onBackendError={() => setCurrentPage('backendError')}
+            />,
+        'result':
+            <ResultUI
+                tickets={tickets}
+                requestID={requestID}
+                onHomeClick={handleResetValuesAndGoHome}
+            />,
+        'info':
+            <Info/>,
+        'tooManyRecords':
+            <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
+                <h1>Your curiosity exceeds my capacity.</h1>
+                <br/>
+                <h3>{numRecords.toLocaleString()} records in your request.</h3>
+                <section>
+                    <br/>
+                    <p>This number is either greater than my limit, or I don't have enough space for it right now.
+                        Try restricting your search to a few periodicals, shortening the year range, or using a more
+                        precise term. </p>
+                    <br/>
+                </section>
+                <ImportantButtonWrap
+                    onClick={handleResetValuesAndGoHome}
+                    aria-label="Home page button"
+                    children={'Make a new request'}
+                />
+            </ClassicUIBox>,
+        'noRecords':
+            <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
+                <h1>No records found. </h1>
+                <p>Try adjusting your year range or periodical selection. Some publish only a few times in a year and
+                    don&rsquo;t have much text available. </p>
+                <p>Adjusting your search term might help too, although Gallica is usually good at finding similar
+                    spellings. </p>
+                <ImportantButtonWrap
+                    onClick={handleResetValuesAndGoHome}
+                    aria-label="Home page button"
+                    children={'Make a new request'}
+                />
+            </ClassicUIBox>,
+        'backendError':
+            <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
+                <h1>Something went wrong. My fault. </h1>
+                <p>Rest assured our very best engineer will soon right his wrongs.</p>
+                <p>Please try again later!</p>
+            </ClassicUIBox>
+    }
 
     function handleLoadedSubmit(ticket) {
         const updatedTickets = getUpdatedTickets(ticket);
         void initRequest(updatedTickets);
     }
 
-    function getUpdatedTickets(ticket){
+    function getUpdatedTickets(ticket) {
         const newTicketID = Object.keys(tickets).length;
         return {
             ...tickets,
@@ -41,8 +105,7 @@ function App() {
     }
 
     async function initRequest(tickets) {
-        setRunningQueries(true);
-        setGettingInput(false);
+        setCurrentPage('running');
         setTickets(tickets);
         const ticketsWithJustCodes = {}
         Object.keys(tickets).map((ticketID) => (
@@ -58,6 +121,9 @@ function App() {
         })
         const progressID = JSON.parse(request.response)["taskid"];
         const requestID = JSON.parse(request.response)["requestid"];
+        if (progressID === null) {
+            setCurrentPage('backendError');
+        }
         setProgressID(progressID);
         setRequestID(requestID);
     }
@@ -76,149 +142,34 @@ function App() {
     function handleExampleRequestClick(request) {
         requestBoxRef.current.scrollIntoView({behavior: 'smooth'});
         const requestWithUniqueTicketIDs = {}
-        Object.keys(request).map((ticketID,index) => (
+        Object.keys(request).map((ticketID, index) => (
             requestWithUniqueTicketIDs[index] = request[ticketID]
         ))
         setTickets(requestWithUniqueTicketIDs);
     }
 
-    function handleTicketFinish() {
-        setRunningQueries(false);
+    function handleTooManyRecords(numRecords) {
+        setNumRecords(numRecords);
+        setCurrentPage('tooManyRecords');
     }
 
-    function handleHomeClick() {
-        setInfoPage(false)
-        setGettingInput(true);
-        setRunningQueries(false);
+    function handleResetValuesAndGoHome() {
+        setCurrentPage('input');
         setTickets({});
         setRequestID(null);
         setProgressID(null);
-        setTooManyRecordsWarning(false);
         setNumRecords(0);
     }
 
-    function handleTooManyRecords(numRecords) {
-        setRunningQueries(false);
-        setTooManyRecordsWarning(true);
-        setNumRecords(numRecords);
-    }
-
-    function handleNoRecords(){
-        setRunningQueries(false);
-        setNoRecordsWarning(true);
-    }
-
-    function handleInfoClick() {
-        setInfoPage(true);
-    }
-
-    if (infoPage) {
-        return (
-            <div className="App">
-                <Header
-                    onHomeClick={handleHomeClick}
-                    onInfoClick={handleInfoClick}
-                />
-                <Info/>
-            </div>
-        )
-    } else if (gettingInput) {
-        return (
-            <div className="App">
-                <Header
-                    onHomeClick={handleHomeClick}
-                    onInfoClick={handleInfoClick}
-                />
-                <Input
-                    tickets={tickets}
-                    onLoadedSubmit={handleLoadedSubmit}
-                    onUnloadedSubmit={handleUnloadedSubmit}
-                    onCreateTicketClick={handleCreateTicketClick}
-                    onTicketClick={handleTicketClick}
-                    onExampleRequestClick={handleExampleRequestClick}
-                    requestBoxRef={requestBoxRef}
-                />
-            </div>
-        )
-    } else if (runningQueries) {
-        return (
-            <div className="App">
-                <Header
-                    onHomeClick={handleHomeClick}
-                    onInfoClick={handleInfoClick}
-                />
-                <RunningQueriesUI
-                    tickets={tickets}
-                    progressID={progressID}
-                    requestID={requestID}
-                    onFinish={handleTicketFinish}
-                    onTooManyRecords={handleTooManyRecords}
-                    onNoRecords={handleNoRecords}
-                    onCancelRequest={handleHomeClick}
-                />
-            </div>
-        )
-    } else if (tooManyRecordsWarning) {
-        return (
-            <div className="App">
-                <Header
-                    onHomeClick={handleHomeClick}
-                    onInfoClick={handleInfoClick}
-                />
-                <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
-                    <h1>Your curiosity exceeds my capacity.</h1>
-                    <br/>
-                    <h3>{numRecords.toLocaleString()} records in your request.</h3>
-                    <section>
-                        <br/>
-                        <p>This number is either greater than my limit, or I don't have enough space for it right now.
-                        Try restricting your search to a few periodicals, shortening the year range, or using a more precise term. </p>
-                        <br/>
-                    </section>
-                    <ImportantButtonWrap
-                        onClick={handleHomeClick}
-                        aria-label="Home page button"
-                        children={'Make a new request'}
-                    />
-                </ClassicUIBox>
-            </div>
-        )
-    } else if (noRecordsWarning) {
-        return (
-            <div className="App">
-                <Header
-                    onHomeClick={handleHomeClick}
-                    onInfoClick={handleInfoClick}
-                />
-                <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
-                    <h1>No records found. </h1>
-                    <p>Try adjusting your year range or periodicals. Some publish only a few times in a year and don&rsquo;t have much text available. </p>
-                    <p>Adjusting your search term might help too, although Gallica is usually good at finding similar spellings. </p>
-                    <ImportantButtonWrap
-                        onClick={handleHomeClick}
-                        aria-label="Home page button"
-                        children={'Make a new request'}
-                    />
-                </ClassicUIBox>
-            </div>
-        )
-    }
-    else {
-        return (
-            <div className="App">
-                <Header
-                    onHomeClick={handleHomeClick}
-                    onInfoClick={handleInfoClick}
-                    includeGraphAgain
-                />
-                <ResultUI
-                    tickets={tickets}
-                    requestID={requestID}
-                    onHomeClick={handleHomeClick}
-                />
-            </div>
-        )
-    }
+    return (
+        <div className="App">
+            <Header
+                onHomeClick={handleResetValuesAndGoHome}
+                onInfoClick={() => setCurrentPage('info')}
+            />
+            {pages[currentPage]}
+        </div>
+    );
 }
 
 function Header(props) {

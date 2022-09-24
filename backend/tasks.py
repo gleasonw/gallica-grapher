@@ -44,7 +44,3 @@ def spawnRequest(self, tickets, requestid):
                 meta={'progress': request.getProgressStats()})
             time.sleep(1)
 
-
-class TooManyRecordsFailure(Exception):
-    pass
-

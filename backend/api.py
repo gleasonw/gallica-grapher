@@ -14,7 +14,6 @@ from dbops.recordDataForUser import RecordDataForUser
 app = Flask(__name__)
 CORS(app)
 userData = RecordDataForUser()
-userData.purgeRecords()
 requestID = random.randint(0, 10000)
 
 
