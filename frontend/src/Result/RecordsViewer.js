@@ -98,6 +98,7 @@ export default function RecordsViewer(props){
 const StyledRecordsViewer = styled.div`
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     gap: 20px;
     margin-top: 20px;
     `;
