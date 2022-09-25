@@ -47,7 +47,7 @@ class RecordDataForUser:
         term = tableArgs.get('term')
         periodical = tableArgs.get('periodical')
         if periodical:
-            tableArgs['periodical'] = '%' + periodical + '%'
+            tableArgs['periodical'] = '%' + periodical.lower() + '%'
         tableArgsSelect = f"""
         {'AND year = %(year)s' if year else ''}
         {'AND month = %(month)s' if month else ''}
