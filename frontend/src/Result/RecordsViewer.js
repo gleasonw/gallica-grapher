@@ -8,19 +8,8 @@ import styled from "styled-components";
 
 export default function RecordsViewer(props){
     const settings = useContext(GraphSettingsContext);
-    const minYearsOfTickets = Object.keys(props.tickets).map(ticketID => {
-        const ticket = props.tickets[ticketID];
-        return ticket.dateRange[0]
-    });
-    const maxYearsOfTickets = Object.keys(props.tickets).map(ticketID => {
-        const ticket = props.tickets[ticketID];
-        return ticket.dateRange[1]
-    });
-    const minYear = Math.min(...minYearsOfTickets);
-    const maxYear = Math.max(...maxYearsOfTickets);
-    const middleYear = Math.floor((minYear + maxYear) / 2);
     const timeBin = settings[props.settingsID].timeBin;
-    const [recordsTableYear, setRecordsTableYear] = useState(middleYear);
+    const [recordsTableYear, setRecordsTableYear] = useState(null);
     const [recordsTableMonth, setRecordsTableMonth] = useState(null);
     const [recordsTableDay, setRecordsTableDay] = useState(null);
     const [recordsTableTerm, setRecordsTableTerm] = useState(null);
