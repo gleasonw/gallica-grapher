@@ -5,6 +5,7 @@ export const StyledOccurrenceTable = styled.table`
     table-layout: fixed;
     td{
         padding: 5px;
+        border: 1px solid #ddd;
     }
     td:hover{
         overflow: visible;

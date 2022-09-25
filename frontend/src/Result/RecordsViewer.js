@@ -58,7 +58,6 @@ export default function RecordsViewer(props){
                 />
             </ClassicUIBox>
             <ClassicUIBox gap={'20px'}>
-                <h4>View occurrences</h4>
                 <DisplayRecordsTable
                         tickets={props.tickets}
                         requestID={props.requestID}
