@@ -9,6 +9,7 @@ const DecorativeTicket = styled.div`
         border: 1px solid #d9d9d9;
         overflow: hidden;
         height: ${props => props.height ? props.height : 'auto'};
+        max-width: ${props => props.maxWidth ? props.maxWidth : '100%'};
         flex: 1;
         position: relative;
     `;

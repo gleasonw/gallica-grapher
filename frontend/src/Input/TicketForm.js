@@ -69,7 +69,6 @@ function TicketForm(props){
                 onCreateTicketClick={handleCreateTicketClick}
             />
             </div>
-            <br />
             <RequestBoxAndFetchButtonWrap>
                 <ImportantButtonWrap>
                     <input

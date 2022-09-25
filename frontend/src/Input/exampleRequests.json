@@ -2,24 +2,24 @@
   "requests": {
     "Cities": {
       "tickets": {
-          "chicago":{
-            "terms": [
-              "chicago"
-            ],
-            "papersAndCodes": [
-              {
-                "code": "cb32895690j",
-                "endDate": 1944,
-                "startDate": 1863,
-                "title": "Le Petit journal (Paris. 1863)"
-              }
-            ],
-            "dateRange": [
-              "1863",
-              "1944"
-            ]
-          },
-          "new york": {
+        "chicago": {
+          "terms": [
+            "chicago"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "dateRange": [
+            "1863",
+            "1944"
+          ]
+        },
+        "new york": {
           "terms": [
             "new york"
           ],
@@ -36,7 +36,7 @@
             "1944"
           ]
         },
-          "londres": {
+        "londres": {
           "terms": [
             "londres"
           ],
@@ -139,7 +139,7 @@
             2020
           ]
         },
-       "congo": {
+        "congo": {
           "terms": [
             "congo"
           ],
@@ -182,56 +182,41 @@
         }
       }
     },
-    "War and Peace": {
-      "tickets": {
-        "war": {
-          "terms": [
-            "guerre",
-            "souffrance",
-            "sang"
-          ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            }
-          ],
-          "dateRange": [
-            "1871",
-            "1921"
-          ]
-        },
-        "peace": {
-          "terms": [
-            "paix",
-            "accord",
-            "amitie"
-          ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            }
-          ],
-          "dateRange": [
-            "1871",
-            "1921"
-          ]
-        }
-      }
-    },
     "PNW": {
       "tickets": {
-        "seattle" : {
+        "seattle": {
           "terms": [
             "seattle"
           ],
           "papersAndCodes": [],
-          "dateRange": ["1880", "1930"]
+          "dateRange": [
+            "1880",
+            "1930"
+          ]
+        }
+      }
+    },
+    "Colors": {
+      "tickets": {
+        "bleu clair": {
+          "terms": [
+            "\"bleu clair\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        },
+        "bleu pastel": {
+          "terms": [
+            "\"bleu pastel\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
         }
       }
     }

@@ -70,7 +70,7 @@ function App() {
             <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
                 <h1>No records found. </h1>
                 <p>Try adjusting your year range or periodical selection. Some publish only a few times in a year and
-                    don&rsquo;t have much text available. </p>
+                    don't have much text available. </p>
                 <p>Adjusting your search term might help too, although Gallica is usually good at finding similar
                     spellings. </p>
                 <ImportantButtonWrap

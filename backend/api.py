@@ -144,23 +144,12 @@ def getCSV():
 
 @app.route('/api/getDisplayRecords')
 def getDisplayRecords():
-    tickets = request.args.get("tickets")
-    requestID = request.args.get("requestID")
-    year = request.args.get("year")
-    month = request.args.get("month")
-    day = request.args.get("day")
-    limit = request.args.get("limit")
-    offset = request.args.get("offset")
-    displayRecords = userData.getRecordsForDisplay(
-        tickets,
-        requestID,
-        year,
-        month,
-        day,
-        limit,
-        offset
-    )
-    return {"displayRecords": displayRecords}
+    tableArgs = dict(request.args)
+    del tableArgs['uniqueforcache']
+    tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
+    displayRecords, count = userData.getRecordsForDisplay(tableArgs)
+    return {"displayRecords": displayRecords,
+            "count": count}
 
 
 @app.route('/api/ocrtext/<arkCode>/<term>')

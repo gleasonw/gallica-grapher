@@ -24,8 +24,15 @@ export default function DisplayRecordsTable(props) {
     if (props.day) {
         recordsQuery += "&day=" + props.day
     }
+    if (props.term) {
+        recordsQuery += "&term=" + props.term
+    }
+    if (props.periodical) {
+        recordsQuery += "&periodical=" + props.periodical
+    }
     const result = useData(recordsQuery);
     const displayRecords = result ? result['displayRecords'] : null;
+    const count = result ? result['count'] : null;
     return (
         <StyledRecordsViewer>
             <OptionsRow
@@ -41,6 +48,9 @@ export default function DisplayRecordsTable(props) {
                 onMonthChange={props.onMonthChange}
                 onDayChange={props.onDayChange}
                 onPeriodicalChange={props.onPeriodicalChange}
+                onTermChange={props.onTermChange}
+                terms={Object.keys(props.tickets).map((ticketID) => props.tickets[ticketID].terms)}
+                count={count}
             />
             <StyledOccurrenceTable>
                 <tbody>
@@ -77,85 +87,118 @@ export default function DisplayRecordsTable(props) {
 
 function OptionsRow(props) {
     return (
-        <NavBarWrap>
+        <div>
+            <NavBarWrap>
+                <StyledInputAndLabel>
+                    <label htmlFor='year'>Year</label>
+                    <ShadowedFocusInput
+                        type={'number'}
+                        selected
+                        value={props.year}
+                        id={'year'}
+                        placeholder={'All'}
+                        onChange={
+                            (e) => props.onYearChange(e.target.value)
+                        }
+                    />
+                </StyledInputAndLabel>
+                <StyledInputAndLabel>
+                    <label htmlFor='month'>Month</label>
+                    <StyledSelect
+                        value={props.month}
+                        id={'month'}
+                        onChange={
+                            (e) => props.onMonthChange(e.target.value)
+                        }
+                    >
+                        <option value={0}>All</option>
+                        <option value={1}>January</option>
+                        <option value={2}>February</option>
+                        <option value={3}>March</option>
+                        <option value={4}>April</option>
+                        <option value={5}>May</option>
+                        <option value={6}>June</option>
+                        <option value={7}>July</option>
+                        <option value={8}>August</option>
+                        <option value={9}>September</option>
+                        <option value={10}>October</option>
+                        <option value={11}>November</option>
+                        <option value={12}>December</option>
+                    </StyledSelect>
+                </StyledInputAndLabel>
+                <StyledInputAndLabel>
+                    <label htmlFor='day'>Day</label>
+                    <StyledSelect
+                        value={props.day}
+                        id={'day'}
+                        onChange={
+                            (e) => props.onDayChange(parseInt(e.target.value))}
+                    >
+                        <option value={0}>All</option>
+                        <option value={1}>1</option>
+                        <option value={2}>2</option>
+                        <option value={3}>3</option>
+                        <option value={4}>4</option>
+                        <option value={5}>5</option>
+                        <option value={6}>6</option>
+                        <option value={7}>7</option>
+                        <option value={8}>8</option>
+                        <option value={9}>9</option>
+                        <option value={10}>10</option>
+                        <option value={11}>11</option>
+                        <option value={12}>12</option>
+                        <option value={13}>13</option>
+                        <option value={14}>14</option>
+                        <option value={15}>15</option>
+                        <option value={16}>16</option>
+                        <option value={17}>17</option>
+                        <option value={18}>18</option>
+                        <option value={19}>19</option>
+                        <option value={20}>20</option>
+                        <option value={21}>21</option>
+                        <option value={22}>22</option>
+                        <option value={23}>23</option>
+                        <option value={24}>24</option>
+                        <option value={25}>25</option>
+                        <option value={26}>26</option>
+                        <option value={27}>27</option>
+                        <option value={28}>28</option>
+                        <option value={29}>29</option>
+                        <option value={30}>30</option>
+                        <option value={31}>31</option>
+                    </StyledSelect>
+                </StyledInputAndLabel>
+            </NavBarWrap>
             <StyledInputAndLabel>
-                <label htmlFor='year'>Year</label>
-                <ShadowedFocusInput
-                    type={'number'}
-                    selected
-                    value={props.year}
-                    id={'year'}
+                <label htmlFor='term'>Term</label>
+                <StyledSelect
+                    value={props.term}
+                    id={'term'}
                     onChange={
-                        (e) => props.onYearChange(parseInt(e.target.value))}
+                        (e) => props.onTermChange(e.target.value)
+                    }
+                >
+                    <option value={''}>All</option>
+                    {props.terms.map((term) => <option value={term}>{term}</option>)}
+                </StyledSelect>
+            </StyledInputAndLabel>
+            <StyledInputAndLabel>
+                <label htmlFor='periodical'>Periodical</label>
+                <ShadowedFocusInput
+                    type={'text'}
+                    selected
+                    value={props.periodical}
+                    id={'periodical'}
+                    placeholder={'Enter a periodical to filter'}
+                    onChange={
+                        (e) => props.onPeriodicalChange(e.target.value)
+                    }
                 />
             </StyledInputAndLabel>
+            <br/>
+            <h2>{props.count} records for these options</h2>
             <StyledInputAndLabel>
-                <label htmlFor='month'>Month</label>
-                <StyledSelect
-                    value={props.month}
-                    id={'month'}
-                    onChange={
-                        (e) => props.onMonthChange(parseInt(e.target.value))}
-                >
-                    <option value={0}>All</option>
-                    <option value={1}>January</option>
-                    <option value={2}>February</option>
-                    <option value={3}>March</option>
-                    <option value={4}>April</option>
-                    <option value={5}>May</option>
-                    <option value={6}>June</option>
-                    <option value={7}>July</option>
-                    <option value={8}>August</option>
-                    <option value={9}>September</option>
-                    <option value={10}>October</option>
-                    <option value={11}>November</option>
-                    <option value={12}>December</option>
-                </StyledSelect>
-            </StyledInputAndLabel>
-            <StyledInputAndLabel>
-                <label htmlFor='day'>Day</label>
-                <StyledSelect
-                    value={props.day}
-                    id={'day'}
-                    onChange={
-                        (e) => props.onDayChange(parseInt(e.target.value))}
-                >
-                    <option value={0}>All</option>
-                    <option value={1}>1</option>
-                    <option value={2}>2</option>
-                    <option value={3}>3</option>
-                    <option value={4}>4</option>
-                    <option value={5}>5</option>
-                    <option value={6}>6</option>
-                    <option value={7}>7</option>
-                    <option value={8}>8</option>
-                    <option value={9}>9</option>
-                    <option value={10}>10</option>
-                    <option value={11}>11</option>
-                    <option value={12}>12</option>
-                    <option value={13}>13</option>
-                    <option value={14}>14</option>
-                    <option value={15}>15</option>
-                    <option value={16}>16</option>
-                    <option value={17}>17</option>
-                    <option value={18}>18</option>
-                    <option value={19}>19</option>
-                    <option value={20}>20</option>
-                    <option value={21}>21</option>
-                    <option value={22}>22</option>
-                    <option value={23}>23</option>
-                    <option value={24}>24</option>
-                    <option value={25}>25</option>
-                    <option value={26}>26</option>
-                    <option value={27}>27</option>
-                    <option value={28}>28</option>
-                    <option value={29}>29</option>
-                    <option value={30}>30</option>
-                    <option value={31}>31</option>
-                </StyledSelect>
-            </StyledInputAndLabel>
-            <StyledInputAndLabel>
-                <label htmlFor='limit'>Limit</label>
+                <label htmlFor='limit'>Show this many</label>
                 <StyledSelect
                     value={props.limit}
                     id={'limit'}
@@ -168,7 +211,7 @@ function OptionsRow(props) {
                 </StyledSelect>
             </StyledInputAndLabel>
             <StyledInputAndLabel>
-                <label htmlFor='offset'>Offset</label>
+                <label htmlFor='offset'>Starting at this index</label>
                 <ShadowedFocusInput
                     type={'number'}
                     selected
@@ -177,7 +220,7 @@ function OptionsRow(props) {
                     onChange={(e) => props.setOffset(parseInt(e.target.value))}
                 />
             </StyledInputAndLabel>
-        </NavBarWrap>
+        </div>
     )
 }
 
@@ -223,6 +266,6 @@ function RecordRows(props) {
 
 const StyledRecordsViewer = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     `;
 

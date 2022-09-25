@@ -14,4 +14,5 @@ export const StyledOccurrenceTable = styled.table`
     tr:nth-child(even){
         background-color: #f2f2f2;
     }
+    border: 3px solid #ddd;
 `;

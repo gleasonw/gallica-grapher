@@ -11,8 +11,17 @@ class RecordDataForUser:
     FROM results
     JOIN papers
     ON results.paperid = papers.code
-    WHERE ticketid in %s
-    AND requestid = %s
+    WHERE ticketid in %(tickets)s
+    AND requestid = %(requestID)s
+    """
+
+    countResultsSelect = """
+    SELECT COUNT(*)
+    FROM results
+    JOIN papers
+    ON results.paperid = papers.code
+    WHERE ticketid in %(tickets)s
+    AND requestid = %(requestID)s
     """
 
     def __init__(self):
@@ -20,29 +29,50 @@ class RecordDataForUser:
         self.csvData = None
         self.parse = buildParser()
 
-    #TODO: compress csv before returning to user
     def getCSVData(self, ticketIDs, requestID):
         tupledTickets = tuple(ticketIDs.split(','))
         with self.conn.cursor() as cur:
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
-            """, (tupledTickets,requestID))
+            """, {'ticketIDs': tupledTickets, 'requestID': requestID})
             self.csvData = cur.fetchall()
         rowLabels = ['ngram', 'identifier', 'periodical', 'year', 'month', 'day']
         self.csvData.insert(0, rowLabels)
         return self.csvData
 
-    def getRecordsForDisplay(self, ticketIDs, requestID, year, month, day, limit, offset):
-        if year and month and day:
-            return self.getYearMonthDayRecordsForDisplay(ticketIDs, requestID, year, month, day, limit, offset)
-        elif year and month:
-            return self.getYearMonthRecordsForDisplay(ticketIDs, requestID, year, month, limit, offset)
-        elif year and day:
-            return self.getYearDayRecordsForDisplay(ticketIDs, requestID, year, day, limit, offset)
-        elif year:
-            return self.getYearRecordsForDisplay(ticketIDs, requestID, year, limit, offset)
-        else:
-            return []
+    def getRecordsForDisplay(self, tableArgs):
+        year = tableArgs.get('year')
+        month = tableArgs.get('month')
+        day = tableArgs.get('day')
+        term = tableArgs.get('term')
+        periodical = tableArgs.get('periodical')
+        if periodical:
+            tableArgs['periodical'] = '%' + periodical + '%'
+        tableArgsSelect = f"""
+        {'AND year = %(year)s' if year else ''}
+        {'AND month = %(month)s' if month else ''}
+        {'AND day = %(day)s' if day else ''}
+        {'AND searchterm = %(term)s' if term else ''}
+        {'AND LOWER(title) LIKE %(periodical)s' if periodical else ''}
+        """
+        limitOrderingOffset = f"""
+        ORDER BY year, month, day
+        LIMIT %(limit)s
+        OFFSET %(offset)s
+        """
+        with self.conn.cursor() as cur:
+            cur.execute(f"""
+            {self.ticketResultsWithPaperName}
+            {tableArgsSelect}
+            {limitOrderingOffset}
+            """, tableArgs)
+            records = cur.fetchall()
+            cur.execute(f"""
+            {self.countResultsSelect}
+            {tableArgsSelect}
+            """, tableArgs)
+            count = cur.fetchone()[0]
+        return records, count
 
     def getOCRTextForRecord(self, ark, term) -> tuple:
         fetcher = Fetch(
@@ -51,59 +81,6 @@ class RecordDataForUser:
         )
         data = fetcher.get(OCRQuery(ark, term))
         return self.parse.OCRtext(data)
-
-    def getYearRecordsForDisplay(self, ticketIDs, requestID, year, limit, offset):
-        tupledTickets = tuple(ticketIDs.split(','))
-        with self.conn.cursor() as cur:
-            cur.execute(f"""
-            {self.ticketResultsWithPaperName}
-            AND year = %s
-            ORDER BY year, month, day
-            LIMIT %s
-            OFFSET %s
-            ; 
-            """, (tupledTickets, requestID, year, limit, offset))
-            return cur.fetchall()
-
-    def getYearMonthRecordsForDisplay(self, ticketIDs, requestID, year, month, limit, offset):
-        tupledTickets = tuple(ticketIDs.split(','))
-        with self.conn.cursor() as cur:
-            cur.execute(f"""
-            {self.ticketResultsWithPaperName}
-            AND year = %s 
-            AND month = %s
-            ORDER BY year, month, day
-            LIMIT %s
-            OFFSET %s
-            """, (tupledTickets, requestID, year, month, limit, offset))
-            return cur.fetchall()
-
-    def getYearDayRecordsForDisplay(self, ticketIDs, requestID, year, day, limit, offset):
-        tupledTickets = tuple(ticketIDs.split(','))
-        with self.conn.cursor() as cur:
-            cur.execute(f"""
-            {self.ticketResultsWithPaperName}
-            AND year = %s 
-            AND day = %s
-            ORDER BY year, month, day
-            LIMIT %s
-            OFFSET %s
-            """, (tupledTickets, requestID, year, day, limit, offset))
-            return cur.fetchall()
-
-    def getYearMonthDayRecordsForDisplay(self, ticketIDs, requestID, year, month, day, limit, offset):
-        tupledTickets = tuple(ticketIDs.split(','))
-        with self.conn.cursor() as cur:
-            cur.execute(f"""
-            {self.ticketResultsWithPaperName}
-            AND year = %s 
-            AND month = %s
-            AND day = %s
-            ORDER BY year, month, day
-            LIMIT %s
-            OFFSET %s
-            """, (tupledTickets, requestID, year, month, day, limit, offset))
-            return cur.fetchall()
 
     def purgeRecords(self):
         with self.conn.cursor() as cur:

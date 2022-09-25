@@ -285,15 +285,14 @@ button, input[type="submit"], input[type="button"] {
     display: block;
 }
 #seeExamplesButton{
-    height: 150px;
     font-size: 20px;
     background: none;
-    align-items: center;
-    justify-content: center;
     display: flex;
     align-self: center;
     width: 100%;
     border: none;
+    margin-top: 30px;
+    margin-bottom: 50px;
 }
 .seeExamplesText{
     color: #4d4d4d;
@@ -304,7 +303,7 @@ button, input[type="submit"], input[type="button"] {
     margin-right: auto;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     flex-wrap: wrap;
     max-width: 100%;
     padding: 10px 20px 10px 20px;

@@ -23,6 +23,8 @@ export default function RecordsViewer(props){
     const [recordsTableYear, setRecordsTableYear] = useState(middleYear);
     const [recordsTableMonth, setRecordsTableMonth] = useState(null);
     const [recordsTableDay, setRecordsTableDay] = useState(null);
+    const [recordsTableTerm, setRecordsTableTerm] = useState(null);
+    const [recordsTablePeriodical, setRecordsTablePeriodical] = useState(null);
     const seriesClickHandlers = {
         'year': handleYearSeriesClick,
         'month': handleMonthSeriesClick,
@@ -75,9 +77,13 @@ export default function RecordsViewer(props){
                         year={recordsTableYear}
                         month={recordsTableMonth}
                         day={recordsTableDay}
+                        term={recordsTableTerm}
+                        periodical={recordsTablePeriodical}
                         onYearChange={setRecordsTableYear}
                         onMonthChange={setRecordsTableMonth}
                         onDayChange={setRecordsTableDay}
+                        onPeriodicalChange={setRecordsTablePeriodical}
+                        onTermChange={setRecordsTableTerm}
                         uuid={props.cacheID}
                     />
                 <DownloadCSVButton
