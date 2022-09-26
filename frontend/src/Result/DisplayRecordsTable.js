@@ -8,6 +8,7 @@ import LesserButton from "../shared/LesserButton";
 import useWindowDimensions from "../shared/hooks/useWindowDimensions";
 import {FilterOptions} from "./FilterOptions";
 import {RecordRows} from "./RecordRows";
+import {SelectionBubble} from "../shared/SelectionBubble";
 
 export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(10);
@@ -15,7 +16,6 @@ export default function DisplayRecordsTable(props) {
     const [showFilterPopup, setShowFilterPopup] = useState(false);
     const {width} = useWindowDimensions();
     let compact = width < 1200;
-    console.log(limit)
     let recordsQuery =
         "/api/getDisplayRecords?" +
         "tickets=" + Object.keys(props.tickets) +
@@ -47,27 +47,34 @@ export default function DisplayRecordsTable(props) {
         setLimit(limit + 10);
     }
 
+    function handleFilterChange(){
+        setOffset(0);
+        setLimit(10);
+    }
+
 //TODO: use a reducer here to minimize prop drilling
     return (
         <StyledRecordsViewer>
             <NavBarWrap>
-                <h1>View {count} occurrences</h1>
+                <h1>
+                    View {count}
+                    {
+                        [props.year, props.month, props.day, props.periodical, props.term].some(Boolean) ?
+                            ' occurrences for these filters'
+                            :
+                            ' total occurrences'
+                    }
+                </h1>
                 {
                     compact &&
                     <LesserButton
                         children={'Filter'}
-                        onClick={() => setShowFilterPopup(!showFilterPopup)}
+                        onClick={() => setShowFilterPopup(true)}
                     />
                 }
             </NavBarWrap>
-            <AppliedFilters
-                year={props.year}
-                month={props.month}
-                day={props.day}
-                periodical={props.periodical}
-                term={props.term}
-            />
             <StyledFilterAndTable
+                onOutsidePopupClick={() => setShowFilterPopup(false)}
                 compact={compact}
                 show={showFilterPopup}
                 year={props.year}
@@ -78,11 +85,21 @@ export default function DisplayRecordsTable(props) {
                 offset={offset}
                 setLimit={setLimit}
                 setOffset={setOffset}
-                onYearChange={props.onYearChange}
-                onMonthChange={props.onMonthChange}
-                onDayChange={props.onDayChange}
-                onPeriodicalChange={props.onPeriodicalChange}
-                onTermChange={props.onTermChange}
+                onYearChange={(year) => handleFilterChange(
+                    props.onYearChange(year)
+                )}
+                onMonthChange={(month) => handleFilterChange(
+                    props.onMonthChange(month)
+                )}
+                onDayChange={(day) => handleFilterChange(
+                    props.onDayChange(day)
+                )}
+                onPeriodicalChange={(periodical) => handleFilterChange(
+                    props.onPeriodicalChange(periodical)
+                )}
+                onTermChange={(term) => handleFilterChange(
+                    props.onTermChange(term)
+                )}
                 tickets={props.tickets}
                 displayRecords={displayRecords}
                 count={count}
@@ -114,52 +131,115 @@ function StyledFilterAndTable(props) {
                 count={props.count}
                 compact={props.compact}
                 show={props.show}
+                onOutsidePopupClick={props.onOutsidePopupClick}
             />
-            <StyledOccurrenceTable>
-                <tbody>
-                <tr>
-                    <th></th>
-                    <th>Term</th>
-                    <th>Periodical</th>
-                    <th>Date</th>
-                    <th>Full text image on Gallica</th>
-                    <th>Scanned text (approximate)</th>
-                </tr>
-                {props.displayRecords ?
-                    props.displayRecords.length > 0 ?
-                        <RecordRows
-                            rows={props.displayRecords}
-                            offset={props.offset}
-                        />
+            <div>
+                <AppliedFilters
+                    year={props.year}
+                    month={props.month}
+                    day={props.day}
+                    periodical={props.periodical}
+                    term={props.term}
+                    onYearClick={() => props.onYearChange(null)}
+                    onMonthClick={() => props.onMonthChange(null)}
+                    onDayClick={() => props.onDayChange(null)}
+                    onPeriodicalClick={() => props.onPeriodicalChange(null)}
+                    onTermClick={() => props.onTermChange(null)}
+                />
+                <StyledOccurrenceTable>
+                    <tbody>
+                    <tr>
+                        <th></th>
+                        <th>Term</th>
+                        <th>Periodical</th>
+                        <th>Date</th>
+                        <th>Full text image on Gallica</th>
+                        <th>Scanned text (approximate)</th>
+                    </tr>
+                    {props.displayRecords ?
+                        props.displayRecords.length > 0 ?
+                            <RecordRows
+                                rows={props.displayRecords}
+                                offset={props.offset}
+                            />
+                            :
+                            <tr>
+                                <td colSpan={6}>No records found for these options; clicking on a point in the graph
+                                    should
+                                    yield results.
+                                </td>
+                            </tr>
                         :
                         <tr>
-                            <td colSpan={6}>No records found for these options; clicking on a point in the graph should
-                                yield results.
-                            </td>
+                            <td>Loading...</td>
                         </tr>
-                    :
-                    <tr>
-                        <td>Loading...</td>
-                    </tr>
+                    }
+                    </tbody>
+                </StyledOccurrenceTable>
+                {props.displayRecords && props.displayRecords.length !== props.count &&
+                <ImportantButtonWrap
+                    children={'Load more'}
+                    onClick={props.onLoadMoreClick}
+                />
                 }
-                </tbody>
-            <ImportantButtonWrap
-                children={'Load more'}
-                onClick={props.onLoadMoreClick}
-            />
-            </StyledOccurrenceTable>
+
+            </div>
         </StyledFilterAndTableWrap>
     )
 }
+
 //TODO: on click remove
-function AppliedFilters(props){
-    return(
+function AppliedFilters(props) {
+    const monthValues = {
+        1: 'January',
+        2: 'February',
+        3: 'March',
+        4: 'April',
+        5: 'May',
+        6: 'June',
+        7: 'July',
+        8: 'August',
+        9: 'September',
+        10: 'October',
+        11: 'November',
+        12: 'December'
+    }
+    return (
         <NavBarWrap>
-            {props.year && <p>Year: {props.year}</p>}
-            {props.month && <p>Month: {props.month}</p>}
-            {props.day && <p>Day: {props.day}</p>}
-            {props.periodical && <p>Periodical: {props.periodical}</p>}
-            {props.term && <p>Term: {props.term}</p>}
+            {!!props.year &&
+                <SelectionBubble
+                    onClick={props.onYearClick}
+                >
+                    {props.year}
+                </SelectionBubble>
+            }
+            {!!props.month &&
+                <SelectionBubble
+                    item={monthValues[props.month]}
+                    onClick={props.onMonthClick}
+                >
+                    {monthValues[props.month]}
+                < /SelectionBubble>
+            }
+            {!!props.day &&
+                <SelectionBubble
+                    onClick={props.onDayClick}
+                >
+                    Day: {props.day}
+                </SelectionBubble>
+            }
+            {!!props.periodical &&
+                <SelectionBubble onClick={props.onPeriodicalClick}>
+                    Periodical: {props.periodical}
+                </SelectionBubble>
+            }
+            {!!props.term &&
+                <SelectionBubble
+                    onClick={props.onTermClick}
+                >
+                    Term: {props.term}
+                </SelectionBubble>
+            }
         </NavBarWrap>
     )
 }

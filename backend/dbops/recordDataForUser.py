@@ -34,7 +34,7 @@ class RecordDataForUser:
         with self.conn.cursor() as cur:
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
-            """, {'ticketIDs': tupledTickets, 'requestID': requestID})
+            """, {'tickets': tupledTickets, 'requestID': requestID})
             self.csvData = cur.fetchall()
         rowLabels = ['ngram', 'identifier', 'periodical', 'year', 'month', 'day']
         self.csvData.insert(0, rowLabels)

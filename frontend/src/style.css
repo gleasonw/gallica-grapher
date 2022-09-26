@@ -153,6 +153,7 @@ header{
     transition: all 150ms;
     border-radius: 10px;
     font-size: 40px;
+    margin-bottom: 10px;
 }
 .bubbleText{
     overflow: hidden;

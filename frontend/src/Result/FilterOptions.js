@@ -2,19 +2,22 @@ import {StyledInputAndLabel, StyledSelect} from "../shared/StyledSelect";
 import {ShadowedFocusInput} from "../shared/ShadowedFocusInput";
 import React from "react";
 import styled from "styled-components";
+import OutsideAlerter from "../shared/OutsideAlerter";
 
 export function FilterOptions(props) {
+    console.log(props.year)
     return (
         <FilterOptionsDisplaySwitch
             compact={props.compact}
             show={props.show}
+            onOutsidePopupClick={props.onOutsidePopupClick}
         >
             <StyledInputAndLabel>
                 <label htmlFor='year'>Year</label>
                 <ShadowedFocusInput
                     type={'number'}
                     selected
-                    value={props.year}
+                    value={!!props.year ? props.year : ''}
                     id={'year'}
                     placeholder={'All'}
                     onChange={
@@ -106,7 +109,7 @@ export function FilterOptions(props) {
                 <ShadowedFocusInput
                     type={'text'}
                     selected
-                    value={props.periodical}
+                    value={!!props.periodical ? props.periodical : ''}
                     id={'periodical'}
                     placeholder={'Enter a periodical to filter'}
                     onChange={
@@ -121,9 +124,11 @@ export function FilterOptions(props) {
 function FilterOptionsDisplaySwitch(props){
     if(props.compact){
         return (
-            <StyledOptionsFilterPop show={props.show}>
-                {props.children}
-            </StyledOptionsFilterPop>
+            <OutsideAlerter doThis={() => props.onOutsidePopupClick()}>
+                <StyledOptionsFilterPop show={props.show}>
+                    {props.children}
+                </StyledOptionsFilterPop>
+            </OutsideAlerter>
         )
     }else{
         return (

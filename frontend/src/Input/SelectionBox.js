@@ -1,6 +1,5 @@
 import React from "react";
-import LesserButton from '../shared/LesserButton';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import {SelectionBubble} from "../shared/SelectionBubble";
 
 export function SelectionBox(props) {
     const bubbles = props.items ?
@@ -8,8 +7,9 @@ export function SelectionBox(props) {
             <SelectionBubble
                 onClick={() => props.onClick(index)}
                 key={index}
-                item={item}
-            />
+            >
+                {item}
+            </SelectionBubble>
         )) :
         <SelectionBubble></SelectionBubble>
 
@@ -20,17 +20,3 @@ export function SelectionBox(props) {
     )
 }
 
-function SelectionBubble(props) {
-    return (
-        <LesserButton
-            className='bubbleItem'
-            type='button'
-            onClick={props.onClick}
-        >
-            <span className='bubbleText'>
-                {props.item}
-            </span>
-            <RemoveCircleIcon/>
-        </LesserButton>
-    )
-}
