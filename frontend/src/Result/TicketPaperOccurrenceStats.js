@@ -1,42 +1,44 @@
-import React, {useContext} from "react";
-import {GraphSettingsContext} from "./GraphSettingsContext";
+import React from "react";
 import useData from "../shared/hooks/useData";
-import {StyledOccurrenceTable} from "../shared/StyledOccurrenceTable";
+import styled from "styled-components";
 
 export function TicketPaperOccurrenceStats(props) {
-    const settings = useContext(GraphSettingsContext);
-    const ticketSettings = props.grouped ? settings.group : settings[props.ticketID];
     const topPapersQuery =
-        "/api/topPapers?ticketID="+props.ticketID+
-        "&requestID="+props.requestID +
-        "&continuous="+ticketSettings.continuous+
-        "&dateRange="+props.dateRange +
-        "&uuid="+props.uuid;
+        "/api/topPapers?tickets=" + props.tickets +
+        "&requestID=" + props.requestID +
+        "&uuid=" + props.cacheID;
 
     const result = useData(topPapersQuery);
-    if(result){
+    if (result) {
         const topPapers = result['topPapers'];
         return (
-            <div className='ticketStats'>
-                <StyledOccurrenceTable>
-                    <tbody>
-                        <tr>
-                            <th>Papers with the most occurrences</th>
-                            <th>Total Occurrences</th>
-                        </tr>
-                        {topPapers.map((paperCount, index) => (
-                            <tr key={paperCount[0]}>
-                                <td><h5>{index+1}.</h5> {paperCount[0]}</td>
-                                <td>{paperCount[1]}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </StyledOccurrenceTable>
-            </div>
+            <StyledTopPaperTable>
+                <tbody>
+                <tr>
+                    <th>Periodicals with the most occurrences</th>
+                </tr>
+                {topPapers.map((paperCount, index) => (
+                    <tr key={paperCount[0]}>
+                        <td>{index + 1}. {paperCount[0]}</td>
+                        <td>{paperCount[1]}</td>
+                    </tr>
+                ))}
+                </tbody>
+            </StyledTopPaperTable>
         )
-    }else{
+    } else {
         return null;
     }
 }
+
+const StyledTopPaperTable = styled.table`
+    margin-top: 20px;
+    td {
+        padding: 5px;
+    }
+    tr {
+        border-bottom: 1px solid #ddd;
+    }
+`;
 
 export default TicketPaperOccurrenceStats;

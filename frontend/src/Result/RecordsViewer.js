@@ -72,7 +72,7 @@ export default function RecordsViewer(props){
                         onDayChange={setRecordsTableDay}
                         onPeriodicalChange={setRecordsTablePeriodical}
                         onTermChange={setRecordsTableTerm}
-                        uuid={props.cacheID}
+                        cacheID={props.cacheID}
                     />
                 <DownloadCSVButton
                     tickets={props.tickets}

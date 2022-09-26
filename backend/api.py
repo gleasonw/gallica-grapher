@@ -124,11 +124,10 @@ def getGraphData():
 
 @app.route('/api/topPapers')
 def getTopPapersFromID():
+    ticketIDS = tuple(request.args["tickets"].split(","))
     topPapers = TopPapersForTicket(
-        ticketID=request.args["ticketID"],
+        tickets=ticketIDS,
         requestID=request.args["requestID"],
-        continuous=request.args["continuous"],
-        dateRange=request.args["dateRange"]
     )
     items = {"topPapers": topPapers.getTopPapers()}
     return items

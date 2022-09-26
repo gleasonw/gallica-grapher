@@ -16,7 +16,7 @@ function ResultUI(props){
         settingsReducer,
         props.tickets,
         initGraphSettings)
-    const [cacheID, setCacheID] = useState(uuidv4());
+    const cacheID = uuidv4();
 
     function handleGroupToggle(){
         setGrouped(!grouped)

@@ -17,7 +17,7 @@ export default function Ticket(props){
     return(
         <DecorativeTicket
             borderRadius={borderRadius}
-            maxWidth="300px"
+            maxWidth={props.isMutable ? "calc(100% - 40px)" : "100%"}
         >
             <SeriesColorBubble color={props.color}/>
             {props.actionIcon}

@@ -432,10 +432,6 @@ label[for="papers"],label[for="searchTerm"]{
     gap: 20px;
     flex-direction: column;
 }
-.ticketStats{
-    width: auto;
-    padding: 20px;
-}
 .graphSettingsNavBar{
     display: flex;
     flex-direction: row;

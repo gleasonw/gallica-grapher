@@ -1,6 +1,5 @@
 import React from "react";
 import TicketLabel from "../shared/TicketLabel";
-import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import RecordsViewer from "./RecordsViewer";
 
@@ -33,13 +32,6 @@ function SoloTicketResult(props) {
                 requestID={props.requestID}
                 settingsID={props.ticketID}
                 cacheID={props.cacheID}
-            />
-            <TicketPaperOccurrenceStats
-                ticketID={props.ticketID}
-                dateRange={props.ticket.dateRange}
-                grouped={false}
-                requestID={props.requestID}
-                uuid={props.cacheID}
             />
         </ClassicUIBox>
     )

@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import useData from "../shared/hooks/useData";
 import {StyledOccurrenceTable} from "../shared/StyledOccurrenceTable";
+import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
 import styled from 'styled-components';
 import NavBarWrap from "./NavBarWrap";
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
@@ -56,7 +57,7 @@ export default function DisplayRecordsTable(props) {
     return (
         <StyledRecordsViewer>
             <NavBarWrap>
-                <h1>
+                <h2>
                     View {count}
                     {
                         [props.year, props.month, props.day, props.periodical, props.term].some(Boolean) ?
@@ -64,7 +65,7 @@ export default function DisplayRecordsTable(props) {
                             :
                             ' total occurrences'
                     }
-                </h1>
+                </h2>
                 {
                     compact &&
                     <LesserButton
@@ -81,6 +82,7 @@ export default function DisplayRecordsTable(props) {
                 month={props.month}
                 day={props.day}
                 periodical={props.periodical}
+                term={props.term}
                 limit={limit}
                 offset={offset}
                 setLimit={setLimit}
@@ -104,6 +106,8 @@ export default function DisplayRecordsTable(props) {
                 displayRecords={displayRecords}
                 count={count}
                 onLoadMoreClick={handleLoadMore}
+                cacheID={props.cacheID}
+                requestID={props.requestID}
             />
 
         </StyledRecordsViewer>
@@ -113,26 +117,33 @@ export default function DisplayRecordsTable(props) {
 function StyledFilterAndTable(props) {
     return (
         <StyledFilterAndTableWrap compact={props.compact}>
-            <FilterOptions
-                year={props.year}
-                month={props.month}
-                day={props.day}
-                periodical={props.periodical}
-                limit={props.limit}
-                offset={props.offset}
-                setLimit={props.setLimit}
-                setOffset={props.setOffset}
-                onYearChange={props.onYearChange}
-                onMonthChange={props.onMonthChange}
-                onDayChange={props.onDayChange}
-                onPeriodicalChange={props.onPeriodicalChange}
-                onTermChange={props.onTermChange}
-                terms={Object.keys(props.tickets).map((ticketID) => props.tickets[ticketID].terms)}
-                count={props.count}
-                compact={props.compact}
-                show={props.show}
-                onOutsidePopupClick={props.onOutsidePopupClick}
-            />
+            <StyledFilterAndTopPapersWrap>
+                <FilterOptions
+                    year={props.year}
+                    month={props.month}
+                    day={props.day}
+                    periodical={props.periodical}
+                    limit={props.limit}
+                    offset={props.offset}
+                    setLimit={props.setLimit}
+                    setOffset={props.setOffset}
+                    onYearChange={props.onYearChange}
+                    onMonthChange={props.onMonthChange}
+                    onDayChange={props.onDayChange}
+                    onPeriodicalChange={props.onPeriodicalChange}
+                    onTermChange={props.onTermChange}
+                    terms={Object.keys(props.tickets).map((ticketID) => props.tickets[ticketID].terms)}
+                    count={props.count}
+                    compact={props.compact}
+                    show={props.show}
+                    onOutsidePopupClick={props.onOutsidePopupClick}
+                />
+                <TicketPaperOccurrenceStats
+                    tickets={Object.keys(props.tickets)}
+                    requestID={props.requestID}
+                    cacheID={props.cacheID}
+                />
+            </StyledFilterAndTopPapersWrap>
             <div>
                 <AppliedFilters
                     year={props.year}
@@ -149,7 +160,6 @@ function StyledFilterAndTable(props) {
                 <StyledOccurrenceTable>
                     <tbody>
                     <tr>
-                        <th></th>
                         <th>Term</th>
                         <th>Periodical</th>
                         <th>Date</th>
@@ -182,7 +192,6 @@ function StyledFilterAndTable(props) {
                     onClick={props.onLoadMoreClick}
                 />
                 }
-
             </div>
         </StyledFilterAndTableWrap>
     )
@@ -237,7 +246,7 @@ function AppliedFilters(props) {
                 <SelectionBubble
                     onClick={props.onTermClick}
                 >
-                    Term: {props.term}
+                    {props.term}
                 </SelectionBubble>
             }
         </NavBarWrap>
@@ -248,6 +257,13 @@ const StyledFilterAndTableWrap = styled.div`
     display: flex;
     flex-direction: ${props => props.compact ? 'column' : 'row'};
     gap: 1em;
+`;
+
+const StyledFilterAndTopPapersWrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    max-width: 20%;
 `;
 
 const StyledRecordsViewer = styled.div`

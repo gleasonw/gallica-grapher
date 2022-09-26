@@ -3,9 +3,11 @@ import styled from "styled-components";
 export const StyledOccurrenceTable = styled.table`
     border-collapse: collapse;
     table-layout: fixed;
+    width: 100%;
     td{
         padding: 5px;
         border: 1px solid #ddd;
+        width: 100%;
     }
     td:hover{
         overflow: visible;

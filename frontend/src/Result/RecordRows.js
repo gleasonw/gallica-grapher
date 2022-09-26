@@ -13,7 +13,6 @@ export function RecordRows(props) {
             let arkCode = gallicaLink.split('/').pop();
             return (
                 <tr key={index}>
-                    <td>{index + props.offset + 1}</td>
                     <td>{term}</td>
                     <td>{periodical}</td>
                     <td>

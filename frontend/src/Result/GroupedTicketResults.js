@@ -1,19 +1,22 @@
 import React from "react";
-import ClassicUIBox from "../shared/ClassicUIBox";
-import GroupedTicketLabel from "./GroupedTicketLabel";
 import RecordsViewer from "./RecordsViewer";
+import TicketLabelRow from "../Input/TicketLabelRow";
 
 export function GroupedTicketResults(props) {
     return (
-        <ClassicUIBox>
-            <GroupedTicketLabel tickets={props.tickets}/>
+        <div>
+            <TicketLabelRow
+                tickets={props.tickets}
+                onTicketClick={(e) => console.log(e)}
+                isMutable={false}
+            />
             <RecordsViewer
                 tickets={props.tickets}
                 requestID={props.requestID}
                 settingsID={'group'}
                 cacheID={props.cacheID}
             />
-        </ClassicUIBox>
+        </div>
 
     )
 }

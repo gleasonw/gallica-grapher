@@ -5,7 +5,6 @@ import styled from "styled-components";
 import OutsideAlerter from "../shared/OutsideAlerter";
 
 export function FilterOptions(props) {
-    console.log(props.year)
     return (
         <FilterOptionsDisplaySwitch
             compact={props.compact}
@@ -28,8 +27,9 @@ export function FilterOptions(props) {
             <StyledInputAndLabel>
                 <label htmlFor='month'>Month</label>
                 <StyledSelect
-                    value={props.month}
+                    value={!!props.month ? props.month : ''}
                     id={'month'}
+                    placeholder={'All'}
                     onChange={
                         (e) => props.onMonthChange(e.target.value)
                     }
@@ -94,7 +94,7 @@ export function FilterOptions(props) {
             <StyledInputAndLabel>
                 <label htmlFor='term'>Term</label>
                 <StyledSelect
-                    value={props.term}
+                    value={!!props.term ? props.term : ''}
                     id={'term'}
                     onChange={
                         (e) => props.onTermChange(e.target.value)
@@ -147,7 +147,7 @@ const StyledFullOptions = styled.div`
     padding: 16px;
     border-radius: 3px;
     align-items: stretch;
-    height: 100%;
+    max-height: 100%;
 `;
 
 const StyledOptionsFilterPop = styled.div`

@@ -2,38 +2,16 @@ import React from "react";
 import styled from 'styled-components';
 import LesserButton from "../shared/LesserButton";
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import Ticket from "./Ticket";
-import SmallIconStyle from "../shared/SmallIconStyle";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import TicketLabelRow from "./TicketLabelRow";
 
 export function RequestBox(props) {
-    const numTickets = Object.keys(props.tickets).length
-    const seriesColors = [
-        '#7cb5ec',
-        '#434348',
-        '#90ed7d',
-        '#f7a35c',
-        '#8085e9'
-    ]
     return(
         <StyledTicketRow>
-            <OverflowScrollTicketRow>
-                {Object.keys(props.tickets).map((ticketID,index) => (
-                    <Ticket
-                        ticket={props.tickets[ticketID]}
-                        key={ticketID}
-                        color={seriesColors[index]}
-                        ticketID={ticketID}
-                        firstInRow = {index === 0}
-                        lastInRow = {index === numTickets - 1}
-                        actionIcon={
-                            <SmallIconStyle onClick={() => props.onTicketClick(ticketID)}>
-                                <RemoveCircleIcon/>
-                            </SmallIconStyle>
-                        }
-                    />
-                ))}
-            </OverflowScrollTicketRow>
+            <TicketLabelRow
+                tickets={props.tickets}
+                onTicketClick={props.onTicketClick}
+                isMutable={true}
+            />
             {Object.keys(props.tickets).length < 5 &&
             <LesserButton
                 onClick={props.onCreateTicketClick}
@@ -47,15 +25,11 @@ export function RequestBox(props) {
     )
 }
 
-const StyledTicketRow = styled.div`
+export const StyledTicketRow = styled.div`
     display: flex;
     flex-direction: row;
     overflow: visible;
     width: 100%;
-`;
-
-const OverflowScrollTicketRow = styled(StyledTicketRow)`
-    max-width: 100%;
 `;
 
 export const StyledRequestBox = styled(RequestBox)`
