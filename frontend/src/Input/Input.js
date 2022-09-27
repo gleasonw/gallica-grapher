@@ -1,11 +1,7 @@
 import React, {useRef, useState} from "react";
 import TicketForm from './TicketForm';
-import ClassicUIBox from "../shared/ClassicUIBox";
-import SmallIconStyle from "../shared/SmallIconStyle";
 import useData from "../shared/hooks/useData";
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import Ticket from "./Ticket";
-import styled from "styled-components";
+import {ExampleBox} from "./ExampleBox";
 
 //TODO: add a reducer
 function Input(props){
@@ -316,56 +312,5 @@ function Input(props){
     )
 
 }
-//TODO: Cache the examples.
-function ExampleBox(props){
-    const exampleJSONdata = require('./exampleRequests.json')
-    const exampleRequests = exampleJSONdata["requests"]
-    const [selectedExample, setSelectedExample] = useState(0)
-    return(
-        <ClassicUIBox flexDirection={'row'}>
-            <StyledExampleSelector>
-                {Object.keys(exampleRequests).map((requestName,index) => (
-                    <StyledExampleButtonSelect
-                        key={requestName}
-                        onClick={() => setSelectedExample(index)}
-                        selected={index === selectedExample}
-                    >
-                        <h1>{requestName}</h1>
-                    </StyledExampleButtonSelect>
-                ))}
-            </StyledExampleSelector>
-            <ExampleContext>
-            </ExampleContext>
-        </ClassicUIBox>
-
-    )
-}
-
-function ExampleContext(props){
-    return(
-        <div className='exampleContext'>
-            {props.children}
-        </div>
-    )
-}
-
-const StyledExampleSelector = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: start;
-    gap: 50px;
-`;
-
-const StyledExampleButtonSelect = styled.button`
-    background-color: transparent;
-    &:hover{
-        ${props => props.selected ? '' : 'background-color: #e0e0e0;'}
-    }
-    color: ${props => props.selected ? 'black' : '#787878'};
-    border: ${props => props.selected ? '1px solid black' : ''};
-    border-radius: 5px;
-    padding: 5px;
-`;
 
 export default Input;

@@ -1,10 +1,319 @@
 {
   "requests": {
-    "Cities": {
+    "Colonialism": {
+      "tickets": {
+        "algerie": {
+          "terms": [
+            "algerie"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32757974m",
+              "endDate": 1921,
+              "startDate": 1871,
+              "title": "Le XIXe siècle (Paris. 1871)"
+            },
+            {
+              "code": "cb328066631",
+              "endDate": 1940,
+              "startDate": 1865,
+              "title": "La Liberté"
+            },
+            {
+              "code": "cb328123058",
+              "endDate": 1944,
+              "startDate": 1884,
+              "title": "Le Matin (Paris. 1884)"
+            },
+            {
+              "code": "cb34355551z",
+              "endDate": 1951,
+              "startDate": 1854,
+              "title": "Le Figaro (Paris. 1854)"
+            },
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "dateRange": [
+            1854,
+            1951
+          ]
+        },
+        "congo": {
+          "terms": [
+            "congo"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32757974m",
+              "endDate": 1921,
+              "startDate": 1871,
+              "title": "Le XIXe siècle (Paris. 1871)"
+            },
+            {
+              "code": "cb328066631",
+              "endDate": 1940,
+              "startDate": 1865,
+              "title": "La Liberté"
+            },
+            {
+              "code": "cb328123058",
+              "endDate": 1944,
+              "startDate": 1884,
+              "title": "Le Matin (Paris. 1884)"
+            },
+            {
+              "code": "cb34355551z",
+              "endDate": 1951,
+              "startDate": 1854,
+              "title": "Le Figaro (Paris. 1854)"
+            },
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "dateRange": [
+            1854,
+            1951
+          ]
+        },
+        "indochine": {
+          "terms": [
+            "indochine"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32757974m",
+              "endDate": 1921,
+              "startDate": 1871,
+              "title": "Le XIXe siècle (Paris. 1871)"
+            },
+            {
+              "code": "cb328066631",
+              "endDate": 1940,
+              "startDate": 1865,
+              "title": "La Liberté"
+            },
+            {
+              "code": "cb328123058",
+              "endDate": 1944,
+              "startDate": 1884,
+              "title": "Le Matin (Paris. 1884)"
+            },
+            {
+              "code": "cb34355551z",
+              "endDate": 1951,
+              "startDate": 1854,
+              "title": "Le Figaro (Paris. 1854)"
+            },
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "dateRange": [
+            1854,
+            1951
+          ]
+        },
+        "mali": {
+            "terms": [
+                "mali"
+            ],
+            "papersAndCodes": [
+                {
+                "code": "cb32757974m",
+                "endDate": 1921,
+                "startDate": 1871,
+                "title": "Le XIXe siècle (Paris. 1871)"
+                },
+                {
+                "code": "cb328066631",
+                "endDate": 1940,
+                "startDate": 1865,
+                "title": "La Liberté"
+                },
+                {
+                "code": "cb328123058",
+                "endDate": 1944,
+                "startDate": 1884,
+                "title": "Le Matin (Paris. 1884)"
+                },
+                {
+                "code": "cb34355551z",
+                "endDate": 1951,
+                "startDate": 1854,
+                "title": "Le Figaro (Paris. 1854)"
+                },
+                {
+                "code": "cb32895690j",
+                "endDate": 1944,
+                "startDate": 1863,
+                "title": "Le Petit journal (Paris. 1863)"
+                }
+            ],
+            "dateRange": [
+                1854,
+                1951
+            ]
+        },
+        "mission civilisatrice": {
+            "terms": [
+                "\"mission civilisatrice\""
+            ],
+            "papersAndCodes": [
+                {
+                "code": "cb32757974m",
+                "endDate": 1921,
+                "startDate": 1871,
+                "title": "Le XIXe siècle (Paris. 1871)"
+                },
+                {
+                "code": "cb328066631",
+                "endDate": 1940,
+                "startDate": 1865,
+                "title": "La Liberté"
+                },
+                {
+                "code": "cb328123058",
+                "endDate": 1944,
+                "startDate": 1884,
+                "title": "Le Matin (Paris. 1884)"
+                },
+                {
+                "code": "cb34355551z",
+                "endDate": 1951,
+                "startDate": 1854,
+                "title": "Le Figaro (Paris. 1854)"
+                },
+                {
+                "code": "cb32895690j",
+                "endDate": 1944,
+                "startDate": 1863,
+                "title": "Le Petit journal (Paris. 1863)"
+                }
+            ],
+            "dateRange": [
+                1854,
+                1951
+            ]
+        }
+      }
+    },
+    "Colors": {
+      "tickets": {
+        "bleu clair": {
+          "terms": [
+            "\"bleu clair\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        },
+        "bleu pastel": {
+          "terms": [
+            "\"bleu pastel\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        }
+      }
+    },
+    "Arts": {
+      "tickets": {
+        "Art Nouveau": {
+            "terms": [
+                "\"Art Nouveau\""
+            ],
+            "papersAndCodes": [],
+            "dateRange": [
+                "1865",
+                "1930"
+            ]
+        },
+        "Art deco": {
+            "terms": [
+                "\"Art deco\""
+            ],
+            "papersAndCodes": [],
+            "dateRange": [
+                "1865",
+                "1930"
+            ]
+        }
+      }
+    },
+    "Pastries": {
+      "tickets": {
+        "patiserrie": {
+          "terms": [
+            "patisserie"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        },
+        "pain au chocolat": {
+          "terms": [
+            "\"pain au chocolat\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        }
+      }
+    },
+    "Corruption": {
+      "tickets": {
+        "corruption": {
+          "terms": [
+            "corruption"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            1870,
+            1900
+          ]
+        }
+      }
+    },
+    "Scandal": {
+      "tickets": {
+        "scandale": {
+          "terms": [
+            "scandale"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            1870,
+            1900
+          ]
+        }
+      }
+    },
+    "Foreign Cities": {
       "tickets": {
         "chicago": {
           "terms": [
-            "chicago"
+            "berlin"
           ],
           "papersAndCodes": [
             {
@@ -52,81 +361,12 @@
             "1863",
             "1944"
           ]
-        }
-      }
-    },
-    "Colonialism": {
-      "tickets": {
-        "colonies": {
-          "terms": [
-            "colonies"
-          ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            },
-            {
-              "code": "cb328066631",
-              "endDate": 1940,
-              "startDate": 1865,
-              "title": "La Liberté"
-            },
-            {
-              "code": "cb328123058",
-              "endDate": 1944,
-              "startDate": 1884,
-              "title": "Le Matin (Paris. 1884)"
-            },
-            {
-              "code": "cb34355551z",
-              "endDate": 1951,
-              "startDate": 1854,
-              "title": "Le Figaro (Paris. 1854)"
-            },
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
-          "dateRange": [
-            1499,
-            2020
-          ]
         },
-        "algerie": {
+        "tokyo": {
           "terms": [
-            "algerie"
+            "tokyo"
           ],
           "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            },
-            {
-              "code": "cb328066631",
-              "endDate": 1940,
-              "startDate": 1865,
-              "title": "La Liberté"
-            },
-            {
-              "code": "cb328123058",
-              "endDate": 1944,
-              "startDate": 1884,
-              "title": "Le Matin (Paris. 1884)"
-            },
-            {
-              "code": "cb34355551z",
-              "endDate": 1951,
-              "startDate": 1854,
-              "title": "Le Figaro (Paris. 1854)"
-            },
             {
               "code": "cb32895690j",
               "endDate": 1944,
@@ -135,54 +375,13 @@
             }
           ],
           "dateRange": [
-            1499,
-            2020
-          ]
-        },
-        "congo": {
-          "terms": [
-            "congo"
-          ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            },
-            {
-              "code": "cb328066631",
-              "endDate": 1940,
-              "startDate": 1865,
-              "title": "La Liberté"
-            },
-            {
-              "code": "cb328123058",
-              "endDate": 1944,
-              "startDate": 1884,
-              "title": "Le Matin (Paris. 1884)"
-            },
-            {
-              "code": "cb34355551z",
-              "endDate": 1951,
-              "startDate": 1854,
-              "title": "Le Figaro (Paris. 1854)"
-            },
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
-          "dateRange": [
-            1499,
-            2020
+            "1863",
+            "1944"
           ]
         }
       }
     },
-    "PNW": {
+    "Far West": {
       "tickets": {
         "seattle": {
           "terms": [
@@ -193,70 +392,28 @@
             "1880",
             "1930"
           ]
-        }
-      }
-    },
-    "Colors": {
-      "tickets": {
-        "bleu clair": {
+        },
+        "san francisco": {
           "terms": [
-            "\"bleu clair\""
+            "\"san francisco\""
           ],
           "papersAndCodes": [],
           "dateRange": [
-            "1865",
-            "1910"
+            "1880",
+            "1930"
           ]
         },
-        "bleu pastel": {
+        "portland": {
           "terms": [
-            "\"bleu pastel\""
+            "portland"
           ],
           "papersAndCodes": [],
           "dateRange": [
-            "1865",
-            "1910"
+            "1880",
+            "1930"
           ]
         }
-      }
-    },
-    "Pastries": {
-      "tickets": {
-        "patiserrie": {
-          "terms": [
-            "patisserie"
-          ],
-          "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1910"
-          ]
-        },
-        "pain au chocolat": {
-          "terms": [
-            "\"pain au chocolat\""
-          ],
-          "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1910"
-          ]
-        }
-      }
-    },
-    "Corruption": {
-    "tickets": {
-      "corruption": {
-        "terms": [
-          "corruption"
-        ],
-        "papersAndCodes": [],
-        "dateRange": [
-          1870,
-          1900
-        ]
       }
     }
   }
-}
 }
