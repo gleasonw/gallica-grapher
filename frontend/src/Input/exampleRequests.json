@@ -219,6 +219,44 @@
           ]
         }
       }
+    },
+    "Pastries": {
+      "tickets": {
+        "patiserrie": {
+          "terms": [
+            "patisserie"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        },
+        "pain au chocolat": {
+          "terms": [
+            "\"pain au chocolat\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        }
+      }
+    },
+    "Corruption": {
+    "tickets": {
+      "corruption": {
+        "terms": [
+          "corruption"
+        ],
+        "papersAndCodes": [],
+        "dateRange": [
+          1870,
+          1900
+        ]
+      }
     }
   }
+}
 }

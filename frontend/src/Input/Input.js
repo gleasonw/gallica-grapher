@@ -5,6 +5,7 @@ import SmallIconStyle from "../shared/SmallIconStyle";
 import useData from "../shared/hooks/useData";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import Ticket from "./Ticket";
+import styled from "styled-components";
 
 //TODO: add a reducer
 function Input(props){
@@ -124,7 +125,7 @@ function Input(props){
             setCustomPapersDateRange(updatedCustomRange)
         }
     }
-    
+
     function handleCustomHighYearChange(event){
         const inputHighYear = event.target.value
         if(isNumeric(inputHighYear) || inputHighYear === '') {
@@ -142,7 +143,7 @@ function Input(props){
             setFullSearchDateRange(updatedFullSearchRange)
         }
     }
-    
+
     function handleFullSearchHighYearChange(event){
         const inputHighYear = event.target.value
         if(isNumeric(inputHighYear) || inputHighYear === '') {
@@ -168,7 +169,7 @@ function Input(props){
         newTerms.splice(bubbleIndex, 1)
         setTerms(newTerms)
     }
-    
+
     function makePaperBubble(paper){
         const updatedPapers = userSelectedPapers.slice();
         updatedPapers.push(paper)
@@ -180,7 +181,7 @@ function Input(props){
         updatedPapers.splice(bubbleIndex, 1)
         setUserSelectedPapers(updatedPapers)
     }
-    
+
     function getPapersFor(paperInputIndex){
         if(paperInputIndex === 0){
             return continuousPapers
@@ -197,7 +198,7 @@ function Input(props){
         if(paperInputIndex === 0){
             return assignNullRangeValuesToPlaceholder(
                 continuousDateRange,
-                1890, 
+                1890,
                 1920
                 )
         }else if(paperInputIndex === 1){
@@ -205,8 +206,8 @@ function Input(props){
             const lowYearDefault = boundaryYearsForUserPapers[0]
             const highYearDefault = boundaryYearsForUserPapers[1]
             return assignNullRangeValuesToPlaceholder(
-                trimmedRange, 
-                lowYearDefault, 
+                trimmedRange,
+                lowYearDefault,
                 highYearDefault
             )
         }else if(paperInputIndex === 2){
@@ -252,11 +253,11 @@ function Input(props){
         <div className='inputBody' onKeyDown={handleKeyDown}>
             <div className='inputUI'>
                 <div className="mainTitle">
-                    Graph word trends in the French National Library's periodical archive.
+                    Graph word occurrences in archived French periodicals.
                 </div>
                 <TicketForm
                     dateRanges = {[
-                        continuousDateRange, 
+                        continuousDateRange,
                         customPapersDateRange,
                         fullSearchDateRange
                     ]}
@@ -302,7 +303,7 @@ function Input(props){
                     type='button'
                     aria-label='Scroll to examples'
                     onClick={handleSeeExamplesClick}
-                    value='Or try some examples ↓'
+                    value='Or tour through some examples ↓'
                 />
             </div>
         <ExampleBox
@@ -319,52 +320,52 @@ function Input(props){
 function ExampleBox(props){
     const exampleJSONdata = require('./exampleRequests.json')
     const exampleRequests = exampleJSONdata["requests"]
+    const [selectedExample, setSelectedExample] = useState(0)
     return(
-        <div
-            className='exampleBox'
-            ref={props.exampleBoxRef}
-        >
-            {Object.keys(exampleRequests).map(requestName => (
-                <ExampleRequest
-                    title={requestName}
-                    request={exampleRequests[requestName]}
-                    onClick={props.onExampleRequestClick}
-                    key={requestName}
-                />
-            ))}
-        </div>
-
-    )
-}
-function ExampleRequest(props){
-    const tickets = props.request["tickets"]
-    const numTickets = Object.keys(tickets).length
-    return(
-        <ClassicUIBox
-            aria-label={`Load example request: ${props.title}`}
-            width={'auto'}
-            height={'auto'}
-        >
-            <h1>
-                {props.title}
-            </h1>
-            <SmallIconStyle onClick={() => props.onClick(tickets)}>
-                <AddBoxIcon/>
-            </SmallIconStyle>
-            <div className={'exampleRequest'}>
-                {Object.keys(tickets).map((ticket, index) => (
-                    <Ticket
-                        ticket={tickets[ticket]}
-                        key={ticket}
-                        ticketID={ticket}
-                        firstInRow={index === 0}
-                        lastInRow={index === numTickets - 1}
-                    />
+        <ClassicUIBox flexDirection={'row'}>
+            <StyledExampleSelector>
+                {Object.keys(exampleRequests).map((requestName,index) => (
+                    <StyledExampleButtonSelect
+                        key={requestName}
+                        onClick={() => setSelectedExample(index)}
+                        selected={index === selectedExample}
+                    >
+                        <h1>{requestName}</h1>
+                    </StyledExampleButtonSelect>
                 ))}
-
-            </div>
+            </StyledExampleSelector>
+            <ExampleContext>
+            </ExampleContext>
         </ClassicUIBox>
+
     )
 }
+
+function ExampleContext(props){
+    return(
+        <div className='exampleContext'>
+            {props.children}
+        </div>
+    )
+}
+
+const StyledExampleSelector = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+    gap: 50px;
+`;
+
+const StyledExampleButtonSelect = styled.button`
+    background-color: transparent;
+    &:hover{
+        ${props => props.selected ? '' : 'background-color: #e0e0e0;'}
+    }
+    color: ${props => props.selected ? 'black' : '#787878'};
+    border: ${props => props.selected ? '1px solid black' : ''};
+    border-radius: 5px;
+    padding: 5px;
+`;
 
 export default Input;

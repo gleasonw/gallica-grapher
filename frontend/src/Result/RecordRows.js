@@ -1,5 +1,6 @@
-import OCRTextBubble from "./OCRTextBubble";
+import OCRText from "./OCRText";
 import React from "react";
+import styled from 'styled-components';
 
 export function RecordRows(props) {
     return (
@@ -13,13 +14,13 @@ export function RecordRows(props) {
             let arkCode = gallicaLink.split('/').pop();
             return (
                 <tr key={index}>
-                    <td>{term}</td>
-                    <td>{periodical}</td>
                     <td>
                         {(year && month && day) && `${year}/${month}/${day}`}
                         {(year && month && !day) && `${year}/${month}`}
                         {(year && !month && !day) && `${year}`}
                     </td>
+                    <td>{periodical}</td>
+                    <td>{term}</td>
                     <td>
                         <a
                             href={gallicaLink}
@@ -28,14 +29,18 @@ export function RecordRows(props) {
                         >
                             {gallicaLink}</a>
                     </td>
-                    <td>
-                        <OCRTextBubble
+                    <StyledOCRTD>
+                        <OCRText
                             term={term}
                             arkCode={arkCode}
                         />
-                    </td>
+                    </StyledOCRTD>
                 </tr>
             )
         })
     )
 }
+
+const StyledOCRTD = styled.td`
+    width: 600px;
+    `;

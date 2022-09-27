@@ -1,11 +1,10 @@
 import React, {useEffect} from 'react';
 import LesserButton from "../shared/LesserButton";
 
-export default function OCRTextBubble(props) {
+export default function OCRText(props) {
     const [arkCode, setArkCode] = React.useState('')
     const [loaded, setLoaded] = React.useState(false);
     const [ocrInfo, setOcrInfo] = React.useState('');
-    const [numResults, setNumResults] = React.useState(0);
     const [buttonText, setButtonText] = React.useState('View context');
 
     useEffect(() => {
@@ -13,7 +12,6 @@ export default function OCRTextBubble(props) {
             setArkCode(props.arkCode);
             setLoaded(false);
             setOcrInfo('');
-            setNumResults(0);
             setButtonText('View context');
         }
     }, [props.arkCode, arkCode]);
@@ -23,7 +21,6 @@ export default function OCRTextBubble(props) {
         const ocrText = await fetch(`/api/ocrtext/${arkCode}/${props.term}`).then(
             response => response.json()
         )
-        setNumResults(ocrText['numResults']);
         setOcrInfo(ocrText['text']);
         setLoaded(true);
     }

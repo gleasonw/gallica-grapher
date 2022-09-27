@@ -3,7 +3,7 @@ import styled from 'styled-components';
 const DecorativeTicket = styled.div`
         display: flex;
         flex-direction: column;
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: ${props => props.isMutable ? 'rgba(255, 255, 255, 0.5)' : 'rgb(255, 255, 255)'};
         padding: 15px;
         border-radius: ${props => props.borderRadius ? props.borderRadius : '10px'};
         border: 1px solid #d9d9d9;
@@ -12,6 +12,7 @@ const DecorativeTicket = styled.div`
         max-width: ${props => props.maxWidth ? props.maxWidth : '100%'};
         flex: 1;
         position: relative;
+        font-size: ${props => props.isMutable ? '15px' : '20px'};
     `;
 
 export default DecorativeTicket;

@@ -160,9 +160,9 @@ function StyledFilterAndTable(props) {
                 <StyledOccurrenceTable>
                     <tbody>
                     <tr>
-                        <th>Term</th>
-                        <th>Periodical</th>
                         <th>Date</th>
+                        <th>Periodical</th>
+                        <th>Term</th>
                         <th>Full text image on Gallica</th>
                         <th>Scanned text (approximate)</th>
                     </tr>

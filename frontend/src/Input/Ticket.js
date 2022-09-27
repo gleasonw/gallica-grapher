@@ -4,20 +4,20 @@ import React from "react";
 import SeriesColorBubble from "../shared/SeriesColorBubble";
 
 export default function Ticket(props){
-    let borderRadius;
-    if (props.firstInRow && props.lastInRow){
-        borderRadius = "0 0 10px 10px";
-    }else if(props.firstInRow){
-        borderRadius = "0 0 0 10px";
-    }else if(props.lastInRow){
-        borderRadius = "0 0 10px 0";
-    }else{
-        borderRadius = "0 0 0 0";
+    let borderRadius = [0, 0, 0, 0];
+    if(props.firstInRow){
+        borderRadius[3] = '10px';
+        !props.isMutable && (borderRadius[0] = '10px');
+    }if(props.lastInRow){
+        borderRadius[2] = '10px';
+        !props.isMutable && (borderRadius[1] = '10px');
     }
+    borderRadius = borderRadius.join(' ');
     return(
         <DecorativeTicket
             borderRadius={borderRadius}
             maxWidth={props.isMutable ? "calc(100% - 40px)" : "100%"}
+            isMutable={props.isMutable}
         >
             <SeriesColorBubble color={props.color}/>
             {props.actionIcon}

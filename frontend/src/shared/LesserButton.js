@@ -14,6 +14,8 @@ const LesserButton = styled.div`
     min-width: 122px;
     max-height: 50px;
     padding: 10px;
+    margin-left: ${props => props.marginLeft || "0px"};
+    margin-right: ${props => props.marginRight || "0px"};
     &:hover{
         background: linear-gradient(to bottom, #ededed 0%, #f5f5f5 100%);
         color: #787878;
