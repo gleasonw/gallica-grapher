@@ -1,5 +1,11 @@
 export default function generateOptions(series, settings, onSeriesClick) {
     let options = {
+        chart: {
+            type: 'line',
+            zoomType: 'x',
+            panning: true,
+            panKey: 'shift'
+        },
         plotOptions:{
             series: {
                 cursor: 'pointer',
@@ -17,7 +23,10 @@ export default function generateOptions(series, settings, onSeriesClick) {
             },
             align: 'left',
             verticalAlign: 'top',
-            borderWidth: 0
+            borderWidth: 0,
+            itemStyle: {
+                fontSize: '15px',
+            }
         },
         title: {
             text: null
@@ -51,7 +60,7 @@ export default function generateOptions(series, settings, onSeriesClick) {
             }
         }
         options.xAxis = {
-            type: 'line'
+            type: 'line',
         }
     }
 

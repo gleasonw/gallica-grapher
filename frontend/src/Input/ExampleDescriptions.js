@@ -20,15 +20,17 @@ This three-way chart of pastries, brioche, and “viennoiserie” (the modern Fr
 `;
 
 descriptions['Scandal'] = `
+<p>A search for “scandal” over a given period is a simple way to detect moments of outrage and controversy, dramas that vivified opinions and sold newspapers. Grouping occurrences by month, or even day, is most effective at capturing the coverage of fleeting scandals, although year-grouping is interesting. 1887 seems to have been a scandalous year.<br></p>
 <p>Alongside the earnest coverage of political scandal, the newspapers of the 19th century were eager for startling narratives to fill their “faits divers” [miscellaneous events] sections. Murders, poisonings, overt corruption, Manet’s nude paintings, all the news that’s fit to sell. The modern-day division between “serious papers” and tabloids was far more fuzzy in the 19th and early 20th centuries. </p>
-<p>A simple search for “scandal” over a given period is a simple way to detect moments of outrage and controversy, dramas that vivified opinions and sold newspapers. Grouping occurrences by month, or even day, is most effective at capturing the coverage of fleeting scandals, although year-grouping is interesting. 1887 seems to have been a scandalous year.<br></p>
-<p>A notable peak begins in 1892, when many papers begin referencing the Panama Canal scandal. The French financier Ferdinand de Lesseps was famous for building the Suez Canal, a lucrative project. His popularity allowed him to raise funds to begin construction of the Panama Canal in 1881. The Central American climate proved more difficult to work in, though, leading to mass worker deaths and halting progress. Lesseps bribed numerous public officials to hide the canal’s difficulties. "Scandale" ensued. </p>
+<p>A notable scandal erupted around December 1892. The French financier Ferdinand de Lesseps was famous for building the Suez Canal, a lucrative project. His success brought him thousands of investors for his new project, the construction of a canal in Panama. Construction began in 1881. The Central American climate, however, proved more difficult to work in, leading to mass worker deaths and halting progress. Lesseps bribed numerous public officials to hide the canal’s difficulties. "Scandale" ensued. 
+Even Gustav Eiffel was implicated. 
+</p>
 <p>Lesseps’ frequent appearances reveal the immense sway the private sector held over France’s 19th-century colonial ambitions. Lesseps was also the primary financier and promoter of explorer Pierre Savorgnan de Brazza’s subjugation of the Congo.</p>
 `;
 
 descriptions['Capitals'] = `
 <p>This tool allows for searches over a single periodical, usefully limiting the scope. The Petit Journal was a prolific, inexpensive, populist journal that published consistently from 1863 to 1944. The Petit Journal’s popular focus and regular coverage neatly condenses a wide swath of public opinion.</p>
-<p>The coverage of foreign cities hides a mountain of context and events that deserve close textual study. The chart plots occurrences of 5 foreign capitals, and the distant powers they often refer to, in the Petit Journal. London initially occupies the most text-space, by the mid 1930’s, however, Berlin, Washington, and Rome have mostly made up the distance. Tokyo never fully enters into the conversation, even during the runup to the Second World War. </p>
+<p>The coverage of foreign cities hides a mountain of context and events that deserve close textual study. The chart plots occurrences of 5 foreign capitals, and the distant powers they often symbolize, in the Petit Journal. London initially occupies the most text-space, by the mid 1930’s, however, Berlin, Washington, and Rome have mostly made up the distance. Tokyo never fully enters into the conversation, even during the runup to the Second World War. </p>
 `;
 
 descriptions['Far West'] = `
