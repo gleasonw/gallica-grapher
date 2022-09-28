@@ -1,5 +1,5 @@
 import React from "react";
-import PaperOptionWrap from "./PaperOptionWrap";
+import OptionWrap from "../OptionWrap";
 import {DateInputBox} from "./DateInputBox";
 import {KeyboardArrowDown} from "@mui/icons-material";
 import {StyledArrow} from "./StyledArrow";
@@ -22,7 +22,7 @@ export function ContinuousTrendInput(props) {
             selected={props.selected === 0}
         />
     return (
-        <PaperOptionWrap
+        <OptionWrap
             selected={props.selected === 0}
             onClick={() => props.onPaperSelectClick(0)}
             onFocus={() => props.onFocus(0)}
@@ -39,6 +39,6 @@ export function ContinuousTrendInput(props) {
             >
                 {props.selected === 0 && <KeyboardArrowDown/>}
             </StyledArrow>
-        </PaperOptionWrap>
+        </OptionWrap>
     )
 }

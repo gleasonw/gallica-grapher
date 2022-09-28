@@ -1,5 +1,5 @@
 import useData from "../../shared/hooks/useData";
-import PaperOptionWrap from "./PaperOptionWrap";
+import OptionWrap from "../OptionWrap";
 import React from "react";
 import {DateInputBox} from "./DateInputBox";
 import {KeyboardArrowUp} from "@mui/icons-material";
@@ -34,7 +34,7 @@ export function FullSearchInput(props) {
         numPapersOverRange = "0";
     }
     return (
-        <PaperOptionWrap
+        <OptionWrap
             selected={props.selected === 2}
             borderBottom={'none'}
             onClick={() => props.onPaperSelectClick(2)}
@@ -48,6 +48,6 @@ export function FullSearchInput(props) {
                 {numPapersOverRange} periodicals publishing
                 at any point between {dateInputs}
             </span>
-        </PaperOptionWrap>
+        </OptionWrap>
     )
 }

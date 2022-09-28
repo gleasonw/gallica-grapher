@@ -1,4 +1,4 @@
-import PaperOptionWrap from "./PaperOptionWrap";
+import OptionWrap from "../OptionWrap";
 import {SelectionBox} from "../SelectionBox";
 import {Dropdown} from "./Dropdown";
 import React from "react";
@@ -24,7 +24,7 @@ export function UserSelectPaperInput(props) {
     const paperNames = props.userSelectedPapers.map(paper => paper.title);
     const selected = props.selected === 1;
     return (
-        <PaperOptionWrap
+        <OptionWrap
             selected={selected}
             onClick={() => props.onPaperSelectClick(1)}
             paddingBottom={'40px'}
@@ -67,7 +67,7 @@ export function UserSelectPaperInput(props) {
             >
                 {props.selected === 1 && <KeyboardArrowDown/>}
             </StyledArrow>
-        </PaperOptionWrap>
+        </OptionWrap>
 
     )
 }

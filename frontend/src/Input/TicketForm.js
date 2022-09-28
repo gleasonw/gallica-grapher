@@ -38,7 +38,7 @@ function TicketForm(props){
             onSubmit={handleSubmit}
             className='userInputForm'
         >
-            <label>Graph this term:</label>
+            <label>Graph occurrences of this word:</label>
             <TermInputBox
                 onEnterPress={handleSubmit}
                 selectedTerms={props.selectedTerms}
@@ -48,7 +48,7 @@ function TicketForm(props){
                 noTermsReminder={showNoTermsReminder}
             />
             <br />
-            <label>in...</label>
+            <label>in these periodicals:</label>
             <PaperInputBox
                 onClick={props.onPaperDropItemClick}
                 deletePaperBubble={props.deletePaperBubble}

@@ -17,12 +17,15 @@ export function ShadowedFocusInput(props) {
                 autoComplete="off"
                 onFocus={() => setFocus(true)}
                 onBlur={() => setFocus(false)}
+                width={props.width}
+                backgroundColor={props.backgroundColor}
             />
         </InlineBubble>
     )
 }
 
 const StyledFocusInput = styled.input`
-    width: 100%;
+    width: ${props => props.width ? props.width : '100%'};
     min-width: 40px;
+    background-color: ${props => props.backgroundColor ? props.backgroundColor : 'transparent'} !important;
     `;

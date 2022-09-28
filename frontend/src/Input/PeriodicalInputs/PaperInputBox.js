@@ -1,8 +1,8 @@
 import React from "react";
-import styled from 'styled-components';
 import {ContinuousTrendInput} from "./ContinuousTrendInput";
 import {UserSelectPaperInput} from "./UserSelectPaperInput";
 import {FullSearchInput} from "./FullSearchInput";
+import {StyledOptionInput} from "../StyledOptionInput";
 
 export class PaperInputBox extends React.Component {
     constructor(props) {
@@ -68,7 +68,7 @@ export class PaperInputBox extends React.Component {
 
     render() {
         return (
-            <StyledPaperInput
+            <StyledOptionInput
                 padding={"0"}
                 backgroundColor={"#f5f5f5"}
                 borderRadius={"10px 10px 0 0"}
@@ -105,14 +105,8 @@ export class PaperInputBox extends React.Component {
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
                     onFocus={this.props.onFocus}
                 />
-            </StyledPaperInput>
+            </StyledOptionInput>
         )
     }
 }
-
-const StyledPaperInput = styled.div`
-    border: 2px solid #d9d9d9;
-    border-radius: 10px 10px 0 0;
-
-`;
 

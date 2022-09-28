@@ -13,6 +13,9 @@ const TextInputBubble = styled.div`
     border-radius: ${props => props.borderRadius || "10px"};
     color: #4d4d4d;
     transition: all 150ms;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
     box-shadow: ${props => props.focus ? "0 0 0 2px #575252" : "rgba(0, 0, 0, 0.075) 0px 1px 1px 0px inset"};
     `;
 

@@ -20,6 +20,7 @@ const LesserButton = styled.div`
         background: linear-gradient(to bottom, #ededed 0%, #f5f5f5 100%);
         color: #787878;
         }
+    width: ${props => props.width || "auto"};
     `;
 
 export default LesserButton;

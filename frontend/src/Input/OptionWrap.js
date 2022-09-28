@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const PaperOptionWrap = styled.div`
+const OptionWrap = styled.div`
     background-color: ${props => props.selected ? "#ffffff" : "rgba(255,255,255,0.0)"};
     color: ${props => props.selected ? "#4d4d4d" : "#d9d9d9"};
     border-bottom: ${props => props.borderBottom || "1px solid #d9d9d9"};
@@ -11,6 +11,9 @@ const PaperOptionWrap = styled.div`
     border-radius: ${props => props.borderRadius ? props.borderRadius : "0px"};
     position: relative;
     padding-bottom: ${props => props.paddingBottom || "12px"};
+    &:hover{
+        background-color: ${props => props.selected ? "#ffffff" : "rgba(255,255,255,0.2)"};
+    }
     `;
 
-export default PaperOptionWrap;
+export default OptionWrap;
