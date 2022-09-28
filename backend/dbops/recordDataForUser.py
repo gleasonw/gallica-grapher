@@ -3,6 +3,8 @@ from fetchComponents.query import OCRQuery
 from fetchComponents.fetch import Fetch
 from gallica.factories.parseFactory import buildParser
 
+conn = PSQLconn().getConn()
+
 
 class RecordDataForUser:
 
@@ -25,7 +27,8 @@ class RecordDataForUser:
     """
 
     def __init__(self):
-        self.conn = PSQLconn().getConn()
+        global conn
+        self.conn = conn if conn else PSQLconn().getConn()
         self.csvData = None
         self.parse = buildParser()
 

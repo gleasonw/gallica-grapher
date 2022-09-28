@@ -13,7 +13,6 @@ from dbops.recordDataForUser import RecordDataForUser
 
 app = Flask(__name__)
 CORS(app)
-userData = RecordDataForUser()
 requestID = random.randint(0, 10000)
 
 
@@ -65,7 +64,7 @@ def getProgress(taskID):
 def revokeTask(taskID, reqID):
     task = spawnRequest.AsyncResult(taskID)
     task.revoke(terminate=True)
-    userData.clearUserRecordsAfterCancel(reqID)
+    RecordDataForUser().clearUserRecordsAfterCancel(reqID)
     return {'state': "REVOKED"}
 
 
@@ -137,7 +136,7 @@ def getTopPapersFromID():
 def getCSV():
     tickets = request.args["tickets"]
     requestID = request.args["requestID"]
-    csvData = userData.getCSVData(tickets, requestID)
+    csvData = RecordDataForUser().getCSVData(tickets, requestID)
     return {"csvData": csvData}
 
 
@@ -146,14 +145,14 @@ def getDisplayRecords():
     tableArgs = dict(request.args)
     del tableArgs['uniqueforcache']
     tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
-    displayRecords, count = userData.getRecordsForDisplay(tableArgs)
+    displayRecords, count = RecordDataForUser().getRecordsForDisplay(tableArgs)
     return {"displayRecords": displayRecords,
             "count": count}
 
 
 @app.route('/api/ocrtext/<arkCode>/<term>')
 def getOCRtext(arkCode, term):
-    numResults, text = userData.getOCRTextForRecord(
+    numResults, text = RecordDataForUser().getOCRTextForRecord(
         arkCode,
         term
     )
