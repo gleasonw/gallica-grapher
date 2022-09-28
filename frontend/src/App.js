@@ -140,7 +140,6 @@ function App() {
     }
 
     function handleExampleRequestClick(request) {
-        requestBoxRef.current.scrollIntoView({behavior: 'smooth'});
         const requestWithUniqueTicketIDs = {}
         Object.keys(request).map((ticketID, index) => (
             requestWithUniqueTicketIDs[index] = request[ticketID]

@@ -10,11 +10,13 @@ const ClassicUIBox = styled.div`
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     padding: 30px;
-    width: ${props => props.width || '100%'};
+    width: ${props => props.width ? props.width : '100%'};
     height: ${props => props.height || '100%'};
     display: ${props => props.display ? props.display : 'flex'};
     flex-direction: ${props => props.flexDirection ? props.flexDirection : 'column'};
+    flex: ${props => props.flex ? props.flex : '1'};
     margin: auto;
+    margin-bottom: 20px;
     gap: ${props => props.gap || '0px'};
     `;
 

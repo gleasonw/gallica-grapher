@@ -3,44 +3,40 @@ import styled from "styled-components";
 import React, {useState} from "react";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import Ticket from "./Ticket";
+import {descriptions} from "./ExampleDescriptions";
 
 export function ExampleBox(props) {
     const exampleJSONdata = require('./exampleRequests.json')
     const exampleRequests = exampleJSONdata["requests"]
     const [selectedExample, setSelectedExample] = useState('Colonialism')
 
-    function handleExampleClick(requestName){
-        setSelectedExample(requestName)
-        props.onExampleRequestClick(exampleRequests[requestName]["tickets"])
-    }
-
     return (
-        <ClassicUIBox flexDirection={'row'} ref={props.exampleBoxRef}>
+        <ClassicUIBox
+            flexDirection={'row'}
+            ref={props.exampleBoxRef}
+            flex={'none'}
+            width={'1200px'}
+            height={'auto'}
+        >
             <StyledExampleSelector>
                 {Object.keys(exampleRequests).map((requestName) => (
                     <StyledExampleButtonSelect
                         key={requestName}
-                        onClick={() => handleExampleClick(requestName)}
+                        onClick={() => setSelectedExample(requestName)}
                         selected={requestName === selectedExample}
                     >
                         <h1>{requestName}</h1>
                     </StyledExampleButtonSelect>
                 ))}
             </StyledExampleSelector>
-            <ExampleContext>
-                {exampleRequests[selectedExample]}
-            </ExampleContext>
+            <StyledExampleContext>
+                <ExampleRequest request={exampleRequests[selectedExample]}/>
+                <StyledContextReader>
+                    <div dangerouslySetInnerHTML={{__html: descriptions[selectedExample]}}/>
+                </StyledContextReader>
+            </StyledExampleContext>
         </ClassicUIBox>
 
-    )
-}
-
-function ExampleContext(props) {
-    console.log(props.children)
-    return (
-        <ExampleRequest
-            request={props.children}
-        />
     )
 }
 
@@ -65,9 +61,8 @@ function ExampleRequest(props){
 const StyledExampleSelector = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: start;
-    gap: 50px;
+    gap: 10px;
     border-right: 1px solid black;
     padding-right: 20px;
 `;
@@ -81,3 +76,19 @@ const StyledExampleButtonSelect = styled.button`
     border-radius: 5px;
     padding: 5px;
 `;
+
+const StyledExampleContext = styled.div`
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    font-size: 20px;
+    gap: 20px;
+    `;
+
+const StyledContextReader = styled.div`
+    width: calc(100% - 40px);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: justify;
+    `;

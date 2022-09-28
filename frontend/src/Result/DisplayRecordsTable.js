@@ -48,7 +48,7 @@ export default function DisplayRecordsTable(props) {
         setLimit(limit + 10);
     }
 
-    function handleFilterChange(){
+    function handleFilterChange() {
         setOffset(0);
         setLimit(10);
     }
@@ -123,6 +123,7 @@ function StyledFilterAndTable(props) {
                     month={props.month}
                     day={props.day}
                     periodical={props.periodical}
+                    term={props.term}
                     limit={props.limit}
                     offset={props.offset}
                     setLimit={props.setLimit}
@@ -138,11 +139,13 @@ function StyledFilterAndTable(props) {
                     show={props.show}
                     onOutsidePopupClick={props.onOutsidePopupClick}
                 />
-                <TicketPaperOccurrenceStats
-                    tickets={Object.keys(props.tickets)}
-                    requestID={props.requestID}
-                    cacheID={props.cacheID}
-                />
+                {!props.compact &&
+                    <TicketPaperOccurrenceStats
+                        tickets={Object.keys(props.tickets)}
+                        requestID={props.requestID}
+                        cacheID={props.cacheID}
+                    />
+                }
             </StyledFilterAndTopPapersWrap>
             <div>
                 <AppliedFilters
@@ -187,10 +190,10 @@ function StyledFilterAndTable(props) {
                     </tbody>
                 </StyledOccurrenceTable>
                 {props.displayRecords && props.displayRecords.length !== props.count &&
-                <ImportantButtonWrap
-                    children={'Load more'}
-                    onClick={props.onLoadMoreClick}
-                />
+                    <ImportantButtonWrap
+                        children={'Load more'}
+                        onClick={props.onLoadMoreClick}
+                    />
                 }
             </div>
         </StyledFilterAndTableWrap>

@@ -237,7 +237,7 @@
       "tickets": {
         "Art Nouveau": {
             "terms": [
-                "\"Art Nouveau\""
+                "\"art nouveau\""
             ],
             "papersAndCodes": [],
             "dateRange": [
@@ -247,7 +247,7 @@
         },
         "Art deco": {
             "terms": [
-                "\"Art deco\""
+                "\"arts decoratifs\""
             ],
             "papersAndCodes": [],
             "dateRange": [
@@ -266,31 +266,27 @@
           "papersAndCodes": [],
           "dateRange": [
             "1865",
-            "1910"
+            "1930"
           ]
         },
         "pain au chocolat": {
           "terms": [
-            "\"pain au chocolat\""
+            "\"brioche\""
           ],
           "papersAndCodes": [],
           "dateRange": [
             "1865",
-            "1910"
+            "1930"
           ]
-        }
-      }
-    },
-    "Corruption": {
-      "tickets": {
-        "corruption": {
+        },
+        "viennoiserie": {
           "terms": [
-            "corruption"
+            "viennoiserie"
           ],
           "papersAndCodes": [],
           "dateRange": [
-            1870,
-            1900
+            "1865",
+            "1930"
           ]
         }
       }
@@ -304,12 +300,12 @@
           "papersAndCodes": [],
           "dateRange": [
             1870,
-            1900
+            1920
           ]
         }
       }
     },
-    "Foreign Cities": {
+    "Capitals": {
       "tickets": {
         "chicago": {
           "terms": [
@@ -330,7 +326,7 @@
         },
         "new york": {
           "terms": [
-            "new york"
+            "washington"
           ],
           "papersAndCodes": [
             {
@@ -378,6 +374,23 @@
             "1863",
             "1944"
           ]
+        },
+        "rome": {
+            "terms": [
+                "rome"
+            ],
+            "papersAndCodes": [
+                {
+                "code": "cb32895690j",
+                "endDate": 1944,
+                "startDate": 1863,
+                "title": "Le Petit journal (Paris. 1863)"
+                }
+            ],
+            "dateRange": [
+                "1863",
+                "1944"
+            ]
         }
       }
     },
@@ -395,7 +408,7 @@
         },
         "san francisco": {
           "terms": [
-            "\"san francisco\""
+            "\"los angeles\""
           ],
           "papersAndCodes": [],
           "dateRange": [

@@ -52,7 +52,7 @@ export function FilterOptions(props) {
             <StyledInputAndLabel>
                 <label htmlFor='day'>Day</label>
                 <StyledSelect
-                    value={props.day}
+                    value={!!props.day ? props.day : ''}
                     id={'day'}
                     onChange={
                         (e) => props.onDayChange(parseInt(e.target.value))}
