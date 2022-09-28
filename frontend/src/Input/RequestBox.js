@@ -11,6 +11,7 @@ export function RequestBox(props) {
                 tickets={props.tickets}
                 onTicketClick={props.onTicketClick}
                 isMutable={true}
+                maxWidth={'200px'}
             />
             {Object.keys(props.tickets).length < 5 &&
             <LesserButton

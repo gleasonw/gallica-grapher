@@ -1,5 +1,101 @@
 {
   "requests": {
+    "Colors": {
+      "tickets": {
+        "bleu clair": {
+          "terms": [
+            "\"bleu clair\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        },
+        "bleu pastel": {
+          "terms": [
+            "\"bleu pastel\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ]
+        }
+      }
+    },
+    "Arts": {
+      "tickets": {
+        "Art Nouveau": {
+            "terms": [
+                "\"art nouveau\""
+            ],
+            "papersAndCodes": [],
+            "dateRange": [
+                "1865",
+                "1930"
+            ]
+        },
+        "Art deco": {
+            "terms": [
+                "\"arts decoratifs\""
+            ],
+            "papersAndCodes": [],
+            "dateRange": [
+                "1865",
+                "1930"
+            ]
+        }
+      }
+    },
+    "Pastries": {
+      "tickets": {
+        "patiserrie": {
+          "terms": [
+            "patisserie"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1930"
+          ]
+        },
+        "pain au chocolat": {
+          "terms": [
+            "brioche"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1930"
+          ]
+        },
+        "viennoiserie": {
+          "terms": [
+            "viennoiserie"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1930"
+          ]
+        }
+      }
+    },
+    "Scandal": {
+      "tickets": {
+        "scandale": {
+          "terms": [
+            "scandale"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            1870,
+            1920
+          ]
+        }
+      }
+    },
     "Colonialism": {
       "tickets": {
         "algerie": {
@@ -206,102 +302,6 @@
                 1854,
                 1951
             ]
-        }
-      }
-    },
-    "Colors": {
-      "tickets": {
-        "bleu clair": {
-          "terms": [
-            "\"bleu clair\""
-          ],
-          "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1910"
-          ]
-        },
-        "bleu pastel": {
-          "terms": [
-            "\"bleu pastel\""
-          ],
-          "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1910"
-          ]
-        }
-      }
-    },
-    "Arts": {
-      "tickets": {
-        "Art Nouveau": {
-            "terms": [
-                "\"art nouveau\""
-            ],
-            "papersAndCodes": [],
-            "dateRange": [
-                "1865",
-                "1930"
-            ]
-        },
-        "Art deco": {
-            "terms": [
-                "\"arts decoratifs\""
-            ],
-            "papersAndCodes": [],
-            "dateRange": [
-                "1865",
-                "1930"
-            ]
-        }
-      }
-    },
-    "Pastries": {
-      "tickets": {
-        "patiserrie": {
-          "terms": [
-            "patisserie"
-          ],
-          "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1930"
-          ]
-        },
-        "pain au chocolat": {
-          "terms": [
-            "\"brioche\""
-          ],
-          "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1930"
-          ]
-        },
-        "viennoiserie": {
-          "terms": [
-            "viennoiserie"
-          ],
-          "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1930"
-          ]
-        }
-      }
-    },
-    "Scandal": {
-      "tickets": {
-        "scandale": {
-          "terms": [
-            "scandale"
-          ],
-          "papersAndCodes": [],
-          "dateRange": [
-            1870,
-            1920
-          ]
         }
       }
     },

@@ -9,4 +9,5 @@ export const StyledTicketLabel = styled.div`
     align-items: center;
     gap: 25px;
     position: relative;
+    overflow: visible;
 `;

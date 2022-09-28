@@ -5,5 +5,4 @@ export const TextClipper = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 100%;
-    position: absolute;
 `

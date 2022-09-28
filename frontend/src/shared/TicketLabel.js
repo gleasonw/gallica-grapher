@@ -34,6 +34,9 @@ const StyledCompactTicketLabel = styled.div`
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+    position: relative;
+    overflow: scroll;
+    font-size: 15px;
 `;
 
 

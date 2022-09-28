@@ -26,17 +26,15 @@ export function ExpandableBlurbControl(props) {
             </BlurbText>
             {
                 expanded ?
-                    <StyledDrop>
-                        <table>
-                            <StyledPeriodicalDropdownTable>
+                        <StyledPeriodicalDropdownTable>
+                            <tbody>
                                 {props.items.map((item) => (
                                     <tr key={item}>
                                         <td>{item}</td>
                                     </tr>
                                 ))}
-                            </StyledPeriodicalDropdownTable>
-                        </table>
-                    </StyledDrop>
+                            </tbody>
+                        </StyledPeriodicalDropdownTable>
                     :
                 <span>
                 + {props.numItemsRemaining} more
@@ -51,16 +49,11 @@ export function ExpandableBlurbControl(props) {
 const StyledBlurbAndPlusLabel = styled.div`
     min-height: 72.5px;
     cursor: pointer;
+    position: relative;
+    overflow: visible;
 `;
 
-const StyledReduceArrow = styled.div`
-    position: absolute;
-    bottom: 0;
-    right: 50%;
-    z-index: 2;
-`;
-
-const StyledPeriodicalDropdownTable = styled.tbody`
+const StyledPeriodicalDropdownTable = styled.table`
     td{
         padding: 10px;
     }

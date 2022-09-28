@@ -25,6 +25,7 @@ export default function TicketLabelRow(props) {
                     firstInRow={index === 0}
                     lastInRow={index === numTickets - 1}
                     isMutable={props.isMutable}
+                    maxWidth={props.maxWidth}
                     actionIcon={
                         props.isMutable ?
                         <SmallIconStyle onClick={() => props.onTicketClick(ticketID)}>

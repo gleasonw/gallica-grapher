@@ -4,6 +4,7 @@ import React, {useState} from "react";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import Ticket from "./Ticket";
 import {descriptions} from "./ExampleDescriptions";
+import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 
 export function ExampleBox(props) {
     const exampleJSONdata = require('./exampleRequests.json')
@@ -15,7 +16,7 @@ export function ExampleBox(props) {
             flexDirection={'row'}
             ref={props.exampleBoxRef}
             flex={'none'}
-            width={'1200px'}
+            width={'auto'}
             height={'auto'}
         >
             <StyledExampleSelector>
@@ -34,6 +35,12 @@ export function ExampleBox(props) {
                 <StyledContextReader>
                     <div dangerouslySetInnerHTML={{__html: descriptions[selectedExample]}}/>
                 </StyledContextReader>
+                <ImportantButtonWrap
+                    children={'Graph 📊'}
+                    onClick={() => props.onExampleRequestClick(
+                        {[selectedExample]: exampleRequests[selectedExample]}
+                    )}
+                />
             </StyledExampleContext>
         </ClassicUIBox>
 
@@ -52,6 +59,7 @@ function ExampleRequest(props){
                         ticketID={ticket}
                         firstInRow={index === 0}
                         lastInRow={index === numTickets - 1}
+                        maxWidth={'200px'}
                     />
                 ))}
             </div>
@@ -83,6 +91,7 @@ const StyledExampleContext = styled.div`
     padding: 20px;
     font-size: 20px;
     gap: 20px;
+    width: 100%;
     `;
 
 const StyledContextReader = styled.div`
