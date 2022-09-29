@@ -54,7 +54,6 @@ class TicketSearchRunner:
     def insertMissingPapersToDB(self, records):
         codesFromRecords = set(record.paperCode for record in records)
         if not codesFromRecords:
-            print("Need to fix this bug")
             return records
         schemaMatches = self.schema.getPaperCodesThatMatch(codesFromRecords)
         setOfCodesInDB = set(match[0] for match in schemaMatches)

@@ -37,7 +37,7 @@ function TicketForm(props) {
             onSubmit={handleSubmit}
             className='userInputForm'
         >
-            <label>Graph occurrences of this word:</label>
+            <label>View occurrences of this word:</label>
             <TermInputBox
                 onEnterPress={handleSubmit}
                 selectedTerms={props.selectedTerms}

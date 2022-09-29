@@ -17,7 +17,7 @@ export function ExampleBox(props) {
             ref={props.exampleBoxRef}
             flex={'none'}
             width={'auto'}
-            height={'auto'}
+            minHeight={'50vw'}
         >
             <StyledExampleSelector>
                 {Object.keys(exampleRequests).map((requestName) => (

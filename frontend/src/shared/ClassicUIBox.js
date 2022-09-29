@@ -12,6 +12,7 @@ const ClassicUIBox = styled.div`
     padding: 30px;
     width: ${props => props.width ? props.width : '100%'};
     height: ${props => props.height || '100%'};
+    min-height: ${props => props.minHeight || '100%'};
     display: ${props => props.display ? props.display : 'flex'};
     flex-direction: ${props => props.flexDirection ? props.flexDirection : 'column'};
     flex: ${props => props.flex ? props.flex : '1'};
