@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const OptionWrap = styled.div`
     background-color: ${props => props.selected ? "#ffffff" : "rgba(255,255,255,0.0)"};
-    color: ${props => props.selected ? "#4d4d4d" : "#d9d9d9"};
+    color: ${props => props.selected ? "#4d4d4d" : "#b3b3b3"};
     border-bottom: ${props => props.borderBottom || "1px solid #d9d9d9"};
     padding: 12px 20px;
     text-align: left;

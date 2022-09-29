@@ -21,7 +21,7 @@ export default function Info(props){
                     <p>This tool exists thanks to the wondrously open and interesting {GallicaApiLink},
                     a product of the French National archives. I used the API for undergraduate research on
                     19th century French culture. Now that I have
-                        graduated, time is plentiful, and I'm trying to make a useful app out of it.</p>
+                        graduated, time is plentiful, and I'm trying to make an app out of it.</p>
                 </section>
                 <h3>Do I need to speak French to use it?</h3>
                 <section>
