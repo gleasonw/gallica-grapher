@@ -13,7 +13,7 @@ from dbops.recordDataForUser import RecordDataForUser
 
 app = Flask(__name__)
 CORS(app)
-requestID = random.randint(0, 10000)
+requestIDSeed = random.randint(0, 10000)
 
 
 @app.route('/')
@@ -23,11 +23,11 @@ def index():
 
 @app.route('/api/init', methods=['POST'])
 def init():
-    global requestID
-    requestID += 1
+    global requestIDSeed
+    requestIDSeed += 1
     tickets = request.get_json()["tickets"]
-    task = spawnRequest.delay(tickets, requestID)
-    return {"taskid": task.id, "requestid": requestID}
+    task = spawnRequest.delay(tickets, requestIDSeed)
+    return {"taskid": task.id, "requestid": requestIDSeed}
 
 
 @app.route('/poll/progress/<taskID>')

@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
 const LesserButton = styled.div`
+    position: ${props => props.position ? props.position : 'relative'};
+    z-index: ${props => props.zIndex ? props.zIndex : '0'};
     cursor: pointer;
     text-align: center;
     background: linear-gradient(to bottom, #f5f5f5 0%, #ededed 100%);
@@ -9,6 +11,7 @@ const LesserButton = styled.div`
     transition: all 150ms;
     color: #4d4d4d;
     border-radius: ${props => props.borderRadius || "10px"};
+    border-top: ${props => props.borderTop || "1px solid #d9d9d9"};
     font-size: 15px;
     max-width: 200px;
     min-width: 122px;

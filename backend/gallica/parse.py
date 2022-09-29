@@ -1,7 +1,8 @@
 from lxml import etree
 from gallica.date import Date
 
-#TODO: split into multiple classes for each parse use case, switch at factory level
+
+# TODO: split into multiple classes for each parse use case, switch at factory level
 class Parse:
 
     def __init__(
@@ -25,6 +26,9 @@ class Parse:
 
     def occurrences(self, xml, startYear) -> list:
         elements = etree.fromstring(xml)
+        if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
+            print("no records bug")
+            etree.dump(elements)
         for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             data = self.getDataFromRecordRoot(record)
             paperCode = self.getPaperCode(data)
@@ -39,7 +43,7 @@ class Parse:
                 paperCode=paperCode,
                 date=date,
                 url=self.getURL(data),
-                )
+            )
             yield newRecord
 
     def onePaperTitleFromOccurrenceBatch(self, responseXML) -> str:
@@ -135,6 +139,3 @@ class Parse:
             content = content.text if content is not None else None
             items.append((page, content))
         return items
-
-
-

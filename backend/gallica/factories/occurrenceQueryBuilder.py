@@ -50,19 +50,19 @@ class CQLFactory:
         self.cqlForCodes = CQLStringForPaperCodes()
 
     def buildCQLforTerm(self, term) -> str:
-        baseQueryComponents = []
-        if self.ticket.startYear and self.ticket.endYear:
-            baseQueryComponents.append(f'dc.date >= "{self.ticket.startYear}"')
-            baseQueryComponents.append(f'dc.date <= "{self.ticket.endYear}"')
-        baseQueryComponents.append(f'(gallica adj "{term}")')
-        baseQueryComponents.append('(dc.type adj "fascicule")')
-        if self.ticket.codes:
-            baseQueryComponents.insert(0, '({formattedCodeString})')
-        baseQuery = " and ".join(baseQueryComponents)
-        baseQuery = f'{baseQuery} sortby dc.date/sort.ascending'
-        return baseQuery
+        codeSelect = '({formattedCodeString}) and '
+        startYearSelect = f'dc.date >= "{self.ticket.startYear}" and '
+        endYearSelect = f'dc.date <= "{self.ticket.endYear}" and '
+        simpleSearchSelect = f'(gallica adj "{term}") and '
+        linkSearchSelect = f'(text adj "{term}" prox/unit=word/distance={self.ticket.linkDistance} "{self.ticket.linkTerm}") and '
+        query = (
+            f"{codeSelect if self.ticket.codes else ''}"
+            f"{startYearSelect if self.ticket.startYear else ''}"
+            f"{endYearSelect if self.ticket.endYear else ''}"
+            f"{simpleSearchSelect if self.ticket.linkTerm is None else linkSearchSelect}"
+            '(dc.type all "fascicule")'
+        )
+        return query
 
     def buildCQLforPaperCodes(self) -> list:
         return self.cqlForCodes.build(self.ticket.codes)
-
-

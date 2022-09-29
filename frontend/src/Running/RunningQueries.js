@@ -62,6 +62,8 @@ function RunningQueriesUI(props) {
                             terms={props.tickets[key]['terms']}
                             papers={props.tickets[key]['papersAndCodes']}
                             dateRange={props.tickets[key]['dateRange']}
+                            linkTerm={props.tickets[key]['linkTerm']}
+                            linkDistance={props.tickets[key]['linkDistance']}
                             key={key}
                             position={`${index + 1} of ${Object.keys(props.tickets).length}`}
                             progressStats={

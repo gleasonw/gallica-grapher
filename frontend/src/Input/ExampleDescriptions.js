@@ -16,7 +16,7 @@ descriptions['Arts'] = `
 `;
 
 descriptions['Pastries'] = `
-This three-way chart of pastries, brioche, and “viennoiserie” (the modern French word for buttery croissants and their derivatives) details the slow rise of “patisserie” [pastry] within French periodicals. Early discussion in 1865 includes a medical journal advocating for beeswax instead of animal fats for maintaining a wooden “pastry board”. Advice that has stood the test of time.
+This three-way chart of pastries, brioche, and “viennoiserie” (the modern French word for buttery croissants and their derivatives) details the slow rise of “patisserie” [pastry] within French periodicals. Early discussion in 1865 includes a medical journal advocating for beeswax instead of animal fats for greasing a baking sheet.
 `;
 
 descriptions['Scandal'] = `

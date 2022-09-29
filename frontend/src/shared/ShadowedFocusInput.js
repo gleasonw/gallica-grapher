@@ -10,6 +10,7 @@ export function ShadowedFocusInput(props) {
                 className={props.className}
                 type={props.type}
                 value={props.value}
+                min={props.min}
                 name={props.name}
                 placeholder={props.placeholder}
                 onChange={props.onChange}

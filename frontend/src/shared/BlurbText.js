@@ -7,4 +7,13 @@ export const BlurbText = styled.div`
     font-size: 15px;
     background: #ece9e2;
     position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    &:hover {
+        white-space: normal;
+        overflow: visible;
+    }
 `

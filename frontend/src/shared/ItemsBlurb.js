@@ -1,7 +1,6 @@
 import React from 'react';
 import {ExpandableBlurbControl} from "./ExpandableBlurbControl";
 import {BlurbText} from "./BlurbText";
-import {TextClipper} from "./TextClipper";
 
 export default function ItemsBlurb(props){
     if(props.papers){
@@ -46,7 +45,7 @@ function generateExpandableBlurb(items, indexToStopAt, numItemsRemaining) {
 function generateFixedBlurb(items) {
     const quotedItems = items.map(item => `"${item}"`)
     const commaSeparatedItems = quotedItems.join(', ')
-    return <BlurbText><TextClipper>{commaSeparatedItems}</TextClipper></BlurbText>
+    return <BlurbText>{commaSeparatedItems}</BlurbText>
 }
 
 export function makePaperBlurb(papers) {

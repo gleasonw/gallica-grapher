@@ -25,7 +25,9 @@ export default function Ticket(props){
                 terms={props.ticket['terms']}
                 papers={props.ticket['papersAndCodes']}
                 dateRange={props.ticket['dateRange']}
-                compact={true}
+                linkTerm={props.ticket['linkTerm']}
+                linkDistance={props.ticket['linkDistance']}
+                compact
             />
         </DecorativeTicket>
     )

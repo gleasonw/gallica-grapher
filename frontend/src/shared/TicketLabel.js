@@ -1,42 +1,31 @@
 import React from 'react';
 import styled from "styled-components";
 import ItemsBlurb from "./ItemsBlurb";
-import {StyledTicketLabel} from "./StyledTicketLabel";
 
-function TicketLabel(props){
-    if(props.compact){
-        return(
-            <StyledCompactTicketLabel>
-                Occurrences of
-                <ItemsBlurb terms={props.terms}/>
-                in
-                <ItemsBlurb papers={props.papers}/>
-                from
-                <ItemsBlurb dateRange={props.dateRange}/>
-            </StyledCompactTicketLabel>
-        )
-    }else{
-        return(
-            <StyledTicketLabel>
-                Occurrences
-                <span>of</span>
-                <ItemsBlurb terms={props.terms}/>
-                in
-                <ItemsBlurb papers={props.papers}/>
-                from
-                <ItemsBlurb dateRange={props.dateRange}/>
-            </StyledTicketLabel>
-        )
-    }
+function TicketLabel(props) {
+    return (
+        <StyledTicketLabel compact={props.compact}>
+            Occurrences of
+            <ItemsBlurb terms={props.terms}/>
+            {!!props.linkTerm && `when it appears within ${props.linkDistance} words of "${props.linkTerm}" `}
+            in
+            <ItemsBlurb papers={props.papers}/>
+            from
+            <ItemsBlurb dateRange={props.dateRange}/>
+        </StyledTicketLabel>
+    )
 }
 
-const StyledCompactTicketLabel = styled.div`
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+const StyledTicketLabel = styled.div`
+    display: flex;
+    font-size: ${props => props.compact ? '15px' : '25px'};
+    flex-direction: ${props => props.compact ? 'column' : 'row'};
+    flex-wrap: wrap;
+    align-items: ${props => props.compact ? 'flex-start' : 'center'};
+    gap: ${props => props.compact ? '5px' : '10px'};
     position: relative;
-    overflow: scroll;
-    font-size: 15px;
+    overflow-y: ${props => props.compact ? 'auto' : 'hidden'};
+    overflow-x: hidden;
 `;
 
 

@@ -41,13 +41,20 @@ export function TermInputBox(props) {
                     when it appears within
                     <ShadowedFocusInput
                         selected
+                        id={'linkDistance'}
+                        value={props.linkDistance}
+                        onChange={props.onLinkDistanceChange}
                         type={'number'}
+                        min={0}
                         placeholder={'10'}
                         width={'50px'}
                         backgroundColor={'white'}
                     />
                     words of
                     <ShadowedFocusInput
+                        id={'linkTerm'}
+                        value={props.linkTerm}
+                        onChange={props.onLinkTermChange}
                         selected
                         type={'text'}
                         placeholder={'another term'}
@@ -58,7 +65,9 @@ export function TermInputBox(props) {
             <LesserButton
                 onClick={() => setShowLinkedSearch(!showLinkedSearch)}
                 borderRadius="0px 0px 10px 10px"
-                width={'50px'}
+                width={'30px'}
+                borderTop={''}
+                zIndex={0.5}
             >
                 <AddLinkIcon/>
                 Link

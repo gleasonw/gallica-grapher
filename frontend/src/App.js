@@ -111,6 +111,8 @@ function App() {
         Object.keys(tickets).map((ticketID) => (
             ticketsWithJustCodes[ticketID] = {
                 terms: tickets[ticketID].terms,
+                linkTerm: tickets[ticketID].linkTerm,
+                linkDistance: tickets[ticketID].linkDistance,
                 codes: tickets[ticketID].papersAndCodes.map(
                     (paperAndCode) => (paperAndCode.code)),
                 dateRange: tickets[ticketID].dateRange

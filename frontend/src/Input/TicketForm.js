@@ -5,35 +5,34 @@ import {PaperInputBox} from "./PeriodicalInputs/PaperInputBox";
 import {TermInputBox} from "./TermInputBox";
 import RequestBoxAndFetchButtonWrap from "./RequestBoxAndFetchButtonWrap";
 
-function TicketForm(props){
+function TicketForm(props) {
     const [showNoTermsReminder, setShowNoTermsReminder] = useState(false);
 
-    function handleSubmit(e){
+    function handleSubmit(e) {
         e.preventDefault();
         if ((!props.tickets || Object.keys(props.tickets).length === 0)
             &&
-            (props.termInput === ''))
-        {
+            (props.termInput === '')) {
             setShowNoTermsReminder(true)
-        }else{
+        } else {
             props.onSubmit(e);
         }
     }
 
-    function handleCreateTicketClick(){
-        if(props.termInput !== '') {
+    function handleCreateTicketClick() {
+        if (props.termInput !== '') {
             props.onCreateTicketClick();
-        }else{
+        } else {
             setShowNoTermsReminder(true);
         }
     }
 
-    function handleTermChange(e){
+    function handleTermChange(e) {
         setShowNoTermsReminder(false);
         props.handleTermChange(e);
     }
 
-    return(
+    return (
         <form
             onSubmit={handleSubmit}
             className='userInputForm'
@@ -46,8 +45,12 @@ function TicketForm(props){
                 termInput={props.termInput}
                 handleTermChange={handleTermChange}
                 noTermsReminder={showNoTermsReminder}
+                linkTerm={props.linkTerm}
+                linkDistance={props.linkDistance}
+                onLinkTermChange={props.onLinkTermChange}
+                onLinkDistanceChange={props.onLinkDistanceChange}
             />
-            <br />
+            <br/>
             <label>in these periodicals:</label>
             <PaperInputBox
                 onClick={props.onPaperDropItemClick}
@@ -62,12 +65,12 @@ function TicketForm(props){
                 onFocus={props.onPaperInputFocus}
             />
             <div ref={props.requestBoxRef}>
-            <StyledRequestBox
-                tickets={props.tickets}
-                onTicketClick={props.onTicketClick}
-                className={'requestBox'}
-                onCreateTicketClick={handleCreateTicketClick}
-            />
+                <StyledRequestBox
+                    tickets={props.tickets}
+                    onTicketClick={props.onTicketClick}
+                    className={'requestBox'}
+                    onCreateTicketClick={handleCreateTicketClick}
+                />
             </div>
             <RequestBoxAndFetchButtonWrap>
                 <ImportantButtonWrap>

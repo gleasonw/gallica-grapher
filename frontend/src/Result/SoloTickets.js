@@ -26,6 +26,9 @@ function SoloTicketResult(props) {
                 terms={props.ticket.terms}
                 papers={props.ticket.papersAndCodes}
                 dateRange={props.ticket.dateRange}
+                linkTerm={props.ticket.linkTerm}
+                linkDistance={props.ticket.linkDistance}
+                compact={false}
             />
             <RecordsViewer
                 tickets={{[props.ticketID]: props.ticket}}

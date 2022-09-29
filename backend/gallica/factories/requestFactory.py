@@ -8,21 +8,34 @@ from dbops.schemaLinkForSearch import SchemaLinkForSearch
 from fetchComponents.concurrentfetch import ConcurrentFetch
 from gallica.request import Request
 from utils.psqlconn import PSQLconn
+from gallica.ticket import Ticket
 
 
 class RequestFactory:
 
     def __init__(self, tickets, requestid):
-        print(f"tickets: {tickets}")
         self.dbConn = PSQLconn().getConn()
         self.requestID = requestid
-        self.tickets = tickets
+        self.tickets = [
+            Ticket(
+                key=key,
+                terms=ticket['terms'],
+                codes=ticket['codes'],
+                dateRange=ticket['dateRange'],
+                linkTerm=ticket.get('linkTerm'),
+                linkDistance=ticket.get('linkDistance')
+            )
+            for key, ticket in tickets.items()
+        ]
         self.occurrenceQueryBuilder = OccurrenceQueryBuilder()
 
     def build(self) -> Request:
         return Request(
             requestID=self.requestID,
-            ticketSearches=list(map(self.buildTicketSearch, self.tickets)),
+            ticketSearches=list(map(
+                self.buildTicketSearch,
+                self.tickets
+            )),
             dbConn=self.dbConn
         )
 
@@ -55,5 +68,3 @@ class RequestFactory:
             sruFetch=sruFetcher,
             paperAdd=paperSearch.addRecordDataForTheseCodesToDB,
         )
-
-

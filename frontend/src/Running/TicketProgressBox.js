@@ -23,6 +23,8 @@ export function TicketProgressBox(props) {
                 terms={props.terms}
                 papers={props.papers}
                 dateRange={props.dateRange}
+                linkTerm={props.linkTerm}
+                linkDistance={props.linkDistance}
             />
             <StyledProgressStats>
                 {

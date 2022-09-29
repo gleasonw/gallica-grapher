@@ -131,7 +131,7 @@ header{
     margin-bottom: 10px;
     align-items: center;
     display: flex;
-    overflow: scroll;
+    overflow: auto;
     flex-direction: row;
     border-radius: 8px;
     gap: 10px;
@@ -189,7 +189,7 @@ header{
 .ticketBubbleContainer{
     display: flex;
     flex-direction: row;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 .requestBubble{
     border: 1px solid #404040;
@@ -277,7 +277,7 @@ button, input[type="submit"], input[type="button"] {
     flex-direction: row;
     justify-content: space-between;
     flex-wrap: nowrap;
-    overflow-x: scroll;
+    overflow-x: auto;
     width: 100%;
     max-width: 100%;
     padding: 10px 20px 10px 20px;
@@ -378,7 +378,7 @@ label[for="papers"],label[for="searchTerm"]{
     padding-bottom: 10px;
     max-height: 300px;
     display: block;
-    overflow-y: scroll;
+    overflow-y: auto;
     font-size: 16px;
     width: 100%;
     border-color: slategray;
@@ -408,7 +408,7 @@ label[for="papers"],label[for="searchTerm"]{
 
 .queryProgressUI{
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     margin-top: 30px;
     justify-content: center;
     align-items: center;

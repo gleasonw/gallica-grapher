@@ -1,4 +1,3 @@
-from ticket import Ticket
 from requestFactory import RequestFactory
 import time
 import psutil
@@ -11,8 +10,7 @@ from paperQueryFactory import PaperQueryFactory
 
 
 def runTests():
-
-    ticket = getSearchOneTermInAllPapersOverRange()
+    ticket = getSearchOneTermInOnePaperOverRange()
 
     try:
         doTest(ticket)
@@ -22,7 +20,7 @@ def runTests():
 
 
 def doTest(ticket):
-    testRequestFactory = RequestFactory([ticket], '45')
+    testRequestFactory = RequestFactory(ticket, '45')
     testRequest = testRequestFactory.build()
     testRequest.start()
     while not testRequest.finished:
@@ -32,42 +30,15 @@ def doTest(ticket):
 
 
 def getSearchOneTermInOnePaperOverRange():
-    testTicket = Ticket(
-        '1234',
-        ['brazza'],
-        ['cb32895690j'],
-        '1863,1944'
-    )
-    return testTicket
-
-
-def getSearchOneTermInTwoPapersOverRange():
-    testTicket = Ticket(
-        '1234',
-        ['brazza'],
-        ['cb328066631', 'cb32895690j'],
-        '1900'
-    )
-    return testTicket
-
-
-def getSearchTwoTermsInTwoPapersOverRange():
-    testTicket = Ticket(
-        '1234',
-        ['brazza', 'paris'],
-        ['cb328066631', 'cb32895690j'],
-        '1900,1930'
-    )
-    return testTicket
-
-
-def getSearchOneTermInAllPapersOverRange():
-    testTicket = Ticket(
-        '1234',
-        ['brazza'],
-        [],
-        ['1850','1950']
-    )
+    testTicket = {
+        0: {
+            'terms': ['brazza'],
+            'codes': [],
+            'dateRange': ['1863', '1944'],
+            'linkTerm': None,
+            'linkDistance': None
+        }
+    }
     return testTicket
 
 
@@ -86,7 +57,6 @@ def getAllPapers():
         insert=dbLink.insertRecordsIntoPapers
     )
     paperSearch.addAllFetchableRecordsToDB()
-
 
 
 if __name__ == '__main__':

@@ -15,6 +15,7 @@ export function FilterOptions(props) {
                 <label htmlFor='year'>Year</label>
                 <ShadowedFocusInput
                     type={'number'}
+                    min={0}
                     selected
                     value={!!props.year ? props.year : ''}
                     id={'year'}
@@ -101,7 +102,9 @@ export function FilterOptions(props) {
                     }
                 >
                     <option value={''}>All</option>
-                    {props.terms.map((term) => <option value={term}>{term}</option>)}
+                    {props.terms.map((subTerm) => {
+                        return subTerm.map((term) => <option value={term}>{term}</option>)
+                    })}
                 </StyledSelect>
             </StyledInputAndLabel>
             <StyledInputAndLabel>

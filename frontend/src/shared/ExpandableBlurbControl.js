@@ -3,7 +3,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {BlurbText} from "./BlurbText";
 import styled from "styled-components";
-import {TextClipper} from "./TextClipper";
 
 export function ExpandableBlurbControl(props) {
     const [expanded, setExpanded] = useState(false);
@@ -19,27 +18,21 @@ export function ExpandableBlurbControl(props) {
 
     return (
         <StyledBlurbAndPlusLabel onClick={handleClick}>
-            <BlurbText>
-                <TextClipper>
-                {props.shortenedItems}
-                </TextClipper>
-            </BlurbText>
+            <BlurbText>{props.shortenedItems}</BlurbText>
             {
                 expanded ?
-                        <StyledPeriodicalDropdownTable>
-                            <tbody>
-                                {props.items.map((item) => (
-                                    <tr key={item}>
-                                        <td>{item}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </StyledPeriodicalDropdownTable>
+                    <StyledPeriodicalDropdownTable>
+                        {props.items.map((item) => (
+                            <tr key={item}>
+                                <td>{item}</td>
+                            </tr>
+                        ))}
+                    </StyledPeriodicalDropdownTable>
                     :
-                <span>
-                + {props.numItemsRemaining} more
-                {arrow}
-                </span>
+                    <span>
+                        + {props.numItemsRemaining} more
+                        {arrow}
+                    </span>
 
             }
         </StyledBlurbAndPlusLabel>
@@ -50,10 +43,12 @@ const StyledBlurbAndPlusLabel = styled.div`
     min-height: 72.5px;
     cursor: pointer;
     position: relative;
-    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
 `;
 
-const StyledPeriodicalDropdownTable = styled.table`
+const StyledPeriodicalDropdownTable = styled.div`
     td{
         padding: 10px;
     }
@@ -61,16 +56,14 @@ const StyledPeriodicalDropdownTable = styled.table`
         background-color: #f2f2f2;
     }
     font-size: 14px;
-    max-width: 600px;
-    overflow-y: scroll;
-    max-height: 300px;
+    max-height: 100px;
+    overflow-y: auto;
+    top: 0;
     td:hover{
         overflow: visible;
         white-space: normal;
         height: auto;
     }
-    position: absolute;
-    z-index: 1;
     background-color: white;
     min-width: 140px;
     border-left: 1px solid #d9d9d9;
@@ -78,9 +71,3 @@ const StyledPeriodicalDropdownTable = styled.table`
     border-bottom: 1px solid #d9d9d9;
     cursor: pointer;
     `;
-
-const StyledDrop = styled.div`
-    position: relative;
-    width: 599px;
-`;
-

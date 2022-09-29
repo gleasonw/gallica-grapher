@@ -6,7 +6,10 @@ import {ExampleBox} from "./ExampleBox";
 //TODO: add a reducer
 function Input(props){
     const exampleBoxRef = useRef(null);
+
     const [terms, setTerms] = useState([]);
+    const [linkTerm, setLinkTerm] = useState(null);
+    const [linkDistance, setLinkDistance] = useState(null);
     const [termInput, setTermInput] = useState('');
     const [userSelectedPapers, setUserSelectedPapers] = useState([]);
     const [selectedPaperInput, setSelectedPaperInput] = useState(0);
@@ -50,10 +53,12 @@ function Input(props){
 
     function handleSubmit(event){
         event.preventDefault();
-        const numTickets = Object.keys(props.tickets).length
-        if(numTickets === 0) {
+        const currentNumTickets = Object.keys(props.tickets).length
+        if(currentNumTickets === 0) {
             const ticket = {
                 terms: terms,
+                linkTerm: linkTerm,
+                linkDistance: linkDistance,
                 papersAndCodes: getPapersFor(selectedPaperInput),
                 dateRange: getDateRangeFor(selectedPaperInput)
             }
@@ -151,9 +156,11 @@ function Input(props){
 
     function handleCreateTicketClick(){
         props.onCreateTicketClick({
-            'terms': terms,
-            'papersAndCodes': getPapersFor(selectedPaperInput),
-            'dateRange': getDateRangeFor(selectedPaperInput)
+            terms: terms,
+            linkTerm: linkTerm,
+            linkDistance: linkDistance,
+            papersAndCodes: getPapersFor(selectedPaperInput),
+            dateRange: getDateRangeFor(selectedPaperInput)
         });
         setTermInput('');
         setTerms([]);
@@ -275,6 +282,10 @@ function Input(props){
                     onPaperDropItemClick={handlePaperDropdownClick}
                     terms={terms}
                     termInput={termInput}
+                    linkTerm={linkTerm}
+                    linkDistance={linkDistance}
+                    onLinkTermChange={(e) => setLinkTerm(e.target.value)}
+                    onLinkDistanceChange={(e) => setLinkDistance(e.target.value)}
                     handleTermChange={handleTermChange}
                     userSelectedPapers={userSelectedPapers}
                     deleteTermBubble={deleteTermBubble}
@@ -299,7 +310,7 @@ function Input(props){
                     type='button'
                     aria-label='Scroll to examples'
                     onClick={handleSeeExamplesClick}
-                    value='Or tour through some examples ↓'
+                    value='Or view an example ↓'
                 />
             </div>
         <ExampleBox

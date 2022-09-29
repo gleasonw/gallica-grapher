@@ -5,7 +5,9 @@ class Ticket:
             key,
             terms,
             codes,
-            dateRange
+            dateRange,
+            linkTerm,
+            linkDistance
     ):
         self.key = key
         self.terms = terms
@@ -15,6 +17,8 @@ class Ticket:
         self.queries = None
         self.estimateNumResults = 0
         self.numResultsRetrieved = 0
+        self.linkTerm = linkTerm
+        self.linkDistance = linkDistance
 
     def setQueries(self, queries):
         self.queries = queries
@@ -26,4 +30,4 @@ class Ticket:
         self.numResultsRetrieved = numResultsRetrieved
 
     def __repr__(self):
-        return f"Ticket({self.key}, {self.terms}, {self.codes}, {self.startYear}, {self.endYear})"
+        return f"Ticket({self.key}, {self.terms}, {self.codes}, {self.startYear}, {self.endYear}, {self.linkTerm}, {self.linkDistance})"

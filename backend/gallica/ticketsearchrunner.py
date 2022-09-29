@@ -40,9 +40,6 @@ class TicketSearchRunner:
                 xml=data,
                 startYear=self.ticket.startYear
             ))
-            if records is None:
-                print("Empty records???")
-                continue
             for record in records:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,
@@ -53,6 +50,7 @@ class TicketSearchRunner:
             self.schema.insertRecordsIntoResults(recordsWithPapersInDB)
 
     #TODO: investigate why codes are null sometimes
+    #TODO: create a list of query blocks to retry
     def insertMissingPapersToDB(self, records):
         codesFromRecords = set(record.paperCode for record in records)
         if not codesFromRecords:

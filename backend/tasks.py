@@ -1,7 +1,6 @@
 from celery import Celery
 from gallica.factories.requestFactory import RequestFactory
 import time
-from gallica.ticket import Ticket
 
 app = Celery()
 app.config_from_object('celery_settings')
@@ -9,19 +8,11 @@ app.config_from_object('celery_settings')
 
 @app.task(bind=True)
 def spawnRequest(self, tickets, requestid):
-    ticketOptions = [
-        Ticket(
-            key=key,
-            terms=ticket['terms'],
-            codes=ticket['codes'],
-            dateRange=ticket['dateRange'],
-        )
-        for key, ticket in tickets.items()
-    ]
-    request = RequestFactory(
-        ticketOptions,
+    factory = RequestFactory(
+        tickets,
         requestid
-    ).build()
+    )
+    request = factory.build()
     request.start()
     while True:
         if request.finished:
