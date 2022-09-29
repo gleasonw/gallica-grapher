@@ -3,7 +3,7 @@
 This tool exists thanks to the wondrously open and interesting Gallica API,
 a product of the French national archives. I used the API for undergraduate research on
 19th century French culture. Now that I have
-graduated, time is momentarily (I hope) plentiful, and I'm trying my hand at making a website out of it. Pull requests and feedback are welcome. 
+graduated, time is plentiful, and I'm trying my hand at making a website out of it. Pull requests and feedback are welcome. 
 
 www.gallicagrapher.com
 
