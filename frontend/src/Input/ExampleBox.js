@@ -5,11 +5,15 @@ import ClassicUIBox from "../shared/ClassicUIBox";
 import Ticket from "./Ticket";
 import {descriptions} from "./ExampleDescriptions";
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
+import useWindowDimensions from "../shared/hooks/useWindowDimensions";
+import {StyledSelect} from "../shared/StyledSelect";
 
 export function ExampleBox(props) {
     const exampleJSONdata = require('./exampleRequests.json')
     const exampleRequests = exampleJSONdata["requests"]
     const [selectedExample, setSelectedExample] = useState('Colonialism')
+    const {width} = useWindowDimensions();
+    let compact = width < 800;
 
     return (
         <ClassicUIBox
@@ -19,18 +23,31 @@ export function ExampleBox(props) {
             width={'auto'}
             minHeight={'50vw'}
         >
-            <StyledExampleSelector>
-                {Object.keys(exampleRequests).map((requestName) => (
-                    <StyledExampleButtonSelect
-                        key={requestName}
-                        onClick={() => setSelectedExample(requestName)}
-                        selected={requestName === selectedExample}
-                    >
-                        <h1>{requestName}</h1>
-                    </StyledExampleButtonSelect>
-                ))}
-            </StyledExampleSelector>
+            {!compact &&
+                <StyledExampleSelector>
+                    {Object.keys(exampleRequests).map((requestName) => (
+                        <StyledExampleButtonSelect
+                            key={requestName}
+                            onClick={() => setSelectedExample(requestName)}
+                            selected={requestName === selectedExample}
+                        >
+                            <h1>{requestName}</h1>
+                        </StyledExampleButtonSelect>
+                    ))}
+                </StyledExampleSelector>
+            }
             <StyledExampleContext>
+                {compact &&
+                    <StyledSelect
+                        id={'exampleSelect'}
+                        value={selectedExample}
+                        onChange={(e) => setSelectedExample(e.target.value)}
+                    >
+                        {Object.keys(exampleRequests).map((requestName) => (
+                            <option key={requestName} value={requestName}>{requestName}</option>
+                        ))}
+                    </StyledSelect>
+                }
                 <ExampleRequest request={exampleRequests[selectedExample]}/>
                 <StyledContextReader>
                     <div dangerouslySetInnerHTML={{__html: descriptions[selectedExample]}}/>
@@ -47,22 +64,22 @@ export function ExampleBox(props) {
     )
 }
 
-function ExampleRequest(props){
+function ExampleRequest(props) {
     const tickets = props.request["tickets"]
     const numTickets = Object.keys(tickets).length
-    return(
-            <div className={'exampleRequest'}>
-                {Object.keys(tickets).map((ticket, index) => (
-                    <Ticket
-                        ticket={tickets[ticket]}
-                        key={ticket}
-                        ticketID={ticket}
-                        firstInRow={index === 0}
-                        lastInRow={index === numTickets - 1}
-                        maxWidth={'200px'}
-                    />
-                ))}
-            </div>
+    return (
+        <div className={'exampleRequest'}>
+            {Object.keys(tickets).map((ticket, index) => (
+                <Ticket
+                    ticket={tickets[ticket]}
+                    key={ticket}
+                    ticketID={ticket}
+                    firstInRow={index === 0}
+                    lastInRow={index === numTickets - 1}
+                    maxWidth={'200px'}
+                />
+            ))}
+        </div>
     )
 }
 
