@@ -6,7 +6,7 @@ descriptions['Colonialism'] = `
 
 descriptions['Colors'] =`
 <p>Today's color spectrum results from decades of experimentation, construction, and meaning-making, much of it occurring in the 19th century. </p>
-<p>A lecture on the history of color inspired this search selection, “bleu clair” [light blue] and “bleu pastel” [pastel blue]. The chart tracks their slow rise to popularity. The first periodicals to mention the colors are mostly scientific journals, describing experimental processes or by-products. Towards the end of the 19th-century, the colors begin to appear in fashion contexts. </p>
+<p>A lecture on the history of color inspired this search selection. The chart tracks the slow rise of “bleu clair” [light blue] and “bleu pastel” [pastel blue]. The first periodicals to mention the colors are mostly scientific journals, describing experimental processes or by-products. Towards the end of the 19th-century, the colors begin to appear in fashion contexts. </p>
 `;
 
 descriptions['Arts'] = `

@@ -49,7 +49,7 @@ export function ExampleBox(props) {
                     </StyledSelect>
                 }
                 <ExampleRequest request={exampleRequests[selectedExample]}/>
-                <StyledContextReader>
+                <StyledContextReader compact={compact}>
                     <div dangerouslySetInnerHTML={{__html: descriptions[selectedExample]}}/>
                 </StyledContextReader>
                 <ImportantButtonWrap
@@ -116,5 +116,5 @@ const StyledContextReader = styled.div`
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-    text-align: justify;
+    text-align: ${props => props.compact ? 'left' : 'justify'};
     `;
