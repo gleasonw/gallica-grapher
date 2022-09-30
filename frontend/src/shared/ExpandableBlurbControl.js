@@ -51,6 +51,7 @@ const StyledBlurbAndPlusLabel = styled.div`
 const StyledPeriodicalDropdownTable = styled.div`
     td{
         padding: 10px;
+        max-width: 400px;
     }
     tr:nth-child(even){
         background-color: #f2f2f2;

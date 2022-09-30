@@ -35,7 +35,7 @@ class TicketSearchRunner:
         self.ticket.setNumResultsRetrieved(self.numResultsRetrieved)
 
     def pipeRecordsToDB(self, returnValues):
-        for data, query in returnValues:
+        for data, term in returnValues:
             records = list(self.parse.occurrences(
                 xml=data,
                 startYear=self.ticket.startYear
@@ -44,7 +44,7 @@ class TicketSearchRunner:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,
                     requestID=self.requestID,
-                    term=query.term
+                    term=term
                 )
             recordsWithPapersInDB = self.insertMissingPapersToDB(records)
             self.schema.insertRecordsIntoResults(recordsWithPapersInDB)

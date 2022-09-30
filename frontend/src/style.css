@@ -5,6 +5,7 @@ body {
     background-size: auto;
     background-origin: padding-box;
     background-clip: border-box;
+    height: 100%;
 }
 .highlight{
     background-color: yellow;
