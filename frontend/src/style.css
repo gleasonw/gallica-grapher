@@ -109,6 +109,7 @@ header{
     #createTicketButton, #graphButton{
         font-size: 20px !important;
     }
+
 }
 .userInputForm{
     width: 100%;
@@ -441,7 +442,6 @@ label[for="papers"],label[for="searchTerm"]{
     display: flex;
     justify-content: center;
     flex-direction: column;
-    padding: 0 50px 50px 50px;
 }
 .groupedLabelBar{
     display: flex;

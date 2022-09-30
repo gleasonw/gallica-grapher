@@ -42,5 +42,4 @@ export function RecordRows(props) {
 }
 
 const StyledOCRTD = styled.td`
-    width: auto;
     `;

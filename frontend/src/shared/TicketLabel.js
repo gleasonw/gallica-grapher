@@ -18,7 +18,7 @@ function TicketLabel(props) {
 
 const StyledTicketLabel = styled.div`
     display: flex;
-    font-size: ${props => props.compact ? '15px' : '25px'};
+    font-size: ${props => props.compact ? '18px' : '25px'};
     flex-direction: ${props => props.compact ? 'column' : 'row'};
     flex-wrap: wrap;
     align-items: ${props => props.compact ? 'flex-start' : 'center'};

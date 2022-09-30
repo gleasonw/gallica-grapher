@@ -4,7 +4,7 @@ export const StyledOccurrenceTable = styled.table`
     border-collapse: collapse;
     width: 100%;
     td{
-        padding: 5px;
+        padding: 10px;
         border: 1px solid #ddd;
     }
     td:hover{

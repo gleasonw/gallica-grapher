@@ -33,6 +33,7 @@ export function TicketPaperOccurrenceStats(props) {
 
 const StyledTopPaperTable = styled.table`
     margin-top: 20px;
+    margin-bottom: 30px;
     td {
         padding: 5px;
     }

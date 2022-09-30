@@ -10,6 +10,7 @@ import useWindowDimensions from "../shared/hooks/useWindowDimensions";
 import {FilterOptions} from "./FilterOptions";
 import {RecordRows} from "./RecordRows";
 import {SelectionBubble} from "../shared/SelectionBubble";
+import DownloadCSVButton from "./DownloadCSVButton";
 
 export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(10);
@@ -140,14 +141,20 @@ function StyledFilterAndTable(props) {
                     onOutsidePopupClick={props.onOutsidePopupClick}
                 />
                 {!props.compact &&
-                    <TicketPaperOccurrenceStats
-                        tickets={Object.keys(props.tickets)}
-                        requestID={props.requestID}
-                        cacheID={props.cacheID}
-                    />
+                    <div>
+                        <TicketPaperOccurrenceStats
+                            tickets={Object.keys(props.tickets)}
+                            requestID={props.requestID}
+                            cacheID={props.cacheID}
+                        />
+                        <DownloadCSVButton
+                            tickets={props.tickets}
+                            requestID={props.requestID}
+                        />
+                    </div>
                 }
             </StyledFilterAndTopPapersWrap>
-            <div>
+            <StyledAppliedFiltersTableWrap>
                 <AppliedFilters
                     year={props.year}
                     month={props.month}
@@ -195,7 +202,7 @@ function StyledFilterAndTable(props) {
                         onClick={props.onLoadMoreClick}
                     />
                 }
-            </div>
+            </StyledAppliedFiltersTableWrap>
         </StyledFilterAndTableWrap>
     )
 }
@@ -274,6 +281,12 @@ const StyledRecordsViewer = styled.div`
     flex-direction: column;
     position: relative;
     `;
+
+const StyledAppliedFiltersTableWrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+`;
 
 
 

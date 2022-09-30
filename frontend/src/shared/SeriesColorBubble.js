@@ -12,9 +12,9 @@ export default function SeriesColorBubble(props){
 const StyledSeriesColorBubble = styled.div`
     background-color: ${props => props.color};
     border-radius: 50%;
-    height: 20px;
-    width: 20px;
+    height: 25px;
+    width: 25px;
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 8px;
+    right: 8px;
     `;

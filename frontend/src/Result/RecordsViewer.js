@@ -1,7 +1,6 @@
 import React, {useContext, useState} from "react";
 import DisplayRecordsTable from "./DisplayRecordsTable";
 import Chart from "./Chart";
-import DownloadCSVButton from "./DownloadCSVButton";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import styled from "styled-components";
@@ -74,10 +73,6 @@ export default function RecordsViewer(props){
                         onTermChange={setRecordsTableTerm}
                         cacheID={props.cacheID}
                     />
-                <DownloadCSVButton
-                    tickets={props.tickets}
-                    requestID={props.requestID}
-                />
             </ClassicUIBox>
         </StyledRecordsViewer>
     )

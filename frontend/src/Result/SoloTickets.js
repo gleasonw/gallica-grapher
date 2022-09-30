@@ -21,7 +21,7 @@ function SoloTickets(props) {
 //TODO: sync timebin display with state
 function SoloTicketResult(props) {
     return (
-        <ClassicUIBox resize={'both'}>
+        <ClassicUIBox width={'100vw'}>
             <TicketLabel
                 terms={props.ticket.terms}
                 papers={props.ticket.papersAndCodes}
