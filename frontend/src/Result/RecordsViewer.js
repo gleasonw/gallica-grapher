@@ -41,11 +41,10 @@ export default function RecordsViewer(props){
 
     //TODO: fix the date offset
     function handleDaySeriesClick(unix){
-        // const date = new Date(unix);
-        // console.log(date.getDay())
-        // setRecordsTableYear(date.getFullYear());
-        // setRecordsTableMonth(date.getUTCMonth() + 1);
-        // setRecordsTableDay(date.getUTCDay());
+        const date = new Date(unix);
+        setRecordsTableYear(date.getUTCFullYear());
+        setRecordsTableMonth(date.getUTCMonth() + 1);
+        setRecordsTableDay(date.getUTCDate());
     }
 
     return (

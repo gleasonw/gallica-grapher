@@ -304,9 +304,13 @@ class TicketGraphSeries:
                 return day
 
         def dateToTimestamp(date):
-            dateObject = ciso8601.parse_datetime(date)
-            dateObject = dateObject.replace(tzinfo=datetime.timezone.utc)
-            timestamp = datetime.datetime.timestamp(dateObject) * 1000
+            try:
+                dateObject = ciso8601.parse_datetime(date)
+                dateObject = dateObject.replace(tzinfo=datetime.timezone.utc)
+                timestamp = datetime.datetime.timestamp(dateObject) * 1000
+            except ValueError:
+                print(f"erred with date: {date}")
+                return None
             return timestamp
 
         if self.timeBin == "day":

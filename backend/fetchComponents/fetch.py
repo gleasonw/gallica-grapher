@@ -36,7 +36,7 @@ class Fetch:
             print(f"Error: {response.status}")
             print(f"Error: {response.data}")
         returnsForQueryType = {
-            Query: (response.data, query.term, end - start),
+            Query: (response.data, query, end - start),
             NumOccurrencesForTermQuery: (response.data, query.cql),
             NumPapersOnGallicaQuery: (response.data, query.cql),
             PaperQuery: (response.data, query.cql),

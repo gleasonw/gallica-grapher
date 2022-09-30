@@ -26,14 +26,12 @@ class Parse:
 
     def occurrences(self, xml, startYear) -> list:
         elements = etree.fromstring(xml)
+        parsedRecords = []
         if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
-            etree.dump(elements)
+            return []
         for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             data = self.getDataFromRecordRoot(record)
             paperCode = self.getPaperCode(data)
-            if paperCode is None:
-                etree.dump(xml)
-                continue
             date = self.getDate(data)
             recordYear = date.getYear()
             if recordYear and int(recordYear) < int(startYear):
@@ -43,7 +41,8 @@ class Parse:
                 date=date,
                 url=self.getURL(data),
             )
-            yield newRecord
+            parsedRecords.append(newRecord)
+        return parsedRecords
 
     def onePaperTitleFromOccurrenceBatch(self, responseXML) -> str:
         elements = etree.fromstring(responseXML)

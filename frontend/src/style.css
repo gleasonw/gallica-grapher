@@ -1,11 +1,10 @@
-body {
-    background-position-x: 0;
-    background-position-y: 0;
+html{
     background: #dcdcdc linear-gradient(to bottom, #dcdcdc, #edebe9 200px) no-repeat;
-    background-size: auto;
-    background-origin: padding-box;
-    background-clip: border-box;
     height: 100%;
+}
+body{
+    height: 100%;
+    background: inherit;
 }
 .highlight{
     background-color: yellow;

@@ -20,6 +20,7 @@ class TicketSearchRunner:
         self.schema = schemaLink
         self.onUpdateProgress = None
         self.numResultsRetrieved = 0
+        self.numQueriesFailed = 0
 
     def setProgressTracker(self, progressTracker):
         self.onUpdateProgress = progressTracker
@@ -29,25 +30,49 @@ class TicketSearchRunner:
             self.ticket.queries,
             self.progressTrackWithPaper
         )
-        self.pipeRecordsToDB(responseData)
+        records, retries = self.parseRecords(responseData)
+        if retries:
+            resolvedRecords = self.retryFailedQueriesOnce(retries)
+            records.extend(resolvedRecords)
+        self.pipeRecordsToDB(records)
         self.schema.removeDuplicateRecordsInTicket(self.ticket.key)
         self.numResultsRetrieved = self.schema.getNumResultsForTicket(self.ticket.key)
         self.ticket.setNumResultsRetrieved(self.numResultsRetrieved)
 
-    def pipeRecordsToDB(self, returnValues):
-        for data, term in returnValues:
-            records = list(self.parse.occurrences(
+    def parseRecords(self, responseValues):
+        queriesToRetry = []
+        parsedRecords = []
+        for data, query in responseValues:
+            records = self.parse.occurrences(
                 xml=data,
                 startYear=self.ticket.startYear
-            ))
+            )
+            if records is None:
+                print(f'No records found for query: {query}')
+                queriesToRetry.append(query)
             for record in records:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,
                     requestID=self.requestID,
-                    term=term
+                    term=query.term
                 )
-            recordsWithPapersInDB = self.insertMissingPapersToDB(records)
-            self.schema.insertRecordsIntoResults(recordsWithPapersInDB)
+                parsedRecords.append(record)
+        return parsedRecords, queriesToRetry
+
+    def retryFailedQueriesOnce(self, queriesToRetry):
+        print('Retrying search for queries:')
+        print(queriesToRetry)
+        retryData = self.SRUfetch.fetchAll(queriesToRetry)
+        resolved, failedQueries = self.parseRecords(retryData)
+        if failedQueries:
+            print('Failed to resolve queries:')
+            print(failedQueries)
+            self.numQueriesFailed = len(failedQueries)
+        return resolved
+
+    def pipeRecordsToDB(self, records):
+        recordsWithPapersInDB = self.insertMissingPapersToDB(records)
+        self.schema.insertRecordsIntoResults(recordsWithPapersInDB)
 
     #TODO: create a list of query blocks to retry
     def insertMissingPapersToDB(self, records):

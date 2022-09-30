@@ -164,6 +164,12 @@ function Input(props){
         });
         setTermInput('');
         setTerms([]);
+        setContinuousDateRange(['','']);
+        setCustomPapersDateRange(['','']);
+        setFullSearchDateRange(['','']);
+        setUserSelectedPapers([]);
+        setLinkDistance(10);
+        setLinkTerm('');
     }
 
 
