@@ -32,6 +32,9 @@ class Fetch:
             fields=query.getParams()
         )
         end = time.perf_counter()
+        if response.status != 200:
+            print(f"Error: {response.status}")
+            print(f"Error: {response.data}")
         returnsForQueryType = {
             Query: (response.data, query.term, end - start),
             NumOccurrencesForTermQuery: (response.data, query.cql),

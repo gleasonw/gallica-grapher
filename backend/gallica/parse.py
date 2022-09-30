@@ -27,7 +27,6 @@ class Parse:
     def occurrences(self, xml, startYear) -> list:
         elements = etree.fromstring(xml)
         if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
-            print("no records bug")
             etree.dump(elements)
         for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             data = self.getDataFromRecordRoot(record)

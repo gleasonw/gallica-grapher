@@ -9,7 +9,7 @@ function Input(props){
 
     const [terms, setTerms] = useState([]);
     const [linkTerm, setLinkTerm] = useState(null);
-    const [linkDistance, setLinkDistance] = useState(null);
+    const [linkDistance, setLinkDistance] = useState(10);
     const [termInput, setTermInput] = useState('');
     const [userSelectedPapers, setUserSelectedPapers] = useState([]);
     const [selectedPaperInput, setSelectedPaperInput] = useState(0);

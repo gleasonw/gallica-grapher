@@ -35,7 +35,7 @@ class TicketSearchRunner:
         self.ticket.setNumResultsRetrieved(self.numResultsRetrieved)
 
     def pipeRecordsToDB(self, returnValues):
-        for data, term in returnValues:
+        for data, query in returnValues:
             records = list(self.parse.occurrences(
                 xml=data,
                 startYear=self.ticket.startYear
@@ -44,12 +44,11 @@ class TicketSearchRunner:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,
                     requestID=self.requestID,
-                    term=term
+                    term=query.term
                 )
             recordsWithPapersInDB = self.insertMissingPapersToDB(records)
             self.schema.insertRecordsIntoResults(recordsWithPapersInDB)
 
-    #TODO: investigate why codes are null sometimes
     #TODO: create a list of query blocks to retry
     def insertMissingPapersToDB(self, records):
         codesFromRecords = set(record.paperCode for record in records)
