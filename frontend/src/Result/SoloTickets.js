@@ -21,7 +21,7 @@ function SoloTickets(props) {
 //TODO: sync timebin display with state
 function SoloTicketResult(props) {
     return (
-        <ClassicUIBox width={'100vw'}>
+        <ClassicUIBox width={'100vw'} padding={'0'}>
             <TicketLabel
                 terms={props.ticket.terms}
                 papers={props.ticket.papersAndCodes}
@@ -29,6 +29,7 @@ function SoloTicketResult(props) {
                 linkTerm={props.ticket.linkTerm}
                 linkDistance={props.ticket.linkDistance}
                 compact={false}
+                center
             />
             <RecordsViewer
                 tickets={{[props.ticketID]: props.ticket}}

@@ -19,22 +19,24 @@ export function RecordRows(props) {
                         {(year && month && !day) && `${year}/${month}`}
                         {(year && !month && !day) && `${year}`}
                     </td>
-                    <td>{periodical}</td>
+                    {!props.compact && <td>{periodical}</td>}
                     <td>{term}</td>
-                    <td>
-                        <a
-                            href={gallicaLink}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                        >
-                            {gallicaLink}</a>
-                    </td>
                     <StyledOCRTD>
                         <OCRText
                             term={term}
                             arkCode={arkCode}
                         />
                     </StyledOCRTD>
+                    {!props.compact &&
+                        <td>
+                            <a
+                                href={gallicaLink}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                            >
+                                {gallicaLink}</a>
+                        </td>
+                    }
                 </tr>
             )
         })

@@ -4,6 +4,7 @@ import Chart from "./Chart";
 import {GraphSettingsContext} from "./GraphSettingsContext";
 import ClassicUIBox from "../shared/ClassicUIBox";
 import styled from "styled-components";
+import useWindowDimensions from "../shared/hooks/useWindowDimensions";
 
 export default function RecordsViewer(props){
     const settings = useContext(GraphSettingsContext);
@@ -13,6 +14,8 @@ export default function RecordsViewer(props){
     const [recordsTableDay, setRecordsTableDay] = useState(null);
     const [recordsTableTerm, setRecordsTableTerm] = useState(null);
     const [recordsTablePeriodical, setRecordsTablePeriodical] = useState(null);
+    const {width} = useWindowDimensions();
+    let compact = width < 800;
     const seriesClickHandlers = {
         'year': handleYearSeriesClick,
         'month': handleMonthSeriesClick,
@@ -47,7 +50,7 @@ export default function RecordsViewer(props){
 
     return (
         <StyledRecordsViewer>
-            <ClassicUIBox>
+            <ClassicUIBox padding={compact ? '0' : '20px'}>
                 <Chart
                     tickets={props.tickets}
                     settingsID={props.settingsID}
@@ -72,6 +75,7 @@ export default function RecordsViewer(props){
                         onPeriodicalChange={setRecordsTablePeriodical}
                         onTermChange={setRecordsTableTerm}
                         cacheID={props.cacheID}
+                        compact={compact}
                     />
             </ClassicUIBox>
         </StyledRecordsViewer>

@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import NavBarWrap from "./NavBarWrap";
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import LesserButton from "../shared/LesserButton";
-import useWindowDimensions from "../shared/hooks/useWindowDimensions";
 import {FilterOptions} from "./FilterOptions";
 import {RecordRows} from "./RecordRows";
 import {SelectionBubble} from "../shared/SelectionBubble";
@@ -16,8 +15,6 @@ export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
     const [showFilterPopup, setShowFilterPopup] = useState(false);
-    const {width} = useWindowDimensions();
-    let compact = width < 1200;
     let recordsQuery =
         "/api/getDisplayRecords?" +
         "tickets=" + Object.keys(props.tickets) +
@@ -58,7 +55,7 @@ export default function DisplayRecordsTable(props) {
     return (
         <StyledRecordsViewer>
             <NavBarWrap>
-                <h2>
+                <h3>
                     View {count}
                     {
                         [props.year, props.month, props.day, props.periodical, props.term].some(Boolean) ?
@@ -66,9 +63,9 @@ export default function DisplayRecordsTable(props) {
                             :
                             ' total occurrences'
                     }
-                </h2>
+                </h3>
                 {
-                    compact &&
+                    props.compact &&
                     <LesserButton
                         children={'Filter'}
                         onClick={() => setShowFilterPopup(true)}
@@ -77,7 +74,7 @@ export default function DisplayRecordsTable(props) {
             </NavBarWrap>
             <StyledFilterAndTable
                 onOutsidePopupClick={() => setShowFilterPopup(false)}
-                compact={compact}
+                compact={props.compact}
                 show={showFilterPopup}
                 year={props.year}
                 month={props.month}
@@ -171,16 +168,17 @@ function StyledFilterAndTable(props) {
                     <tbody>
                     <tr>
                         <th>Date</th>
-                        <th>Periodical</th>
+                        {!props.compact && <th>Periodical</th>}
                         <th>Term</th>
-                        <th>Full text image on Gallica</th>
-                        <th>Scanned text (approximate)</th>
+                        <th>Scanned context (approximate)</th>
+                        {!props.compact && <th>Full text image on Gallica</th>}
                     </tr>
                     {props.displayRecords ?
                         props.displayRecords.length > 0 ?
                             <RecordRows
                                 rows={props.displayRecords}
                                 offset={props.offset}
+                                compact={props.compact}
                             />
                             :
                             <tr>

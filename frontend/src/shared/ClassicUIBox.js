@@ -9,7 +9,8 @@ const ClassicUIBox = styled.div`
     border-bottom-right-radius: 3px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    padding: 30px;
+    padding: ${props => props.padding ? props.padding : '20px'};
+    padding-top: ${props => props.paddingTop ? props.paddingTop : '20px'};
     width: ${props => props.width ? props.width : '100%'};
     height: ${props => props.height || '100%'};
     min-height: ${props => props.minHeight || '100%'};

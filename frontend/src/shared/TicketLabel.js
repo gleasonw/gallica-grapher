@@ -4,7 +4,7 @@ import ItemsBlurb from "./ItemsBlurb";
 
 function TicketLabel(props) {
     return (
-        <StyledTicketLabel compact={props.compact}>
+        <StyledTicketLabel compact={props.compact} center={props.center}>
             Occurrences of
             <ItemsBlurb terms={props.terms}/>
             {!!props.linkTerm && `when it appears within ${props.linkDistance} words of "${props.linkTerm}" `}
@@ -26,6 +26,7 @@ const StyledTicketLabel = styled.div`
     position: relative;
     overflow-y: ${props => props.compact ? 'auto' : 'hidden'};
     overflow-x: hidden;
+    align-self: ${props => props.center ? 'center' : 'flex-start'};
 `;
 
 
