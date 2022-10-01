@@ -22,8 +22,8 @@ export default function Info(props){
                     The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. 
                     Culture became national. Individual opinions ascended to group opinions; “public opinion” rose into being,
                     looming over the political class, and the press was its handler. </p>
-                    <p>This app integrates with a vast archive of digital periodicals through the {GallicaAPILink}.
-                    The archive allows for text searches over thousands of periodicals. I take responses from Gallica, group them, and create a trend line.
+                    <p>This app integrates with a vast archive of periodicals through the {GallicaApiLink}, allowing for rapid text searches over thousands of periodicals. The app routes requests to Gallica,
+                        parses the responses, and creates a trend line.
                     Selecting a point will bring up the associated records in a table beneath the graph.
                     </p>
                 </section>
@@ -38,25 +38,22 @@ export default function Info(props){
                 <section>
                     <ol>
                         <li>Enter a term into the search bar;</li>
-                        <br/>
+                        <li>For a finer search, link another term (e.g., "portland" within 5 words of "Oregon")</li>
                         <li>Select a grouping of periodicals to survey;</li>
-                        <br/>
-                        <li>If you would like to add a search (another trend line on the graph), click "compare";</li>
-                        <br/>
+                        <li>If you would like to add a second search, up to a maximum of 5, click "compare";</li>
                         <li>Click the 'Fetch and Graph 📊' button;</li>
-                        <br/>
-                        <li>Watch the results roll in. If your term is especially popular, I would recommend a cup of tea. Requests run concurrently, but to avoid
+                        <li>Watch the results roll in. If your term is popular, I would recommend a cup of tea. Requests run concurrently, but to avoid
                             blasting the French national library's servers, I have erred on a smaller number of worker threads.</li>
                     </ol>
                 </section>
                 <h3>What do I see on the results page?</h3>
                 <section>
                     <p>The Gallica API returns a record for any occurrence of a term in a periodical issue. I parse these records
-                        and group occurrences within the same year, month, or on the same day to create a time series for each request.</p>
+                        and group occurrences within the same year, month, or day to create a time series for each request.</p>
                 </section>
                 <section>
                     <p>
-                    Beneath the chart is a table of the records pulled from Gallica, with links to the scanned text in which it occurs. Clicking on
+                    Beneath the chart is a table of the records pulled from Gallica, with links to text in which it occurs. Clicking on
                     a point in the chart will list the corresponding records. You can also make direct requests by entering
                     a date above the table.
                     </p>
