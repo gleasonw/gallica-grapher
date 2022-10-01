@@ -9,6 +9,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
 import ClassicUIBox from "./shared/ClassicUIBox";
 import ImportantButtonWrap from "./shared/ImportantButtonWrap";
+import NavBarWrap from "./Result/NavBarWrap";
 
 
 function App() {
