@@ -18,10 +18,14 @@ export default function Info(props){
             <ClassicUIBox>
                 <h1>The Gallica Grapher</h1>
                 <section>
-                    <p>This tool exists thanks to the wondrously open and interesting {GallicaApiLink},
-                    a product of the French National archives. I used the API for undergraduate research on
-                    19th century French culture. Now that I have
-                        graduated, time is plentiful, and I'm trying to make an app out of it.</p>
+                    <p>Culture and identity were once local, the products of word-of-mouth and idle conversation. 
+                    The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. 
+                    Culture became national. Individual opinions ascended to group opinions; “public opinion” rose into being,
+                    looming over the political class, and the press was its handler. </p>
+                    <p>This app integrates with a vast archive of digital periodicals through the {GallicaAPILink}.
+                    The archive allows for text searches over thousands of periodicals. I take responses from Gallica, group them, and create a trend line.
+                    Selecting a point will bring up the associated records in a table beneath the graph.
+                    </p>
                 </section>
                 <h3>Do I need to speak French to use it?</h3>
                 <section>
