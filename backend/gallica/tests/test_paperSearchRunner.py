@@ -29,13 +29,8 @@ class TestPaperSearchRunner(TestCase):
         self.productionAddPublishingYears = self.testSearch.addPublishingYearsToPaperRecord
         self.testSearch.addPublishingYearsToPaperRecord = MagicMock()
 
-        self.productionConvertQueries = self.testSearch.convertResponseToRecords
-        self.testSearch.convertResponseToRecords = MagicMock()
-
     def test_add_record_data_for_these_codes_to_db(self):
-        self.testSearch.addRecordDataForTheseCodesToDB = self.productionAddCodes
-
-        self.testSearch.addRecordDataForTheseCodesToDB(['code1', 'code2'])
+        self.productionAddCodes(['code1', 'code2'])
 
         self.testSearch.queryFactory.buildSRUqueriesForCodes.assert_called_once_with(['code1', 'code2'])
         self.testSearch.doSearch.assert_called_once_with(

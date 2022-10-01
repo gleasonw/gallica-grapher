@@ -74,11 +74,8 @@ class TicketSearchRunner:
         recordsWithPapersInDB = self.insertMissingPapersToDB(records)
         self.schema.insertRecordsIntoResults(recordsWithPapersInDB)
 
-    #TODO: create a list of query blocks to retry
     def insertMissingPapersToDB(self, records):
         codesFromRecords = set(record.paperCode for record in records)
-        if not codesFromRecords:
-            return records
         schemaMatches = self.schema.getPaperCodesThatMatch(codesFromRecords)
         setOfCodesInDB = set(match[0] for match in schemaMatches)
         missingCodes = codesFromRecords - setOfCodesInDB

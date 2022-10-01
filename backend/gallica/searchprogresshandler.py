@@ -23,7 +23,7 @@ class SearchProgressHandler:
     def getTicketID(self):
         return self.ticket.key
 
-    def run(self):
+    def initSearch(self):
         self.search.setProgressTracker(self.updateProgressStats)
         self.search.search()
 

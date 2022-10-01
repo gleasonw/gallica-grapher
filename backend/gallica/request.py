@@ -70,7 +70,7 @@ class Request(threading.Thread):
         for progressHandler in self.ticketSearches:
             progressHandler.setProgressCallback(self.setTicketProgressStats)
             self.setTicketActive(progressHandler)
-            progressHandler.run()
+            progressHandler.initSearch()
             self.setTicketProgressTo100AndMarkAsDone(progressHandler)
         self.finished = True
 

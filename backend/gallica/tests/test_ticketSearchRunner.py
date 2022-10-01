@@ -25,9 +25,6 @@ class TestTicketSearchRunner(TestCase):
         self.productionSearch = self.testSearch.search
         self.testSearch.search = MagicMock()
 
-        self.productionRemoveDuplicates = self.testSearch.removeDuplicateRecords
-        self.testSearch.removeDuplicateRecords = MagicMock()
-
         self.productionInsertMissingPapersToDB = self.testSearch.insertMissingPapersToDB
         self.testSearch.insertMissingPapersToDB = MagicMock()
 
@@ -36,6 +33,9 @@ class TestTicketSearchRunner(TestCase):
 
         self.productionProgressTrackWithPaper = self.testSearch.progressTrackWithPaper
         self.testSearch.progressTrackWithPaper = MagicMock()
+
+        self.productionPipeRecordsToDB = self.testSearch.pipeRecordsToDB
+        self.testSearch.pipeRecordsToDB = MagicMock()
 
     def test_search(self):
         self.testSearch.queries = [['query1'], ['query2']]
@@ -47,7 +47,7 @@ class TestTicketSearchRunner(TestCase):
             call(['query1'], self.testSearch.progressTrackWithPaper),
             call(['query2'], self.testSearch.progressTrackWithPaper),
         ])
-        self.testSearch.removeDuplicateRecords.assert_called()
+        self.testSearch.pipeRecordsToDB.assert_called()
         self.testSearch.insertMissingPapersToDB.assert_called()
         self.testSearch.schema.insertRecordsIntoResults.assert_called()
         self.testSearch.schema.fetchNumResultsForQueries.assert_called_with(

@@ -109,7 +109,7 @@ class TestRequest(TestCase):
         self.productionDoAllSearches()
 
         for searchHandler in self.testRequest.ticketSearches:
-            searchHandler.run.assert_called_once()
+            searchHandler.initSearch.assert_called_once()
             searchHandler.setProgressCallback.assert_called_once_with(
                 self.testRequest.setTicketProgressStats
             )
