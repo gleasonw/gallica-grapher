@@ -9,10 +9,8 @@ conn = PSQLconn().getConn()
 class RecordDataForUser:
 
     ticketResultsWithPaperName = """
-    SELECT searchterm, title, year, month, day, identifier
+    SELECT searchterm, papertitle, year, month, day, identifier
     FROM results
-    JOIN papers
-    ON results.paperid = papers.code
     WHERE ticketid in %(tickets)s
     AND requestid = %(requestID)s
     """
@@ -20,8 +18,6 @@ class RecordDataForUser:
     countResultsSelect = """
     SELECT COUNT(*)
     FROM results
-    JOIN papers
-    ON results.paperid = papers.code
     WHERE ticketid in %(tickets)s
     AND requestid = %(requestID)s
     """
@@ -56,7 +52,7 @@ class RecordDataForUser:
         {'AND month = %(month)s' if month else ''}
         {'AND day = %(day)s' if day else ''}
         {'AND searchterm = %(term)s' if term else ''}
-        {'AND LOWER(title) LIKE %(periodical)s' if periodical else ''}
+        {'AND LOWER(papertitle) LIKE %(periodical)s' if periodical else ''}
         """
         limitOrderingOffset = f"""
         ORDER BY year, month, day
@@ -100,4 +96,16 @@ class RecordDataForUser:
             """, (requestID,))
             self.conn.commit()
 
+    def getTopPapers(self, requestID, tickets):
+        with self.conn.cursor() as cursor:
+            cursor.execute("""
+            SELECT papertitle, count(papertitle) AS papercount
+                FROM results
+                WHERE requestid = %s
+                AND ticketid in %s
+                GROUP BY papertitle
+                ORDER BY papercount DESC
+                LIMIT 10;
+            """, (requestID, tickets,))
+            return cursor.fetchall()
 

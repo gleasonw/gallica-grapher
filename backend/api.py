@@ -7,7 +7,6 @@ import random
 from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
-from dbops.topPapersForTicket import TopPapersForTicket
 from dbops.recordDataForUser import RecordDataForUser
 
 
@@ -124,11 +123,11 @@ def getGraphData():
 @app.route('/api/topPapers')
 def getTopPapersFromID():
     ticketIDS = tuple(request.args["tickets"].split(","))
-    topPapers = TopPapersForTicket(
+    topPapers = RecordDataForUser().getTopPapers(
         tickets=ticketIDS,
         requestID=request.args["requestID"],
     )
-    items = {"topPapers": topPapers.getTopPapers()}
+    items = {"topPapers": topPapers}
     return items
 
 

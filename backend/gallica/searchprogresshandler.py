@@ -10,6 +10,8 @@ class SearchProgressHandler:
         self.numBatches = ceil(self.ticket.estimateNumResults / 50)
         self.averageResponseTime = None
         self.onUpdateProgress = None
+        self.onAddMissingPapers = None
+        self.onAddResults = None
 
     def getNumRetrievedForTicket(self):
         return self.ticket.numResultsRetrieved
@@ -23,9 +25,9 @@ class SearchProgressHandler:
     def getTicketID(self):
         return self.ticket.key
 
-    def initSearch(self):
+    def initSearch(self, props):
         self.search.setProgressTracker(self.updateProgressStats)
-        self.search.search()
+        self.search.search(props)
 
     def updateProgressStats(
             self,

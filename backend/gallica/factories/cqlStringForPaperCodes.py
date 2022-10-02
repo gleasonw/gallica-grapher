@@ -1,4 +1,4 @@
-NUM_CODES_PER_CQL = 5
+NUM_CODES_PER_CQL = 15
 
 
 class CQLStringForPaperCodes:

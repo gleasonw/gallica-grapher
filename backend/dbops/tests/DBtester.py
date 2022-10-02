@@ -1,8 +1,8 @@
 import os
 
+from recordDataForUser import getTopPapers
 from utils.psqlconn import PSQLconn
 from dbops.graphSeriesBatch import TicketGraphSeries
-from topPapersForTicket import TopPapersForTicket
 
 
 class DBtester:
@@ -31,7 +31,7 @@ class DBtester:
             ticketID='testticket',
             continuous=continuous,
             dateRange=dateRange)
-        testResults = topPapers.getTopPapers()
+        testResults = getTopPapers(topPapers.conn, topPapers.requestID, topPapers.tickets)
         self.deleteTestResultsFromFinal()
         return testResults
 

@@ -14,21 +14,33 @@ def spawnRequest(self, tickets, requestid):
     )
     request = factory.build()
     request.start()
+    responsesForRequestState = {
+        'finished': {
+            'status': 'Completed'
+        },
+        'tooManyRecords': {
+            'status': 'Too many records!',
+            'numRecords': request.estimateNumRecords
+        },
+        'noRecords': {
+            'status': 'No records found!'
+        },
+        'error': {
+            'status': 'Error'
+        },
+        'addingRecords': {
+            'status': 'addingRecords'
+        },
+        'addingMissingPapers': {
+            'status': 'addingMissingPapers'
+        },
+        'removingDuplicates': {
+            'status': 'removingDuplicates'
+        }
+    }
     while True:
-        if request.finished:
-            return {
-                'status': 'Complete!',
-                'result': 42}
-        elif request.tooManyRecords:
-            return {
-                'status': 'Too many records!',
-                'numRecords': request.estimateNumRecords
-            }
-        elif request.noRecords:
-            return {
-                'status': 'No records found!',
-                'numRecords': 0
-            }
+        if responsesForRequestState.get(request.state):
+            return responsesForRequestState[request.state]
         else:
             self.update_state(
                 state="PROGRESS",

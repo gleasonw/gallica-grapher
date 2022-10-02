@@ -9,28 +9,29 @@ class PaperSearchRunner:
             sruFetch,
             paperQueryFactory,
             arkFetch,
-            insert
+            addPapersToDB=None
     ):
         self.parse = parse
         self.queryFactory = paperQueryFactory
         self.SRUfetch = sruFetch
         self.ARKfetch = arkFetch
-        self.insertIntoPapers = insert
+        self.addPapersToDB = addPapersToDB
 
     def addRecordDataForTheseCodesToDB(self, codes):
+        print(f'Adding {len(codes)} paper records to DB')
         queries = list(self.queryFactory.buildSRUQueriesForCodes(codes))
-        self.doSearch(queries)
+        return self.doSearch(queries)
 
     def addAllFetchableRecordsToDB(self):
         queries = self.queryFactory.buildAllRecordsQueries()
-        self.doSearch(queries)
+        records = self.doSearch(queries)
+        self.addPapersToDB(records)
 
     def doSearch(self, queries):
         response = self.SRUfetch.fetchAll(queries)
         for data, cql in response:
             records = self.parse.papers(data)
-            recordsWithPublishingYears = self.getPublishingYearsForRecords(records)
-            self.insertIntoPapers(recordsWithPublishingYears)
+            yield from self.getPublishingYearsForRecords(records)
 
     def getPublishingYearsForRecords(self, records):
         records = list(records)

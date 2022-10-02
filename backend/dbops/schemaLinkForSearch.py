@@ -2,13 +2,13 @@ import io
 
 
 class SchemaLinkForSearch:
-    def __init__(self, conn, requestID=None):
+    def __init__(self, conn, paperFetcher=None, requestID=None):
         self.conn = conn
         self.requestID = requestID
-        self.CSVstreamBuilder = CSVStream().generateCSVstreamFromRecords
+        self.fetchRecordsForTheseCodes = paperFetcher
 
     def insertRecordsIntoPapers(self, records):
-        csvStream = self.CSVstreamBuilder(records)
+        csvStream = self.buildCSVstream(records)
         with self.conn.cursor() as curs:
             curs.copy_from(
                 csvStream,
@@ -16,11 +16,13 @@ class SchemaLinkForSearch:
                 sep='|'
             )
 
-    def insertRecordsIntoResults(self, records):
-        csvStream = self.CSVstreamBuilder(records)
+    def insertRecordsIntoResults(self, props):
+        stream, codes = self.buildCSVstreamAndGetCodes(props['records'])
+        self.insertMissingPapersToDB(codes, props['onAddMissingPapers'])
+        props['onAddResults']()
         with self.conn.cursor() as curs:
             curs.copy_from(
-                csvStream,
+                stream,
                 'results',
                 sep='|',
                 columns=(
@@ -29,11 +31,23 @@ class SchemaLinkForSearch:
                     'month',
                     'day',
                     'searchterm',
-                    'paperid',
                     'ticketid',
-                    'requestid'
+                    'requestid',
+                    'papercode',
+                    'papertitle'
                 )
             )
+        props['onRemoveDuplicateRecords']()
+        self.removeDuplicateRecordsInTicket(props['ticketID'])
+
+    def insertMissingPapersToDB(self, codes, onAddMissingPapers):
+        schemaMatches = self.getPaperCodesThatMatch(codes)
+        setOfCodesInDB = set(match[0] for match in schemaMatches)
+        missingCodes = codes - setOfCodesInDB
+        if missingCodes:
+            onAddMissingPapers()
+            paperRecords = self.fetchRecordsForTheseCodes(list(missingCodes))
+            self.insertRecordsIntoPapers(paperRecords)
 
     def getPaperCodesThatMatch(self, codes):
         with self.conn.cursor() as curs:
@@ -42,6 +56,61 @@ class SchemaLinkForSearch:
                 (tuple(codes),)
             )
             return curs.fetchall()
+
+    def buildCSVstreamAndGetCodes(self, records):
+        csvFileLikeObject = io.StringIO()
+        codes = set()
+        for record in records:
+            codes.add(record.paperCode)
+            self.writeToCSVstream(csvFileLikeObject, record)
+        csvFileLikeObject.seek(0)
+        return csvFileLikeObject, codes
+
+    def buildCSVstream(self, records):
+        csvFileLikeObject = io.StringIO()
+        for record in records:
+            self.writeToCSVstream(csvFileLikeObject, record)
+        csvFileLikeObject.seek(0)
+        return csvFileLikeObject
+
+    def writeToCSVstream(self, stream, record):
+        stream.write("|".join(map(
+            self.cleanCSVrow,
+            record.getRow()
+        )) + '\n')
+
+    def removeDuplicateRecordsInTicket(self, ticketID):
+        with self.conn.cursor() as curs:
+            curs.execute(
+                """
+                WITH ticketRecords AS (
+                    SELECT ctid, year, month, day, papertitle, searchterm, ticketid, requestid
+                    FROM results
+                    WHERE ticketid = %s
+                    AND requestid = %s
+                )
+                DELETE FROM results a USING (
+                    SELECT MIN(ctid) as ctid, year, month, day, papertitle, searchterm, ticketid, requestid
+                    FROM ticketRecords
+                    GROUP BY year, month, day, papertitle, searchterm, ticketid, requestid
+                    HAVING COUNT(*) > 1
+                ) b
+                WHERE a.requestid = b.requestid
+                AND a.ticketid = b.ticketid
+                AND a.year = b.year
+                AND (a.month = b.month OR (a.month IS NULL AND b.month IS NULL))
+                AND (a.day = b.day OR (a.day IS NULL AND b.day IS NULL))
+                AND a.papertitle = b.papertitle
+                AND a.searchterm = b.searchterm
+                AND a.ctid <> b.ctid;
+                """,
+                (ticketID, self.requestID,)
+            )
+
+    def cleanCSVrow(self, value):
+        if value is None:
+            return r'\N'
+        return str(value).replace('|', '\\|')
 
     def getNumResultsForTicket(self, ticketID):
         with self.conn.cursor() as curs:
@@ -56,51 +125,3 @@ class SchemaLinkForSearch:
             )
             return curs.fetchone()[0]
 
-    def removeDuplicateRecordsInTicket(self, ticketID):
-        with self.conn.cursor() as curs:
-            curs.execute(
-                """
-                WITH ticketRecords AS (
-                    SELECT ctid, year, month, day, paperid, searchterm, ticketid, requestid
-                    FROM results
-                    WHERE ticketid = %s
-                    AND requestid = %s
-                )
-                DELETE FROM results a USING (
-                    SELECT MIN(ctid) as ctid, year, month, day, paperid, searchterm, ticketid, requestid
-                    FROM ticketRecords
-                    GROUP BY year, month, day, paperid, searchterm, ticketid, requestid
-                    HAVING COUNT(*) > 1
-                ) b
-                WHERE a.requestid = b.requestid
-                AND a.ticketid = b.ticketid
-                AND a.year = b.year
-                AND (a.month = b.month OR (a.month IS NULL AND b.month IS NULL))
-                AND (a.day = b.day OR (a.day IS NULL AND b.day IS NULL))
-                AND a.paperid = b.paperid
-                AND a.searchterm = b.searchterm
-                AND a.ctid <> b.ctid;
-                """,
-                (ticketID, self.requestID,)
-            )
-
-
-class CSVStream:
-
-    def __init__(self):
-        pass
-
-    def generateCSVstreamFromRecords(self, records):
-        csvFileLikeObject = io.StringIO()
-        for record in records:
-            csvFileLikeObject.write("|".join(map(
-                self.cleanCSVrow,
-                record.getRow()
-            )) + '\n')
-        csvFileLikeObject.seek(0)
-        return csvFileLikeObject
-
-    def cleanCSVrow(self, value):
-        if value is None:
-            return r'\N'
-        return str(value).replace('|', '\\|')

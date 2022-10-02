@@ -112,9 +112,10 @@ const StyledExampleContext = styled.div`
     `;
 
 const StyledContextReader = styled.div`
-    width: ${props => props.compact ? '100%' : '50%'};
+    width: ${props => props.compact ? '100%' : '70%'};
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
     text-align: ${props => props.compact ? 'left' : 'justify'};
+    line-height: 1.75;
     `;

@@ -21,30 +21,42 @@
             "1865",
             "1910"
           ]
+        },
+        "rose": {
+          "terms": [
+            "rose"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1910"
+          ],
+          "linkTerm": "pantalon",
+          "linkDistance": 5
         }
       }
     },
     "Arts": {
       "tickets": {
         "Art Nouveau": {
-            "terms": [
-                "\"art nouveau\""
-            ],
-            "papersAndCodes": [],
-            "dateRange": [
-                "1865",
-                "1930"
-            ]
+          "terms": [
+            "\"art nouveau\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1930"
+          ]
         },
         "Art deco": {
-            "terms": [
-                "\"arts decoratifs\""
-            ],
-            "papersAndCodes": [],
-            "dateRange": [
-                "1865",
-                "1930"
-            ]
+          "terms": [
+            "\"arts decoratifs\""
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            "1865",
+            "1930"
+          ]
         }
       }
     },
@@ -60,7 +72,7 @@
             "1930"
           ]
         },
-        "pain au chocolat": {
+        "brioche": {
           "terms": [
             "brioche"
           ],
@@ -70,15 +82,17 @@
             "1930"
           ]
         },
-        "viennoiserie": {
+        "croissant": {
           "terms": [
-            "viennoiserie"
+            "croissant"
           ],
           "papersAndCodes": [],
           "dateRange": [
             "1865",
             "1930"
-          ]
+          ],
+          "linkTerm": "patisserie",
+          "linkDistance": 5
         }
       }
     },
@@ -93,6 +107,43 @@
             1870,
             1920
           ]
+        },
+        "manet": {
+          "terms": [
+            "scandale",
+            "scandaleux"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            1860,
+            1870
+          ],
+          "linkTerm": "manet",
+          "linkDistance": 30
+        },
+        "empoissonement": {
+          "terms": [
+            "scandale"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            1870,
+            1920
+          ],
+          "linkTerm": "empoisonnement",
+          "linkDistance": 30
+        },
+        "corruption": {
+          "terms": [
+            "scandale"
+          ],
+          "papersAndCodes": [],
+          "dateRange": [
+            1870,
+            1920
+          ],
+          "linkTerm": "corruption",
+          "linkDistance": 30
         }
       }
     },
@@ -221,9 +272,10 @@
             1951
           ]
         },
-        "mali": {
+        "conquete": {
             "terms": [
-                "mali"
+              "colonie",
+              "colonial"
             ],
             "papersAndCodes": [
                 {
@@ -260,48 +312,9 @@
             "dateRange": [
                 1854,
                 1951
-            ]
-        },
-        "mission civilisatrice": {
-            "terms": [
-                "\"mission civilisatrice\""
             ],
-            "papersAndCodes": [
-                {
-                "code": "cb32757974m",
-                "endDate": 1921,
-                "startDate": 1871,
-                "title": "Le XIXe siècle (Paris. 1871)"
-                },
-                {
-                "code": "cb328066631",
-                "endDate": 1940,
-                "startDate": 1865,
-                "title": "La Liberté"
-                },
-                {
-                "code": "cb328123058",
-                "endDate": 1944,
-                "startDate": 1884,
-                "title": "Le Matin (Paris. 1884)"
-                },
-                {
-                "code": "cb34355551z",
-                "endDate": 1951,
-                "startDate": 1854,
-                "title": "Le Figaro (Paris. 1854)"
-                },
-                {
-                "code": "cb32895690j",
-                "endDate": 1944,
-                "startDate": 1863,
-                "title": "Le Petit journal (Paris. 1863)"
-                }
-            ],
-            "dateRange": [
-                1854,
-                1951
-            ]
+            "linkTerm": "conquete",
+            "linkDistance": 20
         }
       }
     },
@@ -376,21 +389,21 @@
           ]
         },
         "rome": {
-            "terms": [
-                "rome"
-            ],
-            "papersAndCodes": [
-                {
-                "code": "cb32895690j",
-                "endDate": 1944,
-                "startDate": 1863,
-                "title": "Le Petit journal (Paris. 1863)"
-                }
-            ],
-            "dateRange": [
-                "1863",
-                "1944"
-            ]
+          "terms": [
+            "rome"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "dateRange": [
+            "1863",
+            "1944"
+          ]
         }
       }
     },
@@ -424,7 +437,9 @@
           "dateRange": [
             "1880",
             "1930"
-          ]
+          ],
+            "linkTerm": "oregon",
+            "linkDistance": 20
         }
       }
     }

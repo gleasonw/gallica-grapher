@@ -26,23 +26,23 @@ class Parse:
 
     def occurrences(self, xml, startYear) -> list:
         elements = etree.fromstring(xml)
-        parsedRecords = []
         if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
             return []
         for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
             data = self.getDataFromRecordRoot(record)
+            paperTitle = self.getPaperTitle(data)
             paperCode = self.getPaperCode(data)
             date = self.getDate(data)
             recordYear = date.getYear()
             if recordYear and int(recordYear) < int(startYear):
                 continue
             newRecord = self.makeOccurrenceRecord(
+                paperTitle=paperTitle,
                 paperCode=paperCode,
                 date=date,
                 url=self.getURL(data),
             )
-            parsedRecords.append(newRecord)
-        return parsedRecords
+            yield newRecord
 
     def onePaperTitleFromOccurrenceBatch(self, responseXML) -> str:
         elements = etree.fromstring(responseXML)

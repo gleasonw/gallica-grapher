@@ -7,7 +7,9 @@ function TicketLabel(props) {
         <StyledTicketLabel compact={props.compact} center={props.center}>
             Occurrences of
             <ItemsBlurb terms={props.terms}/>
-            {!!props.linkTerm && `when it appears within ${props.linkDistance} words of "${props.linkTerm}" `}
+            {!!props.linkTerm &&
+                `within ${props.linkDistance} words of "${props.linkTerm}" `
+            }
             in
             <ItemsBlurb papers={props.papers}/>
             from

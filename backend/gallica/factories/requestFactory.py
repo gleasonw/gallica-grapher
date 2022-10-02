@@ -49,22 +49,21 @@ class RequestFactory:
     def buildSearchRunner(self, ticket) -> TicketSearchRunner:
         parse = buildParser()
         sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
-        dbLink = SchemaLinkForSearch(
-            requestID=self.requestID,
-            conn=self.dbConn
-        )
         paperSearch = PaperSearchRunner(
             parse=parse,
             paperQueryFactory=PaperQueryFactory(),
             sruFetch=sruFetcher,
             arkFetch=ConcurrentFetch('https://gallica.bnf.fr/services/Issues'),
-            insert=dbLink.insertRecordsIntoPapers
+        )
+        dbLink = SchemaLinkForSearch(
+            requestID=self.requestID,
+            paperFetcher=paperSearch.addRecordDataForTheseCodesToDB,
+            conn=self.dbConn
         )
         return TicketSearchRunner(
             parse=parse,
             ticket=ticket,
             requestID=self.requestID,
             schemaLink=dbLink,
-            sruFetch=sruFetcher,
-            paperAdd=paperSearch.addRecordDataForTheseCodesToDB,
+            sruFetch=sruFetcher
         )

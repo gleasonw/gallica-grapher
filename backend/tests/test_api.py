@@ -3,6 +3,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import json
 
+from recordDataForUser import getTopPapers
+
 
 class TestAPI(unittest.TestCase):
 
@@ -68,7 +70,7 @@ class TestAPI(unittest.TestCase):
     @patch("backend.api.TopPapersForTicket")
     def test_getTopPapersFromID(self, mock_topPapers):
         mockedTopPapers = mock_topPapers.return_value
-        mockedTopPapers.getTopPapers.return_value = []
+        getTopPapers.return_value = []
         query = '/api/topPapers?id=tests&continuous=tests&dateRange=tests'
 
         testTopPapersFromID = self.app.get(query)

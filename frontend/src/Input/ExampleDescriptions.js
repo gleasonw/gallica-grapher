@@ -7,7 +7,8 @@ descriptions['Colonialism'] = `
 `;
 
 descriptions['Colors'] =`
-<p>A lecture on the history of color inspired this search selection. Today's color spectrum results from decades of experimentation, construction, and meaning-making, much of it occurring in the 19th century. The chart tracks the slow rise of “bleu clair” [light blue] and “bleu pastel” [pastel blue]. The first periodicals to mention the colors are mostly scientific journals, describing experimental processes or by-products. Towards the end of the 19th century, the colors begin to appear in fashion contexts. </p>
+<p>A lecture on the history of color inspired this search selection. Today's color spectrum results from decades of experimentation, construction, and meaning-making, much of it occurring in the 19th century. The chart tracks the slow rise of “bleu clair” [light blue] and “bleu pastel” [pastel blue]. The first periodicals to mention the colors are mostly scientific journals, describing experimental processes or by-products. Towards the end of the 19th century, the colors begin to appear in fashion contexts.</p>
+<p>For science, I include discussion of pink pants.</p>
 `;
 
 descriptions['Arts'] = `
@@ -35,9 +36,7 @@ descriptions['Capitals'] = `
 `;
 
 descriptions['Far West'] = `
-<p>This example tracks mentions of West Coast cities and is a bit of a personal curiosity. It reveals the stunning popularity of Portland in French periodicals, which is a good example of my app’s current limitations and the need to read the context surrounding a term’s appearance. </p> 
-<p>The Gallica API offers support for “proximity” searches, and integrating this into the app would aid dramatically in pinpointing relevant occurrences. A search for “Portland” within 5 words from “Oregon” would tell a different story than the current graph, which mostly tracks the popularity of the Isle of Portland, England.</p> 
-<p>With a more unique city name like Seattle or Los Angeles, though, the story is clearer. Interest in Seattle first peaks around 1908, with many occurrences coming from advertisements for circuitous sailings to Seattle. Los Angeles follows shortly after, with an outlier peak in January 1910. Perhaps a belated gold rush frenzy is driving European interest in the West Coast? Or steamboats have become more affordable for the average French reader? </p> 
-<p>Seattle in the 19th and early 20th centuries is also a chaotic place, and periodicals are happy to relate tales of revenge dynamitings, violent mobs, and other mayhem. Los Angeles is seemingly a bit calmer, with many mentions of air races. Interestingly, a French periodical from the port town of Marseille mentions Seattle more frequently than even the international edition of the New York Herald. </p> 
+<p>This example tracks mentions of a few American cities, emphasizing the interconnectedness of the 19th century and a growing international news cycle.</p> 
+<p>Seattle in the 19th and early 20th centuries was a chaotic place, and periodicals are happy to relate tales of revenge dynamitings, violent mobs, and other mayhem. Los Angeles appears a bit calmer, with many mentions of air races. Interestingly, a French periodical from the port town of Marseille mentions Seattle more frequently than even the international edition of the New York Herald. </p> 
 
 `;

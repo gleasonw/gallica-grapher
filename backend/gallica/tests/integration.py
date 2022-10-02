@@ -32,9 +32,9 @@ def doTest(ticket):
 def getSearchOneTermInOnePaperOverRange():
     testTicket = {
         0: {
-            'terms': ['washington'],
-            'codes': [],
-            'dateRange': ['1863', '1944'],
+            'terms': ['brazza'],
+            'codes': ['cb32895690j'],
+            'dateRange': ['1863', '1900'],
             'linkTerm': None,
             'linkDistance': None
         }
@@ -54,7 +54,7 @@ def getAllPapers():
         paperQueryFactory=PaperQueryFactory(),
         sruFetch=sruFetcher,
         arkFetch=ConcurrentFetch('https://gallica.bnf.fr/services/Issues'),
-        insert=dbLink.insertRecordsIntoPapers
+        addPapersToDB=dbLink.insertRecordsIntoPapers
     )
     paperSearch.addAllFetchableRecordsToDB()
 

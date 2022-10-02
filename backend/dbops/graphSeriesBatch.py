@@ -121,7 +121,7 @@ class TicketGraphSeries:
         self.request = """
         
         WITH ticket_results AS 
-            (SELECT year, month, day, paperid
+            (SELECT year, month, day, papercode
             FROM results 
             WHERE requestid=%s
             AND ticketid=%s
@@ -134,7 +134,7 @@ class TicketGraphSeries:
                 ticket_results
                     
                 JOIN papers 
-                ON ticket_results.paperid = papers.code
+                ON ticket_results.papercode = papers.code
                     AND papers.startdate <= %s
                     AND papers.enddate >= %s
                     AND continuous IS TRUE
@@ -173,7 +173,7 @@ class TicketGraphSeries:
     def initMonthContinuousPaperRequest(self):
         self.request = """
         WITH ticket_results AS
-            (SELECT year, month, paperid
+            (SELECT year, month, papercode
             FROM results 
             WHERE requestid=%s
             AND ticketid=%s
@@ -185,7 +185,7 @@ class TicketGraphSeries:
                     ticket_results
 
                     JOIN papers 
-                    ON ticket_results.paperid = papers.code
+                    ON ticket_results.papercode = papers.code
                         AND papers.startdate <= %s
                         AND papers.enddate >= %s
                         AND continuous IS TRUE
@@ -224,7 +224,7 @@ class TicketGraphSeries:
     def initYearContinuousPaperRequest(self):
         self.request = """
         WITH ticket_results AS
-            (SELECT year, paperid
+            (SELECT year, papercode
             FROM results 
             WHERE requestid=%s
             AND ticketid=%s
@@ -236,7 +236,7 @@ class TicketGraphSeries:
                 ticket_results
 
                 JOIN papers 
-                ON ticket_results.paperid = papers.code
+                ON ticket_results.papercode = papers.code
                     AND papers.startdate <= %s
                     AND papers.enddate >= %s
                     AND continuous IS TRUE

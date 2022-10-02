@@ -31,13 +31,13 @@ class QueryIndexer:
                     term=query.term
                 )
 
-    def makeIndexedPaperQueries(self):
+    def makeIndexedPaperQueries(self, totalResults):
         queries = []
-        for query in self.baseQueries:
-            for index in range(1, query.estimateNumRecordsToFetch, 50):
+        for cql in self.baseQueries:
+            for index in range(1, totalResults, 50):
                 queries.append(
                     PaperQuery(
-                        cql=query.cql,
+                        cql=cql,
                         startIndex=index
                     )
                 )

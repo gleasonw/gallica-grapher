@@ -24,6 +24,6 @@ class PaperQueryFactory:
             'dc.type all "fascicule" and ocrquality > "050.00"'
         )
         indexer = self.makeIndexer([query])
-        indexer.fetchNumResultsForQueries()
-        queries = indexer.makeIndexedPaperQueries()
+        totalResults = indexer.fetchNumResultsForQueries()
+        queries = indexer.makeIndexedPaperQueries(totalResults)
         return queries
