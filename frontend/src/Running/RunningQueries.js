@@ -42,20 +42,21 @@ function RunningQueriesUI(props) {
             )),
         'addingMissingPapers':
             <ClassicUIBox>
-                <h2>Fetching missing periodical data...</h2>
+                <h3>Fetching missing periodical data...</h3>
                 <CircularProgress/>
             </ClassicUIBox>,
         'addingResults':
             <ClassicUIBox>
-                <h2>Loading response data into my database...</h2>
+                <h3>Loading response data into my database...</h3>
                 <CircularProgress/>
             </ClassicUIBox>,
         'removingDuplicates':
             <ClassicUIBox>
-                <h2>Removing duplicate results (Gallica sometimes surfaces the same periodical from different websites)...</h2>
+                <h3>Removing duplicate results (Gallica sometimes surfaces the same periodical from different websites)...</h3>
                 <CircularProgress/>
             </ClassicUIBox>,
     }
+
     useInterval(async () => {
         const requestStateCallbacks = {
             "PROGRESS": () => setProgressStats(
@@ -66,7 +67,7 @@ function RunningQueriesUI(props) {
             ),
             "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON['numRecords']),
             "NO_RECORDS": props.onNoRecords,
-            "SUCCESS": props.onFinish,
+            "COMPLETED": props.onFinish,
             "PENDING": () => null,
             "ADDING_MISSING_PAPERS": () => setDisplayState('addingMissingPapers'),
             "ADDING_RESULTS": () => setDisplayState('addingResults'),
