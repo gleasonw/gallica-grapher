@@ -9,7 +9,6 @@ from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
 from dbops.recordDataForUser import RecordDataForUser
 
-
 app = Flask(__name__)
 CORS(app)
 requestIDSeed = random.randint(0, 10000)
@@ -30,7 +29,7 @@ def init():
 
 
 @app.route('/poll/progress/<taskID>')
-def getProgress(taskID):
+def getRequestState(taskID):
     task = spawnRequest.AsyncResult(taskID)
     state = task.state
     if state == 'PENDING':
@@ -43,17 +42,18 @@ def getProgress(taskID):
             'state': state,
             'progress': task.info.get('progress')
         }
+    elif state in [
+        'ADDING_MISSING_PAPERS',
+        'ADDING_RESULTS',
+        'REMOVING_DUPLICATES'
+    ]:
+        response = {'state': state}
     else:
         result = task.result
-        if result and result['status'] == 'Too many records!':
-            response = {
-                'state': "TOO_MANY_RECORDS",
-                'numRecords': result['numRecords']
-            }
-        elif result and result['status'] == 'No records found!':
-            response = {
-                'state': "NO_RECORDS"
-            }
+        if result:
+            response = {'state': result['status']}
+            if result['status'] == 'TOO_MANY_RECORDS':
+                response['numRecords'] = result['numRecords']
         else:
             response = {'state': "SUCCESS"}
     return response

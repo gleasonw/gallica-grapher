@@ -23,9 +23,10 @@ def doTest(ticket):
     testRequestFactory = RequestFactory(ticket, '45')
     testRequest = testRequestFactory.build()
     testRequest.start()
-    while not testRequest.finished:
+    while not testRequest.state == 'COMPLETED':
         print(psutil.Process().memory_info().rss / 1024 / 1024)
         print(testRequest.ticketProgressStats)
+        print(testRequest.state)
         time.sleep(1)
 
 
@@ -33,8 +34,8 @@ def getSearchOneTermInOnePaperOverRange():
     testTicket = {
         0: {
             'terms': ['brazza'],
-            'codes': ['cb32895690j'],
-            'dateRange': ['1863', '1900'],
+            'codes': [],
+            'dateRange': ['1863', '1944'],
             'linkTerm': None,
             'linkDistance': None
         }

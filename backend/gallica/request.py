@@ -10,7 +10,7 @@ class Request(threading.Thread):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.topPapersForTerms = []
-        self.state = 'running'
+        self.state = 'RUNNING'
         self.requestID = requestID
         self.estimateNumRecords = 0
         self.DBconnection = dbConn
@@ -32,11 +32,15 @@ class Request(threading.Thread):
             ]
         )
         if self.estimateNumRecords == 0:
-            self.state = 'noRecords'
+            self.state = 'NO_RECORDS'
         elif self.numResultsOverLimit():
-            self.state = 'tooManyRecords'
+            self.state = 'TOO_MANY_RECORDS'
         else:
-            self.doAllSearches()
+            try:
+                self.doAllSearches()
+            except Exception:
+                self.state = 'ERROR'
+                raise
         self.DBconnection.close()
 
     def initProgressStats(self):
@@ -73,12 +77,12 @@ class Request(threading.Thread):
             progressHandler.setProgressCallback(self.setTicketProgressStats)
             self.setTicketActive(progressHandler)
             progressHandler.initSearch({
-                'onAddMissingPapers': lambda: self.setRequestState('addingMissingPapers'),
-                'onAddResults': lambda: self.setRequestState('addingResults'),
-                'onRemoveDuplicateRecords': lambda: self.setRequestState('removingDuplicates')
+                'onAddMissingPapers': lambda: self.setRequestState('ADDING_MISSING_PAPERS'),
+                'onAddResults': lambda: self.setRequestState('ADDING_RESULTS'),
+                'onRemoveDuplicateRecords': lambda: self.setRequestState('REMOVING_DUPLICATES')
             })
             self.setTicketProgressTo100AndMarkAsDone(progressHandler)
-        self.state = 'finished'
+        self.state = 'COMPLETED'
 
     def setTicketActive(self, search):
         ticketID = search.getTicketID()

@@ -14,36 +14,42 @@ def spawnRequest(self, tickets, requestid):
     )
     request = factory.build()
     request.start()
-    responsesForRequestState = {
-        'finished': {
-            'status': 'Completed'
+    returnStates = {
+        'COMPLETED': {
+            'status': 'COMPLETED'
         },
-        'tooManyRecords': {
-            'status': 'Too many records!',
+        'TOO_MANY_RECORDS': {
+            'status': 'TOO_MANY_RECORDS',
             'numRecords': request.estimateNumRecords
         },
-        'noRecords': {
-            'status': 'No records found!'
+        'NO_RECORDS': {
+            'status': 'NO_RECORDS'
         },
-        'error': {
-            'status': 'Error'
-        },
-        'addingRecords': {
-            'status': 'addingRecords'
-        },
-        'addingMissingPapers': {
-            'status': 'addingMissingPapers'
-        },
-        'removingDuplicates': {
-            'status': 'removingDuplicates'
+        'ERROR': {
+            'status': 'ERROR'
         }
     }
+    pollStates = {
+        'RUNNING': lambda: self.update_state(
+            state='PROGRESS',
+            meta={'progress': request.getProgressStats()}
+        ),
+        'ADDING_MISSING_PAPERS': lambda: self.update_state(
+            state='ADDING_MISSING_PAPERS'
+        ),
+        'ADDING_RESULTS': lambda: self.update_state(
+            state='ADDING_RESULTS'
+        ),
+        'REMOVING_DUPLICATES': lambda: self.update_state(
+            state='REMOVING_DUPLICATES'
+        ),
+    }
     while True:
-        if responsesForRequestState.get(request.state):
-            return responsesForRequestState[request.state]
+        if response := returnStates.get(request.state):
+            return response
+        elif pollState := pollStates.get(request.state):
+            pollState()
         else:
-            self.update_state(
-                state="PROGRESS",
-                meta={'progress': request.getProgressStats()})
-            time.sleep(1)
+            print(f"Unknown state: {request.state}")
+        time.sleep(1)
 
