@@ -17,7 +17,7 @@ class SchemaLinkForSearch:
             )
 
     def insertRecordsIntoResults(self, props):
-        stream, codes = self.buildCSVstreamAndGetCodes(props['records'])
+        stream, codes = self.buildCSVstreamAndGetCodesAndEnsureNoDuplicates(props['records'])
         self.insertMissingPapersToDB(codes, props['onAddMissingPapers'])
         props['onAddResults']()
         with self.conn.cursor() as curs:
@@ -55,11 +55,23 @@ class SchemaLinkForSearch:
             )
             return curs.fetchall()
 
-    def buildCSVstreamAndGetCodes(self, records):
+    def buildCSVstreamAndGetCodesAndEnsureNoDuplicates(self, records):
         csvFileLikeObject = io.StringIO()
         codes = set()
+        codeDates = {}
         for record in records:
-            codes.add(record.paperCode)
+            recordPaper = record.getPaperCode()
+            if recordPaper in codes:
+                if datesForCode := codeDates.get(recordPaper):
+                    recordDate = record.getDate()
+                    if datesForCode.get(recordDate):
+                        continue
+                    else:
+                        datesForCode[recordDate] = True
+                else:
+                    codeDates[record.getPaperCode()] = {record.getDate(): True}
+            else:
+                codes.add(record.getPaperCode())
             self.writeToCSVstream(csvFileLikeObject, record)
         csvFileLikeObject.seek(0)
         return csvFileLikeObject, codes

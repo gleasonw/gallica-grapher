@@ -43,10 +43,7 @@ class TicketSearchRunner:
 
     def generateRecords(self, responseValues):
         for data, query in responseValues:
-            records = self.parse.occurrences(
-                xml=data,
-                startYear=self.ticket.startYear
-            )
+            records = self.parse.occurrences(data)
             for record in records:
                 record.addFinalRowElements(
                     ticketID=self.ticket.key,

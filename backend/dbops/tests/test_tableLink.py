@@ -65,8 +65,8 @@ class TestCSVStream(TestCase):
     def setUp(self) -> None:
         self.testStream = CSVStream()
 
-        self.generateCSV = self.testStream.buildCSVstreamAndGetCodes
-        self.testStream.buildCSVstreamAndGetCodes = MagicMock()
+        self.generateCSV = self.testStream.buildCSVstreamAndGetCodesAndEnsureNoDuplicates
+        self.testStream.buildCSVstreamAndGetCodesAndEnsureNoDuplicates = MagicMock()
 
         self.cleanCSV = self.testStream.cleanCSVrow
         self.testStream.cleanCSVrow = MagicMock()

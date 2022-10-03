@@ -131,7 +131,7 @@ function StyledFilterAndTable(props) {
                     onDayChange={props.onDayChange}
                     onPeriodicalChange={props.onPeriodicalChange}
                     onTermChange={props.onTermChange}
-                    terms={Object.keys(props.tickets).map((ticketID) => props.tickets[ticketID].terms)}
+                    tickets={props.tickets}
                     count={props.count}
                     compact={props.compact}
                     show={props.show}

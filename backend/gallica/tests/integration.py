@@ -34,8 +34,8 @@ def getSearchOneTermInOnePaperOverRange():
     testTicket = {
         0: {
             'terms': ['brazza'],
-            'codes': [],
-            'dateRange': ['1863', '1944'],
+            'codes': ['cb328066631'],
+            'dateRange': ['',''],
             'linkTerm': None,
             'linkDistance': None
         }

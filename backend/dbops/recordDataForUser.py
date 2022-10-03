@@ -92,13 +92,20 @@ class RecordDataForUser:
     def getTopPapers(self, requestID, tickets):
         with self.conn.cursor() as cursor:
             cursor.execute("""
-            SELECT papertitle, count(papertitle) AS papercount
-                FROM results
+            WITH resultCounts AS (
+                SELECT papercode, count(*) as papercount
+                FROM results 
                 WHERE requestid = %s
                 AND ticketid in %s
-                GROUP BY papertitle
+                GROUP BY papercode
                 ORDER BY papercount DESC
-                LIMIT 10;
+                LIMIT 10
+            )
+            SELECT title, papercount
+                FROM resultCounts
+                JOIN
+                papers
+                ON resultCounts.papercode = papers.code;
             """, (requestID, tickets,))
             return cursor.fetchall()
 

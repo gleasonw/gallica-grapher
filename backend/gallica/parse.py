@@ -24,7 +24,7 @@ class Parse:
             )
             yield newRecord
 
-    def occurrences(self, xml, startYear) -> list:
+    def occurrences(self, xml) -> list:
         elements = etree.fromstring(xml)
         if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
             return []
@@ -34,8 +34,6 @@ class Parse:
             paperCode = self.getPaperCode(data)
             date = self.getDate(data)
             recordYear = date.getYear()
-            if recordYear and int(recordYear) < int(startYear):
-                continue
             newRecord = self.makeOccurrenceRecord(
                 paperTitle=paperTitle,
                 paperCode=paperCode,

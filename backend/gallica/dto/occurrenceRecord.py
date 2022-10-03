@@ -11,6 +11,12 @@ class OccurrenceRecord:
         self.requestID = None
         self.uniqueKey = None
 
+    def getDate(self):
+        return self.date
+
+    def getPaperCode(self):
+        return self.paperCode
+
     def __repr__(self):
         return f'OccurrenceRecord({self.paperTitle}, {self.url}, {self.date})'
 

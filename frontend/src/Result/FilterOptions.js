@@ -102,8 +102,15 @@ export function FilterOptions(props) {
                     }
                 >
                     <option value={''}>All</option>
-                    {props.terms.map((subTerm) => {
-                        return subTerm.map((term) => <option value={term}>{term}</option>)
+                    {Object.values(props.tickets).map((ticket) => {
+                        console.log(ticket);
+                        return ticket.terms.map((term) => (
+                            <option value={term}>
+                                {term}
+                                {!!ticket.linkTerm && ` linked to ${ticket.linkTerm}`}
+                            </option>
+                            )
+                        )
                     })}
                 </StyledSelect>
             </StyledInputAndLabel>
