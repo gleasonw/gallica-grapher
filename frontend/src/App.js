@@ -143,15 +143,15 @@ function App() {
     }
 
     function handleExampleRequestClick(example) {
-        const nameToId = {
-            "Colors": -1,
-            "Arts": -2,
-            "Pastries": -3,
-            "Scandal": -4,
-            "Colonialism": -5,
-            "Capitals": -6,
-            "Far West": -7
-        }
+        // const nameToId = {
+        //     "Colors": -1,
+        //     "Arts": -2,
+        //     "Pastries": -3,
+        //     "Scandal": -4,
+        //     "Colonialism": -5,
+        //     "Capitals": -6,
+        //     "Far West": -7
+        // }
         const [id, tickets] = Object.entries(example)[0];
         const ticketData = tickets['tickets'];
         const requestWithUniqueTicketIDs = {}
@@ -159,8 +159,8 @@ function App() {
             requestWithUniqueTicketIDs[index] = ticketData[ticketID]
         ))
         setTickets(requestWithUniqueTicketIDs);
-        setRequestID(nameToId[id])
-        setCurrentPage('result')
+        // setRequestID(nameToId[id])
+        // setCurrentPage('result')
     }
 
     function handleTooManyRecords(numRecords) {

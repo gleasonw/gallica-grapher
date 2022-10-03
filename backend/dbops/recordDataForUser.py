@@ -81,13 +81,6 @@ class RecordDataForUser:
         data = fetcher.get(OCRQuery(ark, term))
         return self.parse.OCRtext(data)
 
-    def purgeRecords(self):
-        with self.conn.cursor() as cur:
-            cur.execute("""
-            DELETE FROM results
-            """)
-            self.conn.commit()
-
     def clearUserRecordsAfterCancel(self, requestID):
         with self.conn.cursor() as cur:
             cur.execute("""

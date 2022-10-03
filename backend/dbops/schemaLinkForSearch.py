@@ -37,8 +37,6 @@ class SchemaLinkForSearch:
                     'papertitle'
                 )
             )
-        props['onRemoveDuplicateRecords']()
-        self.removeDuplicateRecordsInTicket(props['ticketID'])
 
     def insertMissingPapersToDB(self, codes, onAddMissingPapers):
         schemaMatches = self.getPaperCodesThatMatch(codes)
@@ -79,20 +77,22 @@ class SchemaLinkForSearch:
             record.getRow()
         )) + '\n')
 
+
+    #TODO: optimize query, or discover a better way to remove duplicates
     def removeDuplicateRecordsInTicket(self, ticketID):
         with self.conn.cursor() as curs:
             curs.execute(
                 """
                 WITH ticketRecords AS (
-                    SELECT ctid, year, month, day, papertitle, searchterm, ticketid, requestid
+                    SELECT ctid, year, month, day, papercode, searchterm, ticketid, requestid
                     FROM results
                     WHERE ticketid = %s
                     AND requestid = %s
                 )
                 DELETE FROM results a USING (
-                    SELECT MIN(ctid) as ctid, year, month, day, papertitle, searchterm, ticketid, requestid
+                    SELECT MIN(ctid) as ctid, year, month, day, papercode, searchterm, ticketid, requestid
                     FROM ticketRecords
-                    GROUP BY year, month, day, papertitle, searchterm, ticketid, requestid
+                    GROUP BY year, month, day, papercode, searchterm, ticketid, requestid
                     HAVING COUNT(*) > 1
                 ) b
                 WHERE a.requestid = b.requestid
@@ -100,7 +100,7 @@ class SchemaLinkForSearch:
                 AND a.year = b.year
                 AND (a.month = b.month OR (a.month IS NULL AND b.month IS NULL))
                 AND (a.day = b.day OR (a.day IS NULL AND b.day IS NULL))
-                AND a.papertitle = b.papertitle
+                AND a.papercode = b.papercode
                 AND a.searchterm = b.searchterm
                 AND a.ctid <> b.ctid;
                 """,
