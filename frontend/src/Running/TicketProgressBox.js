@@ -16,8 +16,28 @@ export function TicketProgressBox(props) {
     const progress = props.progressStats.progress
     const resultsRetrieved = props.progressStats.numResultsRetrieved
     const estimateTotal = props.progressStats.numResultsDiscovered
+
+    const displayStates = {
+        'addingMissingPapers':
+            <div>
+                <h3>Fetching missing periodical data...</h3>
+                <CircularProgress/>
+            </div>,
+        'addingResults':
+            <div>
+                <h3>Loading response data into the database...</h3>
+                <CircularProgress/>
+            </div>,
+        'removingDuplicates':
+            <div>
+                <h3>Removing duplicate results (Gallica sometimes surfaces the same periodical from different
+                    websites)...</h3>
+                <CircularProgress/>
+            </div>
+    }
+
     return (
-        <ClassicUIBox display={(active || progress === 100) ? 'flex':'none'}>
+        <ClassicUIBox display={(active || progress === 100) ? 'flex' : 'none'}>
             <span>{props.position}</span>
             <TicketLabel
                 terms={props.terms}
@@ -29,7 +49,7 @@ export function TicketProgressBox(props) {
             <StyledProgressStats>
                 {
                     (progress === 0 && active) ?
-                    <span>
+                        <span>
                         Waiting for a response from the archive...
                         <CircularProgress/>
                     </span>
@@ -44,19 +64,22 @@ export function TicketProgressBox(props) {
                     animated
                     now={props.progressStats.progress}/>
                 {
-                    (progress > 0) && (progress < 100)  &&
+                    (progress > 0) && (progress < 100) &&
                     <StyledProgressStats>
                         <div className='progressStatsText'>
-                            <div>{resultsRetrieved.toLocaleString()} of {estimateTotal.toLocaleString()} records fetched from Paris</div>
+                            <div>{resultsRetrieved.toLocaleString()} of {estimateTotal.toLocaleString()} records fetched
+                                from Paris
+                            </div>
                         </div>
                         <div className='progressStatsText'>
                             {props.progressStats.randomPaper}
                         </div>
                         <div className='progressStatsText'>
-                        {timeEstimate} approximate time to completion
+                            {timeEstimate} approximate time to completion
                         </div>
                     </StyledProgressStats>
                 }
+                {progress === 100 && !!active && displayStates[props.state]}
             </StyledProgressStats>
         </ClassicUIBox>
     )

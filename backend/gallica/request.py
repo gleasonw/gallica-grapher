@@ -74,6 +74,7 @@ class Request(threading.Thread):
 
     def doAllSearches(self):
         for progressHandler in self.ticketSearches:
+            self.state = 'RUNNING'
             progressHandler.setProgressCallback(self.setTicketProgressStats)
             self.setTicketActive(progressHandler)
             progressHandler.initSearch({
