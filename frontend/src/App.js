@@ -9,7 +9,6 @@ import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
 import ClassicUIBox from "./shared/ClassicUIBox";
 import ImportantButtonWrap from "./shared/ImportantButtonWrap";
-import NavBarWrap from "./Result/NavBarWrap";
 
 
 function App() {
@@ -139,7 +138,11 @@ function App() {
     function handleTicketClick(ticketID) {
         let updatedTickets = {...tickets}
         delete updatedTickets[ticketID];
-        setTickets(updatedTickets)
+        const renumberedTickets = {};
+        Object.keys(updatedTickets).map((oldTicketID, index) => (
+            renumberedTickets[index] = updatedTickets[oldTicketID]
+        ));
+        setTickets(renumberedTickets);
     }
 
     function handleExampleRequestClick(example) {

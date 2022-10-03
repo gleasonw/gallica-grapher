@@ -117,7 +117,7 @@ function ChartSettings(props) {
                 </StyledSelect>
             </StyledInputAndLabel>
             <StyledInputAndLabel>
-                <label htmlFor='continuous'>Only continuous periodicals</label>
+                <label htmlFor='continuous'>Only continuous periodicals publishing over range</label>
                 <input
                     id='continuous'
                     type='checkbox'
