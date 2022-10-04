@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from fetchComponents.fetch import Fetch
 
-NUM_WORKERS = 45
+NUM_WORKERS = 30
 
 
 class ConcurrentFetch:

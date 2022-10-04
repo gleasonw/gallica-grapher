@@ -15,10 +15,10 @@ class Fetch:
     def buildUrllib3(self):
         retryStrategy = Retry(
             status_forcelist=[413, 429, 500, 502, 503, 504],
-            backoff_factor=1
+            backoff_factor=1,
         )
         http = urllib3.PoolManager(
-            timeout=urllib3.Timeout(connect=30, read=55),
+            timeout=urllib3.Timeout(connect=30, read=123),
             retries=retryStrategy,
             maxsize=self.maxSize
         )

@@ -8,6 +8,7 @@ from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
 from dbops.recordDataForUser import RecordDataForUser
+from celery.exceptions import TaskRevokedError
 
 app = Flask(__name__)
 CORS(app)
@@ -50,6 +51,8 @@ def getRequestState(taskID):
         response = {'state': state}
     else:
         result = task.result
+        if isinstance(result, TaskRevokedError):
+            return {'state': "TASK_REVOKED"}
         if result:
             response = {'state': result['status']}
             if result['status'] == 'TOO_MANY_RECORDS':
