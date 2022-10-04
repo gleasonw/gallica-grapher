@@ -1,5 +1,5 @@
 from gallica.factories.cqlStringForPaperCodes import CQLStringForPaperCodes
-from gallica.factories.queryIndexer import QueryIndexer
+from gallica.factories.allQueryIndexer import AllQueryIndexer
 from fetchComponents.query import *
 
 
@@ -7,7 +7,7 @@ class PaperQueryFactory:
 
     def __init__(self):
         self.cql = CQLStringForPaperCodes()
-        self.makeIndexer = lambda cql: QueryIndexer(cql)
+        self.makeIndexer = lambda cql: AllQueryIndexer(cql)
         self.makeNumPapersQuery = lambda cql: NumPapersOnGallicaQuery(cql)
 
     def buildSRUQueriesForCodes(self, codes):

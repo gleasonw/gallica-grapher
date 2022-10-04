@@ -3,7 +3,7 @@ from gallica.factories.parseFactory import buildParser
 from fetchComponents.query import *
 
 
-class QueryIndexer:
+class AllQueryIndexer:
 
     def __init__(self, baseQueries):
         self.fetch = ConcurrentFetch('https://gallica.bnf.fr/SRU')

@@ -1,14 +1,14 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock, call
-from occurrenceQueryBuilder import OccurrenceQueryBuilder
-from occurrenceQueryBuilder import CQLFactory
+from fullOccurrenceQueryBuilder import FullOccurrenceQueryBuilder
+from fullOccurrenceQueryBuilder import CQLFactory
 from cqlStringForPaperCodes import CQLStringForPaperCodes
 
 
 class TestOccurrenceQueryBuilder(TestCase):
 
     def setUp(self) -> None:
-        self.testBuilder = OccurrenceQueryBuilder()
+        self.testBuilder = FullOccurrenceQueryBuilder()
 
         self.mockTicket = MagicMock(
             key='testKey',

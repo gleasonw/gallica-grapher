@@ -1,17 +1,13 @@
 from math import ceil
 
 
-class SearchProgressHandler:
+class FullSearchProgressHandler:
 
-    def __init__(self, ticket, searchDriver):
-        self.search = searchDriver
+    def __init__(self, ticket):
         self.ticket = ticket
         self.numBatchesRetrieved = 0
         self.numBatches = ceil(self.ticket.estimateNumResults / 50)
         self.averageResponseTime = None
-        self.onUpdateProgress = None
-        self.onAddMissingPapers = None
-        self.onAddResults = None
 
     def getNumRetrievedForTicket(self):
         return self.ticket.numResultsRetrieved
@@ -19,17 +15,10 @@ class SearchProgressHandler:
     def getEstimateNumResultsForTicket(self):
         return self.ticket.estimateNumResults
 
-    def setProgressCallback(self, callback):
-        self.onUpdateProgress = callback
-
     def getTicketID(self):
         return self.ticket.key
 
-    def initSearch(self, props):
-        self.search.setProgressTracker(self.updateProgressStats)
-        self.search.search(props)
-
-    def updateProgressStats(
+    def handleProgressUpdate(
             self,
             elapsedTime,
             numWorkers,

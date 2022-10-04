@@ -7,7 +7,8 @@ class Ticket:
             codes,
             dateRange,
             linkTerm,
-            linkDistance
+            linkDistance,
+            fetchType
     ):
         self.key = key
         self.terms = terms
@@ -19,6 +20,13 @@ class Ticket:
         self.numResultsRetrieved = 0
         self.linkTerm = linkTerm
         self.linkDistance = linkDistance
+        self.fetchType = fetchType
+
+    def getID(self):
+        return self.key
+
+    def getQueries(self):
+        return self.queries
 
     def setQueries(self, queries):
         self.queries = queries

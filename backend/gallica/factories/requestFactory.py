@@ -1,14 +1,15 @@
 from gallica.factories.parseFactory import buildParser
-from gallica.searchprogresshandler import SearchProgressHandler
+from gallica.fullsearchprogresshandler import FullSearchProgressHandler
 from gallica.papersearchrunner import PaperSearchRunner
 from gallica.ticketsearchrunner import TicketSearchRunner
-from gallica.factories.occurrenceQueryBuilder import OccurrenceQueryBuilder
+from gallica.factories.fullOccurrenceQueryBuilder import FullOccurrenceQueryBuilder
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 from fetchComponents.concurrentfetch import ConcurrentFetch
 from gallica.request import Request
 from utils.psqlconn import PSQLconn
 from gallica.ticket import Ticket
+from gallica.search import Search
 
 
 class RequestFactory:
@@ -27,7 +28,6 @@ class RequestFactory:
             )
             for key, ticket in tickets.items()
         ]
-        self.occurrenceQueryBuilder = OccurrenceQueryBuilder()
 
     def build(self) -> Request:
         return Request(
@@ -39,14 +39,7 @@ class RequestFactory:
             dbConn=self.dbConn
         )
 
-    def buildTicketSearch(self, ticket) -> SearchProgressHandler:
-        self.occurrenceQueryBuilder.addQueriesAndNumResultsToTicket(ticket)
-        return SearchProgressHandler(
-            ticket=ticket,
-            searchDriver=self.buildSearchRunner(ticket)
-        )
-
-    def buildSearchRunner(self, ticket) -> TicketSearchRunner:
+    def buildTicketSearch(self, ticket) -> Search:
         parse = buildParser()
         sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         paperSearch = PaperSearchRunner(
@@ -60,10 +53,44 @@ class RequestFactory:
             paperFetcher=paperSearch.addRecordDataForTheseCodesToDB,
             conn=self.dbConn
         )
-        return TicketSearchRunner(
+        return self.buildSearch(
             parse=parse,
             ticket=ticket,
-            requestID=self.requestID,
-            schemaLink=dbLink,
-            sruFetch=sruFetcher
+            sruFetcher=sruFetcher,
+            dbLink=dbLink
         )
+
+    def buildSearch(self, parse, ticket, sruFetcher, dbLink) -> Search:
+        ticket = ticket
+        fetchType = ticket.fetchType
+        queriesForFetch = {
+            'year': lambda x: self.buildYearGroupQueries(x),
+            'month': lambda x: self.buildMonthGroupQueries(x),
+            'all': lambda x: self.buildAllSearchQueries(x)
+        }
+        if fetchType == 'all':
+            progressHandler = FullSearchProgressHandler(ticket)
+            insertSocket = dbLink.insertRecordsIntoOccurrences
+        else:
+            progressHandler = BasicProgressHandler(ticket)
+            insertSocket = dbLink.insertRecordsIntoGroupCounts
+        queries = queriesForFetch[fetchType](ticket)
+        return Search(
+            ticketID=ticket.getID(),
+            requestID=self.requestID,
+            queries=queries,
+            SRUfetch=sruFetcher,
+            parseDataToRecords=parse.groupCount,
+            insertRecordsIntoDatabase=insertSocket,
+            onUpdateProgress=progressHandler.handleUpdateProgress,
+            onSearchFinish=progressHandler.handleSearchFinish
+        )
+
+    def buildAllSearchQueries(self, ticket) -> Search:
+        return FullOccurrenceQueryBuilder().addQueriesAndNumResultsToTicket(ticket)
+
+    def buildYearGroupQueries(self, ticket) -> list:
+        pass
+
+    def buildMonthGroupQueries(self, ticket) -> list:
+        pass

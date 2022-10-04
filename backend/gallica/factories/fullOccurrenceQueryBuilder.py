@@ -1,14 +1,14 @@
 from gallica.factories.cqlStringForPaperCodes import CQLStringForPaperCodes
-from gallica.factories.queryIndexer import QueryIndexer
+from gallica.factories.allQueryIndexer import AllQueryIndexer
 from fetchComponents.query import NumOccurrencesForTermQuery
 
 
-class OccurrenceQueryBuilder:
+class FullOccurrenceQueryBuilder:
 
     def __init__(self):
         self.cql = None
         self.ticket = None
-        self.makeIndexer = lambda queries: QueryIndexer(queries)
+        self.makeIndexer = lambda queries: AllQueryIndexer(queries)
         self.makeCQLFactory = lambda ticket: CQLFactory(ticket)
         self.makeBaseQuery = lambda cql, term: NumOccurrencesForTermQuery(cql, term)
 

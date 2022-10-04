@@ -1,12 +1,12 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, call
-from occurrenceQueryBuilder import OccurrenceQueryBuilder
+from fullOccurrenceQueryBuilder import FullOccurrenceQueryBuilder
 
 
 class TestQueryIndexer(TestCase):
 
     def setUp(self) -> None:
-        self.testIndexer = OccurrenceQueryBuilder()
+        self.testIndexer = FullOccurrenceQueryBuilder()
         self.testIndexer.fetch = MagicMock()
         self.testIndexer.parse = MagicMock()
         self.testIndexer.makeQuery = MagicMock()
