@@ -2,6 +2,7 @@ import React from "react";
 import {TicketProgressBox} from "./TicketProgressBox";
 import useInterval from "../shared/useInterval";
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
+import ClassicUIBox from "../shared/ClassicUIBox";
 
 
 function RunningQueriesUI(props) {
@@ -10,8 +11,12 @@ function RunningQueriesUI(props) {
         'init': {progress: 0}
     })
     const [displayState, setDisplayState] = React.useState('running');
-
-
+    const [timeBeforeResponse, setTimeBeforeResponse] = React.useState(0);
+    const refreshInterval = 1000;
+    const timeBeforeWarning = 30000;
+    const responseReceived = Object.keys(progressStats).some((ticketID) => (
+        progressStats[ticketID].progress > 0
+    ))
     useInterval(async () => {
         const requestStateCallbacks = {
             "PROGRESS": () => setProgressStats(
@@ -40,7 +45,10 @@ function RunningQueriesUI(props) {
         } else {
             console.log("Unknown state: " + state)
         }
-    }, 1000);
+        if (!responseReceived) {
+            setTimeBeforeResponse(timeBeforeResponse + refreshInterval)
+        }
+    }, refreshInterval);
 
     function handleCancelRequest() {
         setCancelMessage('Cancelling...');
@@ -51,6 +59,12 @@ function RunningQueriesUI(props) {
 
     return (
         <div className='queryProgressUI'>
+            {timeBeforeResponse > timeBeforeWarning && !responseReceived && <ClassicUIBox>
+                <h3>It's taking a while to get a response from the archive.</h3>
+                Sometimes it's a bit slow. You could try again later, or if you just want to flip through some old
+                periodicals, try an example: they're pre-loaded.
+            </ClassicUIBox>
+            }
             {Object.keys(props.tickets).map((key, index) => (
                 <TicketProgressBox
                     terms={props.tickets[key]['terms']}
