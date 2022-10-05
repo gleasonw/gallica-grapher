@@ -1,4 +1,4 @@
-from gallica.factories.cqlStringForPaperCodes import CQLStringForPaperCodes
+from abstractFactory import fetchNumResultsForQueries, makeIndexedPaperQueries, CQLStringForPaperCodes
 from gallica.factories.allQueryIndexer import AllQueryIndexer
 from fetchComponents.query import *
 
@@ -24,6 +24,6 @@ class PaperQueryFactory:
             'dc.type all "fascicule" and ocrquality > "050.00"'
         )
         indexer = self.makeIndexer([query])
-        totalResults = indexer.fetchNumResultsForQueries()
-        queries = indexer.makeIndexedPaperQueries(totalResults)
+        totalResults = fetchNumResultsForQueries(indexer.fetch, indexer.baseQueries, indexer.parse)
+        queries = makeIndexedPaperQueries(indexer.baseQueries, totalResults)
         return queries

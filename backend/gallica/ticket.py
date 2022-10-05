@@ -22,6 +22,9 @@ class Ticket:
         self.linkDistance = linkDistance
         self.fetchType = fetchType
 
+    def getPaperCodes(self):
+        return self.codes
+
     def getID(self):
         return self.key
 

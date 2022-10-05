@@ -10,7 +10,7 @@ class Search:
             insertRecordsIntoDatabase,
             onSearchFinish,
             parseDataToRecords,
-            getEstimateNumRecordsToFetch
+            numRecords
     ):
         self.ticketID = ticketID
         self.requestID = requestID
@@ -20,7 +20,7 @@ class Search:
         self.insertRecordsIntoDatabase = insertRecordsIntoDatabase
         self.onSearchFinish = onSearchFinish
         self.parseDataToRecords = parseDataToRecords
-        self.getEstimateNumRecordsToFetch = getEstimateNumRecordsToFetch
+        self.getEstimateNumRecordsToFetch = numRecords
 
     def getTicketID(self):
         return self.ticketID
