@@ -141,6 +141,36 @@ class AbstractFactory:
             baseQueries[cql].estimateNumRecordsToFetch = numRecordsForBaseCQL
         return totalResults
 
+    def buildCQL(self, ticket):
+        paperCodeCQL = self.buildCQLforPaperCodes(ticket.getPaperCodes())
+        cqlStrings = []
+        for term in ticket.getTerms():
+            if ticket.getLinkTerm():
+                termCQL = self.buildLinkedTermCQL(term, ticket.getLinkTerm(), ticket.getLinkDistance())
+            else:
+                termCQL = self.buildTermCQL(term)
+            cqlStrings.append(termCQL)
+            cqlWithDateSelect = self.buildDateCQL(ticket)
+            if paperCodeCQL:
+                for codeBatchCQL in paperCodeCQL:
+                    for dateSelect in cqlWithDateSelect:
+                        cqlStrings.append(f"{termCQL} {dateSelect} {codeBatchCQL}")
+                    cqlStrings.append(cqlWithDateSelect.format(formattedCodeString=codeBatchCQL))
+            else:
+                cqlStrings.append(f"{termCQL} {cqlWithDateSelect}")
+
+    def buildTermCQL(self, term) -> str:
+        return f'(gallica adj "{term}")'
+    def buildLinkedTermCQL(self, term, linkTerm, linkDistance):
+       return f'(text adj "{term}" prox/unit=word/distance={linkDistance} "{linkTerm}")'
+
+
+    def buildDateCQL(self, ticket) -> str:
+        pass
+
+    def buildCQLforPaperCodes(self, codes) -> list:
+        return self.paperCqlBuilder(codes)
+
     def makeIndexedQueries(self, baseQueries):
         for query in baseQueries.values():
             for index in range(1, query.estimateNumRecordsToFetch, 50):
@@ -150,7 +180,7 @@ class AbstractFactory:
                     numRecords=50,
                     collapsing=False,
                     term=query.term
-            )
+                )
 
     def makeIndexedPaperQueries(self, baseQueries, totalResults):
         queries = []
@@ -163,49 +193,6 @@ class AbstractFactory:
                     )
                 )
         return queries
-
-    def makeBaseQueriesForTermsAndCodes(self):
-        baseQueries = []
-        for term in self.ticket.terms:
-            getThisTermCQL = self.cql.buildTermCQL(term)
-            forTheseCodesCQL = self.cql.buildCQLforPaperCodes()
-            for codesBunch in forTheseCodesCQL:
-                combinedCQL = getThisTermCQL.format(formattedCodeString=codesBunch)
-                baseQueries.append(self.makeBaseQuery(combinedCQL, term))
-        return baseQueries
-
-    def makeBaseQueriesOnlyTerms(self):
-        baseQueries = []
-        for term in self.ticket.terms:
-            cql = self.cql.buildTermCQL(term)
-            baseQueries.append(self.makeBaseQuery(cql, term))
-        return baseQueries
-
-    def buildCQL(self, ticket):
-        paperCodeCQL = self.buildCQLforPaperCodes(ticket.getPaperCodes())
-        cqlStrings = []
-        for term in ticket.getTerms():
-            termCQL = self.buildTermCQL(term)
-            cqlWithDateSelect = self.buildDateCQL(ticket)
-            if paperCodeCQL:
-                for codeBatchCQL in paperCodeCQL:
-                    for dateSelect in cqlWithDateSelect:
-                        cqlStrings.append(f"{termCQL} {dateSelect} {codeBatchCQL}")
-                    cqlStrings.append(cqlWithDateSelect.format(formattedCodeString=codeBatchCQL))
-            else:
-                cqlStrings.append(f"{termCQL} {cqlWithDateSelect}")
-
-    def buildTermCQL(self, term) -> str:
-        simpleSearchSelect = f'(gallica adj "{term}")'
-        linkSearchSelect = f'(text adj "{term}" prox/unit=word/distance={self.ticket.linkDistance} "{self.ticket.linkTerm}")'
-        return f"{simpleSearchSelect if not self.ticket.linkTerm else linkSearchSelect}"
-
-    def buildDateCQL(self, ticket) -> str:
-        pass
-
-    def buildCQLforPaperCodes(self, codes) -> list:
-        return self.paperCqlBuilder(codes)
-
 
 NUM_CODES_PER_CQL = 10
 
