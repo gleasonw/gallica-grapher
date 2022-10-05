@@ -9,7 +9,8 @@ class Search:
             onUpdateProgress,
             insertRecordsIntoDatabase,
             onSearchFinish,
-            parseDataToRecords
+            parseDataToRecords,
+            getEstimateNumRecordsToFetch
     ):
         self.ticketID = ticketID
         self.requestID = requestID
@@ -19,9 +20,13 @@ class Search:
         self.insertRecordsIntoDatabase = insertRecordsIntoDatabase
         self.onSearchFinish = onSearchFinish
         self.parseDataToRecords = parseDataToRecords
+        self.getEstimateNumRecordsToFetch = getEstimateNumRecordsToFetch
 
     def getTicketID(self):
         return self.ticketID
+
+    def getEstimateNumRecords(self):
+        return self.getEstimateNumRecordsToFetch(self.queries)
 
     def doSearch(self):
         rawResponse = self.getSearchResponse()

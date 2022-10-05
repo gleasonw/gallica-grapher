@@ -191,7 +191,7 @@ class TestCQLFactory(TestCase):
             '({formattedCodeString}) and dc.date >= "1900" and dc.date <= "1901" and (gallica adj "term1") and (dc.type adj "fascicule") sortby dc.date/sort.ascending'
         )
 
-    @patch('factories.cql.CQLStringForPaperCodes.build')
+    @patch('factories.cql.CQLStringForPaperCodes.buildRequest')
     def test_format_buildCQLforPaperCodes(self, mock_CQLSelectStringForPapers):
         self.cqlStringBuilder.codes = ['code1', 'code2']
         baseQuery = '({formattedCodeString})'

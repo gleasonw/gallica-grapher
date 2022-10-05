@@ -1,4 +1,4 @@
-from requestFactory import RequestFactory
+from abstractFactory import AbstractFactory
 import time
 import psutil
 from papersearchrunner import PaperSearchRunner
@@ -20,8 +20,8 @@ def runTests():
 
 
 def doTest(ticket):
-    testRequestFactory = RequestFactory(ticket, '45')
-    testRequest = testRequestFactory.build()
+    testRequestFactory = AbstractFactory(ticket, '45')
+    testRequest = testRequestFactory.buildRequest()
     testRequest.start()
     while not testRequest.state == 'COMPLETED':
         print(psutil.Process().memory_info().rss / 1024 / 1024)

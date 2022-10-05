@@ -26,9 +26,9 @@ class TestPaperQueryFactory(TestCase):
 
         test = self.productionBuildSRU(codeGenerator)
 
-        self.testFactory.cql.build.assert_called_once_with(codeGenerator)
+        self.testFactory.cql.buildRequest.assert_called_once_with(codeGenerator)
         self.testFactory.indexer.addQueriesAndNumResultsToTicket.assert_called_with(
-            self.testFactory.cql.build.return_value
+            self.testFactory.cql.buildRequest.return_value
         )
         self.testFactory.queryBatcher.assert_called_once()
         self.assertEqual(
