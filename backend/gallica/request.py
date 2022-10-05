@@ -5,8 +5,8 @@ MAX_DB_SIZE = 10000000
 
 
 class Request(threading.Thread):
-    def __init__(self, requestID, ticketSearches, dbConn):
-        self.ticketSearches = ticketSearches
+    def __init__(self, requestID, dbConn):
+        self.ticketSearches = None
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.topPapersForTerms = []
@@ -17,6 +17,9 @@ class Request(threading.Thread):
         self.ticketProgressStats = self.initProgressStats()
         super().__init__()
 
+    def setTicketSearches(self, ticketSearches):
+        self.ticketSearches = ticketSearches
+
     def setRequestState(self, state):
         self.state = state
         print('Request state: ' + state)
@@ -25,23 +28,22 @@ class Request(threading.Thread):
         return self.ticketProgressStats
 
     def run(self):
-        self.estimateNumRecords = sum(
-            [
-                tick.getEstimateNumResultsForTicket()
-                for tick in self.ticketSearches
-            ]
-        )
-        if self.estimateNumRecords == 0:
-            self.state = 'NO_RECORDS'
-        elif self.numResultsOverLimit():
-            self.state = 'TOO_MANY_RECORDS'
-        else:
-            try:
+        numRecords = self.getNumRecords()
+        if self.numRecordsUnderLimit(numRecords):
+            if numRecords:
                 self.doAllSearches()
-            except Exception:
-                self.state = 'ERROR'
-                raise
+            else:
+                self.state = 'NO_RECORDS'
+        else:
+            self.state = 'TOO_MANY_RECORDS'
         self.DBconnection.close()
+
+    def getNumRecords(self):
+        return sum([search.getNumRecords() for search in self.ticketSearches])
+
+    def numRecordsUnderLimit(self, numRecords):
+        dbSpaceRemainingWithBuffer = MAX_DB_SIZE - self.getNumberRowsStoredInAllTables() - 10000
+        return numRecords < min(dbSpaceRemainingWithBuffer, RECORD_LIMIT)
 
     def initProgressStats(self):
         progressDict = {}
@@ -57,9 +59,6 @@ class Request(threading.Thread):
             }
         return progressDict
 
-    def numResultsOverLimit(self):
-        dbSpaceRemainingWithBuffer = MAX_DB_SIZE - self.getNumberRowsStoredInAllTables() - 10000
-        return self.estimateNumRecords > min(dbSpaceRemainingWithBuffer, RECORD_LIMIT)
 
     def getNumberRowsStoredInAllTables(self):
         with self.DBconnection.cursor() as curs:
@@ -73,16 +72,16 @@ class Request(threading.Thread):
             return curs.fetchone()[0]
 
     def doAllSearches(self):
-        for progressHandler in self.ticketSearches:
+        for search in self.ticketSearches:
             self.state = 'RUNNING'
-            progressHandler.setProgressCallback(self.setTicketProgressStats)
-            self.setTicketActive(progressHandler)
-            progressHandler.initSearch({
-                'onAddMissingPapers': lambda: self.setRequestState('ADDING_MISSING_PAPERS'),
-                'onAddResults': lambda: self.setRequestState('ADDING_RESULTS'),
-                'onRemoveDuplicateRecords': lambda: self.setRequestState('REMOVING_DUPLICATES')
-            })
-            self.setTicketProgressTo100AndMarkAsDone(progressHandler)
+            search.setProgressCallback(self.setTicketProgressStats)
+            self.setTicketActive(search)
+            search.initSearch(
+                onAddMissingPapers=lambda: self.setRequestState('ADDING_MISSING_PAPERS'),
+                onAddResults=lambda: self.setRequestState('ADDING_RESULTS'),
+                onRemoveDuplicates=lambda: self.setRequestState('REMOVING_DUPLICATES')
+            )
+            self.setTicketProgressTo100AndMarkAsDone(search)
         self.state = 'COMPLETED'
 
     def setTicketActive(self, search):

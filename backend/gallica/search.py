@@ -20,6 +20,9 @@ class Search:
         self.onSearchFinish = onSearchFinish
         self.parseDataToRecords = parseDataToRecords
 
+    def getTicketID(self):
+        return self.ticketID
+
     def doSearch(self):
         rawResponse = self.getSearchResponse()
         records = self.parseSearchResponse(rawResponse)

@@ -1,5 +1,5 @@
 from gallica.factories.parseFactory import buildParser
-from gallica.fullsearchprogresshandler import FullSearchProgressHandler
+from gallica.fullsearchprogressupdate import FullSearchProgressUpdate
 from gallica.papersearchrunner import PaperSearchRunner
 from gallica.ticketsearchrunner import TicketSearchRunner
 from gallica.factories.fullOccurrenceQueryBuilder import FullOccurrenceQueryBuilder
@@ -30,16 +30,18 @@ class RequestFactory:
         ]
 
     def build(self) -> Request:
-        return Request(
+        req = Request(
             requestID=self.requestID,
-            ticketSearches=list(map(
-                self.buildTicketSearch,
-                self.tickets
-            )),
             dbConn=self.dbConn
         )
+        req.setTicketSearches(
+            list(map(
+                lambda x: self.buildTicketSearch(x, req.setTicketProgressStats),
+                self.tickets
+            ))
+        )
 
-    def buildTicketSearch(self, ticket) -> Search:
+    def buildTicketSearch(self, ticket, onProgressUpdate) -> Search:
         parse = buildParser()
         sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         paperSearch = PaperSearchRunner(
@@ -57,10 +59,11 @@ class RequestFactory:
             parse=parse,
             ticket=ticket,
             sruFetcher=sruFetcher,
-            dbLink=dbLink
+            dbLink=dbLink,
+            onProgressUpdate=onProgressUpdate
         )
 
-    def buildSearch(self, parse, ticket, sruFetcher, dbLink) -> Search:
+    def buildSearch(self, parse, ticket, sruFetcher, dbLink, onProgressUpdate) -> Search:
         ticket = ticket
         fetchType = ticket.fetchType
         queriesForFetch = {
@@ -69,18 +72,20 @@ class RequestFactory:
             'all': lambda x: self.buildAllSearchQueries(x)
         }
         if fetchType == 'all':
-            progressHandler = FullSearchProgressHandler(ticket)
+            progressHandler = FullSearchProgressUpdate(ticket, onProgressUpdate)
             insertSocket = dbLink.insertRecordsIntoOccurrences
+            parseData = parse.parseOccurrences
         else:
-            progressHandler = BasicProgressHandler(ticket)
+            progressHandler = BasicProgressHandler(ticket, onProgressUpdate)
             insertSocket = dbLink.insertRecordsIntoGroupCounts
+            parseData = parse.groupCounts
         queries = queriesForFetch[fetchType](ticket)
         return Search(
             ticketID=ticket.getID(),
             requestID=self.requestID,
             queries=queries,
             SRUfetch=sruFetcher,
-            parseDataToRecords=parse.groupCount,
+            parseDataToRecords=parseData,
             insertRecordsIntoDatabase=insertSocket,
             onUpdateProgress=progressHandler.handleUpdateProgress,
             onSearchFinish=progressHandler.handleSearchFinish
