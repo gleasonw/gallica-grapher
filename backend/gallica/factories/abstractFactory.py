@@ -1,7 +1,6 @@
 from gallica.factories.parseFactory import buildParser
 from gallica.fullsearchprogressupdate import FullSearchProgressUpdate
 from gallica.papersearchrunner import PaperSearchRunner
-from gallica.factories.fullOccurrenceQueryBuilder import FullOccurrenceQueryBuilder
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 from fetchComponents.concurrentfetch import ConcurrentFetch
@@ -10,6 +9,9 @@ from query import Query, PaperQuery
 from utils.psqlconn import PSQLconn
 from gallica.ticket import Ticket
 from gallica.search import Search
+
+
+NUM_CODES_PER_CQL = 10
 
 
 class AbstractFactory:
@@ -30,6 +32,7 @@ class AbstractFactory:
             for key, ticket in tickets.items()
         ]
         self.paperCqlBuilder = CQLStringForPaperCodes().build
+        self.makeQuery = Query
 
     def buildRequest(self) -> Request:
         req = Request(
@@ -96,80 +99,17 @@ class AbstractFactory:
             numRecords=numRecords
         )
 
-    def buildAllSearchQueries(self, ticket) -> Search:
-        if ticket.getPaperCodes():
-
-
+    def buildAllSearchQueries(self, ticket) -> list:
+        return list(map(
+            self.makeQuery,
+            cqlStrings
+        ))
 
     def buildYearGroupQueries(self, ticket) -> list:
-        pass
+
 
     def buildMonthGroupQueries(self, ticket) -> list:
         pass
-
-    def groupSearchEstimate(self, queries) -> int:
-        pass
-
-    def allSearchEstimate(self, queries) -> int:
-        responses = fetch.fetchAll(baseQueries.values())
-        totalResults = 0
-        for data, cql in responses:
-            numRecordsForBaseCQL = parse.numRecords(data)
-            totalResults += numRecordsForBaseCQL
-            baseQueries[cql].estimateNumRecordsToFetch = numRecordsForBaseCQL
-        return totalResults
-
-    def indexAllSearchQueries(self, ticket):
-        self.ticket = ticket
-        self.cql = self.makeCQLFactory(ticket)
-        if self.ticket.codes:
-            queries = self.makeBaseQueriesForTermsAndCodes()
-        else:
-            queries = self.makeBaseQueriesOnlyTerms()
-        indexer = self.makeIndexer(queries)
-        numResultsForTicket = fetchNumResultsForQueries(indexer.fetch, indexer.baseQueries, indexer.parse)
-        indexedQueries = makeIndexedQueries(indexer.baseQueries)
-        self.ticket.setQueries(indexedQueries)
-        self.ticket.setEstimateNumResults(numResultsForTicket)
-
-    def fetchNumResultsForQueries(self, fetch, baseQueries, parse):
-        responses = fetch.fetchAll(baseQueries.values())
-        totalResults = 0
-        for data, cql in responses:
-            numRecordsForBaseCQL = parse.numRecords(data)
-            totalResults += numRecordsForBaseCQL
-            baseQueries[cql].estimateNumRecordsToFetch = numRecordsForBaseCQL
-        return totalResults
-
-    def buildCQL(self, ticket):
-        paperCodeCQL = self.buildCQLforPaperCodes(ticket.getPaperCodes())
-        cqlStrings = []
-        for term in ticket.getTerms():
-            if ticket.getLinkTerm():
-                termCQL = self.buildLinkedTermCQL(term, ticket.getLinkTerm(), ticket.getLinkDistance())
-            else:
-                termCQL = self.buildTermCQL(term)
-            cqlStrings.append(termCQL)
-            cqlWithDateSelect = self.buildDateCQL(ticket)
-            if paperCodeCQL:
-                for codeBatchCQL in paperCodeCQL:
-                    for dateSelect in cqlWithDateSelect:
-                        cqlStrings.append(f"{termCQL} {dateSelect} {codeBatchCQL}")
-                    cqlStrings.append(cqlWithDateSelect.format(formattedCodeString=codeBatchCQL))
-            else:
-                cqlStrings.append(f"{termCQL} {cqlWithDateSelect}")
-
-    def buildTermCQL(self, term) -> str:
-        return f'(gallica adj "{term}")'
-    def buildLinkedTermCQL(self, term, linkTerm, linkDistance):
-       return f'(text adj "{term}" prox/unit=word/distance={linkDistance} "{linkTerm}")'
-
-
-    def buildDateCQL(self, ticket) -> str:
-        pass
-
-    def buildCQLforPaperCodes(self, codes) -> list:
-        return self.paperCqlBuilder(codes)
 
     def makeIndexedQueries(self, baseQueries):
         for query in baseQueries.values():
@@ -193,8 +133,6 @@ class AbstractFactory:
                     )
                 )
         return queries
-
-NUM_CODES_PER_CQL = 10
 
 
 class CQLStringForPaperCodes:
