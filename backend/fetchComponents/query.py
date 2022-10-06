@@ -35,8 +35,8 @@ class Query:
     def generateCQL(self):
         termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
         dateCQL = self.buildDateCQL()
-        paperCQL = self.buildPaperCQL(self.codes) if self.codes else ""
-        return f"{termCQL} and {dateCQL} and {paperCQL} and (dc.type all \"fascicule\")"
+        paperCQL = f" and {self.buildPaperCQL(self.codes)}" if self.codes else ""
+        return f"({termCQL}) and ({dateCQL}){paperCQL} and (dc.type all \"fascicule\")"
 
     def buildDateCQL(self):
         return f'(gallicapublication_date="{self.publicationStartDate}" and gallicapublication_date="{self.publicationEndDate}")'
@@ -46,6 +46,10 @@ class Query:
 
     def buildLinkedTermCQL(self):
         return f'(text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}")'
+
+    def buildPaperCQL(self, codes):
+        formattedCodes = [f"{code}_date" for code in codes]
+        return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
 
 
 class NumOccurrencesForTermQuery(Query):
@@ -120,6 +124,9 @@ class OCRQuery(Query):
 
     def __repr__(self):
         return f'OCRQuery({self.ark}, {self.term})'
+
+
+
 
 
 

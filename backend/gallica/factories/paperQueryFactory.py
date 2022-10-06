@@ -1,4 +1,5 @@
-from abstractFactory import fetchNumResultsForQueries, makeIndexedPaperQueries, CQLStringForPaperCodes
+from abstractFactory import fetchNumResultsForQueries, makeIndexedPaperQueries
+from query import CQLStringForPaperCodes
 from gallica.factories.allQueryIndexer import AllQueryIndexer
 from fetchComponents.query import *
 
