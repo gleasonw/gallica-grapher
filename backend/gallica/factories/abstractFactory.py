@@ -30,7 +30,6 @@ class AbstractFactory:
             )
             for key, ticket in tickets.items()
         ]
-        self.makeQuery = Query
         self.parse = buildParser()
         self.sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         self.paperSearch = PaperSearchRunner(
@@ -56,14 +55,9 @@ class AbstractFactory:
                 self.tickets
             ))
         )
+        return req
 
     def buildTicketSearch(self, ticket, onProgressUpdate) -> Search:
-        return self.buildSearch(
-            ticket=ticket,
-            onProgressUpdate=onProgressUpdate
-        )
-
-    def buildSearch(self, ticket, onProgressUpdate) -> Search:
         fetchType = ticket.getFetchType()
         baseQueriesForSearch = {
             'year': lambda tick, _: self.buildYearGroupQueries(tick),
@@ -93,39 +87,54 @@ class AbstractFactory:
             numRecords=numRecords
         )
 
+    def buildProgressHandler(self, ticket, onProgressUpdate):
+        raise NotImplementedError
+
     def buildAllSearchQueries(self, ticket) -> list:
-        return buildBaseQueries(
+        return self.buildBaseQueries(
             ticket,
             [(ticket.getStartDate(), ticket.getEndDate())]
 
     def buildYearGroupQueries(self, ticket) -> list:
-        return buildBaseQueries(
+        return self.buildBaseQueries(
             ticket,
-            zip(
+            set(zip(
                 range(ticket.getStartDate(), ticket.getEndDate() + 1),
                 range(ticket.getStartDate(), ticket.getEndDate() + 1)
-            )
+            ))
         )
                 
     def buildMonthGroupQueries(self, ticket) -> list:
         yearMonthDays = []
         for year in range(ticket.getStartDate(), ticket.getEndDate() + 1):
             for month in range(1, 13):
-                yearMonthDays.append(f"{year}-{month:02}-01", f"{year}-{month:02}-31")
-        return buildBaseQueries(ticket, yearMonthDays)
-    
-    def buildBaseQueries(ticket, startEndDates):
+                yearMonthDays.append((f"{year}-{month:02}-01", f"{year}-{month:02}-31"))
+        return self.buildBaseQueries(ticket, yearMonthDays)
+
+    def makeQuery(self, data, codes=None):
+        return Query(
+            codes=codes,
+            linkDistance=data.get('linkDistance'),
+            linkTerm=data.get('linkTerm'),
+            publicationStartDate=data.get('publicationStartDate'),
+            publicationEndDate=data.get('publicationEndDate'),
+            term=data.get('term'),
+            numRecords=data.get('numRecords'),
+            startIndex=data.get('startIndex'),
+            collapsing=data.get('collapsing')
+        )
+
+    def buildBaseQueries(self, ticket, startEndDates):
         codeBundles = self.splitCodesIntoBundles(ticket.getCodes())
-        queries = []
         for term in ticket.getTerms():
             for dates in startEndDates:
                 queryData = {
-                    term=term,
-                    publicationStartDate=dates[0],
-                    publicationEndDate=dates[1],
-                    collapsing=False,
-                    numRecords=1,
-                    startIndex=0,
+                    "term":term,
+                    "publicationStartDate":dates[0],
+                    "publicationEndDate":dates[1],
+                    "collapsing":False,
+                    "numRecords":1,
+                    "startIndex":0,
                 }
                 if codeBundles:
                     return [self.makeQuery(queryData, codes) for codes in codeBundles]
