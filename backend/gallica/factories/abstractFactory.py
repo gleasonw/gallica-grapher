@@ -94,51 +94,43 @@ class AbstractFactory:
         )
 
     def buildAllSearchQueries(self, ticket) -> list:
-        codeBundles = self.splitCodesIntoBundles(ticket.getCodes())
-        for term in ticket.getTerms():
-            for codeBundle in codeBundles:
-                yield self.makeQuery(
-                    codes=codeBundle,
-                    term=term,
-                    publicationStartDate=ticket.getStartDate(),
-                    publicationEndDate=ticket.getEndDate(),
-                    linkDistance=ticket.getLinkDistance(),
-                    linkTerm=ticket.getLinkTerm(),
-                    collapsing=False,
-                    numRecords=1,
-                    startIndex=0
-                )
+        return buildBaseQueries(
+            ticket,
+            [(ticket.getStartDate(), ticket.getEndDate())]
 
     def buildYearGroupQueries(self, ticket) -> list:
-        codeBundles = self.splitCodesIntoBundles(ticket.getCodes())
-        for term in ticket.getTerms():
-            for year in range(ticket.getStartDate(), ticket.getEndDate() + 1):
-                for codeBundle in codeBundles:
-                    yield self.makeQuery(
-                        codes=codeBundle,
-                        term=term,
-                        publicationStartDate=year,
-                        publicationEndDate=year,
-                        collapsing=False,
-                        numRecords=1,
-                        startIndex=0
-                    )
-
+        return buildBaseQueries(
+            ticket,
+            zip(
+                range(ticket.getStartDate(), ticket.getEndDate() + 1),
+                range(ticket.getStartDate(), ticket.getEndDate() + 1)
+            )
+        )
+                
     def buildMonthGroupQueries(self, ticket) -> list:
+        yearMonthDays = []
+        for year in range(ticket.getStartDate(), ticket.getEndDate() + 1):
+            for month in range(1, 13):
+                yearMonthDays.append(f"{year}-{month:02}-01", f"{year}-{month:02}-31")
+        return buildBaseQueries(ticket, yearMonthDays)
+    
+    def buildBaseQueries(ticket, startEndDates):
         codeBundles = self.splitCodesIntoBundles(ticket.getCodes())
+        queries = []
         for term in ticket.getTerms():
-            for year in range(ticket.getStartDate(), ticket.getEndDate() + 1):
-                for month in range(1, 13):
-                    for codeBundle in codeBundles:
-                        yield self.makeQuery(
-                            codes=codeBundle,
-                            term=term,
-                            publicationStartDate=f"{year}-{month:02}-01",
-                            publicationEndDate=f"{year}-{month:02}-31",
-                            collapsing=False,
-                            numRecords=1,
-                            startIndex=0
-                        )
+            for dates in startEndDates:
+                queryData = {
+                    term=term,
+                    publicationStartDate=dates[0],
+                    publicationEndDate=dates[1],
+                    collapsing=False,
+                    numRecords=1,
+                    startIndex=0,
+                }
+                if codeBundles:
+                    return [self.makeQuery(queryData, codes) for codes in codeBundles]
+                else:
+                    return [self.makeQuery(queryData)]
 
     def getNumResultsForEachQuery(self, queries) -> dict:
         responses = self.sruFetcher.fetchAll(queries)
