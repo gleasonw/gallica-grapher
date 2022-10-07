@@ -1,12 +1,10 @@
 from gallica.factories.parseFactory import buildParser
-from gallica.fullsearchprogressupdate import FullSearchProgressUpdate
 from gallica.papersearchrunner import PaperSearchRunner
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 from fetchComponents.concurrentfetch import ConcurrentFetch
 from gallica.request import Request
 from query import Query, PaperQuery
-from query import CQLStringForPaperCodes
 from utils.psqlconn import PSQLconn
 from gallica.ticket import Ticket
 from gallica.search import Search
@@ -32,8 +30,20 @@ class AbstractFactory:
             )
             for key, ticket in tickets.items()
         ]
-        self.paperCqlBuilder = CQLStringForPaperCodes().build
         self.makeQuery = Query
+        self.parse = buildParser()
+        self.sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
+        self.paperSearch = PaperSearchRunner(
+            parse=self.parse,
+            paperQueryFactory=PaperQueryFactory(),
+            sruFetch=self.sruFetcher,
+            arkFetch=ConcurrentFetch('https://gallica.bnf.fr/services/Issues'),
+        )
+        self.dbLink = SchemaLinkForSearch(
+            requestID=self.requestID,
+            paperFetcher=self.paperSearch.addRecordDataForTheseCodesToDB,
+            conn=self.dbConn
+        )
 
     def buildRequest(self) -> Request:
         req = Request(
@@ -48,51 +58,34 @@ class AbstractFactory:
         )
 
     def buildTicketSearch(self, ticket, onProgressUpdate) -> Search:
-        parse = buildParser()
-        sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
-        paperSearch = PaperSearchRunner(
-            parse=parse,
-            paperQueryFactory=PaperQueryFactory(),
-            sruFetch=sruFetcher,
-            arkFetch=ConcurrentFetch('https://gallica.bnf.fr/services/Issues'),
-        )
-        dbLink = SchemaLinkForSearch(
-            requestID=self.requestID,
-            paperFetcher=paperSearch.addRecordDataForTheseCodesToDB,
-            conn=self.dbConn
-        )
         return self.buildSearch(
-            parse=parse,
             ticket=ticket,
-            sruFetcher=sruFetcher,
-            dbLink=dbLink,
             onProgressUpdate=onProgressUpdate
         )
 
-    def buildSearch(self, parse, ticket, sruFetcher, dbLink, onProgressUpdate) -> Search:
-        ticket = ticket
-        fetchType = ticket.fetchType
-        baseQueriesForFetch = {
+    def buildSearch(self, ticket, onProgressUpdate) -> Search:
+        fetchType = ticket.getFetchType()
+        baseQueriesForSearch = {
             'year': lambda tick, _: self.buildYearGroupQueries(tick),
             'month': lambda tick, _: self.buildMonthGroupQueries(tick),
-            'all': lambda tick, recordCount: self.buildAllSearchQueries(tick, recordCount)
+            'all': lambda tick, recordCount: self.buildAllSearchQueries(tick)
         }
-        queries = baseQueriesForFetch[fetchType](ticket)
+        queries = baseQueriesForSearch[fetchType](ticket)
+        progressHandler = self.buildProgressHandler(ticket, onProgressUpdate)
         if fetchType == 'all':
-            progressHandler = FullSearchProgressUpdate(ticket, onProgressUpdate)
-            insertSocket = dbLink.insertRecordsIntoOccurrences
-            parseData = parse.parseOccurrences
-            numRecords = self.allSearchEstimate(queries)
+            insertSocket = self.dbLink.insertRecordsIntoOccurrences
+            parseData = self.parse.occurrences
+            numResultsForQueries = self.getNumResultsForEachQuery(queries)
+            numRecords = sum(numResultsForQueries.values())
         else:
-            progressHandler = BasicProgressHandler(ticket, onProgressUpdate)
-            insertSocket = dbLink.insertRecordsIntoGroupCounts
-            parseData = parse.groupCounts
-            numRecords = self.groupSearchEstimate(queries)
+            insertSocket = self.dbLink.insertRecordsIntoGroupCounts
+            parseData = self.parse.groupCounts
+            numRecords = len(queries)
         return Search(
             ticketID=ticket.getID(),
             requestID=self.requestID,
             queries=queries,
-            SRUfetch=sruFetcher,
+            SRUfetch=self.sruFetcher,
             parseDataToRecords=parseData,
             insertRecordsIntoDatabase=insertSocket,
             onUpdateProgress=progressHandler.handleUpdateProgress,
@@ -101,16 +94,65 @@ class AbstractFactory:
         )
 
     def buildAllSearchQueries(self, ticket) -> list:
-        return list(map(
-            self.makeQuery,
-            cqlStrings
-        ))
+        codeBundles = self.splitCodesIntoBundles(ticket.getCodes())
+        for term in ticket.getTerms():
+            for codeBundle in codeBundles:
+                yield self.makeQuery(
+                    codes=codeBundle,
+                    term=term,
+                    publicationStartDate=ticket.getStartDate(),
+                    publicationEndDate=ticket.getEndDate(),
+                    linkDistance=ticket.getLinkDistance(),
+                    linkTerm=ticket.getLinkTerm(),
+                    collapsing=False,
+                    numRecords=1,
+                    startIndex=0
+                )
 
     def buildYearGroupQueries(self, ticket) -> list:
-
+        codeBundles = self.splitCodesIntoBundles(ticket.getCodes())
+        for term in ticket.getTerms():
+            for year in range(ticket.getStartDate(), ticket.getEndDate() + 1):
+                for codeBundle in codeBundles:
+                    yield self.makeQuery(
+                        codes=codeBundle,
+                        term=term,
+                        publicationStartDate=year,
+                        publicationEndDate=year,
+                        collapsing=False,
+                        numRecords=1,
+                        startIndex=0
+                    )
 
     def buildMonthGroupQueries(self, ticket) -> list:
-        pass
+        codeBundles = self.splitCodesIntoBundles(ticket.getCodes())
+        for term in ticket.getTerms():
+            for year in range(ticket.getStartDate(), ticket.getEndDate() + 1):
+                for month in range(1, 13):
+                    for codeBundle in codeBundles:
+                        yield self.makeQuery(
+                            codes=codeBundle,
+                            term=term,
+                            publicationStartDate=f"{year}-{month:02}-01",
+                            publicationEndDate=f"{year}-{month:02}-31",
+                            collapsing=False,
+                            numRecords=1,
+                            startIndex=0
+                        )
+
+    def getNumResultsForEachQuery(self, queries) -> dict:
+        responses = self.sruFetcher.fetchAll(queries)
+        numResultsForQueries = {}
+        for data, query in responses:
+            numRecordsForBaseCQL = self.parse.numRecords(data)
+            numResultsForQueries[query] = numRecordsForBaseCQL
+        return numResultsForQueries
+
+    def splitCodesIntoBundles(self, codes) -> list:
+        return [
+            codes[i:i+NUM_CODES_PER_CQL]
+            for i in range(0, len(codes), NUM_CODES_PER_CQL)
+        ]
 
     def makeIndexedQueries(self, baseQueries):
         for query in baseQueries.values():

@@ -45,6 +45,12 @@ class Date:
     def getYear(self):
         return self.date[0]
 
+    def getMonth(self):
+        return self.date[1]
+
+    def getDay(self):
+        return self.date[2]
+
     def __del__(self):
         del Date._cache[self.dateText]
 

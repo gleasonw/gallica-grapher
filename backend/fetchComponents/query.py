@@ -4,17 +4,17 @@ class Query:
         self.codes = kwargs.get("codes", [])
         self.linkDistance = kwargs.get("linkDistance", 0)
         self.linkTerm = kwargs.get("linkTerm", None)
-        self.cql = None
+        self.publicationStartDate = kwargs.get('publicationStartDate')
+        self.publicationEndDate = kwargs.get('publicationEndDate')
         self.startIndex = kwargs.get('startIndex')
         self.numRecords = kwargs.get('numRecords')
         self.collapsing = kwargs.get('collapsing')
         self.term = kwargs.get('term')
+
         self.estimateNumRecordsToFetch = None
         self.code = None
         self.ark = None
-        self.publicationStartDate = kwargs.get('publicationStartDate')
-        self.publicationEndDate = kwargs.get('publicationEndDate')
-        self.buildPaperCQL = kwargs.get('buildPaperCQL')
+        self.cql = None
 
     def getParams(self):
         return{
@@ -39,7 +39,7 @@ class Query:
         return f"({termCQL}) and ({dateCQL}){paperCQL} and (dc.type all \"fascicule\")"
 
     def buildDateCQL(self):
-        return f'(gallicapublication_date="{self.publicationStartDate}" and gallicapublication_date="{self.publicationEndDate}")'
+        return f'(gallicapublication_date>="{self.publicationStartDate}" and gallicapublication_date<="{self.publicationEndDate}")'
 
     def buildTermCQL(self) -> str:
         return f'(gallica adj "{self.term}")'
