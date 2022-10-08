@@ -1,10 +1,10 @@
-from abstractFactory import fetchNumResultsForQueries, makeIndexedPaperQueries
+from requestFactory import fetchNumResultsForQueries, makeIndexedPaperQueries
 from query import CQLStringForPaperCodes
 from gallica.factories.allQueryIndexer import AllQueryIndexer
 from fetchComponents.query import *
 
 
-class PaperQueryFactory:
+class PaperSearchFactory:
 
     def __init__(self):
         self.cql = CQLStringForPaperCodes()

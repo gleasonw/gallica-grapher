@@ -1,3 +1,6 @@
+NUM_CODES_PER_BUNDLE = 10
+
+
 class Ticket:
 
     def __init__(
@@ -28,17 +31,25 @@ class Ticket:
     def getID(self):
         return self.key
 
-    def getQueries(self):
-        return self.queries
+    def getGroupingIntervals(self):
+        groupings = {
+            'year': set(zip(
+                range(self.startYear, self.endYear + 1),
+                range(self.startYear, self.endYear + 1)
+            )),
+            'month': [
+                (f"{year}-{month:02}-01", f"{year}-{month:02}-31")
+                for year in range(self.startYear, self.endYear + 1)
+                for month in range(1, 13)
+            ]
+        }
+        return groupings[self.fetchType]
 
-    def setQueries(self, queries):
-        self.queries = queries
-
-    def setEstimateNumResults(self, estimateNumResults):
-        self.estimateNumResults = estimateNumResults
-
-    def setNumResultsRetrieved(self, numResultsRetrieved):
-        self.numResultsRetrieved = numResultsRetrieved
+    def getCodeBundles(self):
+        return None if self.codes is None else [
+            self.codes[i:i+NUM_CODES_PER_BUNDLE]
+            for i in range(0, len(self.codes), NUM_CODES_PER_BUNDLE)
+        ]
 
     def __repr__(self):
         return f"Ticket({self.key}, {self.terms}, {self.codes}, {self.startYear}, {self.endYear}, {self.linkTerm}, {self.linkDistance})"

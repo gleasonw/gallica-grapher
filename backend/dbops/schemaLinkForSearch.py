@@ -38,6 +38,15 @@ class SchemaLinkForSearch:
                 )
             )
 
+    def insertRecordsIntoGroupCounts(self, records):
+        csvStream = self.buildCSVstream(records)
+        with self.conn.cursor() as curs:
+            curs.copy_from(
+                csvStream,
+                'groupcounts',
+                sep='|'
+            )
+
     def insertMissingPapersToDB(self, codes, onAddMissingPapers):
         schemaMatches = self.getPaperCodesThatMatch(codes)
         setOfCodesInDB = set(match[0] for match in schemaMatches)

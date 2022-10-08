@@ -1,5 +1,5 @@
 from celery import Celery
-from gallica.factories.abstractFactory import AbstractFactory
+from gallica.factories.requestFactory import RequestFactory
 import time
 
 app = Celery()
@@ -8,7 +8,7 @@ app.config_from_object('celery_settings')
 
 @app.task(bind=True)
 def spawnRequest(self, tickets, requestid):
-    factory = AbstractFactory(
+    factory = RequestFactory(
         tickets,
         requestid
     )

@@ -33,7 +33,6 @@ class Parse:
             paperTitle = self.getPaperTitle(data)
             paperCode = self.getPaperCode(data)
             date = self.getDate(data)
-            recordYear = date.getYear()
             newRecord = self.makeOccurrenceRecord(
                 paperTitle=paperTitle,
                 paperCode=paperCode,

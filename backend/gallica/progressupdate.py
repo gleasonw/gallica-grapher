@@ -2,32 +2,45 @@ from math import ceil
 from gallica.responseTime import ResponseTime
 
 
-class FullSearchProgressUpdate:
+class ProgressUpdate:
 
-    def __init__(self, ticket, onProgressUpdate):
-        self.ticket = ticket
+    def __init__(self, ticketID, onProgressUpdate, totalRecords):
+        self.ticketID = ticketID
         self.numBatchesRetrieved = 0
-        self.numBatches = ceil(self.ticket.estimateNumResults / 50)
+        self.numBatches = ceil(totalRecords / 50)
         self.averageResponseTime = ResponseTime()
         self.onProgressUpdate = onProgressUpdate
+        self.numRecords = totalRecords
 
     def assembleProgressUpdate(
             self,
             elapsedTime,
             numWorkers,
-            randomPaper
+            randomPaper=None
     ):
         self.numBatchesRetrieved += 1
         self.averageResponseTime.update(elapsedTime)
         self.onProgressUpdate(
-            ticketKey=self.ticket.key,
+            ticketKey=self.ticketID,
             progressStats={
                 'progress': self.getPercentProgress(),
-                'numResultsDiscovered': self.ticket.estimateNumResults,
+                'numResultsDiscovered': self.numRecords,
                 'numResultsRetrieved': self.numBatchesRetrieved * 50,
                 'randomPaper': randomPaper,
                 'estimateSecondsToCompletion': self.getEstimateSecondsToCompletion(numWorkers),
                 'active': 1
+            }
+        )
+
+    def onSearchFinish(self, numResults):
+        self.onProgressUpdate(
+            ticketKey=self.ticketID,
+            progressStats={
+                'progress': 100,
+                'numResultsDiscovered': numResults,
+                'numResultsRetrieved': numResults,
+                'estimateSecondsToCompletion': 0,
+                'active': 0
             }
         )
 

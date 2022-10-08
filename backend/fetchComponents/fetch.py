@@ -29,7 +29,7 @@ class Fetch:
         response = self.http.request(
             "GET",
             self.baseUrl,
-            fields=query.getParams()
+            fields=query.getFetchParams()
         )
         end = time.perf_counter()
         if response.status != 200:

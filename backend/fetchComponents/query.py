@@ -16,7 +16,7 @@ class Query:
         self.ark = None
         self.cql = None
 
-    def getParams(self):
+    def getFetchParams(self):
         return{
             "operation": "searchRetrieve",
             "exactSearch": "True",
@@ -24,7 +24,17 @@ class Query:
             "startRecord": self.startIndex,
             "maximumRecords": self.numRecords,
             "collapsing": self.collapsing,
-            "query": self.cql,
+            "query": self.generateCQL(),
+        }
+
+    def getEssentialDataForMakingAQuery(self):
+        return {
+            "term": self.term,
+            "publicationStartDate": self.publicationStartDate,
+            "publicationEndDate": self.publicationEndDate,
+            "codes": self.codes,
+            "linkDistance": self.linkDistance,
+            "linkTerm": self.linkTerm,
         }
 
     def getCQL(self):
@@ -102,7 +112,7 @@ class ArkQueryForNewspaperYears(Query):
         self.ark = f'ark:/12148/{code}/date'
         self.code = code
 
-    def getParams(self):
+    def getFetchParams(self):
         return {"ark": self.ark}
 
     def __repr__(self):
@@ -116,7 +126,7 @@ class OCRQuery(Query):
         self.ark = ark
         self.term = term
 
-    def getParams(self):
+    def getFetchParams(self):
         return {
             "ark": self.ark,
             "query": self.term
