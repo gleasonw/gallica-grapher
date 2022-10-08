@@ -1,10 +1,10 @@
-from fetchComponents import Query
+from fetchComponents.query import Query
 
 
-class QueryFactory:
+class TicketQueryFactory:
 
-    def __init__(self, sruFetcher):
-        self.sruFetcher = sruFetcher
+    def __init__(self, queryOps):
+        self.queryOps = queryOps
 
     def build(self, ticket, startEndDates):
         for term in ticket.getTerms():
@@ -28,7 +28,8 @@ class QueryFactory:
                         )
                     ]
 
-    def makeQuery(self, term, ticket, dates, codes=[]):
+    def makeQuery(self, term, ticket, dates, codes=None):
+        codes = codes or []
         return Query(
             term=term,
             publicationStartDate=dates[0],
@@ -40,22 +41,3 @@ class QueryFactory:
             collapsing=False,
             codes=codes
         )
-
-    def getNumResultsForEachQuery(self, queries) -> dict:
-        responses = self.sruFetcher.fetchAll(queries)
-        numResultsForQueries = {}
-        for data, query in responses:
-            numRecordsForBaseCQL = self.parse.numRecords(data)
-            numResultsForQueries[query] = numRecordsForBaseCQL
-        return numResultsForQueries
-
-    def makeIndexedQueriesForEachBaseQuery(self, baseQueries) -> list:
-        indexedQueries = []
-        for query, numResults in baseQueries.items():
-            for i in range(0, numResults, 50):
-                baseData = query.getEssentialDataForMakingAQuery()
-                baseData["startIndex"] = i
-                baseData["numRecords"] = 50
-                baseData["collapsing"] = False
-                indexedQueries.append(self.makeQuery(baseData))
-        return indexedQueries

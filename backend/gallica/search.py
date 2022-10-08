@@ -2,42 +2,25 @@ class Search:
 
     def __init__(
             self,
-            ticketID,
-            requestID,
             queries,
-            SRUfetch,
+            gallicaAPI,
             onUpdateProgress,
             insertRecordsIntoDatabase,
-            onSearchFinish,
-            parseDataToRecords,
-            numRecords
+            parseDataToRecords
     ):
-        self.ticketID = ticketID
-        self.requestID = requestID
         self.queries = queries
-        self.SRUfetch = SRUfetch
+        self.gallicaAPI = gallicaAPI
         self.onUpdateProgress = onUpdateProgress
         self.insertRecordsIntoDatabase = insertRecordsIntoDatabase
-        self.onSearchFinish = onSearchFinish
         self.parseDataToRecords = parseDataToRecords
-        self.getEstimateNumRecordsToFetch = numRecords
 
-    def getTicketID(self):
-        return self.ticketID
-
-    def getEstimateNumRecords(self):
-        return self.getEstimateNumRecordsToFetch(self.queries)
-
-    def doSearch(self):
-        rawResponse = self.getSearchResponse()
+    def run(self):
+        rawResponse = self.gallicaAPI.fetch(
+            queries=self.queries,
+            onUpdateProgress=self.onUpdateProgress
+        )
         records = self.parseSearchResponse(rawResponse)
         return self.insertRecordsIntoDatabase(records)
-
-    def getSearchResponse(self):
-        return self.SRUfetch(
-            self.queries,
-            self.onUpdateProgress
-        )
 
     def parseSearchResponse(self, rawResponse):
         for data, query in rawResponse:

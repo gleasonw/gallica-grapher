@@ -1,12 +1,14 @@
-from requestFactory import fetchNumResultsForQueries, makeIndexedPaperQueries
-from query import CQLStringForPaperCodes
-from gallica.factories.allQueryIndexer import AllQueryIndexer
-from fetchComponents.query import *
 
 
 class PaperSearchFactory:
 
-    def __init__(self):
+    def __init__(
+            self,
+            dbLink,
+            baseQueryMaker,
+            parse,
+            sruFetcher
+    ):
         self.cql = CQLStringForPaperCodes()
         self.makeIndexer = lambda cql: AllQueryIndexer(cql)
         self.makeNumPapersQuery = lambda cql: NumPapersOnGallicaQuery(cql)

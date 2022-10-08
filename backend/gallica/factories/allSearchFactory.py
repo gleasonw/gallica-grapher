@@ -1,3 +1,4 @@
+from parseOccurrenceRecords import ParseOccurrenceRecords
 from gallica.search import Search
 
 
@@ -7,38 +8,33 @@ class AllSearchFactory:
             self,
             ticket,
             dbLink,
-            parse,
             baseQueries,
             requestID,
+            parse,
             onUpdateProgress,
-            onSearchFinish,
             sruFetcher
     ):
         self.requestID = requestID
         self.ticket = ticket
         self.insertIntoResults = dbLink.insertRecordsIntoResults
-        self.parse = parse.occurrences
+        self.parse = ParseOccurrenceRecords(parse)
         self.buildQueries = baseQueries.build
         self.getNumResultsForEachQuery = baseQueries.getNumResultsForEachQuery
         self.makeIndexedQueriesForEachBaseQuery = baseQueries.makeIndexedQueriesForEachBaseQuery
         self.onUpdateProgress = onUpdateProgress
-        self.onSearchFinish = onSearchFinish
         self.sruFetcher = sruFetcher
 
-    def getAllSearch(self):
+    def getSearch(self):
         queries = self.buildQueries(
             self.ticket,
             [(self.ticket.getStartDate(), self.ticket.getEndDate())]
         )
-        numResultsForQueries = self.getNumResultsForEachQuery(queries)
+        queriesWithNumResults = self.getNumResultsForEachQuery(queries)
         return Search(
-            ticketID=self.ticket.getID(),
-            requestID=self.requestID,
-            queries=self.makeIndexedQueriesForEachBaseQuery(queries),
-            SRUfetch=self.sruFetcher,
+            queries=self.makeIndexedQueriesForEachBaseQuery(
+                queriesWithNumResults),
+            gallicaAPI=self.sruFetcher,
             parseDataToRecords=self.parse,
             insertRecordsIntoDatabase=self.insertIntoResults,
             onUpdateProgress=self.onUpdateProgress,
-            onSearchFinish=self.onSearchFinish,
-            numRecords=sum(numResultsForQueries.values())
         )

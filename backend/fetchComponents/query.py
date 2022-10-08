@@ -77,34 +77,6 @@ class NumOccurrencesForTermQuery(Query):
         return f'NumOccurrencesForTermQuery({self.cql}, {self.term})'
 
 
-class NumPapersOnGallicaQuery(Query):
-
-    def __init__(self, cql):
-        super().__init__(
-            cql=cql,
-            startIndex=1,
-            numRecords=1,
-            collapsing=True
-        )
-
-    def __repr__(self):
-        return f'NumPapersOnGallicaQuery({self.cql})'
-
-
-class PaperQuery(Query):
-
-    def __init__(self, cql, startIndex):
-        super().__init__(
-            cql=cql,
-            startIndex=startIndex,
-            numRecords=50,
-            collapsing=True
-        )
-
-    def __repr__(self):
-        return f'PaperQuery({self.cql})'
-
-
 class ArkQueryForNewspaperYears(Query):
 
     def __init__(self, code):

@@ -2,44 +2,10 @@ from lxml import etree
 from gallica.date import Date
 
 
-# TODO: split into multiple classes for each parse use case, switch at factory level
 class Parse:
 
-    def __init__(
-            self,
-            makePaperRecord,
-            makeOccurrenceRecord
-    ):
-        self.makePaperRecord = makePaperRecord
-        self.makeOccurrenceRecord = makeOccurrenceRecord
-
-    def papers(self, responseXML) -> list:
-        elements = etree.fromstring(responseXML)
-        for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
-            data = self.getDataFromRecordRoot(record)
-            newRecord = self.makePaperRecord(
-                code=self.getPaperCode(data),
-                title=self.getPaperTitle(data),
-                url=self.getURL(data),
-            )
-            yield newRecord
-
-    def occurrences(self, xml) -> list:
-        elements = etree.fromstring(xml)
-        if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
-            return []
-        for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
-            data = self.getDataFromRecordRoot(record)
-            paperTitle = self.getPaperTitle(data)
-            paperCode = self.getPaperCode(data)
-            date = self.getDate(data)
-            newRecord = self.makeOccurrenceRecord(
-                paperTitle=paperTitle,
-                paperCode=paperCode,
-                date=date,
-                url=self.getURL(data),
-            )
-            yield newRecord
+    def __init__(self):
+        pass
 
     def onePaperTitleFromOccurrenceBatch(self, responseXML) -> str:
         elements = etree.fromstring(responseXML)

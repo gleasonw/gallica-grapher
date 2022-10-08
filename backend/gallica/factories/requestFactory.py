@@ -9,7 +9,7 @@ from gallica.ticket import Ticket
 from gallica.progressupdate import ProgressUpdate
 from factories.allSearchFactory import AllSearchFactory
 from factories.groupSearchFactory import GroupSearchFactory
-from factories.queryFactory import QueryFactory
+from factories.queryIndexer import QueryIndexer
 
 
 class RequestFactory:
@@ -43,7 +43,7 @@ class RequestFactory:
             paperFetcher=self.paperSearch.addRecordDataForTheseCodesToDB,
             conn=self.dbConn
         )
-        self.baseQueries = QueryFactory(sruFetcher=self.sruFetcher)
+        self.baseQueries = QueryIndexer(gallicaAPI=self.sruFetcher)
 
     def buildRequest(self) -> Request:
         req = Request(
@@ -62,12 +62,11 @@ class RequestFactory:
                     parse=self.parse,
                     baseQueries=self.baseQueries,
                     requestID=self.requestID,
-                    onUpdateProgress=lambda ticketID, progressStats:
-                        req.setTicketProgressStats(ticketID, progressStats),
-                    onSearchFinish=lambda ticketID, numResultsRetrieved:
-                        req.setTicketSearchFinished(ticketID, numResultsRetrieved),
+                    onUpdateProgress=lambda progressStats:
+                        req.setTicketProgressStats(tick.getID(), progressStats),
+                    onAddingResultsToDd=lambda: req.setRequestState('ADDING_RESULTS_TO_DB'),
                     sruFetcher=self.sruFetcher
-                ),
+                ).getSearch(),
                 self.tickets
             ))
         )
