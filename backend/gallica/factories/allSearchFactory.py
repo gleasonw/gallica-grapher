@@ -20,7 +20,7 @@ class AllSearchFactory:
         self.parse = ParseOccurrenceRecords(parse)
         self.buildQueries = baseQueries.build
         self.getNumResultsForEachQuery = baseQueries.getNumResultsForEachQuery
-        self.makeIndexedQueriesForEachBaseQuery = baseQueries.makeIndexedQueriesForEachBaseQuery
+        self.makeIndexedQueriesForEachBaseQuery = baseQueries.makeIndexedQueries
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
 

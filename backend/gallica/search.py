@@ -15,7 +15,7 @@ class Search:
         self.parseDataToRecords = parseDataToRecords
 
     def run(self):
-        rawResponse = self.gallicaAPI.fetch(
+        rawResponse = self.gallicaAPI.api(
             queries=self.queries,
             onUpdateProgress=self.onUpdateProgress
         )

@@ -13,7 +13,7 @@ class QueryIndexer:
             numResultsForQueries[query] = numRecordsForBaseCQL
         return numResultsForQueries
 
-    def makeIndexedQueriesForEachBaseQuery(self, baseQueries) -> list:
+    def makeIndexedQueries(self, baseQueries) -> list:
         indexedQueries = []
         for query, numResults in baseQueries.items():
             for i in range(0, numResults, 50):

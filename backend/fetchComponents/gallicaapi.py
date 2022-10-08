@@ -1,11 +1,12 @@
 import time
+from gallicaResponseWrapper import GallicaResponseWrapper
 
 from .query import *
 from urllib3.util.retry import Retry
 import urllib3
 
 
-class Fetch:
+class GallicaAPI:
 
     def __init__(self, baseUrl, maxSize=50):
         self.baseUrl = baseUrl
@@ -24,7 +25,7 @@ class Fetch:
         )
         return http
 
-    def get(self, query) -> tuple:
+    def get(self, query) -> GallicaResponseWrapper:
         start = time.perf_counter()
         response = self.http.request(
             "GET",
@@ -35,14 +36,8 @@ class Fetch:
         if response.status != 200:
             print(f"Error: {response.status}")
             print(f"Error: {response.data}")
-        returnsForQueryType = {
-            Query: (response.data, query, end - start),
-            NumOccurrencesForTermQuery: (response.data, query.cql),
-            NumPapersOnGallicaQuery: (response.data, query.cql),
-            PaperQuery: (response.data, query.cql),
-            ArkQueryForNewspaperYears: (response.data, query.code),
-            OCRQuery: response.data
-        }
-        return returnsForQueryType[type(query)]
-
-
+        return GallicaResponseWrapper(
+            data=response.data,
+            query=query,
+            elapsed=end - start
+        )

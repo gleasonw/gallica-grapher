@@ -3,8 +3,8 @@ from fetchComponents.query import Query
 
 class TicketQueryFactory:
 
-    def __init__(self, queryOps):
-        self.queryOps = queryOps
+    def __init__(self):
+        pass
 
     def build(self, ticket, startEndDates):
         for term in ticket.getTerms():

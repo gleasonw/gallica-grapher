@@ -62,21 +62,6 @@ class Query:
         return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
 
 
-class NumOccurrencesForTermQuery(Query):
-
-    def __init__(self, cql, term):
-        super().__init__(
-            cql=cql,
-            startIndex=1,
-            numRecords=1,
-            collapsing=False,
-            term=term
-        )
-
-    def __repr__(self):
-        return f'NumOccurrencesForTermQuery({self.cql}, {self.term})'
-
-
 class ArkQueryForNewspaperYears(Query):
 
     def __init__(self, code):
@@ -89,6 +74,25 @@ class ArkQueryForNewspaperYears(Query):
 
     def __repr__(self):
         return f'ArkQuery({self.ark})'
+
+
+class PaperQuery(Query):
+
+    def __init__(self, startIndex, numRecords, codes=None):
+        super().__init__(
+            codes=codes,
+            startIndex=startIndex,
+            numRecords=numRecords,
+            collapsing=True)
+
+    def generateCQL(self):
+        if self.codes:
+            return self.buildPaperCQL(self.codes)
+        else:
+            return "dc.type all \"fascicule\" and ocrquality > \"050.00\""
+
+    def __repr__(self):
+        return f'PaperQuery({self.codes}, {self.startIndex}, {self.numRecords})'
 
 
 class OCRQuery(Query):

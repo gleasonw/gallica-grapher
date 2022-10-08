@@ -3,7 +3,7 @@ from fetchComponents.concurrentfetch import ConcurrentFetch
 from fetchComponents.concurrentfetch import NUM_WORKERS
 from unittest.mock import patch, MagicMock, call
 
-from fetchComponents.fetch import get
+from fetchComponents.gallicaapi import get
 
 
 class TestFetch(TestCase):
