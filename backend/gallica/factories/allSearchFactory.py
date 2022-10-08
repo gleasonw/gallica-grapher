@@ -31,16 +31,14 @@ class AllSearchFactory:
             [(self.ticket.getStartDate(), self.ticket.getEndDate())]
         )
         numResultsForQueries = self.getNumResultsForEachQuery(queries)
-        numRecords = sum(numResultsForQueries.values())
-        indexedQueries = self.makeIndexedQueriesForEachBaseQuery(queries)
         return Search(
             ticketID=self.ticket.getID(),
             requestID=self.requestID,
-            queries=indexedQueries,
+            queries=self.makeIndexedQueriesForEachBaseQuery(queries),
             SRUfetch=self.sruFetcher,
             parseDataToRecords=self.parse,
             insertRecordsIntoDatabase=self.insertIntoResults,
             onUpdateProgress=self.onUpdateProgress,
             onSearchFinish=self.onSearchFinish,
-            numRecords=numRecords
+            numRecords=sum(numResultsForQueries.values())
         )
