@@ -1,4 +1,4 @@
-from query import Query
+from fetchComponents import Query
 
 
 class QueryFactory:
@@ -9,34 +9,36 @@ class QueryFactory:
     def build(self, ticket, startEndDates):
         for term in ticket.getTerms():
             for dates in startEndDates:
-                queryData = {
-                    "term":term,
-                    "publicationStartDate":dates[0],
-                    "publicationEndDate":dates[1],
-                    "collapsing":False,
-                    "numRecords":1,
-                    "startIndex":0,
-                }
                 if codeBundles := ticket.getCodeBundles():
-                    queries = []
-                    for codes in codeBundles:
-                        queryData['codes'] = codes
-                        queries.append(self.makeQuery(queryData))
-                    return queries
+                    return [
+                        self.makeQuery(
+                            term=term,
+                            ticket=ticket,
+                            dates=dates,
+                            codes=codes
+                        )
+                        for codes in codeBundles
+                    ]
                 else:
-                    return [self.makeQuery(queryData)]
+                    return [
+                        self.makeQuery(
+                            term=term,
+                            ticket=ticket,
+                            dates=dates
+                        )
+                    ]
 
-    def makeQuery(self, data):
+    def makeQuery(self, term, ticket, dates, codes=[]):
         return Query(
-            codes=data.get('codes'),
-            linkDistance=data.get('linkDistance'),
-            linkTerm=data.get('linkTerm'),
-            publicationStartDate=data.get('publicationStartDate'),
-            publicationEndDate=data.get('publicationEndDate'),
-            term=data.get('term'),
-            numRecords=data.get('numRecords'),
-            startIndex=data.get('startIndex'),
-            collapsing=data.get('collapsing')
+            term=term,
+            publicationStartDate=dates[0],
+            publicationEndDate=dates[1],
+            linkTerm=ticket.getLinkTerm(),
+            linkDistance=ticket.getLinkDistance(),
+            startIndex=0,
+            numRecords=1,
+            collapsing=False,
+            codes=codes
         )
 
     def getNumResultsForEachQuery(self, queries) -> dict:
