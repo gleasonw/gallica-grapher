@@ -19,16 +19,5 @@ class Search:
             queries=self.queries,
             onUpdateProgress=self.onUpdateProgress
         )
-        records = self.parseSearchResponse(rawResponse)
+        records = self.parseDataToRecords(rawResponse)
         return self.insertRecordsIntoDatabase(records)
-
-    def parseSearchResponse(self, rawResponse):
-        for data, query in rawResponse:
-            records = self.parseDataToRecords(data)
-            for record in records:
-                record.addFinalRowElements(
-                    ticketID=self.ticketID,
-                    requestID=self.requestID,
-                    term=query.term
-                )
-                yield record
