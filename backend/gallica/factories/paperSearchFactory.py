@@ -1,7 +1,7 @@
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 
 
-class PaperSearchFactory:
+class PaperSearch:
 
     def __init__(
             self,
