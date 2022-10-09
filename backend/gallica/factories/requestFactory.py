@@ -1,5 +1,4 @@
 from gallica.factories.parseFactory import buildParser
-from gallica.papersearchrunner import PaperSearchRunner
 from gallica.factories.paperSearchFactory import PaperSearchFactory
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 from fetchComponents.concurrentfetch import ConcurrentFetch
@@ -10,6 +9,7 @@ from gallica.progressupdate import ProgressUpdate
 from factories.allSearchFactory import AllSearchFactory
 from factories.groupSearchFactory import GroupSearchFactory
 from factories.queryIndexer import QueryIndexer
+from factories.paperQuery
 
 
 class RequestFactory:
@@ -31,44 +31,19 @@ class RequestFactory:
 
         self.dbConn = PSQLconn().getConn()
         self.parse = buildParser()
-        self.sruFetcher = ConcurrentFetch('https://gallica.bnf.fr/SRU')
-        self.paperSearch = PaperSearchRunner(
-            parse=self.parse,
-            paperQueryFactory=PaperSearchFactory(),
-            sruFetch=self.sruFetcher,
-            arkFetch=ConcurrentFetch('https://gallica.bnf.fr/services/Issues'),
-        )
+        self.SRUapi = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         self.dbLink = SchemaLinkForSearch(
             requestID=self.requestID,
-            paperFetcher=self.paperSearch.addRecordDataForTheseCodesToDB,
-            conn=self.dbConn
+            tools=self
         )
-        self.baseQueries = QueryIndexer(gallicaAPI=self.sruFetcher)
 
     def buildRequest(self) -> Request:
         req = Request(
             requestID=self.requestID,
-            dbConn=self.dbConn
-        )
-        ticketSearchBuilders = {
-            'all': AllSearchFactory,
-            'group': GroupSearchFactory
-        }
-        req.setTicketSearches(
-            list(map(
-                lambda tick: ticketSearchBuilders[tick.fetchType](
-                    ticket=tick,
-                    dbLink=self.dbLink,
-                    parse=self.parse,
-                    baseQueries=self.baseQueries,
-                    requestID=self.requestID,
-                    onUpdateProgress=lambda progressStats:
-                        req.setTicketProgressStats(tick.getID(), progressStats),
-                    onAddingResultsToDd=lambda: req.setRequestState('ADDING_RESULTS_TO_DB'),
-                    sruFetcher=self.sruFetcher
-                ).getSearch(),
-                self.tickets
-            ))
+            dbConn=self.dbConn,
+            tickets=self.tickets,
+            SRUapi=self.SRUapi,
+            dbLink=self.dbLink
         )
         return req
 

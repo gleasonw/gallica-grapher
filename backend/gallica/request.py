@@ -1,20 +1,30 @@
 import threading
+from gallica.factories.allSearchFactory import AllSearchFactory
+from gallica.factories.groupSearchFactory import GroupSearchFactory
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
 
 
 class Request(threading.Thread):
-    def __init__(self, requestID, dbConn):
-        self.ticketSearches = None
+    def __init__(
+            self,
+            requestID,
+            dbConn,
+            tickets,
+            SRUapi,
+            dbLink
+    ):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
-        self.topPapersForTerms = []
         self.state = 'RUNNING'
         self.requestID = requestID
         self.estimateNumRecords = 0
         self.DBconnection = dbConn
         self.ticketProgressStats = self.initProgressStats()
+        self.tickets = tickets
+        self.SRUapi = SRUapi
+        self.dbLink = dbLink
         super().__init__()
 
     def initProgressStats(self):
@@ -68,8 +78,24 @@ class Request(threading.Thread):
             return curs.fetchone()[0]
 
     def doAllSearches(self):
-        for search in self.ticketSearches:
+        searchTypes = {
+            'all': AllSearchFactory,
+            'year': GroupSearchFactory,
+            'month': GroupSearchFactory,
+        }
+        for ticket in self.tickets:
             self.state = 'RUNNING'
+            search = searchTypes[ticket.fetchType](
+                ticket=ticket,
+                dbLink=self.dbLink,
+                requestID=self.requestID,
+                sruFetcher=self.SRUapi,
+                onUpdateProgress=lambda progressStats: self.setTicketProgressStats(
+                    ticket.getID(),
+                    progressStats
+                ),
+                onAddingResultsToDd=lambda: self.setRequestState('ADDING_RESULTS_TO_DB'),
+            ).getSearch()
             search.run()
         self.state = 'COMPLETED'
 

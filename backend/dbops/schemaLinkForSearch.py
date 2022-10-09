@@ -1,11 +1,20 @@
+from gallica.factories.paperSearchFactory import PaperSearchFactory
 import io
 
 
 class SchemaLinkForSearch:
-    def __init__(self, conn, paperFetcher=None, requestID=None):
-        self.conn = conn
+    def __init__(
+            self,
+            tools,
+            requestID=None
+    ):
+        self.conn = tools.conn
         self.requestID = requestID
-        self.fetchRecordsForTheseCodes = paperFetcher
+        self.paperAPI = PaperSearchFactory(
+           dbLink=tools.dbLink,
+           parse=tools.parse,
+           SRUapi=tools.SRUapi
+        )
 
     def insertRecordsIntoPapers(self, records):
         csvStream = self.buildCSVstream(records)
@@ -53,7 +62,9 @@ class SchemaLinkForSearch:
         missingCodes = codes - setOfCodesInDB
         if missingCodes:
             onAddMissingPapers()
-            paperRecords = self.fetchRecordsForTheseCodes(list(missingCodes))
+            paperRecords = self.paperAPI.fetchRecordsForTheseCodes(
+                list(missingCodes)
+            )
             self.insertRecordsIntoPapers(paperRecords)
 
     def getPaperCodesThatMatch(self, codes):

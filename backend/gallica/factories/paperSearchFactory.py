@@ -1,3 +1,4 @@
+from gallica.factories.paperQueryFactory import PaperQueryFactory
 
 
 class PaperSearchFactory:
@@ -5,28 +6,23 @@ class PaperSearchFactory:
     def __init__(
             self,
             dbLink,
-            baseQueryMaker,
             parse,
-            sruFetcher
+            SRUapi,
     ):
-        self.cql = CQLStringForPaperCodes()
-        self.makeIndexer = lambda cql: AllQueryIndexer(cql)
-        self.makeNumPapersQuery = lambda cql: NumPapersOnGallicaQuery(cql)
-
-    def buildSRUQueriesForCodes(self, codes):
-        cqlStrings = self.cql.build(codes)
-        for cql in cqlStrings:
-            yield PaperQuery(cql, startIndex=1)
-
-    def buildARKQueriesForCodes(self, codes):
-        queries = [ArkQueryForNewspaperYears(code) for code in codes]
-        return queries
-
-    def buildAllRecordsQueries(self) -> list:
-        query = self.makeNumPapersQuery(
-            'dc.type all "fascicule" and ocrquality > "050.00"'
+        self.queryMaker = PaperQueryFactory(
+            gallicaAPI=SRUapi,
+            parse=parse
         )
-        indexer = self.makeIndexer([query])
-        totalResults = fetchNumResultsForQueries(indexer.api, indexer.baseQueries, indexer.parse)
-        queries = makeIndexedPaperQueries(indexer.baseQueries, totalResults)
-        return queries
+        self.dbLink = dbLink
+        self.parse = parse
+        self.SRUapi = SRUapi
+
+    def fetchRecordsForTheseCodes(self, codes):
+        queries = self.queryMaker.buildForCodes(codes)
+        records = self.fetchRecordsForTheseQueries(queries)
+        return records
+
+    #TODO: should this be wrapped into the fetch? Get me records for queries, why do I send raw responses back then parse them?
+    def fetchRecordsForTheseQueries(self, queries):
+        responses = self.SRUapi.fetchAll(queries)
+        return self.parse.papers(responses)
