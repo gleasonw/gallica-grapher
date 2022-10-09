@@ -14,13 +14,8 @@ class ConcurrentFetch:
             maxSize=numWorkers
         )
 
-    def fetchAll(self, queries) -> list:
+    def fetchAll(self, queries, tracker=None) -> list:
         with ThreadPoolExecutor(max_workers=self.numWorkers) as executor:
             for response in executor.map(self.api.get, queries):
+                tracker and tracker(response.xml, response.elapsed, self.numWorkers)
                 yield response
-
-    def fetchAllAndTrackProgress(self, queries, tracker) -> list:
-        with ThreadPoolExecutor(max_workers=self.numWorkers) as executor:
-            for response in executor.map(self.api.get, queries):
-                tracker(response.data, response.elapsed, self.numWorkers)
-                yield response.data, response.query

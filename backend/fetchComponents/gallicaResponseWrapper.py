@@ -1,6 +1,6 @@
 class GallicaResponseWrapper:
 
     def __init__(self, data, query, elapsed):
-        self.data = data
+        self.xml = data
         self.query = query
         self.elapsed = elapsed

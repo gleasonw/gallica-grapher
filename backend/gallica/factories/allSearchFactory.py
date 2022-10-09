@@ -1,5 +1,7 @@
-from parseOccurrenceRecords import ParseOccurrenceRecords
+from lxml import etree
 from gallica.search import Search
+from gallica.recordGetter import RecordGetter
+from occurrenceRecord import OccurrenceRecord
 
 
 class AllSearchFactory:
@@ -8,24 +10,26 @@ class AllSearchFactory:
             self,
             ticket,
             dbLink,
-            baseQueries,
             requestID,
             parse,
             onUpdateProgress,
-            sruFetcher
+            sruFetcher,
+            queryBuilder,
+            onAddingResultsToDB
     ):
         self.requestID = requestID
         self.ticket = ticket
         self.insertIntoResults = dbLink.insertRecordsIntoResults
         self.parse = ParseOccurrenceRecords(parse)
-        self.buildQueries = baseQueries.build
-        self.getNumResultsForEachQuery = baseQueries.getNumResultsForEachQuery
-        self.makeIndexedQueriesForEachBaseQuery = baseQueries.makeIndexedQueries
+        self.baseQueryBuilder = queryBuilder.build
+        self.getNumResultsForEachQuery = queryBuilder.getNumResultsForEachQuery
+        self.makeIndexedQueriesForEachBaseQuery = queryBuilder.makeIndexedQueries
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
+        self.onAddingResultsToDB = onAddingResultsToDB
 
     def getSearch(self):
-        queries = self.buildQueries(
+        queries = self.baseQueryBuilder(
             self.ticket,
             [(self.ticket.getStartDate(), self.ticket.getEndDate())]
         )
@@ -33,8 +37,38 @@ class AllSearchFactory:
         return Search(
             queries=self.makeIndexedQueriesForEachBaseQuery(
                 queriesWithNumResults),
-            gallicaAPI=self.sruFetcher,
-            parseDataToRecords=self.parse,
             insertRecordsIntoDatabase=self.insertIntoResults,
-            onUpdateProgress=self.onUpdateProgress,
+            recordGetter=RecordGetter(
+                gallicaAPI=self.sruFetcher,
+                parseData=self.parse,
+                onUpdateProgress=self.onUpdateProgress
+            ),
+            onAddingResultsToDB=self.onAddingResultsToDB
         )
+
+
+class ParseOccurrenceRecords:
+
+    def __init__(self, parser):
+        self.parser = parser
+
+    def parseResponsesToRecords(self, responses):
+        for response in responses:
+            yield from self.generateOccurrenceRecords(response.xml)
+
+    def generateOccurrenceRecords(self, xml):
+        elements = etree.fromstring(xml)
+        if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
+            return []
+        for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
+            data = self.parser.getDataFromRecordRoot(record)
+            paperTitle = self.parser.getPaperTitle(data)
+            paperCode = self.parser.getPaperCode(data)
+            date = self.parser.getDate(data)
+            newRecord = OccurrenceRecord(
+                paperTitle=paperTitle,
+                paperCode=paperCode,
+                date=date,
+                url=self.parser.getURL(data),
+            )
+            yield newRecord

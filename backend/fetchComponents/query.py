@@ -69,6 +69,9 @@ class ArkQueryForNewspaperYears(Query):
         self.ark = f'ark:/12148/{code}/date'
         self.code = code
 
+    def getCode(self):
+        return self.code
+
     def getFetchParams(self):
         return {"ark": self.ark}
 

@@ -52,6 +52,17 @@ class Parse:
             return None
 
     @staticmethod
+    def parseCodeFromArk(xml):
+        arkElement = etree.fromstring(xml)
+        if arkElement is not None:
+            issuesElement = arkElement.find('.')
+            if issuesElement is not None:
+                issueURL = issuesElement.attrib.get('parentArk')
+                return issueURL.split('/')[-2]
+        else:
+            return None
+
+    @staticmethod
     def getDataFromRecordRoot(recordRoot):
         root = recordRoot[2]
         data = root[0]

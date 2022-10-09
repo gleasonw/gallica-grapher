@@ -1,4 +1,4 @@
-from gallica.factories.paperSearchFactory import PaperSearchFactory
+from paperSearch import PaperSearch
 import io
 
 
@@ -10,9 +10,8 @@ class SchemaLinkForSearch:
     ):
         self.conn = tools.conn
         self.requestID = requestID
-        self.paperAPI = PaperSearchFactory(
-           dbLink=tools.dbLink,
-           parse=tools.parse,
+        self.paperAPI = PaperSearch(
+           parse=tools.parser,
            SRUapi=tools.SRUapi
         )
 
@@ -62,7 +61,7 @@ class SchemaLinkForSearch:
         missingCodes = codes - setOfCodesInDB
         if missingCodes:
             onAddMissingPapers()
-            paperRecords = self.paperAPI.fetchRecordsForTheseCodes(
+            paperRecords = self.paperAPI.getRecordsForTheseCodes(
                 list(missingCodes)
             )
             self.insertRecordsIntoPapers(paperRecords)
@@ -108,36 +107,6 @@ class SchemaLinkForSearch:
             self.cleanCSVrow,
             record.getRow()
         )) + '\n')
-
-
-    #TODO: optimize query, or discover a better way to remove duplicates
-    def removeDuplicateRecordsInTicket(self, ticketID):
-        with self.conn.cursor() as curs:
-            curs.execute(
-                """
-                WITH ticketRecords AS (
-                    SELECT ctid, year, month, day, papercode, searchterm, ticketid, requestid
-                    FROM results
-                    WHERE ticketid = %s
-                    AND requestid = %s
-                )
-                DELETE FROM results a USING (
-                    SELECT MIN(ctid) as ctid, year, month, day, papercode, searchterm, ticketid, requestid
-                    FROM ticketRecords
-                    GROUP BY year, month, day, papercode, searchterm, ticketid, requestid
-                    HAVING COUNT(*) > 1
-                ) b
-                WHERE a.requestid = b.requestid
-                AND a.ticketid = b.ticketid
-                AND a.year = b.year
-                AND (a.month = b.month OR (a.month IS NULL AND b.month IS NULL))
-                AND (a.day = b.day OR (a.day IS NULL AND b.day IS NULL))
-                AND a.papercode = b.papercode
-                AND a.searchterm = b.searchterm
-                AND a.ctid <> b.ctid;
-                """,
-                (ticketID, self.requestID,)
-            )
 
     def cleanCSVrow(self, value):
         if value is None:

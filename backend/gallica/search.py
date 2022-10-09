@@ -3,25 +3,16 @@ class Search:
     def __init__(
             self,
             queries,
-            gallicaAPI,
-            onUpdateProgress,
             insertRecordsIntoDatabase,
-            parseDataToRecords,
-            recordGetter
+            recordGetter,
+            onAddingResultsToDB=None
     ):
         self.queries = queries
-        self.gallicaAPI = gallicaAPI
-        self.onUpdateProgress = onUpdateProgress
         self.insertRecordsIntoDatabase = insertRecordsIntoDatabase
-        self.parseDataToRecords = parseDataToRecords
         self.recordGetter = recordGetter
+        self.onAddingResultsToDB = onAddingResultsToDB
 
     def run(self):
-        #TODO: Implement:
-        records = self.recordGetter.getFromQueries(queries)
-        rawResponse = self.gallicaAPI.api(
-            queries=self.queries,
-            onUpdateProgress=self.onUpdateProgress
-        )
-        records = self.parseDataToRecords(rawResponse)
+        records = self.recordGetter.getFromQueries(self.queries)
+        self.onAddingResultsToDB and self.onAddingResultsToDB()
         return self.insertRecordsIntoDatabase(records)

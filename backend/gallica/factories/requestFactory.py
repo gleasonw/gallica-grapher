@@ -1,16 +1,10 @@
-from gallica.factories.parseFactory import buildParser
-from gallica.factories.paperSearchFactory import PaperSearchFactory
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 from fetchComponents.concurrentfetch import ConcurrentFetch
 from gallica.request import Request
 from utils.psqlconn import PSQLconn
 from gallica.ticket import Ticket
-from gallica.progressupdate import ProgressUpdate
-from factories.allSearchFactory import AllSearchFactory
-from factories.groupSearchFactory import GroupSearchFactory
-from factories.queryIndexer import QueryIndexer
-from factories.paperQuery
-
+from gallica.parse import Parse
+from gallica.factories.ticketQueryFactory import TicketQueryFactory
 
 class RequestFactory:
 
@@ -30,20 +24,21 @@ class RequestFactory:
         ]
 
         self.dbConn = PSQLconn().getConn()
-        self.parse = buildParser()
         self.SRUapi = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         self.dbLink = SchemaLinkForSearch(
             requestID=self.requestID,
             tools=self
         )
+        self.parse = Parse()
+        self.queryBuilder = TicketQueryFactory()
 
     def buildRequest(self) -> Request:
-        req = Request(
+        return Request(
             requestID=self.requestID,
             dbConn=self.dbConn,
             tickets=self.tickets,
             SRUapi=self.SRUapi,
-            dbLink=self.dbLink
+            dbLink=self.dbLink,
+            parse=self.parse,
+            queryBuilder=self.queryBuilder
         )
-        return req
-

@@ -24,6 +24,9 @@ class PaperRecord:
             self.code
         )
 
+    def addYearsFromArk(self, years):
+        self.publishingYears = years
+
     def isContinuous(self):
         if self.publishingYears:
             return int(self.publishingYears[-1]) - int(self.publishingYears[0]) + 1 == len(self.publishingYears)

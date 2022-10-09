@@ -12,24 +12,29 @@ class PaperQueryFactory:
             makeQuery=PaperQuery
         )
 
-    def buildForCodes(self, codes):
-        queries = []
+    def buildSRUQueriesForCodes(self, codes):
+        sruQueries = []
         for i in range(0, len(codes), 10):
             codesForQuery = codes[i:i + 10]
-            arkQueries = [ArkQueryForNewspaperYears(code) for code in codesForQuery]
             sruQuery = PaperQuery(
                 startIndex=0,
                 numRecords=10,
                 codes=codesForQuery
             )
-            queries.extend(arkQueries)
-            queries.append(sruQuery)
-        return queries
+            sruQueries.append(sruQuery)
+        return sruQueries
 
-    def buildForAllRecords(self):
+    def buildSRUQueriesForAllRecords(self):
         sruQuery = PaperQuery(
             startIndex=0,
             numRecords=1
         )
         numResults = self.indexer.getNumResultsForEachQuery([sruQuery])
         return self.indexer.makeIndexedQueries(numResults)
+
+    def buildArkQueriesForCodes(self, codes):
+        return [
+            ArkQueryForNewspaperYears(code)
+            for code in codes
+        ]
+

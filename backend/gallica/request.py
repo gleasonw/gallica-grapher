@@ -13,7 +13,9 @@ class Request(threading.Thread):
             dbConn,
             tickets,
             SRUapi,
-            dbLink
+            dbLink,
+            parse,
+            queryBuilder
     ):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
@@ -25,6 +27,8 @@ class Request(threading.Thread):
         self.tickets = tickets
         self.SRUapi = SRUapi
         self.dbLink = dbLink
+        self.parse = parse
+        self.queryBuilder = queryBuilder
         super().__init__()
 
     def initProgressStats(self):
@@ -78,23 +82,25 @@ class Request(threading.Thread):
             return curs.fetchone()[0]
 
     def doAllSearches(self):
-        searchTypes = {
+        searchFactories = {
             'all': AllSearchFactory,
             'year': GroupSearchFactory,
             'month': GroupSearchFactory,
         }
         for ticket in self.tickets:
             self.state = 'RUNNING'
-            search = searchTypes[ticket.fetchType](
+            search = searchFactories[ticket.fetchType](
                 ticket=ticket,
                 dbLink=self.dbLink,
                 requestID=self.requestID,
+                parse=self.parse,
                 sruFetcher=self.SRUapi,
+                queryBuilder=self.queryBuilder,
                 onUpdateProgress=lambda progressStats: self.setTicketProgressStats(
                     ticket.getID(),
                     progressStats
                 ),
-                onAddingResultsToDd=lambda: self.setRequestState('ADDING_RESULTS_TO_DB'),
+                onAddingResultsToDB=lambda: self.setRequestState('ADDING_RESULTS_TO_DB'),
             ).getSearch()
             search.run()
         self.state = 'COMPLETED'
