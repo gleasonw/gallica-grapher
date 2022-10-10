@@ -1,6 +1,6 @@
-from fetchComponents.query import ArkQueryForNewspaperYears
-from fetchComponents.query import PaperQuery
-from queryIndexer import QueryIndexer
+from gallica.fetchComponents.query import ArkQueryForNewspaperYears
+from gallica.fetchComponents.query import PaperQuery
+from gallica.factories.queryIndexer import QueryIndexer
 
 
 class PaperQueryFactory:

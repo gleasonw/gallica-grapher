@@ -25,9 +25,6 @@ class Ticket:
         self.linkDistance = linkDistance
         self.fetchType = fetchType
 
-    def getPaperCodes(self):
-        return self.codes
-
     def getID(self):
         return self.key
 
@@ -46,7 +43,7 @@ class Ticket:
         return groupings[self.fetchType]
 
     def getCodeBundles(self):
-        return None if self.codes is None else [
+        return [] if self.codes is None else [
             self.codes[i:i+NUM_CODES_PER_BUNDLE]
             for i in range(0, len(self.codes), NUM_CODES_PER_BUNDLE)
         ]

@@ -1,9 +1,8 @@
-from lxml import etree
 from gallica.dto.arkRecord import ArkRecord
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 from gallica.recordGetter import RecordGetter
-from fetchComponents.concurrentfetch import ConcurrentFetch
-from paperRecord import PaperRecord
+from concurrentfetch import ConcurrentFetch
+from gallica.dto.paperRecord import PaperRecord
 from gallica.paperSearch import PaperSearch
 
 
@@ -52,11 +51,8 @@ class ParsePaperRecords:
             yield from self.generatePaperRecords(response.xml)
 
     def generatePaperRecords(self, xml):
-        elements = etree.fromstring(xml)
-        if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
-            return []
-        for recordXML in elements.iter("{http://www.loc.gov/zing/srw/}record"):
-            data = self.parser.getDataFromRecordRoot(recordXML)
+        for record in self.parser.getRecordsFromXML(xml):
+            data = self.parser.getDataFromRecordRoot(record)
             yield PaperRecord(
                 code=self.parser.getPaperCode(data),
                 title=self.parser.getPaperTitle(data),

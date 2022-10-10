@@ -8,12 +8,9 @@ class Parse:
         pass
 
     def onePaperTitleFromOccurrenceBatch(self, responseXML) -> str:
-        elements = etree.fromstring(responseXML)
-        recordsRoot = elements.find("{http://www.loc.gov/zing/srw/}records")
-        if recordsRoot is None:
-            return 'nonsense'
-        record = recordsRoot[0]
-        recordData = self.getDataFromRecordRoot(record)
+        records = self.getRecordsFromXML(responseXML)
+        oneRecord = records[0]
+        recordData = self.getDataFromRecordRoot(oneRecord)
         return self.getPaperTitle(recordData)
 
     def OCRtext(self, responseXML) -> tuple:
@@ -23,6 +20,13 @@ class Parse:
         items = topLevel[1].findall('item')
         pagesWithContents = self.getPageAndContent(items)
         return numResults, pagesWithContents
+
+    def getRecordsFromXML(self, xml) -> list:
+        elements = etree.fromstring(xml)
+        recordsRoot = elements.find("{http://www.loc.gov/zing/srw/}records")
+        if recordsRoot is None:
+            return []
+        return recordsRoot.findall("{http://www.loc.gov/zing/srw/}record")
 
     @staticmethod
     def numRecords(xml) -> int:

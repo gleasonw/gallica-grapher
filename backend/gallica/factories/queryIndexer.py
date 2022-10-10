@@ -8,9 +8,9 @@ class QueryIndexer:
     def getNumResultsForEachQuery(self, queries) -> dict:
         responses = self.gallicaAPI.fetchAll(queries)
         numResultsForQueries = {}
-        for data, query in responses:
-            numRecordsForBaseCQL = self.parse.numRecords(data)
-            numResultsForQueries[query] = numRecordsForBaseCQL
+        for response in responses:
+            numRecordsForBaseCQL = self.parse.numRecords(response.xml)
+            numResultsForQueries[response.query] = numRecordsForBaseCQL
         return numResultsForQueries
 
     def makeIndexedQueries(self, baseQueries) -> list:

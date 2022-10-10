@@ -1,6 +1,6 @@
 from utils.psqlconn import PSQLconn
-from fetchComponents.query import OCRQuery
-from fetchComponents.gallicaapi import GallicaAPI
+from query import OCRQuery
+from gallicaapi import GallicaAPI
 from gallica.factories.parseFactory import buildParser
 
 conn = PSQLconn().getConn()

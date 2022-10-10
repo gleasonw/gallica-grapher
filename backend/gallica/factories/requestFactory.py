@@ -1,5 +1,5 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
-from fetchComponents.concurrentfetch import ConcurrentFetch
+from concurrentfetch import ConcurrentFetch
 from gallica.request import Request
 from utils.psqlconn import PSQLconn
 from gallica.ticket import Ticket

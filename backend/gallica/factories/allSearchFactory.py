@@ -1,4 +1,3 @@
-from lxml import etree
 from gallica.search import Search
 from gallica.recordGetter import RecordGetter
 from occurrenceRecord import OccurrenceRecord
@@ -20,7 +19,11 @@ class AllSearchFactory:
         self.requestID = requestID
         self.ticket = ticket
         self.insertIntoResults = dbLink.insertRecordsIntoResults
-        self.parse = ParseOccurrenceRecords(parse)
+        self.parse = ParseOccurrenceRecords(
+            parser=parse,
+            ticketID=ticket.getID(),
+            requestID=requestID
+        )
         self.baseQueryBuilder = queryBuilder.build
         self.getNumResultsForEachQuery = queryBuilder.getNumResultsForEachQuery
         self.makeIndexedQueriesForEachBaseQuery = queryBuilder.makeIndexedQueries
@@ -49,29 +52,34 @@ class AllSearchFactory:
             )
         )
 
-#TODO: pass ticket down, add metadatd to OccurrenceRecord
+
 class ParseOccurrenceRecords:
 
-    def __init__(self, parser):
+    def __init__(self, parser, requestID, ticketID):
         self.parser = parser
+        self.requestID = requestID
+        self.ticketID = ticketID
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
-            yield from self.generateOccurrenceRecords(response.xml)
+            yield from self.generateOccurrenceRecords(
+                query=response.query,
+                xml=response.xml
+            )
 
-    def generateOccurrenceRecords(self, xml):
-        elements = etree.fromstring(xml)
-        if elements.find("{http://www.loc.gov/zing/srw/}records") is None:
-            return []
-        for record in elements.iter("{http://www.loc.gov/zing/srw/}record"):
+    def generateOccurrenceRecords(self, xml, query):
+        for record in self.parser.getRecordsFromXML(xml):
             data = self.parser.getDataFromRecordRoot(record)
             paperTitle = self.parser.getPaperTitle(data)
             paperCode = self.parser.getPaperCode(data)
             date = self.parser.getDate(data)
-            newRecord = OccurrenceRecord(
+            yield OccurrenceRecord(
                 paperTitle=paperTitle,
                 paperCode=paperCode,
                 date=date,
                 url=self.parser.getURL(data),
+                term=query.term,
+                requestID=self.requestID,
+                ticketID=self.ticketID
             )
-            yield newRecord
+

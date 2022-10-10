@@ -18,8 +18,8 @@ class TestParseArkRecord(unittest.TestCase):
                 MagicMock(),
             ]
         )
-        for tesResult in testResultGenerator:
-            self.assertIsInstance(tesResult, ArkRecord)
+        for testResult in testResultGenerator:
+            self.assertIsInstance(testResult, ArkRecord)
 
 
 if __name__ == '__main__':

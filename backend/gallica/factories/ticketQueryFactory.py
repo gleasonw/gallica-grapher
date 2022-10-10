@@ -1,4 +1,4 @@
-from fetchComponents.query import Query
+from query import Query
 
 
 class TicketQueryFactory:
@@ -7,26 +7,25 @@ class TicketQueryFactory:
         pass
 
     def build(self, ticket, startEndDates):
-        for term in ticket.getTerms():
-            for dates in startEndDates:
-                if codeBundles := ticket.getCodeBundles():
-                    return [
-                        self.makeQuery(
-                            term=term,
-                            ticket=ticket,
-                            dates=dates,
-                            codes=codes
-                        )
-                        for codes in codeBundles
-                    ]
-                else:
-                    return [
-                        self.makeQuery(
-                            term=term,
-                            ticket=ticket,
-                            dates=dates
-                        )
-                    ]
+        if codes := ticket.getCodeBundles():
+            return self.buildWithCodeBundles(ticket, startEndDates, codes)
+        else:
+            return self.buildNoCodeBundles(ticket, startEndDates)
+
+    def buildWithCodeBundles(self, ticket, startEndDates, codeBundles):
+        return [
+            self.makeQuery(term, ticket, dates, codes)
+            for term in ticket.getTerms()
+            for dates in startEndDates
+            for codes in codeBundles
+        ]
+
+    def buildNoCodeBundles(self, ticket, startEndDates):
+        return [
+            self.makeQuery(term, ticket, dates)
+            for term in ticket.getTerms()
+            for dates in startEndDates
+        ]
 
     def makeQuery(self, term, ticket, dates, codes=None):
         codes = codes or []
