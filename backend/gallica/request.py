@@ -30,10 +30,8 @@ class Request(threading.Thread):
         self.dbLink = dbLink
         self.parse = parse
         self.queryBuilder = queryBuilder
+        self.searches = self.buildSearchesForTickets()
         super().__init__()
-
-    def setTicketSearches(self, ticketSearches):
-        self.ticketSearches = ticketSearches
 
     def setRequestState(self, state):
         self.state = state
@@ -47,12 +45,16 @@ class Request(threading.Thread):
         }
 
     def run(self):
-        numRecords = sum([search.getNumRecords() for search in self.ticketSearches])
+        self.buildSearchesForTickets()
+        numRecords = sum([
+            search.getNumRecordsToBeInserted()
+            for search in self.searches
+        ])
         if numRecords == 0:
             self.state = 'NO_RECORDS'
         else:
             if self.numRecordsUnderLimit(numRecords):
-                self.doAllSearches()
+                self.doEachSearch()
             else:
                 self.state = 'TOO_MANY_RECORDS'
         self.DBconnection.close()
@@ -72,15 +74,14 @@ class Request(threading.Thread):
             )
             return curs.fetchone()[0]
 
-    def doAllSearches(self):
+    def buildSearchesForTickets(self):
         searchFactories = {
             'all': AllSearchFactory,
             'year': GroupSearchFactory,
             'month': GroupSearchFactory,
         }
-        for ticket in self.tickets:
-            self.state = 'RUNNING'
-            search = searchFactories[ticket.fetchType](
+        return [
+            searchFactories[ticket.fetchType](
                 ticket=ticket,
                 dbLink=self.dbLink,
                 requestID=self.requestID,
@@ -91,8 +92,14 @@ class Request(threading.Thread):
                     ticket.getID(),
                     progressStats
                 ),
-                onAddingResultsToDB=lambda: self.setRequestState('ADDING_RESULTS_TO_DB'),
-            ).getSearch()
+                onAddingResultsToDB=lambda: self.setRequestState('ADDING_RESULTS_TO_DB')
+            )
+            for ticket in self.tickets
+        ]
+
+    def doEachSearch(self):
+        for search in self.searches:
+            self.state = 'RUNNING'
             search.run()
         self.state = 'COMPLETED'
 

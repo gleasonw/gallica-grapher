@@ -43,7 +43,10 @@ class AllSearchFactory:
                 parseData=self.parse,
                 onUpdateProgress=self.onUpdateProgress
             ),
-            onAddingResultsToDB=self.onAddingResultsToDB
+            onAddingResultsToDB=self.onAddingResultsToDB,
+            numRecordsToFetch=sum(
+                [numResults for numResults in queriesWithNumResults.values()]
+            )
         )
 
 

@@ -39,7 +39,8 @@ class GroupSearchFactory:
                 parseData=self.parser,
                 onUpdateProgress=self.onUpdateProgress
             ),
-            onAddingResultsToDB=self.onAddingResultsToDB
+            onAddingResultsToDB=self.onAddingResultsToDB,
+            numRecordsToFetch=len(queries)
         )
 
 
@@ -50,3 +51,4 @@ class ParseGroupedRecordCounts:
 
     def parse(self, xml):
         return self.parser.numRecords(xml)
+
