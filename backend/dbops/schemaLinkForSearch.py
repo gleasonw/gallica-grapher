@@ -1,5 +1,5 @@
-from paperSearch import PaperSearch
 import io
+from gallica.factories.paperSearchFactory import PaperSearchFactory
 
 
 class SchemaLinkForSearch:
@@ -10,7 +10,7 @@ class SchemaLinkForSearch:
     ):
         self.conn = tools.conn
         self.requestID = requestID
-        self.paperAPI = PaperSearch(
+        self.paperAPI = PaperSearchFactory(
            parse=tools.parser,
            SRUapi=tools.SRUapi
         )

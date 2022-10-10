@@ -14,6 +14,7 @@ class ConcurrentFetch:
             maxSize=numWorkers
         )
 
+    #TODO: implement text snippets every 20 seconds or so. Fun way to pass the time
     def fetchAll(self, queries, tracker=None) -> list:
         with ThreadPoolExecutor(max_workers=self.numWorkers) as executor:
             for response in executor.map(self.api.get, queries):

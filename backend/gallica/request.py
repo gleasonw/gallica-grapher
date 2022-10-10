@@ -1,6 +1,7 @@
 import threading
 from gallica.factories.allSearchFactory import AllSearchFactory
 from gallica.factories.groupSearchFactory import GroupSearchFactory
+from gallica.ticketprogressstats import TicketProgressStats
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -31,20 +32,6 @@ class Request(threading.Thread):
         self.queryBuilder = queryBuilder
         super().__init__()
 
-    def initProgressStats(self):
-        progressDict = {}
-        for index, search in enumerate(self.ticketSearches):
-            key = search.getTicketID()
-            progressDict[key] = {
-                'progress': 0,
-                'numResultsDiscovered': 0,
-                'numResultsRetrieved': 0,
-                'randomPaper': None,
-                'estimateSecondsToCompletion': 0,
-                'active': 1 if index == 0 else 0
-            }
-        return progressDict
-
     def setTicketSearches(self, ticketSearches):
         self.ticketSearches = ticketSearches
 
@@ -52,8 +39,12 @@ class Request(threading.Thread):
         self.state = state
         print('Request state: ' + state)
 
+    #TODO: too many ticket ids flying around
     def getProgressStats(self):
-        return self.ticketProgressStats
+        return {
+            ticket.getID(): self.ticketProgressStats[ticket.getID()].get()
+            for ticket in self.tickets
+        }
 
     def run(self):
         numRecords = sum([search.getNumRecords() for search in self.ticketSearches])
@@ -106,4 +97,11 @@ class Request(threading.Thread):
         self.state = 'COMPLETED'
 
     def setTicketProgressStats(self, ticketKey, progressStats):
-        self.ticketProgressStats[ticketKey] = progressStats
+        self.ticketProgressStats[ticketKey].update(progressStats)
+
+    def initProgressStats(self):
+        progressDict = {
+            ticket.getID(): TicketProgressStats(ticketID=ticket.getID())
+            for ticket in self.tickets
+        }
+        return progressDict
