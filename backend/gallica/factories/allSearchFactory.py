@@ -49,7 +49,7 @@ class AllSearchFactory:
             )
         )
 
-
+#TODO: pass ticket down, add metadatd to OccurrenceRecord
 class ParseOccurrenceRecords:
 
     def __init__(self, parser):

@@ -1,5 +1,5 @@
 from lxml import etree
-from arkRecord import ArkRecord
+from gallica.dto.arkRecord import ArkRecord
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 from gallica.recordGetter import RecordGetter
 from fetchComponents.concurrentfetch import ConcurrentFetch
@@ -71,7 +71,7 @@ class ParseArkRecord:
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
-            yield self.generateArkRecord(response.xml, response.query)
+            yield from self.generateArkRecord(response.xml, response.query)
 
     def generateArkRecord(self, xml, query):
         years = self.parser.getYears(xml)
