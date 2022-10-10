@@ -8,10 +8,10 @@ class SchemaLinkForSearch:
             tools,
             requestID=None
     ):
-        self.conn = tools.conn
+        self.conn = tools.dbConn
         self.requestID = requestID
         self.paperAPI = PaperSearchFactory(
-           parse=tools.parser,
+           parse=tools.parse,
            SRUapi=tools.SRUapi
         )
 

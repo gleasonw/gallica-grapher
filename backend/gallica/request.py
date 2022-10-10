@@ -24,13 +24,13 @@ class Request(threading.Thread):
         self.requestID = requestID
         self.estimateNumRecords = 0
         self.DBconnection = dbConn
-        self.ticketProgressStats = self.initProgressStats()
         self.tickets = tickets
         self.SRUapi = SRUapi
         self.dbLink = dbLink
         self.parse = parse
         self.queryBuilder = queryBuilder
-        self.searches = self.buildSearchesForTickets()
+        self.searches = None
+        self.ticketProgressStats = None
         super().__init__()
 
     def setRequestState(self, state):
@@ -45,7 +45,8 @@ class Request(threading.Thread):
         }
 
     def run(self):
-        self.buildSearchesForTickets()
+        self.searches = self.buildSearchesForTickets()
+        self.ticketProgressStats = self.initProgressStats()
         numRecords = sum([
             search.getNumRecordsToBeInserted()
             for search in self.searches

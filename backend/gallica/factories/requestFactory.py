@@ -6,6 +6,7 @@ from gallica.ticket import Ticket
 from gallica.parse import Parse
 from gallica.factories.ticketQueryFactory import TicketQueryFactory
 
+
 class RequestFactory:
 
     def __init__(self, tickets, requestid):
@@ -23,13 +24,13 @@ class RequestFactory:
             for key, ticket in tickets.items()
         ]
 
+        self.parse = Parse()
         self.dbConn = PSQLconn().getConn()
         self.SRUapi = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         self.dbLink = SchemaLinkForSearch(
             requestID=self.requestID,
             tools=self
         )
-        self.parse = Parse()
         self.queryBuilder = TicketQueryFactory()
 
     def buildRequest(self) -> Request:

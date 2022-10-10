@@ -41,6 +41,7 @@ class PaperSearchFactory:
             insertIntoPapers=self.insertIntoPapers
         )
 
+
 class ParsePaperRecords:
 
     def __init__(self, parser):
