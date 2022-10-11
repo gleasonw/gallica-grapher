@@ -24,7 +24,7 @@ class Query:
             "startRecord": self.startIndex,
             "maximumRecords": self.numRecords,
             "collapsing": self.collapsing,
-            "query": self.generateCQL(),
+            "query": self.getCQL(),
         }
 
     def getEssentialDataForMakingAQuery(self):
@@ -45,17 +45,17 @@ class Query:
     def generateCQL(self):
         termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
         dateCQL = self.buildDateCQL()
-        paperCQL = f" and {self.buildPaperCQL(self.codes)}" if self.codes else ""
+        paperCQL = f" and ({self.buildPaperCQL(self.codes)})" if self.codes else ""
         return f"({termCQL}) and ({dateCQL}){paperCQL} and (dc.type all \"fascicule\")"
 
     def buildDateCQL(self):
-        return f'(gallicapublication_date>="{self.publicationStartDate}" and gallicapublication_date<="{self.publicationEndDate}")'
+        return f'gallicapublication_date>="{self.publicationStartDate}" and gallicapublication_date<="{self.publicationEndDate}"'
 
     def buildTermCQL(self) -> str:
-        return f'(gallica adj "{self.term}")'
+        return f'gallica adj "{self.term}"'
 
     def buildLinkedTermCQL(self):
-        return f'(text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}")'
+        return f'text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}"'
 
     def buildPaperCQL(self, codes):
         formattedCodes = [f"{code}_date" for code in codes]
@@ -100,9 +100,9 @@ class PaperQuery(Query):
 
 class OCRQuery(Query):
 
-    def __init__(self, ark, term):
+    def __init__(self, paperCode, term):
         super().__init__()
-        self.ark = ark
+        self.ark = paperCode
         self.term = term
 
     def getFetchParams(self):

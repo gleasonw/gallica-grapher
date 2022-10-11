@@ -1,6 +1,6 @@
 from utils.psqlconn import PSQLconn
 from query import OCRQuery
-from gallicaapi import GallicaAPI
+from gallicaapiwrapper import GallicaAPIWrapper
 from gallica.factories.parseFactory import buildParser
 
 conn = PSQLconn().getConn()
@@ -74,7 +74,7 @@ class RecordDataForUser:
         return records, count
 
     def getOCRTextForRecord(self, ark, term) -> tuple:
-        fetcher = GallicaAPI(
+        fetcher = GallicaAPIWrapper(
             'https://gallica.bnf.fr/services/ContentSearch',
             maxSize=1
         )

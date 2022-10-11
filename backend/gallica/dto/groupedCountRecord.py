@@ -7,6 +7,17 @@ class GroupedCountRecord:
         self.ticketID = ticketID
         self.requestID = requestID
 
+    def getRow(self):
+        return (
+            self.date.getYear(),
+            self.date.getMonth(),
+            self.date.getDay(),
+            self.count,
+            self.term,
+            self.ticketID,
+            self.requestID
+        )
+
     def __repr__(self):
         return f'GroupedCountRecord({self.date}, {self.count})'
 

@@ -6,7 +6,7 @@ from urllib3.util.retry import Retry
 import urllib3
 
 
-class GallicaAPI:
+class GallicaAPIWrapper:
 
     def __init__(self, baseUrl, maxSize=50):
         self.baseUrl = baseUrl

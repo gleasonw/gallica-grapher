@@ -30,9 +30,9 @@ class OccurrenceRecord:
     def getRow(self):
         return (
             self.url,
-            self.date.getDate()[0],
-            self.date.getDate()[1],
-            self.date.getDate()[2],
+            self.date.getYear(),
+            self.date.getMonth(),
+            self.date.getDay(),
             self.term,
             self.ticketID,
             self.requestID,

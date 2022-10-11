@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from fetchComponents.gallicaapi import GallicaAPI
+from fetchComponents.gallicaapiwrapper import GallicaAPIWrapper
 
 NUM_WORKERS = 30
 
@@ -9,7 +9,7 @@ class ConcurrentFetch:
     def __init__(self, baseUrl, numWorkers=NUM_WORKERS):
         self.baseUrl = baseUrl
         self.numWorkers = numWorkers
-        self.api = GallicaAPI(
+        self.api = GallicaAPIWrapper(
             baseUrl=baseUrl,
             maxSize=numWorkers
         )
