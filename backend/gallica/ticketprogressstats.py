@@ -1,5 +1,5 @@
 from math import ceil
-from gallica.responseTime import ResponseTime
+from gallica.averageResponseTime import AverageResponseTime
 
 
 class TicketProgressStats:
@@ -8,7 +8,7 @@ class TicketProgressStats:
         self.ticketID = ticketID
         self.numBatchesRetrieved = 0
         self.numBatches = None
-        self.averageResponseTime = ResponseTime()
+        self.averageResponseTime = AverageResponseTime()
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.estimateSecondsToCompletion = 0

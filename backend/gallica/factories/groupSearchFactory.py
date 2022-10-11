@@ -8,25 +8,24 @@ class GroupSearchFactory:
     def __init__(
             self,
             ticket,
-            onProgressUpdate,
+            onUpdateProgress,
             dbLink,
             parse,
-            baseQueries,
             requestID,
-            onUpdateProgress,
             sruFetcher,
+            queryBuilder,
             onAddingResultsToDB
     ):
         self.requestID = requestID
         self.ticket = ticket
-        self.onProgressUpdate = onProgressUpdate
+        self.onUpdateProgress = onUpdateProgress
         self.insertIntoGroupCounts = dbLink.insertRecordsIntoGroupCounts
         self.parser = ParseGroupedRecordCounts(
             parser=parse,
             ticketID=ticket.getID(),
             requestID=requestID
         )
-        self.buildQueries = baseQueries.build
+        self.buildQueries = queryBuilder.build
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
         self.onAddingResultsToDB = onAddingResultsToDB
@@ -58,7 +57,7 @@ class ParseGroupedRecordCounts:
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
-            count = self.parser.numRecords(response.xml)
+            count = self.parser.getNumRecords(response.xml)
             query = response.query
             yield GroupedCountRecord(
                 date=query.getStartDate(),

@@ -24,7 +24,7 @@ class TestQueryIndexer(unittest.TestCase):
                 xml=MagicMock()
             )
         ]
-        self.testIndexer.parse.numRecords.return_value = 100
+        self.testIndexer.parse.getNumRecords.return_value = 100
 
         result = self.testIndexer.getNumResultsForEachQuery(queries)
 

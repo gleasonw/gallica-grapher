@@ -52,11 +52,10 @@ class ParsePaperRecords:
 
     def generatePaperRecords(self, xml):
         for record in self.parser.getRecordsFromXML(xml):
-            data = self.parser.getDataFromRecordRoot(record)
             yield PaperRecord(
-                code=self.parser.getPaperCode(data),
-                title=self.parser.getPaperTitle(data),
-                url=self.parser.getURL(data),
+                code=self.parser.getPaperCodeFromRecord(record),
+                title=self.parser.getPaperTitleFromRecord(record),
+                url=self.parser.getURLfromRecord(record),
             )
 
 

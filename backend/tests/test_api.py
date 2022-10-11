@@ -139,7 +139,7 @@ class TestAPI(unittest.TestCase):
         mock_celery_task.state = "SUCCESS"
         mock_celery_task.result = {
             "status": "Too many records!",
-            "numRecords": 100
+            "getNumRecords": 100
         }
 
         response = self.app.get('/api/progress/tests')
@@ -148,7 +148,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(
             {
                 'state': 'TOO_MANY_RECORDS',
-                'numRecords': 100
+                'getNumRecords': 100
             },
             response.json
         )

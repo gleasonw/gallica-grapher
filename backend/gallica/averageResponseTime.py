@@ -1,4 +1,4 @@
-class ResponseTime:
+class AverageResponseTime:
 
     def __init__(self):
         self.averageResponseTime = 0

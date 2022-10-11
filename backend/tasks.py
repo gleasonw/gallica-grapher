@@ -20,7 +20,7 @@ def spawnRequest(self, tickets, requestid):
         },
         'TOO_MANY_RECORDS': {
             'status': 'TOO_MANY_RECORDS',
-            'numRecords': request.estimateNumRecords
+            'getNumRecords': request.estimateNumRecords
         },
         'NO_RECORDS': {
             'status': 'NO_RECORDS'

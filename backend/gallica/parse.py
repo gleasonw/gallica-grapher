@@ -7,18 +7,17 @@ class Parse:
     def __init__(self):
         pass
 
-    def onePaperTitleFromOccurrenceBatch(self, responseXML) -> str:
+    def getOnePaperFromRecordBatch(self, responseXML) -> str:
         records = self.getRecordsFromXML(responseXML)
         oneRecord = records[0]
-        recordData = self.getDataFromRecordRoot(oneRecord)
-        return self.getPaperTitle(recordData)
+        return self.getPaperTitleFromRecord(oneRecord)
 
-    def OCRtext(self, responseXML) -> tuple:
+    def getNumResultsAndPagesForOccurrenceInPeriodical(self, responseXML) -> tuple:
         elements = etree.fromstring(responseXML)
         topLevel = elements.find('.')
         numResults = topLevel.attrib.get('countResults')
         items = topLevel[1].findall('item')
-        pagesWithContents = self.getPageAndContent(items)
+        pagesWithContents = self.getPageAndContextForOccurrence(items)
         return numResults, pagesWithContents
 
     def getRecordsFromXML(self, xml) -> list:
@@ -29,7 +28,7 @@ class Parse:
         return recordsRoot.findall("{http://www.loc.gov/zing/srw/}record")
 
     @staticmethod
-    def numRecords(xml) -> int:
+    def getNumRecords(xml) -> int:
         xmlRoot = etree.fromstring(xml)
         numResults = xmlRoot.find(
             "{http://www.loc.gov/zing/srw/}numberOfRecords")
@@ -39,30 +38,19 @@ class Parse:
             return 0
 
     @staticmethod
-    def yearsPublished(xml) -> list:
+    def getYearsPublished(xml) -> list:
         xmlRoot = etree.fromstring(xml)
         years = [
-            Parse.parseYearFromArk(yearElement)
+            Parse.getYearFromElement(yearElement)
             for yearElement in xmlRoot.iter("year")
         ]
         return list(filter(None, years))
 
     @staticmethod
-    def parseYearFromArk(yearElement):
+    def getYearFromElement(yearElement):
         if yearElement is not None:
             year = yearElement.text
             return year if year.isdigit() else None
-        else:
-            return None
-
-    @staticmethod
-    def parseCodeFromArk(xml):
-        arkElement = etree.fromstring(xml)
-        if arkElement is not None:
-            issuesElement = arkElement.find('.')
-            if issuesElement is not None:
-                issueURL = issuesElement.attrib.get('parentArk')
-                return issueURL.split('/')[-2]
         else:
             return None
 
@@ -73,10 +61,10 @@ class Parse:
         return data
 
     @staticmethod
-    def getPaperCode(xml) -> str:
+    def getPaperCodeFromRecord(record) -> str:
+        xml = Parse.getDataFromRecordRoot(record)
         paperCodeElement = xml.find(
             '{http://purl.org/dc/elements/1.1/}relation')
-
         if paperCodeElement is not None:
             elementText = paperCodeElement.text
             paperCode = elementText[-11:len(elementText)]
@@ -85,7 +73,8 @@ class Parse:
             return 'None'
 
     @staticmethod
-    def getURL(xml) -> str:
+    def getURLfromRecord(record) -> str:
+        xml = Parse.getDataFromRecordRoot(record)
         urlElement = xml.find(
             '{http://purl.org/dc/elements/1.1/}identifier')
         if urlElement is not None:
@@ -93,20 +82,22 @@ class Parse:
             return url
 
     @staticmethod
-    def getPaperTitle(xml) -> str:
+    def getPaperTitleFromRecord(record) -> str:
+        xml = Parse.getDataFromRecordRoot(record)
         paperTitle = xml.find(
             '{http://purl.org/dc/elements/1.1/}title').text
         return paperTitle
 
     @staticmethod
-    def getDate(xml) -> Date:
+    def getDateFromRecord(record) -> Date:
+        xml = Parse.getDataFromRecordRoot(record)
         dateElement = xml.find(
             '{http://purl.org/dc/elements/1.1/}date')
         if dateElement is not None:
             return Date(dateElement.text)
 
     @staticmethod
-    def getPageAndContent(itemsXML) -> list:
+    def getPageAndContextForOccurrence(itemsXML) -> list:
         items = []
         for item in itemsXML:
             page = item.find('p_id')

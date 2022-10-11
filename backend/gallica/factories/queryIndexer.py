@@ -9,7 +9,7 @@ class QueryIndexer:
         responses = self.gallicaAPI.fetchAll(queries)
         numResultsForQueries = {}
         for response in responses:
-            numRecordsForBaseCQL = self.parse.numRecords(response.xml)
+            numRecordsForBaseCQL = self.parse.getNumRecords(response.xml)
             numResultsForQueries[response.query] = numRecordsForBaseCQL
         return numResultsForQueries
 
@@ -19,6 +19,6 @@ class QueryIndexer:
             for i in range(0, numResults, 50):
                 baseData = query.getEssentialDataForMakingAQuery()
                 baseData["startIndex"] = i
-                baseData["numRecords"] = 50
+                baseData["getNumRecords"] = 50
                 indexedQueries.append(self.makeQuery(baseData))
         return indexedQueries

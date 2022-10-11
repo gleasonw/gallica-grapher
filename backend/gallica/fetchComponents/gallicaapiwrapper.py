@@ -1,7 +1,5 @@
 import time
-from gallicaResponseWrapper import GallicaResponseWrapper
-
-from .query import *
+from gallica.fetchComponents.gallicaResponseWrapper import GallicaResponseWrapper
 from urllib3.util.retry import Retry
 import urllib3
 

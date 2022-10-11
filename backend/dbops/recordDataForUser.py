@@ -79,7 +79,7 @@ class RecordDataForUser:
             maxSize=1
         )
         data = fetcher.get(OCRQuery(ark, term))
-        return self.parse.OCRtext(data)
+        return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(data)
 
     def clearUserRecordsAfterCancel(self, requestID):
         with self.conn.cursor() as cur:

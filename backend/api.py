@@ -53,7 +53,7 @@ def getRequestState(taskID):
         if result:
             response = {'state': result['status']}
             if result['status'] == 'TOO_MANY_RECORDS':
-                response['numRecords'] = result['numRecords']
+                response['getNumRecords'] = result['getNumRecords']
         else:
             response = {'state': "SUCCESS"}
     return response

@@ -8,7 +8,7 @@ class TestGroupSearchFactory(unittest.TestCase):
     def setUp(self) -> None:
         self.testFactory = GroupSearchFactory(
             ticket=MagicMock(),
-            onProgressUpdate=MagicMock(),
+            onUpdateProgress=MagicMock(),
             dbLink=MagicMock(),
             parse=MagicMock(),
             baseQueries=MagicMock(),

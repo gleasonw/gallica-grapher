@@ -33,16 +33,15 @@ class Request(threading.Thread):
         self.ticketProgressStats = None
         super().__init__()
 
-    def setRequestState(self, state):
-        self.state = state
-        print('Request state: ' + state)
-
     #TODO: too many ticket ids flying around
     def getProgressStats(self):
         return {
             ticket.getID(): self.ticketProgressStats[ticket.getID()].get()
             for ticket in self.tickets
         }
+
+    def setRequestState(self, state):
+        self.state = state
 
     def run(self):
         self.searches = self.buildSearchesForTickets()
@@ -94,7 +93,7 @@ class Request(threading.Thread):
                     progressStats
                 ),
                 onAddingResultsToDB=lambda: self.setRequestState('ADDING_RESULTS_TO_DB')
-            )
+            ).getSearch()
             for ticket in self.tickets
         ]
 

@@ -25,7 +25,7 @@ class TestSpawnRequest(TestCase):
         returnTest = spawnRequest("tests")
 
         self.assertEqual(returnTest["status"], "Too many records!")
-        self.assertEqual(returnTest["numRecords"], 100)
+        self.assertEqual(returnTest["getNumRecords"], 100)
 
     @patch("backend.tasks.Request")
     def test_progress(self, mock_request):

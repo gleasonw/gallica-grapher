@@ -69,15 +69,14 @@ class ParseOccurrenceRecords:
 
     def generateOccurrenceRecords(self, xml, query):
         for record in self.parser.getRecordsFromXML(xml):
-            data = self.parser.getDataFromRecordRoot(record)
-            paperTitle = self.parser.getPaperTitle(data)
-            paperCode = self.parser.getPaperCode(data)
-            date = self.parser.getDate(data)
+            paperTitle = self.parser.getPaperTitleFromRecord(record)
+            paperCode = self.parser.getPaperCodeFromRecord(record)
+            date = self.parser.getDateFromRecord(record)
             yield OccurrenceRecord(
                 paperTitle=paperTitle,
                 paperCode=paperCode,
                 date=date,
-                url=self.parser.getURL(data),
+                url=self.parser.getURLfromRecord(record),
                 term=query.term,
                 requestID=self.requestID,
                 ticketID=self.ticketID
