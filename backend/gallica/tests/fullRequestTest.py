@@ -32,7 +32,7 @@ def getSearchOneTermInOnePaperOverRange():
             'dateRange': [1863, 1944],
             'linkTerm': None,
             'linkDistance': 10,
-            'fetchType': 'all'
+            'fetchType': 'year'
         }
     }
     return testTicket

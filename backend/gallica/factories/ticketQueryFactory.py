@@ -1,4 +1,4 @@
-from query import Query
+from gallica.fetchComponents.query import Query
 
 
 class TicketQueryFactory:

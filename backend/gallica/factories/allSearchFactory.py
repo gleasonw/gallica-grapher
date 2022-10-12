@@ -2,7 +2,7 @@ from gallica.factories.queryIndexer import QueryIndexer
 from gallica.fetchComponents.query import Query
 from gallica.search import Search
 from gallica.recordGetter import RecordGetter
-from occurrenceRecord import OccurrenceRecord
+from gallica.dto.occurrenceRecord import OccurrenceRecord
 
 
 class AllSearchFactory:

@@ -1,7 +1,7 @@
 from gallica.dto.arkRecord import ArkRecord
 from gallica.factories.paperQueryFactory import PaperQueryFactory
 from gallica.recordGetter import RecordGetter
-from concurrentFetch import ConcurrentFetch
+from gallica.fetchComponents.concurrentFetch import ConcurrentFetch
 from gallica.dto.paperRecord import PaperRecord
 from gallica.paperSearch import PaperSearch
 

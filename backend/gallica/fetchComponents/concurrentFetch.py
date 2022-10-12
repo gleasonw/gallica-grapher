@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from fetchComponents.gallicaapiwrapper import GallicaAPIWrapper
+from gallica.fetchComponents.gallicaapiwrapper import GallicaAPIWrapper
 
 NUM_WORKERS = 30
 

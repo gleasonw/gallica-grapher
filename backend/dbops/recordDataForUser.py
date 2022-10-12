@@ -1,7 +1,7 @@
 from utils.psqlconn import PSQLconn
-from query import OCRQuery
-from gallicaapiwrapper import GallicaAPIWrapper
-from gallica.factories.parseFactory import buildParser
+from gallica.fetchComponents.query import OCRQuery
+from gallica.fetchComponents.gallicaapiwrapper import GallicaAPIWrapper
+from gallica.parse import Parse
 
 conn = PSQLconn().getConn()
 
@@ -26,7 +26,7 @@ class RecordDataForUser:
         global conn
         self.conn = conn if conn else PSQLconn().getConn()
         self.csvData = None
-        self.parse = buildParser()
+        self.parse = Parse()
 
     def getCSVData(self, ticketIDs, requestID):
         tupledTickets = tuple(ticketIDs.split(','))
