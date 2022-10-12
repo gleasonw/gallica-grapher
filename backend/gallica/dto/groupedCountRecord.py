@@ -12,10 +12,10 @@ class GroupedCountRecord:
             self.date.getYear(),
             self.date.getMonth(),
             self.date.getDay(),
-            self.count,
             self.term,
             self.ticketID,
-            self.requestID
+            self.requestID,
+            self.count
         )
 
     def __repr__(self):

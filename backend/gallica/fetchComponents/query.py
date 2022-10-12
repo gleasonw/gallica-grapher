@@ -37,6 +37,9 @@ class Query:
             "linkTerm": self.linkTerm,
         }
 
+    def getStartDate(self):
+        return self.publicationStartDate
+
     def getCQL(self):
         if not self.cql:
             self.cql = self.generateCQL()
@@ -60,6 +63,9 @@ class Query:
     def buildPaperCQL(self, codes):
         formattedCodes = [f"{code}_date" for code in codes]
         return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
+
+    def __repr__(self):
+        return f"Query({self.getCQL()})"
 
 
 class ArkQueryForNewspaperYears(Query):

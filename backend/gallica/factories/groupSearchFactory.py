@@ -1,6 +1,7 @@
 from gallica.search import Search
 from gallica.recordGetter import RecordGetter
 from gallica.dto.groupedCountRecord import GroupedCountRecord
+from gallica.date import Date
 
 
 class GroupSearchFactory:
@@ -44,7 +45,9 @@ class GroupSearchFactory:
                 onUpdateProgress=self.onUpdateProgress
             ),
             onAddingResultsToDB=self.onAddingResultsToDB,
-            numRecordsToFetch=len(queries)
+            numRecordsToFetch=len(queries),
+            searchType=self.ticket.getFetchType(),
+            ticketID=self.ticket.getID()
         )
 
 
@@ -60,7 +63,7 @@ class ParseGroupedRecordCounts:
             count = self.parser.getNumRecords(response.xml)
             query = response.query
             yield GroupedCountRecord(
-                date=query.getStartDate(),
+                date=Date(query.getStartDate()),
                 count=count,
                 ticketID=self.ticketID,
                 term=query.term,

@@ -49,7 +49,9 @@ class AllSearchFactory:
             onAddingResultsToDB=self.onAddingResultsToDB,
             numRecordsToFetch=sum(
                 [numResults for numResults in queriesWithNumResults.values()]
-            )
+            ),
+            searchType=self.ticket.getFetchType(),
+            ticketID=self.ticket.getID()
         )
 
 

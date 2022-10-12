@@ -1,12 +1,16 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
-from gallica.ticketprogressstats import TicketProgressStats
+from gallica.searchprogressstats import SearchProgressStats
 
 
-class TestTicketProgressStats(TestCase):
+class TestSearchProgressStats(TestCase):
 
     def setUp(self) -> None:
-        self.ticketProgressStats = TicketProgressStats(ticketID=1)
+        self.ticketProgressStats = SearchProgressStats(
+            ticketID=1,
+            searchType='all',
+            numRecordsToFetch=100
+        )
 
     def test_get(self):
         test = self.ticketProgressStats.get()
@@ -27,11 +31,12 @@ class TestTicketProgressStats(TestCase):
                 'numWorkers': 1,
                 'randomPaper': MagicMock(),
                 'randomTextForDisplay': MagicMock(),
-                'numResultsDiscovered': 5
             }
         )
 
-        self.assertEqual(self.ticketProgressStats.numResultsDiscovered, 5)
+        self.assertEqual(self.ticketProgressStats.numRecordsToFetch, 100)
         self.assertEqual(self.ticketProgressStats.active, 1)
-        self.assertEqual(self.ticketProgressStats.numBatches, 1)
+        self.assertEqual(self.ticketProgressStats.numBatches, 2)
         self.assertEqual(self.ticketProgressStats.numBatchesRetrieved, 1)
+        self.assertEqual(self.ticketProgressStats.progressPercent, 50)
+        self.assertEqual(self.ticketProgressStats.estimateSecondsToCompletion, 1)

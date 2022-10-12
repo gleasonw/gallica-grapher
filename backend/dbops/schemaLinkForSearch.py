@@ -57,11 +57,10 @@ class SchemaLinkForSearch:
                     'year',
                     'month',
                     'day',
-                    'count',
-                    'jstime',
-                    'searchTerm',
-                    'ticketID',
-                    'requestID'
+                    'searchterm',
+                    'ticketid',
+                    'requestid',
+                    'count'
                 )
             )
 

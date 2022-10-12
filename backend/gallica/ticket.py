@@ -28,6 +28,18 @@ class Ticket:
     def getID(self):
         return self.key
 
+    def getTerms(self):
+        return self.terms
+
+    def getLinkTerm(self):
+        return self.linkTerm
+
+    def getLinkDistance(self):
+        return self.linkDistance
+
+    def getFetchType(self):
+        return self.fetchType
+
     def getGroupingIntervals(self):
         groupings = {
             'year': set(zip(
