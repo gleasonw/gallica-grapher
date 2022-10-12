@@ -7,7 +7,7 @@ class Query:
         self.publicationStartDate = kwargs.get('publicationStartDate')
         self.publicationEndDate = kwargs.get('publicationEndDate')
         self.startIndex = kwargs.get('startIndex')
-        self.numRecords = kwargs.get('getNumRecords')
+        self.numRecords = kwargs.get('numRecords')
         self.collapsing = kwargs.get('collapsing')
         self.term = kwargs.get('term')
 

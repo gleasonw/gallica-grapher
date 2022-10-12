@@ -9,7 +9,7 @@ class GroupedCountRecord:
 
     def getRow(self):
         return (
-            self.date.getYearFromElement(),
+            self.date.getYear(),
             self.date.getMonth(),
             self.date.getDay(),
             self.count,

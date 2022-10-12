@@ -103,8 +103,8 @@ class Request(threading.Thread):
             search.run()
         self.state = 'COMPLETED'
 
-    def setTicketProgressStats(self, ticketKey, progressStats):
-        self.ticketProgressStats[ticketKey].update(progressStats)
+    def setTicketProgressStats(self, ticketID, progressStats):
+        self.ticketProgressStats[ticketID].update(progressStats)
 
     def initProgressStats(self):
         progressDict = {

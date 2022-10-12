@@ -30,7 +30,7 @@ class OccurrenceRecord:
     def getRow(self):
         return (
             self.url,
-            self.date.getYearFromElement(),
+            self.date.getYear(),
             self.date.getMonth(),
             self.date.getDay(),
             self.term,

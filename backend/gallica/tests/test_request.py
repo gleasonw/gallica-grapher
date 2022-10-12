@@ -46,4 +46,12 @@ class TestRequest(TestCase):
         self.request.DBconnection.close.assert_called_once()
 
     def test_set_ticket_progress_stats(self):
-        self.fail()
+        self.request.ticketProgressStats = {
+            1: MagicMock(),
+            2: MagicMock(),
+        }
+        self.request.setTicketProgressStats(
+            ticketID=1,
+            progressStats=MagicMock()
+        )
+        self.request.ticketProgressStats[1].update.assert_called_once()

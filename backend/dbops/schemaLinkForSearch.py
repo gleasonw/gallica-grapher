@@ -13,7 +13,7 @@ class SchemaLinkForSearch:
         self.paperAPI = PaperSearchFactory(
            parse=tools.parse,
            SRUapi=tools.SRUapi
-        )
+        ).buildSearch()
 
     def insertRecordsIntoPapers(self, records):
         csvStream = self.buildCSVstream(records)
@@ -52,7 +52,17 @@ class SchemaLinkForSearch:
             curs.copy_from(
                 csvStream,
                 'groupcounts',
-                sep='|'
+                sep='|',
+                columns=(
+                    'year',
+                    'month',
+                    'day',
+                    'count',
+                    'jstime',
+                    'searchTerm',
+                    'ticketID',
+                    'requestID'
+                )
             )
 
     def insertMissingPapersToDB(self, codes, onAddMissingPapers):

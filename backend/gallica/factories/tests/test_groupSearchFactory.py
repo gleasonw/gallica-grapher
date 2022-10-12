@@ -11,11 +11,10 @@ class TestGroupSearchFactory(unittest.TestCase):
             onUpdateProgress=MagicMock(),
             dbLink=MagicMock(),
             parse=MagicMock(),
-            baseQueries=MagicMock(),
             requestID=MagicMock(),
-            onUpdateProgress=MagicMock(),
             sruFetcher=MagicMock(),
-            onAddingResultsToDB=MagicMock()
+            onAddingResultsToDB=MagicMock(),
+            queryBuilder=MagicMock()
         )
 
     def test_getSearch(self):
