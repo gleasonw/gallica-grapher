@@ -110,12 +110,9 @@ function App() {
         const ticketsWithJustCodes = {}
         Object.keys(tickets).map((ticketID) => (
             ticketsWithJustCodes[ticketID] = {
-                terms: tickets[ticketID].terms,
-                linkTerm: tickets[ticketID].linkTerm,
-                linkDistance: tickets[ticketID].linkDistance,
+                ...tickets[ticketID],
                 codes: tickets[ticketID].papersAndCodes.map(
                     (paperAndCode) => (paperAndCode.code)),
-                dateRange: tickets[ticketID].dateRange
             }
         ))
         const {request} = await axios.post('/api/init', {

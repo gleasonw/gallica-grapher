@@ -16,6 +16,7 @@ function Input(props){
     const [customPapersDateRange, setCustomPapersDateRange] = useState(['','']);
     const [continuousDateRange, setContinuousDateRange] = useState(['','']);
     const [fullSearchDateRange, setFullSearchDateRange] = useState(['','']);
+    const [fetchType, setFetchType] = useState('all');
     const queryForContinuousPapers = getContinuousPaperQuery();
     const result = useData(queryForContinuousPapers);
     const continuousPapers = result ? result['paperNameCodes'] : [];
@@ -60,7 +61,8 @@ function Input(props){
                 linkTerm: linkTerm,
                 linkDistance: linkDistance,
                 papersAndCodes: getPapersFor(selectedPaperInput),
-                dateRange: getDateRangeFor(selectedPaperInput)
+                dateRange: getDateRangeFor(selectedPaperInput),
+                fetchType: fetchType
             }
             props.onLoadedSubmit(ticket);
         }else{
@@ -160,7 +162,8 @@ function Input(props){
             linkTerm: linkTerm,
             linkDistance: linkDistance,
             papersAndCodes: getPapersFor(selectedPaperInput),
-            dateRange: getDateRangeFor(selectedPaperInput)
+            dateRange: getDateRangeFor(selectedPaperInput),
+            fetchType: fetchType
         });
         setTermInput('');
         setTerms([]);
@@ -170,6 +173,7 @@ function Input(props){
         setUserSelectedPapers([]);
         setLinkDistance(10);
         setLinkTerm('');
+        setFetchType('all');
     }
 
 
