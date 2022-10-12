@@ -13,6 +13,7 @@ class Date:
 
     @staticmethod
     def __new__(cls, dateText):
+        dateText = str(dateText)
         selfref = Date._cache.get(dateText)
         if not selfref:
             self = super().__new__(cls)

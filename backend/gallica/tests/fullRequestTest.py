@@ -26,12 +26,12 @@ def doTest(ticket):
 def getSearchOneTermInOnePaperOverRange():
     testTicket = {
         0: {
-            'terms': ['washington'],
+            'terms': ['brazza'],
             'codes': [],
-            'dateRange': [1863, 1944],
+            'dateRange': [1882, 1883],
             'linkTerm': None,
             'linkDistance': None,
-            'fetchType' : 'year'
+            'fetchType' : 'all'
         }
     }
     return testTicket

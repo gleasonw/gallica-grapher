@@ -24,10 +24,9 @@ class SchemaLinkForSearch:
                 sep='|'
             )
 
-    def insertRecordsIntoResults(self, props):
-        stream, codes = self.buildCSVstreamAndGetCodesAndEnsureNoDuplicates(props['records'])
-        self.insertMissingPapersToDB(codes, props['onAddMissingPapers'])
-        props['onAddResults']()
+    def insertRecordsIntoResults(self, records):
+        stream, codes = self.buildCSVstreamAndGetCodesAndEnsureNoDuplicates(records)
+        self.insertMissingPapersToDB(codes)
         with self.conn.cursor() as curs:
             curs.copy_from(
                 stream,
@@ -64,12 +63,11 @@ class SchemaLinkForSearch:
                 )
             )
 
-    def insertMissingPapersToDB(self, codes, onAddMissingPapers):
+    def insertMissingPapersToDB(self, codes):
         schemaMatches = self.getPaperCodesThatMatch(codes)
         setOfCodesInDB = set(match[0] for match in schemaMatches)
         missingCodes = codes - setOfCodesInDB
         if missingCodes:
-            onAddMissingPapers()
             paperRecords = self.paperAPI.getRecordsForTheseCodes(
                 list(missingCodes)
             )
@@ -88,18 +86,18 @@ class SchemaLinkForSearch:
         codes = set()
         codeDates = {}
         for record in records:
-            recordPaper = record.getPaperCodeFromRecord()
+            recordPaper = record.getPaperCode()
             if recordPaper in codes:
                 if datesForCode := codeDates.get(recordPaper):
-                    recordDate = record.getDateFromRecord()
+                    recordDate = record.getDate()
                     if datesForCode.get(recordDate):
                         continue
                     else:
                         datesForCode[recordDate] = True
                 else:
-                    codeDates[record.getPaperCodeFromRecord()] = {record.getDateFromRecord(): True}
+                    codeDates[record.getPaperCode()] = {record.getDate(): True}
             else:
-                codes.add(record.getPaperCodeFromRecord())
+                codes.add(record.getPaperCode())
             self.writeToCSVstream(csvFileLikeObject, record)
         csvFileLikeObject.seek(0)
         return csvFileLikeObject, codes

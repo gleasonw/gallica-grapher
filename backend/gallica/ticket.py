@@ -37,6 +37,12 @@ class Ticket:
     def getLinkDistance(self):
         return self.linkDistance
 
+    def getStartDate(self):
+        return self.startYear
+
+    def getEndDate(self):
+        return self.endYear
+
     def getFetchType(self):
         return self.fetchType
 

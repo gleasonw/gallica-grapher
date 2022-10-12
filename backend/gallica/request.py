@@ -16,7 +16,7 @@ class Request(threading.Thread):
             SRUapi,
             dbLink,
             parse,
-            queryBuilder
+            queryBuilder,
     ):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
@@ -30,11 +30,13 @@ class Request(threading.Thread):
         self.parse = parse
         self.queryBuilder = queryBuilder
         self.searches = None
-        self.ticketProgressStats = None
+        self.ticketProgressStats = {}
         super().__init__()
 
     #TODO: too many ticket ids flying around
     def getProgressStats(self):
+        if not self.ticketProgressStats:
+            return {}
         return {
             ticket.getID(): self.ticketProgressStats[ticket.getID()].get()
             for ticket in self.tickets

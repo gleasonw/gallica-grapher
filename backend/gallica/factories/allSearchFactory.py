@@ -1,3 +1,5 @@
+from gallica.factories.queryIndexer import QueryIndexer
+from gallica.fetchComponents.query import Query
 from gallica.search import Search
 from gallica.recordGetter import RecordGetter
 from occurrenceRecord import OccurrenceRecord
@@ -25,11 +27,16 @@ class AllSearchFactory:
             requestID=requestID
         )
         self.baseQueryBuilder = queryBuilder.build
-        self.getNumResultsForEachQuery = queryBuilder.getNumResultsForEachQuery
-        self.makeIndexedQueriesForEachBaseQuery = queryBuilder.makeIndexedQueries
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
         self.onAddingResultsToDB = onAddingResultsToDB
+        self.queryIndexer = QueryIndexer(
+            gallicaAPI=self.sruFetcher,
+            parse=parse,
+            makeQuery=Query
+        )
+        self.getNumResultsForEachQuery = self.queryIndexer.getNumResultsForEachQuery
+        self.makeIndexedQueriesForEachBaseQuery = self.queryIndexer.makeIndexedQueries
 
     def getSearch(self):
         queries = self.baseQueryBuilder(

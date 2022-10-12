@@ -49,13 +49,13 @@ class Query:
         termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
         dateCQL = self.buildDateCQL()
         paperCQL = f" and ({self.buildPaperCQL(self.codes)})" if self.codes else ""
-        return f"({termCQL}) and ({dateCQL}){paperCQL} and (dc.type all \"fascicule\")"
+        return f"({termCQL}) and ({dateCQL}){paperCQL} and (dc.type all \"fascicule\") and (ocr.quality all \"Texte disponible\")"
 
     def buildDateCQL(self):
-        return f'gallicapublication_date>="{self.publicationStartDate}" and gallicapublication_date<="{self.publicationEndDate}"'
+        return f'gallicapublication_date>="{self.publicationStartDate}" and gallicapublication_date<"{self.publicationEndDate}"'
 
     def buildTermCQL(self) -> str:
-        return f'gallica adj "{self.term}"'
+        return f'text adj "{self.term}"'
 
     def buildLinkedTermCQL(self):
         return f'text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}"'

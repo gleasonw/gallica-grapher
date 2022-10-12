@@ -1,4 +1,5 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
+from gallica.factories.queryIndexer import QueryIndexer
 from concurrentFetch import ConcurrentFetch
 from gallica.request import Request
 from utils.psqlconn import PSQLconn

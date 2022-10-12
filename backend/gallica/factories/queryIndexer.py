@@ -20,5 +20,7 @@ class QueryIndexer:
                 baseData = query.getEssentialDataForMakingAQuery()
                 baseData["startIndex"] = i
                 baseData["getNumRecords"] = 50
-                indexedQueries.append(self.makeQuery(baseData))
+                indexedQueries.append(
+                    self.makeQuery(**baseData)
+                )
         return indexedQueries
