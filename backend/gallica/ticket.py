@@ -23,7 +23,7 @@ class Ticket:
         self.numResultsRetrieved = 0
         self.linkTerm = linkTerm
         self.linkDistance = linkDistance
-        self.fetchType = fetchType
+        self.searchType = fetchType
 
     def getID(self):
         return self.key
@@ -43,8 +43,8 @@ class Ticket:
     def getEndDate(self):
         return self.endYear
 
-    def getFetchType(self):
-        return self.fetchType
+    def getSearchType(self):
+        return self.searchType
 
     def getDateGroupings(self):
         groupings = {
@@ -52,7 +52,7 @@ class Ticket:
             'year': self.makeYearGroupings(),
             'month': self.makeMonthGroupings()
         }
-        return groupings[self.fetchType]
+        return groupings[self.searchType]
 
     def makeYearGroupings(self):
         yearGroups = set()

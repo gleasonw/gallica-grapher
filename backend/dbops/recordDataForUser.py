@@ -78,8 +78,8 @@ class RecordDataForUser:
             'https://gallica.bnf.fr/services/ContentSearch',
             maxSize=1
         )
-        data = fetcher.get(OCRQuery(ark, term))
-        return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(data)
+        response = fetcher.get(OCRQuery(ark, term))
+        return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(response.xml)
 
     def clearUserRecordsAfterCancel(self, requestID):
         with self.conn.cursor() as cur:

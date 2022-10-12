@@ -13,9 +13,10 @@ export function TicketProgressBox(props) {
     const remainingMinutes = minutesToCompletion % 60
     const timeEstimate = hoursToCompletion + "h " + remainingMinutes + "m " + remainingSeconds + "s"
     const active = props.progressStats.active
-    const progress = props.progressStats.progress
+    const progress = props.progressStats.progressPercent
     const resultsRetrieved = props.progressStats.numResultsRetrieved
     const estimateTotal = props.progressStats.numResultsDiscovered
+    console.log(props.progressStats)
 
     const displayStates = {
         'addingMissingPapers':
@@ -37,18 +38,18 @@ export function TicketProgressBox(props) {
     }
 
     return (
-        <ClassicUIBox display={(active || progress === 100) ? 'flex' : 'none'}>
-            <span>{props.position}</span>
+        <ClassicUIBox display={(active || progress === 100 || props.index === 0) ? 'flex' : 'none'}>
+            <span>{props.index + 1} of {props.total}</span>
             <TicketLabel
-                terms={props.terms}
-                papers={props.papers}
-                dateRange={props.dateRange}
-                linkTerm={props.linkTerm}
-                linkDistance={props.linkDistance}
+                terms={props.ticket.terms}
+                papers={props.ticket.papersAndCodes}
+                dateRange={props.ticket.dateRange}
+                linkTerm={props.ticket.linkTerm}
+                linkDistance={props.ticket.linkDistance}
             />
             <StyledProgressStats>
                 {
-                    (progress === 0 && active) ?
+                    (progress === 0 && active) || (progress === 0 && props.index === 0) ?
                         <span>
                         Waiting for a response from the archive...
                         <CircularProgress/>
@@ -62,7 +63,7 @@ export function TicketProgressBox(props) {
                 }
                 <ProgressBar
                     animated
-                    now={props.progressStats.progress}/>
+                    now={progress}/>
                 {
                     (progress > 0) && (progress < 100) &&
                     <StyledProgressStats>

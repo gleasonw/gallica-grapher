@@ -8,7 +8,6 @@ class SearchProgressStats:
             self,
             ticketID,
             searchType,
-            numRecordsToFetch,
             parse
     ):
         self.ticketID = ticketID
@@ -22,7 +21,7 @@ class SearchProgressStats:
         self.progressPercent = 0
         self.active = 0
         self.searchType = searchType
-        self.numRecordsToFetch = numRecordsToFetch
+        self.numRecordsToFetch = 0
         self.parse = parse
 
     def get(self):
@@ -31,10 +30,13 @@ class SearchProgressStats:
             'numResultsRetrieved': self.numResultsRetrieved,
             'progressPercent': self.progressPercent,
             'estimateSecondsToCompletion': self.estimateSecondsToCompletion,
-            'randomPaperForDisplay': self.randomPaperForDisplay,
-            'randomTextForDisplay': self.randomTextForDisplay,
+            'randomPaper': self.randomPaperForDisplay,
+            'randomText': self.randomTextForDisplay,
             'active': self.active
         }
+
+    def setNumRecordsToFetch(self, numRecordsToFetch):
+        self.numRecordsToFetch = numRecordsToFetch
 
     def update(self, progressStats):
         if not self.numBatches:

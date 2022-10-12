@@ -103,7 +103,6 @@ export function FilterOptions(props) {
                 >
                     <option value={''}>All</option>
                     {Object.values(props.tickets).map((ticket) => {
-                        console.log(ticket);
                         return ticket.terms.map((term) => (
                             <option value={term}>
                                 {term}

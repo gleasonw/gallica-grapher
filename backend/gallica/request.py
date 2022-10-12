@@ -30,13 +30,11 @@ class Request(threading.Thread):
         self.parse = parse
         self.queryBuilder = queryBuilder
         self.searches = None
-        self.ticketProgressStats = {}
+        self.ticketProgressStats = self.initProgressStats()
         super().__init__()
 
     #TODO: too many ticket ids flying around
     def getProgressStats(self):
-        if not self.ticketProgressStats:
-            return {}
         return {
             ticket.getID(): self.ticketProgressStats[ticket.getID()].get()
             for ticket in self.tickets
@@ -47,7 +45,7 @@ class Request(threading.Thread):
 
     def run(self):
         self.searches = self.buildSearchesForTickets()
-        self.ticketProgressStats = self.initProgressStats()
+        self.setRecordsToFetchForProgressStats()
         numRecords = sum([
             search.getNumRecordsToBeInserted()
             for search in self.searches
@@ -83,7 +81,7 @@ class Request(threading.Thread):
             'month': GroupSearchFactory,
         }
         return [
-            searchFactories[ticket.fetchType](
+            searchFactories[ticket.searchType](
                 ticket=ticket,
                 dbLink=self.dbLink,
                 requestID=self.requestID,
@@ -94,7 +92,8 @@ class Request(threading.Thread):
                     ticket.getID(),
                     progressStats
                 ),
-                onAddingResultsToDB=lambda: self.setRequestState('ADDING_RESULTS_TO_DB')
+                onAddingResultsToDB=lambda: self.setRequestState('ADDING_RESULTS'),
+                onAddingMissingPapersToDB=lambda: self.setRequestState('ADDING_MISSING_PAPERS'),
             ).getSearch()
             for ticket in self.tickets
         ]
@@ -110,12 +109,17 @@ class Request(threading.Thread):
 
     def initProgressStats(self):
         progressDict = {
-            search.getTicketID(): SearchProgressStats(
-                ticketID=search.getTicketID(),
-                searchType=search.getSearchType(),
-                numRecordsToFetch=search.getNumRecordsToBeInserted(),
+            ticket.getID(): SearchProgressStats(
+                ticketID=ticket.getID(),
+                searchType=ticket.getSearchType(),
                 parse=self.parse
             )
-            for search in self.searches
+            for ticket in self.tickets
         }
         return progressDict
+
+    def setRecordsToFetchForProgressStats(self):
+        for search in self.searches:
+            self.ticketProgressStats[search.getTicketID()].setNumRecordsToFetch(
+                search.getNumRecordsToBeInserted()
+            )

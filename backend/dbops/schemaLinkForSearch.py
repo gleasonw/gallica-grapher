@@ -24,9 +24,10 @@ class SchemaLinkForSearch:
                 sep='|'
             )
 
-    def insertRecordsIntoResults(self, records):
+    def insertRecordsIntoResults(self, records, requestStateHandlers):
         stream, codes = self.buildCSVstreamAndGetCodesAndEnsureNoDuplicates(records)
-        self.insertMissingPapersToDB(codes)
+        self.insertMissingPapersToDB(codes, requestStateHandlers['onAddingMissingPapers'])
+        requestStateHandlers['onAddingResultsToDB']()
         with self.conn.cursor() as curs:
             curs.copy_from(
                 stream,
@@ -45,8 +46,9 @@ class SchemaLinkForSearch:
                 )
             )
 
-    def insertRecordsIntoGroupCounts(self, records):
+    def insertRecordsIntoGroupCounts(self, records, requestStateHandlers):
         csvStream = self.buildCSVstream(records)
+        requestStateHandlers['onAddingResultsToDB']()
         with self.conn.cursor() as curs:
             curs.copy_from(
                 csvStream,
@@ -63,11 +65,12 @@ class SchemaLinkForSearch:
                 )
             )
 
-    def insertMissingPapersToDB(self, codes):
+    def insertMissingPapersToDB(self, codes, onAddingMissingPapers):
         schemaMatches = self.getPaperCodesThatMatch(codes)
         setOfCodesInDB = set(match[0] for match in schemaMatches)
         missingCodes = codes - setOfCodesInDB
         if missingCodes:
+            onAddingMissingPapers()
             paperRecords = self.paperAPI.getRecordsForTheseCodes(
                 list(missingCodes)
             )

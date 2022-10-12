@@ -8,20 +8,22 @@ class Search:
             searchType,
             ticketID,
             numRecordsToFetch=None,
-            onAddingResultsToDB=None
+            requestStateHandlers=None
     ):
         self.queries = queries
         self.insertRecordsIntoDatabase = insertRecordsIntoDatabase
         self.recordGetter = recordGetter
-        self.onAddingResultsToDB = onAddingResultsToDB
         self.numRecordsToPutInDB = numRecordsToFetch
         self.ticketID = ticketID
         self.searchType = searchType
+        self.requestStateHandlers = requestStateHandlers
 
     def run(self):
         records = self.recordGetter.getFromQueries(self.queries)
-        self.onAddingResultsToDB and self.onAddingResultsToDB()
-        return self.insertRecordsIntoDatabase(records)
+        return self.insertRecordsIntoDatabase(
+            records=records,
+            requestStateHandlers=self.requestStateHandlers
+        )
 
     def getNumRecordsToBeInserted(self):
         return self.numRecordsToPutInDB

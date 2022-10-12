@@ -16,7 +16,8 @@ class AllSearchFactory:
             onUpdateProgress,
             sruFetcher,
             queryBuilder,
-            onAddingResultsToDB
+            onAddingResultsToDB,
+            onAddingMissingPapersToDB
     ):
         self.requestID = requestID
         self.ticket = ticket
@@ -37,6 +38,7 @@ class AllSearchFactory:
         )
         self.getNumResultsForEachQuery = self.queryIndexer.getNumResultsForEachQuery
         self.makeIndexedQueriesForEachBaseQuery = self.queryIndexer.makeIndexedQueries
+        self.onAddingMissingPapers = onAddingMissingPapersToDB
 
     def getSearch(self):
         queries = self.buildQueriesForTicket(self.ticket)
@@ -50,11 +52,14 @@ class AllSearchFactory:
                 parseData=self.parse,
                 onUpdateProgress=self.onUpdateProgress
             ),
-            onAddingResultsToDB=self.onAddingResultsToDB,
+            requestStateHandlers={
+                'onAddingResultsToDB': self.onAddingResultsToDB,
+                'onAddingMissingPapers': self.onAddingMissingPapers
+            },
             numRecordsToFetch=sum(
                 [numResults for numResults in queriesWithNumResults.values()]
             ),
-            searchType=self.ticket.getFetchType(),
+            searchType=self.ticket.getSearchType(),
             ticketID=self.ticket.getID()
         )
 

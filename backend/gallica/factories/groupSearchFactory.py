@@ -15,7 +15,7 @@ class GroupSearchFactory:
             requestID,
             sruFetcher,
             queryBuilder,
-            onAddingResultsToDB
+            onAddingResultsToDB,
     ):
         self.requestID = requestID
         self.ticket = ticket
@@ -41,7 +41,9 @@ class GroupSearchFactory:
                 parseData=self.parser,
                 onUpdateProgress=self.onUpdateProgress
             ),
-            onAddingResultsToDB=self.onAddingResultsToDB,
+            requestStateHandlers={
+                'onAddingResultsToDB': self.onAddingResultsToDB
+            },
             numRecordsToFetch=len(queries),
             searchType=self.ticket.getFetchType(),
             ticketID=self.ticket.getID()
