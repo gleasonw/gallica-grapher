@@ -13,7 +13,7 @@ class GallicaAPIWrapper:
 
     def buildUrllib3(self):
         retryStrategy = Retry(
-            status_forcelist=[413, 429, 500, 502, 503, 504],
+            status_forcelist=[500, 502, 503, 504],
             backoff_factor=1,
         )
         http = urllib3.PoolManager(

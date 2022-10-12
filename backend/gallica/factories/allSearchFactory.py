@@ -26,7 +26,7 @@ class AllSearchFactory:
             ticketID=ticket.getID(),
             requestID=requestID
         )
-        self.baseQueryBuilder = queryBuilder.build
+        self.buildQueriesForTicket = queryBuilder.build
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
         self.onAddingResultsToDB = onAddingResultsToDB
@@ -39,10 +39,7 @@ class AllSearchFactory:
         self.makeIndexedQueriesForEachBaseQuery = self.queryIndexer.makeIndexedQueries
 
     def getSearch(self):
-        queries = self.baseQueryBuilder(
-            self.ticket,
-            [(self.ticket.getStartDate(), self.ticket.getEndDate())]
-        )
+        queries = self.buildQueriesForTicket(self.ticket)
         queriesWithNumResults = self.getNumResultsForEachQuery(queries)
         return Search(
             queries=self.makeIndexedQueriesForEachBaseQuery(

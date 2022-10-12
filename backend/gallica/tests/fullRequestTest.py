@@ -17,21 +17,22 @@ def doTest(ticket):
     testRequestFactory = RequestFactory(ticket, '45')
     testRequest = testRequestFactory.buildRequest()
     testRequest.start()
-    while testRequest.state != 'COMPLETED':
+    while testRequest.state not in ['COMPLETED', 'NO_RECORDS', 'TOO_MANY_RECORDS']:
         print(psutil.Process().memory_info().rss / 1024 / 1024)
         print(testRequest.getProgressStats())
         time.sleep(1)
+    print(testRequest.state)
 
 
 def getSearchOneTermInOnePaperOverRange():
     testTicket = {
         0: {
             'terms': ['brazza'],
-            'codes': [],
-            'dateRange': [1882, 1883],
+            'codes': ['cb32895690j'],
+            'dateRange': [1863, 1944],
             'linkTerm': None,
-            'linkDistance': None,
-            'fetchType' : 'all'
+            'linkDistance': 10,
+            'fetchType': 'month'
         }
     }
     return testTicket

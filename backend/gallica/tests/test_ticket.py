@@ -40,40 +40,16 @@ class TestTicket(TestCase):
         self.assertEqual(self.yearGroupedTicket.getID(), 1)
         self.assertEqual(self.ticketWithCodes.getID(), 1)
 
-    def test_get_grouping_intervals(self):
-        self.assertEqual(
-            self.monthGroupedTicket.getGroupingIntervals(),
-            [
-                ('1900-01-01', '1900-01-31'),
-                ('1900-02-01', '1900-02-31'),
-                ('1900-03-01', '1900-03-31'),
-                ('1900-04-01', '1900-04-31'),
-                ('1900-05-01', '1900-05-31'),
-                ('1900-06-01', '1900-06-31'),
-                ('1900-07-01', '1900-07-31'),
-                ('1900-08-01', '1900-08-31'),
-                ('1900-09-01', '1900-09-31'),
-                ('1900-10-01', '1900-10-31'),
-                ('1900-11-01', '1900-11-31'),
-                ('1900-12-01', '1900-12-31'),
-                ('1901-01-01', '1901-01-31'),
-                ('1901-02-01', '1901-02-31'),
-                ('1901-03-01', '1901-03-31'),
-                ('1901-04-01', '1901-04-31'),
-                ('1901-05-01', '1901-05-31'),
-                ('1901-06-01', '1901-06-31'),
-                ('1901-07-01', '1901-07-31'),
-                ('1901-08-01', '1901-08-31'),
-                ('1901-09-01', '1901-09-31'),
-                ('1901-10-01', '1901-10-31'),
-                ('1901-11-01', '1901-11-31'),
-                ('1901-12-01', '1901-12-31')
-            ]
-        )
-        self.assertEqual(
-            self.yearGroupedTicket.getGroupingIntervals(),
-            set(zip(range(1900, 1902), range(1900, 1902)))
-        )
+    def test_get_month_grouping_intervals(self):
+        monthGroups = self.monthGroupedTicket.getGroupingIntervals()
+        self.assertTrue(('1900-01-01', '1900-02-01') in monthGroups)
+        self.assertTrue(('1900-12-01', '1901-01-01') in monthGroups)
+        self.assertTrue(('1901-12-01', '1902-01-01') in monthGroups)
+
+    def test_get_year_grouping_intervals(self):
+        yearGroups = self.yearGroupedTicket.getGroupingIntervals()
+        self.assertTrue(('1900-01-01', '1901-01-01') in yearGroups)
+        self.assertTrue(('1901-01-01', '1902-01-01') in yearGroups)
 
     def test_get_code_bundles(self):
         self.assertEqual(self.monthGroupedTicket.getCodeBundles(), [])

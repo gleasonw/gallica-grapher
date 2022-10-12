@@ -26,16 +26,13 @@ class GroupSearchFactory:
             ticketID=ticket.getID(),
             requestID=requestID
         )
-        self.buildQueries = queryBuilder.build
+        self.buildQueriesForTicket = queryBuilder.build
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
         self.onAddingResultsToDB = onAddingResultsToDB
 
     def getSearch(self):
-        queries = self.buildQueries(
-            self.ticket,
-            self.ticket.getGroupingIntervals()
-        )
+        queries = self.buildQueriesForTicket(self.ticket)
         return Search(
             queries=queries,
             insertRecordsIntoDatabase=self.insertIntoGroupCounts,

@@ -46,19 +46,29 @@ class Ticket:
     def getFetchType(self):
         return self.fetchType
 
-    def getGroupingIntervals(self):
+    def getDateGroupings(self):
         groupings = {
-            'year': set(zip(
-                range(self.startYear, self.endYear + 1),
-                range(self.startYear, self.endYear + 1)
-            )),
-            'month': [
-                (f"{year}-{month:02}-01", f"{year}-{month:02}-31")
-                for year in range(self.startYear, self.endYear + 1)
-                for month in range(1, 13)
-            ]
+            'all': self.makeYearGroupings(),
+            'year': self.makeYearGroupings(),
+            'month': self.makeMonthGroupings()
         }
         return groupings[self.fetchType]
+
+    def makeYearGroupings(self):
+        yearGroups = set()
+        for year in range(self.startYear, self.endYear + 1):
+            yearGroups.add((f"{year}-01-01", f"{year + 1}-01-01"))
+        return yearGroups
+
+    def makeMonthGroupings(self):
+        monthGroups = set()
+        for year in range(self.startYear, self.endYear + 1):
+            for month in range(1, 13):
+                if month == 12:
+                    monthGroups.add((f"{year}-{month:02}-01", f"{year + 1}-01-01"))
+                else:
+                    monthGroups.add((f"{year}-{month:02}-01", f"{year}-{month + 1:02}-01"))
+        return monthGroups
 
     def getCodeBundles(self):
         return [] if self.codes is None else [

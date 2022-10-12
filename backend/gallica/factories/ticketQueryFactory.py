@@ -2,29 +2,28 @@ from query import Query
 
 
 class TicketQueryFactory:
-
     def __init__(self):
         pass
 
-    def build(self, ticket, startEndDates):
+    def build(self, ticket):
         if codes := ticket.getCodeBundles():
-            return self.buildWithCodeBundles(ticket, startEndDates, codes)
+            return self.buildWithCodeBundles(ticket, codes)
         else:
-            return self.buildNoCodeBundles(ticket, startEndDates)
+            return self.buildNoCodeBundles(ticket)
 
-    def buildWithCodeBundles(self, ticket, startEndDates, codeBundles):
+    def buildWithCodeBundles(self, ticket, codeBundles):
         return [
             self.makeQuery(term, ticket, dates, codes)
             for term in ticket.getTerms()
-            for dates in startEndDates
+            for dates in ticket.getDateGroupings()
             for codes in codeBundles
         ]
 
-    def buildNoCodeBundles(self, ticket, startEndDates):
+    def buildNoCodeBundles(self, ticket):
         return [
             self.makeQuery(term, ticket, dates)
             for term in ticket.getTerms()
-            for dates in startEndDates
+            for dates in ticket.getDateGroupings()
         ]
 
     def makeQuery(self, term, ticket, dates, codes=None):

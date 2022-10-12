@@ -10,6 +10,8 @@ class TestSearch(TestCase):
             queries=['foo', 'bar'],
             insertRecordsIntoDatabase=MagicMock(),
             recordGetter=MagicMock(),
+            searchType='foo',
+            ticketID='bar'
         )
 
     def test_run(self):
