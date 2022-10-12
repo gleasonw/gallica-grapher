@@ -113,7 +113,8 @@ class Request(threading.Thread):
             search.getTicketID(): SearchProgressStats(
                 ticketID=search.getTicketID(),
                 searchType=search.getSearchType(),
-                numRecordsToFetch=search.getNumRecordsToBeInserted()
+                numRecordsToFetch=search.getNumRecordsToBeInserted(),
+                parse=self.parse
             )
             for search in self.searches
         }

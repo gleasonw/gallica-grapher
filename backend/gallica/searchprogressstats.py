@@ -4,7 +4,13 @@ from gallica.averageResponseTime import AverageResponseTime
 
 class SearchProgressStats:
 
-    def __init__(self, ticketID, searchType, numRecordsToFetch):
+    def __init__(
+            self,
+            ticketID,
+            searchType,
+            numRecordsToFetch,
+            parse
+    ):
         self.ticketID = ticketID
         self.numBatchesRetrieved = 0
         self.numBatches = None
@@ -17,6 +23,7 @@ class SearchProgressStats:
         self.active = 0
         self.searchType = searchType
         self.numRecordsToFetch = numRecordsToFetch
+        self.parse = parse
 
     def get(self):
         return {
@@ -31,39 +38,26 @@ class SearchProgressStats:
 
     def update(self, progressStats):
         if not self.numBatches:
-            self.doSetup(progressStats)
-        else:
-            self.updateProgressState(
-                elapsedTime=progressStats['elapsedTime'],
-                numWorkers=progressStats['numWorkers'],
-                randomPaper=progressStats.get('randomPaper'),
-                randomTextForDisplay=progressStats.get('randomTextForDisplay')
-            )
-
-    def doSetup(self, progressStats):
-        self.active = 1
-        self.numBatches = ceil(self.numRecordsToFetch / 50) if self.searchType == 'all' else self.numRecordsToFetch
+            self.active = 1
+            self.numBatches = ceil(self.numRecordsToFetch / 50) if self.searchType == 'all' else self.numRecordsToFetch
         self.updateProgressState(
             elapsedTime=progressStats['elapsedTime'],
             numWorkers=progressStats['numWorkers'],
+            xml=progressStats['xml']
         )
 
     def updateProgressState(
             self,
             elapsedTime,
             numWorkers,
-            randomPaper=None,
-            randomTextForDisplay=None
+            xml
     ):
         self.numBatchesRetrieved += 1
         self.averageResponseTime.update(elapsedTime)
         self.progressPercent = ceil(self.numBatchesRetrieved / self.numBatches * 100)
         self.numResultsRetrieved = self.numBatchesRetrieved * 50 if self.searchType == 'all' else self.numBatchesRetrieved
         self.estimateSecondsToCompletion = self.getEstimateSecondsToCompletion(numWorkers)
-        if randomPaper:
-            self.randomPaperForDisplay = randomPaper
-        if randomTextForDisplay:
-            self.randomTextForDisplay = randomTextForDisplay
+        self.randomPaperForDisplay = self.parse.getOnePaperFromRecordBatch(xml)
 
     def getEstimateSecondsToCompletion(self, numWorkers):
         numCycles = (self.numBatches - self.numBatchesRetrieved) / numWorkers

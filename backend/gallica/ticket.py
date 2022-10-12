@@ -48,7 +48,7 @@ class Ticket:
 
     def getDateGroupings(self):
         groupings = {
-            'all': self.makeYearGroupings(),
+            'all': [(f"{self.startYear}-01-01", f"{self.endYear + 1}-01-01")],
             'year': self.makeYearGroupings(),
             'month': self.makeMonthGroupings()
         }

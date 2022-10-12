@@ -22,6 +22,7 @@ class ConcurrentFetch:
                     {
                         "elapsedTime": response.elapsed,
                         "numWorkers": self.numWorkers,
+                        "xml": response.xml
                     }
                 )
                 yield response

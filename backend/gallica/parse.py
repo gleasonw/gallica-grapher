@@ -9,8 +9,10 @@ class Parse:
 
     def getOnePaperFromRecordBatch(self, responseXML) -> str:
         records = self.getRecordsFromXML(responseXML)
-        oneRecord = records[0]
-        return self.getPaperTitleFromRecord(oneRecord)
+        if records:
+            return self.getPaperTitleFromRecord(records[0])
+        else:
+            return ''
 
     def getNumResultsAndPagesForOccurrenceInPeriodical(self, responseXML) -> tuple:
         elements = etree.fromstring(responseXML)

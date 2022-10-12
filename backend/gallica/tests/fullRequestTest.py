@@ -28,11 +28,11 @@ def getSearchOneTermInOnePaperOverRange():
     testTicket = {
         0: {
             'terms': ['brazza'],
-            'codes': ['cb32895690j'],
+            'codes': [],
             'dateRange': [1863, 1944],
             'linkTerm': None,
             'linkDistance': 10,
-            'fetchType': 'month'
+            'fetchType': 'all'
         }
     }
     return testTicket
