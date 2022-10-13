@@ -11,7 +11,7 @@ class Ticket:
             dateRange,
             linkTerm,
             linkDistance,
-            fetchType
+            searchType
     ):
         self.key = key
         self.terms = terms
@@ -23,7 +23,7 @@ class Ticket:
         self.numResultsRetrieved = 0
         self.linkTerm = linkTerm
         self.linkDistance = linkDistance
-        self.searchType = fetchType
+        self.searchType = searchType
 
     def getID(self):
         return self.key

@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import DateGroupSelect from './DateGroupSelect.tsx';
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import {StyledRequestBox} from "./RequestBox";
 import {PaperInputBox} from "./PeriodicalInputs/PaperInputBox";
@@ -62,7 +63,13 @@ function TicketForm(props) {
                 numContinuousPapers={props.numContinuousPapers}
                 userSelectedPapers={props.userSelectedPapers}
                 boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
-                onFocus={props.onPaperInputFocus}
+            />
+            <br/>
+            <label>grouped by: </label>
+            <DateGroupSelect
+                selectedSearchType={props.selectedSearchType}
+                onDateGroupClick={props.onSearchTypeClick}
+                selected={props.selectedSearchType}
             />
             <div ref={props.requestBoxRef}>
                 <StyledRequestBox

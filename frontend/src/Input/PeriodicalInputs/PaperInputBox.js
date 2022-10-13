@@ -79,7 +79,6 @@ export class PaperInputBox extends React.Component {
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
                     numContinuousPapers={this.props.numContinuousPapers}
-                    onFocus={this.props.onFocus}
                 />
                 <UserSelectPaperInput
                     yearRange={this.props.dateRanges[1]}
@@ -96,14 +95,12 @@ export class PaperInputBox extends React.Component {
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
                     userSelectedPapers={this.props.userSelectedPapers}
-                    onFocus={this.props.onFocus}
                 />
                 <FullSearchInput
                     yearRange={this.props.dateRanges[2]}
                     yearRangeHandler={this.props.dateRangeHandlers[2]}
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
-                    onFocus={this.props.onFocus}
                 />
             </StyledOptionInput>
         )

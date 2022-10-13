@@ -16,7 +16,7 @@ function Input(props){
     const [customPapersDateRange, setCustomPapersDateRange] = useState(['','']);
     const [continuousDateRange, setContinuousDateRange] = useState(['','']);
     const [fullSearchDateRange, setFullSearchDateRange] = useState(['','']);
-    const [fetchType, setFetchType] = useState('all');
+    const [selectedSearchType, setSelectedSearchType] = useState(0);
     const queryForContinuousPapers = getContinuousPaperQuery();
     const result = useData(queryForContinuousPapers);
     const continuousPapers = result ? result['paperNameCodes'] : [];
@@ -48,25 +48,25 @@ function Input(props){
         exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
     }
 
-    function handlePaperInputFocus(index){
-        setSelectedPaperInput(index)
-    }
-
     function handleSubmit(event){
         event.preventDefault();
         const currentNumTickets = Object.keys(props.tickets).length
         if(currentNumTickets === 0) {
-            const ticket = {
-                terms: terms,
-                linkTerm: linkTerm,
-                linkDistance: linkDistance,
-                papersAndCodes: getPapersFor(selectedPaperInput),
-                dateRange: getDateRangeFor(selectedPaperInput),
-                fetchType: fetchType
-            }
+            const ticket = makeTicketFromState();
             props.onLoadedSubmit(ticket);
         }else{
             props.onUnloadedSubmit();
+        }
+    }
+
+    function makeTicketFromState(){
+        return {
+            terms: terms,
+            linkTerm: linkTerm,
+            linkDistance: linkDistance,
+            papersAndCodes: getPapersFor(selectedPaperInput),
+            dateRange: getDateRangeFor(selectedPaperInput),
+            searchType: getSearchTypeFor(selectedSearchType)
         }
     }
 
@@ -157,14 +157,7 @@ function Input(props){
     }
 
     function handleCreateTicketClick(){
-        props.onCreateTicketClick({
-            terms: terms,
-            linkTerm: linkTerm,
-            linkDistance: linkDistance,
-            papersAndCodes: getPapersFor(selectedPaperInput),
-            dateRange: getDateRangeFor(selectedPaperInput),
-            fetchType: fetchType
-        });
+        props.onCreateTicketClick(makeTicketFromState());
         setTermInput('');
         setTerms([]);
         setContinuousDateRange(['','']);
@@ -173,7 +166,7 @@ function Input(props){
         setUserSelectedPapers([]);
         setLinkDistance(10);
         setLinkTerm('');
-        setFetchType('all');
+        setSelectedSearchType(0);
     }
 
 
@@ -232,6 +225,11 @@ function Input(props){
         }else{
             throw Error(`Unexpected paper index: ${paperInputIndex}`)
         }
+    }
+
+    function getSearchTypeFor(searchTypeIndex){
+        const searchTypes = ['year', 'month', 'all']
+        return searchTypes[searchTypeIndex]
     }
 
     function trimCustomPaperRangeToActualPaperRange(){
@@ -308,12 +306,13 @@ function Input(props){
                     exampleBoxRef={exampleBoxRef}
                     onPaperInputClick={handlePaperInputSelectClick}
                     selectedPaperInput={selectedPaperInput}
+                    selectedSearchType={selectedSearchType}
+                    onSearchTypeClick={(selectIndex) => setSelectedSearchType(selectIndex)}
                     numContinuousPapers={continuousPapers ?
                         continuousPapers.length :
                         '...'
                     }
                     requestBoxRef={props.requestBoxRef}
-                    onPaperInputFocus={handlePaperInputFocus}
                 />
                 <input
                     id='seeExamplesButton'

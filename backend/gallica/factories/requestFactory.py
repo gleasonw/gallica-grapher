@@ -19,7 +19,7 @@ class RequestFactory:
                 dateRange=ticket['dateRange'],
                 linkTerm=ticket.get('linkTerm'),
                 linkDistance=ticket.get('linkDistance'),
-                fetchType=ticket['fetchType']
+                searchType=ticket['searchType']
             )
             for key, ticket in tickets.items()
         ]

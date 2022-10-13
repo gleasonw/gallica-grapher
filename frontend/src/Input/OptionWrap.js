@@ -6,6 +6,7 @@ const OptionWrap = styled.div`
     border-bottom: ${props => props.borderBottom || "1px solid #d9d9d9"};
     padding: 12px 20px;
     text-align: left;
+    width: 100%;
     cursor: pointer;
     transition: all 150ms;
     border-radius: ${props => props.borderRadius ? props.borderRadius : "0px"};

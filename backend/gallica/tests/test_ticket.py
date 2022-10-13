@@ -14,7 +14,7 @@ class TestTicket(TestCase):
             dateRange=(1900, 1901),
             linkTerm=None,
             linkDistance=None,
-            fetchType='month'
+            searchType='month'
         )
         self.yearGroupedTicket = Ticket(
             key=1,
@@ -23,7 +23,7 @@ class TestTicket(TestCase):
             dateRange=(1900, 1901),
             linkTerm=None,
             linkDistance=None,
-            fetchType='year'
+            searchType='year'
         )
         self.ticketWithCodes = Ticket(
             key=1,
@@ -32,7 +32,7 @@ class TestTicket(TestCase):
             dateRange=(1900, 1901),
             linkTerm=None,
             linkDistance=None,
-            fetchType='year'
+            searchType='year'
         )
 
     def test_get_id(self):

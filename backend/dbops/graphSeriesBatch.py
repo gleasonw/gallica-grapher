@@ -63,11 +63,12 @@ class HighchartsSeriesForTicket:
         )
         dataWithProperDateFormat = self.transformDateForSettings(data, settings)
         return {
-            'name': self.getSearchTerms(),
-            'data': dataWithProperDateFormat
+            'name': self.getSearchTermsFromResults() if settings["groupBy"] in ['day', 'month', 'year']
+            else self.getSearchTermsFromGroupCounts(),
+            'data': dataWithProperDateFormat,
         }
 
-    def getSearchTerms(self):
+    def getSearchTermsFromResults(self):
         getSearchTerms = """
         SELECT array_agg(DISTINCT searchterm) 
         FROM results 
@@ -75,7 +76,24 @@ class HighchartsSeriesForTicket:
         AND ticketid = %s;
         """
         cursor = self.dbConnection.cursor()
-        cursor.execute(getSearchTerms, (self.requestID, self.ticketID,))
+        cursor.execute(getSearchTerms, (
+            self.requestID,
+            self.ticketID
+        ))
+        return cursor.fetchone()[0]
+
+    def getSearchTermsFromGroupCounts(self):
+        getSearchTerms = """
+        SELECT array_agg(DISTINCT searchterm) 
+        FROM groupcounts 
+        WHERE requestid=%s 
+        AND ticketid = %s;
+        """
+        cursor = self.dbConnection.cursor()
+        cursor.execute(getSearchTerms, (
+            self.requestID,
+            self.ticketID
+        ))
         return cursor.fetchone()[0]
 
     def getFromDB(self, params, sql):

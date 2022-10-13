@@ -42,9 +42,9 @@ export default function generateOptions(series, settings, onSeriesClick) {
             crosshairs: true,
         },
     };
-    if (settings.timeBin === 'year') {
+    if (settings.timeBin === 'year' || settings.timeBin === 'gallicaYear') {
         formatYearOptions()
-    } else if (settings.timeBin === 'month') {
+    } else if (settings.timeBin === 'month' || settings.timeBin === 'gallicaMonth') {
         formatYearMonOptions()
     } else {
         formatYearMonDayOptions()

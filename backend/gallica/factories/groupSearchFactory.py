@@ -16,6 +16,7 @@ class GroupSearchFactory:
             sruFetcher,
             queryBuilder,
             onAddingResultsToDB,
+            onAddingMissingPapersToDB
     ):
         self.requestID = requestID
         self.ticket = ticket
@@ -45,7 +46,7 @@ class GroupSearchFactory:
                 'onAddingResultsToDB': self.onAddingResultsToDB
             },
             numRecordsToFetch=len(queries),
-            searchType=self.ticket.getFetchType(),
+            searchType=self.ticket.getSearchType(),
             ticketID=self.ticket.getID()
         )
 

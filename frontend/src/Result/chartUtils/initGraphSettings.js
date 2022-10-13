@@ -12,7 +12,6 @@ export default function initGraphSettings(tickets) {
         '#91e8e1'];
     let indexForColorAssignment = 0;
     const initSetting = {
-        timeBin: 'year',
         averageWindow: '0',
         continuous: false
     }
@@ -20,6 +19,7 @@ export default function initGraphSettings(tickets) {
     for (let key in tickets) {
         initialGraphSettings[key] = {
             ...initSetting,
+            timeBin: getTimeBinForSearchType(tickets[key].searchType),
             color: highChartsSeriesColors[indexForColorAssignment]
         }
         indexForColorAssignment =
@@ -28,4 +28,13 @@ export default function initGraphSettings(tickets) {
     }
     initialGraphSettings["group"] = initSetting;
     return initialGraphSettings
+}
+
+function getTimeBinForSearchType(searchType) {
+    const timeBins = {
+        'all': 'year',
+        'year': 'gallicaYear',
+        'month': 'gallicaMonth'
+    }
+    return timeBins[searchType]
 }
