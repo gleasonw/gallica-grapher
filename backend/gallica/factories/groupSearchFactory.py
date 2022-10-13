@@ -26,7 +26,7 @@ class GroupSearchFactory:
             ticketID=ticket.getID(),
             requestID=requestID
         )
-        self.buildQueriesForTicket = queryBuilder.build
+        self.buildQueriesForTicket = queryBuilder.buildForTicket
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
         self.onAddingResultsToDB = onAddingResultsToDB

@@ -1,6 +1,7 @@
 from gallica.factories.groupSearchFactory import GroupSearchFactory
 import unittest
 from unittest.mock import MagicMock
+from gallica.search import Search
 
 
 class TestGroupSearchFactory(unittest.TestCase):
@@ -18,8 +19,8 @@ class TestGroupSearchFactory(unittest.TestCase):
         )
 
     def test_getSearch(self):
-        self.testFactory.getSearch()
-        self.testFactory.ticket.getGroupingIntervals.assert_called_once()
+        test = self.testFactory.getSearch()
+        self.assertIsInstance(test, Search)
 
 
 if __name__ == '__main__':

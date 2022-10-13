@@ -15,7 +15,8 @@ class TestAllSearchFactory(TestCase):
             onUpdateProgress=MagicMock(),
             sruFetcher=MagicMock(),
             queryBuilder=MagicMock(),
-            onAddingResultsToDB=MagicMock()
+            onAddingResultsToDB=MagicMock(),
+            onAddingMissingPapersToDB=MagicMock()
         )
 
     def test_getSearch(self):

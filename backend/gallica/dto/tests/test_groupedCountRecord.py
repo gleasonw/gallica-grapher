@@ -14,13 +14,16 @@ class TestGroupedCountRecord(unittest.TestCase):
             ),
             count=1,
             term='test',
-            ticketID=1,
-            requestID=1
+            ticketID='testticketid',
+            requestID='testrequestid'
         )
 
     def test_getRow(self):
         row = self.testRecord.getRow()
-        self.assertEqual(row, (2020, 1, 1, 1, 'test', 1, 1))
+        self.assertEqual(
+            row,
+            (2020, 1, 1, 'test', 'testticketid', 'testrequestid', 1)
+        )
 
 
 if __name__ == '__main__':

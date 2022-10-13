@@ -5,61 +5,43 @@ import ciso8601
 
 class GraphSeriesBatch:
 
-    def __init__(self, settings):
+    def __init__(self):
         self.dbConnection = PSQLconn().getConn()
-        self.dataBatches = []
-        self.settings = settings
-        self.ticketIDs = settings["ticketIDs"].split(",")
-        self.requestID = settings["requestID"]
 
-        self.selectAllSeriesFromDB()
+    def getSeriesForSettings(self, settings):
+        if not self.dbConnection:
+            self.dbConnection = PSQLconn().getConn()
+        ticketIDs = settings['ticketIDs'].split(',')
+        dataBatches = list(map(
+            lambda ticketID: self.selectOneSeries(
+                ticketID=ticketID,
+                settings=settings,
+            ),
+            ticketIDs
+        ))
+        return {
+            dataBatch.getRequestID(): dataBatch.getSeries()
+            for dataBatch in dataBatches
+        }
 
-    def getSeriesBatch(self):
-        dataBatchesDict = {}
-        for dataBatch in self.dataBatches:
-            requestID = dataBatch[0]
-            series = dataBatch[1]
-            dataBatchesDict[requestID] = series
-        return dataBatchesDict
-
-    def selectAllSeriesFromDB(self):
-        self.dataBatches = list(map(
-            self.selectOneSeries,
-            self.ticketIDs))
-        self.dbConnection.close()
-
-    def selectOneSeries(self, ticketID):
-        series = TicketGraphSeries(
-            self.requestID,
-            ticketID,
-            self.settings,
-            self.dbConnection)
-        return [ticketID, series.getSeries()]
+    def selectOneSeries(self, ticketID, settings):
+        return TicketGraphSeries(
+            ticketID=ticketID,
+            settings=settings,
+            dbConnection=self.dbConnection
+        )
 
 
 class TicketGraphSeries:
 
-    def __init__(self,
-                 requestID,
-                 ticketid,
-                 settings,
-                 dbConnection):
-
-        self.continuous = settings["continuous"].lower() == "true"
-        self.ticketid = ticketid
-        self.requestID = requestID
-        print(f"requestID: {self.requestID}")
-        self.averageWindow = int(settings["averageWindow"])
-        self.timeBin = settings["groupBy"]
-        dateRange = settings["dateRange"].split(",")
-        self.lowYear = dateRange[0]
-        self.highYear = dateRange[1]
-        self.dataNoJSTimestamp = []
-        self.data = []
-        self.searchTerms = []
-        self.request = None
+    def __init__(self, ticketID, settings, dbConnection):
+        self.ticketID = ticketID
+        self.requestID = settings["requestID"]
         self.dbConnection = dbConnection
-        self.makeSeries()
+        self.series = self.getHighchartsFormattedDataForSettings(settings)
+
+    def getRequestID(self):
+        return self.requestID
 
     def getSeries(self):
         return {
@@ -67,30 +49,34 @@ class TicketGraphSeries:
             'data': self.data
         }
 
-    def makeSeries(self):
-        self.buildQueryForSeries()
-        self.runQuery()
-        if self.timeBin == "day" or self.timeBin == "month":
+    def getHighchartsFormattedDataForSettings(self, settings):
+        timeBin = settings["groupBy"]
+        sql = self.getSQLforSettings()
+        if timeBin == "day" or timeBin == "month":
             self.calculateJStime()
-        elif self.timeBin == "year":
+        elif timeBin == "year":
             self.data = self.dataNoJSTimestamp
         else:
             raise Exception("Invalid time bin")
+        return {
+            'name': self.getSearchTermsForTicket(),
+            'data': self.getFromDBForSettings(settings)
+        }
 
     #TODO: rewrite with dictionary routing
-    def buildQueryForSeries(self):
+    def getSQLforSettings(self):
         if self.timeBin == "day" and self.continuous:
-            self.initDayContinuousPaperRequest()
+            return self.initDayContinuousPaperRequest()
         elif self.timeBin == "day" and not self.continuous:
-            self.initDayRequest()
+            return self.initDayRequest()
         elif self.timeBin == "month" and self.continuous:
-            self.initMonthContinuousPaperRequest()
+            return self.initMonthContinuousPaperRequest()
         elif self.timeBin == "month" and not self.continuous:
-            self.initMonthRequest()
+            return self.initMonthRequest()
         elif self.timeBin == "year" and self.continuous:
-            self.initYearContinuousPaperRequest()
+            return self.initYearContinuousPaperRequest()
         elif self.timeBin == "year" and not self.continuous:
-            self.initYearRequest()
+            return self.initYearRequest()
         else:
             raise Exception("Invalid time bin")
 
@@ -252,10 +238,6 @@ class TicketGraphSeries:
         FROM averaged_frequencies;
         """
 
-    def runQuery(self):
-        self.getSearchTerms()
-        self.executeQuery()
-
     def getSearchTerms(self):
         getSearchTerms = """
         SELECT array_agg(DISTINCT searchterm) 
@@ -264,30 +246,34 @@ class TicketGraphSeries:
         AND ticketid = %s;
         """
         cursor = self.dbConnection.cursor()
-        cursor.execute(getSearchTerms, (self.requestID, self.ticketid,))
-        self.searchTerms = cursor.fetchone()[0]
+        cursor.execute(getSearchTerms, (self.requestID, self.ticketID,))
+        return cursor.fetchone()[0]
 
-    def executeQuery(self):
+    def getFromDBForSettings(self, settings):
+        continuous = settings["continuous"].lower() == "true"
+        lowYear = settings["lowYear"]
+        highYear = settings["highYear"]
+        averageWindow = settings["averageWindow"]
         with self.dbConnection.cursor() as curs:
-            if self.continuous:
+            if continuous:
                 params = (
                     self.requestID,
-                    self.ticketid,
-                    self.lowYear,
-                    self.highYear,
-                    self.averageWindow
+                    self.ticketID,
+                    lowYear,
+                    highYear,
+                    averageWindow
                 )
             else:
                 params = (
                     self.requestID,
-                    self.ticketid,
-                    self.averageWindow,
+                    self.ticketID,
+                    averageWindow,
                 )
             curs.execute(
                 self.request,
                 params
             )
-            self.dataNoJSTimestamp = curs.fetchall()
+            return curs.fetchall()
 
     def calculateJStime(self):
 

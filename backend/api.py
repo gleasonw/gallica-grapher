@@ -8,10 +8,12 @@ from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
 from dbops.recordDataForUser import RecordDataForUser
+from utils.psqlconn import PSQLconn
 
 app = Flask(__name__)
 CORS(app)
 requestIDSeed = random.randint(0, 10000)
+graphBatchGetter = GraphSeriesBatch()
 
 
 @app.route('/')
@@ -116,7 +118,7 @@ def getGraphData():
         'requestID': request.args["requestID"]
     }
     series = GraphSeriesBatch(settings)
-    items = {'series': series.getSeriesBatch()}
+    items = {'series': series.getSeriesForSettings()}
     return items
 
 

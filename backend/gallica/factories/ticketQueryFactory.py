@@ -5,7 +5,7 @@ class TicketQueryFactory:
     def __init__(self):
         pass
 
-    def build(self, ticket):
+    def buildForTicket(self, ticket):
         if codes := ticket.getCodeBundles():
             return self.buildWithCodeBundles(ticket, codes)
         else:

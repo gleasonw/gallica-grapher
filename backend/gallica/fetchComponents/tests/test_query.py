@@ -95,9 +95,7 @@ class TestQuery(TestCase):
                 "startRecord": 0,
                 "maximumRecords": 10,
                 "collapsing": True,
-                "query": '(gallica adj "test") and (gallicapublication_date>="1901" and '
-                         'gallicapublication_date<="1902") and (arkPress adj "test_date" or arkPress adj "neat_date") '
-                         'and (dc.type all "fascicule")',
+                "query": '(text adj "test") and (gallicapublication_date>="1901" and gallicapublication_date<"1902") and (arkPress adj "test_date" or arkPress adj "neat_date") and (dc.type all "fascicule") and (ocr.quality all "Texte disponible")'
             }
         )
 
@@ -112,8 +110,7 @@ class TestQuery(TestCase):
                 "startRecord": 0,
                 "maximumRecords": 10,
                 "collapsing": True,
-                "query": '(gallica adj "test") and (gallicapublication_date>="1901" and '
-                         'gallicapublication_date<="1902") and (dc.type all "fascicule")',
+                "query": '(text adj "test") and (gallicapublication_date>="1901" and gallicapublication_date<"1902") and (dc.type all "fascicule") and (ocr.quality all "Texte disponible")'
             }
         )
 
@@ -128,8 +125,7 @@ class TestQuery(TestCase):
                 "startRecord": 0,
                 "maximumRecords": 10,
                 "collapsing": True,
-                "query": '(text adj "test" prox/unit=word/distance=10 "neat") and (gallicapublication_date>="1901" '
-                         'and gallicapublication_date<="1902") and (dc.type all "fascicule")',
+                "query": '(text adj "test" prox/unit=word/distance=10 "neat") and (gallicapublication_date>="1901" and gallicapublication_date<"1902") and (dc.type all "fascicule") and (ocr.quality all "Texte disponible")'
             }
         )
 
