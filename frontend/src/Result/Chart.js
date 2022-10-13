@@ -18,12 +18,15 @@ function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
     const dateRange = getDateRangeSpan(props.tickets);
+    const startYear = dateRange[0];
+    const endYear = dateRange[1];
     const chartRef = useRef(null);
     const query =
         "/api/graphData?keys=" + Object.keys(props.tickets) +
         "&requestID=" + props.requestID +
         "&continuous=" + chartSettings.continuous +
-        "&dateRange=" + dateRange +
+        "&startYear=" + startYear +
+        "&endYear=" + endYear +
         "&timeBin=" + chartSettings.timeBin +
         "&averageWindow=" + chartSettings.averageWindow +
         "&uniqueforcache=" + props.uuid;

@@ -25,7 +25,7 @@ function RunningQueriesUI(props) {
     const refreshInterval = 1000;
     const timeBeforeWarning = 30000;
     const responseReceived = Object.keys(progressStats).some((ticketID) => (
-        progressStats[ticketID].progress > 0
+        progressStats[ticketID].progressPercent > 0
     ))
     useInterval(async () => {
         const requestStateCallbacks = {

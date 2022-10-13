@@ -16,8 +16,8 @@ class Ticket:
         self.key = key
         self.terms = terms
         self.codes = codes
-        self.startYear = dateRange[0]
-        self.endYear = dateRange[1]
+        self.startYear = int(dateRange[0])
+        self.endYear = int(dateRange[1])
         self.queries = None
         self.estimateNumResults = 0
         self.numResultsRetrieved = 0

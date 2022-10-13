@@ -16,7 +16,6 @@ export function TicketProgressBox(props) {
     const progress = props.progressStats.progressPercent
     const resultsRetrieved = props.progressStats.numResultsRetrieved
     const estimateTotal = props.progressStats.numResultsDiscovered
-    console.log(props.progressStats)
 
     const displayStates = {
         'addingMissingPapers':
@@ -49,7 +48,7 @@ export function TicketProgressBox(props) {
             />
             <StyledProgressStats>
                 {
-                    (progress === 0 && active) || (progress === 0 && props.index === 0) ?
+                    (estimateTotal === 0 && active) || (estimateTotal === 0 && props.index === 0) ?
                         <span>
                         Waiting for a response from the archive...
                         <CircularProgress/>
@@ -65,7 +64,7 @@ export function TicketProgressBox(props) {
                     animated
                     now={progress}/>
                 {
-                    (progress > 0) && (progress < 100) &&
+                    (estimateTotal > 0) && (progress < 100) &&
                     <StyledProgressStats>
                         <div className='progressStatsText'>
                             <div>{resultsRetrieved.toLocaleString()} of {estimateTotal.toLocaleString()} records fetched

@@ -114,11 +114,11 @@ def getGraphData():
         'averageWindow': request.args["averageWindow"],
         'groupBy': request.args["timeBin"],
         'continuous': request.args["continuous"],
-        'dateRange': request.args["dateRange"],
+        'startYear': request.args["startYear"],
+        'endYear': request.args["endYear"],
         'requestID': request.args["requestID"]
     }
-    series = GraphSeriesBatch(settings)
-    items = {'series': series.getSeriesForSettings()}
+    items = {'series': graphBatchGetter.getSeriesForSettings(settings)}
     return items
 
 
