@@ -102,6 +102,7 @@ class Request(threading.Thread):
         for search in self.searches:
             self.state = 'RUNNING'
             search.run()
+            self.ticketProgressStats[search.getTicketID()].setComplete()
         self.state = 'COMPLETED'
 
     def setTicketProgressStats(self, ticketID, progressStats):

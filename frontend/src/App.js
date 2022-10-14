@@ -108,19 +108,10 @@ function App() {
     }
 
     async function initRequest(tickets) {
-        setCurrentPage('running');
-        setTickets(tickets);
-        const ticketsWithPaperNamesRemovedAndSearchTypeAdded = {}
-        Object.keys(tickets).map((ticketID) => (
-            ticketsWithPaperNamesRemovedAndSearchTypeAdded[ticketID] = {
-                ...tickets[ticketID],
-                codes: tickets[ticketID].papersAndCodes.map(
-                    (paperAndCode) => (paperAndCode.code)),
-                searchType: getSearchTypeForIndex(selectedSearchType)
-            }
-        ))
+        const ticketsWithSearchType = addSearchTypeToTickets(tickets);
+        const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(ticketsWithSearchType);
         const {request} = await axios.post('/api/init', {
-            tickets: ticketsWithPaperNamesRemovedAndSearchTypeAdded
+            tickets: ticketsWithPaperNamesRemoved
         })
         const progressID = JSON.parse(request.response)["taskid"];
         const requestID = JSON.parse(request.response)["requestid"];
@@ -129,6 +120,31 @@ function App() {
         }
         setProgressID(progressID);
         setRequestID(requestID);
+        setTickets(ticketsWithSearchType);
+        setCurrentPage('running');
+    }
+
+    function addSearchTypeToTickets(someTickets) {
+        const ticketsWithSearchType = {}
+        Object.keys(someTickets).forEach((ticketID) => {
+            ticketsWithSearchType[ticketID] = {
+                ...someTickets[ticketID],
+                searchType: getSearchTypeForIndex(selectedSearchType)
+            }
+        })
+        return ticketsWithSearchType;
+    }
+
+    function removePaperNamesFromTickets(someTickets) {
+        const ticketsWithPaperNamesRemoved = {}
+        Object.keys(someTickets).map((ticketID) => (
+            ticketsWithPaperNamesRemoved[ticketID] = {
+                ...someTickets[ticketID],
+                codes: someTickets[ticketID].papersAndCodes.map(
+                    (paperAndCode) => (paperAndCode.code))
+            }
+        ))
+        return ticketsWithPaperNamesRemoved;
     }
 
     function getSearchTypeForIndex(index) {

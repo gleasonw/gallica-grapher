@@ -29,7 +29,7 @@ def getSearchOneTermInOnePaperOverRange():
         0: {
             'terms': ['brazza'],
             'codes': [],
-            'dateRange': [1863, 1944],
+            'dateRange': [1880, 1885],
             'linkTerm': None,
             'linkDistance': 10,
             'searchType': 'year'

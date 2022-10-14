@@ -79,6 +79,7 @@ export class PaperInputBox extends React.Component {
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
                     numContinuousPapers={this.props.numContinuousPapers}
+                    onFocus={this.props.onFocus}
                 />
                 <UserSelectPaperInput
                     yearRange={this.props.dateRanges[1]}
@@ -86,6 +87,7 @@ export class PaperInputBox extends React.Component {
                     boundaryYearsForUserPapers={this.props.boundaryYearsForUserPapers}
                     deletePaperBubble={this.props.deletePaperBubble}
                     paperInputValue={this.state.paperInputValue}
+                    onFocus={this.props.onFocus}
                     onKeyUp={this.handleKeyUp}
                     onPaperChange={this.handlePaperChange}
                     papersForDropdown={this.state.papersForDropdown}
@@ -101,6 +103,7 @@ export class PaperInputBox extends React.Component {
                     yearRangeHandler={this.props.dateRangeHandlers[2]}
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
+                    onFocus={this.props.onFocus}
                 />
             </StyledOptionInput>
         )

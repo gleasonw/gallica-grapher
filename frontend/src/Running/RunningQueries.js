@@ -6,6 +6,7 @@ import ClassicUIBox from "../shared/ClassicUIBox";
 
 
 function RunningQueriesUI(props) {
+    console.log(props.tickets);
     const initialProgressStats = {}
     Object.keys(props.tickets).map((ticketId) => (
         initialProgressStats[ticketId] = {

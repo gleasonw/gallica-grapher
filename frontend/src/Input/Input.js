@@ -95,10 +95,6 @@ function Input(props){
         makePaperBubble(paper)
     }
 
-    function handlePaperInputSelectClick(paperInputIndex){
-        setSelectedPaperInput(paperInputIndex);
-    }
-
     function handleContinuousLowYearChange(event){
         const inputLowYear = event.target.value
         if(isNumeric(inputLowYear) || inputLowYear === '') {
@@ -279,6 +275,7 @@ function Input(props){
                     ]}
                     onCreateTicketClick={handleCreateTicketClick}
                     onPaperDropItemClick={handlePaperDropdownClick}
+                    onPaperInputFocus={(i) => setSelectedPaperInput(i)}
                     terms={terms}
                     termInput={termInput}
                     linkTerm={linkTerm}
@@ -295,7 +292,7 @@ function Input(props){
                     onTicketClick={props.onTicketClick}
                     tickets={props.tickets}
                     exampleBoxRef={exampleBoxRef}
-                    onPaperInputClick={handlePaperInputSelectClick}
+                    onPaperInputClick={(i) => setSelectedPaperInput(i)}
                     selectedPaperInput={selectedPaperInput}
                     selectedSearchType={props.selectedSearchType}
                     onSearchTypeClick={(selectIndex) => props.onSearchTypeChange(selectIndex)}

@@ -38,6 +38,10 @@ class SearchProgressStats:
     def setNumRecordsToFetch(self, numRecordsToFetch):
         self.numRecordsToFetch = numRecordsToFetch
 
+    def setComplete(self):
+        self.active = 0
+        self.progressPercent = 100
+
     def update(self, progressStats):
         if not self.numBatches:
             self.active = 1

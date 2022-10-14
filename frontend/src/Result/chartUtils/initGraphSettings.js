@@ -1,4 +1,5 @@
 export default function initGraphSettings(tickets) {
+    console.log(tickets);
     const highChartsSeriesColors = [
         '#7cb5ec',
         '#434348',
@@ -26,7 +27,10 @@ export default function initGraphSettings(tickets) {
             (indexForColorAssignment + 1) %
             highChartsSeriesColors.length;
     }
-    initialGraphSettings["group"] = initSetting;
+    initialGraphSettings["group"] = {
+        ...initSetting,
+        timeBin: getTimeBinForSearchType(tickets[Object.keys(tickets)[0]].searchType),
+    };
     return initialGraphSettings
 }
 

@@ -62,7 +62,7 @@ export default function RecordsViewer(props){
                 <DisplayRecordsTable
                     tickets={props.tickets}
                     requestID={props.requestID}
-                    timeBin={props.timeBin}
+                    timeBin={timeBin}
                     year={recordsTableYear}
                     month={recordsTableMonth}
                     day={recordsTableDay}
