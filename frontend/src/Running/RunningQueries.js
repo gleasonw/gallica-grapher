@@ -6,7 +6,6 @@ import ClassicUIBox from "../shared/ClassicUIBox";
 
 
 function RunningQueriesUI(props) {
-    console.log(props.tickets);
     const initialProgressStats = {}
     Object.keys(props.tickets).map((ticketId) => (
         initialProgressStats[ticketId] = {
@@ -30,14 +29,13 @@ function RunningQueriesUI(props) {
     ))
     useInterval(async () => {
         const requestStateCallbacks = {
-            "PROGRESS": () => setProgressStats(progressJSON['progress']),
-            "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON['getNumRecords']),
+            "RUNNING": () => setProgressStats(progressJSON['progress']),
+            "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON['numRecords']),
             "NO_RECORDS": props.onNoRecords,
             "COMPLETED": props.onFinish,
             "PENDING": () => null,
             "ADDING_MISSING_PAPERS": () => setDisplayState('addingMissingPapers'),
             "ADDING_RESULTS": () => setDisplayState('addingResults'),
-            "REMOVING_DUPLICATES": () => setDisplayState('removingDuplicates'),
             "ERROR": props.onBackendError,
         }
         const response = await fetch("/poll/progress/" + props.progressID);
@@ -45,6 +43,7 @@ function RunningQueriesUI(props) {
             props.onBackendError();
         }
         const progressJSON = await response.json();
+        console.log(progressJSON);
         const state = progressJSON["state"]
         if (requestStateCallbacks.hasOwnProperty(state)) {
             requestStateCallbacks[state]()

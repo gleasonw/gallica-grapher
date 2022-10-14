@@ -20,6 +20,7 @@ class QueryIndexer:
                 baseData = query.getEssentialDataForMakingAQuery()
                 baseData["startIndex"] = i
                 baseData["numRecords"] = 50
+                baseData["collapsing"] = False
                 indexedQueries.append(
                     self.makeQuery(**baseData)
                 )

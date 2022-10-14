@@ -19,8 +19,7 @@ class TestGroupSearchFactory(unittest.TestCase):
         )
 
     def test_getSearch(self):
-        test = self.testFactory.getSearch()
-        self.assertIsInstance(test, Search)
+        self.assertIsInstance(self.testFactory.prepare(MagicMock()), Search)
 
 
 if __name__ == '__main__':

@@ -19,6 +19,7 @@ def doTest(ticket):
     testRequest.start()
     while testRequest.state not in ['COMPLETED', 'NO_RECORDS', 'TOO_MANY_RECORDS']:
         print(psutil.Process().memory_info().rss / 1024 / 1024)
+        print(testRequest.state)
         print(testRequest.getProgressStats())
         time.sleep(1)
     print(testRequest.state)
@@ -32,7 +33,7 @@ def getSearchOneTermInOnePaperOverRange():
             'dateRange': [1880, 1885],
             'linkTerm': None,
             'linkDistance': 10,
-            'searchType': 'year'
+            'searchType': 'all'
         }
     }
     return testTicket

@@ -9,8 +9,9 @@ class TestSearchProgressStats(TestCase):
         self.ticketProgressStats = SearchProgressStats(
             ticketID=1,
             searchType='all',
-            numRecordsToFetch=100
+            parse=MagicMock()
         )
+        self.ticketProgressStats.setNumRecordsToFetch(20)
 
     def test_get(self):
         test = self.ticketProgressStats.get()
@@ -20,8 +21,6 @@ class TestSearchProgressStats(TestCase):
         self.assertIsInstance(test['numResultsRetrieved'], int)
         self.assertIsInstance(test['progressPercent'], int)
         self.assertIsInstance(test['estimateSecondsToCompletion'], int)
-        self.assertIsNone(test['randomPaperForDisplay'])
-        self.assertIsNone(test['randomTextForDisplay'])
         self.assertIsInstance(test['active'], int)
 
     def test_update(self):
@@ -29,14 +28,13 @@ class TestSearchProgressStats(TestCase):
             progressStats={
                 'elapsedTime': 1,
                 'numWorkers': 1,
-                'randomPaper': MagicMock(),
-                'randomTextForDisplay': MagicMock(),
+                'xml': MagicMock()
             }
         )
 
-        self.assertEqual(self.ticketProgressStats.numRecordsToFetch, 100)
+        self.assertEqual(self.ticketProgressStats.numRecordsToFetch, 20)
         self.assertEqual(self.ticketProgressStats.active, 1)
-        self.assertEqual(self.ticketProgressStats.numBatches, 2)
+        self.assertEqual(self.ticketProgressStats.numBatches, 1)
         self.assertEqual(self.ticketProgressStats.numBatchesRetrieved, 1)
-        self.assertEqual(self.ticketProgressStats.progressPercent, 50)
-        self.assertEqual(self.ticketProgressStats.estimateSecondsToCompletion, 1)
+        self.assertEqual(self.ticketProgressStats.progressPercent, 100)
+        self.assertEqual(self.ticketProgressStats.estimateSecondsToCompletion, 0)

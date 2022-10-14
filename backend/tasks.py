@@ -14,42 +14,27 @@ def spawnRequest(self, tickets, requestid):
     )
     request = factory.buildRequest()
     request.start()
-    returnStates = {
-        'COMPLETED': {
-            'status': 'COMPLETED'
-        },
-        'TOO_MANY_RECORDS': {
-            'status': 'TOO_MANY_RECORDS',
-            'getNumRecords': request.estimateNumRecords
-        },
-        'NO_RECORDS': {
-            'status': 'NO_RECORDS'
-        },
-        'ERROR': {
-            'status': 'ERROR'
-        }
-    }
     pollStates = {
         'RUNNING': lambda: self.update_state(
-            state='PROGRESS',
+            state='RUNNING',
             meta={'progress': request.getProgressStats()}
         ),
         'ADDING_MISSING_PAPERS': lambda: self.update_state(
-            state='ADDING_MISSING_PAPERS'
+            state='ADDING_MISSING_PAPERS',
+            meta={'progress': request.getProgressStats()}
         ),
         'ADDING_RESULTS': lambda: self.update_state(
-            state='ADDING_RESULTS'
-        ),
-        'REMOVING_DUPLICATES': lambda: self.update_state(
-            state='REMOVING_DUPLICATES'
-        ),
+            state='ADDING_RESULTS',
+            meta={'progress': request.getProgressStats()}
+        )
     }
     while True:
-        if response := returnStates.get(request.state):
-            return response
-        elif pollState := pollStates.get(request.state):
+        if pollState := pollStates.get(request.state):
             pollState()
         else:
-            print(f"Unknown state: {request.state}")
+            return {
+                'state': request.state,
+                'numRecords': request.estimateNumRecords
+            }
         time.sleep(1)
 

@@ -33,31 +33,16 @@ def init():
 @app.route('/poll/progress/<taskID>')
 def getRequestState(taskID):
     task = spawnRequest.AsyncResult(taskID)
-    state = task.state
-    if state == 'PENDING':
+    if task.ready():
         response = {
-            'state': state,
-            'progress': 0
+            'state': task.result.get('state'),
+            'numRecords': task.result.get('numRecords')
         }
-    elif state == 'PROGRESS':
-        response = {
-            'state': state,
-            'progress': task.info.get('progress')
-        }
-    elif state in [
-        'ADDING_MISSING_PAPERS',
-        'ADDING_RESULTS',
-        'REMOVING_DUPLICATES'
-    ]:
-        response = {'state': state}
     else:
-        result = task.result
-        if result:
-            response = {'state': result['status']}
-            if result['status'] == 'TOO_MANY_RECORDS':
-                response['getNumRecords'] = result['getNumRecords']
-        else:
-            response = {'state': "SUCCESS"}
+        response = {
+            'state': task.state,
+            'progress': task.info.get('progress', 0)
+        }
     return response
 
 

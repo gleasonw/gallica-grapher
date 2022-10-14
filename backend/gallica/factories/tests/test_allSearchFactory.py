@@ -16,9 +16,7 @@ class TestAllSearchFactory(TestCase):
             sruFetcher=MagicMock(),
             queryBuilder=MagicMock(),
             onAddingResultsToDB=MagicMock(),
-            onAddingMissingPapersToDB=MagicMock()
         )
 
     def test_getSearch(self):
-        self.testFactory.getSearch()
-        self.assertIsInstance(self.testFactory.getSearch(), Search)
+        self.assertIsInstance(self.testFactory.prepare(MagicMock()), Search)

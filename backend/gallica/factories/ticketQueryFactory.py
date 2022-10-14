@@ -1,4 +1,4 @@
-from gallica.fetchComponents.query import Query
+from gallica.fetchComponents.query import TicketQuery
 
 
 class TicketQueryFactory:
@@ -28,14 +28,13 @@ class TicketQueryFactory:
 
     def makeQuery(self, term, ticket, dates, codes=None):
         codes = codes or []
-        return Query(
+        return TicketQuery(
             term=term,
-            publicationStartDate=dates[0],
-            publicationEndDate=dates[1],
-            linkTerm=ticket.getLinkTerm(),
-            linkDistance=ticket.getLinkDistance(),
+            ticket=ticket,
             startIndex=0,
             numRecords=1,
             collapsing=False,
-            codes=codes
+            codes=codes,
+            startDate=dates[0],
+            endDate=dates[1]
         )

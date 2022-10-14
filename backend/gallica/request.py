@@ -93,8 +93,7 @@ class Request(threading.Thread):
                     progressStats
                 ),
                 onAddingResultsToDB=lambda: self.setRequestState('ADDING_RESULTS'),
-                onAddingMissingPapersToDB=lambda: self.setRequestState('ADDING_MISSING_PAPERS'),
-            ).getSearch()
+            ).prepare(self)
             for ticket in self.tickets
         ]
 

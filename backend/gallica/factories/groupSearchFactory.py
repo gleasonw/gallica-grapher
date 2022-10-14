@@ -16,7 +16,6 @@ class GroupSearchFactory:
             sruFetcher,
             queryBuilder,
             onAddingResultsToDB,
-            onAddingMissingPapersToDB
     ):
         self.requestID = requestID
         self.ticket = ticket
@@ -32,7 +31,7 @@ class GroupSearchFactory:
         self.sruFetcher = sruFetcher
         self.onAddingResultsToDB = onAddingResultsToDB
 
-    def getSearch(self):
+    def prepare(self, request):
         queries = self.buildQueriesForTicket(self.ticket)
         return Search(
             queries=queries,

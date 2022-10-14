@@ -24,7 +24,7 @@ class PaperSearchFactory:
         self.parsePaperRecords = ParsePaperRecords(parse)
         self.SRURecordGetter = RecordGetter(
             gallicaAPI=SRUapi,
-            parseData=parse
+            parseData=ParsePaperRecords(parse)
         )
         self.ARKRecordGetter = RecordGetter(
             gallicaAPI=ConcurrentFetch('https://gallica.bnf.fr/services/Issues'),
@@ -69,7 +69,7 @@ class ParseArkRecord:
             yield from self.generateArkRecord(response.xml, response.query)
 
     def generateArkRecord(self, xml, query):
-        years = self.parser.getYears(xml)
+        years = self.parser.getYearsPublished(xml)
         code = query.getCode()
         yield ArkRecord(
             code=code,

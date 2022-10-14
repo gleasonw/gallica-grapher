@@ -1,7 +1,7 @@
 import unittest
 from gallica.factories.ticketQueryFactory import TicketQueryFactory
 from unittest.mock import MagicMock
-from gallica.fetchComponents.query import Query
+from gallica.fetchComponents.query import TicketQuery
 
 
 class TestTicketQueryFactory(unittest.TestCase):

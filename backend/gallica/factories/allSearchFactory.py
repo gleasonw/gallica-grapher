@@ -1,5 +1,5 @@
 from gallica.factories.queryIndexer import QueryIndexer
-from gallica.fetchComponents.query import Query
+from gallica.fetchComponents.query import TicketQuery
 from gallica.search import Search
 from gallica.recordGetter import RecordGetter
 from gallica.dto.occurrenceRecord import OccurrenceRecord
@@ -17,7 +17,6 @@ class AllSearchFactory:
             sruFetcher,
             queryBuilder,
             onAddingResultsToDB,
-            onAddingMissingPapersToDB
     ):
         self.requestID = requestID
         self.ticket = ticket
@@ -34,13 +33,12 @@ class AllSearchFactory:
         self.queryIndexer = QueryIndexer(
             gallicaAPI=self.sruFetcher,
             parse=parse,
-            makeQuery=Query
+            makeQuery=TicketQuery
         )
         self.getNumResultsForEachQuery = self.queryIndexer.getNumResultsForEachQuery
         self.makeIndexedQueriesForEachBaseQuery = self.queryIndexer.makeIndexedQueries
-        self.onAddingMissingPapers = onAddingMissingPapersToDB
 
-    def getSearch(self):
+    def prepare(self, request):
         queries = self.buildQueriesForTicket(self.ticket)
         queriesWithNumResults = self.getNumResultsForEachQuery(queries)
         return Search(
@@ -54,7 +52,7 @@ class AllSearchFactory:
             ),
             requestStateHandlers={
                 'onAddingResultsToDB': self.onAddingResultsToDB,
-                'onAddingMissingPapers': self.onAddingMissingPapers
+                'onAddingMissingPapers': lambda: request.setRequestState('ADDING_MISSING_PAPERS')
             },
             numRecordsToFetch=sum(
                 [numResults for numResults in queriesWithNumResults.values()]

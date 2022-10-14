@@ -41,13 +41,13 @@ class TestTicket(TestCase):
         self.assertEqual(self.ticketWithCodes.getID(), 1)
 
     def test_get_month_grouping_intervals(self):
-        monthGroups = self.monthGroupedTicket.getGroupingIntervals()
+        monthGroups = self.monthGroupedTicket.getDateGroupings()
         self.assertTrue(('1900-01-01', '1900-02-01') in monthGroups)
         self.assertTrue(('1900-12-01', '1901-01-01') in monthGroups)
         self.assertTrue(('1901-12-01', '1902-01-01') in monthGroups)
 
     def test_get_year_grouping_intervals(self):
-        yearGroups = self.yearGroupedTicket.getGroupingIntervals()
+        yearGroups = self.yearGroupedTicket.getDateGroupings()
         self.assertTrue(('1900-01-01', '1901-01-01') in yearGroups)
         self.assertTrue(('1901-01-01', '1902-01-01') in yearGroups)
 

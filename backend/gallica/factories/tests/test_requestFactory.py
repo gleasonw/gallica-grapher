@@ -11,10 +11,10 @@ class TestRequestFactory(unittest.TestCase):
                 'ticket1': {
                     'terms': ['test'],
                     'codes': ['test'],
-                    'dateRange': ['test', 'test'],
+                    'dateRange': [10, 20],
                     'linkTerm': 'test',
                     'linkDistance': 'test',
-                    'fetchType': 'all'
+                    'searchType': 'all'
                 }
             },
             requestid='test'

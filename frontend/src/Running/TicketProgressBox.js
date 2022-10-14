@@ -16,6 +16,7 @@ export function TicketProgressBox(props) {
     const progress = props.progressStats.progressPercent
     const resultsRetrieved = props.progressStats.numResultsRetrieved
     const estimateTotal = props.progressStats.numResultsDiscovered
+    console.log(props.state)
 
     const displayStates = {
         'addingMissingPapers':
@@ -79,7 +80,7 @@ export function TicketProgressBox(props) {
                         </div>
                     </StyledProgressStats>
                 }
-                {progress === 100 && !!active && displayStates[props.state]}
+                {progress === 100 && active && displayStates[props.state]}
             </StyledProgressStats>
         </ClassicUIBox>
     )
