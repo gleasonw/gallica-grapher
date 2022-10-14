@@ -64,13 +64,6 @@ function TicketForm(props) {
                 userSelectedPapers={props.userSelectedPapers}
                 boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
             />
-            <br/>
-            <label>grouped by: </label>
-            <DateGroupSelect
-                selectedSearchType={props.selectedSearchType}
-                onDateGroupClick={props.onSearchTypeClick}
-                selected={props.selectedSearchType}
-            />
             <div ref={props.requestBoxRef}>
                 <StyledRequestBox
                     tickets={props.tickets}
@@ -79,6 +72,13 @@ function TicketForm(props) {
                     onCreateTicketClick={handleCreateTicketClick}
                 />
             </div>
+            <br/>
+            <label>grouped by: </label>
+            <DateGroupSelect
+                selectedSearchType={props.selectedSearchType}
+                onDateGroupClick={props.onSearchTypeClick}
+                selected={props.selectedSearchType}
+            />
             <RequestBoxAndFetchButtonWrap>
                 <ImportantButtonWrap>
                     <input

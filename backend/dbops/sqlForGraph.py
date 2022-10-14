@@ -205,26 +205,31 @@ class SQLforGraph:
     def getGallicaGroupedYears(self):
         return """
         SELECT year, avgFrequency::float8 
-        FROM
-        (SELECT year, AVG(count)
-        OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM groupcounts
-        WHERE requestid = %s
-        AND ticketid = %s
-        ORDER BY year
-        ) AS avgedCounts
+        FROM (
+            SELECT year, AVG(count) 
+            OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM (
+                SELECT year, count 
+                FROM groupcounts
+                WHERE requestid = %s
+                AND ticketid = %s
+                ORDER BY year
+            ) AS counts
+        ) AS avgedCounts;
         """
 
     def getGallicaGroupedMonths(self):
         return """
         SELECT year, month, avgFrequency::float8
-        FROM
-        (SELECT year, month, AVG(count) 
-        OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM groupcounts
-        WHERE requestid = %s
-        AND ticketid = %s
-        ORDER BY year, month
-        ) AS avgedCounts
-        
+        FROM (
+            SELECT year, month, AVG(count) 
+            OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM (
+                SELECT year, month, count
+                FROM groupcounts
+                WHERE requestid = %s
+                AND ticketid = %s
+                ORDER BY year, month
+            ) AS counts
+        ) AS avgedCounts;
         """

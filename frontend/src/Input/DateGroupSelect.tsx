@@ -5,12 +5,13 @@ export default function DateGroupSelect(props){
     return (
         <StyledOptionInput
             flexDirection={'row'}
+            borderRadius={'10px'}
         >
             <OptionWrap
                 selected = {props.selected === 0}
                 children={'year'}
                 onClick={() => props.onDateGroupClick(0)}
-                borderRadius={'10px 0 0 0'}
+                borderRadius={'10px 0 0 10px'}
             />
             <OptionWrap
                 children={'month'}
@@ -21,7 +22,7 @@ export default function DateGroupSelect(props){
                 selected = {props.selected === 2}
                 children={'no grouping, fetch all'}
                 onClick={() => props.onDateGroupClick(2)}
-                borderRadius={'0 10px 0 0'}
+                borderRadius={'0 10px 10px 0'}
             />
         </StyledOptionInput>
     )

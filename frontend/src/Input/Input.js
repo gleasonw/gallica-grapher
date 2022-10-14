@@ -6,7 +6,6 @@ import {ExampleBox} from "./ExampleBox";
 //TODO: add a reducer
 function Input(props){
     const exampleBoxRef = useRef(null);
-
     const [terms, setTerms] = useState([]);
     const [linkTerm, setLinkTerm] = useState(null);
     const [linkDistance, setLinkDistance] = useState(10);
@@ -16,7 +15,6 @@ function Input(props){
     const [customPapersDateRange, setCustomPapersDateRange] = useState(['','']);
     const [continuousDateRange, setContinuousDateRange] = useState(['','']);
     const [fullSearchDateRange, setFullSearchDateRange] = useState(['','']);
-    const [selectedSearchType, setSelectedSearchType] = useState(0);
     const queryForContinuousPapers = getContinuousPaperQuery();
     const result = useData(queryForContinuousPapers);
     const continuousPapers = result ? result['paperNameCodes'] : [];
@@ -66,7 +64,6 @@ function Input(props){
             linkDistance: linkDistance,
             papersAndCodes: getPapersFor(selectedPaperInput),
             dateRange: getDateRangeFor(selectedPaperInput),
-            searchType: getSearchTypeFor(selectedSearchType)
         }
     }
 
@@ -166,7 +163,6 @@ function Input(props){
         setUserSelectedPapers([]);
         setLinkDistance(10);
         setLinkTerm('');
-        setSelectedSearchType(0);
     }
 
 
@@ -225,11 +221,6 @@ function Input(props){
         }else{
             throw Error(`Unexpected paper index: ${paperInputIndex}`)
         }
-    }
-
-    function getSearchTypeFor(searchTypeIndex){
-        const searchTypes = ['year', 'month', 'all']
-        return searchTypes[searchTypeIndex]
     }
 
     function trimCustomPaperRangeToActualPaperRange(){
@@ -306,8 +297,8 @@ function Input(props){
                     exampleBoxRef={exampleBoxRef}
                     onPaperInputClick={handlePaperInputSelectClick}
                     selectedPaperInput={selectedPaperInput}
-                    selectedSearchType={selectedSearchType}
-                    onSearchTypeClick={(selectIndex) => setSelectedSearchType(selectIndex)}
+                    selectedSearchType={props.selectedSearchType}
+                    onSearchTypeClick={(selectIndex) => props.onSearchTypeChange(selectIndex)}
                     numContinuousPapers={continuousPapers ?
                         continuousPapers.length :
                         '...'

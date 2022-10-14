@@ -15,6 +15,8 @@ export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
     const [showFilterPopup, setShowFilterPopup] = useState(false);
+    const isGallicaGrouped = props.timeBin === 'gallicaYear' || props.timeBin === 'gallicaMonth';
+    console.log(props.timeBin)
     let recordsQuery =
         "/api/getDisplayRecords?" +
         "tickets=" + Object.keys(props.tickets) +
@@ -73,6 +75,7 @@ export default function DisplayRecordsTable(props) {
                 }
             </NavBarWrap>
             <StyledFilterAndTable
+                isGallicaGrouped={isGallicaGrouped}
                 onOutsidePopupClick={() => setShowFilterPopup(false)}
                 compact={props.compact}
                 show={showFilterPopup}
@@ -137,7 +140,7 @@ function StyledFilterAndTable(props) {
                     show={props.show}
                     onOutsidePopupClick={props.onOutsidePopupClick}
                 />
-                {!props.compact &&
+                {!props.compact && !props.isGallicaGrouped &&
                     <div>
                         <TicketPaperOccurrenceStats
                             tickets={Object.keys(props.tickets)}

@@ -60,22 +60,22 @@ export default function RecordsViewer(props){
             </ClassicUIBox>
             <ClassicUIBox gap={'20px'}>
                 <DisplayRecordsTable
-                        tickets={props.tickets}
-                        requestID={props.requestID}
-                        timeBin={props.timeBin}
-                        year={recordsTableYear}
-                        month={recordsTableMonth}
-                        day={recordsTableDay}
-                        term={recordsTableTerm}
-                        periodical={recordsTablePeriodical}
-                        onYearChange={setRecordsTableYear}
-                        onMonthChange={setRecordsTableMonth}
-                        onDayChange={setRecordsTableDay}
-                        onPeriodicalChange={setRecordsTablePeriodical}
-                        onTermChange={setRecordsTableTerm}
-                        cacheID={props.cacheID}
-                        compact={compact}
-                    />
+                    tickets={props.tickets}
+                    requestID={props.requestID}
+                    timeBin={props.timeBin}
+                    year={recordsTableYear}
+                    month={recordsTableMonth}
+                    day={recordsTableDay}
+                    term={recordsTableTerm}
+                    periodical={recordsTablePeriodical}
+                    onYearChange={setRecordsTableYear}
+                    onMonthChange={setRecordsTableMonth}
+                    onDayChange={setRecordsTableDay}
+                    onPeriodicalChange={setRecordsTablePeriodical}
+                    onTermChange={setRecordsTableTerm}
+                    cacheID={props.cacheID}
+                    compact={compact}
+                />
             </ClassicUIBox>
         </StyledRecordsViewer>
     )

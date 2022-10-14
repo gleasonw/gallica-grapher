@@ -36,5 +36,5 @@ function getTimeBinForSearchType(searchType) {
         'year': 'gallicaYear',
         'month': 'gallicaMonth'
     }
-    return timeBins[searchType]
+    return timeBins[searchType];
 }

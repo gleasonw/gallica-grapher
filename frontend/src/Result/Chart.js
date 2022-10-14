@@ -69,9 +69,10 @@ function ChartSettings(props) {
     const settings = useContext(GraphSettingsContext);
     const settingsForID = settings[props.settingsID];
     const dispatch = useContext(GraphSettingsDispatchContext)
+    const isGallicaGrouped = settingsForID.timeBin === "gallicaYear" || settingsForID.timeBin === "gallicaMonth";
     return (
         <NavBarWrap>
-            <StyledInputAndLabel>
+            <StyledInputAndLabel display={isGallicaGrouped ? 'none' : 'flex'}>
                 <label htmlFor='timeBin'>Group by</label>
                 <StyledSelect
                     id='timeBin'
@@ -119,7 +120,7 @@ function ChartSettings(props) {
                     <option value={14}>50</option>
                 </StyledSelect>
             </StyledInputAndLabel>
-            <StyledInputAndLabel>
+            <StyledInputAndLabel display={isGallicaGrouped ? 'none' : 'flex'}>
                 <label htmlFor='continuous'>Only continuous periodicals publishing over range</label>
                 <input
                     id='continuous'

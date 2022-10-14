@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const StyledInputAndLabel = styled.div`
-    display: flex;
+    display: ${props => props.display || "flex"};
     flex-direction: column;
     `;
 

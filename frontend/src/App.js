@@ -13,6 +13,7 @@ import ImportantButtonWrap from "./shared/ImportantButtonWrap";
 
 function App() {
     const [tickets, setTickets] = useState({});
+    const [selectedSearchType, setSelectedSearchType] = useState(0);
     const [requestID, setRequestID] = useState(null);
     const [progressID, setProgressID] = useState(null);
     const [currentPage, setCurrentPage] = useState('input');
@@ -28,6 +29,8 @@ function App() {
                 onTicketClick={handleTicketClick}
                 onExampleRequestClick={handleExampleRequestClick}
                 requestBoxRef={requestBoxRef}
+                selectedSearchType={selectedSearchType}
+                onSearchTypeChange={(i) => setSelectedSearchType(i)}
             />,
         'running':
             <RunningQueriesUI
@@ -107,16 +110,17 @@ function App() {
     async function initRequest(tickets) {
         setCurrentPage('running');
         setTickets(tickets);
-        const ticketsWithJustCodes = {}
+        const ticketsWithPaperNamesRemovedAndSearchTypeAdded = {}
         Object.keys(tickets).map((ticketID) => (
-            ticketsWithJustCodes[ticketID] = {
+            ticketsWithPaperNamesRemovedAndSearchTypeAdded[ticketID] = {
                 ...tickets[ticketID],
                 codes: tickets[ticketID].papersAndCodes.map(
                     (paperAndCode) => (paperAndCode.code)),
+                searchType: getSearchTypeForIndex(selectedSearchType)
             }
         ))
         const {request} = await axios.post('/api/init', {
-            tickets: ticketsWithJustCodes
+            tickets: ticketsWithPaperNamesRemovedAndSearchTypeAdded
         })
         const progressID = JSON.parse(request.response)["taskid"];
         const requestID = JSON.parse(request.response)["requestid"];
@@ -125,6 +129,11 @@ function App() {
         }
         setProgressID(progressID);
         setRequestID(requestID);
+    }
+
+    function getSearchTypeForIndex(index) {
+        const searchTypes = ['year', 'month', 'all']
+        return searchTypes[index]
     }
 
     function handleCreateTicketClick(items) {
