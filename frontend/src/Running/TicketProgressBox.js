@@ -12,33 +12,17 @@ export function TicketProgressBox(props) {
     const remainingSeconds = Math.floor(secondsToCompletion % 60)
     const remainingMinutes = minutesToCompletion % 60
     const timeEstimate = hoursToCompletion + "h " + remainingMinutes + "m " + remainingSeconds + "s"
-    const active = props.progressStats.active
-    const progress = props.progressStats.progressPercent
     const resultsRetrieved = props.progressStats.numResultsRetrieved
     const estimateTotal = props.progressStats.numResultsDiscovered
-    console.log(props.state)
-
-    const displayStates = {
-        'addingMissingPapers':
-            <div>
-                <h3>Fetching missing periodical data...</h3>
-                <CircularProgress/>
-            </div>,
-        'addingResults':
-            <div>
-                <h3>Loading response data into the database...</h3>
-                <CircularProgress/>
-            </div>,
-        'removingDuplicates':
-            <div>
-                <h3>Removing duplicate results (Gallica sometimes surfaces the same periodical from different
-                    websites)...</h3>
-                <CircularProgress/>
-            </div>
-    }
+    const ticketSearchState = props.progressStats.state
+    const progress = ticketSearchState === 'COMPLETED' ? 100 : props.progressStats.progressPercent
 
     return (
-        <ClassicUIBox display={(active || progress === 100 || props.index === 0) ? 'flex' : 'none'}>
+        <ClassicUIBox display={(
+            ticketSearchState === 'RUNNING' ||
+            progress === 100 ||
+            props.index === 0) ? 'flex' : 'none'}
+        >
             <span>{props.index + 1} of {props.total}</span>
             <TicketLabel
                 terms={props.ticket.terms}
@@ -49,23 +33,22 @@ export function TicketProgressBox(props) {
             />
             <StyledProgressStats>
                 {
-                    (estimateTotal === 0 && active) || (estimateTotal === 0 && props.index === 0) ?
-                        <span>
+                    (ticketSearchState === 'RUNNING' || props.index === 0) && estimateTotal === 0 &&
+                    <span>
                         Waiting for a response from the archive...
                         <CircularProgress/>
                     </span>
-                        :
-                        null
-                }
-                {
-                    progress === 100 &&
-                    <div>{resultsRetrieved.toLocaleString()} results retrieved after eliminating duplicates.</div>
                 }
                 <ProgressBar
                     animated
-                    now={progress}/>
+                    now={progress}
+                />
                 {
-                    (estimateTotal > 0) && (progress < 100) &&
+                    ticketSearchState === 'COMPLETE' &&
+                    <div>{resultsRetrieved.toLocaleString()} results retrieved after eliminating duplicates.</div>
+                }
+                {
+                    ticketSearchState === 'RUNNING' &&
                     <StyledProgressStats>
                         <div className='progressStatsText'>
                             <div>{resultsRetrieved.toLocaleString()} of {estimateTotal.toLocaleString()} records fetched
@@ -80,7 +63,13 @@ export function TicketProgressBox(props) {
                         </div>
                     </StyledProgressStats>
                 }
-                {progress === 100 && active && displayStates[props.state]}
+                {
+                    ticketSearchState === "ADDING_MISSING_PAPERS" &&
+                    <div>
+                        <h3>Fetching missing periodical data...</h3>
+                        <CircularProgress/>
+                    </div>
+                }
             </StyledProgressStats>
         </ClassicUIBox>
     )

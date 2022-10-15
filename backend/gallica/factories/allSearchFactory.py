@@ -52,7 +52,10 @@ class AllSearchFactory:
             ),
             requestStateHandlers={
                 'onAddingResultsToDB': self.onAddingResultsToDB,
-                'onAddingMissingPapers': lambda: request.setRequestState('ADDING_MISSING_PAPERS')
+                'onAddingMissingPapers': lambda: request.setSearchState(
+                    state='ADDING_MISSING_PAPERS',
+                    ticketID=self.ticket.getID()
+                )
             },
             numRecordsToFetch=sum(
                 [numResults for numResults in queriesWithNumResults.values()]

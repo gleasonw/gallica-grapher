@@ -65,7 +65,10 @@ class TestQuery(TestCase):
             collapsing=True,
             startDate='1901',
             endDate='1902',
-            ticket=MagicMock()
+            ticket=MagicMock(
+                getLinkDistance=MagicMock(return_value=0),
+                getLinkTerm=MagicMock(return_value='')
+            )
         )
         self.queryWithoutCodes = TicketQuery(
             term='test',
@@ -74,7 +77,10 @@ class TestQuery(TestCase):
             collapsing=True,
             startDate='1901',
             endDate='1902',
-            ticket=MagicMock(),
+            ticket=MagicMock(
+                getLinkDistance=MagicMock(return_value=0),
+                getLinkTerm=MagicMock(return_value='')
+            ),
             codes=[]
         )
         self.queryWithLinkTermAndDistance = TicketQuery(
@@ -91,10 +97,20 @@ class TestQuery(TestCase):
             codes=[]
         )
 
-    #TODO: figure out a less rigid way to test for correctness. stopgap measures.
     def test_get_fetch_params_given_codes(self):
         test = self.queryWithCodes.getFetchParams()
-        self.assertIsInstance(test, dict)
+        self.assertDictEqual(
+            test,
+            {
+                "operation": "searchRetrieve",
+                "version": 1.2,
+                "exactSearch": "True",
+                "startRecord": 0,
+                "maximumRecords": 10,
+                "collapsing": True,
+                "query": 'text adj "test" and gallicapublication_date>="1901" and gallicapublication_date<"1902" and (arkPress adj "test_date" or arkPress adj "neat_date")'
+            }
+        )
 
     def test_get_fetch_params_without_codes(self):
         test = self.queryWithoutCodes.getFetchParams()
@@ -106,4 +122,13 @@ class TestQuery(TestCase):
 
     def test_get_essential_data_for_making_aquery(self):
         test = self.queryWithCodes.getEssentialDataForMakingAQuery()
-        self.assertIsInstance(test, dict)
+        self.assertDictEqual(
+            test,
+            {
+                'term': 'test',
+                'codes': ['test', 'neat'],
+                'endDate': '1902',
+                'startDate': '1901',
+                "ticket": self.queryWithCodes.ticket
+            }
+        )

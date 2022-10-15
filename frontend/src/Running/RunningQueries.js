@@ -20,7 +20,6 @@ function RunningQueriesUI(props) {
     ))
     const [cancelMessage, setCancelMessage] = React.useState('Cancel');
     const [progressStats, setProgressStats] = React.useState(initialProgressStats);
-    const [displayState, setDisplayState] = React.useState('running');
     const [timeBeforeResponse, setTimeBeforeResponse] = React.useState(0);
     const refreshInterval = 1000;
     const timeBeforeWarning = 30000;
@@ -34,8 +33,6 @@ function RunningQueriesUI(props) {
             "NO_RECORDS": props.onNoRecords,
             "COMPLETED": props.onFinish,
             "PENDING": () => null,
-            "ADDING_MISSING_PAPERS": () => setDisplayState('addingMissingPapers'),
-            "ADDING_RESULTS": () => setDisplayState('addingResults'),
             "ERROR": props.onBackendError,
         }
         const response = await fetch("/poll/progress/" + props.progressID);
@@ -73,7 +70,6 @@ function RunningQueriesUI(props) {
             {Object.keys(props.tickets).map((key, index) => (
                 <TicketProgressBox
                     ticket={props.tickets[key]}
-                    state={displayState}
                     key={key}
                     index={index}
                     total={Object.keys(props.tickets).length}

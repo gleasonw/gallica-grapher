@@ -118,6 +118,7 @@ function App() {
         if (progressID === null) {
             setCurrentPage('backendError');
         }
+        console.log(ticketsWithSearchType)
         setProgressID(progressID);
         setRequestID(requestID);
         setTickets(ticketsWithSearchType);

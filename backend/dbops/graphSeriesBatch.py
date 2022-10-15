@@ -107,7 +107,7 @@ class HighchartsSeriesForTicket:
     def transformDateForSettings(self, data, settings):
         if settings["groupBy"] == "day":
             return list(map(self.getRowsWithYMDtimestamp, data))
-        elif settings["groupBy"] == "month":
+        elif settings["groupBy"] == "month" or settings["groupBy"] == "gallicaMonth":
             return list(map(self.getRowsWithYearMonthTimestamp, data))
         else:
             return data

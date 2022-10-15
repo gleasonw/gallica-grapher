@@ -1,5 +1,4 @@
 export default function initGraphSettings(tickets) {
-    console.log(tickets);
     const highChartsSeriesColors = [
         '#7cb5ec',
         '#434348',

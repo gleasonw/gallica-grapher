@@ -67,6 +67,9 @@ class TicketQuery(SRUQuery):
         self.term = term
         self.ticket = ticket
 
+    def getTicketID(self):
+        return self.ticket.getID()
+
     def getEssentialDataForMakingAQuery(self):
         return {
             "term": self.term,
@@ -82,8 +85,8 @@ class TicketQuery(SRUQuery):
     def generateCQL(self):
         termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
         dateCQL = self.buildDateCQL()
-        paperCQL = f" and ({self.buildPaperCQL(self.codes)})" if self.codes else ""
-        return f"({termCQL}) and ({dateCQL}){paperCQL} and (dc.type all \"fascicule\") and (ocr.quality all \"Texte disponible\")"
+        paperCQL = self.buildPaperCQL(self.codes) if self.codes else "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
+        return f"{termCQL} and {dateCQL} and ({paperCQL})"
 
     def buildDateCQL(self):
         return f'gallicapublication_date>="{self.startDate}" and gallicapublication_date<"{self.endDate}"'

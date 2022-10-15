@@ -19,7 +19,7 @@ class SearchProgressStats:
         self.randomPaperForDisplay = None
         self.randomTextForDisplay = None
         self.progressPercent = 0
-        self.active = 0
+        self.state = 'NOT_STARTED'
         self.searchType = searchType
         self.numRecordsToFetch = 0
         self.parse = parse
@@ -32,19 +32,18 @@ class SearchProgressStats:
             'estimateSecondsToCompletion': self.estimateSecondsToCompletion,
             'randomPaper': self.randomPaperForDisplay,
             'randomText': self.randomTextForDisplay,
-            'active': self.active
+            'state': self.state
         }
 
     def setNumRecordsToFetch(self, numRecordsToFetch):
         self.numRecordsToFetch = numRecordsToFetch
 
-    def setComplete(self):
-        self.active = 0
-        self.progressPercent = 100
+    def setState(self, state):
+        self.state = state
 
     def update(self, progressStats):
         if not self.numBatches:
-            self.active = 1
+            self.state = "RUNNING"
             self.numBatches = ceil(self.numRecordsToFetch / 50) if self.searchType == 'all' else self.numRecordsToFetch
         self.updateProgressState(
             elapsedTime=progressStats['elapsedTime'],

@@ -30,18 +30,18 @@ class Request(threading.Thread):
         self.parse = parse
         self.queryBuilder = queryBuilder
         self.searches = None
-        self.ticketProgressStats = self.initProgressStats()
+        self.searchProgressStats = self.initProgressStats()
         super().__init__()
 
     #TODO: too many ticket ids flying around
     def getProgressStats(self):
         return {
-            ticket.getID(): self.ticketProgressStats[ticket.getID()].get()
+            ticket.getID(): self.searchProgressStats[ticket.getID()].get()
             for ticket in self.tickets
         }
 
-    def setRequestState(self, state):
-        self.state = state
+    def setSearchState(self, ticketID, state):
+        self.searchProgressStats[ticketID].setState(state)
 
     def run(self):
         self.searches = self.buildSearchesForTickets()
@@ -88,11 +88,11 @@ class Request(threading.Thread):
                 parse=self.parse,
                 sruFetcher=self.SRUapi,
                 queryBuilder=self.queryBuilder,
-                onUpdateProgress=lambda progressStats: self.setTicketProgressStats(
-                    ticket.getID(),
-                    progressStats
+                onUpdateProgress=lambda progressStats: self.setSearchProgressStats(progressStats),
+                onAddingResultsToDB=lambda: self.setSearchState(
+                    state='ADDING_RESULTS',
+                    ticketID=ticket.getID()
                 ),
-                onAddingResultsToDB=lambda: self.setRequestState('ADDING_RESULTS'),
             ).prepare(self)
             for ticket in self.tickets
         ]
@@ -101,11 +101,12 @@ class Request(threading.Thread):
         for search in self.searches:
             self.state = 'RUNNING'
             search.run()
-            self.ticketProgressStats[search.getTicketID()].setComplete()
+            self.setSearchState(ticketID=search.getTicketID(), state='COMPLETED')
         self.state = 'COMPLETED'
 
-    def setTicketProgressStats(self, ticketID, progressStats):
-        self.ticketProgressStats[ticketID].update(progressStats)
+    def setSearchProgressStats(self, progressStats):
+        ticketID = progressStats['ticketID']
+        self.searchProgressStats[ticketID].update(progressStats)
 
     def initProgressStats(self):
         progressDict = {
@@ -120,6 +121,6 @@ class Request(threading.Thread):
 
     def setRecordsToFetchForProgressStats(self):
         for search in self.searches:
-            self.ticketProgressStats[search.getTicketID()].setNumRecordsToFetch(
+            self.searchProgressStats[search.getTicketID()].setNumRecordsToFetch(
                 search.getNumRecordsToBeInserted()
             )

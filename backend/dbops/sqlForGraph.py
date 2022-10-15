@@ -209,10 +209,11 @@ class SQLforGraph:
             SELECT year, AVG(count) 
             OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
             FROM (
-                SELECT year, count 
+                SELECT year, sum(count) as count
                 FROM groupcounts
                 WHERE requestid = %s
                 AND ticketid = %s
+                GROUP BY year
                 ORDER BY year
             ) AS counts
         ) AS avgedCounts;
@@ -225,10 +226,11 @@ class SQLforGraph:
             SELECT year, month, AVG(count) 
             OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
             FROM (
-                SELECT year, month, count
+                SELECT year, month, sum(count) as count
                 FROM groupcounts
                 WHERE requestid = %s
                 AND ticketid = %s
+                GROUP BY year, month
                 ORDER BY year, month
             ) AS counts
         ) AS avgedCounts;
