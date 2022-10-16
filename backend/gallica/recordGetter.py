@@ -17,3 +17,5 @@ class RecordGetter:
         )
         records = self.parser.parseResponsesToRecords(rawResponse)
         return records
+
+

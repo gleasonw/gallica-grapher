@@ -1,6 +1,6 @@
 import threading
-from gallica.factories.allSearchFactory import AllSearchFactory
-from gallica.factories.groupSearchFactory import GroupSearchFactory
+from allSearchFactory import AllSearchFactory
+from groupSearchFactory import GroupSearchFactory
 from gallica.searchprogressstats import SearchProgressStats
 
 RECORD_LIMIT = 1000000
@@ -112,7 +112,6 @@ class Request(threading.Thread):
         progressDict = {
             ticket.getID(): SearchProgressStats(
                 ticketID=ticket.getID(),
-                searchType=ticket.getSearchType(),
                 parse=self.parse
             )
             for ticket in self.tickets

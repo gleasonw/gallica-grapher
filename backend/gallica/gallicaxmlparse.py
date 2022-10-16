@@ -1,8 +1,8 @@
 from lxml import etree
-from gallica.date import Date
+from date import Date
 
 
-class Parse:
+class GallicaXMLparse:
 
     def __init__(self):
         pass
@@ -43,7 +43,7 @@ class Parse:
     def getYearsPublished(xml) -> list:
         xmlRoot = etree.fromstring(xml)
         years = [
-            Parse.getYearFromElement(yearElement)
+            GallicaXMLparse.getYearFromElement(yearElement)
             for yearElement in xmlRoot.iter("year")
         ]
         return list(filter(None, years))
@@ -64,7 +64,7 @@ class Parse:
 
     @staticmethod
     def getPaperCodeFromRecord(record) -> str:
-        xml = Parse.getDataFromRecordRoot(record)
+        xml = GallicaXMLparse.getDataFromRecordRoot(record)
         paperCodeElement = xml.find(
             '{http://purl.org/dc/elements/1.1/}relation')
         if paperCodeElement is not None:
@@ -76,7 +76,7 @@ class Parse:
 
     @staticmethod
     def getURLfromRecord(record) -> str:
-        xml = Parse.getDataFromRecordRoot(record)
+        xml = GallicaXMLparse.getDataFromRecordRoot(record)
         urlElement = xml.find(
             '{http://purl.org/dc/elements/1.1/}identifier')
         if urlElement is not None:
@@ -85,14 +85,14 @@ class Parse:
 
     @staticmethod
     def getPaperTitleFromRecord(record) -> str:
-        xml = Parse.getDataFromRecordRoot(record)
+        xml = GallicaXMLparse.getDataFromRecordRoot(record)
         paperTitle = xml.find(
             '{http://purl.org/dc/elements/1.1/}title').text
         return paperTitle
 
     @staticmethod
     def getDateFromRecord(record) -> Date:
-        xml = Parse.getDataFromRecordRoot(record)
+        xml = GallicaXMLparse.getDataFromRecordRoot(record)
         dateElement = xml.find(
             '{http://purl.org/dc/elements/1.1/}date')
         if dateElement is not None:

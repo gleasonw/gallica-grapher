@@ -5,7 +5,6 @@ class Search:
             queries,
             insertRecordsIntoDatabase,
             recordGetter,
-            searchType,
             ticketID,
             numRecordsToFetch=None,
             requestStateHandlers=None
@@ -15,7 +14,6 @@ class Search:
         self.recordGetter = recordGetter
         self.numRecordsToPutInDB = numRecordsToFetch
         self.ticketID = ticketID
-        self.searchType = searchType
         self.requestStateHandlers = requestStateHandlers
 
     def run(self):
@@ -30,6 +28,3 @@ class Search:
 
     def getTicketID(self):
         return self.ticketID
-
-    def getSearchType(self):
-        return self.searchType

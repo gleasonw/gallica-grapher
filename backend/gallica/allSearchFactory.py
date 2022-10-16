@@ -1,7 +1,7 @@
-from gallica.factories.queryIndexer import QueryIndexer
-from gallica.fetchComponents.query import TicketQuery
+from queryIndexer import QueryIndexer
+from query import TicketQuery
 from gallica.search import Search
-from gallica.recordGetter import RecordGetter
+from recordGetter import RecordGetter
 from parseOccurrenceRecords import ParseOccurrenceRecords
 
 
@@ -26,7 +26,7 @@ class AllSearchFactory:
             ticketID=ticket.getID(),
             requestID=requestID
         )
-        self.buildQueriesForTicket = queryBuilder.buildForTicket
+        self.buildQueriesForTicket = queryBuilder.buildForBundle
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
         self.onAddingResultsToDB = onAddingResultsToDB
@@ -60,7 +60,6 @@ class AllSearchFactory:
             numRecordsToFetch=sum(
                 [numResults for numResults in queriesWithNumResults.values()]
             ),
-            searchType=self.ticket.getSearchType(),
             ticketID=self.ticket.getID()
         )
 

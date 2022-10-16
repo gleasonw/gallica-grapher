@@ -1,5 +1,5 @@
 from math import ceil
-from gallica.averageResponseTime import AverageResponseTime
+from averageResponseTime import AverageResponseTime
 
 
 class SearchProgressStats:

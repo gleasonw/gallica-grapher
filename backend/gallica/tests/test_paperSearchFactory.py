@@ -1,5 +1,5 @@
 from gallica.paperSearch import PaperSearch
-from gallica.factories.paperSearchFactory import PaperSearchFactory
+from paperSearchFactory import PaperSearchFactory
 import unittest
 from unittest.mock import MagicMock
 

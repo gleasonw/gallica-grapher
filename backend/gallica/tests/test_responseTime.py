@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallica.averageResponseTime import AverageResponseTime
+from averageResponseTime import AverageResponseTime
 
 
 class TestResponseTime(TestCase):

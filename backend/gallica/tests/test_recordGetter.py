@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
-from gallica.recordGetter import RecordGetter
+from recordGetter import RecordGetter
 
 
 class TestRecordGetter(TestCase):

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallica.date import Date
+from date import Date
 
 
 class TestDate(TestCase):

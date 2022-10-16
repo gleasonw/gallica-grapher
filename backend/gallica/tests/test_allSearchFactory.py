@@ -1,5 +1,5 @@
 from gallica.search import Search
-from gallica.factories.allSearchFactory import AllSearchFactory
+from allSearchFactory import AllSearchFactory
 from unittest import TestCase
 from unittest.mock import MagicMock
 

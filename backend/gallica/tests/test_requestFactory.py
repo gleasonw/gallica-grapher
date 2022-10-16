@@ -1,4 +1,4 @@
-from gallica.factories.requestFactory import RequestFactory
+from requestFactory import RequestFactory
 from gallica.request import Request
 import unittest
 

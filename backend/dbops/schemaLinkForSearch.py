@@ -1,5 +1,5 @@
 import io
-from gallica.factories.paperSearchFactory import PaperSearchFactory
+from paperSearchFactory import PaperSearchFactory
 
 
 class SchemaLinkForSearch:

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from math import ceil
 from gallica.ticket import Ticket
-from gallica.ticket import NUM_CODES_PER_BUNDLE
+from gallica.params import NUM_CODES_PER_BUNDLE
 
 
 class TestTicket(TestCase):
@@ -56,5 +56,5 @@ class TestTicket(TestCase):
         self.assertEqual(self.yearGroupedTicket.getCodeBundles(), [])
         self.assertEqual(
             len(self.ticketWithCodes.getCodeBundles()),
-            ceil(len(self.ticketWithCodes.codes) / NUM_CODES_PER_BUNDLE)
+            ceil(len(self.ticketWithCodes.getCodes()) / NUM_CODES_PER_BUNDLE)
             )

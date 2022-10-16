@@ -1,10 +1,10 @@
 import time
-from gallica.fetchComponents.gallicaResponseWrapper import GallicaResponseWrapper
+from gallicaWrapper.fetchComponents.gallicaResponseWrapper import GallicaResponseWrapper
 from urllib3.util.retry import Retry
 import urllib3
 
 
-class GallicaAPIWrapper:
+class Get:
 
     def __init__(self, baseUrl, maxSize=50):
         self.baseUrl = baseUrl

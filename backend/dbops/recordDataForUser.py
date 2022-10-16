@@ -1,11 +1,11 @@
 from utils.psqlconn import PSQLconn
-from gallica.parseOccurrenceRecords import ParseOccurrenceRecords
-from gallica.fetchComponents.query import OCRQuery
-from gallica.fetchComponents.gallicaapiwrapper import GallicaAPIWrapper
-from gallica.fetchComponents.concurrentFetch import ConcurrentFetch
-from gallica.parse import Parse
-from gallica.fetchComponents.query import MomentQuery
-from gallica.recordGetter import RecordGetter
+from parseOccurrenceRecords import ParseOccurrenceRecords
+from query import OCRQuery
+from get import Get
+from concurrentFetch import ConcurrentFetch
+from gallicaxmlparse import GallicaXMLparse
+from query import MomentQuery
+from recordGetter import RecordGetter
 
 conn = PSQLconn().getConn()
 
@@ -30,7 +30,7 @@ class RecordDataForUser:
         global conn
         self.conn = conn if conn else PSQLconn().getConn()
         self.csvData = None
-        self.parse = Parse()
+        self.parse = GallicaXMLparse()
 
     def getCSVData(self, ticketIDs, requestID):
         tupledTickets = tuple(ticketIDs.split(','))
@@ -81,7 +81,7 @@ class RecordDataForUser:
         return records, count
 
     def getOCRTextForRecord(self, ark, term) -> tuple:
-        fetcher = GallicaAPIWrapper(
+        fetcher = Get(
             'https://gallica.bnf.fr/services/ContentSearch',
             maxSize=1
         )
@@ -89,14 +89,6 @@ class RecordDataForUser:
         return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(response.xml)
 
     def getGallicaRecordsForDisplay(self, ticket, filters):
-        recordGetter = RecordGetter(
-            gallicaAPI=ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU'),
-            parseData=ParseOccurrenceRecords(
-                parser=self.parse,
-                requestID=-10,
-                ticketID=-10
-            )
-        )
         records = recordGetter.getFromQueries(
             [
                 MomentQuery(

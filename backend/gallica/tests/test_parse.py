@@ -1,7 +1,6 @@
 from unittest import TestCase
-from unittest.mock import MagicMock
-from gallica.parse import Parse
-from gallica.date import Date
+from gallicaxmlparse import GallicaXMLparse
+from date import Date
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -10,7 +9,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 class TestParse(TestCase):
 
     def setUp(self) -> None:
-        self.parse = Parse()
+        self.parse = GallicaXMLparse()
         with open(os.path.join(here, 'xmlForTesting/occurrences.xml'), 'rb') as f:
             self.occurrencesXML = f.read()
         with open(os.path.join(here, 'xmlForTesting/papers.xml'), 'rb') as f:

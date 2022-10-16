@@ -1,7 +1,6 @@
 from gallica.search import Search
-from gallica.recordGetter import RecordGetter
-from gallica.dto.groupedCountRecord import GroupedCountRecord
-from gallica.date import Date
+from recordGetter import RecordGetter
+from groupSearchFactory import ParseGroupedRecordCounts
 
 
 class GroupSearchFactory:
@@ -26,7 +25,7 @@ class GroupSearchFactory:
             ticketID=ticket.getID(),
             requestID=requestID
         )
-        self.buildQueriesForTicket = queryBuilder.buildForTicket
+        self.buildQueriesForTicket = queryBuilder.buildForBundle
         self.onUpdateProgress = onUpdateProgress
         self.sruFetcher = sruFetcher
         self.onAddingResultsToDB = onAddingResultsToDB
@@ -45,26 +44,7 @@ class GroupSearchFactory:
                 'onAddingResultsToDB': self.onAddingResultsToDB
             },
             numRecordsToFetch=len(queries),
-            searchType=self.ticket.getSearchType(),
             ticketID=self.ticket.getID()
         )
 
 
-class ParseGroupedRecordCounts:
-
-    def __init__(self, parser, ticketID, requestID):
-        self.parser = parser
-        self.ticketID = ticketID
-        self.requestID = requestID
-
-    def parseResponsesToRecords(self, responses):
-        for response in responses:
-            count = self.parser.getNumRecords(response.xml)
-            query = response.query
-            yield GroupedCountRecord(
-                date=Date(query.getStartDate()),
-                count=count,
-                ticketID=self.ticketID,
-                term=query.term,
-                requestID=self.requestID
-            )

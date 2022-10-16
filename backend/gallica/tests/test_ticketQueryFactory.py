@@ -1,7 +1,6 @@
 import unittest
-from gallica.factories.ticketQueryFactory import TicketQueryFactory
+from queryBuilder import TicketQueryFactory
 from unittest.mock import MagicMock
-from gallica.fetchComponents.query import TicketQuery
 
 
 class TestTicketQueryFactory(unittest.TestCase):
@@ -18,12 +17,12 @@ class TestTicketQueryFactory(unittest.TestCase):
         )
 
     def test_buildWithCodeBundles(self):
-        test = self.testTicketQueryFactory.buildForTicket(self.testTicket)
+        test = self.testTicketQueryFactory.buildForBundle(self.testTicket)
 
         self.assertEqual(len(test), 4)
 
     def test_buildNoCodeBundles(self):
-        test = self.testTicketQueryFactory.buildForTicket(self.testTicket)
+        test = self.testTicketQueryFactory.buildForBundle(self.testTicket)
 
         self.assertEqual(len(test), 4)
 

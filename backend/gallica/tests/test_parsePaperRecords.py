@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
-from gallica.factories.paperSearchFactory import ParsePaperRecords
+from parsePaperRecords import ParsePaperRecords
 from gallica.dto.paperRecord import PaperRecord
 
 

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
-from gallica.factories.queryIndexer import QueryIndexer
+from queryIndexer import QueryIndexer
 
 
 class TestQueryIndexer(unittest.TestCase):

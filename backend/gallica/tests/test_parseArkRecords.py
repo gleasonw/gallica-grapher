@@ -1,6 +1,6 @@
 from gallica.dto.arkRecord import ArkRecord
 import unittest
-from gallica.factories.paperSearchFactory import ParseArkRecord
+from parseArkRecord import ParseArkRecord
 from unittest.mock import MagicMock
 
 

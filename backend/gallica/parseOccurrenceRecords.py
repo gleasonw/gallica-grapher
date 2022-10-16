@@ -1,10 +1,11 @@
 from gallica.dto.occurrenceRecord import OccurrenceRecord
+from gallica.gallicaxmlparse import GallicaXMLparse
 
 
 class ParseOccurrenceRecords:
 
-    def __init__(self, parser, requestID, ticketID):
-        self.parser = parser
+    def __init__(self, requestID, ticketID):
+        self.parser = GallicaXMLparse()
         self.requestID = requestID
         self.ticketID = ticketID
 

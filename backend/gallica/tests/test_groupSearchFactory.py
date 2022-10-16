@@ -1,4 +1,4 @@
-from gallica.factories.groupSearchFactory import GroupSearchFactory
+from groupSearchFactory import GroupSearchFactory
 import unittest
 from unittest.mock import MagicMock
 from gallica.search import Search

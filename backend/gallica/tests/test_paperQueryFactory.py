@@ -1,7 +1,7 @@
-from gallica.fetchComponents.query import ArkQueryForNewspaperYears
+from query import ArkQueryForNewspaperYears
 import unittest
-from gallica.factories.paperQueryFactory import PaperQueryFactory
-from gallica.fetchComponents.query import PaperQuery
+from paperQueryFactory import PaperQueryFactory
+from query import PaperQuery
 from unittest.mock import MagicMock
 
 

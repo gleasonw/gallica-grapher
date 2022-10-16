@@ -1,10 +1,10 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
-from gallica.fetchComponents.concurrentFetch import ConcurrentFetch
+from concurrentFetch import ConcurrentFetch
 from gallica.request import Request
 from utils.psqlconn import PSQLconn
 from gallica.ticket import Ticket
-from gallica.parse import Parse
-from gallica.factories.ticketQueryFactory import TicketQueryFactory
+from gallicaxmlparse import GallicaXMLparse
+from queryBuilder import TicketQueryFactory
 
 
 class RequestFactory:
@@ -27,7 +27,7 @@ class RequestFactory:
             for key, ticket in tickets.items()
         ]
 
-        self.parse = Parse()
+        self.parse = GallicaXMLparse()
         self.dbConn = PSQLconn().getConn()
         self.SRUapi = ConcurrentFetch('https://gallica.bnf.fr/SRU')
         self.dbLink = SchemaLinkForSearch(

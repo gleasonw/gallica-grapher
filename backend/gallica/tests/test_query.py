@@ -1,4 +1,4 @@
-from gallica.fetchComponents.query import TicketQuery, ArkQueryForNewspaperYears, PaperQuery, OCRQuery
+from query import TicketQuery, ArkQueryForNewspaperYears, PaperQuery, OCRQuery
 from unittest import TestCase
 from unittest.mock import MagicMock
 
