@@ -19,11 +19,9 @@ export default function RecordsViewer(props){
     const seriesClickHandlers = {
         'year': handleYearSeriesClick,
         'month': handleMonthSeriesClick,
-        'day': handleDaySeriesClick
-    }
-
-    function handleSeriesClick(point){
-        seriesClickHandlers[timeBin](point.category);
+        'day': handleDaySeriesClick,
+        'gallicaYear': handleYearSeriesClick,
+        'gallicaMonth': handleMonthSeriesClick,
     }
 
     function handleYearSeriesClick(year){
@@ -53,7 +51,7 @@ export default function RecordsViewer(props){
                 <Chart
                     tickets={props.tickets}
                     settingsID={props.settingsID}
-                    onSeriesClick={handleSeriesClick}
+                    onSeriesClick={(point) => seriesClickHandlers[timeBin](point.category)}
                     requestID={props.requestID}
                     uuid={props.cacheID}
                 />

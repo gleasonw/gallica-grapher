@@ -6,7 +6,6 @@ import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSetting
 import useData from "../shared/hooks/useData";
 import syncColors from "./chartUtils/syncColors";
 import generateOptions from "./chartUtils/generateOptions";
-import getDateRangeSpan from "./chartUtils/getDateRangeSpan";
 import NavBarWrap from "./NavBarWrap";
 import {StyledSelect} from "../shared/StyledSelect";
 import {StyledInputAndLabel} from "../shared/StyledSelect";
@@ -17,9 +16,8 @@ require("highcharts/modules/export-data")(Highcharts);
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
-    const dateRange = getDateRangeSpan(props.tickets);
-    const startYear = dateRange[0];
-    const endYear = dateRange[1];
+    const startYear = Object.values(props.tickets)[0].startYear;
+    const endYear = Object.values(props.tickets)[0].endYear;
     const chartRef = useRef(null);
     const query =
         "/api/graphData?keys=" + Object.keys(props.tickets) +

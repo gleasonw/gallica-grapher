@@ -1,31 +1,9 @@
 import useData from "../../shared/hooks/useData";
 import OptionWrap from "../OptionWrap";
 import React from "react";
-import {DateInputBox} from "./DateInputBox";
-import {KeyboardArrowUp} from "@mui/icons-material";
-import {StyledArrow} from "./StyledArrow";
 
 export function FullSearchInput(props) {
-    const lowYearPlaceholder = 1499;
-    const highYearPlaceholder = 2020;
-    const lowYear = props.yearRange[0];
-    const highYear = props.yearRange[1];
-    let lowYearForDBQuery = lowYear ? lowYear : lowYearPlaceholder;
-    let highYearForDBQuery = highYear ? highYear : highYearPlaceholder;
-    const onLowDateChange = props.yearRangeHandler[0];
-    const onHighDateChange = props.yearRangeHandler[1];
-    const dateInputs =
-        <DateInputBox
-            onLowDateChange={onLowDateChange}
-            onHighDateChange={onHighDateChange}
-            minYearPlaceholder={lowYearPlaceholder}
-            maxYearPlaceholder={highYearPlaceholder}
-            lowYear={lowYear}
-            highYear={highYear}
-            selected={props.selected === 2}
-        />
-    const urlForPapersInRange =
-        "/api/numPapersOverRange/" + lowYearForDBQuery + "/" + highYearForDBQuery;
+    const urlForPapersInRange = `/api/numPapersOverRange/${props.startYear}/${props.endYear}`;
     const result = useData(urlForPapersInRange);
     let numPapersOverRange;
     if (result) {
@@ -38,15 +16,12 @@ export function FullSearchInput(props) {
             selected={props.selected === 2}
             borderBottom={'none'}
             onClick={() => props.onPaperSelectClick(2)}
-            borderRadius={'0'}
+            borderRadius={'10px 10px 0 0'}
             onFocus={() => props.onFocus(2)}
         >
-            <StyledArrow>
-                {props.selected === 2 && <KeyboardArrowUp/>}
-            </StyledArrow>
             <span className={'paperOptionHeader'}>
                 {numPapersOverRange} periodicals publishing
-                at any point between {dateInputs}
+                at any point
             </span>
         </OptionWrap>
     )

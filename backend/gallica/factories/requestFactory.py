@@ -16,7 +16,10 @@ class RequestFactory:
                 key=key,
                 terms=ticket['terms'],
                 codes=ticket['codes'],
-                dateRange=ticket['dateRange'],
+                dateRange=[
+                    ticket['startYear'],
+                    ticket['endYear']
+                ],
                 linkTerm=ticket.get('linkTerm'),
                 linkDistance=ticket.get('linkDistance'),
                 searchType=ticket['searchType']

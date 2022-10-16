@@ -3,17 +3,18 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS
 import random
+import json
 
 from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
 from dbops.recordDataForUser import RecordDataForUser
-from utils.psqlconn import PSQLconn
 
 app = Flask(__name__)
 CORS(app)
 requestIDSeed = random.randint(0, 10000)
 graphBatchGetter = GraphSeriesBatch()
+recordDataGetter = RecordDataForUser()
 
 
 @app.route('/')
@@ -134,6 +135,18 @@ def getDisplayRecords():
     displayRecords, count = RecordDataForUser().getRecordsForDisplay(tableArgs)
     return {"displayRecords": displayRecords,
             "count": count}
+
+
+@app.route('/api/getGallicaRecords')
+def getGallicaRecordsForDisplay():
+    args = dict(request.args)
+    ticket = json.loads(args['ticket'])
+    del args['ticket']
+    records = recordDataGetter.getGallicaRecordsForDisplay(
+        ticket=ticket,
+        filters=args
+    )
+    return {"displayRecords": records}
 
 
 @app.route('/api/ocrtext/<arkCode>/<term>')

@@ -14,6 +14,8 @@ import ImportantButtonWrap from "./shared/ImportantButtonWrap";
 function App() {
     const [tickets, setTickets] = useState({});
     const [selectedSearchType, setSelectedSearchType] = useState(0);
+    const [startYear, setStartYear] = useState(1880);
+    const [endYear, setEndYear] = useState(1900);
     const [requestID, setRequestID] = useState(null);
     const [progressID, setProgressID] = useState(null);
     const [currentPage, setCurrentPage] = useState('input');
@@ -30,6 +32,10 @@ function App() {
                 onExampleRequestClick={handleExampleRequestClick}
                 requestBoxRef={requestBoxRef}
                 selectedSearchType={selectedSearchType}
+                startYear={startYear}
+                endYear={endYear}
+                onStartYearChange={(e) => setStartYear(e.target.value)}
+                onEndYearChange={(e) => setEndYear(e.target.value)}
                 onSearchTypeChange={(i) => setSelectedSearchType(i)}
             />,
         'running':
@@ -108,8 +114,8 @@ function App() {
     }
 
     async function initRequest(tickets) {
-        const ticketsWithSearchType = addSearchTypeToTickets(tickets);
-        const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(ticketsWithSearchType);
+        const completedTickets = addSearchAndDateRangeToTickets(tickets);
+        const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
         const {request} = await axios.post('/api/init', {
             tickets: ticketsWithPaperNamesRemoved
         })
@@ -118,19 +124,20 @@ function App() {
         if (progressID === null) {
             setCurrentPage('backendError');
         }
-        console.log(ticketsWithSearchType)
         setProgressID(progressID);
         setRequestID(requestID);
-        setTickets(ticketsWithSearchType);
+        setTickets(completedTickets);
         setCurrentPage('running');
     }
 
-    function addSearchTypeToTickets(someTickets) {
+    function addSearchAndDateRangeToTickets(someTickets) {
         const ticketsWithSearchType = {}
         Object.keys(someTickets).forEach((ticketID) => {
             ticketsWithSearchType[ticketID] = {
                 ...someTickets[ticketID],
-                searchType: getSearchTypeForIndex(selectedSearchType)
+                searchType: getSearchTypeForIndex(selectedSearchType),
+                startYear: startYear,
+                endYear: endYear
             }
         })
         return ticketsWithSearchType;

@@ -1,7 +1,11 @@
 from utils.psqlconn import PSQLconn
+from gallica.parseOccurrenceRecords import ParseOccurrenceRecords
 from gallica.fetchComponents.query import OCRQuery
 from gallica.fetchComponents.gallicaapiwrapper import GallicaAPIWrapper
+from gallica.fetchComponents.concurrentFetch import ConcurrentFetch
 from gallica.parse import Parse
+from gallica.fetchComponents.query import MomentQuery
+from gallica.recordGetter import RecordGetter
 
 conn = PSQLconn().getConn()
 
@@ -60,17 +64,20 @@ class RecordDataForUser:
         OFFSET %(offset)s
         """
         with self.conn.cursor() as cur:
+
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
             {tableArgsSelect}
             {limitOrderingOffset}
             """, tableArgs)
             records = cur.fetchall()
+
             cur.execute(f"""
             {self.countResultsSelect}
             {tableArgsSelect}
             """, tableArgs)
             count = cur.fetchone()[0]
+
         return records, count
 
     def getOCRTextForRecord(self, ark, term) -> tuple:
@@ -80,6 +87,33 @@ class RecordDataForUser:
         )
         response = fetcher.get(OCRQuery(ark, term))
         return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(response.xml)
+
+    def getGallicaRecordsForDisplay(self, ticket, filters):
+        recordGetter = RecordGetter(
+            gallicaAPI=ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU'),
+            parseData=ParseOccurrenceRecords(
+                parser=self.parse,
+                requestID=-10,
+                ticketID=-10
+            )
+        )
+        records = recordGetter.getFromQueries(
+            [
+                MomentQuery(
+                    term=[filters.get('term')] if filters.get('term') else ticket['terms'],
+                    codes=[filters.get('code')] if filters.get('code') else ticket['papersAndCodes'],
+                    year=filters.get('year'),
+                    month=filters.get('month') or 1,
+                    day=filters.get('day') or 1,
+                    linkTerm=ticket['linkTerm'],
+                    linkDistance=ticket['linkDistance'],
+                    startIndex=filters['offset'],
+                    numRecords=filters['limit']
+                )
+            ]
+        )
+        records = list(records)
+        pass
 
     def clearUserRecordsAfterCancel(self, requestID):
         with self.conn.cursor() as cur:

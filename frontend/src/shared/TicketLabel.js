@@ -12,8 +12,10 @@ function TicketLabel(props) {
             }
             in
             <ItemsBlurb papers={props.papers}/>
-            from
-            <ItemsBlurb dateRange={props.dateRange}/>
+            {
+                props.startYear && props.endYear &&
+                `between ${<ItemsBlurb dateRange={[props.startYear, props.endYear]}/>}.`
+            }
         </StyledTicketLabel>
     )
 }

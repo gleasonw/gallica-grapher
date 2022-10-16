@@ -16,40 +16,54 @@ export default function DisplayRecordsTable(props) {
     const [offset, setOffset] = useState(0);
     const [showFilterPopup, setShowFilterPopup] = useState(false);
     const isGallicaGrouped = props.timeBin === 'gallicaYear' || props.timeBin === 'gallicaMonth';
-    let recordsQuery =
-        "/api/getDisplayRecords?" +
-        "tickets=" + Object.keys(props.tickets) +
-        "&requestID=" + props.requestID +
-        "&limit=" + limit +
-        "&offset=" + offset +
-        "&uniqueforcache=" + props.cacheID;
-    if (props.year) {
-        recordsQuery += "&year=" + props.year;
-    }
-    if (props.month) {
-        recordsQuery += "&month=" + props.month;
-    }
-    if (props.day) {
-        recordsQuery += "&day=" + props.day
-    }
-    if (props.term) {
-        recordsQuery += "&term=" + props.term
-    }
-    if (props.periodical) {
-        recordsQuery += "&periodical=" + props.periodical
-    }
-    const result = useData(recordsQuery);
+    let DBquery = getDBquery();
+    let recordsFromGallicaQuery = getGallicaQuery(props.tickets);
+    const result = useData(isGallicaGrouped ? recordsFromGallicaQuery : DBquery);
     const displayRecords = result ? result['displayRecords'] : null;
     const count = result ? result['count'] : null;
-
-    function handleLoadMore() {
-        console.log('load more')
-        setLimit(limit + 10);
-    }
 
     function handleFilterChange() {
         setOffset(0);
         setLimit(10);
+    }
+
+    function getDBquery(){
+        let query =
+            "/api/getDisplayRecords?" +
+            "tickets=" + Object.keys(props.tickets) +
+            "&requestID=" + props.requestID +
+            "&limit=" + limit +
+            "&offset=" + offset +
+            "&uniqueforcache=" + props.cacheID;
+        return addFiltersToQuery(query);
+    }
+
+    function getGallicaQuery(tickets){
+        const jsonedTicket = JSON.stringify(Object.values(tickets)[0]);
+        const query = "/api/getGallicaRecords?" +
+            "ticket=" + jsonedTicket +
+            "&limit=" + limit +
+            "&offset=" + offset;
+        return addFiltersToQuery(query);
+    }
+
+    function addFiltersToQuery(query){
+        if (props.year) {
+            query += "&year=" + props.year;
+        }
+        if (props.month) {
+            query += "&month=" + props.month;
+        }
+        if (props.day) {
+            query += "&day=" + props.day
+        }
+        if (props.term) {
+            query += "&term=" + props.term
+        }
+        if (props.periodical) {
+            query += "&periodical=" + props.periodical
+        }
+        return query;
     }
 
 //TODO: use a reducer here to minimize prop drilling
@@ -105,7 +119,7 @@ export default function DisplayRecordsTable(props) {
                 tickets={props.tickets}
                 displayRecords={displayRecords}
                 count={count}
-                onLoadMoreClick={handleLoadMore}
+                onLoadMoreClick={() => setLimit(limit + 10)}
                 cacheID={props.cacheID}
                 requestID={props.requestID}
             />

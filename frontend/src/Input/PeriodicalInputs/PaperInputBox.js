@@ -73,22 +73,28 @@ export class PaperInputBox extends React.Component {
                 backgroundColor={"#f5f5f5"}
                 borderRadius={"10px 10px 0 0"}
             >
+                <FullSearchInput
+                    selected={this.props.selectedPaperInput}
+                    onPaperSelectClick={this.props.onPaperInputSelectClick}
+                    onFocus={this.props.onFocus}
+                    startYear={this.props.startYear}
+                    endYear={this.props.endYear}
+                />
                 <ContinuousTrendInput
-                    yearRange={this.props.dateRanges[0]}
-                    yearRangeHandler={this.props.dateRangeHandlers[0]}
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
                     numContinuousPapers={this.props.numContinuousPapers}
                     onFocus={this.props.onFocus}
+                    startYear={this.props.startYear}
+                    endYear={this.props.endYear}
                 />
                 <UserSelectPaperInput
-                    yearRange={this.props.dateRanges[1]}
-                    yearRangeHandler={this.props.dateRangeHandlers[1]}
-                    boundaryYearsForUserPapers={this.props.boundaryYearsForUserPapers}
                     deletePaperBubble={this.props.deletePaperBubble}
                     paperInputValue={this.state.paperInputValue}
                     onFocus={this.props.onFocus}
                     onKeyUp={this.handleKeyUp}
+                    startYear={this.props.startYear}
+                    endYear={this.props.endYear}
                     onPaperChange={this.handlePaperChange}
                     papersForDropdown={this.state.papersForDropdown}
                     onClick={this.handleDropdownClick}
@@ -97,13 +103,6 @@ export class PaperInputBox extends React.Component {
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
                     userSelectedPapers={this.props.userSelectedPapers}
-                />
-                <FullSearchInput
-                    yearRange={this.props.dateRanges[2]}
-                    yearRangeHandler={this.props.dateRangeHandlers[2]}
-                    selected={this.props.selectedPaperInput}
-                    onPaperSelectClick={this.props.onPaperInputSelectClick}
-                    onFocus={this.props.onFocus}
                 />
             </StyledOptionInput>
         )

@@ -1,6 +1,6 @@
 from gallica.dto.occurrenceRecord import OccurrenceRecord
 import unittest
-from gallica.factories.allSearchFactory import ParseOccurrenceRecords
+from parseOccurrenceRecords import ParseOccurrenceRecords
 from unittest.mock import MagicMock
 
 

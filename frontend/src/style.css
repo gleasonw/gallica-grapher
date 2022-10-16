@@ -118,6 +118,9 @@ header{
     width: 100%;
     max-width: 800px;
     margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 .requestBoxLabel{
     align-self: center;
@@ -125,10 +128,8 @@ header{
 .dateInputs{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
     gap: 10px;
-    margin-left: 10px;
 }
 .bubblesContainer{
     margin-bottom: 10px;

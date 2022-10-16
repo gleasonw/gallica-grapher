@@ -16,6 +16,11 @@ class SRUQuery(Query):
         self.collapsing = collapsing
         self.cql = None
         self.codes = codes
+        self.term = None
+        self.linkTerm = None
+        self.linkDistance = None
+        self.startDate = None
+        self.endDate = None
 
     def getFetchParams(self):
         return{
@@ -34,7 +39,19 @@ class SRUQuery(Query):
         return self.cql
 
     def generateCQL(self):
-        raise NotImplementedError
+        termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
+        dateCQL = self.buildDateCQL()
+        paperCQL = self.buildPaperCQL(self.codes) if self.codes else "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
+        return f"{termCQL} and {dateCQL} and ({paperCQL})"
+
+    def buildDateCQL(self):
+        return f'gallicapublication_date>="{self.startDate}" and gallicapublication_date<"{self.endDate}"'
+
+    def buildTermCQL(self) -> str:
+        return f'text adj "{self.term}"'
+
+    def buildLinkedTermCQL(self):
+        return f'text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}"'
 
     def buildPaperCQL(self, codes):
         formattedCodes = [f"{code}_date" for code in codes]
@@ -82,23 +99,39 @@ class TicketQuery(SRUQuery):
     def getStartDate(self):
         return self.startDate
 
-    def generateCQL(self):
-        termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
-        dateCQL = self.buildDateCQL()
-        paperCQL = self.buildPaperCQL(self.codes) if self.codes else "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
-        return f"{termCQL} and {dateCQL} and ({paperCQL})"
-
-    def buildDateCQL(self):
-        return f'gallicapublication_date>="{self.startDate}" and gallicapublication_date<"{self.endDate}"'
-
-    def buildTermCQL(self) -> str:
-        return f'text adj "{self.term}"'
-
-    def buildLinkedTermCQL(self):
-        return f'text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}"'
-
     def __repr__(self):
         return f"Query({self.getCQL()})"
+
+
+class MomentQuery(SRUQuery):
+
+    def __init__(
+            self,
+            term,
+            codes,
+            year,
+            startIndex,
+            numRecords,
+            linkTerm,
+            linkDistance,
+            day=1,
+            month=1
+    ):
+        super().__init__(
+            startIndex=startIndex,
+            numRecords=numRecords,
+            collapsing="false",
+            codes=codes
+        )
+        self.term = term[0]
+        self.year = int(year)
+        self.month = month
+        self.day = day
+        self.linkTerm = linkTerm
+        self.linkDistance = linkDistance
+
+    def buildDateCQL(self):
+        return f'gallicapublication_date>="{self.year}-{self.month:02}-{self.day:02}" and gallicapublication_date<"{self.year+1}-{self.month:02}-{self.day:02}"'
 
 
 class ArkQueryForNewspaperYears(Query):

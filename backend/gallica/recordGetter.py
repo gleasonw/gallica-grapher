@@ -11,7 +11,7 @@ class RecordGetter:
         self.onUpdateProgress = onUpdateProgress
 
     def getFromQueries(self, queries):
-        rawResponse = self.gallicaAPI.fetchAll(
+        rawResponse = self.gallicaAPI.get(
             queries=queries,
             onUpdateProgress=self.onUpdateProgress
         )

@@ -11,23 +11,16 @@ function Input(props){
     const [linkDistance, setLinkDistance] = useState(10);
     const [termInput, setTermInput] = useState('');
     const [userSelectedPapers, setUserSelectedPapers] = useState([]);
-    const [selectedPaperInput, setSelectedPaperInput] = useState(0);
-    const [customPapersDateRange, setCustomPapersDateRange] = useState(['','']);
-    const [continuousDateRange, setContinuousDateRange] = useState(['','']);
-    const [fullSearchDateRange, setFullSearchDateRange] = useState(['','']);
+    const [selectedPaperInput, setSelectedPaperInput] = useState(2);
     const queryForContinuousPapers = getContinuousPaperQuery();
     const result = useData(queryForContinuousPapers);
     const continuousPapers = result ? result['paperNameCodes'] : [];
     const boundaryYearsForUserPapers = setUserPapersYearBoundary();
 
     function getContinuousPaperQuery(){
-        let queryLowYear = continuousDateRange[0] === '' ?
-        1890 : continuousDateRange[0];
-        let queryHighYear = continuousDateRange[1] === '' ?
-            1920 : continuousDateRange[1];
         return "api/continuousPapers?limit=2000" +
-            "&startYear=" + queryLowYear +
-            "&endYear=" + queryHighYear;
+            "&startYear=" + props.startYear +
+            "&endYear=" + props.endYear;
     }
 
     function setUserPapersYearBoundary(){
@@ -40,10 +33,6 @@ function Input(props){
             maxYear = Math.max(...paperHighYears)
         }
         return [minYear, maxYear]
-    }
-
-    function handleSeeExamplesClick(){
-        exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
     }
 
     function handleSubmit(event){
@@ -62,8 +51,7 @@ function Input(props){
             terms: terms,
             linkTerm: linkTerm,
             linkDistance: linkDistance,
-            papersAndCodes: getPapersFor(selectedPaperInput),
-            dateRange: getDateRangeFor(selectedPaperInput),
+            papersAndCodes: getPapersFor(selectedPaperInput)
         }
     }
 
@@ -91,71 +79,10 @@ function Input(props){
         setTerms(trimmedTerms)
     }
 
-    function handlePaperDropdownClick(paper){
-        makePaperBubble(paper)
-    }
-
-    function handleContinuousLowYearChange(event){
-        const inputLowYear = event.target.value
-        if(isNumeric(inputLowYear) || inputLowYear === '') {
-            const updatedContinousRange = continuousDateRange.slice()
-            updatedContinousRange[0] = inputLowYear
-            setContinuousDateRange(updatedContinousRange)
-        }
-    }
-
-    function handleContinuousHighYearChange(event){
-        const inputHighYear = event.target.value
-        if(isNumeric(inputHighYear) || inputHighYear === '') {
-            const updatedContinousRange = continuousDateRange.slice()
-            updatedContinousRange[1] = inputHighYear
-            setContinuousDateRange(updatedContinousRange)
-        }
-    }
-
-    function handleCustomLowYearChange(event){
-        const inputLowYear = event.target.value
-        if(isNumeric(inputLowYear) || inputLowYear === '') {
-            const updatedCustomRange = customPapersDateRange.slice()
-            updatedCustomRange[0] = inputLowYear
-            setCustomPapersDateRange(updatedCustomRange)
-        }
-    }
-
-    function handleCustomHighYearChange(event){
-        const inputHighYear = event.target.value
-        if(isNumeric(inputHighYear) || inputHighYear === '') {
-            const updatedCustomRange = customPapersDateRange.slice()
-            updatedCustomRange[1] = inputHighYear
-            setCustomPapersDateRange(updatedCustomRange)
-        }
-    }
-
-    function handleFullSearchLowYearChange(event){
-        const inputLowYear = event.target.value
-        if(isNumeric(inputLowYear) || inputLowYear === '') {
-            const updatedFullSearchRange = fullSearchDateRange.slice()
-            updatedFullSearchRange[0] = inputLowYear
-            setFullSearchDateRange(updatedFullSearchRange)
-        }
-    }
-
-    function handleFullSearchHighYearChange(event){
-        const inputHighYear = event.target.value
-        if(isNumeric(inputHighYear) || inputHighYear === '') {
-            const updatedFullSearchRange = fullSearchDateRange.slice()
-            updatedFullSearchRange[1] = inputHighYear
-            setFullSearchDateRange(updatedFullSearchRange)
-        }
-    }
-
     function handleCreateTicketClick(){
         props.onCreateTicketClick(makeTicketFromState());
         setTermInput('');
         setTerms([]);
-        setContinuousDateRange(['','']);
-        setCustomPapersDateRange(['','']);
-        setFullSearchDateRange(['','']);
         setUserSelectedPapers([]);
         setLinkDistance(10);
         setLinkTerm('');
@@ -192,61 +119,6 @@ function Input(props){
         }
     }
 
-    function getDateRangeFor(paperInputIndex){
-        if(paperInputIndex === 0){
-            return assignNullRangeValuesToPlaceholder(
-                continuousDateRange,
-                1890,
-                1920
-                )
-        }else if(paperInputIndex === 1){
-            let trimmedRange = trimCustomPaperRangeToActualPaperRange()
-            const lowYearDefault = boundaryYearsForUserPapers[0]
-            const highYearDefault = boundaryYearsForUserPapers[1]
-            return assignNullRangeValuesToPlaceholder(
-                trimmedRange,
-                lowYearDefault,
-                highYearDefault
-            )
-        }else if(paperInputIndex === 2){
-            return assignNullRangeValuesToPlaceholder(
-                fullSearchDateRange,
-                1499,
-                2020
-            )
-        }else{
-            throw Error(`Unexpected paper index: ${paperInputIndex}`)
-        }
-    }
-
-    function trimCustomPaperRangeToActualPaperRange(){
-        const userRange = customPapersDateRange
-        const minYear = boundaryYearsForUserPapers[0]
-        const maxYear = boundaryYearsForUserPapers[1]
-        if(userRange[0] < minYear){
-            userRange[0] = minYear
-        }
-        if(userRange[1] > maxYear){
-            userRange[1] = maxYear
-        }
-        return userRange
-    }
-
-    function assignNullRangeValuesToPlaceholder(range, lowDefault, highDefault){
-        if (range[0] === '') {
-            range[0] = lowDefault
-        }
-        if (range[1] === '') {
-            range[1] =highDefault
-        }
-        return range
-    }
-
-    function isNumeric(str){
-        if (typeof str != "string") return false
-        return !isNaN(str) && !isNaN(parseFloat(str))
-    }
-
     return (
         <div className='inputBody' onKeyDown={handleKeyDown}>
             <div className='inputUI'>
@@ -254,27 +126,12 @@ function Input(props){
                     Graph word occurrences in archived French periodicals.
                 </div>
                 <TicketForm
-                    dateRanges = {[
-                        continuousDateRange,
-                        customPapersDateRange,
-                        fullSearchDateRange
-                    ]}
-                    dateRangeHandlers = {[
-                        [
-                            handleContinuousLowYearChange,
-                            handleContinuousHighYearChange
-                        ],
-                        [
-                            handleCustomLowYearChange,
-                            handleCustomHighYearChange
-                        ],
-                        [
-                            handleFullSearchLowYearChange,
-                            handleFullSearchHighYearChange
-                        ]
-                    ]}
+                    startYear={props.startYear}
+                    endYear={props.endYear}
+                    onStartYearChange={props.onStartYearChange}
+                    onEndYearChange={props.onEndYearChange}
                     onCreateTicketClick={handleCreateTicketClick}
-                    onPaperDropItemClick={handlePaperDropdownClick}
+                    onPaperDropItemClick={(paper) => makePaperBubble(paper)}
                     onPaperInputFocus={(i) => setSelectedPaperInput(i)}
                     terms={terms}
                     termInput={termInput}
@@ -306,7 +163,9 @@ function Input(props){
                     id='seeExamplesButton'
                     type='button'
                     aria-label='Scroll to examples'
-                    onClick={handleSeeExamplesClick}
+                    onClick={() => exampleBoxRef.current.scrollIntoView(
+                        {behavior: "smooth"})
+                    }
                     value='Or view an example ↓'
                 />
             </div>
