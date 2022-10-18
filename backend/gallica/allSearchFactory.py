@@ -1,5 +1,5 @@
 from queryIndexer import QueryIndexer
-from query import TicketQuery
+from query import OccurrenceQuery
 from gallica.search import Search
 from recordGetter import RecordGetter
 from parseOccurrenceRecords import ParseOccurrenceRecords
@@ -33,7 +33,7 @@ class AllSearchFactory:
         self.queryIndexer = QueryIndexer(
             gallicaAPI=self.sruFetcher,
             parse=parse,
-            makeQuery=TicketQuery
+            makeQuery=OccurrenceQuery
         )
         self.getNumResultsForEachQuery = self.queryIndexer.getNumResultsForEachQuery
         self.makeIndexedQueriesForEachBaseQuery = self.queryIndexer.makeIndexedQueries

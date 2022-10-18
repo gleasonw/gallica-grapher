@@ -1,4 +1,4 @@
-from query import TicketQuery, ArkQueryForNewspaperYears, PaperQuery, OCRQuery
+from query import OccurrenceQuery, ArkQueryForNewspaperYears, PaperQuery, OCRQuery
 from unittest import TestCase
 from unittest.mock import MagicMock
 
@@ -57,7 +57,7 @@ class TestArkQueryForNewspaperYears(TestCase):
 class TestQuery(TestCase):
 
     def setUp(self) -> None:
-        self.queryWithCodes = TicketQuery(
+        self.queryWithCodes = OccurrenceQuery(
             term='test',
             codes=['test', 'neat'],
             startIndex=0,
@@ -70,7 +70,7 @@ class TestQuery(TestCase):
                 getLinkTerm=MagicMock(return_value='')
             )
         )
-        self.queryWithoutCodes = TicketQuery(
+        self.queryWithoutCodes = OccurrenceQuery(
             term='test',
             startIndex=0,
             numRecords=10,
@@ -83,7 +83,7 @@ class TestQuery(TestCase):
             ),
             codes=[]
         )
-        self.queryWithLinkTermAndDistance = TicketQuery(
+        self.queryWithLinkTermAndDistance = OccurrenceQuery(
             term='test',
             startIndex=0,
             numRecords=10,

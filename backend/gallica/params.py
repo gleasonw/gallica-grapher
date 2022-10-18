@@ -10,8 +10,8 @@ class Params:
                  endDate,
                  link,
                  grouping,
-                 numRecords,
-                 startIndex):
+                 numRecords=50,
+                 startIndex=0):
         self.terms = terms
         self.codes = codes
         self.startDate = startDate

@@ -39,9 +39,59 @@ class SRUQuery(Query):
         return self.cql
 
     def generateCQL(self):
+        raise NotImplementedError
+
+    def buildPaperCQLfromQueryCodes(self):
+        formattedCodes = [f"{code}_date" for code in self.codes]
+        return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
+
+
+class OccurrenceQuery(SRUQuery):
+
+    def __init__(
+            self,
+            codes,
+            term,
+            startIndex,
+            numRecords,
+            collapsing,
+            startDate,
+            endDate,
+            requestMetaData
+    ):
+        super().__init__(
+            startIndex=startIndex,
+            numRecords=numRecords,
+            collapsing=collapsing,
+            codes=codes
+        )
+        self.linkDistance = requestMetaData.getLinkDistance()
+        self.linkTerm = requestMetaData.getLinkTerm()
+        self.startDate = startDate
+        self.endDate = endDate
+        self.term = term
+        self.bundle = requestMetaData
+        self.identifier = requestMetaData.getIdentifier()
+
+    def getIdentifier(self):
+        return self.identifier
+
+    def getEssentialDataForMakingAQuery(self):
+        return {
+            "term": self.term,
+            "endDate": self.endDate,
+            "startDate": self.startDate,
+            "codes": self.codes,
+            "metadata": self.bundle
+        }
+
+    def getStartDate(self):
+        return self.startDate
+
+    def generateCQL(self):
         termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
         dateCQL = self.buildDateCQL()
-        paperCQL = self.buildPaperCQL(self.codes) if self.codes else "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
+        paperCQL = self.buildPaperCQLfromQueryCodes() if self.codes else "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
         return f"{termCQL} and {dateCQL} and ({paperCQL})"
 
     def buildDateCQL(self):
@@ -53,85 +103,8 @@ class SRUQuery(Query):
     def buildLinkedTermCQL(self):
         return f'text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}"'
 
-    def buildPaperCQL(self, codes):
-        formattedCodes = [f"{code}_date" for code in codes]
-        return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
-
-
-class TicketQuery(SRUQuery):
-
-    def __init__(
-            self,
-            ticket,
-            codes,
-            term,
-            startIndex,
-            numRecords,
-            collapsing,
-            startDate,
-            endDate
-    ):
-        super().__init__(
-            startIndex=startIndex,
-            numRecords=numRecords,
-            collapsing=collapsing,
-            codes=codes
-        )
-        self.linkDistance = ticket.getLinkDistance()
-        self.linkTerm = ticket.getLinkTerm()
-        self.startDate = startDate
-        self.endDate = endDate
-        self.term = term
-        self.ticket = ticket
-
-    def getTicketID(self):
-        return self.ticket.getID()
-
-    def getEssentialDataForMakingAQuery(self):
-        return {
-            "term": self.term,
-            "endDate": self.endDate,
-            "startDate": self.startDate,
-            "codes": self.codes,
-            "ticket": self.ticket
-        }
-
-    def getStartDate(self):
-        return self.startDate
-
     def __repr__(self):
         return f"Query({self.getCQL()})"
-
-
-class MomentQuery(SRUQuery):
-
-    def __init__(
-            self,
-            term,
-            codes,
-            year,
-            startIndex,
-            numRecords,
-            linkTerm,
-            linkDistance,
-            day=1,
-            month=1
-    ):
-        super().__init__(
-            startIndex=startIndex,
-            numRecords=numRecords,
-            collapsing="false",
-            codes=codes
-        )
-        self.term = term[0]
-        self.year = int(year)
-        self.month = month
-        self.day = day
-        self.linkTerm = linkTerm
-        self.linkDistance = linkDistance
-
-    def buildDateCQL(self):
-        return f'gallicapublication_date>="{self.year}-{self.month:02}-{self.day:02}" and gallicapublication_date<"{self.year+1}-{self.month:02}-{self.day:02}"'
 
 
 class ArkQueryForNewspaperYears(Query):
@@ -163,7 +136,7 @@ class PaperQuery(SRUQuery):
 
     def generateCQL(self):
         if self.codes:
-            return self.buildPaperCQL(self.codes)
+            return self.buildPaperCQLfromQueryCodes()
         else:
             return "dc.type all \"fascicule\" and ocrquality > \"050.00\""
 

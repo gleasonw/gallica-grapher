@@ -1,4 +1,4 @@
-from query import TicketQuery
+from query import OccurrenceQuery
 
 
 class QueryBuilder:
@@ -40,7 +40,7 @@ class TicketQueryBuilder(QueryBuilder):
 
     def makeQuery(self, term, ticket, dates, codes=None):
         codes = codes or []
-        return TicketQuery(
+        return OccurrenceQuery(
             term=term,
             ticket=ticket,
             startIndex=0,
@@ -62,7 +62,7 @@ class ParamQueryBuilder(QueryBuilder):
 
     def makeQuery(self, term, params, dates, codes=None):
         codes = codes or []
-        return TicketQuery(
+        return OccurrenceQuery(
             term=term,
             ticket=params,
             startIndex=params.getStartIndex(),

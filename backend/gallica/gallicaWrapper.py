@@ -48,8 +48,10 @@ class GallicaWrapper:
 
 
 class SRUWrapper(GallicaWrapper):
-    def __init__(self):
+    def __init__(self, requestID, ticketID):
         super().__init__()
+        self.requestID = requestID
+        self.ticketID = ticketID
 
     def get(self, grouping, **kwargs):
         params = Params(
@@ -70,8 +72,8 @@ class SRUWrapper(GallicaWrapper):
 
     def buildParser(self):
         return ParseOccurrenceRecords(
-            requestID=-10,
-            ticketID=-10
+            requestID=self.requestID,
+            ticketID=self.ticketID
         )
 
     def buildQueryBuilder(self):
