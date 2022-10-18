@@ -1,11 +1,9 @@
 # The Gallica Grapher
 
-This tool exists thanks to the wondrously open and interesting Gallica API,
-a product of the French national archives. I used the API for undergraduate research on
-19th century French culture. Now that I have
-graduated, time is plentiful, and I'm trying my hand at making a website out of it. Pull requests and feedback are welcome. 
+Culture and identity were once local, the products of word-of-mouth and conversation. The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Culture became national. Individual opinions ascended to group opinions; “public opinion” rose into being, looming over the political class, and the press was its handler.
 
-www.gallicagrapher.com
+This app integrates with the French National Archives Gallica API, allowing for rapid text searches over thousands of periodicals. The app routes requests to Gallica, parses the responses, and creates a trend line. Selecting a point will bring up the associated records in a table beneath the graph.
+
 
 ### Do I need to speak French to use it?
 
