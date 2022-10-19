@@ -1,5 +1,5 @@
 from gallica.recordGetter import RecordGetter
-from gallica.queryBuilder import ParamQueryBuilder
+from gallica.queryFactory import ParamQueryBuilder
 from gallica.params import Params
 from gallica.concurrentFetch import ConcurrentFetch
 from gallica.parseArkRecord import ParseArkRecord
@@ -53,19 +53,10 @@ class SRUWrapper(GallicaWrapper):
         self.requestID = requestID
         self.ticketID = ticketID
 
-    def get(self, grouping, **kwargs):
-        params = Params(
-            terms=kwargs['terms'],
-            codes=kwargs['codes'],
-            startDate=kwargs['startDate'],
-            endDate=kwargs['endDate'],
-            link=kwargs['link'],
-            grouping=grouping,
-            numRecords=kwargs['numRecords'],
-            startIndex=kwargs['startIndex'],
-        )
-        queries = self.queryBuilder.buildQueriesForParams(params)
-        return self.recordGetter.getFromQueries(queries=queries)
+    def get(self, grouping='all', generate=False, **kwargs):
+        queries = self.queryBuilder.buildQueriesForArgs(kwargs)
+        recordGenerator = self.recordGetter.getFromQueries(queries=queries)
+        return recordGenerator if generate else list(recordGenerator)
 
     def buildApi(self):
         return ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU')

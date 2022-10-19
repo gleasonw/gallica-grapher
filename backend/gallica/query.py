@@ -1,26 +1,28 @@
 class Query:
 
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        self.postInit(**kwargs)
 
     def getFetchParams(self):
         raise NotImplementedError
 
+    def postInit(self, **kwargs):
+        pass
+
 
 class SRUQuery(Query):
 
-    def __init__(self, startIndex, numRecords, collapsing, codes):
+    def __init__(self, **kwargs):
         super().__init__()
-        self.startIndex = startIndex
-        self.numRecords = numRecords
-        self.collapsing = collapsing
+        self.startIndex = kwargs['startIndex']
+        self.numRecords = kwargs['numRecords']
+        self.collapsing = kwargs['collapsing']
         self.cql = None
-        self.codes = codes
-        self.term = None
-        self.linkTerm = None
-        self.linkDistance = None
-        self.startDate = None
-        self.endDate = None
+        self.codes = None
+        self.postInit(**kwargs)
+
+    def postInit(self, **kwargs):
+        pass
 
     def getFetchParams(self):
         return{
@@ -48,30 +50,14 @@ class SRUQuery(Query):
 
 class OccurrenceQuery(SRUQuery):
 
-    def __init__(
-            self,
-            codes,
-            term,
-            startIndex,
-            numRecords,
-            collapsing,
-            startDate,
-            endDate,
-            requestMetaData
-    ):
-        super().__init__(
-            startIndex=startIndex,
-            numRecords=numRecords,
-            collapsing=collapsing,
-            codes=codes
-        )
-        self.linkDistance = requestMetaData.getLinkDistance()
-        self.linkTerm = requestMetaData.getLinkTerm()
-        self.startDate = startDate
-        self.endDate = endDate
-        self.term = term
-        self.bundle = requestMetaData
-        self.identifier = requestMetaData.getIdentifier()
+    def postInit(self, **kwargs):
+        self.searchMetaData = kwargs['searchMetaData']
+        self.linkDistance = self.searchMetaData.getLinkDistance()
+        self.linkTerm = self.searchMetaData.getLinkTerm()
+        self.startDate = kwargs['startDate']
+        self.endDate = kwargs['endDate']
+        self.term = kwargs['term']
+        self.identifier = self.searchMetaData.getIdentifier()
 
     def getIdentifier(self):
         return self.identifier
@@ -82,7 +68,7 @@ class OccurrenceQuery(SRUQuery):
             "endDate": self.endDate,
             "startDate": self.startDate,
             "codes": self.codes,
-            "metadata": self.bundle
+            "searchMetaData": self.searchMetaData
         }
 
     def getStartDate(self):
@@ -109,10 +95,9 @@ class OccurrenceQuery(SRUQuery):
 
 class ArkQueryForNewspaperYears(Query):
 
-    def __init__(self, code):
-        super().__init__()
-        self.ark = f'ark:/12148/{code}/date'
-        self.code = code
+    def postInit(self, **kwargs):
+        self.ark = f'ark:/12148/{kwargs["code"]}/date'
+        self.code = kwargs['code']
 
     def getCode(self):
         return self.code
@@ -126,13 +111,8 @@ class ArkQueryForNewspaperYears(Query):
 
 class PaperQuery(SRUQuery):
 
-    def __init__(self, startIndex, numRecords, codes=None):
-        super().__init__(
-            startIndex=startIndex,
-            numRecords=numRecords,
-            collapsing=True,
-            codes=codes
-        )
+    def postInit(self, **kwargs):
+        self.collapsing = True
 
     def generateCQL(self):
         if self.codes:
@@ -146,10 +126,9 @@ class PaperQuery(SRUQuery):
 
 class OCRQuery(Query):
 
-    def __init__(self, paperCode, term):
-        super().__init__()
-        self.ark = paperCode
-        self.term = term
+    def postInit(self, **kwargs):
+        self.ark = kwargs['ark']
+        self.term = kwargs['term']
 
     def getFetchParams(self):
         return {

@@ -1,6 +1,5 @@
 from gallica.search import Search
 from recordGetter import RecordGetter
-from groupSearchFactory import ParseGroupedRecordCounts
 
 
 class GroupSearchFactory:

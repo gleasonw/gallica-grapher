@@ -5,62 +5,17 @@ from recordGetter import RecordGetter
 from parseOccurrenceRecords import ParseOccurrenceRecords
 
 
-class AllSearchFactory:
+class SearchFactory:
 
-    def __init__(
-            self,
-            ticket,
-            dbLink,
-            requestID,
-            parse,
-            onUpdateProgress,
-            sruFetcher,
-            queryBuilder,
-            onAddingResultsToDB,
-    ):
-        self.requestID = requestID
-        self.ticket = ticket
-        self.insertIntoResults = dbLink.insertRecordsIntoResults
-        self.parse = ParseOccurrenceRecords(
-            parser=parse,
-            ticketID=ticket.getID(),
-            requestID=requestID
-        )
-        self.buildQueriesForTicket = queryBuilder.buildForBundle
-        self.onUpdateProgress = onUpdateProgress
-        self.sruFetcher = sruFetcher
-        self.onAddingResultsToDB = onAddingResultsToDB
-        self.queryIndexer = QueryIndexer(
-            gallicaAPI=self.sruFetcher,
-            parse=parse,
-            makeQuery=OccurrenceQuery
-        )
-        self.getNumResultsForEachQuery = self.queryIndexer.getNumResultsForEachQuery
-        self.makeIndexedQueriesForEachBaseQuery = self.queryIndexer.makeIndexedQueries
+    def build(self, config):
+        return self.prepare(config)
 
-    def prepare(self, request):
-        queries = self.buildQueriesForTicket(self.ticket)
-        queriesWithNumResults = self.getNumResultsForEachQuery(queries)
+    def prepare(self, config):
         return Search(
-            queries=self.makeIndexedQueriesForEachBaseQuery(
-                queriesWithNumResults),
-            insertRecordsIntoDatabase=self.insertIntoResults,
-            recordGetter=RecordGetter(
-                gallicaAPI=self.sruFetcher,
-                parseData=self.parse,
-                onUpdateProgress=self.onUpdateProgress
-            ),
-            requestStateHandlers={
-                'onAddingResultsToDB': self.onAddingResultsToDB,
-                'onAddingMissingPapers': lambda: request.setSearchState(
-                    state='ADDING_MISSING_PAPERS',
-                    ticketID=self.ticket.getID()
-                )
-            },
-            numRecordsToFetch=sum(
-                [numResults for numResults in queriesWithNumResults.values()]
-            ),
-            ticketID=self.ticket.getID()
+            gallicaAPI=config[0],
+            insertRecordsIntoDatabase=config[1],
+            requestStateHandlers=config[2],
+            identifier=config[3]
         )
 
 

@@ -1,5 +1,5 @@
 import unittest
-from queryBuilder import TicketQueryFactory
+from queryFactory import TicketQueryFactory
 from unittest.mock import MagicMock
 
 

@@ -4,7 +4,7 @@ from gallica.request import Request
 from utils.psqlconn import PSQLconn
 from gallica.ticket import Ticket
 from gallicaxmlparse import GallicaXMLparse
-from queryBuilder import TicketQueryFactory
+from queryFactory import TicketQueryFactory
 
 
 class RequestFactory:
