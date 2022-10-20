@@ -11,15 +11,18 @@ class Params:
                  link,
                  grouping,
                  numRecords=50,
-                 startIndex=0):
+                 startIndex=0,
+                 identifier=None
+                 ):
         self.terms = terms
         self.codes = codes
-        self.startDate = startDate
-        self.endDate = endDate
+        self.startDate = int(startDate)
+        self.endDate = int(endDate)
         self.link = link
         self.grouping = grouping
         self.numRecords = numRecords
         self.startIndex = startIndex
+        self.identifier = identifier
 
     def getLinkDistance(self):
         return self.link[1]
@@ -27,8 +30,17 @@ class Params:
     def getNumRecords(self):
         return self.numRecords
 
+    def getTerms(self):
+        return self.terms
+
     def getStartIndex(self):
         return self.startIndex
+
+    def getIdentifier(self):
+        return self.identifier
+
+    def getGrouping(self):
+        return self.grouping
 
     def getCodeBundles(self):
         return [] if self.codes is None else [
@@ -41,11 +53,12 @@ class Params:
 
     def getDateGroupings(self):
         groupings = {
-            'all': self.makeAllGroupings(),
-            'year': self.makeYearGroupings(),
-            'month': self.makeMonthGroupings()
+            'all': self.makeAllGroupings,
+            'year': self.makeYearGroupings,
+            'month': self.makeMonthGroupings
         }
-        return groupings[self.grouping]
+        dates = groupings[self.grouping]()
+        return dates
 
     def makeAllGroupings(self):
         return [(f"{self.startDate}-01-01", f"{self.endDate + 1}-01-01")]

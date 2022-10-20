@@ -1,10 +1,5 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
-from concurrentFetch import ConcurrentFetch
-from gallica.request import Request
 from utils.psqlconn import PSQLconn
-from gallica.ticket import Ticket
-from gallicaxmlparse import GallicaXMLparse
-from queryFactory import TicketQueryFactory
 
 
 class RequestFactory:

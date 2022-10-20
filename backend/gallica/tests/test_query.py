@@ -1,4 +1,4 @@
-from query import OccurrenceQuery, ArkQueryForNewspaperYears, PaperQuery, OCRQuery
+from query import OccurrenceQuery, ArkQueryForNewspaperYears, PaperQuery, ContentQuery
 from unittest import TestCase
 from unittest.mock import MagicMock
 
@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 class TestOCRQuery(TestCase):
 
     def setUp(self) -> None:
-        self.ocrQuery = OCRQuery(
+        self.ocrQuery = ContentQuery(
             paperCode='test',
             term='test'
         )

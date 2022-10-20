@@ -1,4 +1,4 @@
-class GallicaResponse:
+class Response:
 
     def __init__(self, data, query, elapsed):
         self.xml = data

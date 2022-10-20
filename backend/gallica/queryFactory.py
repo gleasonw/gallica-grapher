@@ -1,43 +1,42 @@
 from query import OccurrenceQuery
 from query import ArkQueryForNewspaperYears
 from query import PaperQuery
+from query import ContentQuery
 from gallica.params import Params
 
 
 class QueryFactory:
 
-    def __init__(self, gallicaAPI, parse):
+    def __init__(self, gallicaAPI, parse, numResultsCallback=None):
         self.gallicaAPI = gallicaAPI
         self.parse = parse
+        self.numResultsCallback = numResultsCallback
 
-    def getNumResultsForEachQuery(self, queries) -> dict:
-        responses = self.gallicaAPI.fetchAll(queries)
-        numResultsForQueries = {}
-        for response in responses:
-            numRecordsForBaseCQL = self.parse.getNumRecords(response.xml)
-            numResultsForQueries[response.query] = numRecordsForBaseCQL
+    def getNumResultsForEachQuery(self, queries) -> list:
+        responses = self.gallicaAPI.get(queries)
+        numResultsForQueries = [
+            (response.query, self.parse.getNumResults(response.xml))
+            for response in responses
+        ]
+        self.numResultsCallback and self.numResultsCallback(numResultsForQueries)
         return numResultsForQueries
 
-    def makeIndexedQueries(self, baseQueries) -> list:
+    def indexEachQueryFromNumResults(self, queries) -> list:
         indexedQueries = []
-        for query, numResults in baseQueries.items():
+        for query, numResults in self.getNumResultsForEachQuery(queries):
             for i in range(0, numResults, 50):
                 baseData = query.getEssentialDataForMakingAQuery()
-                baseData["startIndex"] = i
                 baseData["numRecords"] = 50
-                baseData["collapsing"] = False
                 indexedQueries.append(
                     self.makeQuery(**baseData)
                 )
         return indexedQueries
 
-    def makeQuery(self, term, dates, bundle, codes=None):
+    def makeQuery(self, term, startDate, endDate, searchMetaData, startIndex=0, numRecords=50, codes=None):
         raise NotImplementedError
 
 
 class OccurrenceQueryFactory(QueryFactory):
-    def __init__(self):
-        super().__init__()
 
     def buildQueriesForArgs(self, args):
         baseQueries = self.buildForBundle(
@@ -47,12 +46,15 @@ class OccurrenceQueryFactory(QueryFactory):
                 startDate=args['startDate'],
                 endDate=args['endDate'],
                 link=(args['linkTerm'], args['linkDistance']),
-                grouping=args['searchType'],
+                grouping=args['grouping'],
                 numRecords=args['numRecords'],
                 startIndex=args['startIndex']
             )
         )
-        return self.makeIndexedQueries(baseQueries) if args['grouping'] == 'all' else baseQueries
+        if args['grouping'] == 'all':
+            return self.indexEachQueryFromNumResults(baseQueries)
+        else:
+            return baseQueries
 
     def buildForBundle(self, bundle):
         if codes := bundle.getCodeBundles():
@@ -62,41 +64,33 @@ class OccurrenceQueryFactory(QueryFactory):
 
     def buildWithCodeBundles(self, bundle, codeBundles):
         return [
-            self.makeQuery(term, bundle, dates, codes)
+            self.makeQuery(term, startDate, endDate, bundle, codes)
             for term in bundle.getTerms()
-            for dates in bundle.getDateGroupings()
+            for startDate, endDate in bundle.getDateGroupings()
             for codes in codeBundles
         ]
 
     def buildNoCodeBundles(self, bundle):
         return [
-            self.makeQuery(term, dates, bundle)
+            self.makeQuery(term, startDate, endDate, bundle)
             for term in bundle.getTerms()
-            for dates in bundle.getDateGroupings()
+            for startDate, endDate in bundle.getDateGroupings()
         ]
 
-    def makeQuery(self, term, ticket, dates, codes=None):
+    def makeQuery(self, term, startDate, endDate, searchMetaData, startIndex=0, numRecords=1, codes=None):
         codes = codes or []
         return OccurrenceQuery(
             term=term,
-            ticket=ticket,
-            startIndex=0,
-            numRecords=1,
-            collapsing=False,
+            searchMetaData=searchMetaData,
+            startIndex=startIndex,
+            numRecords=numRecords,
             codes=codes,
-            startDate=dates[0],
-            endDate=dates[1]
+            startDate=startDate,
+            endDate=endDate,
         )
 
 
 class PaperQueryFactory(QueryFactory):
-
-    def __init__(self, gallicaAPI, parse):
-        self.indexer = QueryIndexer(
-            gallicaAPI=gallicaAPI,
-            parse=parse,
-            makeQuery=PaperQuery
-        )
 
     def buildSRUQueriesForCodes(self, codes):
         sruQueries = []
@@ -111,24 +105,25 @@ class PaperQueryFactory(QueryFactory):
         return sruQueries
 
     def buildSRUQueriesForAllRecords(self):
-        sruQuery = PaperQuery(
-            startIndex=0,
-            numRecords=1
-        )
-        numResults = self.indexer.getNumResultsForEachQuery([sruQuery])
-        return self.indexer.makeIndexedQueries(numResults)
+        return self.indexEachQueryFromNumResults([
+            PaperQuery(
+                startIndex=0,
+                numRecords=1
+            )
+        ])
 
     def buildArkQueriesForCodes(self, codes):
         return [
-            ArkQueryForNewspaperYears(code)
+            ArkQueryForNewspaperYears(code=code)
             for code in codes
         ]
 
 
-class QueryIndexer:
+class ContentQueryFactory:
 
-    def __init__(self, gallicaAPI, parse, makeQuery):
-        self.gallicaAPI = gallicaAPI
-        self.parse = parse
-        self.makeQuery = makeQuery
+    def buildQueryForArkAndTerm(self, ark, term):
+        return ContentQuery(
+            ark=ark,
+            term=term
+        )
 

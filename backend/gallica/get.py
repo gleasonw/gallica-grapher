@@ -1,5 +1,5 @@
 import time
-from gallicaWrapper.fetchComponents.gallicaResponseWrapper import GallicaResponseWrapper
+from gallica.response import Response
 from urllib3.util.retry import Retry
 import urllib3
 
@@ -23,7 +23,7 @@ class Get:
         )
         return http
 
-    def get(self, query) -> GallicaResponseWrapper:
+    def get(self, query) -> Response:
         start = time.perf_counter()
         response = self.http.request(
             "GET",
@@ -34,7 +34,7 @@ class Get:
         if response.status != 200:
             print(f"Error: {response.status}")
             print(f"Error: {response.data}")
-        return GallicaResponseWrapper(
+        return Response(
             data=response.data,
             query=query,
             elapsed=end - start

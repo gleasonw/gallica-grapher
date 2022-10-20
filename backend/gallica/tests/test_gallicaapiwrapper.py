@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 from unittest import TestCase
-from gallicaResponse import GallicaResponse
+from response import Response
 from get import Get
 
 
@@ -14,4 +14,4 @@ class TestGallicaAPIWrapper(TestCase):
         response = self.gallicaAPIWrapper.get(query=MagicMock(
             getFetchParams=MagicMock(return_value={"q": "test"})
         ))
-        self.assertIsInstance(response, GallicaResponse)
+        self.assertIsInstance(response, Response)

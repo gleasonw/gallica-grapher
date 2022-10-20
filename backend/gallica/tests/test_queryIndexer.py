@@ -37,7 +37,7 @@ class TestQueryIndexer(unittest.TestCase):
         }
         self.testIndexer.makeQuery.return_value = "testQuery"
 
-        result = self.testIndexer.makeIndexedQueries(baseQueries)
+        result = self.testIndexer.indexEachQueryFromNumResults(baseQueries)
 
         self.assertEqual(result, ["testQuery"] * 6)
 

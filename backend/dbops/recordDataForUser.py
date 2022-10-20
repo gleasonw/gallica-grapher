@@ -1,6 +1,6 @@
 from utils.psqlconn import PSQLconn
 from parseOccurrenceRecords import ParseOccurrenceRecords
-from query import OCRQuery
+from query import ContentQuery
 from get import Get
 from concurrentFetch import ConcurrentFetch
 from gallicaxmlparse import GallicaXMLparse
@@ -85,7 +85,7 @@ class RecordDataForUser:
             'https://gallica.bnf.fr/services/ContentSearch',
             maxSize=1
         )
-        response = fetcher.get(OCRQuery(ark, term))
+        response = fetcher.get(ContentQuery(ark, term))
         return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(response.xml)
 
     def getGallicaRecordsForDisplay(self, ticket, filters):

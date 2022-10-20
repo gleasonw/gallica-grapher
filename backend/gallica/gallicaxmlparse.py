@@ -4,9 +4,6 @@ from date import Date
 
 class GallicaXMLparse:
 
-    def __init__(self):
-        pass
-
     def getOnePaperFromRecordBatch(self, responseXML) -> str:
         records = self.getRecordsFromXML(responseXML)
         if records:

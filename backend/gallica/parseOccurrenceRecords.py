@@ -9,6 +9,9 @@ class ParseOccurrenceRecords:
         self.requestID = requestID
         self.ticketID = ticketID
 
+    def getNumResults(self, xml):
+        return self.parser.getNumRecords(xml)
+
     def parseResponsesToRecords(self, responses):
         for response in responses:
             yield from self.generateOccurrenceRecords(

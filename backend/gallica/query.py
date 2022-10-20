@@ -1,39 +1,35 @@
 class Query:
 
     def __init__(self, **kwargs):
-        self.postInit(**kwargs)
+        self.postInit(kwargs)
 
     def getFetchParams(self):
         raise NotImplementedError
 
-    def postInit(self, **kwargs):
+    def postInit(self, kwargs):
         pass
 
 
 class SRUQuery(Query):
 
     def __init__(self, **kwargs):
-        super().__init__()
         self.startIndex = kwargs['startIndex']
         self.numRecords = kwargs['numRecords']
-        self.collapsing = kwargs['collapsing']
         self.cql = None
         self.codes = None
-        self.postInit(**kwargs)
-
-    def postInit(self, **kwargs):
-        pass
+        super().__init__(**kwargs)
 
     def getFetchParams(self):
-        return{
+        base = {
             "operation": "searchRetrieve",
             "exactSearch": "True",
             "version": 1.2,
             "startRecord": self.startIndex,
             "maximumRecords": self.numRecords,
-            "collapsing": self.collapsing,
             "query": self.getCQL(),
         }
+        base.update(self.getCollapsingSetting())
+        return base
 
     def getCQL(self):
         if not self.cql:
@@ -47,10 +43,13 @@ class SRUQuery(Query):
         formattedCodes = [f"{code}_date" for code in self.codes]
         return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
 
+    def getCollapsingSetting(self):
+        return {"collapsing": "false"}
+
 
 class OccurrenceQuery(SRUQuery):
 
-    def postInit(self, **kwargs):
+    def postInit(self, kwargs):
         self.searchMetaData = kwargs['searchMetaData']
         self.linkDistance = self.searchMetaData.getLinkDistance()
         self.linkTerm = self.searchMetaData.getLinkTerm()
@@ -95,7 +94,7 @@ class OccurrenceQuery(SRUQuery):
 
 class ArkQueryForNewspaperYears(Query):
 
-    def postInit(self, **kwargs):
+    def postInit(self, kwargs):
         self.ark = f'ark:/12148/{kwargs["code"]}/date'
         self.code = kwargs['code']
 
@@ -111,7 +110,7 @@ class ArkQueryForNewspaperYears(Query):
 
 class PaperQuery(SRUQuery):
 
-    def postInit(self, **kwargs):
+    def postInit(self, kwargs):
         self.collapsing = True
 
     def generateCQL(self):
@@ -124,9 +123,9 @@ class PaperQuery(SRUQuery):
         return f'PaperQuery({self.codes}, {self.startIndex}, {self.numRecords})'
 
 
-class OCRQuery(Query):
+class ContentQuery(Query):
 
-    def postInit(self, **kwargs):
+    def postInit(self, kwargs):
         self.ark = kwargs['ark']
         self.term = kwargs['term']
 
