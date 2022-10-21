@@ -12,6 +12,18 @@ class QueryFactory:
         self.parse = parse
         self.numResultsCallback = numResultsCallback
 
+    def indexEachQueryFromNumResults(self, queries) -> list:
+        indexedQueries = []
+        for query, numResults in self.getNumResultsForEachQuery(queries):
+            for i in range(0, numResults, 50):
+                baseData = query.getEssentialDataForMakingAQuery()
+                baseData['startIndex'] = i
+                baseData["numRecords"] = 50
+                indexedQueries.append(
+                    self.makeQuery(**baseData)
+                )
+        return indexedQueries
+
     def getNumResultsForEachQuery(self, queries) -> list:
         responses = self.gallicaAPI.get(queries)
         numResultsForQueries = [
@@ -21,18 +33,7 @@ class QueryFactory:
         self.numResultsCallback and self.numResultsCallback(numResultsForQueries)
         return numResultsForQueries
 
-    def indexEachQueryFromNumResults(self, queries) -> list:
-        indexedQueries = []
-        for query, numResults in self.getNumResultsForEachQuery(queries):
-            for i in range(0, numResults, 50):
-                baseData = query.getEssentialDataForMakingAQuery()
-                baseData["numRecords"] = 50
-                indexedQueries.append(
-                    self.makeQuery(**baseData)
-                )
-        return indexedQueries
-
-    def makeQuery(self, term, startDate, endDate, searchMetaData, startIndex=0, numRecords=50, codes=None):
+    def makeQuery(self, **kwargs):
         raise NotImplementedError
 
 
@@ -92,6 +93,10 @@ class OccurrenceQueryFactory(QueryFactory):
 
 class PaperQueryFactory(QueryFactory):
 
+    def buildQueriesForArgs(self, args):
+        codes = args.get('codes')
+        return self.buildSRUQueriesForCodes(codes) if codes else self.buildSRUQueriesForAllRecords()
+
     def buildSRUQueriesForCodes(self, codes):
         sruQueries = []
         for i in range(0, len(codes), 10):
@@ -117,6 +122,13 @@ class PaperQueryFactory(QueryFactory):
             ArkQueryForNewspaperYears(code=code)
             for code in codes
         ]
+
+    def makeQuery(self, codes, startIndex, numRecords):
+        return PaperQuery(
+            startIndex=startIndex,
+            numRecords=numRecords,
+            codes=codes
+        )
 
 
 class ContentQueryFactory:

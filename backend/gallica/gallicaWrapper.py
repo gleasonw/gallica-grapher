@@ -42,8 +42,8 @@ class SRUWrapper(GallicaWrapper):
         self.requestID = kwargs.get('requestID')
         self.ticketID = kwargs.get('ticketID')
 
-    def get(self, generate=False, **kwargs):
-        parser = self.buildParserForGrouping(kwargs['grouping'])
+    def get(self, generate=False, grouping='year', **kwargs):
+        parser = self.buildParserForGrouping(grouping)
         api = self.buildApi()
         recordGetter = self.buildRecordGetter(
             api=api,
@@ -52,6 +52,21 @@ class SRUWrapper(GallicaWrapper):
         queryBuilder = self.buildQueryBuilder(
             api=api,
             parser=parser
+        )
+        queries = queryBuilder.buildQueriesForArgs(kwargs)
+        recordGenerator = recordGetter.getFromQueries(queries=queries)
+        return recordGenerator if generate else list(recordGenerator)
+
+    def getPapers(self, generate=False, **kwargs):
+        api = self.buildApi()
+        parser = ParsePaperRecords()
+        recordGetter = self.buildRecordGetter(
+            api=api,
+            parser=parser
+        )
+        queryBuilder = PaperQueryFactory(
+            gallicaAPI=api,
+            parse=parser,
         )
         queries = queryBuilder.buildQueriesForArgs(kwargs)
         recordGenerator = recordGetter.getFromQueries(queries=queries)
@@ -141,9 +156,6 @@ class ContentWrapper(GallicaWrapper):
 
 
 if __name__ == '__main__':
-    testWrap = connect('content')
-    records = testWrap.get(
-        ark='bpt6k2700685',
-        term='cinquante'
-    )
-    print(len(records))
+    testWrap = connect('sru')
+    records = testWrap.getPapers(codes=['cb32895690j'])
+    print(records)

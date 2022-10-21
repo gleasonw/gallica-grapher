@@ -111,13 +111,19 @@ class ArkQueryForNewspaperYears(Query):
 class PaperQuery(SRUQuery):
 
     def postInit(self, kwargs):
-        self.collapsing = True
+        self.codes = kwargs.get('codes') or []
 
     def generateCQL(self):
         if self.codes:
             return self.buildPaperCQLfromQueryCodes()
         else:
             return "dc.type all \"fascicule\" and ocrquality > \"050.00\""
+
+    def getCollapsingSetting(self):
+        return {"collapsing": "true"}
+
+    def getEssentialDataForMakingAQuery(self):
+        return {"codes": self.codes}
 
     def __repr__(self):
         return f'PaperQuery({self.codes}, {self.startIndex}, {self.numRecords})'

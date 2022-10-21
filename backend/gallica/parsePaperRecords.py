@@ -1,10 +1,14 @@
 from paperRecord import PaperRecord
+from gallicaxmlparse import GallicaXMLparse
 
 
 class ParsePaperRecords:
 
-    def __init__(self, parser):
-        self.parser = parser
+    def __init__(self):
+        self.parser = GallicaXMLparse()
+
+    def getNumResults(self, xml):
+        return self.parser.getNumRecords(xml)
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
