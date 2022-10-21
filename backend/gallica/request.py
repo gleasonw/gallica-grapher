@@ -1,6 +1,6 @@
 import threading
 from allSearchFactory import AllSearchFactory
-from groupSearchFactory import GroupSearchFactory
+from SearchFactory import SearchFactory
 from gallica.searchprogressstats import SearchProgressStats
 
 RECORD_LIMIT = 1000000
@@ -77,8 +77,8 @@ class Request(threading.Thread):
     def buildSearchesForTickets(self):
         searchFactories = {
             'all': AllSearchFactory,
-            'year': GroupSearchFactory,
-            'month': GroupSearchFactory,
+            'year': SearchFactory,
+            'month': SearchFactory,
         }
         return [
             searchFactories[ticket.searchType](

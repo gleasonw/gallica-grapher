@@ -3,8 +3,9 @@ import gallicaWrapper
 
 class GetAndPut:
 
-    def do(self, args, dbLink, identifier=None, requestStateHandlers=None):
+    def getAndInsertRecordsForArgs(self, args, dbLink, identifier=None, requestStateHandlers=None):
         #need to pass handlers to wrapper
+        #papersearch ?
         api = gallicaWrapper.connect('sru')
         records = api.get(**args)
         return dbLink.insert(

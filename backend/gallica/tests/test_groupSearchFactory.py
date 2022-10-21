@@ -1,4 +1,4 @@
-from groupSearchFactory import GroupSearchFactory
+from SearchFactory import SearchFactory
 import unittest
 from unittest.mock import MagicMock
 from gallica.getandput import GetAndPut
@@ -7,7 +7,7 @@ from gallica.getandput import GetAndPut
 class TestGroupSearchFactory(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.testFactory = GroupSearchFactory(
+        self.testFactory = SearchFactory(
             ticket=MagicMock(),
             onUpdateProgress=MagicMock(),
             dbLink=MagicMock(),

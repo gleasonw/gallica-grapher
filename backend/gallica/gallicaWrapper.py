@@ -15,6 +15,7 @@ def connect(gallicaAPIselect, **kwargs):
         'sru': SRUWrapper,
         'issues': IssuesWrapper,
         'content': ContentWrapper,
+        'papers' : PapersWrapper,
     }
     api = gallicaAPIselect.lower()
     if api not in apiWrappers:
@@ -52,21 +53,6 @@ class SRUWrapper(GallicaWrapper):
         queryBuilder = self.buildQueryBuilder(
             api=api,
             parser=parser
-        )
-        queries = queryBuilder.buildQueriesForArgs(kwargs)
-        recordGenerator = recordGetter.getFromQueries(queries=queries)
-        return recordGenerator if generate else list(recordGenerator)
-
-    def getPapers(self, generate=False, **kwargs):
-        api = self.buildApi()
-        parser = ParsePaperRecords()
-        recordGetter = self.buildRecordGetter(
-            api=api,
-            parser=parser
-        )
-        queryBuilder = PaperQueryFactory(
-            gallicaAPI=api,
-            parse=parser,
         )
         queries = queryBuilder.buildQueriesForArgs(kwargs)
         recordGenerator = recordGetter.getFromQueries(queries=queries)
@@ -153,6 +139,27 @@ class ContentWrapper(GallicaWrapper):
     def buildAPI(self):
         return ConcurrentFetch('https://gallica.bnf.fr/services/ContentSearch')
 
+
+class PapersWrapper(GallicaWrapper):
+
+    #TODO: rewrite to get ark queries and compose, just copy previous code essentially
+    def getPapers(self, generate=False, **kwargs):
+        api = self.buildApi()
+        parser = ParsePaperRecords()
+        recordGetter = self.buildRecordGetter(
+            api=api,
+            parser=parser
+        )
+        queryBuilder = PaperQueryFactory(
+            gallicaAPI=api,
+            parse=parser,
+        )
+        queries = queryBuilder.buildQueriesForArgs(kwargs)
+        recordGenerator = recordGetter.getFromQueries(queries=queries)
+        return recordGenerator if generate else list(recordGenerator)
+
+    def buildApi(self):
+        return ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU')
 
 
 if __name__ == '__main__':
