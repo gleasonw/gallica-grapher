@@ -1,4 +1,4 @@
-from gallica.search import Search
+from gallica.getandput import GetAndPut
 from recordGetter import RecordGetter
 
 
@@ -31,7 +31,7 @@ class GroupSearchFactory:
 
     def prepare(self, request):
         queries = self.buildQueriesForTicket(self.ticket)
-        return Search(
+        return GetAndPut(
             queries=queries,
             insertRecordsIntoDatabase=self.insertIntoGroupCounts,
             recordGetter=RecordGetter(

@@ -1,7 +1,7 @@
 from groupSearchFactory import GroupSearchFactory
 import unittest
 from unittest.mock import MagicMock
-from gallica.search import Search
+from gallica.getandput import GetAndPut
 
 
 class TestGroupSearchFactory(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestGroupSearchFactory(unittest.TestCase):
         )
 
     def test_getSearch(self):
-        self.assertIsInstance(self.testFactory.prepare(MagicMock()), Search)
+        self.assertIsInstance(self.testFactory.prepare(MagicMock()), GetAndPut)
 
 
 if __name__ == '__main__':

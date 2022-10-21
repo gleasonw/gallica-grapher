@@ -1,4 +1,4 @@
-from gallica.search import Search
+from gallica.getandput import GetAndPut
 from allSearchFactory import AllSearchFactory
 from unittest import TestCase
 from unittest.mock import MagicMock
@@ -19,4 +19,4 @@ class TestAllSearchFactory(TestCase):
         )
 
     def test_getSearch(self):
-        self.assertIsInstance(self.testFactory.prepare(MagicMock()), Search)
+        self.assertIsInstance(self.testFactory.prepare(MagicMock()), GetAndPut)

@@ -1,12 +1,12 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
-from gallica.search import Search
+from gallica.getandput import GetAndPut
 
 
 class TestSearch(TestCase):
 
     def setUp(self) -> None:
-        self.search = Search(
+        self.search = GetAndPut(
             queries=['foo', 'bar'],
             insertRecordsIntoDatabase=MagicMock(),
             recordGetter=MagicMock(),
