@@ -1,5 +1,5 @@
 from gallica.dto.groupedCountRecord import GroupedCountRecord
-from SearchFactory import ParseGroupedRecordCounts
+from search import ParseGroupedRecordCounts
 import unittest
 from unittest.mock import MagicMock
 

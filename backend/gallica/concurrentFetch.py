@@ -23,7 +23,6 @@ class ConcurrentFetch:
                         "elapsedTime": response.elapsed,
                         "numWorkers": self.numWorkers,
                         "xml": response.xml,
-                        "ticketID": response.query.getTicketID(),
                     }
                 )
                 yield response

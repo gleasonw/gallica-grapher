@@ -16,7 +16,7 @@ class SRUQuery(Query):
         self.startIndex = kwargs['startIndex']
         self.numRecords = kwargs['numRecords']
         self.cql = None
-        self.codes = None
+        self.codes = kwargs.get('codes')
         super().__init__(**kwargs)
 
     def getFetchParams(self):
@@ -75,9 +75,13 @@ class OccurrenceQuery(SRUQuery):
 
     def generateCQL(self):
         termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
-        dateCQL = self.buildDateCQL()
+        dateCQL = self.buildDateCQL() if self.startDate and self.endDate else ''
         paperCQL = self.buildPaperCQLfromQueryCodes() if self.codes else "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
-        return f"{termCQL} and {dateCQL} and ({paperCQL})"
+        cqlList = []
+        termCQL and cqlList.append(termCQL)
+        dateCQL and cqlList.append(dateCQL)
+        paperCQL and cqlList.append(paperCQL)
+        return ' and '.join(cqlList)
 
     def buildDateCQL(self):
         return f'gallicapublication_date>="{self.startDate}" and gallicapublication_date<"{self.endDate}"'

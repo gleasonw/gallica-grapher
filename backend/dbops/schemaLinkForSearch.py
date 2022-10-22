@@ -1,21 +1,17 @@
 import io
-from paperSearchFactory import PaperSearchFactory
+from gallica.gallicaWrapper import connect
+from utils.psqlconn import PSQLconn
+
+#TODO: ensure that object creation is done lazily
 
 
 class SchemaLinkForSearch:
-    def __init__(
-            self,
-            tools,
-            requestID=None
-    ):
-        self.conn = tools.dbConn
+    def __init__(self, requestID=None):
         self.requestID = requestID
-        self.paperAPI = PaperSearchFactory(
-           parse=tools.parse,
-           SRUapi=tools.SRUapi
-        ).buildSearch()
+        self.conn = PSQLconn().getConn()
+        self.paperAPI = connect('papers')
 
-    def insertRecordsIntoPapers(self, records):
+    def insertRecordsIntoPapers(self, records, stateHooks, identifier=None):
         csvStream = self.buildCSVstream(records)
         with self.conn.cursor() as curs:
             curs.copy_from(
@@ -24,10 +20,13 @@ class SchemaLinkForSearch:
                 sep='|'
             )
 
-    def insertRecordsIntoResults(self, records, requestStateHandlers):
+    def insertRecordsIntoResults(self, records, stateHooks):
         stream, codes = self.buildCSVstreamAndGetCodesAndEnsureNoDuplicates(records)
-        self.insertMissingPapersToDB(codes, requestStateHandlers['onAddingMissingPapers'])
-        requestStateHandlers['onAddingResultsToDB']()
+        self.insertMissingPapersToDB(
+            codes,
+            onAddingMissingPapers=lambda: stateHooks.setSearchState('ADDING_MISSING_PAPERS')
+        )
+        stateHooks.setSearchState('ADDING_RESULTS')
         with self.conn.cursor() as curs:
             curs.copy_from(
                 stream,
@@ -46,9 +45,9 @@ class SchemaLinkForSearch:
                 )
             )
 
-    def insertRecordsIntoGroupCounts(self, records, requestStateHandlers):
+    def insertRecordsIntoGroupCounts(self, records, stateHooks):
         csvStream = self.buildCSVstream(records)
-        requestStateHandlers['onAddingResultsToDB']()
+        stateHooks.setSearchState('ADDING_RESULTS')
         with self.conn.cursor() as curs:
             curs.copy_from(
                 csvStream,
@@ -71,9 +70,7 @@ class SchemaLinkForSearch:
         missingCodes = codes - setOfCodesInDB
         if missingCodes:
             onAddingMissingPapers()
-            paperRecords = self.paperAPI.getRecordsForTheseCodes(
-                list(missingCodes)
-            )
+            paperRecords = self.paperAPI.get(codes=list(missingCodes))
             self.insertRecordsIntoPapers(paperRecords)
 
     def getPaperCodesThatMatch(self, codes):

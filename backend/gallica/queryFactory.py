@@ -7,14 +7,12 @@ from gallica.params import Params
 
 class QueryFactory:
 
-    def __init__(self, gallicaAPI, parse, numResultsCallback=None):
+    def __init__(self, gallicaAPI):
         self.gallicaAPI = gallicaAPI
-        self.parse = parse
-        self.numResultsCallback = numResultsCallback
 
-    def indexEachQueryFromNumResults(self, queries) -> list:
+    def indexEachQueryFromNumResults(self, queriesWithNumResults) -> list:
         indexedQueries = []
-        for query, numResults in self.getNumResultsForEachQuery(queries):
+        for query, numResults in queriesWithNumResults:
             for i in range(0, numResults, 50):
                 baseData = query.getEssentialDataForMakingAQuery()
                 baseData['startIndex'] = i
@@ -24,15 +22,6 @@ class QueryFactory:
                 )
         return indexedQueries
 
-    def getNumResultsForEachQuery(self, queries) -> list:
-        responses = self.gallicaAPI.get(queries)
-        numResultsForQueries = [
-            (response.query, self.parse.getNumResults(response.xml))
-            for response in responses
-        ]
-        self.numResultsCallback and self.numResultsCallback(numResultsForQueries)
-        return numResultsForQueries
-
     def makeQuery(self, **kwargs):
         raise NotImplementedError
 
@@ -40,22 +29,7 @@ class QueryFactory:
 class OccurrenceQueryFactory(QueryFactory):
 
     def buildQueriesForArgs(self, args):
-        baseQueries = self.buildForBundle(
-            Params(
-                terms=args['terms'],
-                codes=args['codes'],
-                startDate=args['startDate'],
-                endDate=args['endDate'],
-                link=(args['linkTerm'], args['linkDistance']),
-                grouping=args['grouping'],
-                numRecords=args['numRecords'],
-                startIndex=args['startIndex']
-            )
-        )
-        if args['grouping'] == 'all':
-            return self.indexEachQueryFromNumResults(baseQueries)
-        else:
-            return baseQueries
+        return self.buildForBundle(Params(**args))
 
     def buildForBundle(self, bundle):
         if codes := bundle.getCodeBundles():
@@ -65,7 +39,13 @@ class OccurrenceQueryFactory(QueryFactory):
 
     def buildWithCodeBundles(self, bundle, codeBundles):
         return [
-            self.makeQuery(term, startDate, endDate, bundle, codes)
+            self.makeQuery(
+                term=term,
+                startDate=startDate,
+                endDate=endDate,
+                searchMetaData=bundle,
+                codes=codes
+            )
             for term in bundle.getTerms()
             for startDate, endDate in bundle.getDateGroupings()
             for codes in codeBundles

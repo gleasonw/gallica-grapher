@@ -4,16 +4,14 @@ class RecordGetter:
             self,
             gallicaAPI,
             parseData,
-            onUpdateProgress=None
     ):
         self.gallicaAPI = gallicaAPI
         self.parser = parseData
-        self.onUpdateProgress = onUpdateProgress
 
-    def getFromQueries(self, queries):
+    def getFromQueries(self, queries, onUpdateProgress=None):
         rawResponse = self.gallicaAPI.get(
             queries=queries,
-            onUpdateProgress=self.onUpdateProgress
+            onUpdateProgress=onUpdateProgress
         )
         records = self.parser.parseResponsesToRecords(rawResponse)
         return records

@@ -1,4 +1,5 @@
 from math import ceil
+from gallicaxmlparse import GallicaXMLparse
 from averageResponseTime import AverageResponseTime
 
 
@@ -7,8 +8,7 @@ class SearchProgressStats:
     def __init__(
             self,
             ticketID,
-            searchType,
-            parse
+            grouping
     ):
         self.ticketID = ticketID
         self.numBatchesRetrieved = 0
@@ -20,9 +20,9 @@ class SearchProgressStats:
         self.randomTextForDisplay = None
         self.progressPercent = 0
         self.state = 'NOT_STARTED'
-        self.searchType = searchType
+        self.grouping = grouping
         self.numRecordsToFetch = 0
-        self.parse = parse
+        self.parse = GallicaXMLparse()
 
     def get(self):
         return {
@@ -44,7 +44,7 @@ class SearchProgressStats:
     def update(self, progressStats):
         if not self.numBatches:
             self.state = "RUNNING"
-            self.numBatches = ceil(self.numRecordsToFetch / 50) if self.searchType == 'all' else self.numRecordsToFetch
+            self.numBatches = ceil(self.numRecordsToFetch / 50) if self.grouping == 'all' else self.numRecordsToFetch
         self.updateProgressState(
             elapsedTime=progressStats['elapsedTime'],
             numWorkers=progressStats['numWorkers'],
@@ -60,7 +60,7 @@ class SearchProgressStats:
         self.numBatchesRetrieved += 1
         self.averageResponseTime.update(elapsedTime)
         self.progressPercent = ceil(self.numBatchesRetrieved / self.numBatches * 100)
-        self.numResultsRetrieved = self.numBatchesRetrieved * 50 if self.searchType == 'all' else self.numBatchesRetrieved
+        self.numResultsRetrieved = self.numBatchesRetrieved * 50 if self.grouping == 'all' else self.numBatchesRetrieved
         self.estimateSecondsToCompletion = self.getEstimateSecondsToCompletion(numWorkers)
         self.randomPaperForDisplay = self.parse.getOnePaperFromRecordBatch(xml)
 

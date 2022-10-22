@@ -1,5 +1,5 @@
 from celery import Celery
-from requestFactory import RequestFactory
+from gallica.request import Request
 import time
 
 app = Celery()
@@ -8,11 +8,10 @@ app.config_from_object('celery_settings')
 
 @app.task(bind=True)
 def spawnRequest(self, tickets, requestid):
-    factory = RequestFactory(
-        tickets,
-        requestid
+    request = Request(
+        argsBundles=tickets,
+        requestID=requestid
     )
-    request = factory.buildRequest()
     request.start()
     pollStates = {
         'RUNNING': lambda: self.update_state(

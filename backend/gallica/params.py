@@ -3,26 +3,16 @@ NUM_CODES_PER_BUNDLE = 10
 
 class Params:
 
-    def __init__(self,
-                 terms,
-                 codes,
-                 startDate,
-                 endDate,
-                 link,
-                 grouping,
-                 numRecords=50,
-                 startIndex=0,
-                 identifier=None
-                 ):
-        self.terms = terms
-        self.codes = codes
-        self.startDate = int(startDate)
-        self.endDate = int(endDate)
-        self.link = link
-        self.grouping = grouping
-        self.numRecords = numRecords
-        self.startIndex = startIndex
-        self.identifier = identifier
+    def __init__(self, **kwargs):
+        self.terms = kwargs['terms']
+        self.codes = kwargs.get('codes') or []
+        self.startDate = int(kwargs.get('startDate', 0))
+        self.endDate = int(kwargs.get('endDate', 0))
+        self.link = kwargs.get('link') or (None, None)
+        self.grouping = kwargs['grouping']
+        self.numRecords = kwargs.get('numRecords', 50)
+        self.startIndex = kwargs.get('startIndex', 0)
+        self.identifier = kwargs.get('identifier')
 
     def getLinkDistance(self):
         return self.link[1]
@@ -42,6 +32,9 @@ class Params:
     def getGrouping(self):
         return self.grouping
 
+    def getYearRangeLength(self):
+        return self.endDate + 1 - self.startDate
+
     def getCodeBundles(self):
         return [] if self.codes is None else [
             self.codes[i:i+NUM_CODES_PER_BUNDLE]
@@ -52,6 +45,8 @@ class Params:
         return self.link[0]
 
     def getDateGroupings(self):
+        if self.startDate == 0 and self.endDate == 0:
+            return [(None, None)]
         groupings = {
             'all': self.makeAllGroupings,
             'year': self.makeYearGroupings,
@@ -80,4 +75,4 @@ class Params:
         return monthGroups
 
     def __repr__(self):
-        return f"Params({self.terms}, {self.codes}, {self.startDate}, {self.endDate}, {self.getLinkTerm()}, {self.getLinkDistance()}"
+        return f"Params({self.terms}, {self.codes}, {self.startDate}, {self.endDate}, {self.getLinkTerm()}, {self.getLinkDistance()})"

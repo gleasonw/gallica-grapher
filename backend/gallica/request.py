@@ -1,6 +1,6 @@
 import threading
-from allSearchFactory import AllSearchFactory
-from SearchFactory import SearchFactory
+from utils.psqlconn import PSQLconn
+import gallica.search
 from gallica.searchprogressstats import SearchProgressStats
 
 RECORD_LIMIT = 1000000
@@ -8,44 +8,36 @@ MAX_DB_SIZE = 10000000
 
 
 class Request(threading.Thread):
-    def __init__(
-            self,
-            requestID,
-            dbConn,
-            tickets,
-            SRUapi,
-            dbLink,
-            parse,
-            queryBuilder,
-    ):
+    def __init__(self, requestID, argsBundles):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.state = 'RUNNING'
         self.requestID = requestID
         self.estimateNumRecords = 0
-        self.DBconnection = dbConn
-        self.tickets = tickets
-        self.SRUapi = SRUapi
-        self.dbLink = dbLink
-        self.parse = parse
-        self.queryBuilder = queryBuilder
+        self.dbConn = PSQLconn().getConn()
+        self.argsBundles = argsBundles
         self.searches = None
         self.searchProgressStats = self.initProgressStats()
         super().__init__()
 
-    #TODO: too many ticket ids flying around
     def getProgressStats(self):
         return {
-            ticket.getID(): self.searchProgressStats[ticket.getID()].get()
-            for ticket in self.tickets
+            key: self.searchProgressStats[key].get()
+            for key in self.argsBundles.keys()
         }
 
     def setSearchState(self, ticketID, state):
         self.searchProgressStats[ticketID].setState(state)
 
+    def setSearchProgressStats(self, progressStats):
+        ticketID = progressStats['ticketID']
+        self.searchProgressStats[ticketID].update(progressStats)
+
     def run(self):
-        self.searches = self.buildSearchesForTickets()
-        self.setRecordsToFetchForProgressStats()
+        self.searches = gallica.search.build(
+            argBundles=self.argsBundles,
+            stateHooks=self
+        )
         numRecords = sum([
             search.getNumRecordsToBeInserted()
             for search in self.searches
@@ -57,14 +49,13 @@ class Request(threading.Thread):
                 self.doEachSearch()
             else:
                 self.state = 'TOO_MANY_RECORDS'
-        self.DBconnection.close()
 
     def numRecordsUnderLimit(self, numRecords):
         dbSpaceRemainingWithBuffer = MAX_DB_SIZE - self.getNumberRowsStoredInAllTables() - 10000
         return numRecords < min(dbSpaceRemainingWithBuffer, RECORD_LIMIT)
 
     def getNumberRowsStoredInAllTables(self):
-        with self.DBconnection.cursor() as curs:
+        with self.dbConn.cursor() as curs:
             curs.execute(
                 """
                 SELECT sum(reltuples)::bigint AS estimate
@@ -74,52 +65,49 @@ class Request(threading.Thread):
             )
             return curs.fetchone()[0]
 
-    def buildSearchesForTickets(self):
-        searchFactories = {
-            'all': AllSearchFactory,
-            'year': SearchFactory,
-            'month': SearchFactory,
-        }
-        return [
-            searchFactories[ticket.searchType](
-                ticket=ticket,
-                dbLink=self.dbLink,
-                requestID=self.requestID,
-                parse=self.parse,
-                sruFetcher=self.SRUapi,
-                queryBuilder=self.queryBuilder,
-                onUpdateProgress=lambda progressStats: self.setSearchProgressStats(progressStats),
-                onAddingResultsToDB=lambda: self.setSearchState(
-                    state='ADDING_RESULTS',
-                    ticketID=ticket.getID()
-                ),
-            ).prepare(self)
-            for ticket in self.tickets
-        ]
-
     def doEachSearch(self):
         for search in self.searches:
             self.state = 'RUNNING'
-            search.run()
+            search.getRecordsFromAPIAndInsertToDB()
             self.setSearchState(ticketID=search.getTicketID(), state='COMPLETED')
         self.state = 'COMPLETED'
 
-    def setSearchProgressStats(self, progressStats):
-        ticketID = progressStats['ticketID']
-        self.searchProgressStats[ticketID].update(progressStats)
-
     def initProgressStats(self):
         progressDict = {
-            ticket.getID(): SearchProgressStats(
-                ticketID=ticket.getID(),
-                parse=self.parse
+            key: SearchProgressStats(
+                ticketID=key,
+                grouping=argsBundle['grouping']
             )
-            for ticket in self.tickets
+            for key, argsBundle in self.argsBundles.items()
         }
         return progressDict
 
-    def setRecordsToFetchForProgressStats(self):
-        for search in self.searches:
-            self.searchProgressStats[search.getTicketID()].setNumRecordsToFetch(
-                search.getNumRecordsToBeInserted()
-            )
+
+if __name__ == '__main__':
+    argsBundles ={
+        0: {
+            'terms': ['brazza'],
+            'codes': [],
+            'startDate': 1870,
+            'endDate': 1885,
+            'linkTerm': None,
+            'linkDistance': 10,
+            'grouping': 'year'
+        },
+        1: {
+            'terms': ['stanley'],
+            'codes': [],
+            'startDate': 1870,
+            'endDate': 1885,
+            'linkTerm': None,
+            'linkDistance': 10,
+            'grouping': 'year'
+        }
+    }
+    testRequest = Request(
+        argsBundles=argsBundles,
+        requestID='45'
+    )
+    testRequest.start()
+    testRequest.join()
+    print(testRequest.getProgressStats())

@@ -8,7 +8,7 @@ class TestSearchProgressStats(TestCase):
     def setUp(self) -> None:
         self.ticketProgressStats = SearchProgressStats(
             ticketID=1,
-            searchType='all',
+            grouping='all',
             parse=MagicMock()
         )
         self.ticketProgressStats.setNumRecordsToFetch(20)
