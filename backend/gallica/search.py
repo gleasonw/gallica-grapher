@@ -37,10 +37,11 @@ class Search:
         records = self.api.get(**self.buildAPIFetchArgs())
         return self.insertRecordsToDB(
             records=records,
+            identifier=self.identifier,
             stateHooks=self.stateHooks
         )
 
-    def getNumRecordsToBeInserted(self):
+    def getNumRecordsToBeInserted(self, onNumRecordsFound):
         raise NotImplementedError
 
     def getAPIWrapper(self):
@@ -50,10 +51,15 @@ class Search:
         raise NotImplementedError
 
     def buildAPIFetchArgs(self):
-        baseArgs= {'onUpdateProgress': lambda progressStats: self.stateHooks.setProgressStats(
-            progressStats=progressStats,
-            ticketID=self.params.get('ticketID'),
-        )}
+        baseArgs= {
+            'onUpdateProgress': lambda progressStats: self.stateHooks.setSearchProgressStats(
+                progressStats={
+                    **progressStats,
+                    "ticketID": self.identifier
+                }
+            ),
+            **self.params
+        }
         baseArgs.update(self.getLocalFetchArgs())
         return baseArgs
 
@@ -69,8 +75,10 @@ class AllSearch(Search):
     def postInit(self):
         self.baseQueriesWithNumResults = self.api.getNumRecordsForArgs(**self.params)
 
-    def getNumRecordsToBeInserted(self):
-        return sum(queryWithResult[1] for queryWithResult in self.baseQueriesWithNumResults)
+    def getNumRecordsToBeInserted(self, onNumRecordsFound):
+        found = sum(queryWithResult[1] for queryWithResult in self.baseQueriesWithNumResults)
+        onNumRecordsFound(self, found)
+        return found
 
     def getAPIWrapper(self):
         return gallicaWrapper.connect('sru')
@@ -93,14 +101,16 @@ class GroupedSearch(Search):
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoGroupCounts
 
-    def getNumRecordsToBeInserted(self):
+    def getNumRecordsToBeInserted(self, onNumRecordsFound):
         startYear = self.params.get('startDate')
         endYear = self.params.get('endDate')
         grouping = self.params.get('grouping')
         if grouping == 'year':
-            return endYear + 1 - startYear
+            sum = endYear + 1 - startYear
         else:
-            return (endYear + 1 - startYear) * 12
+            sum = (endYear + 1 - startYear) * 12
+        onNumRecordsFound(self, sum)
+        return sum
 
 
 class PaperSearch(Search):

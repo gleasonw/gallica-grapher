@@ -11,7 +11,7 @@ class SchemaLinkForSearch:
         self.conn = PSQLconn().getConn()
         self.paperAPI = connect('papers')
 
-    def insertRecordsIntoPapers(self, records, stateHooks, identifier=None):
+    def insertRecordsIntoPapers(self, records, stateHooks=None, identifier=None):
         csvStream = self.buildCSVstream(records)
         with self.conn.cursor() as curs:
             curs.copy_from(
@@ -20,13 +20,19 @@ class SchemaLinkForSearch:
                 sep='|'
             )
 
-    def insertRecordsIntoResults(self, records, stateHooks):
+    def insertRecordsIntoResults(self, records, identifier, stateHooks):
         stream, codes = self.buildCSVstreamAndGetCodesAndEnsureNoDuplicates(records)
         self.insertMissingPapersToDB(
             codes,
-            onAddingMissingPapers=lambda: stateHooks.setSearchState('ADDING_MISSING_PAPERS')
+            onAddingMissingPapers=lambda: stateHooks.setSearchState(
+                state='ADDING_MISSING_PAPERS',
+                ticketID=identifier
+            )
         )
-        stateHooks.setSearchState('ADDING_RESULTS')
+        stateHooks.setSearchState(
+            state='ADDING_RESULTS',
+            ticketID=identifier
+        )
         with self.conn.cursor() as curs:
             curs.copy_from(
                 stream,
@@ -45,9 +51,12 @@ class SchemaLinkForSearch:
                 )
             )
 
-    def insertRecordsIntoGroupCounts(self, records, stateHooks):
+    def insertRecordsIntoGroupCounts(self, records, identifier, stateHooks):
         csvStream = self.buildCSVstream(records)
-        stateHooks.setSearchState('ADDING_RESULTS')
+        stateHooks.setSearchState(
+            state='ADDING_RESULTS',
+            ticketID=identifier
+        )
         with self.conn.cursor() as curs:
             curs.copy_from(
                 csvStream,
