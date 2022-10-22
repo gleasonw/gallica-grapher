@@ -27,8 +27,8 @@ export function TicketProgressBox(props) {
             <TicketLabel
                 terms={props.ticket.terms}
                 papers={props.ticket.papersAndCodes}
-                startYear={props.ticket.startYear}
-                endYear={props.ticket.endYear}
+                startDate={props.ticket.startDate}
+                endDate={props.ticket.endDate}
                 linkTerm={props.ticket.linkTerm}
                 linkDistance={props.ticket.linkDistance}
             />

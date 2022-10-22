@@ -19,7 +19,7 @@ export default function initGraphSettings(tickets) {
     for (let key in tickets) {
         initialGraphSettings[key] = {
             ...initSetting,
-            timeBin: getTimeBinForSearchType(tickets[key].searchType),
+            timeBin: getTimeBinForSearchType(tickets[key].grouping),
             color: highChartsSeriesColors[indexForColorAssignment]
         }
         indexForColorAssignment =
@@ -28,7 +28,7 @@ export default function initGraphSettings(tickets) {
     }
     initialGraphSettings["group"] = {
         ...initSetting,
-        timeBin: getTimeBinForSearchType(tickets[Object.keys(tickets)[0]].searchType),
+        timeBin: getTimeBinForSearchType(tickets[Object.keys(tickets)[0]].grouping),
     };
     return initialGraphSettings
 }

@@ -69,12 +69,12 @@ def papers(keyword):
     return similarPapers
 
 
-@app.route('/api/numPapersOverRange/<startYear>/<endYear>')
-def numPapersOverRange(startYear, endYear):
+@app.route('/api/numPapersOverRange/<startDate>/<endDate>')
+def numPapersOverRange(startDate, endDate):
     search = PaperLocalSearch()
     numPapers = search.getNumPapersInRange(
-        startYear,
-        endYear
+        startDate,
+        endDate
     )
     return {'numPapersOverRange': numPapers}
 
@@ -82,12 +82,12 @@ def numPapersOverRange(startYear, endYear):
 @app.route('/api/continuousPapers')
 def getContinuousPapersOverRange():
     limit = request.args.get('limit')
-    startYear = request.args.get('startYear')
-    endYear = request.args.get('endYear')
+    startDate = request.args.get('startDate')
+    endDate = request.args.get('endDate')
     search = PaperLocalSearch()
     selectPapers = search.selectPapersContinuousOverRange(
-        startYear,
-        endYear,
+        startDate,
+        endDate,
         limit
     )
     return selectPapers
@@ -100,8 +100,8 @@ def getGraphData():
         'averageWindow': request.args["averageWindow"],
         'groupBy': request.args["timeBin"],
         'continuous': request.args["continuous"],
-        'startYear': request.args["startYear"],
-        'endYear': request.args["endYear"],
+        'startDate': request.args["startDate"],
+        'endDate': request.args["endDate"],
         'requestID': request.args["requestID"]
     }
     items = {'series': graphBatchGetter.getSeriesForSettings(settings)}

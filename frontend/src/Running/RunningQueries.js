@@ -40,7 +40,6 @@ function RunningQueriesUI(props) {
             props.onBackendError();
         }
         const progressJSON = await response.json();
-        console.log(progressJSON);
         const state = progressJSON["state"]
         if (requestStateCallbacks.hasOwnProperty(state)) {
             requestStateCallbacks[state]()

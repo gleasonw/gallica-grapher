@@ -14,8 +14,8 @@ import ImportantButtonWrap from "./shared/ImportantButtonWrap";
 function App() {
     const [tickets, setTickets] = useState({});
     const [selectedSearchType, setSelectedSearchType] = useState(0);
-    const [startYear, setStartYear] = useState(1880);
-    const [endYear, setEndYear] = useState(1900);
+    const [startDate, setstartDate] = useState(1880);
+    const [endDate, setendDate] = useState(1900);
     const [requestID, setRequestID] = useState(null);
     const [progressID, setProgressID] = useState(null);
     const [currentPage, setCurrentPage] = useState('input');
@@ -32,10 +32,10 @@ function App() {
                 onExampleRequestClick={handleExampleRequestClick}
                 requestBoxRef={requestBoxRef}
                 selectedSearchType={selectedSearchType}
-                startYear={startYear}
-                endYear={endYear}
-                onStartYearChange={(e) => setStartYear(e.target.value)}
-                onEndYearChange={(e) => setEndYear(e.target.value)}
+                startDate={startDate}
+                endDate={endDate}
+                onstartDateChange={(e) => setstartDate(e.target.value)}
+                onendDateChange={(e) => setendDate(e.target.value)}
                 onSearchTypeChange={(i) => setSelectedSearchType(i)}
             />,
         'running':
@@ -135,9 +135,9 @@ function App() {
         Object.keys(someTickets).forEach((ticketID) => {
             ticketsWithSearchType[ticketID] = {
                 ...someTickets[ticketID],
-                searchType: getSearchTypeForIndex(selectedSearchType),
-                startYear: startYear,
-                endYear: endYear
+                grouping: getSearchTypeForIndex(selectedSearchType),
+                startDate: startDate,
+                endDate: endDate
             }
         })
         return ticketsWithSearchType;

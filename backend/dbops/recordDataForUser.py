@@ -1,11 +1,7 @@
 from utils.psqlconn import PSQLconn
-from parseOccurrenceRecords import ParseOccurrenceRecords
-from query import ContentQuery
-from get import Get
-from concurrentFetch import ConcurrentFetch
-from gallicaxmlparse import GallicaXMLparse
-from query import MomentQuery
-from recordGetter import RecordGetter
+from gallica.query import ContentQuery
+from gallica.get import Get
+from gallica.gallicaxmlparse import GallicaXMLparse
 
 conn = PSQLconn().getConn()
 
@@ -89,23 +85,7 @@ class RecordDataForUser:
         return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(response.xml)
 
     def getGallicaRecordsForDisplay(self, ticket, filters):
-        records = recordGetter.getFromQueries(
-            [
-                MomentQuery(
-                    term=[filters.get('term')] if filters.get('term') else ticket['terms'],
-                    codes=[filters.get('code')] if filters.get('code') else ticket['papersAndCodes'],
-                    year=filters.get('year'),
-                    month=filters.get('month') or 1,
-                    day=filters.get('day') or 1,
-                    linkTerm=ticket['linkTerm'],
-                    linkDistance=ticket['linkDistance'],
-                    startIndex=filters['offset'],
-                    numRecords=filters['limit']
-                )
-            ]
-        )
-        records = list(records)
-        pass
+        return []
 
     def clearUserRecordsAfterCancel(self, requestID):
         with self.conn.cursor() as cur:

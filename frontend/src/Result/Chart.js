@@ -16,21 +16,22 @@ require("highcharts/modules/export-data")(Highcharts);
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
-    const startYear = Object.values(props.tickets)[0].startYear;
-    const endYear = Object.values(props.tickets)[0].endYear;
+    const startDate = Object.values(props.tickets)[0].startDate;
+    const endDate = Object.values(props.tickets)[0].endDate;
     const chartRef = useRef(null);
     const query =
         "/api/graphData?keys=" + Object.keys(props.tickets) +
         "&requestID=" + props.requestID +
         "&continuous=" + chartSettings.continuous +
-        "&startYear=" + startYear +
-        "&endYear=" + endYear +
+        "&startDate=" + startDate +
+        "&endDate=" + endDate +
         "&timeBin=" + chartSettings.timeBin +
         "&averageWindow=" + chartSettings.averageWindow +
         "&uniqueforcache=" + props.uuid;
     const result = useData(query);
     if (result) {
         const series = result['series'];
+        console.log(series);
         const graphDataWithSyncedColors = syncColors(
             series,
             allSettings);

@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
 export const handlers = [
-    rest.get('/api/numPapersOverRange/:startYear/:endYear', (req, res, ctx) => {
+    rest.get('/api/numPapersOverRange/:startDate/:endDate', (req, res, ctx) => {
         return res(ctx.json({numPapers: 1}));
     }),
     rest.get('/api/continuousPapers', (req, res, ctx) => {
@@ -9,8 +9,8 @@ export const handlers = [
             'paperNameCodes': [{
                 'title': 'title',
                 'code': 'code',
-                'startYear': 2000,
-                'endYear': 2001
+                'startDate': 2000,
+                'endDate': 2001
             }]
         }));
     }),
@@ -20,8 +20,8 @@ export const handlers = [
             'paperNameCodes': [{
                 'title': 'A great tests paper',
                 'code': 'code',
-                'startYear': 2000,
-                'endYear': 2001
+                'startDate': 2000,
+                'endDate': 2001
             }]
         }));
     }),

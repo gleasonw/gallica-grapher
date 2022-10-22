@@ -1,4 +1,4 @@
-from gallicaxmlparse import GallicaXMLparse
+from gallica.gallicaxmlparse import GallicaXMLparse
 
 
 class ParseContentRecord:

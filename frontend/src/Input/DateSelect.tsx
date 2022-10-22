@@ -13,10 +13,10 @@ export default function DateSelect(props){
                 borderRadius={'10px'}
             >
                 <DateInputBox
-                    startYear={props.startYear}
-                    endYear={props.endYear}
-                    onStartYearChange={props.onStartYearChange}
-                    onEndYearChange={props.onEndYearChange}
+                    startDate={props.startDate}
+                    endDate={props.endDate}
+                    onstartDateChange={props.onstartDateChange}
+                    onendDateChange={props.onendDateChange}
                 />
             </OptionWrap>
         </StyledOptionInput>

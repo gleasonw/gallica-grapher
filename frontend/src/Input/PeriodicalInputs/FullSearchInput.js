@@ -3,7 +3,7 @@ import OptionWrap from "../OptionWrap";
 import React from "react";
 
 export function FullSearchInput(props) {
-    const urlForPapersInRange = `/api/numPapersOverRange/${props.startYear}/${props.endYear}`;
+    const urlForPapersInRange = `/api/numPapersOverRange/${props.startDate}/${props.endDate}`;
     const result = useData(urlForPapersInRange);
     let numPapersOverRange;
     if (result) {

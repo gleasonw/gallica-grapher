@@ -19,8 +19,8 @@ function Input(props){
 
     function getContinuousPaperQuery(){
         return "api/continuousPapers?limit=2000" +
-            "&startYear=" + props.startYear +
-            "&endYear=" + props.endYear;
+            "&startDate=" + props.startDate +
+            "&endDate=" + props.endDate;
     }
 
     function setUserPapersYearBoundary(){
@@ -52,22 +52,6 @@ function Input(props){
             linkTerm: linkTerm,
             linkDistance: linkDistance,
             papersAndCodes: getPapersFor(selectedPaperInput)
-        }
-    }
-
-    function handleKeyDown(event){
-        if(event.key === 'ArrowDown'){
-            event.preventDefault();
-            if(selectedPaperInput < 2){
-                setSelectedPaperInput(selectedPaperInput + 1);
-            }
-        }else if(event.key === 'ArrowUp'){
-            event.preventDefault();
-            if(selectedPaperInput > 0){
-                setSelectedPaperInput(selectedPaperInput - 1);
-            }
-        }else{
-
         }
     }
 
@@ -120,16 +104,16 @@ function Input(props){
     }
 
     return (
-        <div className='inputBody' onKeyDown={handleKeyDown}>
+        <div className='inputBody'>
             <div className='inputUI'>
                 <div className="mainTitle">
                     Graph word occurrences in archived French periodicals.
                 </div>
                 <TicketForm
-                    startYear={props.startYear}
-                    endYear={props.endYear}
-                    onStartYearChange={props.onStartYearChange}
-                    onEndYearChange={props.onEndYearChange}
+                    startDate={props.startDate}
+                    endDate={props.endDate}
+                    onstartDateChange={props.onstartDateChange}
+                    onendDateChange={props.onendDateChange}
                     onCreateTicketClick={handleCreateTicketClick}
                     onPaperDropItemClick={(paper) => makePaperBubble(paper)}
                     onPaperInputFocus={(i) => setSelectedPaperInput(i)}

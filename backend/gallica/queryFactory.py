@@ -1,7 +1,7 @@
-from query import OccurrenceQuery
-from query import ArkQueryForNewspaperYears
-from query import PaperQuery
-from query import ContentQuery
+from gallica.query import OccurrenceQuery
+from gallica.query import ArkQueryForNewspaperYears
+from gallica.query import PaperQuery
+from gallica.query import ContentQuery
 from gallica.params import Params
 
 

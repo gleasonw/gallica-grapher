@@ -7,21 +7,21 @@ export function DateInputBox(props) {
             <ShadowedFocusInput
                 selected
                 type={'text'}
-                value={props.startYear}
+                value={props.startDate}
                 id={'lowYear'}
                 className={'dateInput'}
                 placeholder={props.minYearPlaceholder}
-                onChange={props.onStartYearChange}
+                onChange={props.onstartDateChange}
             />
             and
             <ShadowedFocusInput
                 selected
                 type={'text'}
-                value={props.endYear}
+                value={props.endDate}
                 id={'highYear'}
                 className={'dateInput'}
                 placeholder={props.maxYearPlaceholder}
-                onChange={props.onEndYearChange}
+                onChange={props.onendDateChange}
             />
         </div>
     )

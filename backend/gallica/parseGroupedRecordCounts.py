@@ -1,5 +1,5 @@
-from date import Date
-from groupedCountRecord import GroupedCountRecord
+from gallica.date import Date
+from gallica.dto.groupedCountRecord import GroupedCountRecord
 from gallica.gallicaxmlparse import GallicaXMLparse
 
 

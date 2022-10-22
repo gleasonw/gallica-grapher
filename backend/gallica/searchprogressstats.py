@@ -1,6 +1,6 @@
 from math import ceil
-from gallicaxmlparse import GallicaXMLparse
-from averageResponseTime import AverageResponseTime
+from gallica.gallicaxmlparse import GallicaXMLparse
+from gallica.averageResponseTime import AverageResponseTime
 
 
 class SearchProgressStats:

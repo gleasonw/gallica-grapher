@@ -1,5 +1,5 @@
-from paperRecord import PaperRecord
-from gallicaxmlparse import GallicaXMLparse
+from gallica.dto.paperRecord import PaperRecord
+from gallica.gallicaxmlparse import GallicaXMLparse
 
 
 class ParsePaperRecords:

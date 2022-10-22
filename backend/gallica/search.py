@@ -1,5 +1,5 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
-import gallicaWrapper
+import gallica.gallicaWrapper as gallicaWrapper
 
 
 def build(argBundles, stateHooks):
@@ -25,9 +25,14 @@ class Search:
         self.identifier = identifier
         self.stateHooks = stateHooks
         self.params = args
-        self.dbLink = SchemaLinkForSearch(requestID=args.get('requestID'))
+        self.params['startDate'] = int(self.params['startDate'])
+        self.params['endDate'] = int(self.params['endDate'])
+        self.dbLink = SchemaLinkForSearch(requestID=stateHooks.requestID)
         self.insertRecordsToDB = self.getDBinsert()
-        self.api = self.getAPIWrapper()
+        self.api = self.getAPIWrapper(
+            ticketID=self.identifier,
+            requestID=stateHooks.requestID
+        )
         self.postInit()
 
     def __repr__(self):
@@ -44,7 +49,7 @@ class Search:
     def getNumRecordsToBeInserted(self, onNumRecordsFound):
         raise NotImplementedError
 
-    def getAPIWrapper(self):
+    def getAPIWrapper(self, ticketID, requestID):
         raise NotImplementedError
 
     def getDBinsert(self):
@@ -80,8 +85,12 @@ class AllSearch(Search):
         onNumRecordsFound(self, found)
         return found
 
-    def getAPIWrapper(self):
-        return gallicaWrapper.connect('sru')
+    def getAPIWrapper(self, ticketID, requestID):
+        return gallicaWrapper.connect(
+            gallicaAPIselect='sru',
+            ticketID=ticketID,
+            requestID=requestID
+        )
 
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoResults
@@ -95,20 +104,24 @@ class AllSearch(Search):
 
 class GroupedSearch(Search):
 
-    def getAPIWrapper(self):
-        return gallicaWrapper.connect('sru')
+    def getAPIWrapper(self, ticketID, requestID):
+        return gallicaWrapper.connect(
+            gallicaAPIselect='sru',
+            ticketID=ticketID,
+            requestID=requestID
+        )
 
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound):
-        startYear = self.params.get('startDate')
-        endYear = self.params.get('endDate')
+        startDate = self.params.get('startDate')
+        endDate = self.params.get('endDate')
         grouping = self.params.get('grouping')
         if grouping == 'year':
-            sum = endYear + 1 - startYear
+            sum = endDate + 1 - startDate
         else:
-            sum = (endYear + 1 - startYear) * 12
+            sum = (endDate + 1 - startDate) * 12
         onNumRecordsFound(self, sum)
         return sum
 

@@ -1,5 +1,5 @@
-from arkRecord import ArkRecord
-from gallicaxmlparse import GallicaXMLparse
+from gallica.dto.arkRecord import ArkRecord
+from gallica.gallicaxmlparse import GallicaXMLparse
 
 
 class ParseArkRecord:

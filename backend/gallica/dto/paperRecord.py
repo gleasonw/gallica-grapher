@@ -11,15 +11,15 @@ class PaperRecord:
 
     def getRow(self):
         if self.publishingYears:
-            startYear = self.publishingYears[0]
-            endYear = self.publishingYears[-1]
+            startDate = self.publishingYears[0]
+            endDate = self.publishingYears[-1]
         else:
-            startYear = None
-            endYear = None
+            startDate = None
+            endDate = None
         return (
             self.title,
-            startYear,
-            endYear,
+            startDate,
+            endDate,
             self.isContinuous(),
             self.code
         )

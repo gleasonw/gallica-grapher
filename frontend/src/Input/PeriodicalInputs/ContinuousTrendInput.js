@@ -1,7 +1,5 @@
 import React from "react";
 import OptionWrap from "../OptionWrap";
-import {KeyboardArrowDown} from "@mui/icons-material";
-import {StyledArrow} from "./StyledArrow";
 
 export function ContinuousTrendInput(props) {
     return (
