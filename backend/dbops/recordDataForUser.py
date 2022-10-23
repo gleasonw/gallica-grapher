@@ -1,7 +1,6 @@
 from utils.psqlconn import PSQLconn
-from gallica.query import ContentQuery
-from gallica.get import Get
 from gallica.gallicaxmlparse import GallicaXMLparse
+import gallica.gallicaWrapper as gallicaWrapper
 
 conn = PSQLconn().getConn()
 
@@ -77,15 +76,18 @@ class RecordDataForUser:
         return records, count
 
     def getOCRTextForRecord(self, ark, term) -> tuple:
-        fetcher = Get(
-            'https://gallica.bnf.fr/services/ContentSearch',
-            maxSize=1
-        )
-        response = fetcher.get(ContentQuery(ark, term))
-        return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(response.xml)
+        wrapper = gallicaWrapper.connect('content')
+        return wrapper.get(ark, term)[0]
 
     def getGallicaRecordsForDisplay(self, ticket, filters):
-        return []
+        wrapper = gallicaWrapper.connect('sru')
+        argsBundle = {
+            **ticket,
+            'numRecords': filters.get('limit'),
+            'startRecord': filters.get('offset'),
+        }
+        records = wrapper.get(**argsBundle)
+        return records
 
     def clearUserRecordsAfterCancel(self, requestID):
         with self.conn.cursor() as cur:

@@ -3,6 +3,7 @@ import React from "react";
 import styled from 'styled-components';
 
 export function RecordRows(props) {
+    console.log(props.rows);
     return (
         props.rows.map((record, index) => {
             let term = record[0];

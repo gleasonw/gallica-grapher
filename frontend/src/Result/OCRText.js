@@ -1,10 +1,16 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import LesserButton from "../shared/LesserButton";
 
 export default function OCRText(props) {
     const [loaded, setLoaded] = React.useState(false);
     const [ocrInfo, setOcrInfo] = React.useState('');
     const [buttonText, setButtonText] = React.useState('View context');
+
+    useEffect(() => {
+        setLoaded(false);
+        setButtonText('View context');
+        setOcrInfo('');
+    }, [props.arkCode]);
 
     async function handleClick() {
         setButtonText('Loading...');

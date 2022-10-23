@@ -28,8 +28,16 @@ class QueryFactory:
 
 class OccurrenceQueryFactory(QueryFactory):
 
-    def buildQueriesForArgs(self, args):
-        return self.buildForBundle(Params(**args))
+    def buildQueriesForArgs(self, args, getNumResultsForQueries):
+        baseQueries = self.buildForBundle(Params(**args))
+        if args['grouping'] == 'all':
+            return self.buildIndexedQueriesFromArgs(
+                args=args,
+                baseQueries=baseQueries,
+                getNumResultsForQueries=getNumResultsForQueries
+            )
+        else:
+            return baseQueries
 
     def buildForBundle(self, bundle):
         if codes := bundle.getCodeBundles():
@@ -57,6 +65,16 @@ class OccurrenceQueryFactory(QueryFactory):
             for term in bundle.getTerms()
             for startDate, endDate in bundle.getDateGroupings()
         ]
+
+    def buildIndexedQueriesFromArgs(self, args, baseQueries, getNumResultsForQueries):
+        if numDesiredRecords := args['numRecords']:
+            return self.indexEachQueryFromNumResults(
+                [(baseQueries[0], int(numDesiredRecords))]
+            )
+        else:
+            return self.indexEachQueryFromNumResults(
+                getNumResultsForQueries(baseQueries)
+            )
 
     def makeQuery(self, term, startDate, endDate, searchMetaData, startIndex=0, numRecords=1, codes=None):
         codes = codes or []

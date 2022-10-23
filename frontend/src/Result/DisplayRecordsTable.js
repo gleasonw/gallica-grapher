@@ -39,12 +39,23 @@ export default function DisplayRecordsTable(props) {
     }
 
     function getGallicaQuery(tickets){
-        const jsonedTicket = JSON.stringify(Object.values(tickets)[0]);
-        const query = "/api/getGallicaRecords?" +
-            "ticket=" + jsonedTicket +
+        const baseArgs = []
+        Object.values(tickets).forEach(ticket => {
+            const args = {
+                ...ticket,
+                grouping: 'all',
+                terms: props.term || ticket.terms,
+                codes: props.periodical || ticket.papersAndCodes.map(paperCode => paperCode.code),
+                startDate: props.year || ticket.startDate,
+                endDate: props.year || ticket.endDate,
+            }
+            delete args['papersAndCodes']
+            baseArgs.push(JSON.stringify(args))
+        })
+        return "/api/getGallicaRecords?" +
+            "tickets=" + baseArgs +
             "&limit=" + limit +
             "&offset=" + offset;
-        return addFiltersToQuery(query);
     }
 
     function addFiltersToQuery(query){

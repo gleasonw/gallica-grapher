@@ -39,3 +39,13 @@ class OccurrenceRecord:
             self.paperCode,
             self.paperTitle
         )
+
+    def getDisplayRow(self):
+        return (
+            self.term,
+            self.paperTitle,
+            self.date.getYear(),
+            self.date.getMonth(),
+            self.date.getDay(),
+            self.url
+        )

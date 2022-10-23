@@ -40,6 +40,8 @@ def getRequestState(taskID):
             'numRecords': task.result.get('numRecords')
         }
     else:
+        if task.info.get('progress') is None:
+            print('no progress')
         response = {
             'state': task.state,
             'progress': task.info.get('progress', 0)
@@ -133,19 +135,22 @@ def getDisplayRecords():
     del tableArgs['uniqueforcache']
     tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
     displayRecords, count = RecordDataForUser().getRecordsForDisplay(tableArgs)
-    return {"displayRecords": displayRecords,
-            "count": count}
+    return {
+        "displayRecords": displayRecords,
+        "count": count
+    }
 
 
 @app.route('/api/getGallicaRecords')
 def getGallicaRecordsForDisplay():
     args = dict(request.args)
-    ticket = json.loads(args['ticket'])
-    del args['ticket']
+    ticket = json.loads(args['tickets'])
+    del args['tickets']
     records = recordDataGetter.getGallicaRecordsForDisplay(
         ticket=ticket,
         filters=args
     )
+    records = [record.getDisplayRow() for record in records]
     return {"displayRecords": records}
 
 

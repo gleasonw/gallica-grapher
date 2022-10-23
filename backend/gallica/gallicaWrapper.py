@@ -79,6 +79,7 @@ class SRUWrapper(GallicaWrapper):
         )
         return recordGenerator if generate else list(recordGenerator)
 
+    #TODO: be more reasonable... 'generate queries from stored'?
     def getQueriesForArgs(self, args, storedQueries):
         if storedQueries:
             if args['grouping'] == 'all':
@@ -86,7 +87,10 @@ class SRUWrapper(GallicaWrapper):
             else:
                 return [query for query, _ in storedQueries]
         else:
-            return self.queryBuilder.buildQueriesForArgs(args)
+            return self.queryBuilder.buildQueriesForArgs(
+                args=args,
+                getNumResultsForQueries=self.getNumResultsForEachQuery
+            )
 
     def getNumRecordsForArgs(self, **kwargs):
         baseQueries = self.queryBuilder.buildQueriesForArgs(kwargs)
