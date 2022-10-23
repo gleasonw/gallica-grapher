@@ -69,40 +69,22 @@ class SRUWrapper(GallicaWrapper):
         recordGetter = self.buildRecordGetter(
             parser=self.soloRecordParser if grouping == 'all' else self.groupedRecordParser
         )
-        queries = self.getQueriesForArgs(
-            args=kwargs,
-            storedQueries=queriesWithCounts
-        )
+        if queriesWithCounts is None:
+            queries = self.queryBuilder.buildQueriesForArgs(kwargs)
+        else:
+            queries = self.queryBuilder.buildQueriesFromQueryCounts(
+                args=kwargs,
+                queriesWithCounts=queriesWithCounts
+            )
         recordGenerator = recordGetter.getFromQueries(
             queries=queries,
             onUpdateProgress=onUpdateProgress
         )
         return recordGenerator if generate else list(recordGenerator)
 
-    #TODO: be more reasonable... 'generate queries from stored'?
-    def getQueriesForArgs(self, args, storedQueries):
-        if storedQueries:
-            if args['grouping'] == 'all':
-                return self.queryBuilder.indexEachQueryFromNumResults(storedQueries)
-            else:
-                return [query for query, _ in storedQueries]
-        else:
-            return self.queryBuilder.buildQueriesForArgs(
-                args=args,
-                getNumResultsForQueries=self.getNumResultsForEachQuery
-            )
-
     def getNumRecordsForArgs(self, **kwargs):
         baseQueries = self.queryBuilder.buildQueriesForArgs(kwargs)
-        return self.getNumResultsForEachQuery(baseQueries)
-
-    def getNumResultsForEachQuery(self, queries) -> list:
-        responses = self.api.get(queries)
-        numResultsForQueries = [
-            (response.query, self.soloRecordParser.getNumResults(response.xml))
-            for response in responses
-        ]
-        return numResultsForQueries
+        return self.queryBuilder.getNumResultsForEachQuery(baseQueries)
 
     def buildAPI(self):
         return ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU')

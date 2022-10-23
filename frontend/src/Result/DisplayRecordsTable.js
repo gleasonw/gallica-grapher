@@ -40,16 +40,18 @@ export default function DisplayRecordsTable(props) {
 
     function getGallicaQuery(tickets){
         const baseArgs = []
+        console.log([props.year, props.month, props.day])
+        const momentDate = buildDateStringForFilters()
         Object.values(tickets).forEach(ticket => {
             const args = {
                 ...ticket,
                 grouping: 'all',
                 terms: props.term || ticket.terms,
                 codes: props.periodical || ticket.papersAndCodes.map(paperCode => paperCode.code),
-                startDate: props.year || ticket.startDate,
-                endDate: props.year || ticket.endDate,
+                startDate: momentDate || ticket.startDate,
             }
             delete args['papersAndCodes']
+            delete args['endDate']
             baseArgs.push(JSON.stringify(args))
         })
         return "/api/getGallicaRecords?" +
@@ -57,6 +59,19 @@ export default function DisplayRecordsTable(props) {
             "&limit=" + limit +
             "&offset=" + offset;
     }
+
+    function buildDateStringForFilters(){
+        if(props.year && props.month && props.day){
+            return `${props.year}-${props.month}-${props.day}`
+        }else if(props.year && props.month){
+            return `${props.year}-${props.month}`
+        }else if(props.year){
+            return `${props.year}`
+        }else{
+            return null
+        }
+    }
+
 
     function addFiltersToQuery(query){
         if (props.year) {

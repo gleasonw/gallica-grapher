@@ -1,4 +1,5 @@
 from gallica.query import OccurrenceQuery
+from gallica.gallicaxmlparse import GallicaXMLparse
 from gallica.query import ArkQueryForNewspaperYears
 from gallica.query import PaperQuery
 from gallica.query import ContentQuery
@@ -9,18 +10,28 @@ class QueryFactory:
 
     def __init__(self, gallicaAPI):
         self.gallicaAPI = gallicaAPI
+        self.parser = GallicaXMLparse()
 
-    def indexEachQueryFromNumResults(self, queriesWithNumResults) -> list:
+    def createIndexedQueriesFromRootQueries(self, queries, limit=None) -> list:
         indexedQueries = []
+        queriesWithNumResults = ((query, limit) for query in queries) if limit else self.getNumResultsForEachQuery(queries)
         for query, numResults in queriesWithNumResults:
             for i in range(0, numResults, 50):
                 baseData = query.getEssentialDataForMakingAQuery()
                 baseData['startIndex'] = i
-                baseData["numRecords"] = 50
+                baseData["numRecords"] = min(50, numResults - i)
                 indexedQueries.append(
                     self.makeQuery(**baseData)
                 )
         return indexedQueries
+
+    def getNumResultsForEachQuery(self, queries) -> list:
+        responses = self.gallicaAPI.get(queries)
+        numResultsForQueries = [
+            (response.query, self.parser.getNumRecords(response.xml))
+            for response in responses
+        ]
+        return numResultsForQueries
 
     def makeQuery(self, **kwargs):
         raise NotImplementedError
@@ -28,34 +39,35 @@ class QueryFactory:
 
 class OccurrenceQueryFactory(QueryFactory):
 
-    def buildQueriesForArgs(self, args, getNumResultsForQueries):
-        baseQueries = self.buildForBundle(Params(**args))
+    def buildQueriesForArgs(self, args):
+        baseQueries = self.buildForParams(
+            Params(**args)
+        )
         if args['grouping'] == 'all':
             return self.buildIndexedQueriesFromArgs(
                 args=args,
                 baseQueries=baseQueries,
-                getNumResultsForQueries=getNumResultsForQueries
             )
         else:
             return baseQueries
 
-    def buildForBundle(self, bundle):
-        if codes := bundle.getCodeBundles():
-            return self.buildWithCodeBundles(bundle, codes)
+    def buildForParams(self, params):
+        if codes := params.getCodeBundles():
+            return self.buildWithCodeBundles(params, codes)
         else:
-            return self.buildNoCodeBundles(bundle)
+            return self.buildNoCodeBundles(params)
 
-    def buildWithCodeBundles(self, bundle, codeBundles):
+    def buildWithCodeBundles(self, params, codeBundles):
         return [
             self.makeQuery(
                 term=term,
                 startDate=startDate,
                 endDate=endDate,
-                searchMetaData=bundle,
+                searchMetaData=params,
                 codes=codes
             )
-            for term in bundle.getTerms()
-            for startDate, endDate in bundle.getDateGroupings()
+            for term in params.getTerms()
+            for startDate, endDate in params.getDateGroupings()
             for codes in codeBundles
         ]
 
@@ -66,15 +78,14 @@ class OccurrenceQueryFactory(QueryFactory):
             for startDate, endDate in bundle.getDateGroupings()
         ]
 
-    def buildIndexedQueriesFromArgs(self, args, baseQueries, getNumResultsForQueries):
+    def buildIndexedQueriesFromArgs(self, args, baseQueries):
         if numDesiredRecords := args['numRecords']:
-            return self.indexEachQueryFromNumResults(
-                [(baseQueries[0], int(numDesiredRecords))]
+            return self.createIndexedQueriesFromRootQueries(
+                queries=baseQueries,
+                limit=int(numDesiredRecords)
             )
         else:
-            return self.indexEachQueryFromNumResults(
-                getNumResultsForQueries(baseQueries)
-            )
+            return self.createIndexedQueriesFromRootQueries(baseQueries)
 
     def makeQuery(self, term, startDate, endDate, searchMetaData, startIndex=0, numRecords=1, codes=None):
         codes = codes or []
@@ -108,7 +119,7 @@ class PaperQueryFactory(QueryFactory):
         return sruQueries
 
     def buildSRUQueriesForAllRecords(self):
-        return self.indexEachQueryFromNumResults([
+        return self.createIndexedQueriesFromRootQueries([
             PaperQuery(
                 startIndex=0,
                 numRecords=1

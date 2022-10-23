@@ -98,13 +98,13 @@ class SchemaLinkForSearch:
             recordPaper = record.getPaperCode()
             if recordPaper in codes:
                 if datesForCode := codeDates.get(recordPaper):
-                    recordDate = record.getDate()
+                    recordDate = record.getDateAsList()
                     if datesForCode.get(recordDate):
                         continue
                     else:
                         datesForCode[recordDate] = True
                 else:
-                    codeDates[record.getPaperCode()] = {record.getDate(): True}
+                    codeDates[record.getPaperCode()] = {record.getDateAsList(): True}
             else:
                 codes.add(record.getPaperCode())
             self.writeToCSVstream(csvFileLikeObject, record)

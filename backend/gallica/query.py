@@ -39,9 +39,12 @@ class SRUQuery(Query):
     def generateCQL(self):
         raise NotImplementedError
 
-    def buildPaperCQLfromQueryCodes(self):
-        formattedCodes = [f"{code}_date" for code in self.codes]
-        return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
+    def buildPaperCQL(self):
+        if self.codes:
+            formattedCodes = [f"{code}_date" for code in self.codes]
+            return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
+        else:
+            return "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
 
     def getCollapsingSetting(self):
         return {"collapsing": "false"}
@@ -74,23 +77,25 @@ class OccurrenceQuery(SRUQuery):
         return self.startDate
 
     def generateCQL(self):
-        termCQL = self.buildLinkedTermCQL() if self.linkTerm else self.buildTermCQL()
-        dateCQL = self.buildDateCQL() if self.startDate and self.endDate else ''
-        paperCQL = self.buildPaperCQLfromQueryCodes() if self.codes else "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
         cqlList = []
-        termCQL and cqlList.append(termCQL)
-        dateCQL and cqlList.append(dateCQL)
-        paperCQL and cqlList.append(paperCQL)
+        (termCQL := self.buildTermCQL()) and cqlList.append(termCQL)
+        (dateCQL := self.buildDateCQL()) and cqlList.append(dateCQL)
+        (paperCQL := self.buildPaperCQL()) and cqlList.append(paperCQL)
         return ' and '.join(cqlList)
 
     def buildDateCQL(self):
-        return f'gallicapublication_date>="{self.startDate}" and gallicapublication_date<"{self.endDate}"'
+        if self.startDate and self.endDate:
+            return f'gallicapublication_date>="{self.startDate}" and gallicapublication_date<"{self.endDate}"'
+        elif self.startDate:
+            return f'gallicapublication_date="{self.startDate}"'
+        else:
+            return ''
 
     def buildTermCQL(self) -> str:
-        return f'text adj "{self.term}"'
-
-    def buildLinkedTermCQL(self):
-        return f'text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}"'
+        if self.linkTerm:
+            return f'text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}"'
+        else:
+            return f'text adj "{self.term}"'
 
     def __repr__(self):
         return f"Query({self.getCQL()})"
@@ -118,10 +123,7 @@ class PaperQuery(SRUQuery):
         self.codes = kwargs.get('codes') or []
 
     def generateCQL(self):
-        if self.codes:
-            return self.buildPaperCQLfromQueryCodes()
-        else:
-            return "dc.type all \"fascicule\" and ocrquality > \"050.00\""
+        return self.buildPaperCQL()
 
     def getCollapsingSetting(self):
         return {"collapsing": "true"}

@@ -17,12 +17,12 @@ class TestTicketQueryFactory(unittest.TestCase):
         )
 
     def test_buildWithCodeBundles(self):
-        test = self.testTicketQueryFactory.buildForBundle(self.testTicket)
+        test = self.testTicketQueryFactory.buildForParams(self.testTicket)
 
         self.assertEqual(len(test), 4)
 
     def test_buildNoCodeBundles(self):
-        test = self.testTicketQueryFactory.buildForBundle(self.testTicket)
+        test = self.testTicketQueryFactory.buildForParams(self.testTicket)
 
         self.assertEqual(len(test), 4)
 

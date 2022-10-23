@@ -31,7 +31,6 @@ function Chart(props) {
     const result = useData(query);
     if (result) {
         const series = result['series'];
-        console.log(series);
         const graphDataWithSyncedColors = syncColors(
             series,
             allSettings);

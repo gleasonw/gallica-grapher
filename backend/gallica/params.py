@@ -1,3 +1,4 @@
+from gallica.date import Date
 NUM_CODES_PER_BUNDLE = 10
 
 
@@ -6,8 +7,8 @@ class Params:
     def __init__(self, **kwargs):
         self.terms = kwargs['terms']
         self.codes = kwargs.get('codes') or []
-        self.startDate = int(kwargs.get('startDate', 0))
-        self.endDate = int(kwargs.get('endDate', 0))
+        self.startDate = Date(kwargs.get('startDate')) if kwargs.get('startDate') else None
+        self.endDate = Date(kwargs.get('endDate')) if kwargs.get('endDate') else self.startDate
         self.link = kwargs.get('link') or (None, None)
         self.grouping = kwargs['grouping']
         self.numRecords = kwargs.get('numRecords', 50)
@@ -32,8 +33,14 @@ class Params:
     def getGrouping(self):
         return self.grouping
 
+    def endYearInt(self):
+        return int(self.endDate.getYear())
+
+    def startYearInt(self):
+        return int(self.startDate.getYear())
+
     def getYearRangeLength(self):
-        return self.endDate + 1 - self.startDate
+        return self.endYearInt() + 1 - self.startYearInt()
 
     def getCodeBundles(self):
         return [] if self.codes is None else [
@@ -45,28 +52,41 @@ class Params:
         return self.link[0]
 
     def getDateGroupings(self):
-        if self.startDate == 0 and self.endDate == 0:
+        if self.startDate is None and self.endDate is None:
             return [(None, None)]
         groupings = {
-            'all': self.makeAllGroupings,
+            'all': self.makeWideGroupingsForAllSearch,
             'year': self.makeYearGroupings,
             'month': self.makeMonthGroupings
         }
         dates = groupings[self.grouping]()
         return dates
 
-    def makeAllGroupings(self):
-        return [(f"{self.startDate}-01-01", f"{self.endDate + 1}-01-01")]
+    def makeWideGroupingsForAllSearch(self):
+        if self.startDate.getDay():
+            return [(self.startDate.getDateText(), None)]
+        elif month := self.startDate.getMonth():
+            nextYear = self.startYearInt() + 1 if month == '12' else self.startDate.getYear()
+            nextMonth = int(month) + 1 % 12
+            return [(
+                f"{self.startDate.getYear()}-{int(self.startDate.getMonth()):02}-01",
+                f"{nextYear}-{nextMonth:02}-01"
+            )]
+        else:
+            return [(
+                f"{self.startDate.getYear()}-01-01",
+                f"{self.endYearInt() + 1}-01-01"
+            )]
 
     def makeYearGroupings(self):
         yearGroups = set()
-        for year in range(self.startDate, self.endDate + 1):
+        for year in range(self.startYearInt(), self.endYearInt() + 1):
             yearGroups.add((f"{year}-01-01", f"{year + 1}-01-01"))
         return yearGroups
 
     def makeMonthGroupings(self):
         monthGroups = set()
-        for year in range(self.startDate, self.endDate + 1):
+        for year in range(self.startYearInt(), self.endYearInt() + 1):
             for month in range(1, 13):
                 if month == 12:
                     monthGroups.add((f"{year}-{month:02}-01", f"{year + 1}-01-01"))
