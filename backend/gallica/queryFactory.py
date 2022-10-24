@@ -13,8 +13,11 @@ class QueryFactory:
         self.parser = GallicaXMLparse()
 
     def createIndexedQueriesFromRootQueries(self, queries, limit=None) -> list:
-        indexedQueries = []
         queriesWithNumResults = ((query, limit) for query in queries) if limit else self.getNumResultsForEachQuery(queries)
+        return self.indexQueriesWithNumResults(queriesWithNumResults)
+
+    def indexQueriesWithNumResults(self, queriesWithNumResults):
+        indexedQueries = []
         for query, numResults in queriesWithNumResults:
             for i in range(0, numResults, 50):
                 baseData = query.getEssentialDataForMakingAQuery()
@@ -38,6 +41,9 @@ class QueryFactory:
 
 
 class OccurrenceQueryFactory(QueryFactory):
+
+    def buildQueriesFromQueryCounts(self, queryCounts):
+        return self.indexQueriesWithNumResults(queryCounts)
 
     def buildQueriesForArgs(self, args):
         baseQueries = self.buildForParams(
@@ -79,7 +85,7 @@ class OccurrenceQueryFactory(QueryFactory):
         ]
 
     def buildIndexedQueriesFromArgs(self, args, baseQueries):
-        if numDesiredRecords := args['numRecords']:
+        if numDesiredRecords := args.get('numRecords'):
             return self.createIndexedQueriesFromRootQueries(
                 queries=baseQueries,
                 limit=int(numDesiredRecords)

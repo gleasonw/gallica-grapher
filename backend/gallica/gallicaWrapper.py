@@ -72,10 +72,7 @@ class SRUWrapper(GallicaWrapper):
         if queriesWithCounts is None:
             queries = self.queryBuilder.buildQueriesForArgs(kwargs)
         else:
-            queries = self.queryBuilder.buildQueriesFromQueryCounts(
-                args=kwargs,
-                queriesWithCounts=queriesWithCounts
-            )
+            queries = self.queryBuilder.buildQueriesFromQueryCounts(queriesWithCounts)
         recordGenerator = recordGetter.getFromQueries(
             queries=queries,
             onUpdateProgress=onUpdateProgress

@@ -12,7 +12,7 @@ export default function RecordsViewer(props){
     const [recordsTableYear, setRecordsTableYear] = useState(null);
     const [recordsTableMonth, setRecordsTableMonth] = useState(null);
     const [recordsTableDay, setRecordsTableDay] = useState(null);
-    const [recordsTableTerm, setRecordsTableTerm] = useState(null);
+    const [recordsTableTicket, setRecordsTableTicket] = useState(null);
     const [recordsTablePeriodical, setRecordsTablePeriodical] = useState(null);
     const {width} = useWindowDimensions();
     let compact = width < 800;
@@ -64,13 +64,13 @@ export default function RecordsViewer(props){
                     year={recordsTableYear}
                     month={recordsTableMonth}
                     day={recordsTableDay}
-                    term={recordsTableTerm}
+                    selectedTicket={recordsTableTicket}
                     periodical={recordsTablePeriodical}
                     onYearChange={setRecordsTableYear}
                     onMonthChange={setRecordsTableMonth}
                     onDayChange={setRecordsTableDay}
                     onPeriodicalChange={setRecordsTablePeriodical}
-                    onTermChange={setRecordsTableTerm}
+                    onSelectedTicketChange={setRecordsTableTicket}
                     cacheID={props.cacheID}
                     compact={compact}
                 />

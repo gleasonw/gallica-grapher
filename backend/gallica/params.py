@@ -67,7 +67,7 @@ class Params:
             return [(self.startDate.getDateText(), None)]
         elif month := self.startDate.getMonth():
             nextYear = self.startYearInt() + 1 if month == '12' else self.startDate.getYear()
-            nextMonth = int(month) + 1 % 12
+            nextMonth = (int(month) + 1) % 12
             return [(
                 f"{self.startDate.getYear()}-{int(self.startDate.getMonth()):02}-01",
                 f"{nextYear}-{nextMonth:02}-01"

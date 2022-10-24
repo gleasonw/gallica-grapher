@@ -93,22 +93,24 @@ export function FilterOptions(props) {
                 </StyledSelect>
             </StyledInputAndLabel>
             <StyledInputAndLabel>
-                <label htmlFor='term'>Term</label>
+                <label htmlFor='ticket'>Ticket</label>
                 <StyledSelect
-                    value={!!props.term ? props.term : ''}
-                    id={'term'}
+                    value={!!props.selectedTicket ? props.selectedTicket : ''}
+                    id={'ticket'}
                     onChange={
-                        (e) => props.onTermChange(e.target.value)
+                        (e) => props.onSelectedTicketChange(e.target.value)
                     }
                 >
                     <option value={''}>All</option>
-                    {Object.values(props.tickets).map((ticket) => {
-                        return ticket.terms.map((term) => (
-                            <option value={term}>
-                                {term}
-                                {!!ticket.linkTerm && ` linked to ${ticket.linkTerm}`}
+                    {Object.keys(props.tickets).map((ticket) => {
+                        const args = props.tickets[ticket];
+                        const terms = args.terms;
+                        const linkTerm = args.linkTerm;
+                        return (
+                            <option value={ticket}>
+                                {Number(ticket)+1}: {terms}
+                                {!!linkTerm && ` linked to ${linkTerm}`}
                             </option>
-                            )
                         )
                     })}
                 </StyledSelect>

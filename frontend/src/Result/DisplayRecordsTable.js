@@ -16,9 +16,11 @@ export default function DisplayRecordsTable(props) {
     const [offset, setOffset] = useState(0);
     const [showFilterPopup, setShowFilterPopup] = useState(false);
     const isGallicaGrouped = props.timeBin === 'gallicaYear' || props.timeBin === 'gallicaMonth';
-    let DBquery = getDBquery();
-    let recordsFromGallicaQuery = getGallicaQuery(props.tickets);
-    const result = useData(isGallicaGrouped ? recordsFromGallicaQuery : DBquery);
+    const ticketToDisplay = props.selectedTicket ? {[props.selectedTicket]: props.tickets[props.selectedTicket]} : props.tickets;
+    const result = useData(isGallicaGrouped ?
+        buildGallicaQuery(ticketToDisplay) :
+        buildDBQuery(ticketToDisplay)
+    );
     const displayRecords = result ? result['displayRecords'] : null;
     const count = result ? result['count'] : null;
 
@@ -27,10 +29,10 @@ export default function DisplayRecordsTable(props) {
         setLimit(10);
     }
 
-    function getDBquery(){
+    function buildDBQuery(tickets){
         let query =
             "/api/getDisplayRecords?" +
-            "tickets=" + Object.keys(props.tickets) +
+            "tickets=" + Object.keys(tickets) +
             "&requestID=" + props.requestID +
             "&limit=" + limit +
             "&offset=" + offset +
@@ -38,16 +40,16 @@ export default function DisplayRecordsTable(props) {
         return addFiltersToQuery(query);
     }
 
-    function getGallicaQuery(tickets){
+    function buildGallicaQuery(tickets){
         let argsForQuery = {};
         const momentDate = buildDateStringForFilters()
         Object.keys(tickets).map((key) => {
             const ticket = tickets[key];
+            delete ticket.endDate;
+            delete ticket.papersAndCodes;
             argsForQuery[key] = {
                 ...ticket,
                 grouping: 'all',
-                terms: props.term || ticket.terms,
-                codes: props.periodical || ticket.papersAndCodes.map(paperCode => paperCode.code),
                 startDate: momentDate || ticket.startDate,
             }
         });
@@ -81,9 +83,6 @@ export default function DisplayRecordsTable(props) {
         if (props.day) {
             query += "&day=" + props.day
         }
-        if (props.term) {
-            query += "&term=" + props.term
-        }
         if (props.periodical) {
             query += "&periodical=" + props.periodical
         }
@@ -97,7 +96,7 @@ export default function DisplayRecordsTable(props) {
                 <h3>
                     View {count}
                     {
-                        [props.year, props.month, props.day, props.periodical, props.term].some(Boolean) ?
+                        [props.year, props.month, props.day, props.periodical, props.ticket].some(Boolean) ?
                             ' occurrences for these filters'
                             :
                             ' total occurrences'
@@ -120,7 +119,7 @@ export default function DisplayRecordsTable(props) {
                 month={props.month}
                 day={props.day}
                 periodical={props.periodical}
-                term={props.term}
+                selectedTicket={props.selectedTicket}
                 limit={limit}
                 offset={offset}
                 setLimit={setLimit}
@@ -137,8 +136,8 @@ export default function DisplayRecordsTable(props) {
                 onPeriodicalChange={(periodical) => handleFilterChange(
                     props.onPeriodicalChange(periodical)
                 )}
-                onTermChange={(term) => handleFilterChange(
-                    props.onTermChange(term)
+                onSelectedTicketChange={(ticket) => handleFilterChange(
+                    props.onSelectedTicketChange(ticket)
                 )}
                 tickets={props.tickets}
                 displayRecords={displayRecords}
@@ -161,7 +160,7 @@ function StyledFilterAndTable(props) {
                     month={props.month}
                     day={props.day}
                     periodical={props.periodical}
-                    term={props.term}
+                    selectedTicket={props.selectedTicket}
                     limit={props.limit}
                     offset={props.offset}
                     setLimit={props.setLimit}
@@ -170,7 +169,7 @@ function StyledFilterAndTable(props) {
                     onMonthChange={props.onMonthChange}
                     onDayChange={props.onDayChange}
                     onPeriodicalChange={props.onPeriodicalChange}
-                    onTermChange={props.onTermChange}
+                    onSelectedTicketChange={props.onSelectedTicketChange}
                     tickets={props.tickets}
                     count={props.count}
                     compact={props.compact}
@@ -197,12 +196,13 @@ function StyledFilterAndTable(props) {
                     month={props.month}
                     day={props.day}
                     periodical={props.periodical}
-                    term={props.term}
+                    selectedTicket={props.selectedTicket}
+                    tickets={props.tickets}
                     onYearClick={() => props.onYearChange(null)}
                     onMonthClick={() => props.onMonthChange(null)}
                     onDayClick={() => props.onDayChange(null)}
                     onPeriodicalClick={() => props.onPeriodicalChange(null)}
-                    onTermClick={() => props.onTermChange(null)}
+                    onTicketClick={() => props.onSelectedTicketChange(null)}
                 />
                 <StyledOccurrenceTable>
                     <tbody>
@@ -290,11 +290,11 @@ function AppliedFilters(props) {
                     Periodical: {props.periodical}
                 </SelectionBubble>
             }
-            {!!props.term &&
+            {!!props.selectedTicket &&
                 <SelectionBubble
-                    onClick={props.onTermClick}
+                    onClick={props.onTicketClick}
                 >
-                    {props.term}
+                    {Number(props.selectedTicket) + 1}: {props.tickets[props.selectedTicket].terms}
                 </SelectionBubble>
             }
         </NavBarWrap>
