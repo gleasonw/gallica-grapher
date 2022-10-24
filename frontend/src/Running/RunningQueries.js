@@ -42,7 +42,6 @@ function RunningQueriesUI(props) {
         const progressJSON = await response.json();
         const state = progressJSON["state"]
         if (requestStateCallbacks.hasOwnProperty(state)) {
-            console.log(progressJSON.progress)
             requestStateCallbacks[state]()
         } else {
             console.log("Unknown state: " + state)

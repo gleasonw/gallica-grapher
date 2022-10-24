@@ -9,7 +9,7 @@ class Params:
         self.codes = kwargs.get('codes') or []
         self.startDate = Date(kwargs.get('startDate')) if kwargs.get('startDate') else None
         self.endDate = Date(kwargs.get('endDate')) if kwargs.get('endDate') else self.startDate
-        self.link = kwargs.get('link') or (None, None)
+        self.link = (kwargs.get('linkTerm'), kwargs.get('linkDistance'))
         self.grouping = kwargs['grouping']
         self.numRecords = kwargs.get('numRecords', 50)
         self.startIndex = kwargs.get('startIndex', 0)

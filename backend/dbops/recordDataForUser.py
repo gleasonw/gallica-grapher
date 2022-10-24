@@ -82,7 +82,7 @@ class RecordDataForUser:
     def getGallicaRecordsForDisplay(self, tickets, filters):
         wrapper = gallicaWrapper.connect('sru')
         records = []
-        for key, ticket in tickets.items():
+        for ticket in tickets:
             argsBundle = {
                 **ticket,
                 'numRecords': filters.get('limit'),

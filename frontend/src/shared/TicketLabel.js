@@ -1,20 +1,23 @@
 import React from 'react';
 import styled from "styled-components";
-import ItemsBlurb from "./ItemsBlurb";
+import {PaperBlurb} from "./ItemsBlurb";
+import {DateBlurb} from "./ItemsBlurb";
+import {TermsBlurb} from "./ItemsBlurb";
 
 function TicketLabel(props) {
+    const dateRange = [props.startDate, props.endDate]
     return (
         <StyledTicketLabel compact={props.compact} center={props.center}>
             Occurrences of
-            <ItemsBlurb terms={props.terms}/>
+            <TermsBlurb terms={props.terms}/>
             {!!props.linkTerm &&
                 `within ${props.linkDistance} words of "${props.linkTerm}" `
             }
             in
-            <ItemsBlurb papers={props.papers}/>
+            <PaperBlurb papers={props.papers}/>
             {
-                props.startDate && props.endDate &&
-                `between ${<ItemsBlurb dateRange={[props.startDate, props.endDate]}/>}.`
+                dateRange.length > 0 &&
+                <StyledDateLine> between <DateBlurb dateRange={dateRange}/></StyledDateLine>
             }
         </StyledTicketLabel>
     )
@@ -31,6 +34,14 @@ const StyledTicketLabel = styled.div`
     position: relative;
     overflow-y: ${props => props.compact ? 'auto' : 'hidden'};
     align-self: ${props => props.center ? 'center' : 'flex-start'};
+`;
+
+const StyledDateLine = styled.div`
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
 `;
 
 

@@ -2,30 +2,27 @@ import React from 'react';
 import {ExpandableBlurbControl} from "./ExpandableBlurbControl";
 import {BlurbText} from "./BlurbText";
 
-export default function ItemsBlurb(props){
-    if(props.papers){
-        return makePaperBlurb(props.papers)
-    }else if(props.terms){
-        return generateBlurb(props.terms)
-    }else if(props.dateRange){
-        const dateString = `${props.dateRange[0]} to ${props.dateRange[1]}`
-        return <BlurbText>{dateString}</BlurbText>
-    }else{
-        return null
-    }
+export function PaperBlurb(props){
+    const titles = getPaperNames(props.papers)
+    return props.papers.length > 0 ? <TermsBlurb terms={titles}/> : <BlurbText>all papers</BlurbText>
 }
 
-export function generateBlurb(items) {
-    const highestIndexBefore28Characters = getHighestIndexBeforeLimitCharactersCombined(items)
-    const numItemsRemaining = items.length - highestIndexBefore28Characters - 1
+export function DateBlurb(props){
+    const dateString = `${props.dateRange[0]} and ${props.dateRange[1]}`
+    return <BlurbText>{dateString}</BlurbText>
+}
+
+export function TermsBlurb(props) {
+    const highestIndexBefore28Characters = getHighestIndexBeforeLimitCharactersCombined(props.terms)
+    const numItemsRemaining = props.terms.length - highestIndexBefore28Characters - 1
     if (numItemsRemaining > 0) {
         return generateExpandableBlurb(
-            items,
+            props.terms,
             highestIndexBefore28Characters,
             numItemsRemaining
         )
     } else {
-        return generateFixedBlurb(items)
+        return generateFixedBlurb(props.terms)
     }
 }
 
@@ -46,11 +43,6 @@ function generateFixedBlurb(items) {
     const quotedItems = items.map(item => `"${item}"`)
     const commaSeparatedItems = quotedItems.join(', ')
     return <BlurbText>{commaSeparatedItems}</BlurbText>
-}
-
-export function makePaperBlurb(papers) {
-    const titles = getPaperNames(papers)
-    return papers.length > 0 ? generateBlurb(titles) : <BlurbText>all papers</BlurbText>
 }
 
 function getPaperNames(papers) {

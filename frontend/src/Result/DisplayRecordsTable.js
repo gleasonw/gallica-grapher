@@ -41,16 +41,14 @@ export default function DisplayRecordsTable(props) {
     }
 
     function buildGallicaQuery(tickets){
-        let argsForQuery = {};
-        const momentDate = buildDateStringForFilters()
-        Object.keys(tickets).map((key) => {
+        let argsForQuery = Object.keys(tickets).map((key) => {
             const ticket = tickets[key];
-            delete ticket.endDate;
-            delete ticket.papersAndCodes;
-            argsForQuery[key] = {
-                ...ticket,
+            return {
+                terms: ticket.terms,
+                linkTerm: ticket.linkTerm,
+                linkDistance: ticket.linkDistance,
                 grouping: 'all',
-                startDate: momentDate || ticket.startDate,
+                startDate: buildDateStringForFilters() || ticket.startDate,
             }
         });
         argsForQuery = JSON.stringify(argsForQuery);

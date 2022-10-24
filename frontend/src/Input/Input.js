@@ -51,7 +51,9 @@ function Input(props){
             terms: terms,
             linkTerm: linkTerm,
             linkDistance: linkDistance,
-            papersAndCodes: getPapersFor(selectedPaperInput)
+            papersAndCodes: getPapersFor(selectedPaperInput),
+            startDate: props.startDate,
+            endDate: props.endDate,
         }
     }
 

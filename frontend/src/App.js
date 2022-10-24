@@ -114,7 +114,7 @@ function App() {
     }
 
     async function initRequest(tickets) {
-        const completedTickets = addSearchAndDateRangeToTickets(tickets);
+        const completedTickets = addGroupingToTickets(tickets);
         const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
         const {request} = await axios.post('/api/init', {
             tickets: ticketsWithPaperNamesRemoved
@@ -130,14 +130,12 @@ function App() {
         setCurrentPage('running');
     }
 
-    function addSearchAndDateRangeToTickets(someTickets) {
+    function addGroupingToTickets(someTickets) {
         const ticketsWithSearchType = {}
         Object.keys(someTickets).forEach((ticketID) => {
             ticketsWithSearchType[ticketID] = {
                 ...someTickets[ticketID],
                 grouping: getSearchTypeForIndex(selectedSearchType),
-                startDate: startDate,
-                endDate: endDate
             }
         })
         return ticketsWithSearchType;
