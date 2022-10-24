@@ -12,7 +12,7 @@ import {SelectionBubble} from "../shared/SelectionBubble";
 import DownloadCSVButton from "./DownloadCSVButton";
 
 export default function DisplayRecordsTable(props) {
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(Math.round(10 / Object.keys(props.tickets).length));
     const [offset, setOffset] = useState(0);
     const [showFilterPopup, setShowFilterPopup] = useState(false);
     const isGallicaGrouped = props.timeBin === 'gallicaYear' || props.timeBin === 'gallicaMonth';
@@ -39,23 +39,21 @@ export default function DisplayRecordsTable(props) {
     }
 
     function getGallicaQuery(tickets){
-        const baseArgs = []
-        console.log([props.year, props.month, props.day])
+        let argsForQuery = {};
         const momentDate = buildDateStringForFilters()
-        Object.values(tickets).forEach(ticket => {
-            const args = {
+        Object.keys(tickets).map((key) => {
+            const ticket = tickets[key];
+            argsForQuery[key] = {
                 ...ticket,
                 grouping: 'all',
                 terms: props.term || ticket.terms,
                 codes: props.periodical || ticket.papersAndCodes.map(paperCode => paperCode.code),
                 startDate: momentDate || ticket.startDate,
             }
-            delete args['papersAndCodes']
-            delete args['endDate']
-            baseArgs.push(JSON.stringify(args))
-        })
+        });
+        argsForQuery = JSON.stringify(argsForQuery);
         return "/api/getGallicaRecords?" +
-            "tickets=" + baseArgs +
+            "tickets=" + argsForQuery +
             "&limit=" + limit +
             "&offset=" + offset;
     }

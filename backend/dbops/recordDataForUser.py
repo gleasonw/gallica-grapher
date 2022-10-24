@@ -79,14 +79,16 @@ class RecordDataForUser:
         wrapper = gallicaWrapper.connect('content')
         return wrapper.get(ark, term)[0]
 
-    def getGallicaRecordsForDisplay(self, ticket, filters):
+    def getGallicaRecordsForDisplay(self, tickets, filters):
         wrapper = gallicaWrapper.connect('sru')
-        argsBundle = {
-            **ticket,
-            'numRecords': filters.get('limit'),
-            'startRecord': filters.get('offset'),
-        }
-        records = wrapper.get(**argsBundle)
+        records = []
+        for key, ticket in tickets.items():
+            argsBundle = {
+                **ticket,
+                'numRecords': filters.get('limit'),
+                'startRecord': filters.get('offset'),
+            }
+            records.extend(wrapper.get(**argsBundle))
         return records
 
     def clearUserRecordsAfterCancel(self, requestID):

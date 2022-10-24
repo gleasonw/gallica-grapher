@@ -144,10 +144,10 @@ def getDisplayRecords():
 @app.route('/api/getGallicaRecords')
 def getGallicaRecordsForDisplay():
     args = dict(request.args)
-    ticket = json.loads(args['tickets'])
+    tickets = json.loads(args['tickets'])
     del args['tickets']
     records = recordDataGetter.getGallicaRecordsForDisplay(
-        ticket=ticket,
+        tickets=tickets,
         filters=args
     )
     records = [record.getDisplayRow() for record in records]
