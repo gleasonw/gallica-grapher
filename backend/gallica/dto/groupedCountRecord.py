@@ -21,3 +21,4 @@ class GroupedCountRecord:
     def __repr__(self):
         return f'GroupedCountRecord({self.date}, {self.count})'
 
+

@@ -5,7 +5,6 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import TicketLabelRow from "./TicketLabelRow";
 
 export function RequestBox(props) {
-    console.log(props.tickets)
     return(
         <StyledTicketRow>
             <TicketLabelRow

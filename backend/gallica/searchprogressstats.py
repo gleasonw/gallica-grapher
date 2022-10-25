@@ -32,8 +32,12 @@ class SearchProgressStats:
             'estimateSecondsToCompletion': self.estimateSecondsToCompletion,
             'randomPaper': self.randomPaperForDisplay,
             'randomText': self.randomTextForDisplay,
-            'state': self.state
+            'state': self.state,
+            'grouping': self.grouping
         }
+
+    def setGrouping(self, grouping):
+        self.grouping = grouping
 
     def setNumRecordsToFetch(self, numRecordsToFetch):
         self.numRecordsToFetch = numRecordsToFetch

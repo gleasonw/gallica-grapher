@@ -43,6 +43,7 @@ function Chart(props) {
             <StyledChartUI>
                 <ChartSettings
                     settingsID={props.settingsID}
+                    periodicalRestricted={Object.keys(props.tickets).every(key => props.tickets[key].papersAndCodes.length > 0)}
                 />
                 <HighchartsReact
                     highcharts={Highcharts}
@@ -118,7 +119,7 @@ function ChartSettings(props) {
                     <option value={14}>50</option>
                 </StyledSelect>
             </StyledInputAndLabel>
-            <StyledInputAndLabel display={isGallicaGrouped ? 'none' : 'flex'}>
+            <StyledInputAndLabel display={props.periodicalRestricted || isGallicaGrouped ? 'none' : 'flex'}>
                 <label htmlFor='continuous'>Only continuous periodicals publishing over range</label>
                 <input
                     id='continuous'

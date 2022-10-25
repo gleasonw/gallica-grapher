@@ -49,6 +49,7 @@ export default function DisplayRecordsTable(props) {
                 linkDistance: ticket.linkDistance,
                 grouping: 'all',
                 startDate: buildDateStringForFilters() || ticket.startDate,
+                codes: ticket.papersAndCodes.map((paperAndCode) => paperAndCode.code)
             }
         });
         argsForQuery = JSON.stringify(argsForQuery);
@@ -173,6 +174,7 @@ function StyledFilterAndTable(props) {
                     compact={props.compact}
                     show={props.show}
                     onOutsidePopupClick={props.onOutsidePopupClick}
+                    isGallicaGrouped={props.isGallicaGrouped}
                 />
                 {!props.compact && !props.isGallicaGrouped &&
                     <div>
@@ -292,7 +294,7 @@ function AppliedFilters(props) {
                 <SelectionBubble
                     onClick={props.onTicketClick}
                 >
-                    {Number(props.selectedTicket) + 1}: {props.tickets[props.selectedTicket].terms}
+                    {props.tickets[props.selectedTicket].terms}
                 </SelectionBubble>
             }
         </NavBarWrap>

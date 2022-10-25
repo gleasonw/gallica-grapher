@@ -11,11 +11,20 @@ def build(argBundles, stateHooks):
     searchObjs = []
     for key, bundle in argBundles.items():
         search = bundle['grouping']
-        searchObjs.append(searches[search](
+        runner = searches[search](
             identifier=key,
             stateHooks=stateHooks,
             args=bundle
-        ))
+        )
+        if search != 'all' and runner.moreDateIntervalsThanRecordBatches() and len(argBundles.items()) == 1:
+            bundle['grouping'] = 'all'
+            runner = AllSearch(
+                identifier=key,
+                stateHooks=stateHooks,
+                args=bundle
+            )
+            stateHooks.onSearchChangeToAll(key)
+        searchObjs.append(runner)
     return searchObjs
 
 
@@ -119,7 +128,7 @@ class GroupedSearch(Search):
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoGroupCounts
 
-    def getNumRecordsToBeInserted(self, onNumRecordsFound):
+    def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
         startDate = self.params.get('startDate')
         endDate = self.params.get('endDate')
         grouping = self.params.get('grouping')
@@ -127,8 +136,14 @@ class GroupedSearch(Search):
             sum = endDate + 1 - startDate
         else:
             sum = (endDate + 1 - startDate) * 12
-        onNumRecordsFound(self, sum)
+        onNumRecordsFound and onNumRecordsFound(self, sum)
         return sum
+
+    def moreDateIntervalsThanRecordBatches(self):
+        args = {**self.params, 'grouping':'all'}
+        numResults = self.api.getNumResultsForArgs(args)[0][1]
+        numIntervals = self.getNumRecordsToBeInserted()
+        return int(numResults / 50) < numIntervals
 
 
 class PaperSearch(Search):

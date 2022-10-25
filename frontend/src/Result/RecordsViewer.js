@@ -24,8 +24,12 @@ export default function RecordsViewer(props){
         'gallicaMonth': handleMonthSeriesClick,
     }
 
+    function handleSeriesClick(point){
+        setRecordsTableTicket(point.series.name.charAt(0));
+        seriesClickHandlers[timeBin](point);
+    }
+
     function handleYearSeriesClick(point){
-        console.log({point})
         setRecordsTableYear(point.category);
         setRecordsTableMonth(0);
         setRecordsTableDay(0);
@@ -52,7 +56,7 @@ export default function RecordsViewer(props){
                 <Chart
                     tickets={props.tickets}
                     settingsID={props.settingsID}
-                    onSeriesClick={(point) => seriesClickHandlers[timeBin](point)}
+                    onSeriesClick={(point) => handleSeriesClick(point)}
                     requestID={props.requestID}
                     uuid={props.cacheID}
                 />

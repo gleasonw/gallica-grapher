@@ -46,18 +46,16 @@ class OccurrenceQueryFactory(QueryFactory):
         return self.indexQueriesWithNumResults(queryCounts)
 
     def buildQueriesForArgs(self, args):
-        baseQueries = self.buildForParams(
-            Params(**args)
-        )
         if args['grouping'] == 'all':
             return self.buildIndexedQueriesFromArgs(
                 args=args,
-                baseQueries=baseQueries,
+                baseQueries=self.buildBaseQueriesFromArgs(args)
             )
         else:
-            return baseQueries
+            return self.buildBaseQueriesFromArgs(args)
 
-    def buildForParams(self, params):
+    def buildBaseQueriesFromArgs(self, args):
+        params = Params(**args)
         if codes := params.getCodeBundles():
             return self.buildWithCodeBundles(params, codes)
         else:

@@ -84,6 +84,7 @@ function TicketForm(props) {
                     endDate={props.endDate}
                     onstartDateChange={props.onstartDateChange}
                     onendDateChange={props.onendDateChange}
+                    selectedPaperBoundary={props.boundaryYearsForUserPapers}
                 />
                 <label>grouped by: </label>
                 <DateGroupSelect

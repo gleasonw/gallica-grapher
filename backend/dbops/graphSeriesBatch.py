@@ -63,7 +63,7 @@ class HighchartsSeriesForTicket:
         )
         dataWithProperDateFormat = self.transformDateForSettings(data, settings)
         return {
-            'name': self.getSearchTermsByGrouping(settings["groupBy"]),
+            'name': f"{self.ticketID}: {self.getSearchTermsByGrouping(settings['groupBy'])}",
             'data': dataWithProperDateFormat,
         }
 

@@ -2,7 +2,6 @@ import OptionWrap from "../OptionWrap";
 import {SelectionBox} from "../SelectionBox";
 import {Dropdown} from "./Dropdown";
 import React from "react";
-import {KeyboardArrowDown} from "@mui/icons-material";
 import {ShadowedFocusInput} from "../../shared/ShadowedFocusInput";
 
 export function UserSelectPaperInput(props) {

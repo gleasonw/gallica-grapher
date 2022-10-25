@@ -24,15 +24,13 @@ function Input(props){
     }
 
     function setUserPapersYearBoundary(){
-        let minYear = 1499
-        let maxYear = 2020
-        if(userSelectedPapers.length > 0){
+        if(userSelectedPapers.length > 0) {
             const paperLowYears = userSelectedPapers.map(paper => paper["startDate"])
             const paperHighYears = userSelectedPapers.map(paper => paper["endDate"])
-            minYear = Math.min(...paperLowYears)
-            maxYear = Math.max(...paperHighYears)
+            const minYear = Math.min(...paperLowYears)
+            const maxYear = Math.max(...paperHighYears)
+            return [minYear, maxYear]
         }
-        return [minYear, maxYear]
     }
 
     function handleSubmit(event){

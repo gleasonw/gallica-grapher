@@ -3,6 +3,7 @@ from utils.psqlconn import PSQLconn
 import gallica.search
 from gallica.searchprogressstats import SearchProgressStats
 import time
+import psutil
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -29,6 +30,9 @@ class Request(threading.Thread):
 
     def setSearchState(self, ticketID, state):
         self.searchProgressStats[ticketID].setState(state)
+
+    def onSearchChangeToAll(self, ticketID):
+        self.searchProgressStats[ticketID].setGrouping('all')
 
     def setSearchProgressStats(self, progressStats):
         ticketID = progressStats['ticketID']
@@ -93,22 +97,13 @@ class Request(threading.Thread):
 if __name__ == '__main__':
     argsBundles ={
         0: {
-            'terms': ['brazza'],
-            'codes': [],
-            'startDate': 1870,
-            'endDate': 1885,
-            'linkTerm': 'Congo',
-            'linkDistance': 10,
-            'grouping': 'all'
-        },
-        1: {
-            'terms': ['malamine'],
+            'terms': ['paix'],
             'codes': [],
             'startDate': 1870,
             'endDate': 1885,
             'linkTerm': None,
             'linkDistance': 10,
-            'grouping': 'all'
+            'grouping': 'month'
         }
     }
     testRequest = Request(
@@ -117,5 +112,7 @@ if __name__ == '__main__':
     )
     testRequest.start()
     while testRequest.state != "COMPLETED":
-        print(testRequest.getProgressStats())
         time.sleep(1)
+        #print memory usage in mb
+        print(psutil.Process().memory_info().rss / 1000000)
+        print(testRequest.getProgressStats())

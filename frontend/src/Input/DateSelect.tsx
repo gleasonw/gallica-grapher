@@ -18,6 +18,11 @@ export default function DateSelect(props){
                     onstartDateChange={props.onstartDateChange}
                     onendDateChange={props.onendDateChange}
                 />
+                {
+                    props.selectedPaperBoundary &&
+                    <div>(selected papers published between {props.selectedPaperBoundary[0]} and {props.selectedPaperBoundary[1]})</div>
+                }
+
             </OptionWrap>
         </StyledOptionInput>
     )

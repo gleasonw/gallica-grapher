@@ -108,26 +108,28 @@ export function FilterOptions(props) {
                         const linkTerm = args.linkTerm;
                         return (
                             <option value={ticket}>
-                                {Number(ticket)+1}: {terms}
+                                {terms}
                                 {!!linkTerm && ` linked to ${linkTerm}`}
                             </option>
                         )
                     })}
                 </StyledSelect>
             </StyledInputAndLabel>
-            <StyledInputAndLabel>
-                <label htmlFor='periodical'>Periodical</label>
-                <ShadowedFocusInput
-                    type={'text'}
-                    selected
-                    value={!!props.periodical ? props.periodical : ''}
-                    id={'periodical'}
-                    placeholder={'Enter a periodical to filter'}
-                    onChange={
-                        (e) => props.onPeriodicalChange(e.target.value)
-                    }
-                />
-            </StyledInputAndLabel>
+            {!props.isGallicaGrouped &&
+                <StyledInputAndLabel>
+                    <label htmlFor='periodical'>Periodical</label>
+                    <ShadowedFocusInput
+                        type={'text'}
+                        selected
+                        value={!!props.periodical ? props.periodical : ''}
+                        id={'periodical'}
+                        placeholder={'Enter a periodical to filter'}
+                        onChange={
+                            (e) => props.onPeriodicalChange(e.target.value)
+                        }
+                    />
+                </StyledInputAndLabel>
+            }
         </FilterOptionsDisplaySwitch>
     )
 }

@@ -48,6 +48,7 @@ function App() {
                 onNoRecords={() => setCurrentPage('noRecords')}
                 onCancelRequest={handleResetValuesAndGoHome}
                 onBackendError={() => setCurrentPage('backendError')}
+                onBackendGroupingChange={handleBackendGroupingChange}
             />,
         'result':
             <ResultUI
@@ -112,6 +113,18 @@ function App() {
     function handleUnloadedSubmit() {
         void initRequest(tickets);
     }
+
+    function handleBackendGroupingChange(ticketID) {
+        const updatedTickets = {
+            ...tickets,
+            [ticketID]: {
+                ...tickets[ticketID],
+                grouping: 'all'
+            }
+        }
+        setTickets(updatedTickets);
+    }
+
 
     async function initRequest(tickets) {
         const completedTickets = addGroupingToTickets(tickets);

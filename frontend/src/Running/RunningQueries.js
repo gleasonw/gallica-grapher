@@ -73,6 +73,7 @@ function RunningQueriesUI(props) {
                     index={index}
                     total={Object.keys(props.tickets).length}
                     progressStats={progressStats[key]}
+                    onBackendGroupingChange={() => props.onBackendGroupingChange(key)}
                 />
             ))}
             <ImportantButtonWrap

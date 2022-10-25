@@ -80,7 +80,7 @@ class SRUWrapper(GallicaWrapper):
         return recordGenerator if generate else list(recordGenerator)
 
     def getNumResultsForArgs(self, args):
-        baseQueries = self.queryBuilder.buildQueriesForArgs(args)
+        baseQueries = self.queryBuilder.buildBaseQueriesFromArgs(args)
         return self.queryBuilder.getNumResultsForEachQuery(baseQueries)
 
     def buildAPI(self):

@@ -16,6 +16,8 @@ export function TicketProgressBox(props) {
     const estimateTotal = props.progressStats.numResultsDiscovered
     const ticketSearchState = props.progressStats.state
     const progress = ticketSearchState === 'COMPLETED' ? 100 : props.progressStats.progressPercent
+    const backendGrouping = props.progressStats.grouping;
+    backendGrouping && backendGrouping !== props.ticket.grouping && props.onBackendGroupingChange()
 
     return (
         <ClassicUIBox display={(
