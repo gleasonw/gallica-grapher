@@ -13,6 +13,8 @@ def build(desiredRecord, **kwargs):
         'occurrence': ParseOccurrenceRecords,
         'paper': ParsePaperRecords,
     }
+    if desiredRecord not in recordParsers:
+        raise ValueError(f'Unrecognized record type: {desiredRecord}. Options include: {recordParsers.keys()}')
     parser = GallicaXMLparse()
     return recordParsers[desiredRecord](parser, **kwargs)
 

@@ -2,9 +2,8 @@ from gallica.recordGetter import RecordGetter
 from gallica.queryBuilder import OccurrenceQueryBuilder
 from gallica.queryBuilder import ContentQueryFactory
 from gallica.concurrentFetch import ConcurrentFetch
-from parseRecord import ParsePaperRecords, ParseOccurrenceRecords, ParseGroupedRecordCounts, ParseContentRecord, \
-    ParseArkRecord
 from gallica.queryBuilder import PaperQueryBuilder
+import parseRecord
 
 
 def connect(gallicaAPIselect, **kwargs):
@@ -49,32 +48,41 @@ class GallicaWrapper:
 class SRUWrapper(GallicaWrapper):
 
     def preInit(self, kwargs):
-        self.groupedRecordParser = ParseGroupedRecordCounts(
+        self.groupedRecordParser = parseRecord.build(
+            desiredRecord='groupedCount',
             ticketID=kwargs.get('ticketID'),
             requestID=kwargs.get('requestID')
         )
-        self.soloRecordParser = ParseOccurrenceRecords(
+        self.soloRecordParser = parseRecord.build(
+            desiredRecord='occurrence',
             ticketID=kwargs.get('ticketID'),
             requestID=kwargs.get('requestID')
         )
 
+    #TODO: refactor... this method includes too many special cases (3)
     def get(self, onUpdateProgress=None, generate=False, queriesWithCounts=None, **kwargs):
         grouping = kwargs.get('grouping')
         if grouping is None:
             grouping = 'year'
             kwargs['grouping'] = grouping
-        recordGetter = self.buildRecordGetter(
-            parser=self.soloRecordParser if grouping == 'all' else self.groupedRecordParser
-        )
-        if queriesWithCounts is None:
-            queries = self.queryBuilder.buildQueriesForArgs(kwargs)
-        else:
-            queries = self.queryBuilder.buildQueriesFromQueryCounts(queriesWithCounts)
+        recordGetter = self.buildRecordGetterForGrouping(grouping)
         recordGenerator = recordGetter.getFromQueries(
-            queries=queries,
+            queries=self.buildQueries(kwargs, queriesWithCounts),
             onUpdateProgress=onUpdateProgress
         )
         return recordGenerator if generate else list(recordGenerator)
+
+    def buildRecordGetterForGrouping(self, grouping):
+        if grouping == 'all':
+            return self.buildRecordGetter(self.soloRecordParser)
+        else:
+            return self.buildRecordGetter(self.groupedRecordParser)
+
+    def buildQueries(self, kwargs, queriesWithCounts):
+        if queriesWithCounts:
+            return self.queryBuilder.buildQueriesFromQueryCounts(queriesWithCounts)
+        else:
+            return self.queryBuilder.buildQueriesForArgs(kwargs)
 
     def getNumResultsForArgs(self, args):
         baseQueries = self.queryBuilder.buildBaseQueriesFromArgs(args)
@@ -99,7 +107,7 @@ class IssuesWrapper(GallicaWrapper):
         return recordGenerator if generate else list(recordGenerator)
 
     def buildParser(self):
-        return ParseArkRecord()
+        return parseRecord.build('paper')
 
     def buildAPI(self):
         return ConcurrentFetch('https://gallica.bnf.fr/services/Issues')
