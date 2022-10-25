@@ -1,6 +1,6 @@
 # The Gallica Grapher
 
-Culture and identity were once local, the products of word-of-mouth and conversation. The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Culture became national. Individual opinions ascended to group opinions; “public opinion” rose into being, looming over the political class, and the press was its handler.
+Culture and identity were once local, the products of community and conversation. The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Culture became national. Individual opinions ascended to group opinions; “public opinion” rose into being, looming over the political class, and the press was its handler.
 
 This app integrates with the French National Archives Gallica API, allowing for rapid text searches over thousands of periodicals. The app routes requests to Gallica, parses the responses, and creates a trend line. Selecting a point will bring up the associated records in a table beneath the graph.
 
@@ -21,7 +21,7 @@ Pour les francophones qui se demandent pourquoi ce site est en anglais : je vais
 2. Select a grouping of periodicals to survey;
 3. If you would like to add a search (another trend line on the graph), click "compare";
 3. Click the 'Fetch and Graph 📊' button;
-4. Watch the results roll in. If your term is especially popular, I would recommend a cup of tea. Requests initSearch concurrently, but to avoid 
+4. Watch the results roll in. If your term is especially popular, I would recommend a cup of tea. Requests run concurrently, but to avoid 
 blasting the French national library's servers, I have erred on a smaller number of worker threads.
 
 ### What do I see on the results page?
