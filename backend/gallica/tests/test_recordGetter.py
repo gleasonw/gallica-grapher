@@ -9,11 +9,10 @@ class TestRecordGetter(TestCase):
         self.recordGetter = RecordGetter(
             gallicaAPI=MagicMock(),
             parseData=MagicMock(),
-            onUpdateProgress=MagicMock()
         )
 
     def test_get_from_queries(self):
         self.recordGetter.getFromQueries(queries=[])
 
-        self.recordGetter.gallicaAPI.fetchAll.assert_called_once()
+        self.recordGetter.gallicaAPI.get.assert_called_once()
         self.recordGetter.parser.parseResponsesToRecords.assert_called_once()

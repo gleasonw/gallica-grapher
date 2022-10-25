@@ -1,9 +1,8 @@
 import unittest
-from queryFactory import TicketQueryFactory
 from unittest.mock import MagicMock
 
 
-class TestTicketQueryFactory(unittest.TestCase):
+class TestQueryBuilder(unittest.TestCase):
 
     def setUp(self) -> None:
         self.testTicketQueryFactory = TicketQueryFactory()

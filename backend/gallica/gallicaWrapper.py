@@ -1,13 +1,10 @@
 from gallica.recordGetter import RecordGetter
-from gallica.queryFactory import OccurrenceQueryFactory
-from gallica.queryFactory import ContentQueryFactory
+from gallica.queryBuilder import OccurrenceQueryBuilder
+from gallica.queryBuilder import ContentQueryFactory
 from gallica.concurrentFetch import ConcurrentFetch
-from gallica.parseArkRecord import ParseArkRecord
-from gallica.parsePaperRecords import ParsePaperRecords
-from gallica.parseContentRecord import ParseContentRecord
-from gallica.parseOccurrenceRecords import ParseOccurrenceRecords
-from gallica.parseGroupedRecordCounts import ParseGroupedRecordCounts
-from gallica.queryFactory import PaperQueryFactory
+from parseRecord import ParsePaperRecords, ParseOccurrenceRecords, ParseGroupedRecordCounts, ParseContentRecord, \
+    ParseArkRecord
+from gallica.queryBuilder import PaperQueryBuilder
 
 
 def connect(gallicaAPIselect, **kwargs):
@@ -87,7 +84,7 @@ class SRUWrapper(GallicaWrapper):
         return ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU')
 
     def buildQueryBuilder(self):
-        return OccurrenceQueryFactory(gallicaAPI=self.api)
+        return OccurrenceQueryBuilder(gallicaAPI=self.api)
 
 
 class IssuesWrapper(GallicaWrapper):
@@ -108,7 +105,7 @@ class IssuesWrapper(GallicaWrapper):
         return ConcurrentFetch('https://gallica.bnf.fr/services/Issues')
 
     def buildQueryBuilder(self):
-        return PaperQueryFactory(gallicaAPI=self.api)
+        return PaperQueryBuilder(gallicaAPI=self.api)
 
 
 class ContentWrapper(GallicaWrapper):
@@ -156,7 +153,7 @@ class PapersWrapper(GallicaWrapper):
         return ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU')
 
     def buildQueryBuilder(self):
-        return PaperQueryFactory(gallicaAPI=self.api)
+        return PaperQueryBuilder(gallicaAPI=self.api)
 
     def buildParser(self):
         return ParsePaperRecords()

@@ -6,7 +6,7 @@ import os
 here = os.path.dirname(os.path.abspath(__file__))
 
 
-class TestParse(TestCase):
+class TestGallicaXMLparse(TestCase):
 
     def setUp(self) -> None:
         self.parse = GallicaXMLparse()
@@ -73,7 +73,7 @@ class TestParse(TestCase):
     def test_get_date(self):
         records = self.parse.getRecordsFromXML(self.occurrencesXML)
         oneRecord = records[0]
-        self.assertEqual(
-            self.parse.getDateFromRecord(oneRecord),
-            Date('1883-04')
+        self.assertListEqual(
+            self.parse.getDateFromRecord(oneRecord).getDateAsList(),
+            Date('1883-04').getDateAsList()
         )

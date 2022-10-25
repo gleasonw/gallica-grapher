@@ -6,7 +6,7 @@ from gallica.query import ContentQuery
 from gallica.params import Params
 
 
-class QueryFactory:
+class QueryBuilder:
 
     def __init__(self, gallicaAPI):
         self.gallicaAPI = gallicaAPI
@@ -40,7 +40,7 @@ class QueryFactory:
         raise NotImplementedError
 
 
-class OccurrenceQueryFactory(QueryFactory):
+class OccurrenceQueryBuilder(QueryBuilder):
 
     def buildQueriesFromQueryCounts(self, queryCounts):
         return self.indexQueriesWithNumResults(queryCounts)
@@ -104,7 +104,7 @@ class OccurrenceQueryFactory(QueryFactory):
         )
 
 
-class PaperQueryFactory(QueryFactory):
+class PaperQueryBuilder(QueryBuilder):
 
     def buildQueriesForArgs(self, args):
         codes = args.get('codes')

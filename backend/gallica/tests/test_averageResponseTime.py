@@ -2,7 +2,7 @@ from unittest import TestCase
 from averageResponseTime import AverageResponseTime
 
 
-class TestResponseTime(TestCase):
+class TestAverageResponseTime(TestCase):
 
     def setUp(self) -> None:
         self.responseTime = AverageResponseTime()
