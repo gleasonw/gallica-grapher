@@ -79,8 +79,8 @@ class SRUWrapper(GallicaWrapper):
         )
         return recordGenerator if generate else list(recordGenerator)
 
-    def getNumRecordsForArgs(self, **kwargs):
-        baseQueries = self.queryBuilder.buildQueriesForArgs(kwargs)
+    def getNumResultsForArgs(self, args):
+        baseQueries = self.queryBuilder.buildQueriesForArgs(args)
         return self.queryBuilder.getNumResultsForEachQuery(baseQueries)
 
     def buildAPI(self):
@@ -149,7 +149,7 @@ class PapersWrapper(GallicaWrapper):
             record.addYearsFromArk(yearsAsDict[record.code])
         return sruPaperRecords
 
-    def getNumRecordsForArgs(self, **kwargs):
+    def getNumResultsForArgs(self, **kwargs):
         pass
 
     def buildAPI(self):

@@ -134,7 +134,7 @@ def getDisplayRecords():
     tableArgs = dict(request.args)
     del tableArgs['uniqueforcache']
     tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
-    displayRecords, count = RecordDataForUser().getRecordsForDisplay(tableArgs)
+    displayRecords, count = recordDataGetter.getRecordsForDisplay(tableArgs)
     return {
         "displayRecords": displayRecords,
         "count": count

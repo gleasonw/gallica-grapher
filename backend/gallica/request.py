@@ -97,18 +97,18 @@ if __name__ == '__main__':
             'codes': [],
             'startDate': 1870,
             'endDate': 1885,
-            'linkTerm': None,
+            'linkTerm': 'Congo',
             'linkDistance': 10,
-            'grouping': 'month'
+            'grouping': 'all'
         },
         1: {
-            'terms': ['stanley'],
+            'terms': ['malamine'],
             'codes': [],
             'startDate': 1870,
             'endDate': 1885,
             'linkTerm': None,
             'linkDistance': 10,
-            'grouping': 'month'
+            'grouping': 'all'
         }
     }
     testRequest = Request(

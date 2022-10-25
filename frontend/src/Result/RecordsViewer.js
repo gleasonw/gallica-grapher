@@ -24,22 +24,23 @@ export default function RecordsViewer(props){
         'gallicaMonth': handleMonthSeriesClick,
     }
 
-    function handleYearSeriesClick(year){
-        setRecordsTableYear(year);
+    function handleYearSeriesClick(point){
+        console.log({point})
+        setRecordsTableYear(point.category);
         setRecordsTableMonth(0);
         setRecordsTableDay(0);
     }
 
-    function handleMonthSeriesClick(unix){
-        const date = new Date(unix);
+    function handleMonthSeriesClick(point){
+        const date = new Date(point.category);
         setRecordsTableYear(date.getUTCFullYear());
         setRecordsTableMonth(date.getUTCMonth() + 1);
         setRecordsTableDay(0);
     }
 
     //TODO: fix the date offset
-    function handleDaySeriesClick(unix){
-        const date = new Date(unix);
+    function handleDaySeriesClick(point){
+        const date = new Date(point.category);
         setRecordsTableYear(date.getUTCFullYear());
         setRecordsTableMonth(date.getUTCMonth() + 1);
         setRecordsTableDay(date.getUTCDate());
@@ -51,7 +52,7 @@ export default function RecordsViewer(props){
                 <Chart
                     tickets={props.tickets}
                     settingsID={props.settingsID}
-                    onSeriesClick={(point) => seriesClickHandlers[timeBin](point.category)}
+                    onSeriesClick={(point) => seriesClickHandlers[timeBin](point)}
                     requestID={props.requestID}
                     uuid={props.cacheID}
                 />
