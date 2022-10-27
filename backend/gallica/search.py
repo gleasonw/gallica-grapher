@@ -33,9 +33,9 @@ class Search:
     def __init__(self, identifier, stateHooks, args):
         self.identifier = identifier
         self.stateHooks = stateHooks
-        self.params = args
-        self.params['startDate'] = int(self.params['startDate'])
-        self.params['endDate'] = int(self.params['endDate'])
+        self.args = args
+        self.args['startDate'] = int(self.args['startDate'])
+        self.args['endDate'] = int(self.args['endDate'])
         self.dbLink = SchemaLinkForSearch(requestID=stateHooks.requestID)
         self.insertRecordsToDB = self.getDBinsert()
         self.api = self.getAPIWrapper(
@@ -45,7 +45,7 @@ class Search:
         self.postInit()
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.params})'
+        return f'{self.__class__.__name__}({self.args})'
 
     def getRecordsFromAPIAndInsertToDB(self):
         records = self.api.get(**self.buildAPIFetchArgs())
@@ -72,7 +72,7 @@ class Search:
                     "ticketID": self.identifier
                 }
             ),
-            **self.params
+            **self.args
         }
         baseArgs.update(self.getLocalFetchArgs())
         return baseArgs
@@ -89,7 +89,7 @@ class AllSearch(Search):
     def postInit(self):
         self.baseQueriesWithNumResults = self.api.getNumResultsForArgs(
             args={
-                **self.params,
+                **self.args,
                 'numRecords':1
             }
         )
@@ -129,9 +129,9 @@ class GroupedSearch(Search):
         return self.dbLink.insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-        startDate = self.params.get('startDate')
-        endDate = self.params.get('endDate')
-        grouping = self.params.get('grouping')
+        startDate = self.args.get('startDate')
+        endDate = self.args.get('endDate')
+        grouping = self.args.get('grouping')
         if grouping == 'year':
             sum = endDate + 1 - startDate
         else:
@@ -140,7 +140,7 @@ class GroupedSearch(Search):
         return sum
 
     def moreDateIntervalsThanRecordBatches(self):
-        args = {**self.params, 'grouping':'all'}
+        args = {**self.args, 'grouping': 'all'}
         numResults = self.api.getNumResultsForArgs(args)[0][1]
         numIntervals = self.getNumRecordsToBeInserted()
         return int(numResults / 50) < numIntervals

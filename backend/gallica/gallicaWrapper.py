@@ -80,7 +80,7 @@ class SRUWrapper(GallicaWrapper):
 
     def buildQueries(self, kwargs, queriesWithCounts):
         if queriesWithCounts:
-            return self.queryBuilder.buildQueriesFromQueryCounts(queriesWithCounts)
+            return self.queryBuilder.indexQueriesWithNumResults(queriesWithCounts)
         else:
             return self.queryBuilder.buildQueriesForArgs(kwargs)
 

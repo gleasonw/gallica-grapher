@@ -42,9 +42,6 @@ class QueryBuilder:
 
 class OccurrenceQueryBuilder(QueryBuilder):
 
-    def buildQueriesFromQueryCounts(self, queryCounts):
-        return self.indexQueriesWithNumResults(queryCounts)
-
     def buildQueriesForArgs(self, args):
         if args['grouping'] == 'all':
             return self.buildIndexedQueriesFromArgs(
