@@ -2,7 +2,7 @@ from dbops.schemaLinkForSearch import SchemaLinkForSearch
 import gallica.gallicaWrapper as gallicaWrapper
 
 
-def build(argBundles, stateHooks):
+def build(argBundles, stateHooks, wrapper=gallicaWrapper):
     searches = {
         'all': AllSearch,
         'year': GroupedSearch,
@@ -10,19 +10,17 @@ def build(argBundles, stateHooks):
     }
     searchObjs = []
     for key, bundle in argBundles.items():
+        initParams = {
+            'identifier': key,
+            'args': bundle,
+            'stateHooks': stateHooks,
+            'connectable': wrapper
+        }
         search = bundle['grouping']
-        runner = searches[search](
-            identifier=key,
-            stateHooks=stateHooks,
-            args=bundle
-        )
+        runner = searches[search](**initParams)
         if search != 'all' and runner.moreDateIntervalsThanRecordBatches() and len(argBundles.items()) == 1:
             bundle['grouping'] = 'all'
-            runner = AllSearch(
-                identifier=key,
-                stateHooks=stateHooks,
-                args=bundle
-            )
+            runner = AllSearch(**initParams)
             stateHooks.onSearchChangeToAll(key)
         searchObjs.append(runner)
     return searchObjs
@@ -30,27 +28,25 @@ def build(argBundles, stateHooks):
 
 class Search:
 
-    def __init__(self, identifier, stateHooks, args):
+    def __init__(self, identifier, stateHooks, args, connectable):
         self.identifier = identifier
         self.stateHooks = stateHooks
-        self.args = args
-        self.args['startDate'] = int(self.args['startDate'])
-        self.args['endDate'] = int(self.args['endDate'])
+        self.args = {
+            **args,
+            'startDate': int(args['startDate']),
+            'endDate': int(args['endDate'])
+        }
         self.dbLink = SchemaLinkForSearch(requestID=stateHooks.requestID)
         self.insertRecordsToDB = self.getDBinsert()
-        self.api = self.getAPIWrapper(
-            ticketID=self.identifier,
-            requestID=stateHooks.requestID
-        )
+        self.api = self.getAPIWrapper(connectable)
         self.postInit()
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self.args})'
 
     def getRecordsFromAPIAndInsertToDB(self):
-        records = self.api.get(**self.buildAPIFetchArgs())
         return self.insertRecordsToDB(
-            records=records,
+            records=self.api.get(**self.buildAPIFetchArgs()),
             identifier=self.identifier,
             stateHooks=self.stateHooks
         )
@@ -58,7 +54,7 @@ class Search:
     def getNumRecordsToBeInserted(self, onNumRecordsFound):
         raise NotImplementedError
 
-    def getAPIWrapper(self, ticketID, requestID):
+    def getAPIWrapper(self, wrapper):
         raise NotImplementedError
 
     def getDBinsert(self):
@@ -99,11 +95,11 @@ class AllSearch(Search):
         onNumRecordsFound(self, found)
         return found
 
-    def getAPIWrapper(self, ticketID, requestID):
-        return gallicaWrapper.connect(
+    def getAPIWrapper(self, wrapper):
+        return wrapper.connect(
             gallicaAPIselect='sru',
-            ticketID=ticketID,
-            requestID=requestID
+            ticketID=self.identifier,
+            requestID=self.stateHooks.requestID
         )
 
     def getDBinsert(self):
@@ -118,38 +114,35 @@ class AllSearch(Search):
 
 class GroupedSearch(Search):
 
-    def getAPIWrapper(self, ticketID, requestID):
-        return gallicaWrapper.connect(
+    def getAPIWrapper(self, wrapper):
+        return wrapper.connect(
             gallicaAPIselect='sru',
-            ticketID=ticketID,
-            requestID=requestID
+            ticketID=self.identifier,
+            requestID=self.stateHooks.requestID
         )
 
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-        startDate = self.args.get('startDate')
-        endDate = self.args.get('endDate')
-        grouping = self.args.get('grouping')
-        if grouping == 'year':
-            sum = endDate + 1 - startDate
-        else:
-            sum = (endDate + 1 - startDate) * 12
-        onNumRecordsFound and onNumRecordsFound(self, sum)
-        return sum
+        numRecords = self.args['endDate'] + 1 - self.args['startDate']
+        if self.args['grouping'] == 'month':
+            numRecords *= 12
+        onNumRecordsFound and onNumRecordsFound(self, numRecords)
+        return numRecords
 
     def moreDateIntervalsThanRecordBatches(self):
         args = {**self.args, 'grouping': 'all'}
-        numResults = self.api.getNumResultsForArgs(args)[0][1]
+        firstResult = self.api.getNumResultsForArgs(args)[0]
+        numResults = firstResult[1]
         numIntervals = self.getNumRecordsToBeInserted()
         return int(numResults / 50) < numIntervals
 
 
 class PaperSearch(Search):
 
-    def getAPIWrapper(self):
-        return gallicaWrapper.connect('papers')
+    def getAPIWrapper(self, wrapper):
+        return wrapper.connect('papers')
 
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoPapers

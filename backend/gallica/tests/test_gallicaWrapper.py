@@ -1,4 +1,10 @@
 from unittest import TestCase
+from gallicaWrapper import connect
+from gallicaWrapper import GallicaWrapper
+from gallicaWrapper import SRUWrapper
+from gallicaWrapper import IssuesWrapper
+from gallicaWrapper import ContentWrapper
+from gallicaWrapper import PapersWrapper
 
 
 class TestGallicaWrapper(TestCase):

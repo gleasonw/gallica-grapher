@@ -133,7 +133,7 @@ class ContentWrapper(GallicaWrapper):
         return ContentQueryFactory()
 
     def buildParser(self):
-        return ParseContentRecord()
+        return parseRecord.build('content')
 
     def buildAPI(self):
         return ConcurrentFetch('https://gallica.bnf.fr/services/ContentSearch')

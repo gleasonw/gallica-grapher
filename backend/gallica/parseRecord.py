@@ -23,7 +23,7 @@ class ParseRecord:
 
     def __init__(self, parser, **kwargs):
         self.parser = parser
-        self.postInit(**kwargs)
+        self.postInit(kwargs)
 
     def postInit(self, args):
         pass
