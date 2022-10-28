@@ -12,6 +12,7 @@ def build(desiredRecord, **kwargs):
         'groupedCount': ParseGroupedRecordCounts,
         'occurrence': ParseOccurrenceRecords,
         'paper': ParsePaperRecords,
+        'content': ParseContentRecord
     }
     if desiredRecord not in recordParsers:
         raise ValueError(f'Unrecognized record type: {desiredRecord}. Options include: {recordParsers.keys()}')

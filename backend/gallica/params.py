@@ -1,6 +1,8 @@
 from gallica.date import Date
 NUM_CODES_PER_BUNDLE = 10
 
+#TODO: pipe args instead of encapsulating them here. Think transformations. I should be able
+# to get the same results by piping the same args to different functions.
 
 class Params:
 

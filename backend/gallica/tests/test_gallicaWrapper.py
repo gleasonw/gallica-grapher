@@ -1,6 +1,6 @@
 from unittest import TestCase
+from gallica.recordGetter import RecordGetter
 from gallicaWrapper import connect
-from gallicaWrapper import GallicaWrapper
 from gallicaWrapper import SRUWrapper
 from gallicaWrapper import IssuesWrapper
 from gallicaWrapper import ContentWrapper
@@ -8,31 +8,40 @@ from gallicaWrapper import PapersWrapper
 
 
 class TestGallicaWrapper(TestCase):
+
+    def setUp(self) -> None:
+        self.gallicaAPIs = [
+            SRUWrapper(),
+            IssuesWrapper(),
+            ContentWrapper(),
+            PapersWrapper()
+        ]
+
+    #superclass responsibility tests
+    def test_buildRecordGetter(self):
+        self.assertIsInstance(self.gallicaAPIs[0].buildRecordGetter(), RecordGetter)
+
+    #Liskov tests
+    def test_responds_to_get(self):
+        [self.assertTrue(hasattr(api, 'get')) for api in self.gallicaAPIs]
+
+    #subclass responsibility tests
+    def test_responds_to_preInit(self):
+        [self.assertTrue(hasattr(api, 'preInit')) for api in self.gallicaAPIs]
+
+    def test_responds_to_buildAPI(self):
+        [self.assertTrue(hasattr(api, 'buildAPI')) for api in self.gallicaAPIs]
+
+    def test_responds_to_buildQueryBuilder(self):
+        [self.assertTrue(hasattr(api, 'buildQueryBuilder')) for api in self.gallicaAPIs]
+
+    def test_responds_to_buildParser(self):
+        [self.assertTrue(hasattr(api, 'buildParser')) for api in self.gallicaAPIs]
+
     def test_connect(self):
-        self.fail()
-
-
-class TestSRUWrapper(TestCase):
-    def test_get(self):
-        self.fail()
-
-    def test_get_num_results_for_args(self):
-        self.fail()
-
-
-class TestIssuesWrapper(TestCase):
-    def test_get(self):
-        self.fail()
-
-
-class TestContentWrapper(TestCase):
-    def test_get(self):
-        self.fail()
-
-
-class TestPapersWrapper(TestCase):
-    def test_get(self):
-        self.fail()
-
-    def test_get_num_results_for_args(self):
-        self.fail()
+        self.assertIsInstance(connect('sru'), SRUWrapper)
+        self.assertIsInstance(connect('issues'), IssuesWrapper)
+        self.assertIsInstance(connect('content'), ContentWrapper)
+        self.assertIsInstance(connect('papers'), PapersWrapper)
+        with self.assertRaises(ValueError):
+            connect('not an api')

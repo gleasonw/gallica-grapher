@@ -1,25 +1,47 @@
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
-
 from arkRecord import ArkRecord
 from groupedCountRecord import GroupedCountRecord
 from occurrenceRecord import OccurrenceRecord
 from paperRecord import PaperRecord
-from parseRecord import ParseArkRecord, ParseOccurrenceRecords, ParsePaperRecords
+from parseRecord import ParseArkRecord
+from parseRecord import ParseGroupedRecordCounts
+from parseRecord import ParseOccurrenceRecords
+from parseRecord import ParsePaperRecords
+from parseRecord import ParseContentRecord
+from parseRecord import build
 
 
 class TestParseRecord(TestCase):
-    pass
+
+    def setUp(self) -> None:
+        self.parsers = [
+            ParseArkRecord(MagicMock()),
+            ParseOccurrenceRecords(MagicMock(), requestID=1, ticketID=1),
+            ParsePaperRecords(MagicMock()),
+            ParseContentRecord(MagicMock()),
+            ParseGroupedRecordCounts(MagicMock(), requestID=1, ticketID=1),
+        ]
+
+    def test_build(self):
+        self.assertIsInstance(build('ark'), ParseArkRecord)
+        self.assertIsInstance(build('groupedCount', requestID=1, ticketID=1), ParseGroupedRecordCounts)
+        self.assertIsInstance(build('occurrence', requestID=1, ticketID=1), ParseOccurrenceRecords)
+        self.assertIsInstance(build('paper'), ParsePaperRecords)
+        self.assertIsInstance(build('content'), ParseContentRecord)
+
+    def test_responds_to_parseResponsesToRecords(self):
+        [self.assertTrue(hasattr(parser, 'parseResponsesToRecords')) for parser in self.parsers]
 
 
 class TestParseArkRecord(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.testParse = ParseArkRecord()
+        self.parser = ParseArkRecord(MagicMock())
 
     def test_parseResponsesToRecords(self):
-        testResultGenerator = self.testParse.parseResponsesToRecords(
+        testResultGenerator = self.parser.parseResponsesToRecords(
             [
                 MagicMock(),
                 MagicMock(),
@@ -90,3 +112,28 @@ class TestParsePaperRecords(unittest.TestCase):
 
         for testResult in test:
             self.assertIsInstance(testResult, PaperRecord)
+
+
+class TestParseContentRecord(unittest.TestCase):
+
+        def setUp(self) -> None:
+            self.testParse = ParseContentRecord(
+                parser=MagicMock()
+            )
+
+        def test_parseResponsesToRecords(self):
+            responses = [
+                MagicMock(),
+                MagicMock(),
+            ]
+            self.testParse.parser.getNumResultsAndPagesForOccurrenceInPeriodical.return_value = [
+                2,
+                'test',
+            ]
+
+            test = self.testParse.parseResponsesToRecords(responses)
+
+            for testResult in test:
+                numResults, pages = testResult
+                self.assertEqual(numResults, 2)
+                self.assertEqual(pages, 'test')

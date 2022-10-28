@@ -7,7 +7,7 @@ class TestOCRQuery(TestCase):
 
     def setUp(self) -> None:
         self.ocrQuery = ContentQuery(
-            paperCode='test',
+            ark='test',
             term='test'
         )
 
@@ -35,7 +35,7 @@ class TestPaperQuery(TestCase):
         test = self.paperQuery.getCQL()
         self.assertEqual(
             test,
-            "dc.type all \"fascicule\" and ocrquality > \"050.00\""
+            "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
         )
 
 
@@ -65,7 +65,7 @@ class TestQuery(TestCase):
             collapsing=True,
             startDate='1901',
             endDate='1902',
-            ticket=MagicMock(
+            searchMetaData=MagicMock(
                 getLinkDistance=MagicMock(return_value=0),
                 getLinkTerm=MagicMock(return_value='')
             )
@@ -77,7 +77,7 @@ class TestQuery(TestCase):
             collapsing=True,
             startDate='1901',
             endDate='1902',
-            ticket=MagicMock(
+            searchMetaData=MagicMock(
                 getLinkDistance=MagicMock(return_value=0),
                 getLinkTerm=MagicMock(return_value='')
             ),
@@ -90,7 +90,7 @@ class TestQuery(TestCase):
             collapsing=True,
             startDate='1901',
             endDate='1902',
-            ticket=MagicMock(
+            searchMetaData=MagicMock(
                 getLinkDistance=MagicMock(return_value=10),
                 getLinkTerm=MagicMock(return_value='neat')
             ),
@@ -107,8 +107,8 @@ class TestQuery(TestCase):
                 "exactSearch": "True",
                 "startRecord": 0,
                 "maximumRecords": 10,
-                "collapsing": True,
-                "query": 'text adj "test" and gallicapublication_date>="1901" and gallicapublication_date<"1902" and (arkPress adj "test_date" or arkPress adj "neat_date")'
+                "collapsing": 'false',
+                "query": 'text adj "test" and gallicapublication_date>="1901" and gallicapublication_date<"1902" and arkPress adj "test_date" or arkPress adj "neat_date"'
             }
         )
 
@@ -129,6 +129,6 @@ class TestQuery(TestCase):
                 'codes': ['test', 'neat'],
                 'endDate': '1902',
                 'startDate': '1901',
-                "ticket": self.queryWithCodes.ticket
+                "searchMetaData": self.queryWithCodes.searchMetaData
             }
         )

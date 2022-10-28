@@ -29,6 +29,9 @@ class GallicaWrapper:
     def preInit(self, kwargs):
         pass
 
+    def get(self, **kwargs):
+        raise NotImplementedError(f'get() not implemented for {self.__class__.__name__}')
+
     def buildAPI(self):
         raise NotImplementedError(f'buildAPI() not implemented for {self.__class__.__name__}')
 
@@ -59,7 +62,6 @@ class SRUWrapper(GallicaWrapper):
             requestID=kwargs.get('requestID')
         )
 
-    #TODO: refactor... this method includes too many special cases (3)
     def get(self, onUpdateProgress=None, generate=False, queriesWithCounts=None, **kwargs):
         grouping = kwargs.get('grouping')
         if grouping is None:

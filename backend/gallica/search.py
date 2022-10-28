@@ -2,7 +2,7 @@ from dbops.schemaLinkForSearch import SchemaLinkForSearch
 import gallica.gallicaWrapper as gallicaWrapper
 
 
-def build(argBundles, stateHooks, wrapper=gallicaWrapper):
+def buildSearch(argBundles, stateHooks, wrapper=gallicaWrapper):
     searches = {
         'all': AllSearch,
         'year': GroupedSearch,

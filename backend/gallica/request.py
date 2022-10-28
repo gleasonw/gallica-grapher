@@ -1,7 +1,7 @@
 import threading
 from utils.psqlconn import PSQLconn
-import gallica.search
-from gallica.searchprogressstats import SearchProgressStats
+from gallica.search import buildSearch
+from gallica.searchprogressstats import initProgressStats
 import time
 import psutil
 
@@ -9,15 +9,25 @@ RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
 
 
+def buildRequest(identifier, argsBundles):
+    return Request(
+        identifier=identifier,
+        argsBundles=argsBundles,
+        statKeeper=initProgressStats,
+        searchBuilder=buildSearch
+    )
+
+
 class Request(threading.Thread):
-    def __init__(self, requestID, argsBundles):
+    def __init__(self, identifier, argsBundles, statKeeper, searchBuilder):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.state = 'RUNNING'
-        self.requestID = requestID
+        self.requestID = identifier
         self.estimateNumRecords = 0
         self.dbConn = PSQLconn().getConn()
         self.argsBundles = argsBundles
+        #TODO: Why not build searches here? Likewise for progress stats?
         self.searches = None
         self.searchProgressStats = self.initProgressStats()
         super().__init__()
@@ -85,7 +95,7 @@ class Request(threading.Thread):
 
     def initProgressStats(self):
         progressDict = {
-            key: SearchProgressStats(
+            key: initProgressStats(
                 ticketID=key,
                 grouping=argsBundle['grouping']
             )

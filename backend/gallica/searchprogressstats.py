@@ -3,12 +3,21 @@ from gallica.gallicaxmlparse import GallicaXMLparse
 from gallica.averageResponseTime import AverageResponseTime
 
 
+def initProgressStats(ticketID, grouping):
+    return SearchProgressStats(
+        ticketID=ticketID,
+        grouping=grouping,
+        parse=GallicaXMLparse(),
+    )
+
+
 class SearchProgressStats:
 
     def __init__(
             self,
             ticketID,
-            grouping
+            grouping,
+            parse
     ):
         self.ticketID = ticketID
         self.numBatchesRetrieved = 0
@@ -22,7 +31,7 @@ class SearchProgressStats:
         self.state = 'NOT_STARTED'
         self.grouping = grouping
         self.numRecordsToFetch = 0
-        self.parse = GallicaXMLparse()
+        self.parse = parse
 
     def get(self):
         return {

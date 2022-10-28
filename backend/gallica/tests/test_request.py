@@ -8,19 +8,10 @@ class TestRequest(TestCase):
     def setUp(self) -> None:
         self.request = Request(
             requestID=1,
-            dbConn=MagicMock(),
-            tickets=[
-                MagicMock(
-                    searchType='month',
-                    getID=MagicMock(return_value=1)),
-                MagicMock(
-                    searchType='all',
-                    getID=MagicMock(return_value=2)),
-            ],
-            SRUapi=MagicMock(),
-            dbLink=MagicMock(),
-            parse=MagicMock(),
-            queryBuilder=MagicMock()
+            argsBundles={
+                1: MagicMock(),
+                2: MagicMock()
+            }
         )
 
     def test_get_progress_stats(self):
