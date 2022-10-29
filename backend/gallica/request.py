@@ -14,21 +14,24 @@ def buildRequest(identifier, argsBundles):
         identifier=identifier,
         argsBundles=argsBundles,
         statKeeper=initProgressStats,
-        searchBuilder=buildSearch
+        searchBuilder=buildSearch,
+        conn=PSQLconn().getConn()
     )
 
 
 class Request(threading.Thread):
-    def __init__(self, identifier, argsBundles, statKeeper, searchBuilder):
+    def __init__(self, identifier, argsBundles, statKeeper, searchBuilder, conn):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.state = 'RUNNING'
         self.requestID = identifier
         self.estimateNumRecords = 0
-        self.dbConn = PSQLconn().getConn()
+        self.dbConn = conn
         self.argsBundles = argsBundles
         #TODO: Why not build searches here? Likewise for progress stats?
         self.searches = None
+        self.statBuilder = statKeeper
+        self.searchBuilder = searchBuilder
         self.searchProgressStats = self.initProgressStats()
         super().__init__()
 
@@ -49,14 +52,13 @@ class Request(threading.Thread):
         self.searchProgressStats[ticketID].update(progressStats)
 
     def run(self):
-        self.searches = gallica.search.build(
+        self.searches = self.searchBuilder(
             argBundles=self.argsBundles,
             stateHooks=self
         )
         numRecords = sum(
-            search.getNumRecordsToBeInserted(
-                onNumRecordsFound=lambda search, numRecordsDiscovered:
-                    self.searchProgressStats[search.identifier].setNumRecordsToFetch(numRecordsDiscovered)
+            search.getNumRecordsToBeInserted(onNumRecordsFound=lambda search, numRecordsDiscovered:
+                self.searchProgressStats[search.identifier].setNumRecordsToFetch(numRecordsDiscovered)
             )
             for search in self.searches
         )
@@ -95,7 +97,7 @@ class Request(threading.Thread):
 
     def initProgressStats(self):
         progressDict = {
-            key: initProgressStats(
+            key: self.statBuilder(
                 ticketID=key,
                 grouping=argsBundle['grouping']
             )
@@ -116,9 +118,9 @@ if __name__ == '__main__':
             'grouping': 'month'
         }
     }
-    testRequest = Request(
+    testRequest = buildRequest(
         argsBundles=argsBundles,
-        requestID='45'
+        identifier='45'
     )
     testRequest.start()
     while testRequest.state != "COMPLETED":

@@ -1,6 +1,5 @@
-from search import Search
-from search import build
 from search import AllSearch
+from search import buildSearch
 from search import GroupedSearch
 from search import PaperSearch
 from unittest import TestCase
@@ -27,7 +26,7 @@ class Test(TestCase):
             }
         }
         stateHooks = MagicMock()
-        searchObjs = build(argBundles, stateHooks, wrapper=MagicMock())
+        searchObjs = buildSearch(argBundles, stateHooks, wrapper=MagicMock())
         self.assertEqual(len(searchObjs), 3)
         self.assertIsInstance(searchObjs[0], AllSearch)
         self.assertIsInstance(searchObjs[1], GroupedSearch)

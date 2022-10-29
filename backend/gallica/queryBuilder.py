@@ -51,6 +51,15 @@ class OccurrenceQueryBuilder(QueryBuilder):
         else:
             return self.buildBaseQueriesFromArgs(args)
 
+    def buildIndexedQueriesFromArgs(self, args, baseQueries):
+        if numDesiredRecords := args.get('numRecords'):
+            return self.createIndexedQueriesFromRootQueries(
+                queries=baseQueries,
+                limit=int(numDesiredRecords)
+            )
+        else:
+            return self.createIndexedQueriesFromRootQueries(baseQueries)
+
     def buildBaseQueriesFromArgs(self, args):
         params = Params(**args)
         if codes := params.getCodeBundles():
@@ -78,15 +87,6 @@ class OccurrenceQueryBuilder(QueryBuilder):
             for term in bundle.getTerms()
             for startDate, endDate in bundle.getDateGroupings()
         ]
-
-    def buildIndexedQueriesFromArgs(self, args, baseQueries):
-        if numDesiredRecords := args.get('numRecords'):
-            return self.createIndexedQueriesFromRootQueries(
-                queries=baseQueries,
-                limit=int(numDesiredRecords)
-            )
-        else:
-            return self.createIndexedQueriesFromRootQueries(baseQueries)
 
     def makeQuery(self, term, startDate, endDate, searchMetaData, startIndex=0, numRecords=1, codes=None):
         codes = codes or []

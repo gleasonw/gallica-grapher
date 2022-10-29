@@ -1,6 +1,7 @@
 from celery import Celery
 from gallica.request import Request
 import time
+from gallica.request import buildRequest
 
 app = Celery()
 app.config_from_object('celery_settings')
@@ -8,9 +9,9 @@ app.config_from_object('celery_settings')
 
 @app.task(bind=True)
 def spawnRequest(self, tickets, requestid):
-    request = Request(
+    request = buildRequest(
         argsBundles=tickets,
-        requestID=requestid
+        identifier=requestid
     )
     request.start()
     pollStates = {
