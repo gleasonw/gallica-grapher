@@ -1,8 +1,8 @@
-from utils.psqlconn import PSQLconn
 from gallica.gallicaxmlparse import GallicaXMLparse
 import gallica.gallicaWrapper as gallicaWrapper
+from dbops.connContext import getConn
 
-conn = PSQLconn().getConn()
+conn = getConn()
 
 
 class RecordDataForUser:
@@ -22,8 +22,7 @@ class RecordDataForUser:
     """
 
     def __init__(self):
-        global conn
-        self.conn = conn if conn else PSQLconn().getConn()
+        self.conn = getConn()
         self.csvData = None
         self.parse = GallicaXMLparse()
 

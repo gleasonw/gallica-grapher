@@ -1,14 +1,13 @@
 import io
 from gallica.gallicaWrapper import connect
-from utils.psqlconn import PSQLconn
-
+from dbops.connContext import getConn
 #TODO: ensure that object creation is done lazily
 
 
 class SchemaLinkForSearch:
     def __init__(self, requestID=None):
         self.requestID = requestID
-        self.conn = PSQLconn().getConn()
+        self.conn = getConn()
         self.paperAPI = connect('papers')
 
     def insertRecordsIntoPapers(self, records, stateHooks=None, identifier=None):

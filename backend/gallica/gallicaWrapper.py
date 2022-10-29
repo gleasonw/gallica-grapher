@@ -3,7 +3,7 @@ from gallica.queryBuilder import OccurrenceQueryBuilder
 from gallica.queryBuilder import ContentQueryFactory
 from gallica.concurrentFetch import ConcurrentFetch
 from gallica.queryBuilder import PaperQueryBuilder
-import parseRecord
+from gallica.parseRecord import buildParser
 
 
 def connect(gallicaAPIselect, **kwargs):
@@ -51,12 +51,12 @@ class GallicaWrapper:
 class SRUWrapper(GallicaWrapper):
 
     def preInit(self, kwargs):
-        self.groupedRecordParser = parseRecord.build(
+        self.groupedRecordParser = buildParser(
             desiredRecord='groupedCount',
             ticketID=kwargs.get('ticketID'),
             requestID=kwargs.get('requestID')
         )
-        self.soloRecordParser = parseRecord.build(
+        self.soloRecordParser = buildParser(
             desiredRecord='occurrence',
             ticketID=kwargs.get('ticketID'),
             requestID=kwargs.get('requestID')
@@ -109,7 +109,7 @@ class IssuesWrapper(GallicaWrapper):
         return recordGenerator if generate else list(recordGenerator)
 
     def buildParser(self):
-        return parseRecord.build('paper')
+        return buildParser('paper')
 
     def buildAPI(self):
         return ConcurrentFetch('https://gallica.bnf.fr/services/Issues')
@@ -135,7 +135,7 @@ class ContentWrapper(GallicaWrapper):
         return ContentQueryFactory()
 
     def buildParser(self):
-        return parseRecord.build('content')
+        return buildParser('content')
 
     def buildAPI(self):
         return ConcurrentFetch('https://gallica.bnf.fr/services/ContentSearch')

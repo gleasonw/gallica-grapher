@@ -1,10 +1,10 @@
-from utils.psqlconn import PSQLconn
+from dbops.connContext import getConn
 
 
 class PaperLocalSearch:
 
     def __init__(self):
-        self.dbConnection = PSQLconn().getConn()
+        self.dbConnection = getConn()
         self.cursor = self.dbConnection.cursor()
 
     def selectPapersContinuousOverRange(self, firstInputYear, secondInputYear, limit):

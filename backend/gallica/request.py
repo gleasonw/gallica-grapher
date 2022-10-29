@@ -1,7 +1,7 @@
 import threading
-from utils.psqlconn import PSQLconn
 from gallica.search import buildSearch
 from gallica.searchprogressstats import initProgressStats
+from dbops.connContext import getConn
 import time
 import psutil
 
@@ -15,7 +15,7 @@ def buildRequest(identifier, argsBundles):
         argsBundles=argsBundles,
         statKeeper=initProgressStats,
         searchBuilder=buildSearch,
-        conn=PSQLconn().getConn()
+        conn=getConn()
     )
 
 

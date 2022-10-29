@@ -1,18 +1,18 @@
-from utils.psqlconn import PSQLconn
 from dbops.sqlForGraph import SQLforGraph
 import datetime
 import ciso8601
+from dbops.connContext import getConn
 
 
 class GraphSeriesBatch:
 
     def __init__(self):
-        self.dbConnection = PSQLconn().getConn()
+        self.dbConnection = getConn()
         self.sqlGetter = SQLforGraph()
 
     def getSeriesForSettings(self, settings):
         if self.dbConnection.closed:
-            self.dbConnection = PSQLconn().getConn()
+            self.dbConnection = getConn()
         ticketIDs = settings['ticketIDs'].split(',')
         dataBatches = list(map(
             lambda ticketID: self.selectOneSeries(

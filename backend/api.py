@@ -4,17 +4,19 @@ from flask import request
 from flask_cors import CORS
 import random
 import json
-
 from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
 from dbops.recordDataForUser import RecordDataForUser
+from dbops.connContext import buildDBConn
 
 app = Flask(__name__)
 CORS(app)
 requestIDSeed = random.randint(0, 10000)
 graphBatchGetter = GraphSeriesBatch()
 recordDataGetter = RecordDataForUser()
+print("Starting up...")
+buildDBConn()
 
 
 @app.route('/')
