@@ -28,7 +28,6 @@ class Request(threading.Thread):
         self.estimateNumRecords = 0
         self.dbConn = conn
         self.argsBundles = argsBundles
-        #TODO: Why not build searches here? Likewise for progress stats?
         self.searches = None
         self.statBuilder = statKeeper
         self.searchBuilder = searchBuilder
@@ -109,13 +108,13 @@ class Request(threading.Thread):
 if __name__ == '__main__':
     argsBundles ={
         0: {
-            'terms': ['paix'],
+            'terms': ['brazza'],
             'codes': [],
             'startDate': 1870,
             'endDate': 1885,
             'linkTerm': None,
             'linkDistance': 10,
-            'grouping': 'month'
+            'grouping': 'all'
         }
     }
     testRequest = buildRequest(

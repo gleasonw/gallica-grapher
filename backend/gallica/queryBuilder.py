@@ -43,22 +43,13 @@ class QueryBuilder:
 class OccurrenceQueryBuilder(QueryBuilder):
 
     def buildQueriesForArgs(self, args):
+        baseQueries = self.buildBaseQueriesFromArgs(args)
         if args['grouping'] == 'all':
-            return self.buildIndexedQueriesFromArgs(
-                args=args,
-                baseQueries=self.buildBaseQueriesFromArgs(args)
-            )
-        else:
-            return self.buildBaseQueriesFromArgs(args)
-
-    def buildIndexedQueriesFromArgs(self, args, baseQueries):
-        if numDesiredRecords := args.get('numRecords'):
             return self.createIndexedQueriesFromRootQueries(
                 queries=baseQueries,
-                limit=int(numDesiredRecords)
+                limit=args.get('numRecords')
             )
-        else:
-            return self.createIndexedQueriesFromRootQueries(baseQueries)
+        return baseQueries
 
     def buildBaseQueriesFromArgs(self, args):
         params = Params(**args)
