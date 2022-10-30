@@ -1,16 +1,16 @@
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
-from arkRecord import ArkRecord
-from groupedCountRecord import GroupedCountRecord
-from occurrenceRecord import OccurrenceRecord
-from paperRecord import PaperRecord
-from parseRecord import ParseArkRecord
-from parseRecord import ParseGroupedRecordCounts
-from parseRecord import ParseOccurrenceRecords
-from parseRecord import ParsePaperRecords
-from parseRecord import ParseContentRecord
-from parseRecord import build
+from gallica.dto.arkRecord import ArkRecord
+from gallica.dto.groupedCountRecord import GroupedCountRecord
+from gallica.dto.occurrenceRecord import OccurrenceRecord
+from gallica.dto.paperRecord import PaperRecord
+from gallica.parseRecord import ParseArkRecord
+from gallica.parseRecord import ParseGroupedRecordCounts
+from gallica.parseRecord import ParseOccurrenceRecords
+from gallica.parseRecord import ParsePaperRecords
+from gallica.parseRecord import ParseContentRecord
+from gallica.parseRecord import buildParser
 
 
 class TestParseRecord(TestCase):
@@ -25,11 +25,11 @@ class TestParseRecord(TestCase):
         ]
 
     def test_build(self):
-        self.assertIsInstance(build('ark'), ParseArkRecord)
-        self.assertIsInstance(build('groupedCount', requestID=1, ticketID=1), ParseGroupedRecordCounts)
-        self.assertIsInstance(build('occurrence', requestID=1, ticketID=1), ParseOccurrenceRecords)
-        self.assertIsInstance(build('paper'), ParsePaperRecords)
-        self.assertIsInstance(build('content'), ParseContentRecord)
+        self.assertIsInstance(buildParser('ark'), ParseArkRecord)
+        self.assertIsInstance(buildParser('groupedCount', requestID=1, ticketID=1), ParseGroupedRecordCounts)
+        self.assertIsInstance(buildParser('occurrence', requestID=1, ticketID=1), ParseOccurrenceRecords)
+        self.assertIsInstance(buildParser('paper'), ParsePaperRecords)
+        self.assertIsInstance(buildParser('content'), ParseContentRecord)
 
     def test_responds_to_parseResponsesToRecords(self):
         [self.assertTrue(hasattr(parser, 'parseResponsesToRecords')) for parser in self.parsers]

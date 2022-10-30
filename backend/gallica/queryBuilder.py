@@ -3,7 +3,9 @@ from gallica.gallicaxmlparse import GallicaXMLparse
 from gallica.query import ArkQueryForNewspaperYears
 from gallica.query import PaperQuery
 from gallica.query import ContentQuery
-from gallica.params import Params
+from gallica.dateGrouping import DateGrouping
+
+NUM_CODES_PER_BUNDLE = 10
 
 
 class QueryBuilder:
@@ -52,31 +54,27 @@ class OccurrenceQueryBuilder(QueryBuilder):
         return baseQueries
 
     def buildBaseQueriesFromArgs(self, args):
-        params = Params(**args)
-        if codes := params.getCodeBundles():
-            return self.buildWithCodeBundles(params, codes)
-        else:
-            return self.buildNoCodeBundles(params)
-
-    def buildWithCodeBundles(self, params, codeBundles):
         return [
             self.makeQuery(
                 term=term,
                 startDate=startDate,
                 endDate=endDate,
-                searchMetaData=params,
-                codes=codes
+                searchMetaData=args,
+                codes=codeBundle
             )
-            for term in params.getTerms()
-            for startDate, endDate in params.getDateGroupings()
-            for codes in codeBundles
+            for term in args.get('terms')
+            for startDate, endDate in DateGrouping(
+                args.get('startDate'),
+                args.get('endDate'),
+                args.get('grouping')
+            )
+            for codeBundle in self.bundleCodesTogether(args.get('codes'))
         ]
 
-    def buildNoCodeBundles(self, bundle):
-        return [
-            self.makeQuery(term, startDate, endDate, bundle)
-            for term in bundle.getTerms()
-            for startDate, endDate in bundle.getDateGroupings()
+    def bundleCodesTogether(self, codes):
+        return ['no_codes'] if codes is None else [
+            codes[i:i+NUM_CODES_PER_BUNDLE]
+            for i in range(0, len(codes), NUM_CODES_PER_BUNDLE)
         ]
 
     def makeQuery(self, term, startDate, endDate, searchMetaData, startIndex=0, numRecords=1, codes=None):

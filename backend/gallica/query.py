@@ -53,13 +53,14 @@ class SRUQuery(Query):
 class OccurrenceQuery(SRUQuery):
 
     def postInit(self, kwargs):
-        self.searchMetaData = kwargs['searchMetaData']
-        self.linkDistance = self.searchMetaData.getLinkDistance()
-        self.linkTerm = self.searchMetaData.getLinkTerm()
         self.startDate = kwargs['startDate']
         self.endDate = kwargs['endDate']
         self.term = kwargs['term']
-        self.identifier = self.searchMetaData.getIdentifier()
+
+        self.searchMetaData = kwargs['searchMetaData']
+        self.linkDistance = self.searchMetaData.get('linkDistance', 0)
+        self.linkTerm = self.searchMetaData.get('linkTerm')
+        self.identifier = self.searchMetaData.get('identifier')
 
     def getIdentifier(self):
         return self.identifier
