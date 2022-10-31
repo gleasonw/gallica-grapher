@@ -114,8 +114,17 @@ if __name__ == '__main__':
             'endDate': 1885,
             'linkTerm': None,
             'linkDistance': 10,
-            'grouping': 'all'
-        }
+            'grouping': 'year'
+        },
+        1: {
+            'terms': ['stanley'],
+            'codes': [],
+            'startDate': 1886,
+            'endDate': 1900,
+            'linkTerm': None,
+            'linkDistance': 10,
+            'grouping': 'year'
+        },
     }
     testRequest = buildRequest(
         argsBundles=argsBundles,

@@ -65,10 +65,10 @@ class TestQuery(TestCase):
             collapsing=True,
             startDate='1901',
             endDate='1902',
-            searchMetaData=MagicMock(
-                getLinkDistance=MagicMock(return_value=0),
-                getLinkTerm=MagicMock(return_value='')
-            )
+            searchMetaData={
+                'linkDistance': 0,
+                'linkTerm': ''
+            },
         )
         self.queryWithoutCodes = OccurrenceQuery(
             term='test',
@@ -77,10 +77,10 @@ class TestQuery(TestCase):
             collapsing=True,
             startDate='1901',
             endDate='1902',
-            searchMetaData=MagicMock(
-                getLinkDistance=MagicMock(return_value=0),
-                getLinkTerm=MagicMock(return_value='')
-            ),
+            searchMetaData={
+                'linkDistance': 0,
+                'linkTerm': ''
+            },
             codes=[]
         )
         self.queryWithLinkTermAndDistance = OccurrenceQuery(
@@ -90,10 +90,10 @@ class TestQuery(TestCase):
             collapsing=True,
             startDate='1901',
             endDate='1902',
-            searchMetaData=MagicMock(
-                getLinkDistance=MagicMock(return_value=10),
-                getLinkTerm=MagicMock(return_value='neat')
-            ),
+            searchMetaData={
+                'linkDistance': 0,
+                'linkTerm': ''
+            },
             codes=[]
         )
 

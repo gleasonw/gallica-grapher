@@ -1,5 +1,9 @@
+from gallica.date import Date
+
 
 def DateGrouping(startDate, endDate, grouping):
+    startDate = Date(startDate)
+    endDate = Date(endDate)
     if startDate is None and endDate is None:
         return [(None, None)]
     groupings = {

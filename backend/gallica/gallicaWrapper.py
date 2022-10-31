@@ -166,4 +166,4 @@ class PapersWrapper(GallicaWrapper):
         return PaperQueryBuilder(gallicaAPI=self.api)
 
     def buildParser(self):
-        return ParsePaperRecords()
+        return buildParser('paper')

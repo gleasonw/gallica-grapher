@@ -40,7 +40,7 @@ class SRUQuery(Query):
         raise NotImplementedError
 
     def buildPaperCQL(self):
-        if self.codes:
+        if self.codes and self.codes[0]:
             formattedCodes = [f"{code}_date" for code in self.codes]
             return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
         else:

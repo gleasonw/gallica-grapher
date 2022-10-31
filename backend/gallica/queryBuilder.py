@@ -72,7 +72,7 @@ class OccurrenceQueryBuilder(QueryBuilder):
         ]
 
     def bundleCodesTogether(self, codes):
-        return ['no_codes'] if codes is None else [
+        return [None] if codes is None or len(codes) == 0 else [
             codes[i:i+NUM_CODES_PER_BUNDLE]
             for i in range(0, len(codes), NUM_CODES_PER_BUNDLE)
         ]

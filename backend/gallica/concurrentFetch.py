@@ -4,6 +4,7 @@ from gallica.get import Get
 NUM_WORKERS = 30
 
 
+#TODO: make the get functional. Doesn't need to be an object
 class ConcurrentFetch:
 
     def __init__(self, baseUrl, numWorkers=NUM_WORKERS):
