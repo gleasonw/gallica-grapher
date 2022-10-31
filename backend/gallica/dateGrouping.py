@@ -26,9 +26,13 @@ def makeWideGroupingsForAllSearch(startDate, endDate):
             f"{nextYear}-{nextMonth:02}-01"
         )]
     else:
+        if endDate.getYear():
+            endBoundary = int(endDate.getYear()) + 1
+        else:
+            endBoundary = int(startDate.getYear()) + 1
         return [(
             f"{startDate.getYear()}-01-01",
-            f"{int(endDate.getYear()) + 1}-01-01"
+            f"{endBoundary}-01-01"
         )]
 
 

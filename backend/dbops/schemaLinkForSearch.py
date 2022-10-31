@@ -1,7 +1,6 @@
 import io
 from gallica.gallicaWrapper import connect
 from dbops.connContext import getConn
-#TODO: ensure that object creation is done lazily
 
 
 class SchemaLinkForSearch:

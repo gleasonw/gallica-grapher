@@ -21,6 +21,7 @@ class QueryBuilder:
     def indexQueriesWithNumResults(self, queriesWithNumResults):
         indexedQueries = []
         for query, numResults in queriesWithNumResults:
+            numResults = int(numResults)
             for i in range(0, numResults, 50):
                 baseData = query.getEssentialDataForMakingAQuery()
                 baseData['startIndex'] = i

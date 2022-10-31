@@ -6,6 +6,7 @@ import {StyledRequestBox} from "./RequestBox";
 import {PaperInputBox} from "./PeriodicalInputs/PaperInputBox";
 import {TermInputBox} from "./TermInputBox";
 import RequestBoxAndFetchButtonWrap from "./RequestBoxAndFetchButtonWrap";
+import styled from "styled-components";
 
 function TicketForm(props) {
     const [showNoTermsReminder, setShowNoTermsReminder] = useState(false);
@@ -35,11 +36,8 @@ function TicketForm(props) {
     }
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            className='userInputForm'
-        >
-            <div>
+        <StyledTicketForm onSubmit={handleSubmit}>
+            <StyledLabeledInput>
                 <label>View occurrences of this word:</label>
                 <TermInputBox
                     onEnterPress={handleSubmit}
@@ -53,8 +51,8 @@ function TicketForm(props) {
                     onLinkTermChange={props.onLinkTermChange}
                     onLinkDistanceChange={props.onLinkDistanceChange}
                 />
-            </div>
-            <div>
+            </StyledLabeledInput>
+            <StyledLabeledInput>
                 <label>in these periodicals:</label>
                 <PaperInputBox
                     onClick={props.onPaperDropItemClick}
@@ -76,8 +74,8 @@ function TicketForm(props) {
                         onCreateTicketClick={handleCreateTicketClick}
                     />
                 </div>
-            </div>
-            <div>
+            </StyledLabeledInput>
+            <StyledLabeledInput>
                 <label>between:</label>
                 <DateSelect
                     startDate={props.startDate}
@@ -92,7 +90,7 @@ function TicketForm(props) {
                     onDateGroupClick={props.onSearchTypeClick}
                     selected={props.selectedSearchType}
                 />
-            </div>
+            </StyledLabeledInput>
             <RequestBoxAndFetchButtonWrap>
                 <ImportantButtonWrap>
                     <input
@@ -101,9 +99,24 @@ function TicketForm(props) {
                     />
                 </ImportantButtonWrap>
             </RequestBoxAndFetchButtonWrap>
-        </form>
+        </StyledTicketForm>
     )
 }
 
+const StyledTicketForm = styled.form`
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    width: calc(100% - 2rem);
+    max-width: 800px;
+`;
+
+const StyledLabeledInput = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    font-size: 1.2rem;
+`;
 
 export default TicketForm;

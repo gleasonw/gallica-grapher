@@ -1,5 +1,6 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 import gallica.gallicaWrapper as gallicaWrapper
+from gallica.queryBuilder import NUM_CODES_PER_BUNDLE
 
 
 def buildSearch(argBundles, stateHooks, wrapper=gallicaWrapper):
@@ -128,6 +129,8 @@ class GroupedSearch(Search):
         numRecords = self.args['endDate'] + 1 - self.args['startDate']
         if self.args['grouping'] == 'month':
             numRecords *= 12
+        if self.args.get('codes'):
+            numRecords *= (len(self.args['codes']) // NUM_CODES_PER_BUNDLE) + 1
         onNumRecordsFound and onNumRecordsFound(self, numRecords)
         return numRecords
 

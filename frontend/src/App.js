@@ -14,8 +14,8 @@ import ImportantButtonWrap from "./shared/ImportantButtonWrap";
 function App() {
     const [tickets, setTickets] = useState({});
     const [selectedSearchType, setSelectedSearchType] = useState(0);
-    const [startDate, setstartDate] = useState(1880);
-    const [endDate, setendDate] = useState(1900);
+    const [startDate, setStartDate] = useState(1880);
+    const [endDate, setEndDate] = useState(1900);
     const [requestID, setRequestID] = useState(null);
     const [progressID, setProgressID] = useState(null);
     const [currentPage, setCurrentPage] = useState('input');
@@ -34,8 +34,8 @@ function App() {
                 selectedSearchType={selectedSearchType}
                 startDate={startDate}
                 endDate={endDate}
-                onstartDateChange={(e) => setstartDate(e.target.value)}
-                onendDateChange={(e) => setendDate(e.target.value)}
+                onstartDateChange={(e) => setStartDate(e.target.value)}
+                onendDateChange={(e) => setEndDate(e.target.value)}
                 onSearchTypeChange={(i) => setSelectedSearchType(i)}
             />,
         'running':
