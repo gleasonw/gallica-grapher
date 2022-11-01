@@ -2,8 +2,6 @@ import threading
 from gallica.search import buildSearch
 from gallica.searchprogressstats import initProgressStats
 from dbops.connContext import getConn
-import time
-import psutil
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
