@@ -150,6 +150,7 @@ function App() {
                 grouping: getSearchTypeForIndex(selectedSearchType),
             }
         })
+        console.log(ticketsWithSearchType);
         return ticketsWithSearchType;
     }
 
@@ -199,9 +200,10 @@ function App() {
         const [id, tickets] = Object.entries(example)[0];
         const ticketData = tickets['tickets'];
         const requestWithUniqueTicketIDs = {}
-        Object.keys(ticketData).map((ticketID, index) => (
-            requestWithUniqueTicketIDs[index] = ticketData[ticketID]
-        ))
+        Object.keys(ticketData).map((ticketID, index) => {
+            ticketData[ticketID].grouping = 'all';
+            requestWithUniqueTicketIDs[index] = ticketData[ticketID];
+        })
         setTickets(requestWithUniqueTicketIDs);
         setRequestID(nameToId[id])
         setCurrentPage('result')
