@@ -25,12 +25,6 @@ class SQLforGraph:
                 settings["endDate"],
                 settings["averageWindow"]
             )
-        elif settings["groupBy"] in ["year", "month", "day"]:
-            return (
-                settings["requestID"],
-                ticketID,
-                settings["averageWindow"]
-            )
         elif settings["groupBy"] in ["gallicaYear", "gallicaMonth"]:
             return (
                 settings["averageWindow"],
@@ -38,7 +32,11 @@ class SQLforGraph:
                 ticketID
             )
         else:
-            raise KeyError("Invalid time bin")
+            return (
+                settings["requestID"],
+                ticketID,
+                settings["averageWindow"]
+            )
 
     def getDayGroupedSQL(self):
         return """
