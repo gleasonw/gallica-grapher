@@ -103,27 +103,3 @@ class Request(threading.Thread):
             for key, argsBundle in self.argsBundles.items()
         }
         return progressDict
-
-
-if __name__ == '__main__':
-    argsBundles ={
-        0: {
-            'terms': ['braza'],
-            'codes': [],
-            'startDate': 1880,
-            'endDate': 1890,
-            'linkTerm': None,
-            'linkDistance': 10,
-            'grouping': 'year'
-        }
-    }
-    testRequest = buildRequest(
-        argsBundles=argsBundles,
-        identifier='45'
-    )
-    testRequest.start()
-    while testRequest.state != "COMPLETED":
-        time.sleep(1)
-        #print memory usage in mb
-        print(psutil.Process().memory_info().rss / 1000000)
-        print(testRequest.getProgressStats())
