@@ -55,16 +55,16 @@ class Request(threading.Thread):
             argBundles=self.argsBundles,
             stateHooks=self
         )
-        numRecords = sum(
+        self.estimateNumRecords = sum(
             search.getNumRecordsToBeInserted(onNumRecordsFound=lambda search, numRecordsDiscovered:
                 self.searchProgressStats[search.identifier].setNumRecordsToFetch(numRecordsDiscovered)
             )
             for search in self.searches
         )
-        if numRecords == 0:
+        if self.estimateNumRecords == 0:
             self.state = 'NO_RECORDS'
         else:
-            if self.numRecordsUnderLimit(numRecords):
+            if self.numRecordsUnderLimit(self.estimateNumRecords):
                 self.doEachSearch()
             else:
                 self.state = 'TOO_MANY_RECORDS'

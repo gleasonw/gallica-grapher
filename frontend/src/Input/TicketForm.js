@@ -52,20 +52,22 @@ function TicketForm(props) {
                     onLinkDistanceChange={props.onLinkDistanceChange}
                 />
             </StyledLabeledInput>
-            <StyledLabeledInput>
-                <label>in these periodicals:</label>
-                <PaperInputBox
-                    onClick={props.onPaperDropItemClick}
-                    deletePaperBubble={props.deletePaperBubble}
-                    onPaperInputSelectClick={props.onPaperInputClick}
-                    selectedPaperInput={props.selectedPaperInput}
-                    numContinuousPapers={props.numContinuousPapers}
-                    userSelectedPapers={props.userSelectedPapers}
-                    boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
-                    onFocus={props.onPaperInputFocus}
-                    startDate={props.startDate}
-                    endDate={props.endDate}
-                />
+            <div>
+                <StyledLabeledInput>
+                    <label>in these periodicals:</label>
+                    <PaperInputBox
+                        onClick={props.onPaperDropItemClick}
+                        deletePaperBubble={props.deletePaperBubble}
+                        onPaperInputSelectClick={props.onPaperInputClick}
+                        selectedPaperInput={props.selectedPaperInput}
+                        numContinuousPapers={props.numContinuousPapers}
+                        userSelectedPapers={props.userSelectedPapers}
+                        boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
+                        onFocus={props.onPaperInputFocus}
+                        startDate={props.startDate}
+                        endDate={props.endDate}
+                    />
+                </StyledLabeledInput>
                 <div ref={props.requestBoxRef}>
                     <StyledRequestBox
                         tickets={props.tickets}
@@ -74,7 +76,7 @@ function TicketForm(props) {
                         onCreateTicketClick={handleCreateTicketClick}
                     />
                 </div>
-            </StyledLabeledInput>
+            </div>
             <StyledLabeledInput>
                 <label>between:</label>
                 <DateSelect
@@ -106,8 +108,8 @@ function TicketForm(props) {
 const StyledTicketForm = styled.form`
     display: flex;
     flex-direction: column;
-    gap: 1rem;
     padding: 1rem;
+    gap: 1rem;
     width: calc(100% - 2rem);
     max-width: 800px;
 `;

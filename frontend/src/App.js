@@ -65,9 +65,8 @@ function App() {
                 <h3>{numRecords.toLocaleString()} records in your request.</h3>
                 <section>
                     <br/>
-                    <p>This number is either greater than my limit, or I don't have enough space for it right now.
-                        Try restricting your search to a few periodicals, shortening the year range, or using a more
-                        precise term. </p>
+                    <p>I can't retrieve all these records for you. There are just too many of them. Try
+                    running the same request, but group by year. I don't have to pull as many records from Paris for that.</p>
                     <br/>
                 </section>
                 <ImportantButtonWrap
