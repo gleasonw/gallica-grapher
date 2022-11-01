@@ -26,7 +26,7 @@ class SRUQuery(Query):
             "version": 1.2,
             "startRecord": self.startIndex,
             "maximumRecords": self.numRecords,
-            "query": self.getCQL(),
+            "query": self.getCQL()
         }
         base.update(self.getCollapsingSetting())
         return base

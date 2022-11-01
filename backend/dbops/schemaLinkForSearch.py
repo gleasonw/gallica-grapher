@@ -19,7 +19,7 @@ class SchemaLinkForSearch:
             )
 
     def insertRecordsIntoResults(self, records, identifier, stateHooks):
-        stream, codes = self.buildCSVstreamAndGetCodesAndEnsureNoDuplicates(records)
+        stream, codes = self.build_csv_stream_ensure_no_issue_duplicates(records)
         self.insertMissingPapersToDB(
             codes,
             onAddingMissingPapers=lambda: stateHooks.setSearchState(
@@ -88,7 +88,7 @@ class SchemaLinkForSearch:
             )
             return curs.fetchall()
 
-    def buildCSVstreamAndGetCodesAndEnsureNoDuplicates(self, records):
+    def build_csv_stream_ensure_no_issue_duplicates(self, records):
         csvFileLikeObject = io.StringIO()
         codes = set()
         codeDates = {}

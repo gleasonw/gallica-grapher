@@ -163,6 +163,7 @@ function App() {
                     (paperAndCode) => (paperAndCode.code))
             }
         ))
+        delete ticketsWithPaperNamesRemoved['papersAndCodes'];
         return ticketsWithPaperNamesRemoved;
     }
 

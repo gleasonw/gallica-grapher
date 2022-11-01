@@ -108,23 +108,14 @@ class Request(threading.Thread):
 if __name__ == '__main__':
     argsBundles ={
         0: {
-            'terms': ['brazza'],
+            'terms': ['braza'],
             'codes': [],
-            'startDate': 1870,
-            'endDate': 1885,
+            'startDate': 1880,
+            'endDate': 1890,
             'linkTerm': None,
             'linkDistance': 10,
             'grouping': 'year'
-        },
-        1: {
-            'terms': ['stanley'],
-            'codes': [],
-            'startDate': 1886,
-            'endDate': 1900,
-            'linkTerm': None,
-            'linkDistance': 10,
-            'grouping': 'year'
-        },
+        }
     }
     testRequest = buildRequest(
         argsBundles=argsBundles,

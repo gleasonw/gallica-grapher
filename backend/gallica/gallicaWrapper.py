@@ -109,7 +109,7 @@ class IssuesWrapper(GallicaWrapper):
         return recordGenerator if generate else list(recordGenerator)
 
     def buildParser(self):
-        return buildParser('paper')
+        return buildParser('ark')
 
     def buildAPI(self):
         return ConcurrentFetch('https://gallica.bnf.fr/services/Issues')

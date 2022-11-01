@@ -99,11 +99,11 @@ class PaperQueryBuilder(QueryBuilder):
 
     def buildSRUQueriesForCodes(self, codes):
         sruQueries = []
-        for i in range(0, len(codes), 10):
-            codesForQuery = codes[i:i + 10]
+        for i in range(0, len(codes), NUM_CODES_PER_BUNDLE):
+            codesForQuery = codes[i:i + NUM_CODES_PER_BUNDLE]
             sruQuery = PaperQuery(
                 startIndex=0,
-                numRecords=10,
+                numRecords=NUM_CODES_PER_BUNDLE,
                 codes=codesForQuery
             )
             sruQueries.append(sruQuery)

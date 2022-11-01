@@ -20,6 +20,7 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaWrapper):
         search = bundle['grouping']
         runner = searches[search](**initParams)
         if search != 'all' and runner.moreDateIntervalsThanRecordBatches() and len(argBundles.items()) == 1:
+            #TODO: save num results and pass to all search to avoid duplicate work
             bundle['grouping'] = 'all'
             runner = AllSearch(**initParams)
             stateHooks.onSearchChangeToAll(key)

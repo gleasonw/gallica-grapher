@@ -5,6 +5,13 @@ from gallicaWrapper import SRUWrapper
 from gallicaWrapper import IssuesWrapper
 from gallicaWrapper import ContentWrapper
 from gallicaWrapper import PapersWrapper
+from gallica.parseRecord import ParseArkRecord
+from gallica.parseRecord import ParsePaperRecords
+from gallica.parseRecord import ParseContentRecord
+from gallica.concurrentFetch import ConcurrentFetch
+from gallica.queryBuilder import OccurrenceQueryBuilder
+from gallica.queryBuilder import PaperQueryBuilder
+from gallica.queryBuilder import ContentQueryFactory
 
 
 class TestGallicaWrapper(TestCase):
@@ -45,3 +52,62 @@ class TestGallicaWrapper(TestCase):
         self.assertIsInstance(connect('papers'), PapersWrapper)
         with self.assertRaises(ValueError):
             connect('not an api')
+
+#subclass state tests
+
+
+class TestSRUWrapper(TestCase):
+
+    def setUp(self) -> None:
+        self.api = SRUWrapper()
+
+    def test_buildAPI(self):
+        self.assertIsInstance(self.api.buildAPI(), ConcurrentFetch)
+
+    def test_buildQueryBuilder(self):
+        self.assertIsInstance(self.api.buildQueryBuilder(), OccurrenceQueryBuilder)
+
+
+class TestIssuesWrapper(TestCase):
+
+    def setUp(self) -> None:
+        self.api = IssuesWrapper()
+
+    def test_buildAPI(self):
+        self.assertIsInstance(self.api.buildAPI(), ConcurrentFetch)
+
+    def test_buildQueryBuilder(self):
+        self.assertIsInstance(self.api.buildQueryBuilder(), PaperQueryBuilder)
+
+    def test_buildParser(self):
+        self.assertIsInstance(self.api.buildParser(), ParseArkRecord)
+
+
+class TestContentWrapper(TestCase):
+
+        def setUp(self) -> None:
+            self.api = ContentWrapper()
+
+        def test_buildAPI(self):
+            self.assertIsInstance(self.api.buildAPI(), ConcurrentFetch)
+
+        def test_buildQueryBuilder(self):
+            self.assertIsInstance(self.api.buildQueryBuilder(), ContentQueryFactory)
+
+        def test_buildParser(self):
+            self.assertIsInstance(self.api.buildParser(), ParseContentRecord)
+
+
+class TestPapersWrapper(TestCase):
+
+        def setUp(self) -> None:
+            self.api = PapersWrapper()
+
+        def test_buildAPI(self):
+            self.assertIsInstance(self.api.buildAPI(), ConcurrentFetch)
+
+        def test_buildQueryBuilder(self):
+            self.assertIsInstance(self.api.buildQueryBuilder(), PaperQueryBuilder)
+
+        def test_buildParser(self):
+            self.assertIsInstance(self.api.buildParser(), ParsePaperRecords)
