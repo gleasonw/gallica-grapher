@@ -296,10 +296,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "londres": {
           "terms": [
@@ -355,10 +353,8 @@
             "seattle"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1880",
-            "1930"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "san francisco": {
           "terms": [

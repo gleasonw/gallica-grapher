@@ -4,6 +4,7 @@ from gallica.query import ArkQueryForNewspaperYears
 from gallica.query import PaperQuery
 from gallica.query import ContentQuery
 from gallica.dateGrouping import DateGrouping
+import logging
 
 NUM_CODES_PER_BUNDLE = 10
 
@@ -55,6 +56,14 @@ class OccurrenceQueryBuilder(QueryBuilder):
         return baseQueries
 
     def buildBaseQueriesFromArgs(self, args):
+        terms = args.get('terms')
+        codes = args.get('codes')
+        if terms is None:
+            raise ValueError('terms must be provided --> get(terms="...") or get(terms=["...", ...])')
+        if not isinstance(terms, list):
+            terms = [terms]
+        if codes and not isinstance(codes, list):
+            codes = [codes]
         return [
             self.makeQuery(
                 term=term,
@@ -63,13 +72,13 @@ class OccurrenceQueryBuilder(QueryBuilder):
                 searchMetaData=args,
                 codes=codeBundle
             )
-            for term in args.get('terms')
+            for term in terms
             for startDate, endDate in DateGrouping(
                 args.get('startDate'),
                 args.get('endDate'),
                 args.get('grouping')
             )
-            for codeBundle in self.bundleCodesTogether(args.get('codes'))
+            for codeBundle in self.bundleCodesTogether(codes)
         ]
 
     def bundleCodesTogether(self, codes):
@@ -95,7 +104,12 @@ class PaperQueryBuilder(QueryBuilder):
 
     def buildQueriesForArgs(self, args):
         codes = args.get('codes')
-        return self.buildSRUQueriesForCodes(codes) if codes else self.buildSRUQueriesForAllRecords()
+        if codes is None:
+            logging.warning('No codes provided (get(codes=["..."]) or get(codes="...")). Proceeding to fetch all papers on Gallica. Stop me if you wish!')
+            return self.buildSRUQueriesForAllRecords()
+        if not isinstance(codes, list):
+            codes = [codes]
+        return self.buildSRUQueriesForCodes(codes)
 
     def buildSRUQueriesForCodes(self, codes):
         sruQueries = []

@@ -167,3 +167,19 @@ class PapersWrapper(GallicaWrapper):
 
     def buildParser(self):
         return buildParser('paper')
+
+
+if __name__ == '__main__':
+    sruWrapper = connect('sru')
+    issuesWrapper = connect('issues')
+    contentWrapper = connect('content')
+    papersWrapper = connect('papers')
+    records = sruWrapper.get(
+        terms='brazza',
+        grouping='all',
+        startDate='1863',
+        endDate='1940',
+        codes='cb32895690j',
+    )
+    for record in records:
+        print(record.getRow())

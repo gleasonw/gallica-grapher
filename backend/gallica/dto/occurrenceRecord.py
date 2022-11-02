@@ -25,20 +25,21 @@ class OccurrenceRecord:
         return self.paperCode
 
     def __repr__(self):
-        return f'OccurrenceRecord({self.paperTitle}, {self.url}, {self.date})'
+        return f'OccurrenceRecord({self.term}, {self.paperTitle}, {self.url}, {self.date})'
 
     def getRow(self):
-        return (
+        row = [
             self.url,
             self.date.getYear(),
             self.date.getMonth(),
             self.date.getDay(),
             self.term,
-            self.ticketID,
-            self.requestID,
-            self.paperCode,
-            self.paperTitle
-        )
+        ]
+        self.ticketID and row.append(self.ticketID)
+        self.requestID and row.append(self.requestID)
+        row.append(self.paperCode)
+        row.append(self.paperTitle)
+        return tuple(row)
 
     def getDisplayRow(self):
         return (

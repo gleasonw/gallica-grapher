@@ -7,7 +7,7 @@ class PaperRecord:
         self.publishingYears = []
 
     def __repr__(self):
-        return f'PaperRecord({self.code}, {self.title}, {self.url})'
+        return f'PaperRecord({self.code}, {self.title}, {self.url}, [{self.publishingYears[0]}-{self.publishingYears[-1]}])'
 
     def getRow(self):
         if self.publishingYears:
