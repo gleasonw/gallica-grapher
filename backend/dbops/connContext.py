@@ -1,16 +1,14 @@
 import psycopg2
 import os
 
-_conn = None
-
 
 def buildDBConn():
-    global _conn
     if os.environ.get('DATABASE_URL'):
-        _conn = initHerokuConn()
+        conn = initHerokuConn()
     else:
-        _conn = initLocalConn()
-    _conn.set_session(autocommit=True)
+        conn = initLocalConn()
+    conn.set_session(autocommit=True)
+    return conn
 
 
 def initLocalConn():
@@ -25,13 +23,17 @@ def initLocalConn():
 
 
 def initHerokuConn():
+    print("Connecting to Heroku database...")
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
 
 
+_conn = buildDBConn()
+
+
 def getConn():
     global _conn
-    if _conn is None or _conn.closed:
-        buildDBConn()
+    if _conn.closed:
+        _conn = buildDBConn()
     return _conn

@@ -22,13 +22,13 @@ class RecordDataForUser:
     """
 
     def __init__(self):
-        self.conn = getConn()
         self.csvData = None
         self.parse = GallicaXMLparse()
 
     def getCSVData(self, ticketIDs, requestID):
         tupledTickets = tuple(ticketIDs.split(','))
-        with self.conn.cursor() as cur:
+        dbConn = getConn()
+        with dbConn.cursor() as cur:
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
             """, {'tickets': tupledTickets, 'requestID': requestID})
@@ -57,7 +57,8 @@ class RecordDataForUser:
         LIMIT %(limit)s
         OFFSET %(offset)s
         """
-        with self.conn.cursor() as cur:
+        dbConn = getConn()
+        with dbConn.cursor() as cur:
 
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
@@ -91,15 +92,16 @@ class RecordDataForUser:
         return records
 
     def clearUserRecordsAfterCancel(self, requestID):
-        with self.conn.cursor() as cur:
+        dbConn = getConn()
+        with dbConn.cursor() as cur:
             cur.execute("""
             DELETE FROM results
             WHERE requestid = %s
             """, (requestID,))
-            self.conn.commit()
 
     def getTopPapers(self, requestID, tickets):
-        with self.conn.cursor() as cursor:
+        dbConn = getConn()
+        with dbConn.cursor() as cursor:
             cursor.execute("""
             WITH resultCounts AS (
                 SELECT papercode, count(*) as papercount

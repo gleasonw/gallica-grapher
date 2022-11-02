@@ -3,10 +3,6 @@ from dbops.connContext import getConn
 
 class PaperLocalSearch:
 
-    def __init__(self):
-        self.dbConnection = getConn()
-        self.cursor = self.dbConnection.cursor()
-
     def selectPapersContinuousOverRange(self, firstInputYear, secondInputYear, limit):
         biggerYear = max(firstInputYear, secondInputYear)
         smallerYear = min(firstInputYear, secondInputYear)
@@ -23,13 +19,15 @@ class PaperLocalSearch:
             args = (smallerYear, biggerYear, limit,)
         else:
             args = (smallerYear, biggerYear,)
-        with self.dbConnection.cursor() as curs:
+        dbConn = getConn()
+        with dbConn.cursor() as curs:
             curs.execute(query, args)
             papersContinuousOverRange = curs.fetchall()
             return paperDataToJSON(papersContinuousOverRange)
 
     def selectPapersSimilarToKeyword(self, keyword):
-        with self.dbConnection.cursor() as curs:
+        dbConn = getConn()
+        with dbConn.cursor() as curs:
             keyword = keyword.lower()
             curs.execute("""
                 SELECT title, code, startdate, enddate
@@ -41,7 +39,8 @@ class PaperLocalSearch:
             return paperDataToJSON(papersSimilarToKeyword)
 
     def getNumPapersInRange(self, startDate, endDate):
-        with self.dbConnection.cursor() as curs:
+        dbConn = getConn()
+        with dbConn.cursor() as curs:
             curs.execute("""
                 SELECT COUNT(*) FROM papers
                     WHERE startdate BETWEEN %s AND %s

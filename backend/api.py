@@ -8,15 +8,12 @@ from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
 from dbops.recordDataForUser import RecordDataForUser
-from dbops.connContext import buildDBConn
 
 app = Flask(__name__)
 CORS(app)
 requestIDSeed = random.randint(0, 10000)
 graphBatchGetter = GraphSeriesBatch()
 recordDataGetter = RecordDataForUser()
-print("Starting up...")
-buildDBConn()
 
 
 @app.route('/')
@@ -115,7 +112,7 @@ def getGraphData():
 @app.route('/api/topPapers')
 def getTopPapersFromID():
     ticketIDS = tuple(request.args["tickets"].split(","))
-    topPapers = RecordDataForUser().getTopPapers(
+    topPapers = recordDataGetter.getTopPapers(
         tickets=ticketIDS,
         requestID=request.args["requestID"],
     )
@@ -127,7 +124,7 @@ def getTopPapersFromID():
 def getCSV():
     tickets = request.args["tickets"]
     requestID = request.args["requestID"]
-    csvData = RecordDataForUser().getCSVData(tickets, requestID)
+    csvData = recordDataGetter.getCSVData(tickets, requestID)
     return {"csvData": csvData}
 
 
@@ -158,7 +155,7 @@ def getGallicaRecordsForDisplay():
 
 @app.route('/api/ocrtext/<arkCode>/<term>')
 def getOCRtext(arkCode, term):
-    numResults, text = RecordDataForUser().getOCRTextForRecord(
+    numResults, text = recordDataGetter.getOCRTextForRecord(
         arkCode,
         term
     )
