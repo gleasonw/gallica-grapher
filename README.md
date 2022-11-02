@@ -1,6 +1,6 @@
 # The Gallica Grapher
 
-Culture and identity were once local, the products of community and conversation. The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Culture became national. Individual opinions ascended to group opinions; “public opinion” rose into being, looming over the political class, and the press was its handler.
+Culture and identity were once local, the products of community and conversation. The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Culture became national as individual opinions ascended to group opinions; “public opinion” rose into being, looming over the political class, and the press was its handler.
 
 This app integrates with the French National Archives Gallica API, allowing for rapid text searches over thousands of periodicals. The app routes requests to Gallica, parses the responses, and creates a trend line. Selecting a point will bring up the associated records in a table beneath the graph.
 
@@ -29,7 +29,7 @@ blasting the French national library's servers, I have erred on a smaller number
 The Gallica API returns a record for any occurrence of a term in a periodical issue. I parse these records
 and group occurrences for a given bin size (year, month, or day) to create a time series for each request.  
 
-Beneath the chart is a table of the records pulled from Gallica, with links to the scanned periodical. Clicking on
+Beneath the chart is a table of records pulled from Gallica, with links to the scanned periodical. Clicking on
 a point in the chart will list the corresponding records. You can also make direct requests by entering
 a date above the table. I'm still designing this section for better usability -- I think it's the most
 interesting part of the tool. You can see cultural trends as they arise, then dive into the texts that 
