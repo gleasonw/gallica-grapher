@@ -24,12 +24,14 @@ class GallicaWrapper:
 
     def buildQueryBuilder(self):
         raise NotImplementedError(f'buildQueryBuilder() not implemented for {self.__class__.__name__}')
-
-    def buildRecordGetter(self, parser=None):
-        return RecordGetter(
-            gallicaAPI=self.api,
-            parseData=parser or self.buildParser()
+        
+    def getFromQueries(self, queries, parser, onUpdateProgress=None):
+        rawResponse = self.api.get(
+            queries=queries,
+            onUpdateProgress=onUpdateProgress
         )
+        records = parser.parseResponsesToRecords(rawResponse)
+        return records
 
     def buildParser(self):
         pass
@@ -54,18 +56,12 @@ class SRUWrapper(GallicaWrapper):
         if grouping is None:
             grouping = 'year'
             kwargs['grouping'] = grouping
-        recordGetter = self.buildRecordGetterForGrouping(grouping)
-        recordGenerator = recordGetter.getFromQueries(
+        recordGenerator = self.getFromQueries(
             queries=self.buildQueries(kwargs, queriesWithCounts),
+            parser=self.soloRecordParser if grouping == 'all' else groupedRecordParser
             onUpdateProgress=onUpdateProgress
         )
         return recordGenerator if generate else list(recordGenerator)
-
-    def buildRecordGetterForGrouping(self, grouping):
-        if grouping == 'all':
-            return self.buildRecordGetter(self.soloRecordParser)
-        else:
-            return self.buildRecordGetter(self.groupedRecordParser)
 
     def buildQueries(self, kwargs, queriesWithCounts):
         if queriesWithCounts:
