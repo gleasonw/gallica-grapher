@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallicaGetter.recordGetter import RecordGetter
+from unittest.mock import MagicMock
 from gallicaGetter import connect
 from gallicaGetter.gallicaWrapper import SRUWrapper
 from gallicaGetter.gallicaWrapper import IssuesWrapper
@@ -23,10 +23,6 @@ class TestGallicaWrapper(TestCase):
             ContentWrapper(),
             PapersWrapper()
         ]
-
-    #superclass responsibility tests
-    def test_buildRecordGetter(self):
-        self.assertIsInstance(self.gallicaAPIs[0].buildRecordGetter(), RecordGetter)
 
     #Liskov tests
     def test_responds_to_get(self):
@@ -67,6 +63,15 @@ class TestSRUWrapper(TestCase):
     def test_buildQueryBuilder(self):
         self.assertIsInstance(self.api.buildQueryBuilder(), OccurrenceQueryBuilder)
 
+    def test_get(self):
+        getter = SRUWrapper()
+        getter.getFromQueries = MagicMock()
+
+        self.assertIsInstance(
+            getter.get(terms='a term'),
+            list
+        )
+
 
 class TestIssuesWrapper(TestCase):
 
@@ -81,6 +86,16 @@ class TestIssuesWrapper(TestCase):
 
     def test_buildParser(self):
         self.assertIsInstance(self.api.buildParser(), ParseArkRecord)
+
+    def test_get(self):
+        getter = IssuesWrapper()
+        getter.queryBuilder = MagicMock()
+        getter.getFromQueries = MagicMock()
+
+        self.assertIsInstance(
+            getter.get('a paper code'),
+            list
+        )
 
 
 class TestContentWrapper(TestCase):
@@ -97,17 +112,39 @@ class TestContentWrapper(TestCase):
         def test_buildParser(self):
             self.assertIsInstance(self.api.buildParser(), ParseContentRecord)
 
+        def test_get(self):
+            getter = ContentWrapper()
+            getter.queryBuilder = MagicMock()
+            getter.getFromQueries = MagicMock()
+
+            self.assertIsInstance(
+                getter.get(
+                    ark='a periodical issue code',
+                    term='a term'
+                ),
+                list
+            )
+
 
 class TestPapersWrapper(TestCase):
 
         def setUp(self) -> None:
-            self.api = PapersWrapper()
+            self.paperWrapper = PapersWrapper()
 
         def test_buildAPI(self):
-            self.assertIsInstance(self.api.buildAPI(10), ConcurrentFetch)
+            self.assertIsInstance(self.paperWrapper.buildAPI(10), ConcurrentFetch)
 
         def test_buildQueryBuilder(self):
-            self.assertIsInstance(self.api.buildQueryBuilder(), PaperQueryBuilder)
+            self.assertIsInstance(self.paperWrapper.buildQueryBuilder(), PaperQueryBuilder)
 
         def test_buildParser(self):
-            self.assertIsInstance(self.api.buildParser(), ParsePaperRecords)
+            self.assertIsInstance(self.paperWrapper.buildParser(), ParsePaperRecords)
+
+        def test_get(self):
+            #TODO: many dependencies.
+            getter = PapersWrapper()
+            getter.queryBuilder = MagicMock()
+            getter.getFromQueries = MagicMock()
+            getter.issuesWrapper = MagicMock()
+
+            self.assertIsInstance(getter.get('a paper code'), list)

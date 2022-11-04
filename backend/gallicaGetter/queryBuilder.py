@@ -102,10 +102,9 @@ class OccurrenceQueryBuilder(QueryBuilder):
 
 class PaperQueryBuilder(QueryBuilder):
 
-    def buildQueriesForArgs(self, args):
-        codes = args.get('codes')
-        if codes is None:
-            logging.warning('No codes provided (get(codes=["..."]) or get(codes="...")). Proceeding to fetch all papers on Gallica. Stop me if you wish!')
+    def buildQueriesForArgs(self, codes):
+        if codes == '':
+            logging.warning('No codes provided (get(["..."]) or get("something") Proceeding to fetch all papers on Gallica. Stop me if you wish!')
             return self.buildSRUQueriesForAllRecords()
         if not isinstance(codes, list):
             codes = [codes]
