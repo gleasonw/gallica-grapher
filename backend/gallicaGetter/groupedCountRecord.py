@@ -8,17 +8,18 @@ class GroupedCountRecord:
         self.requestID = requestID
 
     def getRow(self):
-        return (
+        row = [
             self.date.getYear(),
             self.date.getMonth(),
             self.date.getDay(),
-            self.term,
-            self.ticketID,
-            self.requestID,
-            self.count
-        )
+            self.term
+        ]
+        self.ticketID and row.append(self.ticketID)
+        self.requestID and row.append(self.requestID)
+        row.append(self.count)
+        return tuple(row)
 
     def __repr__(self):
-        return f'GroupedCountRecord({self.date}, {self.count})'
+        return f'GroupedCountRecord({self.date}, {self.term}, {self.count})'
 
 

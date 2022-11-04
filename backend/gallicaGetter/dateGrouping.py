@@ -1,4 +1,4 @@
-from gallica.date import Date
+from .date import Date
 
 
 def DateGrouping(startDate, endDate, grouping):
@@ -37,8 +37,12 @@ def makeWideGroupingsForAllSearch(startDate, endDate):
 
 
 def makeYearGroupings(startDate, endDate):
+    if endDate.getYear():
+        endBoundary = int(endDate.getYear()) + 1
+    else:
+        endBoundary = int(startDate.getYear()) + 1
     yearGroups = set()
-    for year in range(int(startDate.getYear()), int(endDate.getYear()) + 1):
+    for year in range(int(startDate.getYear()), endBoundary):
         yearGroups.add((f"{year}-01-01", f"{year + 1}-01-01"))
     return yearGroups
 

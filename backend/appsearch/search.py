@@ -1,6 +1,6 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
-import gallica.gallicaWrapper as gallicaWrapper
-from gallica.queryBuilder import NUM_CODES_PER_BUNDLE
+import gallicaWrapper as gallicaWrapper
+from queryBuilder import NUM_CODES_PER_BUNDLE
 
 
 def buildSearch(argBundles, stateHooks, wrapper=gallicaWrapper):

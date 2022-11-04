@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
-from gallica.searchprogressstats import SearchProgressStats
+from appsearch.searchprogressstats import SearchProgressStats
 
 
 class TestSearchProgressStats(TestCase):

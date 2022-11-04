@@ -1,9 +1,8 @@
 from unittest import TestCase
-from gallica.dateGrouping import DateGrouping
-from gallica.date import Date
+from gallicaGetter.dateGrouping import DateGrouping
 
 
-class TestParams(TestCase):
+class TestDateGrouping(TestCase):
 
     def test_get_month_grouping_intervals(self):
         monthGroups = DateGrouping('1900-01-01', '1902-01-01', 'month')

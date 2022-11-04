@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
-from gallica.request import Request
+from appsearch.request import Request
 
 
 class TestRequest(TestCase):

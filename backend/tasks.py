@@ -1,7 +1,7 @@
 from celery import Celery
-from gallica.request import Request
+from appsearch.request import Request
 import time
-from gallica.request import buildRequest
+from appsearch.request import buildRequest
 
 app = Celery()
 app.config_from_object('celery_settings')

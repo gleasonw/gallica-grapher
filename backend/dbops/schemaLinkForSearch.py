@@ -1,5 +1,5 @@
 import io
-from gallica.gallicaWrapper import connect
+import gallicaGetter
 from dbops.connContext import getConn
 
 
@@ -7,7 +7,7 @@ class SchemaLinkForSearch:
     def __init__(self, requestID=None):
         self.requestID = requestID
         self.conn = getConn()
-        self.paperAPI = connect('papers')
+        self.paperAPI = gallicaGetter.connect('papers')
 
     def insertRecordsIntoPapers(self, records, stateHooks=None, identifier=None):
         csvStream = self.buildCSVstream(records)

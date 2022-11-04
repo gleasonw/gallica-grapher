@@ -1,5 +1,5 @@
-from gallica.gallicaxmlparse import GallicaXMLparse
-import gallica.gallicaWrapper as gallicaWrapper
+from gallicaxmlparse import GallicaXMLparse
+import gallicaWrapper as gallicaWrapper
 from dbops.connContext import getConn
 
 conn = getConn()

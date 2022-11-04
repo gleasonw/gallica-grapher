@@ -58,7 +58,7 @@ class OccurrenceQuery(SRUQuery):
         self.term = kwargs['term']
 
         self.searchMetaData = kwargs['searchMetaData']
-        self.linkDistance = self.searchMetaData.get('linkDistance', 0)
+        self.linkDistance = self.searchMetaData.get('linkDistance', 10)
         self.linkTerm = self.searchMetaData.get('linkTerm')
         self.identifier = self.searchMetaData.get('identifier')
 

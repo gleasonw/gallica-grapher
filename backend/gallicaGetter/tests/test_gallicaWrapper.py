@@ -1,17 +1,17 @@
 from unittest import TestCase
-from gallica.recordGetter import RecordGetter
+from recordGetter import RecordGetter
 from gallicaWrapper import connect
 from gallicaWrapper import SRUWrapper
 from gallicaWrapper import IssuesWrapper
 from gallicaWrapper import ContentWrapper
 from gallicaWrapper import PapersWrapper
-from gallica.parseRecord import ParseArkRecord
-from gallica.parseRecord import ParsePaperRecords
-from gallica.parseRecord import ParseContentRecord
-from gallica.concurrentFetch import ConcurrentFetch
-from gallica.queryBuilder import OccurrenceQueryBuilder
-from gallica.queryBuilder import PaperQueryBuilder
-from gallica.queryBuilder import ContentQueryFactory
+from parseRecord import ParseArkRecord
+from parseRecord import ParsePaperRecords
+from parseRecord import ParseContentRecord
+from concurrentFetch import ConcurrentFetch
+from queryBuilder import OccurrenceQueryBuilder
+from queryBuilder import PaperQueryBuilder
+from queryBuilder import ContentQueryFactory
 
 
 class TestGallicaWrapper(TestCase):
@@ -62,7 +62,7 @@ class TestSRUWrapper(TestCase):
         self.api = SRUWrapper()
 
     def test_buildAPI(self):
-        self.assertIsInstance(self.api.buildAPI(), ConcurrentFetch)
+        self.assertIsInstance(self.api.buildAPI(10), ConcurrentFetch)
 
     def test_buildQueryBuilder(self):
         self.assertIsInstance(self.api.buildQueryBuilder(), OccurrenceQueryBuilder)
@@ -74,7 +74,7 @@ class TestIssuesWrapper(TestCase):
         self.api = IssuesWrapper()
 
     def test_buildAPI(self):
-        self.assertIsInstance(self.api.buildAPI(), ConcurrentFetch)
+        self.assertIsInstance(self.api.buildAPI(10), ConcurrentFetch)
 
     def test_buildQueryBuilder(self):
         self.assertIsInstance(self.api.buildQueryBuilder(), PaperQueryBuilder)
@@ -89,7 +89,7 @@ class TestContentWrapper(TestCase):
             self.api = ContentWrapper()
 
         def test_buildAPI(self):
-            self.assertIsInstance(self.api.buildAPI(), ConcurrentFetch)
+            self.assertIsInstance(self.api.buildAPI(10), ConcurrentFetch)
 
         def test_buildQueryBuilder(self):
             self.assertIsInstance(self.api.buildQueryBuilder(), ContentQueryFactory)
@@ -104,7 +104,7 @@ class TestPapersWrapper(TestCase):
             self.api = PapersWrapper()
 
         def test_buildAPI(self):
-            self.assertIsInstance(self.api.buildAPI(), ConcurrentFetch)
+            self.assertIsInstance(self.api.buildAPI(10), ConcurrentFetch)
 
         def test_buildQueryBuilder(self):
             self.assertIsInstance(self.api.buildQueryBuilder(), PaperQueryBuilder)

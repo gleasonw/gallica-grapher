@@ -1,27 +1,14 @@
-from gallica.recordGetter import RecordGetter
-from gallica.queryBuilder import OccurrenceQueryBuilder
-from gallica.queryBuilder import ContentQueryFactory
-from gallica.concurrentFetch import ConcurrentFetch
-from gallica.queryBuilder import PaperQueryBuilder
-from gallica.parseRecord import buildParser
-
-
-def connect(gallicaAPIselect, **kwargs):
-    apiWrappers = {
-        'sru': SRUWrapper,
-        'issues': IssuesWrapper,
-        'content': ContentWrapper,
-        'papers': PapersWrapper,
-    }
-    api = gallicaAPIselect.lower()
-    if api not in apiWrappers:
-        raise ValueError(f'API {api} not supported')
-    return apiWrappers[api](**kwargs)
+from .recordGetter import RecordGetter
+from .queryBuilder import OccurrenceQueryBuilder
+from .queryBuilder import ContentQueryFactory
+from .concurrentFetch import ConcurrentFetch
+from .queryBuilder import PaperQueryBuilder
+from .parseRecord import buildParser
 
 
 class GallicaWrapper:
     def __init__(self, **kwargs):
-        self.api = self.buildAPI()
+        self.api = self.buildAPI(kwargs.get('numWorkers', 10))
         self.parser = None
         self.queryBuilder = self.buildQueryBuilder()
         self.preInit(kwargs)
@@ -32,7 +19,7 @@ class GallicaWrapper:
     def get(self, **kwargs):
         raise NotImplementedError(f'get() not implemented for {self.__class__.__name__}')
 
-    def buildAPI(self):
+    def buildAPI(self, numWorkers):
         raise NotImplementedError(f'buildAPI() not implemented for {self.__class__.__name__}')
 
     def buildQueryBuilder(self):
@@ -90,8 +77,11 @@ class SRUWrapper(GallicaWrapper):
         baseQueries = self.queryBuilder.buildBaseQueriesFromArgs(args)
         return self.queryBuilder.getNumResultsForEachQuery(baseQueries)
 
-    def buildAPI(self):
-        return ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU')
+    def buildAPI(self, numWorkers):
+        return ConcurrentFetch(
+            baseUrl='https://gallica.bnf.fr/SRU',
+            numWorkers=numWorkers
+        )
 
     def buildQueryBuilder(self):
         return OccurrenceQueryBuilder(gallicaAPI=self.api)
@@ -111,8 +101,11 @@ class IssuesWrapper(GallicaWrapper):
     def buildParser(self):
         return buildParser('ark')
 
-    def buildAPI(self):
-        return ConcurrentFetch('https://gallica.bnf.fr/services/Issues')
+    def buildAPI(self, numWorkers):
+        return ConcurrentFetch(
+            'https://gallica.bnf.fr/services/Issues',
+            numWorkers=numWorkers
+        )
 
     def buildQueryBuilder(self):
         return PaperQueryBuilder(gallicaAPI=self.api)
@@ -137,8 +130,11 @@ class ContentWrapper(GallicaWrapper):
     def buildParser(self):
         return buildParser('content')
 
-    def buildAPI(self):
-        return ConcurrentFetch('https://gallica.bnf.fr/services/ContentSearch')
+    def buildAPI(self, numWorkers):
+        return ConcurrentFetch(
+            baseUrl='https://gallica.bnf.fr/services/ContentSearch',
+            numWorkers=numWorkers
+        )
 
 
 class PapersWrapper(GallicaWrapper):
@@ -159,8 +155,11 @@ class PapersWrapper(GallicaWrapper):
     def getNumResultsForArgs(self, **kwargs):
         pass
 
-    def buildAPI(self):
-        return ConcurrentFetch(baseUrl='https://gallica.bnf.fr/SRU')
+    def buildAPI(self, numWorkers):
+        return ConcurrentFetch(
+            baseUrl='https://gallica.bnf.fr/SRU',
+            numWorkers=numWorkers
+        )
 
     def buildQueryBuilder(self):
         return PaperQueryBuilder(gallicaAPI=self.api)
@@ -170,16 +169,13 @@ class PapersWrapper(GallicaWrapper):
 
 
 if __name__ == '__main__':
-    sruWrapper = connect('sru')
-    issuesWrapper = connect('issues')
-    contentWrapper = connect('content')
-    papersWrapper = connect('papers')
+    sruWrapper = connect('sru', numWorkers=10)
     records = sruWrapper.get(
         terms='brazza',
-        grouping='all',
-        startDate='1863',
-        endDate='1940',
-        codes='cb32895690j',
+        grouping='year',
+        generate=True,
+        startDate='1900',
+        endDate='1910'
     )
     for record in records:
         print(record.getRow())

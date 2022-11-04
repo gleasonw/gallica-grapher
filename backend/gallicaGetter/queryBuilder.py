@@ -1,9 +1,9 @@
-from gallica.query import OccurrenceQuery
-from gallica.gallicaxmlparse import GallicaXMLparse
-from gallica.query import ArkQueryForNewspaperYears
-from gallica.query import PaperQuery
-from gallica.query import ContentQuery
-from gallica.dateGrouping import DateGrouping
+from .query import OccurrenceQuery
+from .gallicaxmlparse import GallicaXMLparse
+from .query import ArkQueryForNewspaperYears
+from .query import PaperQuery
+from .query import ContentQuery
+from .dateGrouping import DateGrouping
 import logging
 
 NUM_CODES_PER_BUNDLE = 10

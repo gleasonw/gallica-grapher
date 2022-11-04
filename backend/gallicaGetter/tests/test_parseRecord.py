@@ -1,16 +1,16 @@
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
-from gallica.dto.arkRecord import ArkRecord
-from gallica.dto.groupedCountRecord import GroupedCountRecord
-from gallica.dto.occurrenceRecord import OccurrenceRecord
-from gallica.dto.paperRecord import PaperRecord
-from gallica.parseRecord import ParseArkRecord
-from gallica.parseRecord import ParseGroupedRecordCounts
-from gallica.parseRecord import ParseOccurrenceRecords
-from gallica.parseRecord import ParsePaperRecords
-from gallica.parseRecord import ParseContentRecord
-from gallica.parseRecord import buildParser
+from arkRecord import ArkRecord
+from groupedCountRecord import GroupedCountRecord
+from occurrenceRecord import OccurrenceRecord
+from paperRecord import PaperRecord
+from parseRecord import ParseArkRecord
+from parseRecord import ParseGroupedRecordCounts
+from parseRecord import ParseOccurrenceRecords
+from parseRecord import ParsePaperRecords
+from parseRecord import ParseContentRecord
+from parseRecord import buildParser
 
 
 class TestParseRecord(TestCase):

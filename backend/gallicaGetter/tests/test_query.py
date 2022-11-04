@@ -1,6 +1,5 @@
 from query import OccurrenceQuery, ArkQueryForNewspaperYears, PaperQuery, ContentQuery
 from unittest import TestCase
-from unittest.mock import MagicMock
 
 
 class TestOCRQuery(TestCase):

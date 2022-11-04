@@ -1,5 +1,5 @@
 import unittest
-from gallica.dto.paperRecord import PaperRecord
+from paperRecord import PaperRecord
 
 
 class TestPaperRecord(unittest.TestCase):
