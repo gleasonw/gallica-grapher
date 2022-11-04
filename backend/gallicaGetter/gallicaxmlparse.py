@@ -1,5 +1,5 @@
 from lxml import etree
-from .date import Date
+from gallicaGetter.date import Date
 
 
 class GallicaXMLparse:

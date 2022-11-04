@@ -1,7 +1,7 @@
-from .gallicaWrapper import SRUWrapper
-from .gallicaWrapper import IssuesWrapper
-from .gallicaWrapper import ContentWrapper
-from .gallicaWrapper import PapersWrapper
+from gallicaGetter.gallicaWrapper import SRUWrapper
+from gallicaGetter.gallicaWrapper import IssuesWrapper
+from gallicaGetter.gallicaWrapper import ContentWrapper
+from gallicaGetter.gallicaWrapper import PapersWrapper
 
 
 def connect(gallicaAPIselect, **kwargs):

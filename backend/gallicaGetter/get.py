@@ -1,5 +1,5 @@
 import time
-from .response import Response
+from gallicaGetter.response import Response
 from urllib3.util.retry import Retry
 import urllib3
 

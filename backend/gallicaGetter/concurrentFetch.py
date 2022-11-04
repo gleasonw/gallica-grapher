@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from .get import Get
+from gallicaGetter.get import Get
 
 NUM_WORKERS = 30
 

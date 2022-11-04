@@ -1,17 +1,17 @@
 from unittest import TestCase
-from recordGetter import RecordGetter
-from gallicaWrapper import connect
-from gallicaWrapper import SRUWrapper
-from gallicaWrapper import IssuesWrapper
-from gallicaWrapper import ContentWrapper
-from gallicaWrapper import PapersWrapper
-from parseRecord import ParseArkRecord
-from parseRecord import ParsePaperRecords
-from parseRecord import ParseContentRecord
-from concurrentFetch import ConcurrentFetch
-from queryBuilder import OccurrenceQueryBuilder
-from queryBuilder import PaperQueryBuilder
-from queryBuilder import ContentQueryFactory
+from gallicaGetter.recordGetter import RecordGetter
+from gallicaGetter import connect
+from gallicaGetter.gallicaWrapper import SRUWrapper
+from gallicaGetter.gallicaWrapper import IssuesWrapper
+from gallicaGetter.gallicaWrapper import ContentWrapper
+from gallicaGetter.gallicaWrapper import PapersWrapper
+from gallicaGetter.parseRecord import ParseArkRecord
+from gallicaGetter.parseRecord import ParsePaperRecords
+from gallicaGetter.parseRecord import ParseContentRecord
+from gallicaGetter.concurrentFetch import ConcurrentFetch
+from gallicaGetter.queryBuilder import OccurrenceQueryBuilder
+from gallicaGetter.queryBuilder import PaperQueryBuilder
+from gallicaGetter.queryBuilder import ContentQueryFactory
 
 
 class TestGallicaWrapper(TestCase):

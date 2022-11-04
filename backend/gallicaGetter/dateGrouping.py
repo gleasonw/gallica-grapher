@@ -1,4 +1,4 @@
-from .date import Date
+from gallicaGetter.date import Date
 
 
 def DateGrouping(startDate, endDate, grouping):

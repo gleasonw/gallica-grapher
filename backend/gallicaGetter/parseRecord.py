@@ -1,9 +1,9 @@
-from .arkRecord import ArkRecord
-from .date import Date
-from .gallicaxmlparse import GallicaXMLparse
-from .groupedCountRecord import GroupedCountRecord
-from .occurrenceRecord import OccurrenceRecord
-from .paperRecord import PaperRecord
+from gallicaGetter.arkRecord import ArkRecord
+from gallicaGetter.date import Date
+from gallicaGetter.gallicaxmlparse import GallicaXMLparse
+from gallicaGetter.groupedCountRecord import GroupedCountRecord
+from gallicaGetter.occurrenceRecord import OccurrenceRecord
+from gallicaGetter.paperRecord import PaperRecord
 
 
 def buildParser(desiredRecord, **kwargs):

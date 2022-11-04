@@ -1,9 +1,9 @@
-from .recordGetter import RecordGetter
-from .queryBuilder import OccurrenceQueryBuilder
-from .queryBuilder import ContentQueryFactory
-from .concurrentFetch import ConcurrentFetch
-from .queryBuilder import PaperQueryBuilder
-from .parseRecord import buildParser
+from gallicaGetter.recordGetter import RecordGetter
+from gallicaGetter.queryBuilder import OccurrenceQueryBuilder
+from gallicaGetter.queryBuilder import ContentQueryFactory
+from gallicaGetter.concurrentFetch import ConcurrentFetch
+from gallicaGetter.queryBuilder import PaperQueryBuilder
+from gallicaGetter.parseRecord import buildParser
 
 
 class GallicaWrapper:
