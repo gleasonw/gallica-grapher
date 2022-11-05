@@ -43,7 +43,7 @@ class Date:
     def getDateAsList(self) -> list:
         return self.date
 
-    def getDateText(self) -> str:
+    def getDate(self) -> str:
         return self.dateText
 
     def getYear(self) -> str:

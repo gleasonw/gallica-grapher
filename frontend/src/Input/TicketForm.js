@@ -64,8 +64,8 @@ function TicketForm(props) {
                         userSelectedPapers={props.userSelectedPapers}
                         boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
                         onFocus={props.onPaperInputFocus}
-                        startDate={props.startDate}
-                        endDate={props.endDate}
+                        startYear={props.startYear}
+                        endYear={props.endYear}
                     />
                 </StyledLabeledInput>
                 <div ref={props.requestBoxRef}>
@@ -80,10 +80,18 @@ function TicketForm(props) {
             <StyledLabeledInput>
                 <label>between:</label>
                 <DateSelect
-                    startDate={props.startDate}
-                    endDate={props.endDate}
-                    onstartDateChange={props.onstartDateChange}
-                    onendDateChange={props.onendDateChange}
+                    startYear={props.startYear}
+                    startMonth={props.startMonth}
+                    startDay={props.startDay}
+                    endYear={props.endYear}
+                    endMonth={props.endMonth}
+                    endDay={props.endDay}
+                    onStartYearChange={props.onStartYearChange}
+                    onStartMonthChange={props.onStartMonthChange}
+                    onStartDayChange={props.onStartDayChange}
+                    onEndYearChange={props.onEndYearChange}
+                    onEndMonthChange={props.onEndMonthChange}
+                    onEndDayChange={props.onEndDayChange}
                     selectedPaperBoundary={props.boundaryYearsForUserPapers}
                 />
                 <label>grouped by: </label>

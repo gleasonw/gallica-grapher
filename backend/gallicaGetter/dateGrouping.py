@@ -16,24 +16,28 @@ def DateGrouping(startDate, endDate, grouping):
 
 
 def makeWideGroupingsForAllSearch(startDate, endDate):
-    if startDate.getDay():
-        return [(startDate.getDateText(), None)]
-    elif month := startDate.getMonth():
-        nextYear = int(startDate.getYear()) + 1 if month == '12' else startDate.getYear()
-        nextMonth = (int(month) % 12) + 1
+    if not startDate.getYear() or not endDate.getYear():
+        markerDate = startDate if startDate.getYear() else endDate
+        if markerDate.getDay():
+            return [(markerDate.getDateText(), None)]
+        if month := markerDate.getMonth():
+            if month == '12':
+                nextYear = int(markerDate.getYear()) + 1
+            else:
+                nextYear = markerDate.getYear()
+            nextMonth = (int(month) + 1) % 12
+            return [(
+                f"{markerDate.getYear()}-{int(markerDate.getMonth()):02}-01",
+                f"{nextYear}-{nextMonth:02}-01"
+            )]
         return [(
-            f"{startDate.getYear()}-{int(startDate.getMonth()):02}-01",
-            f"{nextYear}-{nextMonth:02}-01"
+            f"{markerDate.getYear()}-01-01",
+            f"{int(markerDate.getYear()) + 1}-01-01"
         )]
     else:
-        if endDate.getYear():
-            endBoundary = int(endDate.getYear()) + 1
-        else:
-            endBoundary = int(startDate.getYear()) + 1
-        return [(
-            f"{startDate.getYear()}-01-01",
-            f"{endBoundary}-01-01"
-        )]
+        start = min(startDate.getDate(), endDate.getDate())
+        end = max(startDate.getDate(), endDate.getDate())
+        return [(start, end)]
 
 
 def makeYearGroupings(startDate, endDate):

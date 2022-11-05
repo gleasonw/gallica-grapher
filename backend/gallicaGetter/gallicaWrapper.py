@@ -175,6 +175,6 @@ class PapersWrapper(GallicaWrapper):
 
 
 if __name__ == '__main__':
-    wrapper = IssuesWrapper()
-    test = wrapper.get('cb32895690j')
-    print(test)
+    wrapper = SRUWrapper()
+    test = wrapper.get(terms='brazza', startDate='1905-4-10', endDate='1905-4-01', grouping='all')
+    print(len(test))

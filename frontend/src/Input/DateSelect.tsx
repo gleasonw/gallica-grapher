@@ -13,10 +13,18 @@ export default function DateSelect(props){
                 borderRadius={'10px'}
             >
                 <DateInputBox
-                    startDate={props.startDate}
-                    endDate={props.endDate}
-                    onstartDateChange={props.onstartDateChange}
-                    onendDateChange={props.onendDateChange}
+                    startYear={props.startYear}
+                    startMonth={props.startMonth}
+                    startDay={props.startDay}
+                    endYear={props.endYear}
+                    endMonth={props.endMonth}
+                    endDay={props.endDay}
+                    onStartYearChange={props.onStartYearChange}
+                    onStartMonthChange={props.onStartMonthChange}
+                    onStartDayChange={props.onStartDayChange}
+                    onEndYearChange={props.onEndYearChange}
+                    onEndMonthChange={props.onEndMonthChange}
+                    onEndDayChange={props.onEndDayChange}
                 />
                 {
                     props.selectedPaperBoundary &&

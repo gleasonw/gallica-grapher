@@ -19,8 +19,8 @@ function Input(props){
 
     function getContinuousPaperQuery(){
         return "api/continuousPapers?limit=2000" +
-            "&startDate=" + props.startDate +
-            "&endDate=" + props.endDate;
+            "&startDate=" + props.startYear +
+            "&endDate=" + props.endYear;
     }
 
     function setUserPapersYearBoundary(){
@@ -50,9 +50,16 @@ function Input(props){
             linkTerm: linkTerm,
             linkDistance: linkDistance,
             papersAndCodes: getPapersFor(selectedPaperInput),
-            startDate: props.startDate,
-            endDate: props.endDate,
+            startDate: makeDateString(props.startYear, props.startMonth, props.startDay),
+            endDate: makeDateString(props.endYear, props.endMonth, props.endDay)
         }
+    }
+
+    function makeDateString(year, month, day){
+        let dateElements = [year];
+        if(month) dateElements.push(month);
+        if(day) dateElements.push(day);
+        return dateElements.join('-');
     }
 
     function handleTermChange(event) {
@@ -110,10 +117,18 @@ function Input(props){
                     Graph word occurrences in archived French periodicals.
                 </div>
                 <TicketForm
-                    startDate={props.startDate}
-                    endDate={props.endDate}
-                    onstartDateChange={props.onstartDateChange}
-                    onendDateChange={props.onendDateChange}
+                    startYear={props.startYear}
+                    startMonth={props.startMonth}
+                    startDay={props.startDay}
+                    endYear={props.endYear}
+                    endMonth={props.endMonth}
+                    endDay={props.endDay}
+                    onStartYearChange={props.onStartYearChange}
+                    onStartMonthChange={props.onStartMonthChange}
+                    onStartDayChange={props.onStartDayChange}
+                    onEndYearChange={props.onEndYearChange}
+                    onEndMonthChange={props.onEndMonthChange}
+                    onEndDayChange={props.onEndDayChange}
                     onCreateTicketClick={handleCreateTicketClick}
                     onPaperDropItemClick={(paper) => makePaperBubble(paper)}
                     onPaperInputFocus={(i) => setSelectedPaperInput(i)}

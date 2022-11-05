@@ -14,8 +14,12 @@ import ImportantButtonWrap from "./shared/ImportantButtonWrap";
 function App() {
     const [tickets, setTickets] = useState({});
     const [selectedSearchType, setSelectedSearchType] = useState(0);
-    const [startDate, setStartDate] = useState(1880);
-    const [endDate, setEndDate] = useState(1900);
+    const [startYear, setStartYear] = useState(1880);
+    const [startMonth, setStartMonth] = useState(null);
+    const [startDay, setStartDay] = useState(null);
+    const [endYear, setEndYear] = useState(1930);
+    const [endMonth, setEndMonth] = useState(null);
+    const [endDay, setEndDay] = useState(null);
     const [requestID, setRequestID] = useState(null);
     const [progressID, setProgressID] = useState(null);
     const [currentPage, setCurrentPage] = useState('input');
@@ -32,10 +36,18 @@ function App() {
                 onExampleRequestClick={handleExampleRequestClick}
                 requestBoxRef={requestBoxRef}
                 selectedSearchType={selectedSearchType}
-                startDate={startDate}
-                endDate={endDate}
-                onstartDateChange={(e) => setStartDate(e.target.value)}
-                onendDateChange={(e) => setEndDate(e.target.value)}
+                startYear={startYear}
+                startMonth={startMonth}
+                startDay={startDay}
+                endYear={endYear}
+                endMonth={endMonth}
+                endDay={endDay}
+                onStartYearChange={(year) => setStartYear(year)}
+                onStartMonthChange={(month) => setStartMonth(month)}
+                onStartDayChange={(day) => setStartDay(day)}
+                onEndYearChange={(year) => setEndYear(year)}
+                onEndMonthChange={(month) => setEndMonth(month)}
+                onEndDayChange={(day) => setEndDay(day)}
                 onSearchTypeChange={(i) => setSelectedSearchType(i)}
             />,
         'running':

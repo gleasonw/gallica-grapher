@@ -8,11 +8,11 @@ export function DateInputBox(props) {
             <ShadowedFocusInput
                 selected
                 type={'text'}
-                value={props.startDate}
+                value={props.startYear}
                 id={'lowYear'}
                 className={'dateInput'}
-                placeholder={props.minYearPlaceholder}
-                onChange={props.onstartDateChange}
+                placeholder={1880}
+                onChange={(e) => props.onStartYearChange(e.target.value)}
             />
             /
             <ShadowedFocusInput
@@ -21,8 +21,8 @@ export function DateInputBox(props) {
                 value={props.startMonth}
                 id={'month'}
                 className={'dateInput'}
-                placeholder={props.monthPlaceholder}
-                onChange={props.onMonthChange}
+                placeholder={1}
+                onChange={(e) => props.onStartMonthChange(e.target.value)}
             />
             /
             <ShadowedFocusInput
@@ -31,8 +31,8 @@ export function DateInputBox(props) {
                 value={props.startDay}
                 id={'day'}
                 className={'dateInput'}
-                placeholder={props.dayPlaceholder}
-                onChange={props.onDayChange}
+                placeholder={1}
+                onChange={(e) => props.onStartDayChange(e.target.value)}
             />
 
             and
@@ -40,11 +40,11 @@ export function DateInputBox(props) {
             <ShadowedFocusInput
                 selected
                 type={'text'}
-                value={props.endDate}
+                value={props.endYear}
                 id={'highYear'}
                 className={'dateInput'}
-                placeholder={props.maxYearPlaceholder}
-                onChange={props.onendDateChange}
+                placeholder={1900}
+                onChange={(e) => props.onEndYearChange(e.target.value)}
             />
             /
             <ShadowedFocusInput
@@ -53,8 +53,8 @@ export function DateInputBox(props) {
                 value={props.endMonth}
                 id={'endMonth'}
                 className={'dateInput'}
-                placeholder={props.endMonthPlaceholder}
-                onChange={props.onEndMonthChange}
+                placeholder={12}
+                onChange={(e) => props.onEndMonthChange(e.target.value)}
             />
             /
             <ShadowedFocusInput
@@ -63,8 +63,8 @@ export function DateInputBox(props) {
                 value={props.endDay}
                 id={'endDay'}
                 className={'dateInput'}
-                placeholder={props.endDayPlaceholder}
-                onChange={props.onEndDayChange}
+                placeholder={31}
+                onChange={(e) => props.onEndDayChange(e.target.value)}
             />
         </StyledDateInputs>
     )

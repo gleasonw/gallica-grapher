@@ -35,8 +35,8 @@ class Search:
         self.stateHooks = stateHooks
         self.args = {
             **args,
-            'startDate': int(args['startDate']),
-            'endDate': int(args['endDate'])
+            'startDate': args['startDate'],
+            'endDate': args['endDate']
         }
         self.dbLink = SchemaLinkForSearch(requestID=stateHooks.requestID)
         self.insertRecordsToDB = self.getDBinsert()

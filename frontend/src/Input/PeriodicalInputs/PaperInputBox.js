@@ -77,8 +77,8 @@ export class PaperInputBox extends React.Component {
                     selected={this.props.selectedPaperInput}
                     onPaperSelectClick={this.props.onPaperInputSelectClick}
                     onFocus={this.props.onFocus}
-                    startDate={this.props.startDate}
-                    endDate={this.props.endDate}
+                    startYear={this.props.startYear}
+                    endYear={this.props.endYear}
                 />
                 <ContinuousTrendInput
                     selected={this.props.selectedPaperInput}

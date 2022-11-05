@@ -1,7 +1,7 @@
 from unittest import TestCase
 from gallicaGetter.dateGrouping import DateGrouping
 
-
+#TODO: add tests for boundary cases
 class TestDateGrouping(TestCase):
 
     def test_get_month_grouping_intervals(self):
