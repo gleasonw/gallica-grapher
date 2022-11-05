@@ -10,8 +10,6 @@ This app integrates with the French National Archives Gallica API, allowing for 
 Most of the periodicals in the archive are in French, so French words are most relevant. There are, though, a sizeable number of international or 
 European editions in English, such as the New York Herald. Play around with it!  
 
-Pour les francophones qui se demandent pourquoi ce site est en anglais : je vais traduire le site bientôt, je me concentre sur le système pour l'instant.
-
 
 ### How do I begin a search?  
 
