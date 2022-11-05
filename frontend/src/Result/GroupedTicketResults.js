@@ -1,52 +1,23 @@
-import React, {useContext} from "react";
-import {GraphSettingsContext} from "./GraphSettingsContext";
-import TicketLabel from "../shared/TicketLabel";
-import Chart from "./Chart";
-import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
-import DownloadCSVButton from "./DownloadCSVButton";
+import React from "react";
+import RecordsViewer from "./RecordsViewer";
+import TicketLabelRow from "../Input/TicketLabelRow";
 
 export function GroupedTicketResults(props) {
     return (
-        <div className='groupedResultsUI'>
-            <Chart
+        <div>
+            <TicketLabelRow
                 tickets={props.tickets}
-                settingsID='group'
+                isMutable={false}
             />
-            <GroupedStatBar tickets={props.tickets}/>
-            <DownloadCSVButton tickets={props.tickets}/>
+            <RecordsViewer
+                tickets={props.tickets}
+                requestID={props.requestID}
+                settingsID={'group'}
+                cacheID={props.cacheID}
+            />
         </div>
 
     )
-}
-
-function GroupedStatBar(props) {
-    const settings = useContext(GraphSettingsContext);
-
-
-    return (
-        <div className='groupedStatBar'>
-            {Object.keys(props.tickets).map(key => (
-                <div
-                    className='groupedStatBarEntry'
-                    key={key}
-                >
-                    <svg width = "20" height="20">
-                        <circle cx="10" cy="10" r="10" fill={settings[key].color}/>
-                    </svg>
-                    <TicketLabel
-                        terms={props.tickets[key].terms}
-                        papers={props.tickets[key].papersAndCodes}
-                        dateRange={props.tickets[key].dateRange}
-                    />
-                    <TicketPaperOccurrenceStats
-                        ticketID={key}
-                        dateRange={props.tickets[key].dateRange}
-                        grouped={true}
-                    />
-                </div>
-            ))}
-        </div>
-    );
 }
 
 export default GroupedTicketResults;

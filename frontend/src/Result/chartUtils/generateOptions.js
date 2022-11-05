@@ -1,5 +1,21 @@
-export default function generateOptions(series, settings) {
+export default function generateOptions(series, settings, onSeriesClick) {
     let options = {
+        chart: {
+            type: 'line',
+            zoomType: 'x',
+            panning: true,
+            panKey: 'shift'
+        },
+        plotOptions:{
+            series: {
+                cursor: 'pointer',
+                point: {
+                  events: {
+                    click: (e) => onSeriesClick(e.point)
+                  }
+                }
+              }
+        },
         legend: {
             dateTimeLabelFormats: {
                 month: '%b',
@@ -7,7 +23,10 @@ export default function generateOptions(series, settings) {
             },
             align: 'left',
             verticalAlign: 'top',
-            borderWidth: 0
+            borderWidth: 0,
+            itemStyle: {
+                fontSize: '15px',
+            }
         },
         title: {
             text: null
@@ -22,10 +41,10 @@ export default function generateOptions(series, settings) {
             shared: true,
             crosshairs: true,
         },
-    }
-    if (settings.timeBin === 'year') {
+    };
+    if (settings.timeBin === 'year' || settings.timeBin === 'gallicaYear') {
         formatYearOptions()
-    } else if (settings.timeBin === 'month') {
+    } else if (settings.timeBin === 'month' || settings.timeBin === 'gallicaMonth') {
         formatYearMonOptions()
     } else {
         formatYearMonDayOptions()
@@ -33,6 +52,7 @@ export default function generateOptions(series, settings) {
 
     function formatYearOptions() {
         options.plotOptions = {
+            ...options.plotOptions,
             line: {
                 marker: {
                     enabled: false
@@ -40,7 +60,7 @@ export default function generateOptions(series, settings) {
             }
         }
         options.xAxis = {
-            type: 'line'
+            type: 'line',
         }
     }
 

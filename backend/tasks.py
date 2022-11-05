@@ -1,32 +1,40 @@
 from celery import Celery
-from scripts.request import Request
+from appsearch.request import Request
 import time
+from appsearch.request import buildRequest
 
 app = Celery()
 app.config_from_object('celery_settings')
 
 
 @app.task(bind=True)
-def spawnRequest(self, tickets):
-    gallicaRequest = Request(tickets, spawnRequest.request.id)
-    gallicaRequest.start()
+def spawnRequest(self, tickets, requestid):
+    request = buildRequest(
+        argsBundles=tickets,
+        identifier=requestid
+    )
+    request.start()
+    pollStates = {
+        'RUNNING': lambda: self.update_state(
+            state='RUNNING',
+            meta={'progress': request.getProgressStats()}
+        ),
+        'ADDING_MISSING_PAPERS': lambda: self.update_state(
+            state='ADDING_MISSING_PAPERS',
+            meta={'progress': request.getProgressStats()}
+        ),
+        'ADDING_RESULTS': lambda: self.update_state(
+            state='ADDING_RESULTS',
+            meta={'progress': request.getProgressStats()}
+        )
+    }
     while True:
-        if gallicaRequest.finished:
-            return {
-                'status': 'Complete!',
-                'result': 42}
-        elif gallicaRequest.tooManyRecords:
-            return {
-                'status': 'Too many records!',
-                'numRecords': gallicaRequest.estimateNumRecords
-            }
+        if pollState := pollStates.get(request.state):
+            pollState()
         else:
-            self.update_state(
-                state="PROGRESS",
-                meta={'progress': gallicaRequest.getProgressStats()})
-            time.sleep(1)
-
-
-class TooManyRecordsFailure(Exception):
-    pass
+            return {
+                'state': request.state,
+                'numRecords': request.estimateNumRecords
+            }
+        time.sleep(1)
 

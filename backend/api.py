@@ -2,16 +2,18 @@ import os
 from flask import Flask
 from flask import request
 from flask_cors import CORS
-
-from scripts.paperLocalSearch import PaperLocalSearch
-from scripts.ticketGraphSeriesBatch import TicketGraphSeriesBatch
+import random
+import json
+from dbops.localPaperSearch import PaperLocalSearch
+from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
-from scripts.topPapersForTicket import TopPapersForTicket
-from scripts.reactCSVdata import ReactCSVdata
-
+from dbops.recordDataForUser import RecordDataForUser
 
 app = Flask(__name__)
 CORS(app)
+requestIDSeed = random.randint(0, 10000)
+graphBatchGetter = GraphSeriesBatch()
+recordDataGetter = RecordDataForUser()
 
 
 @app.route('/')
@@ -21,29 +23,37 @@ def index():
 
 @app.route('/api/init', methods=['POST'])
 def init():
+    global requestIDSeed
+    requestIDSeed += 1
     tickets = request.get_json()["tickets"]
-    task = spawnRequest.delay(tickets)
-    return {"taskid": task.id}
+    task = spawnRequest.delay(tickets, requestIDSeed)
+    return {"taskid": task.id, "requestid": requestIDSeed}
 
 
-@app.route('/api/progress/<taskID>')
-def getProgress(taskID):
+@app.route('/poll/progress/<taskID>')
+def getRequestState(taskID):
     task = spawnRequest.AsyncResult(taskID)
-    if task.state == 'PROGRESS':
+    if task.ready():
         response = {
-            'state': task.state,
-            'progress': task.info.get('progress')
+            'state': task.result.get('state'),
+            'numRecords': task.result.get('numRecords')
         }
     else:
-        result = task.result
-        if result and result['status'] == 'Too many records!':
-            response = {
-                'state': "TOO_MANY_RECORDS",
-                'numRecords': result['numRecords']
-            }
-        else:
-            response = {'state': "SUCCESS"}
+        if task.info.get('progress') is None:
+            print('no progress')
+        response = {
+            'state': task.state,
+            'progress': task.info.get('progress', 0)
+        }
     return response
+
+
+@app.route('/api/revokeTask/<taskID>/<reqID>')
+def revokeTask(taskID, reqID):
+    task = spawnRequest.AsyncResult(taskID)
+    task.revoke(terminate=True)
+    RecordDataForUser().clearUserRecordsAfterCancel(reqID)
+    return {'state': "REVOKED"}
 
 
 @app.route('/api/paperchartjson')
@@ -60,12 +70,12 @@ def papers(keyword):
     return similarPapers
 
 
-@app.route('/api/numPapersOverRange/<startYear>/<endYear>')
-def numPapersOverRange(startYear, endYear):
+@app.route('/api/numPapersOverRange/<startDate>/<endDate>')
+def numPapersOverRange(startDate, endDate):
     search = PaperLocalSearch()
     numPapers = search.getNumPapersInRange(
-        startYear,
-        endYear
+        startDate,
+        endDate
     )
     return {'numPapersOverRange': numPapers}
 
@@ -73,15 +83,15 @@ def numPapersOverRange(startYear, endYear):
 @app.route('/api/continuousPapers')
 def getContinuousPapersOverRange():
     limit = request.args.get('limit')
-    startYear = request.args.get('startYear')
-    endYear = request.args.get('endYear')
+    startDate = request.args.get('startDate')
+    endDate = request.args.get('endDate')
     search = PaperLocalSearch()
     selectPapers = search.selectPapersContinuousOverRange(
-        startYear,
-        endYear,
+        startDate,
+        endDate,
         limit
     )
-    return {'continuousPapers': selectPapers}
+    return selectPapers
 
 
 @app.route('/api/graphData')
@@ -91,29 +101,65 @@ def getGraphData():
         'averageWindow': request.args["averageWindow"],
         'groupBy': request.args["timeBin"],
         'continuous': request.args["continuous"],
-        'dateRange': request.args["dateRange"]
+        'startDate': request.args["startDate"],
+        'endDate': request.args["endDate"],
+        'requestID': request.args["requestID"]
     }
-    series = TicketGraphSeriesBatch(settings)
-    items = {'series': series.getSeriesBatch()}
+    items = {'series': graphBatchGetter.getSeriesForSettings(settings)}
     return items
 
 
 @app.route('/api/topPapers')
 def getTopPapersFromID():
-    topPapers = TopPapersForTicket(
-        request.args["id"],
-        continuous=request.args["continuous"],
-        dateRange=request.args["dateRange"]
+    ticketIDS = tuple(request.args["tickets"].split(","))
+    topPapers = recordDataGetter.getTopPapers(
+        tickets=ticketIDS,
+        requestID=request.args["requestID"],
     )
-    items = {"topPapers": topPapers.getTopPapers()}
+    items = {"topPapers": topPapers}
     return items
 
 
 @app.route('/api/getcsv')
 def getCSV():
     tickets = request.args["tickets"]
-    csvData = ReactCSVdata().getCSVData(tickets)
+    requestID = request.args["requestID"]
+    csvData = recordDataGetter.getCSVData(tickets, requestID)
     return {"csvData": csvData}
+
+
+@app.route('/api/getDisplayRecords')
+def getDisplayRecords():
+    tableArgs = dict(request.args)
+    del tableArgs['uniqueforcache']
+    tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
+    displayRecords, count = recordDataGetter.getRecordsForDisplay(tableArgs)
+    return {
+        "displayRecords": displayRecords,
+        "count": count
+    }
+
+
+@app.route('/api/getGallicaRecords')
+def getGallicaRecordsForDisplay():
+    args = dict(request.args)
+    tickets = json.loads(args['tickets'])
+    del args['tickets']
+    records = recordDataGetter.getGallicaRecordsForDisplay(
+        tickets=tickets,
+        filters=args
+    )
+    records = [record.getDisplayRow() for record in records]
+    return {"displayRecords": records}
+
+
+@app.route('/api/ocrtext/<arkCode>/<term>')
+def getOCRtext(arkCode, term):
+    numResults, text = recordDataGetter.getOCRTextForRecord(
+        arkCode,
+        term
+    )
+    return {"numResults": numResults, "text": text}
 
 
 if __name__ == "__main__":

@@ -1,177 +1,260 @@
-import React, {useState} from 'react';
-import {v4 as uuidv4} from 'uuid';
+import React, {useRef, useState} from 'react';
 import Input from "./Input/Input";
+import Info from "./Info";
 import RunningQueriesUI from "./Running/RunningQueries";
-import ReactMarkdown from 'react-markdown';
 import ResultUI from "./Result/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from "axios";
 import InfoIcon from '@mui/icons-material/Info';
+import axios from "axios";
+import ClassicUIBox from "./shared/ClassicUIBox";
+import ImportantButtonWrap from "./shared/ImportantButtonWrap";
 
 
 function App() {
-    const [tickets, setTickets] = useState([]);
-    const [idTickets, setIDTickets] = useState({});
-    const [requestID, setRequestID] = useState('');
-    const [gettingInput, setGettingInput] = useState(true);
-    const [runningQueries, setRunningQueries] = useState(false);
-    const [infoPage, setInfoPage] = useState(false);
-    const [tooManyRecordsWarning, setTooManyRecordsWarning] = useState(false);
+    const [tickets, setTickets] = useState({});
+    const [selectedSearchType, setSelectedSearchType] = useState(0);
+    const [startYear, setStartYear] = useState(1880);
+    const [startMonth, setStartMonth] = useState(null);
+    const [startDay, setStartDay] = useState(null);
+    const [endYear, setEndYear] = useState(1930);
+    const [endMonth, setEndMonth] = useState(null);
+    const [endDay, setEndDay] = useState(null);
+    const [requestID, setRequestID] = useState(null);
+    const [progressID, setProgressID] = useState(null);
+    const [currentPage, setCurrentPage] = useState('input');
     const [numRecords, setNumRecords] = useState(0);
+    const requestBoxRef = useRef(null);
+    const pages = {
+        'input':
+            <Input
+                tickets={tickets}
+                onLoadedSubmit={(ticket) => initRequest(getUpdatedTickets(ticket))}
+                onUnloadedSubmit={() => initRequest(tickets)}
+                onCreateTicketClick={handleCreateTicketClick}
+                onTicketClick={handleTicketClick}
+                onExampleRequestClick={handleExampleRequestClick}
+                requestBoxRef={requestBoxRef}
+                selectedSearchType={selectedSearchType}
+                startYear={startYear}
+                startMonth={startMonth}
+                startDay={startDay}
+                endYear={endYear}
+                endMonth={endMonth}
+                endDay={endDay}
+                onStartYearChange={(year) => setStartYear(year)}
+                onStartMonthChange={(month) => setStartMonth(month)}
+                onStartDayChange={(day) => setStartDay(day)}
+                onEndYearChange={(year) => setEndYear(year)}
+                onEndMonthChange={(month) => setEndMonth(month)}
+                onEndDayChange={(day) => setEndDay(day)}
+                onSearchTypeChange={(i) => setSelectedSearchType(i)}
+            />,
+        'running':
+            <RunningQueriesUI
+                tickets={tickets}
+                progressID={progressID}
+                requestID={requestID}
+                onFinish={() => setCurrentPage('result')}
+                onTooManyRecords={handleTooManyRecords}
+                onNoRecords={() => setCurrentPage('noRecords')}
+                onCancelRequest={handleResetValuesAndGoHome}
+                onBackendError={() => setCurrentPage('backendError')}
+                onBackendGroupingChange={handleBackendGroupingChange}
+            />,
+        'result':
+            <ResultUI
+                tickets={tickets}
+                requestID={requestID}
+                onHomeClick={handleResetValuesAndGoHome}
+            />,
+        'info':
+            <Info/>,
+        'tooManyRecords':
+            <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
+                <h1>Your curiosity exceeds my capacity.</h1>
+                <br/>
+                <h3>{numRecords.toLocaleString()} records in your request.</h3>
+                <section>
+                    <br/>
+                    <p>I can't retrieve all these records for you. There are just too many of them. Try
+                    running the same request, but group by year. I don't have to pull as many records from Paris for that.</p>
+                    <br/>
+                </section>
+                <ImportantButtonWrap
+                    onClick={handleResetValuesAndGoHome}
+                    aria-label="Home page button"
+                    children={'Make a new request'}
+                />
+            </ClassicUIBox>,
+        'noRecords':
+            <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
+                <h1>No records found. </h1>
+                <p>Try adjusting your year range or periodical selection. Some publish only a few times in a year and
+                    don't have much text available. </p>
+                <p>Adjusting your search term might help too, although Gallica is usually good at finding similar
+                    spellings. </p>
+                <ImportantButtonWrap
+                    onClick={handleResetValuesAndGoHome}
+                    aria-label="Home page button"
+                    children={'Make a new request'}
+                />
+            </ClassicUIBox>,
+        'backendError':
+            <ClassicUIBox width={'calc(100% - 100px)'} height={'auto'}>
+                <h1>Something went wrong. My fault. </h1>
+                <p>Rest assured our very best engineer will soon right his wrongs.</p>
+                <p>Please try again later!</p>
+            </ClassicUIBox>
+    }
 
-    const header =
-        <header className="header">
-            <div className="infoAndHomeBar">
-                <div
-                    className={'gallicaGrapherHome'}
-                    onClick={handleHomeClick}
-                >
-                    Graphing Gallica
-                </div>
-                <div
-                    className="info"
-                    onClick={handleInfoClick}
-                >
-                    <InfoIcon/>
-                </div>
-            </div>
-        </header>
+    function getUpdatedTickets(ticket) {
+        const newTicketID = Object.keys(tickets).length;
+        return {
+            ...tickets,
+            [newTicketID]: ticket
+        };
+    }
 
-    async function handleInputSubmit(event){
-        event.preventDefault();
-        const ticksWithIDS = generateTicketIDs();
+    function handleBackendGroupingChange(ticketID) {
+        const updatedTickets = {
+            ...tickets,
+            [ticketID]: {
+                ...tickets[ticketID],
+                grouping: 'all'
+            }
+        }
+        setTickets(updatedTickets);
+    }
+
+    async function initRequest(tickets) {
+        setCurrentPage('running');
+        const completedTickets = addGroupingToTickets(tickets);
+        const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
         const {request} = await axios.post('/api/init', {
-            tickets: ticksWithIDS
+            tickets: ticketsWithPaperNamesRemoved
         })
-        const taskID = JSON.parse(request.response)["taskid"];
-        setIDTickets(ticksWithIDS);
-        setRequestID(taskID);
-        setGettingInput(false);
-        setRunningQueries(true);
-    }
-
-    function handleCreateTicketClick(items){
-        createTicketFromInput(items)
-    }
-
-    function handleTicketClick(index){
-        deleteTicketAtIndex(index);
-    }
-
-    function handleExampleRequestClick(request){
-        window.scrollTo(0, 0);
-        setTickets(request);
-    }
-
-    function generateTicketIDs(){
-        let ticketsWithID = {};
-        for (let i = 0; i < tickets.length; i++){
-            let id = uuidv4()
-            ticketsWithID[id] = tickets[i]
+        const progressID = JSON.parse(request.response)["taskid"];
+        const requestID = JSON.parse(request.response)["requestid"];
+        if (progressID === null) {
+            setCurrentPage('backendError');
         }
-        return ticketsWithID
+        setProgressID(progressID);
+        setRequestID(requestID);
+        setTickets(completedTickets);
     }
 
-    function createTicketFromInput(items){
-        if(items.terms.length > 0){
-            let updatedTickets = tickets.slice();
-            updatedTickets.push(items);
-            setTickets(updatedTickets)
+    function addGroupingToTickets(someTickets) {
+        const ticketsWithSearchType = {}
+        Object.keys(someTickets).forEach((ticketID) => {
+            ticketsWithSearchType[ticketID] = {
+                ...someTickets[ticketID],
+                grouping: getSearchTypeForIndex(selectedSearchType),
+            }
+        })
+        return ticketsWithSearchType;
+    }
+
+    function removePaperNamesFromTickets(someTickets) {
+        const ticketsWithPaperNamesRemoved = {}
+        Object.keys(someTickets).map((ticketID) => (
+            ticketsWithPaperNamesRemoved[ticketID] = {
+                ...someTickets[ticketID],
+                codes: someTickets[ticketID].papersAndCodes.map(
+                    (paperAndCode) => (paperAndCode.code))
+            }
+        ))
+        delete ticketsWithPaperNamesRemoved['papersAndCodes'];
+        return ticketsWithPaperNamesRemoved;
+    }
+
+    function getSearchTypeForIndex(index) {
+        const searchTypes = ['year', 'month', 'all']
+        return searchTypes[index]
+    }
+
+    function handleCreateTicketClick(items) {
+        const updatedTickets = getUpdatedTickets(items);
+        setTickets(updatedTickets);
+    }
+
+    function handleTicketClick(ticketID) {
+        let updatedTickets = {...tickets}
+        delete updatedTickets[ticketID];
+        const renumberedTickets = {};
+        Object.keys(updatedTickets).map((oldTicketID, index) => (
+            renumberedTickets[index] = updatedTickets[oldTicketID]
+        ));
+        setTickets(renumberedTickets);
+    }
+
+    function handleExampleRequestClick(example) {
+        const nameToId = {
+            "Colors": -1,
+            "Arts": -2,
+            "Pastries": -3,
+            "Scandal": -4,
+            "Colonialism": -5,
+            "Capitals": -6,
+            "Far West": -7
         }
-
+        const [id, tickets] = Object.entries(example)[0];
+        const ticketData = tickets['tickets'];
+        const requestWithUniqueTicketIDs = {}
+        Object.keys(ticketData).map((ticketID, index) => {
+            ticketData[ticketID].grouping = 'all';
+            requestWithUniqueTicketIDs[index] = ticketData[ticketID];
+        })
+        setTickets(requestWithUniqueTicketIDs);
+        setRequestID(nameToId[id])
+        setCurrentPage('result')
     }
 
-    function deleteTicketAtIndex(index){
-        const updatedTickets = tickets.slice()
-        updatedTickets.splice(index, 1)
-        setTickets(updatedTickets)
+    function handleTooManyRecords(numRecords) {
+        setNumRecords(numRecords);
+        setCurrentPage('tooManyRecords');
     }
 
-    function handleTicketFinish(){
-        setRunningQueries(false);
-    }
-
-    function handleHomeClick(){
-        setInfoPage(false)
-        setGettingInput(true);
-        setRunningQueries(false);
-        setTickets([]);
-        setIDTickets({});
-        setRequestID('');
-        setTooManyRecordsWarning(false);
+    function handleResetValuesAndGoHome() {
+        setCurrentPage('input');
+        setTickets({});
+        setRequestID(null);
+        setProgressID(null);
         setNumRecords(0);
     }
 
-    function handleTooManyRecords(numRecords){
-        setRunningQueries(false);
-        setTooManyRecordsWarning(true);
-        setNumRecords(numRecords);
-    }
-
-    function handleInfoClick(){
-        setInfoPage(true);
-    }
-    if(infoPage) {
-        return(
-            <div>
-                {header}
-                <div className={'infoText'}>
-                    This is a graphing tool.
-                </div>
-            </div>
-        )
-    }else if(gettingInput){
-        return (
-            <div className="App">
-                {header}
-                <Input
-                    requestTickets={tickets}
-                    onInputSubmit={handleInputSubmit}
-                    onCreateTicketClick={handleCreateTicketClick}
-                    onTicketClick={handleTicketClick}
-                    onExampleRequestClick={handleExampleRequestClick}
-                />
-            </div>
-        )
-    }else if(runningQueries){
-          return (
-            <div className="App">
-                {header}
-                <RunningQueriesUI
-                    tickets={idTickets}
-                    onFinish={handleTicketFinish}
-                    requestID={requestID}
-                    onTooManyRecords={handleTooManyRecords}
-                />
-            </div>
-          )
-    }else if(tooManyRecordsWarning){
-        return (
-            <div className="App">
-                {header}
-                <div className={'tooManyRecordsWarningBox'}>
-                    <h1>Your curiosity exceeds my capacity.</h1>
-                    <span>
-            Your request returned {numRecords.toLocaleString()} records from Gallica's archive. This number is either
-                        greater than my limit, or I don't have enough space for it right now. Try restricting your search to a few periodicals,
-            shortening the year range, or using a more precise ngram. Click on Graphing Gallica to return to home.
-                    </span>
-                </div>
-            </div>
-        )
-    }else{
-        return (
-            <div className="App">
-                {header}
-                <ResultUI
-                    tickets={idTickets}
-                />
-            </div>
-          )
-    }
+    return (
+        <div className="App">
+            <Header
+                onHomeClick={handleResetValuesAndGoHome}
+                onInfoClick={() => setCurrentPage('info')}
+            />
+            {pages[currentPage]}
+        </div>
+    );
 }
 
-
+function Header(props) {
+    return (
+        <header className="header">
+            <div className="infoAndHomeBar">
+                <button
+                    className={'gallicaGrapherHome'}
+                    onClick={props.onHomeClick}
+                    aria-label="Home page button"
+                >
+                    Graphing Gallica
+                </button>
+                <button
+                    className="info"
+                    onClick={props.onInfoClick}
+                    aria-label="Information page button"
+                >
+                    <InfoIcon/>
+                </button>
+            </div>
+        </header>
+    )
+}
 
 export default App;

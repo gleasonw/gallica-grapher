@@ -1,8 +1,8 @@
 import React from "react";
 import TicketLabel from "../shared/TicketLabel";
-import TicketPaperOccurrenceStats from "./TicketPaperOccurrenceStats";
-import Chart from "./Chart";
-import DownloadCSVButton from "./DownloadCSVButton";
+import ClassicUIBox from "../shared/ClassicUIBox";
+import RecordsViewer from "./RecordsViewer";
+import styled from 'styled-components';
 
 function SoloTickets(props) {
     return (
@@ -12,32 +12,40 @@ function SoloTickets(props) {
                     ticket={props.tickets[key]}
                     key={key}
                     ticketID={key}
+                    requestID={props.requestID}
+                    cacheID={props.cacheID}
                 />
             ))}
         </div>
     )
 }
-
+//TODO: sync timebin display with state
 function SoloTicketResult(props) {
     return (
-        <div className='ticketResults'>
-            <TicketLabel
-                terms={props.ticket.terms}
-                papers={props.ticket.papersAndCodes}
-                dateRange={props.ticket.dateRange}
-            />
-            <Chart
+        <StyledSoloTicket>
+            <ClassicUIBox>
+                <TicketLabel
+                    terms={props.ticket.terms}
+                    papers={props.ticket.papersAndCodes}
+                    startDate={props.ticket.startDate}
+                    endDate={props.ticket.endDate}
+                    linkTerm={props.ticket.linkTerm}
+                    linkDistance={props.ticket.linkDistance}
+                    compact={false}
+                    center
+                />
+            </ClassicUIBox>
+            <RecordsViewer
                 tickets={{[props.ticketID]: props.ticket}}
+                requestID={props.requestID}
                 settingsID={props.ticketID}
+                cacheID={props.cacheID}
             />
-            <TicketPaperOccurrenceStats
-                ticketID={props.ticketID}
-                dateRange={props.ticket.dateRange}
-                grouped={false}
-            />
-            <DownloadCSVButton tickets={{[props.ticketID]: ''}}/>
-        </div>
+        </StyledSoloTicket>
     )
 }
-
+const StyledSoloTicket = styled.div`
+    display: flex;
+    flex-direction: column;
+`
 export default SoloTickets;

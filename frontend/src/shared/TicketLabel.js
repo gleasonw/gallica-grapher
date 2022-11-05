@@ -1,54 +1,48 @@
 import React from 'react';
-import PrettyTextOverflow from "./PrettyTextOverflow";
+import styled from "styled-components";
+import {PaperBlurb} from "./ItemsBlurb";
+import {DateBlurb} from "./ItemsBlurb";
+import {TermsBlurb} from "./ItemsBlurb";
 
-function TicketLabel(props){
-    return(
-        <div className='ticketLabel'>
-            <TicketTermRow terms={props.terms}/>
-            {props.papers.length > 0 && <TicketPaperRow papers={props.papers}/>}
-            <TicketDateRow dateRange={props.dateRange}/>
-        </div>
+function TicketLabel(props) {
+    const dateRange = [props.startDate, props.endDate]
+    return (
+        <StyledTicketLabel compact={props.compact} center={props.center}>
+            Occurrences of
+            <TermsBlurb terms={props.terms}/>
+            {!!props.linkTerm &&
+                `within ${props.linkDistance} words of "${props.linkTerm}" `
+            }
+            in
+            <PaperBlurb papers={props.papers}/>
+            {
+                dateRange.length > 0 &&
+                <StyledDateLine> between <DateBlurb dateRange={dateRange}/></StyledDateLine>
+            }
+        </StyledTicketLabel>
     )
 }
 
-function TicketTermRow(props){
-    const quotedTerms = addQuotesAndCommasAroundItems(props.terms)
-    return renderRow(quotedTerms, 'Ngrams:')
-}
-function TicketPaperRow(props){
-    const papers = props.papers
-    const paperNames = []
-    papers.map(paperAndCode => (
-        paperNames.push(paperAndCode['title'])
-    ));
-    const quotedItems= addQuotesAndCommasAroundItems(paperNames)
-    return renderRow(quotedItems, 'In papers:')
-}
-function addQuotesAndCommasAroundItems(items){
-    return items.map(
-        term => "'" + term + "'"
-    ).join(', ')
-}
-function renderRow(item, label){
-    if(item){
-        return(
-            <section className={'ticketItems'}>
-                <h3 className={'ticketRowLabel'}>
-                    {label}
-                </h3>
-                <div className={'bubblesContainer'}>
-                    <PrettyTextOverflow>
-                        {item}
-                    </PrettyTextOverflow>
-                </div>
-            </section>
-        )
-    }
-}
-function TicketDateRow(props){
-    const dateRange = props.dateRange
-    const rangeString = dateRange[0] + ' to ' + dateRange[1]
-    return renderRow(rangeString, 'Over range:')
-}
+const StyledTicketLabel = styled.div`
+    display: flex;
+    font-size: ${props => props.compact ? '18px' : '25px'};
+    flex-direction: ${props => props.compact ? 'column' : 'row'};
+    flex-wrap: wrap;
+    max-width: 100%;
+    align-items: ${props => props.compact ? 'flex-start' : 'center'};
+    gap: ${props => props.compact ? '5px' : '10px'};
+    position: relative;
+    overflow-y: ${props => props.compact ? 'auto' : 'hidden'};
+    align-self: ${props => props.center ? 'center' : 'flex-start'};
+`;
+
+const StyledDateLine = styled.div`
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+`;
+
 
 export default TicketLabel;

@@ -1,5 +1,5 @@
 import React from "react";
-import useData from "./hooks/useData";
+import useData from "../shared/hooks/useData";
 import {CSVDownload} from "react-csv";
 import LesserButton from "../shared/LesserButton";
 
@@ -26,6 +26,7 @@ function DownloadCSVButton(props) {
             {downloadCSV && <ExportCSV
                 tickets={props.tickets}
                 onClose={handleDownloadCSVclose}
+                requestID={props.requestID}
             />}
         </div>
     );
@@ -33,7 +34,9 @@ function DownloadCSVButton(props) {
 
 function ExportCSV(props) {
     const ticketIDs = Object.keys(props.tickets);
-    const query = "/api/getcsv?tickets=" + ticketIDs.join(",");
+    const query = "/api/getcsv?" +
+        "tickets=" + ticketIDs.join(",") +
+        "&requestID=" + props.requestID;
     const response = useData(query);
 
     if (response) {

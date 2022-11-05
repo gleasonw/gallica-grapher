@@ -1,125 +1,112 @@
 {
   "requests": {
-    "Cities": {
-      "tickets": [
-        {
+    "Colors": {
+      "tickets": {
+        "bleu clair": {
           "terms": [
-            "chicago"
+            "\"bleu clair\""
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910
         },
-        {
+        "bleu pastel": {
           "terms": [
-            "new york"
+            "\"bleu pastel\""
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910
         },
-        {
+        "rose": {
           "terms": [
-            "londres"
+            "rose"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910,
+          "linkTerm": "pantalon",
+          "linkDistance": 2
         }
-      ]
+      }
     },
-    "Cuisine": {
-      "tickets": [
-        {
+    "Arts": {
+      "tickets": {
+        "Art Nouveau": {
           "terms": [
-            "chocolat"
+            "\"art nouveau\""
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb344287435",
-              "endDate": 1925,
-              "startDate": 1883,
-              "title": "L'Art culinaire (Société des cuisiniers français)"
-            }
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910
+        },
+        "Art deco": {
+          "terms": [
+            "\"arts decoratifs\""
           ],
-          "dateRange": [
-            "1883",
-            "1925"
-          ]
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910
         }
-      ]
+      }
+    },
+    "Pastries": {
+      "tickets": {
+        "patiserrie": {
+          "terms": [
+            "patisserie"
+          ],
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910
+        },
+        "brioche": {
+          "terms": [
+            "brioche"
+          ],
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910
+        },
+        "croissant": {
+          "terms": [
+            "croissant"
+          ],
+          "papersAndCodes": [],
+          "linkTerm": "patisserie",
+          "startDate": 1865,
+          "endDate" : 1910,
+          "linkDistance": 5
+        }
+      }
+    },
+    "Scandal": {
+      "tickets": {
+        "empoissonement": {
+          "terms": [
+            "scandale"
+          ],
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910,
+          "linkTerm": "empoisonnement",
+          "linkDistance": 30
+        },
+        "corruption": {
+          "terms": [
+            "scandale"
+          ],
+          "papersAndCodes": [],
+          "startDate": 1865,
+          "endDate" : 1910,
+          "linkTerm": "corruption",
+          "linkDistance": 30
+        }
+      }
     },
     "Colonialism": {
-      "tickets": [
-        {
-          "terms": [
-            "colonies"
-          ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            },
-            {
-              "code": "cb328066631",
-              "endDate": 1940,
-              "startDate": 1865,
-              "title": "La Liberté"
-            },
-            {
-              "code": "cb328123058",
-              "endDate": 1944,
-              "startDate": 1884,
-              "title": "Le Matin (Paris. 1884)"
-            },
-            {
-              "code": "cb34355551z",
-              "endDate": 1951,
-              "startDate": 1854,
-              "title": "Le Figaro (Paris. 1854)"
-            },
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
-          "dateRange": [
-            1499,
-            2020
-          ]
-        },
-        {
+      "tickets": {
+        "algerie": {
           "terms": [
             "algerie"
           ],
@@ -155,12 +142,10 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            1499,
-            2020
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
-        {
+        "congo": {
           "terms": [
             "congo"
           ],
@@ -196,39 +181,12 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            1499,
-            2020
-          ]
-        }
-      ]
-    },
-    "War and Peace": {
-      "tickets": [
-        {
-          "terms": [
-            "guerre",
-            "souffrance",
-            "sang"
-          ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            }
-          ],
-          "dateRange": [
-            "1871",
-            "1921"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
-        {
+        "indochine": {
           "terms": [
-            "paix",
-            "accord",
-            "amitie"
+            "indochine"
           ],
           "papersAndCodes": [
             {
@@ -236,14 +194,187 @@
               "endDate": 1921,
               "startDate": 1871,
               "title": "Le XIXe siècle (Paris. 1871)"
+            },
+            {
+              "code": "cb328066631",
+              "endDate": 1940,
+              "startDate": 1865,
+              "title": "La Liberté"
+            },
+            {
+              "code": "cb328123058",
+              "endDate": 1944,
+              "startDate": 1884,
+              "title": "Le Matin (Paris. 1884)"
+            },
+            {
+              "code": "cb34355551z",
+              "endDate": 1951,
+              "startDate": 1854,
+              "title": "Le Figaro (Paris. 1854)"
+            },
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            "1871",
-            "1921"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
+        },
+        "conquete": {
+            "terms": [
+              "colonie",
+              "colonial"
+            ],
+            "papersAndCodes": [
+                {
+                "code": "cb32757974m",
+                "endDate": 1921,
+                "startDate": 1871,
+                "title": "Le XIXe siècle (Paris. 1871)"
+                },
+                {
+                "code": "cb328066631",
+                "endDate": 1940,
+                "startDate": 1865,
+                "title": "La Liberté"
+                },
+                {
+                "code": "cb328123058",
+                "endDate": 1944,
+                "startDate": 1884,
+                "title": "Le Matin (Paris. 1884)"
+                },
+                {
+                "code": "cb34355551z",
+                "endDate": 1951,
+                "startDate": 1854,
+                "title": "Le Figaro (Paris. 1854)"
+                },
+                {
+                "code": "cb32895690j",
+                "endDate": 1944,
+                "startDate": 1863,
+                "title": "Le Petit journal (Paris. 1863)"
+                }
+            ],
+            "startDate": 1854,
+            "endDate" : 1951,
+            "linkTerm": "conquete",
+            "linkDistance": 20
         }
-      ]
+      }
+    },
+    "Capitals": {
+      "tickets": {
+        "chicago": {
+          "terms": [
+            "berlin"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "startDate": 1854,
+          "endDate" : 1951
+        },
+        "new york": {
+          "terms": [
+            "washington"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "startDate": 1854,
+          "endDate" : 1951
+        },
+        "londres": {
+          "terms": [
+            "londres"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "startDate": 1854,
+          "endDate" : 1951
+        },
+        "tokyo": {
+          "terms": [
+            "tokyo"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "startDate": 1854,
+          "endDate" : 1951
+        },
+        "rome": {
+          "terms": [
+            "rome"
+          ],
+          "papersAndCodes": [
+            {
+              "code": "cb32895690j",
+              "endDate": 1944,
+              "startDate": 1863,
+              "title": "Le Petit journal (Paris. 1863)"
+            }
+          ],
+          "startDate": 1854,
+          "endDate" : 1951
+        }
+      }
+    },
+    "Far West": {
+      "tickets": {
+        "seattle": {
+          "terms": [
+            "seattle"
+          ],
+          "papersAndCodes": [],
+          "startDate": 1854,
+          "endDate" : 1951
+        },
+        "san francisco": {
+          "terms": [
+            "\"los angeles\""
+          ],
+          "papersAndCodes": [],
+          "startDate": 1854,
+          "endDate" : 1951
+        },
+        "portland": {
+          "terms": [
+            "portland"
+          ],
+          "papersAndCodes": [],
+          "startDate": 1854,
+          "endDate" : 1951,
+          "linkTerm": "oregon",
+          "linkDistance": 20
+        }
+      }
     }
   }
 }

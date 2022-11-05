@@ -1,200 +1,182 @@
-import React from "react";
+import React, {useRef, useState} from "react";
 import TicketForm from './TicketForm';
-import TicketLabel from "../shared/TicketLabel";
-import DecorativeTicket from "../shared/DecorativeTicket";
-import ImportantButtonWrap from "../shared/ImportantButtonWrap";
+import useData from "../shared/hooks/useData";
+import {ExampleBox} from "./ExampleBox";
 
-class Input extends React.Component {
-    constructor(props) {
-        super(props);
-        this.exampleBoxRef = React.createRef();
-        this.state = {
-            terms: [],
-            papers: [],
-            dateBoundaryPlaceholder: [1499, 2020],
-            currentDateRange: ['', ''],
-            showNoTicketReminder: false
-        };
-        this.handleLowDateChange = this.handleLowDateChange.bind(this);
-        this.handleHighDateChange = this.handleHighDateChange.bind(this);
-        this.handlePaperDropdownClick = this.handlePaperDropdownClick.bind(this);
-        this.handleKeyDown = this.handleKeyDown.bind(this);
-        this.handleSeeExamplesClick = this.handleSeeExamplesClick.bind(this);
-        this.deletePaperBubble = this.deletePaperBubble.bind(this);
-        this.deleteTermBubble = this.deleteTermBubble.bind(this);
+//TODO: add a reducer
+function Input(props){
+    const exampleBoxRef = useRef(null);
+    const [terms, setTerms] = useState([]);
+    const [linkTerm, setLinkTerm] = useState(null);
+    const [linkDistance, setLinkDistance] = useState(10);
+    const [termInput, setTermInput] = useState('');
+    const [userSelectedPapers, setUserSelectedPapers] = useState([]);
+    const [selectedPaperInput, setSelectedPaperInput] = useState(2);
+    const queryForContinuousPapers = getContinuousPaperQuery();
+    const result = useData(queryForContinuousPapers);
+    const continuousPapers = result ? result['paperNameCodes'] : [];
+    const boundaryYearsForUserPapers = setUserPapersYearBoundary();
+
+    function getContinuousPaperQuery(){
+        return "api/continuousPapers?limit=2000" +
+            "&startDate=" + props.startYear +
+            "&endDate=" + props.endYear;
     }
 
-    deletePaperBubble(bubbleIndex){
-        const papers = this.state.papers.slice()
-        papers.splice(bubbleIndex, 1)
-        this.updateDateBoundaryPlaceholder(papers)
-        this.setState({papers: papers})
-    }
-
-    deleteTermBubble(bubbleIndex){
-        const terms = this.state.terms.slice()
-        terms.splice(bubbleIndex, 1)
-        this.setState({terms: terms})
-    }
-
-    handlePaperDropdownClick(paper){
-        this.makePaperBubble(paper)
-    }
-
-    handleLowDateChange(event){
-        const range = this.state.currentDateRange.slice()
-        range[0] = event.target.value
-        this.setState({currentDateRange: range})
-    }
-
-    handleHighDateChange(event){
-        const range = this.state.currentDateRange.slice()
-        range[1] = event.target.value
-        this.setState({currentDateRange: range})
-    }
-
-    handleKeyDown(event){
-        event.preventDefault()
-        this.makeTermBubble(event.target.value)
-    }
-
-    handleSeeExamplesClick(){
-        this.exampleBoxRef.current.scrollIntoView({behavior: "smooth"})
-    }
-
-    makePaperBubble(paper){
-        const papers = this.state.papers.slice();
-        papers.push(paper)
-        this.updateDateBoundaryPlaceholder(papers)
-        this.setState({papers: papers})
-    }
-
-    makeTermBubble(term){
-        if(term){
-            const terms = this.state.terms.slice();
-            terms.push(term)
-            this.setState({terms: terms})
+    function setUserPapersYearBoundary(){
+        if(userSelectedPapers.length > 0) {
+            const paperLowYears = userSelectedPapers.map(paper => paper["startDate"])
+            const paperHighYears = userSelectedPapers.map(paper => paper["endDate"])
+            const minYear = Math.min(...paperLowYears)
+            const maxYear = Math.max(...paperHighYears)
+            return [minYear, maxYear]
         }
     }
 
-    updateDateBoundaryPlaceholder(papers){
-        let minYear = 1499
-        let maxYear = 2020
-        if(papers.length > 0){
-            const paperLowYears = papers.map(paper => paper["startDate"])
-            const paperHighYears = papers.map(paper => paper["endDate"])
-            minYear = Math.min(...paperLowYears)
-            maxYear = Math.max(...paperHighYears)
+    function handleSubmit(event){
+        event.preventDefault();
+        const currentNumTickets = Object.keys(props.tickets).length
+        if(currentNumTickets === 0) {
+            const ticket = makeTicketFromState();
+            props.onLoadedSubmit(ticket);
+        }else{
+            props.onUnloadedSubmit();
         }
-        console.log(minYear, maxYear)
-        this.setState({dateBoundaryPlaceholder: [minYear, maxYear]})
     }
 
-    trimDateRangeToPaperBoundary(){
-        const range = this.state.currentDateRange.slice()
-        const minYear = this.state.dateBoundaryPlaceholder[0]
-        const maxYear = this.state.dateBoundaryPlaceholder[1]
-        if(range[0] < minYear || range[0] === ''){
-            range[0] = minYear
+    function makeTicketFromState(){
+        return {
+            terms: terms,
+            linkTerm: linkTerm,
+            linkDistance: linkDistance,
+            papersAndCodes: getPapersFor(selectedPaperInput),
+            startDate: makeDateString(props.startYear, props.startMonth, props.startDay),
+            endDate: makeDateString(props.endYear, props.endMonth, props.endDay)
         }
-        if(range[1] > maxYear || range[1] === ''){
-            range[1] = maxYear
-        }
-        return range
     }
 
-    render() {
-        return (
-            <div className='inputBody'>
-                <div className='inputUI' ref={this.props.formRef}>
-                    <div className="mainTitle">
-                        Enter a word or phrase to query Gallica then graph the results.
-                    </div>
-                    <TicketForm
-                        lowYearValue={this.state.currentDateRange[0]}
-                        highYearValue={this.state.currentDateRange[1]}
-                        onLowDateChange={this.handleLowDateChange}
-                        onHighDateChange={this.handleHighDateChange}
-                        onPaperChange={this.handlePaperChange}
-                        onTermChange={this.handleTermChange}
-                        onCreateTicketClick={() => this.props.onCreateTicketClick(
-                            {
-                                'terms': this.state.terms,
-                                'papersAndCodes': this.state.papers,
-                                'dateRange': this.trimDateRangeToPaperBoundary()
-                            }
-                        )}
-                        onPaperDropItemClick={this.handlePaperDropdownClick}
-                        onKeyDown={this.handleKeyDown}
-                        selectedTerms={this.state.terms}
-                        selectedPapers={this.state.papers}
-                        deleteTermBubble={this.deleteTermBubble}
-                        deletePaperBubble={this.deletePaperBubble}
-                        minYearPlaceholder={this.state.dateBoundaryPlaceholder[0]}
-                        maxYearPlaceholder={this.state.dateBoundaryPlaceholder[1]}
-                        onGraphStartClick={this.props.onInputSubmit}
-                        onTicketClick={this.props.onTicketClick}
-                        tickets={this.props.requestTickets}
-                        exampleBoxRef={this.exampleBoxRef}
-                    />
-                    <input
+    function makeDateString(year, month, day){
+        let dateElements = [year];
+        if(month) dateElements.push(month);
+        if(day) dateElements.push(day);
+        return dateElements.join('-');
+    }
+
+    function handleTermChange(event) {
+        const input = event.target.value
+        const splitCommaTerms = input.split(',')
+        const trimmedTerms = splitCommaTerms.map(term => term.trim())
+        setTermInput(input)
+        setTerms(trimmedTerms)
+    }
+
+    function handleCreateTicketClick(){
+        props.onCreateTicketClick(makeTicketFromState());
+        setTermInput('');
+        setTerms([]);
+        setUserSelectedPapers([]);
+        setLinkDistance(10);
+        setLinkTerm('');
+    }
+
+
+    function deleteTermBubble(bubbleIndex){
+        const newTerms = terms.slice()
+        newTerms.splice(bubbleIndex, 1)
+        setTerms(newTerms)
+    }
+
+    function makePaperBubble(paper){
+        const updatedPapers = userSelectedPapers.slice();
+        updatedPapers.push(paper)
+        setUserSelectedPapers(updatedPapers)
+    }
+
+    function deletePaperBubble(bubbleIndex){
+        const updatedPapers = userSelectedPapers.slice();
+        updatedPapers.splice(bubbleIndex, 1)
+        setUserSelectedPapers(updatedPapers)
+    }
+
+    function getPapersFor(paperInputIndex){
+        if(paperInputIndex === 0){
+            return continuousPapers
+        }else if(paperInputIndex === 1){
+            return userSelectedPapers
+        }else if(paperInputIndex === 2){
+            return []
+        }else{
+            throw Error(`Unexpected paper index: ${paperInputIndex}`)
+        }
+    }
+
+    return (
+        <div className='inputBody'>
+            <div className='inputUI'>
+                <div className="mainTitle">
+                    Graph word occurrences in archived French periodicals.
+                </div>
+                <TicketForm
+                    startYear={props.startYear}
+                    startMonth={props.startMonth}
+                    startDay={props.startDay}
+                    endYear={props.endYear}
+                    endMonth={props.endMonth}
+                    endDay={props.endDay}
+                    onStartYearChange={props.onStartYearChange}
+                    onStartMonthChange={props.onStartMonthChange}
+                    onStartDayChange={props.onStartDayChange}
+                    onEndYearChange={props.onEndYearChange}
+                    onEndMonthChange={props.onEndMonthChange}
+                    onEndDayChange={props.onEndDayChange}
+                    onCreateTicketClick={handleCreateTicketClick}
+                    onPaperDropItemClick={(paper) => makePaperBubble(paper)}
+                    onPaperInputFocus={(i) => setSelectedPaperInput(i)}
+                    terms={terms}
+                    termInput={termInput}
+                    linkTerm={linkTerm}
+                    linkDistance={linkDistance}
+                    onLinkTermChange={(e) => setLinkTerm(e.target.value)}
+                    onLinkDistanceChange={(e) => setLinkDistance(e.target.value)}
+                    handleTermChange={handleTermChange}
+                    userSelectedPapers={userSelectedPapers}
+                    deleteTermBubble={deleteTermBubble}
+                    deletePaperBubble={deletePaperBubble}
+                    boundaryYearsForUserPapers={boundaryYearsForUserPapers}
+                    onSubmit={handleSubmit}
+                    onGraphStartClick={handleSubmit}
+                    onTicketClick={props.onTicketClick}
+                    tickets={props.tickets}
+                    exampleBoxRef={exampleBoxRef}
+                    onPaperInputClick={(i) => setSelectedPaperInput(i)}
+                    selectedPaperInput={selectedPaperInput}
+                    selectedSearchType={props.selectedSearchType}
+                    onSearchTypeClick={(selectIndex) => props.onSearchTypeChange(selectIndex)}
+                    numContinuousPapers={continuousPapers ?
+                        continuousPapers.length :
+                        '...'
+                    }
+                    requestBoxRef={props.requestBoxRef}
+                />
+                <input
                     id='seeExamplesButton'
                     type='button'
-                    onClick={this.handleSeeExamplesClick}
-                    value='Or try some examples ↓'
-                    />
-                </div>
-            <ExampleBox
-                exampleBoxRef={this.exampleBoxRef}
-                onExampleRequestClick={this.props.onExampleRequestClick}
-            />
-            </div>
-
-
-        )
-    }
-
-}
-//TODO: Cache the examples.
-function ExampleBox(props){
-    const exampleJSONdata = require('./exampleRequests.json')
-    const exampleRequests = exampleJSONdata["requests"]
-    return(
-        <div
-            className='exampleBox'
-            ref={props.exampleBoxRef}
-        >
-            {Object.keys(exampleRequests).map(requestName => (
-                <ExampleRequest
-                    title={requestName}
-                    request={exampleRequests[requestName]}
-                    onClick={props.onExampleRequestClick}
-                    key={requestName}
+                    aria-label='Scroll to examples'
+                    onClick={() => exampleBoxRef.current.scrollIntoView(
+                        {behavior: "smooth"})
+                    }
+                    value='Or view an example ↓'
                 />
-            ))}
+            </div>
+        <ExampleBox
+            exampleBoxRef={exampleBoxRef}
+            onExampleRequestClick={props.onExampleRequestClick}
+        />
         </div>
 
-    )
-}
-function ExampleRequest(props){
-    const tickets = props.request["tickets"]
-    return(
-        <ImportantButtonWrap onClick={() => props.onClick(tickets)}>
-            <h1>{props.title}</h1>
-            <div className={'exampleRequest'}>
-                {tickets.map((ticket, index) => (
-                    <DecorativeTicket key={index}>
-                        <TicketLabel
-                            terms={ticket["terms"]}
-                            papers={ticket["papersAndCodes"]}
-                            dateRange={ticket["dateRange"]}
-                        />
-                    </DecorativeTicket>
-                ))}
 
-            </div>
-        </ImportantButtonWrap>
     )
+
 }
 
 export default Input;

@@ -1,88 +1,132 @@
 import React, {useState} from 'react';
+import DateGroupSelect from './DateGroupSelect.tsx';
+import DateSelect from './DateSelect.tsx';
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
-import {RequestBox} from "./RequestBox";
-import {PaperInputBox} from "./PaperInputBox";
-import {DateInputBox} from "./DateInputBox";
+import {StyledRequestBox} from "./RequestBox";
+import {PaperInputBox} from "./PeriodicalInputs/PaperInputBox";
 import {TermInputBox} from "./TermInputBox";
+import RequestBoxAndFetchButtonWrap from "./RequestBoxAndFetchButtonWrap";
+import styled from "styled-components";
 
-function TicketForm(props){
-    const [showTicketReminder, setShowTicketReminder] = useState(false);
-    const noTicketReminder =
-        <div>
-            <div className='noTicketReminder'>
-                <span className='noTicketReminderText'>
-                    You have no tickets.
-                </span>
-            </div>
-        </div>
+function TicketForm(props) {
+    const [showNoTermsReminder, setShowNoTermsReminder] = useState(false);
 
-    function handleSubmit(e){
+    function handleSubmit(e) {
         e.preventDefault();
-        if (props.tickets && props.tickets.length > 0){
-            props.onGraphStartClick(e);
-        }else{
-            setShowTicketReminder(true);
+        if ((!props.tickets || Object.keys(props.tickets).length === 0)
+            &&
+            (props.termInput === '')) {
+            setShowNoTermsReminder(true)
+        } else {
+            props.onSubmit(e);
         }
     }
 
-    function handleCreateTicketClick(){
-        setShowTicketReminder(false);
-        props.onCreateTicketClick();
+    function handleCreateTicketClick() {
+        if (props.termInput !== '') {
+            props.onCreateTicketClick();
+        } else {
+            setShowNoTermsReminder(true);
+        }
     }
 
-    return(
-        <form
-            onSubmit={handleSubmit}
-            className='userInputForm'
-        >
-            <TermInputBox
-                onChange={props.onTermChange}
-                onKeyDown={props.onKeyDown}
-                selectedTerms={props.selectedTerms}
-                deleteTermBubble={props.deleteTermBubble}
-            />
-            <br />
-            <PaperInputBox
-                onClick={props.onPaperDropItemClick}
-                onChange={props.onPaperChange}
-                selectedPapers={props.selectedPapers}
-                deletePaperBubble={props.deletePaperBubble}
-            />
-            <br />
-            <DateInputBox
-                onLowDateChange={props.onLowDateChange}
-                onHighDateChange={props.onHighDateChange}
-                minYearPlaceholder={props.minYearPlaceholder}
-                maxYearPlaceholder={props.maxYearPlaceholder}
-                lowYear={props.lowYearValue}
-                highYear={props.highYearValue}
-            />
-            <div className='graphWarningBoxBoundary'>
-                {showTicketReminder && props.tickets.length === 0 ? noTicketReminder : null}
-                <div className='createTicketAndGraphButtonContainer'>
-                    <ImportantButtonWrap>
-                        <input
-                            type='button'
-                            value='Add series +'
-                            onClick={handleCreateTicketClick}
-                        />
-                    </ImportantButtonWrap>
-                    <ImportantButtonWrap>
-                        <input
-                            type='submit'
-                            value='Fetch and graph 📊'
-                        />
-                    </ImportantButtonWrap>
-                </div>
-                <RequestBox
-                    tickets={props.tickets}
-                    onTicketClick={props.onTicketClick}
+    function handleTermChange(e) {
+        setShowNoTermsReminder(false);
+        props.handleTermChange(e);
+    }
+
+    return (
+        <StyledTicketForm onSubmit={handleSubmit}>
+            <StyledLabeledInput>
+                <label>View occurrences of this word:</label>
+                <TermInputBox
+                    onEnterPress={handleSubmit}
+                    selectedTerms={props.selectedTerms}
+                    deleteTermBubble={props.deleteTermBubble}
+                    termInput={props.termInput}
+                    handleTermChange={handleTermChange}
+                    noTermsReminder={showNoTermsReminder}
+                    linkTerm={props.linkTerm}
+                    linkDistance={props.linkDistance}
+                    onLinkTermChange={props.onLinkTermChange}
+                    onLinkDistanceChange={props.onLinkDistanceChange}
                 />
+            </StyledLabeledInput>
+            <div>
+                <StyledLabeledInput>
+                    <label>in these periodicals:</label>
+                    <PaperInputBox
+                        onClick={props.onPaperDropItemClick}
+                        deletePaperBubble={props.deletePaperBubble}
+                        onPaperInputSelectClick={props.onPaperInputClick}
+                        selectedPaperInput={props.selectedPaperInput}
+                        numContinuousPapers={props.numContinuousPapers}
+                        userSelectedPapers={props.userSelectedPapers}
+                        boundaryYearsForUserPapers={props.boundaryYearsForUserPapers}
+                        onFocus={props.onPaperInputFocus}
+                        startYear={props.startYear}
+                        endYear={props.endYear}
+                    />
+                </StyledLabeledInput>
+                <div ref={props.requestBoxRef}>
+                    <StyledRequestBox
+                        tickets={props.tickets}
+                        onTicketClick={props.onTicketClick}
+                        className={'requestBox'}
+                        onCreateTicketClick={handleCreateTicketClick}
+                    />
+                </div>
             </div>
-
-
-        </form>
+            <StyledLabeledInput>
+                <label>between:</label>
+                <DateSelect
+                    startYear={props.startYear}
+                    startMonth={props.startMonth}
+                    startDay={props.startDay}
+                    endYear={props.endYear}
+                    endMonth={props.endMonth}
+                    endDay={props.endDay}
+                    onStartYearChange={props.onStartYearChange}
+                    onStartMonthChange={props.onStartMonthChange}
+                    onStartDayChange={props.onStartDayChange}
+                    onEndYearChange={props.onEndYearChange}
+                    onEndMonthChange={props.onEndMonthChange}
+                    onEndDayChange={props.onEndDayChange}
+                    selectedPaperBoundary={props.boundaryYearsForUserPapers}
+                />
+                <label>grouped by: </label>
+                <DateGroupSelect
+                    selectedSearchType={props.selectedSearchType}
+                    onDateGroupClick={props.onSearchTypeClick}
+                    selected={props.selectedSearchType}
+                />
+            </StyledLabeledInput>
+            <RequestBoxAndFetchButtonWrap>
+                <ImportantButtonWrap>
+                    <input
+                        type='submit'
+                        value='Fetch and graph 📊'
+                    />
+                </ImportantButtonWrap>
+            </RequestBoxAndFetchButtonWrap>
+        </StyledTicketForm>
     )
 }
+
+const StyledTicketForm = styled.form`
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    width: calc(100% - 2rem);
+    max-width: 800px;
+`;
+
+const StyledLabeledInput = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    font-size: 1.2rem;
+`;
 
 export default TicketForm;

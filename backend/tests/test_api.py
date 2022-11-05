@@ -3,6 +3,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import json
 
+from recordDataForUser import getTopPapers
+
 
 class TestAPI(unittest.TestCase):
 
@@ -12,13 +14,13 @@ class TestAPI(unittest.TestCase):
 
     @patch("backend.api.spawnRequest.delay")
     def test_init(self, mock_spawnRequestThread):
-        mock_spawnRequestThread.return_value = MagicMock(id="test")
+        mock_spawnRequestThread.return_value = MagicMock(id="tests")
         response = self.app.post(
             '/api/init',
             json={'tickets': {}})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json['taskid'], "test")
+        self.assertEqual(response.json['taskid'], "tests")
 
     def test_paperChart(self):
         testJSON = self.app.get('/api/paperchartjson')
@@ -27,7 +29,7 @@ class TestAPI(unittest.TestCase):
         self.assertIsNotNone(testJSON.data)
 
     def test_papers(self):
-        testPapersSimilarToKeyword = self.app.get('/api/papers/test')
+        testPapersSimilarToKeyword = self.app.get('/api/papers/tests')
 
         assert testPapersSimilarToKeyword.status_code == 200
         self.assertIsNotNone(testPapersSimilarToKeyword)
@@ -48,7 +50,7 @@ class TestAPI(unittest.TestCase):
         mock_search.selectPapersContinuousOverRange = MagicMock(return_value=1)
         mock_search.return_value = mock_search
 
-        testContinuousPapersOverRange = self.app.get('/api/continuousPapers?limit=1&startYear=0&endYear=100')
+        testContinuousPapersOverRange = self.app.get('/api/continuousPapers?limit=1&startDate=0&endDate=100')
 
         mock_search.selectPapersContinuousOverRange.assert_called_once_with('0', '100', '1')
         assert testContinuousPapersOverRange.status_code == 200
@@ -57,8 +59,8 @@ class TestAPI(unittest.TestCase):
     @patch("backend.api.TicketGraphSeriesBatch")
     def test_getGraphData(self, mock_series):
         mockedSeries = mock_series.return_value
-        mockedSeries.getSeriesBatch.return_value = []
-        query = '/api/graphData?keys=test&averageWindow=test&timeBin=test&continuous=test&dateRange=test'
+        mockedSeries.getSeriesForSettings.return_value = []
+        query = '/api/graphData?keys=tests&averageWindow=tests&timeBin=tests&continuous=tests&dateRange=tests'
 
         response = self.app.get(query)
 
@@ -68,8 +70,8 @@ class TestAPI(unittest.TestCase):
     @patch("backend.api.TopPapersForTicket")
     def test_getTopPapersFromID(self, mock_topPapers):
         mockedTopPapers = mock_topPapers.return_value
-        mockedTopPapers.getTopPapers.return_value = []
-        query = '/api/topPapers?id=test&continuous=test&dateRange=test'
+        getTopPapers.return_value = []
+        query = '/api/topPapers?id=tests&continuous=tests&dateRange=tests'
 
         testTopPapersFromID = self.app.get(query)
 
@@ -103,7 +105,7 @@ class TestAPI(unittest.TestCase):
             ))
         mock_celery_task.state = "PROGRESS"
 
-        response = self.app.get('/api/progress/test')
+        response = self.app.get('/api/progress/tests')
 
         self.assertEqual(
             {
@@ -125,7 +127,7 @@ class TestAPI(unittest.TestCase):
         mock_celery_task.AsyncResult.return_value = mock_celery_task
         mock_celery_task.state = "SUCCESS"
 
-        response = self.app.get('/api/progress/test')
+        response = self.app.get('/api/progress/tests')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual({"state": "SUCCESS"}, response.json)
@@ -137,16 +139,16 @@ class TestAPI(unittest.TestCase):
         mock_celery_task.state = "SUCCESS"
         mock_celery_task.result = {
             "status": "Too many records!",
-            "numRecords": 100
+            "getNumRecords": 100
         }
 
-        response = self.app.get('/api/progress/test')
+        response = self.app.get('/api/progress/tests')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             {
                 'state': 'TOO_MANY_RECORDS',
-                'numRecords': 100
+                'getNumRecords': 100
             },
             response.json
         )

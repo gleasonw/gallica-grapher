@@ -1,60 +1,41 @@
-import TicketLabel from "../shared/TicketLabel";
 import React from "react";
-import DecorativeTicket from "../shared/DecorativeTicket";
+import styled from 'styled-components';
+import LesserButton from "../shared/LesserButton";
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import TicketLabelRow from "./TicketLabelRow";
 
 export function RequestBox(props) {
-    return (
-        <div className={'requestBoxContainer'}>
-            <div className='requestBox'>
-                <RequestTicketBox
-                    tickets={props.tickets}
-                    onTicketClick={props.onTicketClick}
-                />
-            </div>
-        </div>
-    );
-
+    return(
+        <StyledTicketRow>
+            <TicketLabelRow
+                tickets={props.tickets}
+                onTicketClick={props.onTicketClick}
+                isMutable={true}
+                maxWidth={'200px'}
+            />
+            {Object.keys(props.tickets).length < 5 &&
+            <LesserButton
+                onClick={props.onCreateTicketClick}
+                borderRadius="0px 0px 10px 10px"
+            >
+                <AddBoxIcon/>
+                Compare
+            </LesserButton>
+            }
+        </StyledTicketRow>
+    )
 }
 
-function RequestTicketBox(props) {
-    if (props.tickets && props.tickets.length > 0) {
-        return (
-            <div className="ticketBubbleContainer">
-                {props.tickets.map((ticket, index) => (
-                    <DecorativeTicket key={index}>
-                        <RequestTicket
-                            ticket={ticket}
-                            onClick={() => props.onTicketClick(index)}
-                        />
-                    </DecorativeTicket>
-                ))}
-            </div>
-        )
-    } else {
-        return (
-            <div className="ticketBubbleContainer">
-                <div id='placeHolderTicket'/>
-            </div>
-        )
-    }
-}
+export const StyledTicketRow = styled.div`
+    display: flex;
+    flex-direction: row;
+    overflow: visible;
+    width: 100%;
+`;
 
-function RequestTicket(props) {
-    const terms = props.ticket['terms']
-    const papers = props.ticket['papersAndCodes']
-    const dateRange = props.ticket['dateRange']
-    return (
-        <button
-            type="button"
-            onClick={props.onClick}
-        >
-            <div className="ticket">
-                <TicketLabel
-                    terms={terms}
-                    papers={papers}
-                    dateRange={dateRange}
-                />
-            </div>
-        </button>
-    );
-}
+export const StyledRequestBox = styled(RequestBox)`
+    display: flex;
+    flex-direction: row;
+    transition: all 150ms;
+`;
+
