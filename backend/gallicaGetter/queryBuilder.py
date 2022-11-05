@@ -131,6 +131,8 @@ class PaperQueryBuilder(QueryBuilder):
         ])
 
     def buildArkQueriesForCodes(self, codes):
+        if type(codes) == str:
+            codes = [codes]
         return [
             ArkQueryForNewspaperYears(code=code)
             for code in codes

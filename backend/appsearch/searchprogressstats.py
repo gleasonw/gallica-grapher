@@ -1,6 +1,6 @@
 from math import ceil
-from gallicaxmlparse import GallicaXMLparse
-from averageResponseTime import AverageResponseTime
+from gallicaGetter.gallicaxmlparse import GallicaXMLparse
+from appsearch.averageResponseTime import AverageResponseTime
 
 
 def initProgressStats(ticketID, grouping):

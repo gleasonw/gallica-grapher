@@ -175,7 +175,6 @@ class PapersWrapper(GallicaWrapper):
 
 
 if __name__ == '__main__':
-    wrapper = PapersWrapper()
-    records = wrapper.get('cb34355551z')
-    print(records)
-    print(records[0].years)
+    wrapper = IssuesWrapper()
+    test = wrapper.get('cb32895690j')
+    print(test)

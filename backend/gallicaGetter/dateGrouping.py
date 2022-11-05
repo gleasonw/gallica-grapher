@@ -20,7 +20,7 @@ def makeWideGroupingsForAllSearch(startDate, endDate):
         return [(startDate.getDateText(), None)]
     elif month := startDate.getMonth():
         nextYear = int(startDate.getYear()) + 1 if month == '12' else startDate.getYear()
-        nextMonth = (int(month) + 1) % 12
+        nextMonth = (int(month) % 12) + 1
         return [(
             f"{startDate.getYear()}-{int(startDate.getMonth()):02}-01",
             f"{nextYear}-{nextMonth:02}-01"

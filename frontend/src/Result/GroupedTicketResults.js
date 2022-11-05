@@ -7,7 +7,6 @@ export function GroupedTicketResults(props) {
         <div>
             <TicketLabelRow
                 tickets={props.tickets}
-                onTicketClick={(e) => console.log(e)}
                 isMutable={false}
             />
             <RecordsViewer

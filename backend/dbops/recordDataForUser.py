@@ -1,6 +1,6 @@
-from gallicaxmlparse import GallicaXMLparse
-import gallicaWrapper as gallicaWrapper
+from gallicaGetter.gallicaxmlparse import GallicaXMLparse
 from dbops.connContext import getConn
+import gallicaGetter
 
 conn = getConn()
 
@@ -76,11 +76,11 @@ class RecordDataForUser:
         return records, count
 
     def getOCRTextForRecord(self, ark, term) -> tuple:
-        wrapper = gallicaWrapper.connect('content')
+        wrapper = gallicaGetter.connect('content')
         return wrapper.get(ark, term)[0]
 
     def getGallicaRecordsForDisplay(self, tickets, filters):
-        wrapper = gallicaWrapper.connect('sru')
+        wrapper = gallicaGetter.connect('sru')
         records = []
         for ticket in tickets:
             argsBundle = {

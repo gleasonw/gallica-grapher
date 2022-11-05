@@ -25,8 +25,8 @@ function App() {
         'input':
             <Input
                 tickets={tickets}
-                onLoadedSubmit={handleLoadedSubmit}
-                onUnloadedSubmit={handleUnloadedSubmit}
+                onLoadedSubmit={(ticket) => initRequest(getUpdatedTickets(ticket))}
+                onUnloadedSubmit={() => initRequest(tickets)}
                 onCreateTicketClick={handleCreateTicketClick}
                 onTicketClick={handleTicketClick}
                 onExampleRequestClick={handleExampleRequestClick}
@@ -96,21 +96,12 @@ function App() {
             </ClassicUIBox>
     }
 
-    function handleLoadedSubmit(ticket) {
-        const updatedTickets = getUpdatedTickets(ticket);
-        void initRequest(updatedTickets);
-    }
-
     function getUpdatedTickets(ticket) {
         const newTicketID = Object.keys(tickets).length;
         return {
             ...tickets,
             [newTicketID]: ticket
         };
-    }
-
-    function handleUnloadedSubmit() {
-        void initRequest(tickets);
     }
 
     function handleBackendGroupingChange(ticketID) {
@@ -124,8 +115,8 @@ function App() {
         setTickets(updatedTickets);
     }
 
-
     async function initRequest(tickets) {
+        setCurrentPage('running');
         const completedTickets = addGroupingToTickets(tickets);
         const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
         const {request} = await axios.post('/api/init', {
@@ -139,7 +130,6 @@ function App() {
         setProgressID(progressID);
         setRequestID(requestID);
         setTickets(completedTickets);
-        setCurrentPage('running');
     }
 
     function addGroupingToTickets(someTickets) {
@@ -150,7 +140,6 @@ function App() {
                 grouping: getSearchTypeForIndex(selectedSearchType),
             }
         })
-        console.log(ticketsWithSearchType);
         return ticketsWithSearchType;
     }
 

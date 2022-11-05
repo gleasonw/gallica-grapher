@@ -1,9 +1,9 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
-import gallicaWrapper as gallicaWrapper
-from queryBuilder import NUM_CODES_PER_BUNDLE
+import gallicaGetter
+from gallicaGetter.queryBuilder import NUM_CODES_PER_BUNDLE
 
 
-def buildSearch(argBundles, stateHooks, wrapper=gallicaWrapper):
+def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
     searches = {
         'all': AllSearch,
         'year': GroupedSearch,
