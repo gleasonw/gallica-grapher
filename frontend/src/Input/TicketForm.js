@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import DateGroupSelect from './DateGroupSelect.tsx';
-import DateSelect from './DateSelect.tsx';
+import DateRangeSelect from './DateRangeSelect.tsx';
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import {StyledRequestBox} from "./RequestBox";
 import {PaperInputBox} from "./PeriodicalInputs/PaperInputBox";
@@ -79,7 +79,7 @@ function TicketForm(props) {
             </div>
             <StyledLabeledInput>
                 <label>between:</label>
-                <DateSelect
+                <DateRangeSelect
                     startYear={props.startYear}
                     startMonth={props.startMonth}
                     startDay={props.startDay}
@@ -93,6 +93,7 @@ function TicketForm(props) {
                     onEndMonthChange={props.onEndMonthChange}
                     onEndDayChange={props.onEndDayChange}
                     selectedPaperBoundary={props.boundaryYearsForUserPapers}
+                    justifyContent={'space-between'}
                 />
                 <label>grouped by: </label>
                 <DateGroupSelect

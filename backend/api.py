@@ -131,7 +131,6 @@ def getCSV():
 @app.route('/api/getDisplayRecords')
 def getDisplayRecords():
     tableArgs = dict(request.args)
-    del tableArgs['uniqueforcache']
     tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
     displayRecords, count = recordDataGetter.getRecordsForDisplay(tableArgs)
     return {

@@ -56,9 +56,12 @@ function Input(props){
     }
 
     function makeDateString(year, month, day){
+        console.log(month)
         let dateElements = [year];
-        if(month) dateElements.push(month);
-        if(day) dateElements.push(day);
+        //TODO: this date checking is a mess
+        (month && parseInt(month) !== 0) && dateElements.push(month);
+        (day && parseInt(day) !== 0) && dateElements.push(day);
+        console.log(dateElements);
         return dateElements.join('-');
     }
 

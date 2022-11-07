@@ -127,7 +127,7 @@ class GroupedSearch(Search):
         return self.dbLink.insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-        numRecords = self.args['endDate'] + 1 - self.args['startDate']
+        numRecords = int(self.args['endDate'][0:4]) + 1 - int(self.args['startDate'][0:4]) + 1
         if self.args['grouping'] == 'month':
             numRecords *= 12
         if self.args.get('codes'):

@@ -19,7 +19,7 @@ def makeWideGroupingsForAllSearch(startDate, endDate):
     if not startDate.getYear() or not endDate.getYear():
         markerDate = startDate if startDate.getYear() else endDate
         if markerDate.getDay():
-            return [(markerDate.getDateText(), None)]
+            return [(markerDate.getDate(), None)]
         if month := markerDate.getMonth():
             if month == '12':
                 nextYear = int(markerDate.getYear()) + 1

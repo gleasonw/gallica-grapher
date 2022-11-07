@@ -19,15 +19,15 @@ function Chart(props) {
     const startDate = Object.values(props.tickets)[0].startDate;
     const endDate = Object.values(props.tickets)[0].endDate;
     const chartRef = useRef(null);
-    const query =
+    let query =
         "/api/graphData?keys=" + Object.keys(props.tickets) +
         "&requestID=" + props.requestID +
         "&continuous=" + chartSettings.continuous +
         "&startDate=" + startDate +
         "&endDate=" + endDate +
         "&timeBin=" + chartSettings.timeBin +
-        "&averageWindow=" + chartSettings.averageWindow +
-        "&uniqueforcache=" + props.uuid;
+        "&averageWindow=" + chartSettings.averageWindow
+    if(props.requestID > 0) query += `&uniqueforcache=${props.uuid}`
     const result = useData(query);
     if (result) {
         const series = result['series'];

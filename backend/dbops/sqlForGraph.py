@@ -1,8 +1,5 @@
 class SQLforGraph:
 
-    def __init__(self):
-        pass
-
     def getSQLforSettings(self, timeBin, continuous):
         sqlSettings = {
             ("day", "false"): self.getDayGroupedSQL(),

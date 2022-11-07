@@ -240,7 +240,6 @@ header{
 input[type='text'],input[type='number']{
     height: 100%;
     border: 0;
-    font-size: 16px;
     background-color: inherit;
     outline: none;
     color: inherit;
