@@ -19,6 +19,7 @@ const OptionWrap = styled.div`
     display: ${props => props.display || "block"};
     align-items: center;
     justify-content: ${props => props.justifyContent || "flex-start"};
+    gap: 20px;
     `;
 
 export default OptionWrap;

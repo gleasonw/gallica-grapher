@@ -129,6 +129,7 @@ def getCSV():
     return {"csvData": csvData}
 
 
+#TODO: enlist celery worker?
 @app.route('/api/getDisplayRecords')
 def getDisplayRecords():
     tableArgs = dict(request.args)

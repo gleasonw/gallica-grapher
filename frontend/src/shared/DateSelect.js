@@ -17,6 +17,7 @@ export function DateSelect(props) {
                     onChange={
                         (e) => props.onYearChange(e.target.value)
                     }
+                    width={'86px'}
                 />
             </StyledInputAndLabel>
             <StyledInputAndLabel>
@@ -93,4 +94,6 @@ export function DateSelect(props) {
 const StyledDateSelect = styled.div`
     display: flex;
     flex-direction: ${props => props.flexDirection ? props.flexDirection : 'column'}; 
+    gap: 5px;
+    flex-wrap: wrap;
     `;

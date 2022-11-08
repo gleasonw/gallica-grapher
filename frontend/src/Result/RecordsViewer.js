@@ -42,7 +42,6 @@ export default function RecordsViewer(props){
         setRecordsTableDay(0);
     }
 
-    //TODO: fix the date offset
     function handleDaySeriesClick(point){
         const date = new Date(point.category);
         setRecordsTableYear(date.getUTCFullYear());

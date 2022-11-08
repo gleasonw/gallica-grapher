@@ -17,7 +17,6 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
             'stateHooks': stateHooks,
             'connectable': wrapper
         }
-        print(bundle)
         if not bundle.get('startDate') and not bundle.get('endDate'):
             bundle['grouping'] = 'all'
             stateHooks.onSearchChangeToAll(key)
@@ -29,8 +28,6 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
             runner = AllSearch(**initParams)
             stateHooks.onSearchChangeToAll(key)
         searchObjs.append(runner)
-
-    print(searchObjs)
     return searchObjs
 
 

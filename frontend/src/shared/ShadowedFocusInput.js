@@ -26,7 +26,7 @@ export function ShadowedFocusInput(props) {
 }
 
 const StyledFocusInput = styled.input`
-    width: ${props => props.width ? props.width : '100%'};
+    width: ${props => props.width ? props.width : 'auto'};
     min-width: 40px;
     background-color: ${props => props.backgroundColor ? props.backgroundColor : 'transparent'} !important;
     `;

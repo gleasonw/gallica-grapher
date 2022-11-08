@@ -19,7 +19,7 @@ function SoloTickets(props) {
         </div>
     )
 }
-//TODO: sync timebin display with state
+
 function SoloTicketResult(props) {
     return (
         <StyledSoloTicket>

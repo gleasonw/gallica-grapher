@@ -94,6 +94,7 @@ function TicketForm(props) {
                     onEndDayChange={props.onEndDayChange}
                     selectedPaperBoundary={props.boundaryYearsForUserPapers}
                     justifyContent={'space-between'}
+                    flexDirection={'row'}
                 />
                 <label>grouped by: </label>
                 <DateGroupSelect
