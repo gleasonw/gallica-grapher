@@ -2,7 +2,7 @@
 
 Culture and identity were once local, the products of community and conversation. The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Culture became national as individual opinions ascended to group opinions; “public opinion” rose into being, looming over the political class, and the press was its handler.
 
-This app integrates with the French National Archives Gallica API, allowing for rapid text searches over thousands of periodicals. The app routes requests to Gallica, parses the responses, and creates a trend line. Selecting a point will bring up the associated records in a table beneath the graph.
+This app integrates with the French National Archives Gallica API to allow rapid text searches over thousands of periodicals. The app routes requests to Gallica, parses the responses, and creates a trend line. Selecting a point will bring up the associated records in a table beneath the graph.
 
 
 ### Do I need to speak French to use it?
