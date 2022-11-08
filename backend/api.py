@@ -26,6 +26,7 @@ def init():
     global requestIDSeed
     requestIDSeed += 1
     tickets = request.get_json()["tickets"]
+    print(tickets)
     task = spawnRequest.delay(tickets, requestIDSeed)
     return {"taskid": task.id, "requestid": requestIDSeed}
 

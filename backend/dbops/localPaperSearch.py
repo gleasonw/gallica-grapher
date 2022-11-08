@@ -6,6 +6,8 @@ class PaperLocalSearch:
     def selectPapersContinuousOverRange(self, firstInputYear, secondInputYear, limit):
         biggerYear = max(firstInputYear, secondInputYear)
         smallerYear = min(firstInputYear, secondInputYear)
+        biggerYear = biggerYear or 9999
+        smallerYear = smallerYear or 0
         query = """
         SELECT title, code, startdate, enddate
         FROM papers
@@ -40,6 +42,8 @@ class PaperLocalSearch:
 
     def getNumPapersInRange(self, startDate, endDate):
         dbConn = getConn()
+        startDate = startDate or 0
+        endDate = endDate or 9999
         with dbConn.cursor() as curs:
             curs.execute("""
                 SELECT COUNT(*) FROM papers

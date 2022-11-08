@@ -2,7 +2,8 @@ from gallicaGetter.date import Date
 
 
 def DateGrouping(startDate, endDate, grouping):
-    if startDate is None and endDate is None:
+    if not startDate and not endDate:
+        print("BOTH DATES NONE")
         return [(None, None)]
     startDate = Date(startDate)
     endDate = Date(endDate)
@@ -21,15 +22,7 @@ def makeWideGroupingsForAllSearch(startDate, endDate):
         if markerDate.getDay():
             return [(markerDate.getDate(), None)]
         if month := markerDate.getMonth():
-            if month == '12':
-                nextYear = int(markerDate.getYear()) + 1
-            else:
-                nextYear = markerDate.getYear()
-            nextMonth = (int(month) + 1) % 12
-            return [(
-                f"{markerDate.getYear()}-{int(markerDate.getMonth()):02}-01",
-                f"{nextYear}-{nextMonth:02}-01"
-            )]
+            return getOneMonthInterval(month, markerDate.getYear())
         return [(
             f"{markerDate.getYear()}-01-01",
             f"{int(markerDate.getYear()) + 1}-01-01"
@@ -41,17 +34,20 @@ def makeWideGroupingsForAllSearch(startDate, endDate):
 
 
 def makeYearGroupings(startDate, endDate):
-    if endDate.getYear():
-        endBoundary = int(endDate.getYear()) + 1
-    else:
-        endBoundary = int(startDate.getYear()) + 1
+    if not startDate.getYear() or not endDate.getYear():
+        markerDate = startDate if startDate.getYear() else endDate
+        return [(f"{markerDate.getYear()}-01-01", f"{int(markerDate.getYear()) + 1}-01-01")]
     yearGroups = set()
-    for year in range(int(startDate.getYear()), endBoundary):
+    lowEnd, highEnd = sorted([int(startDate.getYear()), int(endDate.getYear())])
+    for year in range(lowEnd, highEnd + 1):
         yearGroups.add((f"{year}-01-01", f"{year + 1}-01-01"))
     return yearGroups
 
 
 def makeMonthGroupings(startDate, endDate):
+    if not startDate.getYear() or not endDate.getYear():
+        markerDate = startDate if startDate.getYear() else endDate
+        return getOneMonthInterval(markerDate.getMonth(), markerDate.getYear())
     monthGroups = set()
     for year in range(int(startDate.getYear()), int(endDate.getYear()) + 1):
         for month in range(1, 13):
@@ -60,3 +56,10 @@ def makeMonthGroupings(startDate, endDate):
             else:
                 monthGroups.add((f"{year}-{month:02}-02", f"{year}-{month + 1:02}-01"))
     return monthGroups
+
+
+def getOneMonthInterval(month, year):
+    month, year = int(month), int(year)
+    if month == 12:
+        return [(f"{year}-{month:02}-02", f"{year + 1}-01-01")]
+    return [(f"{year}-{month:02}-02", f"{year}-{month + 1:02}-01")]

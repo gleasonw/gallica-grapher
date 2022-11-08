@@ -77,7 +77,7 @@ class SchemaLinkForSearch:
         missingCodes = codes - setOfCodesInDB
         if missingCodes:
             onAddingMissingPapers()
-            paperRecords = self.paperAPI.get(codes=list(missingCodes))
+            paperRecords = self.paperAPI.get(list(missingCodes))
             self.insertRecordsIntoPapers(paperRecords)
 
     def getPaperCodesThatMatch(self, codes):

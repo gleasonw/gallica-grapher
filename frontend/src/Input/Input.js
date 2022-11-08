@@ -50,8 +50,8 @@ function Input(props){
             linkTerm: linkTerm,
             linkDistance: linkDistance,
             papersAndCodes: getPapersFor(selectedPaperInput),
-            startDate: makeDateString(props.startYear, props.startMonth, props.startDay),
-            endDate: makeDateString(props.endYear, props.endMonth, props.endDay)
+            startDate: makeDateString(props.startYear || 1700, props.startMonth, props.startDay),
+            endDate: makeDateString(props.endYear || 2020, props.endMonth, props.endDay)
         }
     }
 

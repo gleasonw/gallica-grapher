@@ -101,3 +101,18 @@ class Request(threading.Thread):
             for key, argsBundle in self.argsBundles.items()
         }
         return progressDict
+
+
+if __name__ == '__main__':
+    request = buildRequest(
+        identifier='test',
+        argsBundles={
+            '0': {
+                'terms': 'brazza',
+                'grouping': 'year',
+                'startDate': None,
+                'endDate': None
+            }
+        }
+    )
+    request.run()
