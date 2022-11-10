@@ -7,12 +7,9 @@ from dbops.connContext import getConn
 class GraphSeriesBatch:
 
     def __init__(self):
-        self.dbConnection = getConn()
         self.sqlGetter = SQLforGraph()
 
     def getSeriesForSettings(self, settings):
-        if self.dbConnection.closed:
-            self.dbConnection = getConn()
         ticketIDs = settings['ticketIDs'].split(',')
         dataBatches = list(map(
             lambda ticketID: self.selectOneSeries(
@@ -30,17 +27,15 @@ class GraphSeriesBatch:
         return HighchartsSeriesForTicket(
             ticketID=ticketID,
             settings=settings,
-            dbConnection=self.dbConnection,
             sqlGetter=self.sqlGetter,
         )
 
 
 class HighchartsSeriesForTicket:
 
-    def __init__(self, ticketID, settings, sqlGetter, dbConnection):
+    def __init__(self, ticketID, settings, sqlGetter):
         self.ticketID = ticketID
         self.requestID = settings["requestID"]
-        self.dbConnection = dbConnection
         self.sqlGetter = sqlGetter
         self.series = self.buildHighchartsSeries(settings)
 
@@ -75,15 +70,17 @@ class HighchartsSeriesForTicket:
         WHERE requestid=%s 
         AND ticketid = %s;
         """
-        cursor = self.dbConnection.cursor()
-        cursor.execute(getSearchTerms, (
-            self.requestID,
-            self.ticketID
-        ))
-        return cursor.fetchone()[0]
+        conn = getConn()
+        with conn.cursor() as curs:
+            curs.execute(getSearchTerms, (
+                self.requestID,
+                self.ticketID
+            ))
+            return curs.fetchone()[0]
 
     def getFromDB(self, params, sql):
-        with self.dbConnection.cursor() as curs:
+        conn = getConn()
+        with conn.cursor() as curs:
             curs.execute(
                 sql,
                 params
