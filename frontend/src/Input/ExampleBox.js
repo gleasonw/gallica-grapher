@@ -1,4 +1,3 @@
-//TODO: Cache the examples.
 import styled from "styled-components";
 import React, {useState} from "react";
 import ClassicUIBox from "../shared/ClassicUIBox";

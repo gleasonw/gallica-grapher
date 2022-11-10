@@ -19,20 +19,18 @@ function Input(props){
 
     function getContinuousPaperQuery(){
         return "api/continuousPapers?limit=2000" +
-            "&startYear=" + props.startYear +
-            "&endYear=" + props.endYear;
+            "&startDate=" + props.startYear +
+            "&endDate=" + props.endYear;
     }
 
     function setUserPapersYearBoundary(){
-        let minYear = 1499
-        let maxYear = 2020
-        if(userSelectedPapers.length > 0){
+        if(userSelectedPapers.length > 0) {
             const paperLowYears = userSelectedPapers.map(paper => paper["startDate"])
             const paperHighYears = userSelectedPapers.map(paper => paper["endDate"])
-            minYear = Math.min(...paperLowYears)
-            maxYear = Math.max(...paperHighYears)
+            const minYear = Math.min(...paperLowYears)
+            const maxYear = Math.max(...paperHighYears)
+            return [minYear, maxYear]
         }
-        return [minYear, maxYear]
     }
 
     function handleSubmit(event){
@@ -51,24 +49,20 @@ function Input(props){
             terms: terms,
             linkTerm: linkTerm,
             linkDistance: linkDistance,
-            papersAndCodes: getPapersFor(selectedPaperInput)
+            papersAndCodes: getPapersFor(selectedPaperInput),
+            startDate: makeDateString(props.startYear || 1700, props.startMonth, props.startDay),
+            endDate: makeDateString(props.endYear || 2020, props.endMonth, props.endDay)
         }
     }
 
-    function handleKeyDown(event){
-        if(event.key === 'ArrowDown'){
-            event.preventDefault();
-            if(selectedPaperInput < 2){
-                setSelectedPaperInput(selectedPaperInput + 1);
-            }
-        }else if(event.key === 'ArrowUp'){
-            event.preventDefault();
-            if(selectedPaperInput > 0){
-                setSelectedPaperInput(selectedPaperInput - 1);
-            }
-        }else{
-
-        }
+    function makeDateString(year, month, day){
+        console.log(month)
+        let dateElements = [year];
+        //TODO: this date checking is a mess
+        (month && parseInt(month) !== 0) && dateElements.push(month);
+        (day && parseInt(day) !== 0) && dateElements.push(day);
+        console.log(dateElements);
+        return dateElements.join('-');
     }
 
     function handleTermChange(event) {
@@ -120,16 +114,24 @@ function Input(props){
     }
 
     return (
-        <div className='inputBody' onKeyDown={handleKeyDown}>
+        <div className='inputBody'>
             <div className='inputUI'>
                 <div className="mainTitle">
                     Graph word occurrences in archived French periodicals.
                 </div>
                 <TicketForm
                     startYear={props.startYear}
+                    startMonth={props.startMonth}
+                    startDay={props.startDay}
                     endYear={props.endYear}
+                    endMonth={props.endMonth}
+                    endDay={props.endDay}
                     onStartYearChange={props.onStartYearChange}
+                    onStartMonthChange={props.onStartMonthChange}
+                    onStartDayChange={props.onStartDayChange}
                     onEndYearChange={props.onEndYearChange}
+                    onEndMonthChange={props.onEndMonthChange}
+                    onEndDayChange={props.onEndDayChange}
                     onCreateTicketClick={handleCreateTicketClick}
                     onPaperDropItemClick={(paper) => makePaperBubble(paper)}
                     onPaperInputFocus={(i) => setSelectedPaperInput(i)}

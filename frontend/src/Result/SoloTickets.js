@@ -19,7 +19,7 @@ function SoloTickets(props) {
         </div>
     )
 }
-//TODO: sync timebin display with state
+
 function SoloTicketResult(props) {
     return (
         <StyledSoloTicket>
@@ -27,7 +27,8 @@ function SoloTicketResult(props) {
                 <TicketLabel
                     terms={props.ticket.terms}
                     papers={props.ticket.papersAndCodes}
-                    dateRange={props.ticket.dateRange}
+                    startDate={props.ticket.startDate}
+                    endDate={props.ticket.endDate}
                     linkTerm={props.ticket.linkTerm}
                     linkDistance={props.ticket.linkDistance}
                     compact={false}

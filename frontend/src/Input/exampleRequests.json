@@ -7,30 +7,24 @@
             "\"bleu clair\""
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1910"
-          ]
+          "startDate": 1865,
+          "endDate" : 1910
         },
         "bleu pastel": {
           "terms": [
             "\"bleu pastel\""
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1910"
-          ]
+          "startDate": 1865,
+          "endDate" : 1910
         },
         "rose": {
           "terms": [
             "rose"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1910"
-          ],
+          "startDate": 1865,
+          "endDate" : 1910,
           "linkTerm": "pantalon",
           "linkDistance": 2
         }
@@ -43,20 +37,16 @@
             "\"art nouveau\""
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1930"
-          ]
+          "startDate": 1865,
+          "endDate" : 1910
         },
         "Art deco": {
           "terms": [
             "\"arts decoratifs\""
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1930"
-          ]
+          "startDate": 1865,
+          "endDate" : 1910
         }
       }
     },
@@ -67,31 +57,25 @@
             "patisserie"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1930"
-          ]
+          "startDate": 1865,
+          "endDate" : 1910
         },
         "brioche": {
           "terms": [
             "brioche"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1930"
-          ]
+          "startDate": 1865,
+          "endDate" : 1910
         },
         "croissant": {
           "terms": [
             "croissant"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1865",
-            "1930"
-          ],
           "linkTerm": "patisserie",
+          "startDate": 1865,
+          "endDate" : 1910,
           "linkDistance": 5
         }
       }
@@ -103,10 +87,8 @@
             "scandale"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            1870,
-            1920
-          ],
+          "startDate": 1865,
+          "endDate" : 1910,
           "linkTerm": "empoisonnement",
           "linkDistance": 30
         },
@@ -115,10 +97,8 @@
             "scandale"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            1870,
-            1920
-          ],
+          "startDate": 1865,
+          "endDate" : 1910,
           "linkTerm": "corruption",
           "linkDistance": 30
         }
@@ -162,10 +142,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            1854,
-            1951
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "congo": {
           "terms": [
@@ -203,10 +181,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            1854,
-            1951
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "indochine": {
           "terms": [
@@ -244,10 +220,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            1854,
-            1951
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "conquete": {
             "terms": [
@@ -286,10 +260,8 @@
                 "title": "Le Petit journal (Paris. 1863)"
                 }
             ],
-            "dateRange": [
-                1854,
-                1951
-            ],
+            "startDate": 1854,
+            "endDate" : 1951,
             "linkTerm": "conquete",
             "linkDistance": 20
         }
@@ -309,10 +281,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "new york": {
           "terms": [
@@ -326,10 +296,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "londres": {
           "terms": [
@@ -343,10 +311,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "tokyo": {
           "terms": [
@@ -360,10 +326,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "rome": {
           "terms": [
@@ -377,10 +341,8 @@
               "title": "Le Petit journal (Paris. 1863)"
             }
           ],
-          "dateRange": [
-            "1863",
-            "1944"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         }
       }
     },
@@ -391,32 +353,26 @@
             "seattle"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1880",
-            "1930"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "san francisco": {
           "terms": [
             "\"los angeles\""
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1880",
-            "1930"
-          ]
+          "startDate": 1854,
+          "endDate" : 1951
         },
         "portland": {
           "terms": [
             "portland"
           ],
           "papersAndCodes": [],
-          "dateRange": [
-            "1880",
-            "1930"
-          ],
-            "linkTerm": "oregon",
-            "linkDistance": 20
+          "startDate": 1854,
+          "endDate" : 1951,
+          "linkTerm": "oregon",
+          "linkDistance": 20
         }
       }
     }

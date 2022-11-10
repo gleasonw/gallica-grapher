@@ -1,8 +1,5 @@
 class SQLforGraph:
 
-    def __init__(self):
-        pass
-
     def getSQLforSettings(self, timeBin, continuous):
         sqlSettings = {
             ("day", "false"): self.getDayGroupedSQL(),
@@ -21,14 +18,8 @@ class SQLforGraph:
             return (
                 settings["requestID"],
                 ticketID,
-                settings["startYear"],
-                settings["endYear"],
-                settings["averageWindow"]
-            )
-        elif settings["groupBy"] in ["year", "month", "day"]:
-            return (
-                settings["requestID"],
-                ticketID,
+                settings["startDate"],
+                settings["endDate"],
                 settings["averageWindow"]
             )
         elif settings["groupBy"] in ["gallicaYear", "gallicaMonth"]:
@@ -38,7 +29,11 @@ class SQLforGraph:
                 ticketID
             )
         else:
-            raise("Invalid time bin")
+            return (
+                settings["requestID"],
+                ticketID,
+                settings["averageWindow"]
+            )
 
     def getDayGroupedSQL(self):
         return """

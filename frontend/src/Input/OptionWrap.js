@@ -16,6 +16,10 @@ const OptionWrap = styled.div`
     &:hover{
         background-color: ${props => props.selected ? "#ffffff" : "rgba(255,255,255,0.2)"};
     }
+    display: ${props => props.display || "block"};
+    align-items: center;
+    justify-content: ${props => props.justifyContent || "flex-start"};
+    gap: 20px;
     `;
 
 export default OptionWrap;

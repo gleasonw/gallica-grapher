@@ -32,7 +32,7 @@ Even Gustav Eiffel was implicated.
 
 descriptions['Capitals'] = `
 <p>The Petit Journal was a prolific, inexpensive, and populist journal that published consistently from 1863 to 1944. The Petit Journal’s everyday focus and regular coverage neatly condenses a wide swath of public opinion.</p>
-<p>The chart plots occurrences of 5 foreign capitals, and the distant powers they often symbolize, in the Petit Journal. London initially occupies the most text-space, by the mid 1930’s, however, Berlin, Washington, and Rome have mostly made up the distance. Tokyo never fully enters into the conversation, even during the runup to the Second World War. </p>
+<p>The chart plots occurrences of 5 foreign capitals, and the distant powers they often symbolize, in the Petit Journal. London initially occupies the most text-space. By the mid 1930’s, however, Berlin, Washington, and Rome have made up the distance. Tokyo never fully enters into the media conversation, not even during the runup to the Second World War. </p>
 `;
 
 descriptions['Far West'] = `

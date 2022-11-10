@@ -4,7 +4,6 @@ from flask import request
 from flask_cors import CORS
 import random
 import json
-
 from dbops.localPaperSearch import PaperLocalSearch
 from dbops.graphSeriesBatch import GraphSeriesBatch
 from tasks import spawnRequest
@@ -27,6 +26,7 @@ def init():
     global requestIDSeed
     requestIDSeed += 1
     tickets = request.get_json()["tickets"]
+    print(tickets)
     task = spawnRequest.delay(tickets, requestIDSeed)
     return {"taskid": task.id, "requestid": requestIDSeed}
 
@@ -40,6 +40,8 @@ def getRequestState(taskID):
             'numRecords': task.result.get('numRecords')
         }
     else:
+        if task.info.get('progress') is None:
+            print('no progress')
         response = {
             'state': task.state,
             'progress': task.info.get('progress', 0)
@@ -69,12 +71,12 @@ def papers(keyword):
     return similarPapers
 
 
-@app.route('/api/numPapersOverRange/<startYear>/<endYear>')
-def numPapersOverRange(startYear, endYear):
+@app.route('/api/numPapersOverRange/<startDate>/<endDate>')
+def numPapersOverRange(startDate, endDate):
     search = PaperLocalSearch()
     numPapers = search.getNumPapersInRange(
-        startYear,
-        endYear
+        startDate,
+        endDate
     )
     return {'numPapersOverRange': numPapers}
 
@@ -82,12 +84,12 @@ def numPapersOverRange(startYear, endYear):
 @app.route('/api/continuousPapers')
 def getContinuousPapersOverRange():
     limit = request.args.get('limit')
-    startYear = request.args.get('startYear')
-    endYear = request.args.get('endYear')
+    startDate = request.args.get('startDate')
+    endDate = request.args.get('endDate')
     search = PaperLocalSearch()
     selectPapers = search.selectPapersContinuousOverRange(
-        startYear,
-        endYear,
+        startDate,
+        endDate,
         limit
     )
     return selectPapers
@@ -100,8 +102,8 @@ def getGraphData():
         'averageWindow': request.args["averageWindow"],
         'groupBy': request.args["timeBin"],
         'continuous': request.args["continuous"],
-        'startYear': request.args["startYear"],
-        'endYear': request.args["endYear"],
+        'startDate': request.args["startDate"],
+        'endDate': request.args["endDate"],
         'requestID': request.args["requestID"]
     }
     items = {'series': graphBatchGetter.getSeriesForSettings(settings)}
@@ -111,7 +113,7 @@ def getGraphData():
 @app.route('/api/topPapers')
 def getTopPapersFromID():
     ticketIDS = tuple(request.args["tickets"].split(","))
-    topPapers = RecordDataForUser().getTopPapers(
+    topPapers = recordDataGetter.getTopPapers(
         tickets=ticketIDS,
         requestID=request.args["requestID"],
     )
@@ -123,35 +125,38 @@ def getTopPapersFromID():
 def getCSV():
     tickets = request.args["tickets"]
     requestID = request.args["requestID"]
-    csvData = RecordDataForUser().getCSVData(tickets, requestID)
+    csvData = recordDataGetter.getCSVData(tickets, requestID)
     return {"csvData": csvData}
 
 
+#TODO: enlist celery worker?
 @app.route('/api/getDisplayRecords')
 def getDisplayRecords():
     tableArgs = dict(request.args)
-    del tableArgs['uniqueforcache']
     tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
-    displayRecords, count = RecordDataForUser().getRecordsForDisplay(tableArgs)
-    return {"displayRecords": displayRecords,
-            "count": count}
+    displayRecords, count = recordDataGetter.getRecordsForDisplay(tableArgs)
+    return {
+        "displayRecords": displayRecords,
+        "count": count
+    }
 
 
 @app.route('/api/getGallicaRecords')
 def getGallicaRecordsForDisplay():
     args = dict(request.args)
-    ticket = json.loads(args['ticket'])
-    del args['ticket']
+    tickets = json.loads(args['tickets'])
+    del args['tickets']
     records = recordDataGetter.getGallicaRecordsForDisplay(
-        ticket=ticket,
+        tickets=tickets,
         filters=args
     )
+    records = [record.getDisplayRow() for record in records]
     return {"displayRecords": records}
 
 
 @app.route('/api/ocrtext/<arkCode>/<term>')
 def getOCRtext(arkCode, term):
-    numResults, text = RecordDataForUser().getOCRTextForRecord(
+    numResults, text = recordDataGetter.getOCRTextForRecord(
         arkCode,
         term
     )

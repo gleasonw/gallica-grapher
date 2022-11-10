@@ -12,7 +12,7 @@ export default function RecordsViewer(props){
     const [recordsTableYear, setRecordsTableYear] = useState(null);
     const [recordsTableMonth, setRecordsTableMonth] = useState(null);
     const [recordsTableDay, setRecordsTableDay] = useState(null);
-    const [recordsTableTerm, setRecordsTableTerm] = useState(null);
+    const [recordsTableTicket, setRecordsTableTicket] = useState(null);
     const [recordsTablePeriodical, setRecordsTablePeriodical] = useState(null);
     const {width} = useWindowDimensions();
     let compact = width < 800;
@@ -24,22 +24,26 @@ export default function RecordsViewer(props){
         'gallicaMonth': handleMonthSeriesClick,
     }
 
-    function handleYearSeriesClick(year){
-        setRecordsTableYear(year);
+    function handleSeriesClick(point){
+        setRecordsTableTicket(point.series.name.charAt(0));
+        seriesClickHandlers[timeBin](point);
+    }
+
+    function handleYearSeriesClick(point){
+        setRecordsTableYear(point.category);
         setRecordsTableMonth(0);
         setRecordsTableDay(0);
     }
 
-    function handleMonthSeriesClick(unix){
-        const date = new Date(unix);
+    function handleMonthSeriesClick(point){
+        const date = new Date(point.category);
         setRecordsTableYear(date.getUTCFullYear());
         setRecordsTableMonth(date.getUTCMonth() + 1);
         setRecordsTableDay(0);
     }
 
-    //TODO: fix the date offset
-    function handleDaySeriesClick(unix){
-        const date = new Date(unix);
+    function handleDaySeriesClick(point){
+        const date = new Date(point.category);
         setRecordsTableYear(date.getUTCFullYear());
         setRecordsTableMonth(date.getUTCMonth() + 1);
         setRecordsTableDay(date.getUTCDate());
@@ -51,7 +55,7 @@ export default function RecordsViewer(props){
                 <Chart
                     tickets={props.tickets}
                     settingsID={props.settingsID}
-                    onSeriesClick={(point) => seriesClickHandlers[timeBin](point.category)}
+                    onSeriesClick={(point) => handleSeriesClick(point)}
                     requestID={props.requestID}
                     uuid={props.cacheID}
                 />
@@ -64,13 +68,13 @@ export default function RecordsViewer(props){
                     year={recordsTableYear}
                     month={recordsTableMonth}
                     day={recordsTableDay}
-                    term={recordsTableTerm}
+                    selectedTicket={recordsTableTicket}
                     periodical={recordsTablePeriodical}
                     onYearChange={setRecordsTableYear}
                     onMonthChange={setRecordsTableMonth}
                     onDayChange={setRecordsTableDay}
                     onPeriodicalChange={setRecordsTablePeriodical}
-                    onTermChange={setRecordsTableTerm}
+                    onSelectedTicketChange={setRecordsTableTicket}
                     cacheID={props.cacheID}
                     compact={compact}
                 />

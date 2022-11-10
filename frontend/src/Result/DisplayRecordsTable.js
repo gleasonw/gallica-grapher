@@ -12,13 +12,15 @@ import {SelectionBubble} from "../shared/SelectionBubble";
 import DownloadCSVButton from "./DownloadCSVButton";
 
 export default function DisplayRecordsTable(props) {
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(Math.round(10 / Object.keys(props.tickets).length));
     const [offset, setOffset] = useState(0);
     const [showFilterPopup, setShowFilterPopup] = useState(false);
     const isGallicaGrouped = props.timeBin === 'gallicaYear' || props.timeBin === 'gallicaMonth';
-    let DBquery = getDBquery();
-    let recordsFromGallicaQuery = getGallicaQuery(props.tickets);
-    const result = useData(isGallicaGrouped ? recordsFromGallicaQuery : DBquery);
+    const ticketToDisplay = props.selectedTicket ? {[props.selectedTicket]: props.tickets[props.selectedTicket]} : props.tickets;
+    const result = useData(isGallicaGrouped ?
+        buildGallicaQuery(ticketToDisplay) :
+        buildDBQuery(ticketToDisplay)
+    );
     const displayRecords = result ? result['displayRecords'] : null;
     const count = result ? result['count'] : null;
 
@@ -27,10 +29,10 @@ export default function DisplayRecordsTable(props) {
         setLimit(10);
     }
 
-    function getDBquery(){
+    function buildDBQuery(tickets){
         let query =
             "/api/getDisplayRecords?" +
-            "tickets=" + Object.keys(props.tickets) +
+            "tickets=" + Object.keys(tickets) +
             "&requestID=" + props.requestID +
             "&limit=" + limit +
             "&offset=" + offset +
@@ -38,14 +40,37 @@ export default function DisplayRecordsTable(props) {
         return addFiltersToQuery(query);
     }
 
-    function getGallicaQuery(tickets){
-        const jsonedTicket = JSON.stringify(Object.values(tickets)[0]);
-        const query = "/api/getGallicaRecords?" +
-            "ticket=" + jsonedTicket +
+    function buildGallicaQuery(tickets){
+        let argsForQuery = Object.keys(tickets).map((key) => {
+            const ticket = tickets[key];
+            return {
+                terms: ticket.terms,
+                linkTerm: ticket.linkTerm,
+                linkDistance: ticket.linkDistance,
+                grouping: 'all',
+                startDate: buildDateStringForFilters() || ticket.startDate,
+                codes: ticket.papersAndCodes.map((paperAndCode) => paperAndCode.code)
+            }
+        });
+        argsForQuery = JSON.stringify(argsForQuery);
+        return "/api/getGallicaRecords?" +
+            "tickets=" + argsForQuery +
             "&limit=" + limit +
             "&offset=" + offset;
-        return addFiltersToQuery(query);
     }
+
+    function buildDateStringForFilters(){
+        if(props.year && props.month && props.day){
+            return `${props.year}-${props.month}-${props.day}`
+        }else if(props.year && props.month){
+            return `${props.year}-${props.month}`
+        }else if(props.year){
+            return `${props.year}`
+        }else{
+            return null
+        }
+    }
+
 
     function addFiltersToQuery(query){
         if (props.year) {
@@ -56,9 +81,6 @@ export default function DisplayRecordsTable(props) {
         }
         if (props.day) {
             query += "&day=" + props.day
-        }
-        if (props.term) {
-            query += "&term=" + props.term
         }
         if (props.periodical) {
             query += "&periodical=" + props.periodical
@@ -73,7 +95,7 @@ export default function DisplayRecordsTable(props) {
                 <h3>
                     View {count}
                     {
-                        [props.year, props.month, props.day, props.periodical, props.term].some(Boolean) ?
+                        [props.year, props.month, props.day, props.periodical, props.ticket].some(Boolean) ?
                             ' occurrences for these filters'
                             :
                             ' total occurrences'
@@ -96,7 +118,7 @@ export default function DisplayRecordsTable(props) {
                 month={props.month}
                 day={props.day}
                 periodical={props.periodical}
-                term={props.term}
+                selectedTicket={props.selectedTicket}
                 limit={limit}
                 offset={offset}
                 setLimit={setLimit}
@@ -113,8 +135,8 @@ export default function DisplayRecordsTable(props) {
                 onPeriodicalChange={(periodical) => handleFilterChange(
                     props.onPeriodicalChange(periodical)
                 )}
-                onTermChange={(term) => handleFilterChange(
-                    props.onTermChange(term)
+                onSelectedTicketChange={(ticket) => handleFilterChange(
+                    props.onSelectedTicketChange(ticket)
                 )}
                 tickets={props.tickets}
                 displayRecords={displayRecords}
@@ -137,7 +159,7 @@ function StyledFilterAndTable(props) {
                     month={props.month}
                     day={props.day}
                     periodical={props.periodical}
-                    term={props.term}
+                    selectedTicket={props.selectedTicket}
                     limit={props.limit}
                     offset={props.offset}
                     setLimit={props.setLimit}
@@ -146,12 +168,13 @@ function StyledFilterAndTable(props) {
                     onMonthChange={props.onMonthChange}
                     onDayChange={props.onDayChange}
                     onPeriodicalChange={props.onPeriodicalChange}
-                    onTermChange={props.onTermChange}
+                    onSelectedTicketChange={props.onSelectedTicketChange}
                     tickets={props.tickets}
                     count={props.count}
                     compact={props.compact}
                     show={props.show}
                     onOutsidePopupClick={props.onOutsidePopupClick}
+                    isGallicaGrouped={props.isGallicaGrouped}
                 />
                 {!props.compact && !props.isGallicaGrouped &&
                     <div>
@@ -173,12 +196,13 @@ function StyledFilterAndTable(props) {
                     month={props.month}
                     day={props.day}
                     periodical={props.periodical}
-                    term={props.term}
+                    selectedTicket={props.selectedTicket}
+                    tickets={props.tickets}
                     onYearClick={() => props.onYearChange(null)}
                     onMonthClick={() => props.onMonthChange(null)}
                     onDayClick={() => props.onDayChange(null)}
                     onPeriodicalClick={() => props.onPeriodicalChange(null)}
-                    onTermClick={() => props.onTermChange(null)}
+                    onTicketClick={() => props.onSelectedTicketChange(null)}
                 />
                 <StyledOccurrenceTable>
                     <tbody>
@@ -266,11 +290,11 @@ function AppliedFilters(props) {
                     Periodical: {props.periodical}
                 </SelectionBubble>
             }
-            {!!props.term &&
+            {!!props.selectedTicket &&
                 <SelectionBubble
-                    onClick={props.onTermClick}
+                    onClick={props.onTicketClick}
                 >
-                    {props.term}
+                    {props.tickets[props.selectedTicket].terms}
                 </SelectionBubble>
             }
         </NavBarWrap>

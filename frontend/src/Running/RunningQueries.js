@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {TicketProgressBox} from "./TicketProgressBox";
 import useInterval from "../shared/useInterval";
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
@@ -18,17 +18,18 @@ function RunningQueriesUI(props) {
             'active': 0
         }
     ))
-    const [cancelMessage, setCancelMessage] = React.useState('Cancel');
-    const [progressStats, setProgressStats] = React.useState(initialProgressStats);
-    const [timeBeforeResponse, setTimeBeforeResponse] = React.useState(0);
+    const [cancelMessage, setCancelMessage] = useState('Cancel');
+    const [progressStats, setProgressStats] = useState({});
+    const [timeBeforeResponse, setTimeBeforeResponse] = useState(0);
     const refreshInterval = 1000;
     const timeBeforeWarning = 30000;
     const responseReceived = Object.keys(progressStats).some((ticketID) => (
         progressStats[ticketID].progressPercent > 0
     ))
+
     useInterval(async () => {
         const requestStateCallbacks = {
-            "RUNNING": () => setProgressStats(progressJSON['progress']),
+            "RUNNING": () => setProgressStats(progressJSON.progress ? progressJSON.progress : progressStats),
             "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON['numRecords']),
             "NO_RECORDS": props.onNoRecords,
             "COMPLETED": props.onFinish,
@@ -40,7 +41,6 @@ function RunningQueriesUI(props) {
             props.onBackendError();
         }
         const progressJSON = await response.json();
-        console.log(progressJSON);
         const state = progressJSON["state"]
         if (requestStateCallbacks.hasOwnProperty(state)) {
             requestStateCallbacks[state]()
@@ -58,7 +58,6 @@ function RunningQueriesUI(props) {
             props.onCancelRequest
         )
     }
-
     return (
         <div className='queryProgressUI'>
             {timeBeforeResponse > timeBeforeWarning && !responseReceived && <ClassicUIBox>
@@ -73,7 +72,8 @@ function RunningQueriesUI(props) {
                     key={key}
                     index={index}
                     total={Object.keys(props.tickets).length}
-                    progressStats={progressStats[key]}
+                    progressStats={progressStats[key] || initialProgressStats[key]}
+                    onBackendGroupingChange={() => props.onBackendGroupingChange(key)}
                 />
             ))}
             <ImportantButtonWrap

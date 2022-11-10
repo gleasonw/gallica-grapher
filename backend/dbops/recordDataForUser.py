@@ -1,13 +1,6 @@
-from utils.psqlconn import PSQLconn
-from parseOccurrenceRecords import ParseOccurrenceRecords
-from query import OCRQuery
-from get import Get
-from concurrentFetch import ConcurrentFetch
-from gallicaxmlparse import GallicaXMLparse
-from query import MomentQuery
-from recordGetter import RecordGetter
-
-conn = PSQLconn().getConn()
+from gallicaGetter.gallicaxmlparse import GallicaXMLparse
+from dbops.connContext import getConn
+import gallicaGetter
 
 
 class RecordDataForUser:
@@ -27,14 +20,13 @@ class RecordDataForUser:
     """
 
     def __init__(self):
-        global conn
-        self.conn = conn if conn else PSQLconn().getConn()
         self.csvData = None
         self.parse = GallicaXMLparse()
 
     def getCSVData(self, ticketIDs, requestID):
         tupledTickets = tuple(ticketIDs.split(','))
-        with self.conn.cursor() as cur:
+        dbConn = getConn()
+        with dbConn.cursor() as cur:
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
             """, {'tickets': tupledTickets, 'requestID': requestID})
@@ -63,7 +55,8 @@ class RecordDataForUser:
         LIMIT %(limit)s
         OFFSET %(offset)s
         """
-        with self.conn.cursor() as cur:
+        dbConn = getConn()
+        with dbConn.cursor() as cur:
 
             cur.execute(f"""
             {self.ticketResultsWithPaperName}
@@ -81,42 +74,33 @@ class RecordDataForUser:
         return records, count
 
     def getOCRTextForRecord(self, ark, term) -> tuple:
-        fetcher = Get(
-            'https://gallica.bnf.fr/services/ContentSearch',
-            maxSize=1
-        )
-        response = fetcher.get(OCRQuery(ark, term))
-        return self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(response.xml)
+        wrapper = gallicaGetter.connect('content')
+        return wrapper.get(ark, term)[0]
 
-    def getGallicaRecordsForDisplay(self, ticket, filters):
-        records = recordGetter.getFromQueries(
-            [
-                MomentQuery(
-                    term=[filters.get('term')] if filters.get('term') else ticket['terms'],
-                    codes=[filters.get('code')] if filters.get('code') else ticket['papersAndCodes'],
-                    year=filters.get('year'),
-                    month=filters.get('month') or 1,
-                    day=filters.get('day') or 1,
-                    linkTerm=ticket['linkTerm'],
-                    linkDistance=ticket['linkDistance'],
-                    startIndex=filters['offset'],
-                    numRecords=filters['limit']
-                )
-            ]
-        )
-        records = list(records)
-        pass
+    def getGallicaRecordsForDisplay(self, tickets, filters):
+        wrapper = gallicaGetter.connect('sru')
+        records = []
+        for ticket in tickets:
+            argsBundle = {
+                **ticket,
+                'numRecords': filters.get('limit'),
+                'startRecord': filters.get('offset'),
+            }
+            records.extend(wrapper.get(**argsBundle))
+        records.sort(key=lambda record: record.date.getDate())
+        return records
 
     def clearUserRecordsAfterCancel(self, requestID):
-        with self.conn.cursor() as cur:
+        dbConn = getConn()
+        with dbConn.cursor() as cur:
             cur.execute("""
             DELETE FROM results
             WHERE requestid = %s
             """, (requestID,))
-            self.conn.commit()
 
     def getTopPapers(self, requestID, tickets):
-        with self.conn.cursor() as cursor:
+        dbConn = getConn()
+        with dbConn.cursor() as cursor:
             cursor.execute("""
             WITH resultCounts AS (
                 SELECT papercode, count(*) as papercount

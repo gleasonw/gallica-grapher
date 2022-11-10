@@ -1,9 +1,9 @@
-from psqlconn import PSQLconn
+from dbops.connContext import getConn
 
 
 def removeOldResultsFromDB():
     print('Removing old results from DB...')
-    conn = PSQLconn().getConn()
+    conn = getConn()
     cur = conn.cursor()
     cur.execute("""
     DELETE FROM results 

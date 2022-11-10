@@ -15,7 +15,11 @@ function App() {
     const [tickets, setTickets] = useState({});
     const [selectedSearchType, setSelectedSearchType] = useState(0);
     const [startYear, setStartYear] = useState(1880);
-    const [endYear, setEndYear] = useState(1900);
+    const [startMonth, setStartMonth] = useState(null);
+    const [startDay, setStartDay] = useState(null);
+    const [endYear, setEndYear] = useState(1930);
+    const [endMonth, setEndMonth] = useState(null);
+    const [endDay, setEndDay] = useState(null);
     const [requestID, setRequestID] = useState(null);
     const [progressID, setProgressID] = useState(null);
     const [currentPage, setCurrentPage] = useState('input');
@@ -25,17 +29,25 @@ function App() {
         'input':
             <Input
                 tickets={tickets}
-                onLoadedSubmit={handleLoadedSubmit}
-                onUnloadedSubmit={handleUnloadedSubmit}
+                onLoadedSubmit={(ticket) => initRequest(getUpdatedTickets(ticket))}
+                onUnloadedSubmit={() => initRequest(tickets)}
                 onCreateTicketClick={handleCreateTicketClick}
                 onTicketClick={handleTicketClick}
                 onExampleRequestClick={handleExampleRequestClick}
                 requestBoxRef={requestBoxRef}
                 selectedSearchType={selectedSearchType}
                 startYear={startYear}
+                startMonth={startMonth}
+                startDay={startDay}
                 endYear={endYear}
-                onStartYearChange={(e) => setStartYear(e.target.value)}
-                onEndYearChange={(e) => setEndYear(e.target.value)}
+                endMonth={endMonth}
+                endDay={endDay}
+                onStartYearChange={(year) => setStartYear(year)}
+                onStartMonthChange={(month) => setStartMonth(month)}
+                onStartDayChange={(day) => setStartDay(day)}
+                onEndYearChange={(year) => setEndYear(year)}
+                onEndMonthChange={(month) => setEndMonth(month)}
+                onEndDayChange={(day) => setEndDay(day)}
                 onSearchTypeChange={(i) => setSelectedSearchType(i)}
             />,
         'running':
@@ -48,6 +60,7 @@ function App() {
                 onNoRecords={() => setCurrentPage('noRecords')}
                 onCancelRequest={handleResetValuesAndGoHome}
                 onBackendError={() => setCurrentPage('backendError')}
+                onBackendGroupingChange={handleBackendGroupingChange}
             />,
         'result':
             <ResultUI
@@ -64,9 +77,8 @@ function App() {
                 <h3>{numRecords.toLocaleString()} records in your request.</h3>
                 <section>
                     <br/>
-                    <p>This number is either greater than my limit, or I don't have enough space for it right now.
-                        Try restricting your search to a few periodicals, shortening the year range, or using a more
-                        precise term. </p>
+                    <p>I can't retrieve all these records for you. There are just too many of them. Try
+                    running the same request, but group by year. I don't have to pull as many records from Paris for that.</p>
                     <br/>
                 </section>
                 <ImportantButtonWrap
@@ -96,11 +108,6 @@ function App() {
             </ClassicUIBox>
     }
 
-    function handleLoadedSubmit(ticket) {
-        const updatedTickets = getUpdatedTickets(ticket);
-        void initRequest(updatedTickets);
-    }
-
     function getUpdatedTickets(ticket) {
         const newTicketID = Object.keys(tickets).length;
         return {
@@ -109,12 +116,20 @@ function App() {
         };
     }
 
-    function handleUnloadedSubmit() {
-        void initRequest(tickets);
+    function handleBackendGroupingChange(ticketID) {
+        const updatedTickets = {
+            ...tickets,
+            [ticketID]: {
+                ...tickets[ticketID],
+                grouping: 'all'
+            }
+        }
+        setTickets(updatedTickets);
     }
 
     async function initRequest(tickets) {
-        const completedTickets = addSearchAndDateRangeToTickets(tickets);
+        setCurrentPage('running');
+        const completedTickets = addGroupingToTickets(tickets);
         const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
         const {request} = await axios.post('/api/init', {
             tickets: ticketsWithPaperNamesRemoved
@@ -127,17 +142,14 @@ function App() {
         setProgressID(progressID);
         setRequestID(requestID);
         setTickets(completedTickets);
-        setCurrentPage('running');
     }
 
-    function addSearchAndDateRangeToTickets(someTickets) {
+    function addGroupingToTickets(someTickets) {
         const ticketsWithSearchType = {}
         Object.keys(someTickets).forEach((ticketID) => {
             ticketsWithSearchType[ticketID] = {
                 ...someTickets[ticketID],
-                searchType: getSearchTypeForIndex(selectedSearchType),
-                startYear: startYear,
-                endYear: endYear
+                grouping: getSearchTypeForIndex(selectedSearchType),
             }
         })
         return ticketsWithSearchType;
@@ -152,6 +164,7 @@ function App() {
                     (paperAndCode) => (paperAndCode.code))
             }
         ))
+        delete ticketsWithPaperNamesRemoved['papersAndCodes'];
         return ticketsWithPaperNamesRemoved;
     }
 
@@ -188,9 +201,10 @@ function App() {
         const [id, tickets] = Object.entries(example)[0];
         const ticketData = tickets['tickets'];
         const requestWithUniqueTicketIDs = {}
-        Object.keys(ticketData).map((ticketID, index) => (
-            requestWithUniqueTicketIDs[index] = ticketData[ticketID]
-        ))
+        Object.keys(ticketData).map((ticketID, index) => {
+            ticketData[ticketID].grouping = 'all';
+            requestWithUniqueTicketIDs[index] = ticketData[ticketID];
+        })
         setTickets(requestWithUniqueTicketIDs);
         setRequestID(nameToId[id])
         setCurrentPage('result')

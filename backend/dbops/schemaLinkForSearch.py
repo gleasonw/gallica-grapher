@@ -1,21 +1,15 @@
 import io
-from paperSearchFactory import PaperSearchFactory
+import gallicaGetter
+from dbops.connContext import getConn
 
 
 class SchemaLinkForSearch:
-    def __init__(
-            self,
-            tools,
-            requestID=None
-    ):
-        self.conn = tools.dbConn
+    def __init__(self, requestID=None):
         self.requestID = requestID
-        self.paperAPI = PaperSearchFactory(
-           parse=tools.parse,
-           SRUapi=tools.SRUapi
-        ).buildSearch()
+        self.conn = getConn()
+        self.paperAPI = gallicaGetter.connect('papers')
 
-    def insertRecordsIntoPapers(self, records):
+    def insertRecordsIntoPapers(self, records, stateHooks=None, identifier=None):
         csvStream = self.buildCSVstream(records)
         with self.conn.cursor() as curs:
             curs.copy_from(
@@ -24,10 +18,19 @@ class SchemaLinkForSearch:
                 sep='|'
             )
 
-    def insertRecordsIntoResults(self, records, requestStateHandlers):
-        stream, codes = self.buildCSVstreamAndGetCodesAndEnsureNoDuplicates(records)
-        self.insertMissingPapersToDB(codes, requestStateHandlers['onAddingMissingPapers'])
-        requestStateHandlers['onAddingResultsToDB']()
+    def insertRecordsIntoResults(self, records, identifier, stateHooks):
+        stream, codes = self.build_csv_stream_ensure_no_issue_duplicates(records)
+        self.insertMissingPapersToDB(
+            codes,
+            onAddingMissingPapers=lambda: stateHooks.setSearchState(
+                state='ADDING_MISSING_PAPERS',
+                ticketID=identifier
+            )
+        )
+        stateHooks.setSearchState(
+            state='ADDING_RESULTS',
+            ticketID=identifier
+        )
         with self.conn.cursor() as curs:
             curs.copy_from(
                 stream,
@@ -46,9 +49,12 @@ class SchemaLinkForSearch:
                 )
             )
 
-    def insertRecordsIntoGroupCounts(self, records, requestStateHandlers):
+    def insertRecordsIntoGroupCounts(self, records, identifier, stateHooks):
         csvStream = self.buildCSVstream(records)
-        requestStateHandlers['onAddingResultsToDB']()
+        stateHooks.setSearchState(
+            state='ADDING_RESULTS',
+            ticketID=identifier
+        )
         with self.conn.cursor() as curs:
             curs.copy_from(
                 csvStream,
@@ -71,9 +77,7 @@ class SchemaLinkForSearch:
         missingCodes = codes - setOfCodesInDB
         if missingCodes:
             onAddingMissingPapers()
-            paperRecords = self.paperAPI.getRecordsForTheseCodes(
-                list(missingCodes)
-            )
+            paperRecords = self.paperAPI.get(list(missingCodes))
             self.insertRecordsIntoPapers(paperRecords)
 
     def getPaperCodesThatMatch(self, codes):
@@ -84,7 +88,7 @@ class SchemaLinkForSearch:
             )
             return curs.fetchall()
 
-    def buildCSVstreamAndGetCodesAndEnsureNoDuplicates(self, records):
+    def build_csv_stream_ensure_no_issue_duplicates(self, records):
         csvFileLikeObject = io.StringIO()
         codes = set()
         codeDates = {}

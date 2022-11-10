@@ -1,15 +1,13 @@
-from utils.psqlconn import PSQLconn
+from dbops.connContext import getConn
 
 
 class PaperLocalSearch:
 
-    def __init__(self):
-        self.dbConnection = PSQLconn().getConn()
-        self.cursor = self.dbConnection.cursor()
-
     def selectPapersContinuousOverRange(self, firstInputYear, secondInputYear, limit):
         biggerYear = max(firstInputYear, secondInputYear)
         smallerYear = min(firstInputYear, secondInputYear)
+        biggerYear = biggerYear or 9999
+        smallerYear = smallerYear or 0
         query = """
         SELECT title, code, startdate, enddate
         FROM papers
@@ -23,13 +21,15 @@ class PaperLocalSearch:
             args = (smallerYear, biggerYear, limit,)
         else:
             args = (smallerYear, biggerYear,)
-        with self.dbConnection.cursor() as curs:
+        dbConn = getConn()
+        with dbConn.cursor() as curs:
             curs.execute(query, args)
             papersContinuousOverRange = curs.fetchall()
             return paperDataToJSON(papersContinuousOverRange)
 
     def selectPapersSimilarToKeyword(self, keyword):
-        with self.dbConnection.cursor() as curs:
+        dbConn = getConn()
+        with dbConn.cursor() as curs:
             keyword = keyword.lower()
             curs.execute("""
                 SELECT title, code, startdate, enddate
@@ -40,8 +40,11 @@ class PaperLocalSearch:
             papersSimilarToKeyword = curs.fetchall()
             return paperDataToJSON(papersSimilarToKeyword)
 
-    def getNumPapersInRange(self, startYear, endYear):
-        with self.dbConnection.cursor() as curs:
+    def getNumPapersInRange(self, startDate, endDate):
+        dbConn = getConn()
+        startDate = startDate or 0
+        endDate = endDate or 9999
+        with dbConn.cursor() as curs:
             curs.execute("""
                 SELECT COUNT(*) FROM papers
                     WHERE startdate BETWEEN %s AND %s
@@ -49,12 +52,12 @@ class PaperLocalSearch:
                         OR (startdate < %s AND enddate > %s)
                     ;
                 """, (
-                startYear,
-                endYear,
-                startYear,
-                endYear,
-                startYear,
-                endYear))
+                startDate,
+                endDate,
+                startDate,
+                endDate,
+                startDate,
+                endDate))
             numPapersOverRange = curs.fetchone()
             return numPapersOverRange[0]
 

@@ -1,18 +1,18 @@
-from utils.psqlconn import PSQLconn
 from dbops.sqlForGraph import SQLforGraph
 import datetime
 import ciso8601
+from dbops.connContext import getConn
 
 
 class GraphSeriesBatch:
 
     def __init__(self):
-        self.dbConnection = PSQLconn().getConn()
+        self.dbConnection = getConn()
         self.sqlGetter = SQLforGraph()
 
     def getSeriesForSettings(self, settings):
         if self.dbConnection.closed:
-            self.dbConnection = PSQLconn().getConn()
+            self.dbConnection = getConn()
         ticketIDs = settings['ticketIDs'].split(',')
         dataBatches = list(map(
             lambda ticketID: self.selectOneSeries(
@@ -63,29 +63,15 @@ class HighchartsSeriesForTicket:
         )
         dataWithProperDateFormat = self.transformDateForSettings(data, settings)
         return {
-            'name': self.getSearchTermsFromResults() if settings["groupBy"] in ['day', 'month', 'year']
-            else self.getSearchTermsFromGroupCounts(),
+            'name': f"{self.ticketID}: {self.getSearchTermsByGrouping(settings['groupBy'])}",
             'data': dataWithProperDateFormat,
         }
 
-    def getSearchTermsFromResults(self):
-        getSearchTerms = """
+    def getSearchTermsByGrouping(self, grouping):
+        dbSource = 'FROM results' if grouping in ['day', 'month', 'year'] else 'FROM groupcounts'
+        getSearchTerms = f"""
         SELECT array_agg(DISTINCT searchterm) 
-        FROM results 
-        WHERE requestid=%s 
-        AND ticketid = %s;
-        """
-        cursor = self.dbConnection.cursor()
-        cursor.execute(getSearchTerms, (
-            self.requestID,
-            self.ticketID
-        ))
-        return cursor.fetchone()[0]
-
-    def getSearchTermsFromGroupCounts(self):
-        getSearchTerms = """
-        SELECT array_agg(DISTINCT searchterm) 
-        FROM groupcounts 
+        {dbSource}
         WHERE requestid=%s 
         AND ticketid = %s;
         """

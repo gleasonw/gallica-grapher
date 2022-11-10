@@ -16,6 +16,8 @@ export function TicketProgressBox(props) {
     const estimateTotal = props.progressStats.numResultsDiscovered
     const ticketSearchState = props.progressStats.state
     const progress = ticketSearchState === 'COMPLETED' ? 100 : props.progressStats.progressPercent
+    const backendGrouping = props.progressStats.grouping;
+    backendGrouping && backendGrouping !== props.ticket.grouping && props.onBackendGroupingChange()
 
     return (
         <ClassicUIBox display={(
@@ -27,8 +29,8 @@ export function TicketProgressBox(props) {
             <TicketLabel
                 terms={props.ticket.terms}
                 papers={props.ticket.papersAndCodes}
-                startYear={props.ticket.startYear}
-                endYear={props.ticket.endYear}
+                startDate={props.ticket.startDate}
+                endDate={props.ticket.endDate}
                 linkTerm={props.ticket.linkTerm}
                 linkDistance={props.ticket.linkDistance}
             />

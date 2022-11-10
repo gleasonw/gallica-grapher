@@ -1,6 +1,6 @@
 from celery import Celery
-from requestFactory import RequestFactory
 import time
+from appsearch.request import buildRequest
 
 app = Celery()
 app.config_from_object('celery_settings')
@@ -8,11 +8,10 @@ app.config_from_object('celery_settings')
 
 @app.task(bind=True)
 def spawnRequest(self, tickets, requestid):
-    factory = RequestFactory(
-        tickets,
-        requestid
+    request = buildRequest(
+        argsBundles=tickets,
+        identifier=requestid
     )
-    request = factory.buildRequest()
     request.start()
     pollStates = {
         'RUNNING': lambda: self.update_state(
