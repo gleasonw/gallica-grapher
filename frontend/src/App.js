@@ -128,7 +128,6 @@ function App() {
     }
 
     async function initRequest(tickets) {
-        setCurrentPage('running');
         const completedTickets = addGroupingToTickets(tickets);
         const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
         const {request} = await axios.post('/api/init', {
@@ -142,6 +141,7 @@ function App() {
         setProgressID(progressID);
         setRequestID(requestID);
         setTickets(completedTickets);
+        setCurrentPage('running');
     }
 
     function addGroupingToTickets(someTickets) {
