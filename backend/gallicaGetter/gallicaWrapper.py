@@ -1,8 +1,8 @@
-from gallicaGetter.queryBuilder import OccurrenceQueryBuilder
-from gallicaGetter.queryBuilder import ContentQueryFactory
-from gallicaGetter.concurrentFetch import ConcurrentFetch
-from gallicaGetter.queryBuilder import PaperQueryBuilder
-from gallicaGetter.parseRecord import buildParser
+from build.queryBuilder import OccurrenceQueryBuilder
+from build.queryBuilder import ContentQueryFactory
+from fetch.concurrentFetch import ConcurrentFetch
+from build.queryBuilder import PaperQueryBuilder
+from parse.parseRecord import buildParser
 
 
 class GallicaWrapper:
@@ -176,5 +176,7 @@ class PapersWrapper(GallicaWrapper):
 
 if __name__ == '__main__':
     wrapper = SRUWrapper()
-    test = wrapper.get(terms='brazza')
+    test = wrapper.get('', startDate=1800, endDate=2000)
     print(len(test))
+    for record in test:
+        print(record.getRow())

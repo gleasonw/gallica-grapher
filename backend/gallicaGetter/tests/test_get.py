@@ -1,5 +1,5 @@
-from gallicaGetter.get import Get
-from gallicaGetter.response import Response
+from gallicaGetter.fetch.get import Get
+from gallicaGetter.fetch.response import Response
 from unittest.mock import MagicMock
 from unittest import TestCase
 
@@ -10,7 +10,8 @@ class TestGet(TestCase):
         self.getter = Get('test')
 
     def test_get(self):
-        self.getter.http = MagicMock()
+        self.getter.http = MagicMock(request=MagicMock(
+            return_value=MagicMock(status=200)))
         response = self.getter.get(MagicMock())
         self.assertIsInstance(response, Response)
 

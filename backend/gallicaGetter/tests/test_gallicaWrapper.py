@@ -5,13 +5,13 @@ from gallicaGetter.gallicaWrapper import SRUWrapper
 from gallicaGetter.gallicaWrapper import IssuesWrapper
 from gallicaGetter.gallicaWrapper import ContentWrapper
 from gallicaGetter.gallicaWrapper import PapersWrapper
-from gallicaGetter.parseRecord import ParseArkRecord
-from gallicaGetter.parseRecord import ParsePaperRecords
-from gallicaGetter.parseRecord import ParseContentRecord
-from gallicaGetter.concurrentFetch import ConcurrentFetch
-from gallicaGetter.queryBuilder import OccurrenceQueryBuilder
-from gallicaGetter.queryBuilder import PaperQueryBuilder
-from gallicaGetter.queryBuilder import ContentQueryFactory
+from gallicaGetter.parse.parseRecord import ParseArkRecord
+from gallicaGetter.parse.parseRecord import ParsePaperRecords
+from gallicaGetter.parse.parseRecord import ParseContentRecord
+from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
+from gallicaGetter.build.queryBuilder import OccurrenceQueryBuilder
+from gallicaGetter.build.queryBuilder import PaperQueryBuilder
+from gallicaGetter.build.queryBuilder import ContentQueryFactory
 
 
 class TestGallicaWrapper(TestCase):
