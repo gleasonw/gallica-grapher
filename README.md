@@ -24,9 +24,6 @@ blasting the French national library's servers, I have erred on a smaller number
 
 ### What do I see on the results page?
 
-The Gallica API returns a record for any occurrence of a term in a periodical issue. I parse these records
-and group occurrences for a given bin size (year, month, or day) to create a time series for each request.  
-
 Beneath the chart is a table of records pulled from Gallica, with links to the scanned periodical. Clicking on
 a point in the chart will list the corresponding records. You can also make direct requests by entering
 a date above the table. I'm still designing this section for better usability -- I think it's the most
