@@ -48,10 +48,6 @@ export default function Info(props){
                 </section>
                 <h3>What do I see on the results page?</h3>
                 <section>
-                    <p>The Gallica API returns a record for any occurrence of a term in a periodical issue. I parse these records
-                        and group occurrences within the same year, month, or day to create a time series for each request.</p>
-                </section>
-                <section>
                     <p>
                     Beneath the chart is a table of the records pulled from Gallica, with links to text in which it occurs. Clicking on
                     a point in the chart will list the corresponding records. You can also make direct requests by entering
