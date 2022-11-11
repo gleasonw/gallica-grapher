@@ -1,4 +1,4 @@
-from parse.date import Date
+from gallicaGetter.parse.date import Date
 from typing import List, Tuple
 
 

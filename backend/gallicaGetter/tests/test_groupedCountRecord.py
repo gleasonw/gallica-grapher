@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 import unittest
-from groupedCountRecord import GroupedCountRecord
+from gallicaGetter.parse.groupedCountRecord import GroupedCountRecord
 
 
 class TestGroupedCountRecord(unittest.TestCase):

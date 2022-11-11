@@ -1,9 +1,10 @@
-from parse.arkRecord import ArkRecord
-from parse.date import Date
-from parse.gallicaxmlparse import GallicaXMLparse
-from parse.groupedCountRecord import GroupedCountRecord
-from parse.occurrenceRecord import OccurrenceRecord
-from parse.paperRecord import PaperRecord
+from gallicaGetter.parse.arkRecord import ArkRecord
+from gallicaGetter.parse.date import Date
+from gallicaGetter.parse.gallicaxmlparse import GallicaXMLparse
+from gallicaGetter.parse.groupedCountRecord import GroupedCountRecord
+from gallicaGetter.parse.occurrenceRecord import OccurrenceRecord
+from gallicaGetter.parse.paperRecord import PaperRecord
+from gallicaGetter.parse.parseHTML import parse_html
 
 
 def buildParser(desiredRecord, **kwargs):
@@ -12,7 +13,8 @@ def buildParser(desiredRecord, **kwargs):
         'groupedCount': ParseGroupedRecordCounts,
         'occurrence': ParseOccurrenceRecords,
         'paper': ParsePaperRecords,
-        'content': ParseContentRecord
+        'content': ParseContentRecord,
+        'fullText': ParseFullText,
     }
     if desiredRecord not in recordParsers:
         raise ValueError(f'Unrecognized record type: {desiredRecord}. Options include: {recordParsers.keys()}')
@@ -40,7 +42,7 @@ class ParsePaperRecords(ParseRecord):
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
-            yield from self.generatePaperRecords(response.xml)
+            yield from self.generatePaperRecords(response.data)
 
     def generatePaperRecords(self, xml):
         for record in self.parser.getRecordsFromXML(xml):
@@ -64,7 +66,7 @@ class ParseOccurrenceRecords(ParseRecord):
         for response in responses:
             yield from self.generateOccurrenceRecords(
                 query=response.query,
-                xml=response.xml
+                xml=response.data
             )
 
     def generateOccurrenceRecords(self, xml, query):
@@ -91,7 +93,7 @@ class ParseGroupedRecordCounts(ParseRecord):
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
-            count = self.parser.getNumRecords(response.xml)
+            count = self.parser.getNumRecords(response.data)
             query = response.query
             yield GroupedCountRecord(
                 date=Date(query.getStartDate()),
@@ -106,7 +108,16 @@ class ParseContentRecord(ParseRecord):
 
     def parseResponsesToRecords(self, responses):
         return (
-            self.parser.getNumResultsAndPagesForOccurrenceInPeriodical(response.xml)
+            self.parser.getNumResultsAndPagesForOccurrenceInPeriodical(response.data)
+            for response in responses
+        )
+
+
+class ParseFullText(ParseRecord):
+
+    def parseResponsesToRecords(self, responses):
+        return (
+            parse_html(response.data)
             for response in responses
         )
 
@@ -115,7 +126,7 @@ class ParseArkRecord(ParseRecord):
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
-            yield from self.generateArkRecord(response.xml, response.query)
+            yield from self.generateArkRecord(response.data, response.query)
 
     def generateArkRecord(self, xml, query):
         years = self.parser.getYearsPublished(xml)

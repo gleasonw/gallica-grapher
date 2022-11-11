@@ -1,4 +1,4 @@
-from query import OccurrenceQuery, ArkQueryForNewspaperYears, PaperQuery, ContentQuery
+from gallicaGetter.fetch.query import OccurrenceQuery, ArkQueryForNewspaperYears, PaperQuery, ContentQuery
 from unittest import TestCase
 
 

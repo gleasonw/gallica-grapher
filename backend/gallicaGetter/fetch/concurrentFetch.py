@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from fetch.get import Get
+from gallicaGetter.fetch.get import Get
 
 NUM_WORKERS = 30
 
@@ -25,7 +25,7 @@ class ConcurrentFetch:
                     {
                         "elapsedTime": response.elapsed,
                         "numWorkers": self.numWorkers,
-                        "xml": response.xml,
+                        "xml": response.data,
                     }
                 )
                 yield response

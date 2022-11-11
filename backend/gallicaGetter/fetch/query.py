@@ -120,6 +120,18 @@ class ArkQueryForNewspaperYears(Query):
         return f'ArkQuery({self.ark})'
 
 
+class FullTextQuery(Query):
+
+    def postInit(self, kwargs):
+        self.ark = f'ark:/12148/{kwargs["ark"]}.texteBrut'
+
+    def getFetchParams(self):
+        return {"ark": self.ark}
+
+    def __repr__(self) -> str:
+        return f'RawTextQuery({self.ark})'
+
+
 class PaperQuery(SRUQuery):
 
     def postInit(self, kwargs):

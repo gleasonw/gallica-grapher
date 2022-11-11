@@ -6,7 +6,7 @@ import urllib3
 class Response:
 
     def __init__(self, data, query, elapsed):
-        self.xml = data
+        self.data = data
         self.query = query
         self.elapsed = elapsed
 

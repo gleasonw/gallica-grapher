@@ -1,5 +1,5 @@
 from lxml import etree
-from parse.date import Date
+from gallicaGetter.parse.date import Date
 
 
 class GallicaXMLparse:
@@ -25,6 +25,10 @@ class GallicaXMLparse:
         if recordsRoot is None:
             return []
         return recordsRoot.findall("{http://www.loc.gov/zing/srw/}record")
+
+    def getHTML(self, xml) -> str:
+        elements = etree.fromstring(xml)
+        return elements.find('html').text
 
     @staticmethod
     def getNumRecords(xml) -> int:

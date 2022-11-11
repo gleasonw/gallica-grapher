@@ -1,5 +1,4 @@
-from gallicaGetter.fetch.get import Get
-from gallicaGetter.fetch.response import Response
+from gallicaGetter.fetch.get import Get, Response
 from unittest.mock import MagicMock
 from unittest import TestCase
 

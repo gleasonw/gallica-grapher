@@ -1,5 +1,5 @@
 from math import ceil
-from gallicaGetter.gallicaxmlparse import GallicaXMLparse
+from gallicaGetter.parse.gallicaxmlparse import GallicaXMLparse
 from appsearch.averageResponseTime import AverageResponseTime
 
 

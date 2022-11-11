@@ -1,9 +1,10 @@
-from fetch.query import OccurrenceQuery
-from parse.gallicaxmlparse import GallicaXMLparse
-from fetch.query import ArkQueryForNewspaperYears
-from fetch.query import PaperQuery
-from fetch.query import ContentQuery
-from build.dateGrouping import DateGrouping
+from gallicaGetter.fetch.query import OccurrenceQuery
+from gallicaGetter.parse.gallicaxmlparse import GallicaXMLparse
+from gallicaGetter.fetch.query import ArkQueryForNewspaperYears
+from gallicaGetter.fetch.query import PaperQuery
+from gallicaGetter.fetch.query import ContentQuery
+from gallicaGetter.fetch.query import FullTextQuery
+from gallicaGetter.build.dateGrouping import DateGrouping
 import logging
 
 NUM_CODES_PER_BUNDLE = 10
@@ -11,8 +12,8 @@ NUM_CODES_PER_BUNDLE = 10
 
 class QueryBuilder:
 
-    def __init__(self, gallicaAPI):
-        self.gallicaAPI = gallicaAPI
+    def __init__(self, gallicaAPI=None):
+        self.callbackAPI = gallicaAPI
         self.parser = GallicaXMLparse()
 
     def createIndexedQueriesFromRootQueries(self, queries, limit=None) -> list:
@@ -33,9 +34,9 @@ class QueryBuilder:
         return indexedQueries
 
     def getNumResultsForEachQuery(self, queries) -> list:
-        responses = self.gallicaAPI.get(queries)
+        responses = self.callbackAPI.get(queries)
         numResultsForQueries = [
-            (response.query, self.parser.getNumRecords(response.xml))
+            (response.query, self.parser.getNumRecords(response.data))
             for response in responses
         ]
         return numResultsForQueries
@@ -144,7 +145,7 @@ class PaperQueryBuilder(QueryBuilder):
         )
 
 
-class ContentQueryFactory:
+class ContentQueryBuilder:
 
     def buildQueryForArkAndTerm(self, ark, term):
         return ContentQuery(
@@ -152,3 +153,13 @@ class ContentQueryFactory:
             term=term
         )
 
+
+class FullTextQueryBuilder:
+
+    def buildQueriesForArkCodes(self, arkCodes):
+        if type(arkCodes) is not list:
+            arkCodes = [arkCodes]
+        return [
+            FullTextQuery(ark=code)
+            for code in arkCodes
+        ]
