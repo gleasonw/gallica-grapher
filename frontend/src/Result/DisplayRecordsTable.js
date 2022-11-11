@@ -12,7 +12,7 @@ import {SelectionBubble} from "../shared/SelectionBubble";
 import DownloadCSVButton from "./DownloadCSVButton";
 
 export default function DisplayRecordsTable(props) {
-    const [limit, setLimit] = useState(Math.round(10 / Object.keys(props.tickets).length));
+    const [limit, setLimit] = useState(50);
     const [offset, setOffset] = useState(0);
     const [showFilterPopup, setShowFilterPopup] = useState(false);
     const isGallicaGrouped = props.timeBin === 'gallicaYear' || props.timeBin === 'gallicaMonth';
