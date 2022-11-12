@@ -1,7 +1,7 @@
 from unittest import TestCase
-from gallicaGetter.query import OccurrenceQuery
-from gallicaGetter.queryBuilder import OccurrenceQueryBuilder
-from gallicaGetter.queryBuilder import PaperQueryBuilder
+from gallicaGetter.fetch.query import OccurrenceQuery
+from gallicaGetter.build.queryBuilder import OccurrenceQueryBuilder
+from gallicaGetter.build.queryBuilder import PaperQueryBuilder
 from unittest.mock import MagicMock
 
 

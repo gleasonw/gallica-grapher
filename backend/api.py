@@ -26,6 +26,7 @@ def init():
     global requestIDSeed
     requestIDSeed += 1
     tickets = request.get_json()["tickets"]
+    print(tickets)
     task = spawnRequest.delay(tickets, requestIDSeed)
     return {"taskid": task.id, "requestid": requestIDSeed}
 
@@ -128,10 +129,10 @@ def getCSV():
     return {"csvData": csvData}
 
 
+#TODO: enlist celery worker?
 @app.route('/api/getDisplayRecords')
 def getDisplayRecords():
     tableArgs = dict(request.args)
-    del tableArgs['uniqueforcache']
     tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
     displayRecords, count = recordDataGetter.getRecordsForDisplay(tableArgs)
     return {

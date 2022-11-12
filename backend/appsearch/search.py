@@ -17,7 +17,10 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
             'stateHooks': stateHooks,
             'connectable': wrapper
         }
-        search = bundle['grouping']
+        if not bundle.get('startDate') and not bundle.get('endDate'):
+            bundle['grouping'] = 'all'
+            stateHooks.onSearchChangeToAll(key)
+        search = bundle.get('grouping')
         runner = searches[search](**initParams)
         if search != 'all' and runner.moreDateIntervalsThanRecordBatches() and len(argBundles.items()) == 1:
             #TODO: save num results and pass to all search to avoid duplicate work
@@ -127,11 +130,14 @@ class GroupedSearch(Search):
         return self.dbLink.insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-        numRecords = self.args['endDate'] + 1 - self.args['startDate']
-        if self.args['grouping'] == 'month':
-            numRecords *= 12
-        if self.args.get('codes'):
-            numRecords *= (len(self.args['codes']) // NUM_CODES_PER_BUNDLE) + 1
+        if not self.args.get('endDate') or not self.args.get('startDate'):
+            numRecords = 1
+        else:
+            numRecords = int(self.args['endDate'][0:4]) + 1 - int(self.args['startDate'][0:4]) + 1
+            if self.args['grouping'] == 'month':
+                numRecords *= 12
+            if self.args.get('codes'):
+                numRecords *= (len(self.args['codes']) // NUM_CODES_PER_BUNDLE) + 1
         onNumRecordsFound and onNumRecordsFound(self, numRecords)
         return numRecords
 

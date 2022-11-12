@@ -2,8 +2,6 @@ from gallicaGetter.gallicaxmlparse import GallicaXMLparse
 from dbops.connContext import getConn
 import gallicaGetter
 
-conn = getConn()
-
 
 class RecordDataForUser:
 
@@ -89,6 +87,7 @@ class RecordDataForUser:
                 'startRecord': filters.get('offset'),
             }
             records.extend(wrapper.get(**argsBundle))
+        records.sort(key=lambda record: record.date.getDate())
         return records
 
     def clearUserRecordsAfterCancel(self, requestID):

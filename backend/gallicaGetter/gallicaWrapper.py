@@ -1,30 +1,31 @@
-from gallicaGetter.queryBuilder import OccurrenceQueryBuilder
-from gallicaGetter.queryBuilder import ContentQueryFactory
-from gallicaGetter.concurrentFetch import ConcurrentFetch
-from gallicaGetter.queryBuilder import PaperQueryBuilder
-from gallicaGetter.parseRecord import buildParser
+from gallicaGetter.build.queryBuilder import OccurrenceQueryBuilder
+from gallicaGetter.build.queryBuilder import ContentQueryBuilder
+from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
+from gallicaGetter.build.queryBuilder import PaperQueryBuilder
+from gallicaGetter.build.queryBuilder import FullTextQueryBuilder
+from gallicaGetter.parse.parseRecord import buildParser
 
 
 class GallicaWrapper:
     def __init__(self, **kwargs):
-        self.api = self.buildAPI(kwargs.get('numWorkers', 10))
+        self.api = self.getAPI(kwargs.get('numWorkers', 10))
         self.parser = None
-        self.queryBuilder = self.buildQueryBuilder()
-        self.preInit(kwargs)
+        self.queryBuilder = self.getQueryBuilder()
+        self.postInit(kwargs)
 
-    def preInit(self, kwargs):
+    def postInit(self, kwargs):
         pass
 
     def get(self, **kwargs):
         raise NotImplementedError(f'get() not implemented for {self.__class__.__name__}')
 
-    def buildAPI(self, numWorkers):
+    def getAPI(self, numWorkers):
         raise NotImplementedError(f'buildAPI() not implemented for {self.__class__.__name__}')
 
-    def buildQueryBuilder(self):
+    def getQueryBuilder(self):
         raise NotImplementedError(f'buildQueryBuilder() not implemented for {self.__class__.__name__}')
         
-    def getFromQueries(self, queries, parser, onUpdateProgress=None):
+    def fetchFromQueries(self, queries, parser, onUpdateProgress=None):
         rawResponse = self.api.get(
             queries,
             onUpdateProgress=onUpdateProgress
@@ -38,7 +39,7 @@ class GallicaWrapper:
 
 class SRUWrapper(GallicaWrapper):
 
-    def preInit(self, kwargs):
+    def postInit(self, kwargs):
         self.groupedRecordParser = buildParser(
             desiredRecord='groupedCount',
             ticketID=kwargs.get('ticketID'),
@@ -56,7 +57,7 @@ class SRUWrapper(GallicaWrapper):
         if grouping is None:
             grouping = 'year'
             kwargs['grouping'] = grouping
-        recordGenerator = self.getFromQueries(
+        recordGenerator = self.fetchFromQueries(
             queries=self.buildQueries(kwargs, queriesWithCounts),
             parser=self.soloRecordParser if grouping == 'all' else self.groupedRecordParser,
             onUpdateProgress=onUpdateProgress
@@ -73,45 +74,42 @@ class SRUWrapper(GallicaWrapper):
         baseQueries = self.queryBuilder.buildBaseQueriesFromArgs(args)
         return self.queryBuilder.getNumResultsForEachQuery(baseQueries)
 
-    def buildAPI(self, numWorkers):
+    def getAPI(self, numWorkers):
         return ConcurrentFetch(
             baseUrl='https://gallica.bnf.fr/SRU',
             numWorkers=numWorkers
         )
 
-    def buildQueryBuilder(self):
+    def getQueryBuilder(self):
         return OccurrenceQueryBuilder(gallicaAPI=self.api)
 
 
 class IssuesWrapper(GallicaWrapper):
 
-    def preInit(self, kwargs):
-        self.parser = self.buildParser()
+    def postInit(self, kwargs):
+        self.parser = buildParser('ark')
 
     def get(self, codes, generate=False):
         queries = self.queryBuilder.buildArkQueriesForCodes(codes)
-        recordGenerator = self.getFromQueries(
+        recordGenerator = self.fetchFromQueries(
             queries,
             parser=self.parser
         )
         return recordGenerator if generate else list(recordGenerator)
 
-    def buildParser(self):
-        return buildParser('ark')
-
-    def buildAPI(self, numWorkers):
+    def getAPI(self, numWorkers):
         return ConcurrentFetch(
             'https://gallica.bnf.fr/services/Issues',
             numWorkers=numWorkers
         )
 
-    def buildQueryBuilder(self):
+    def getQueryBuilder(self):
         return PaperQueryBuilder(gallicaAPI=self.api)
 
 
 class ContentWrapper(GallicaWrapper):
 
-    def preInit(self, kwargs):
+    def postInit(self, kwargs):
         self.parser = buildParser('content')
 
     def get(self, ark, term, generate=False):
@@ -119,19 +117,16 @@ class ContentWrapper(GallicaWrapper):
             ark=ark,
             term=term
         )
-        recordGen = self.getFromQueries(
+        recordGen = self.fetchFromQueries(
             queries=query,
             parser=self.parser
         )
         return recordGen if generate else list(recordGen)
 
-    def buildQueryBuilder(self):
-        return ContentQueryFactory()
+    def getQueryBuilder(self):
+        return ContentQueryBuilder()
 
-    def buildParser(self):
-        return buildParser('content')
-
-    def buildAPI(self, numWorkers):
+    def getAPI(self, numWorkers):
         return ConcurrentFetch(
             baseUrl='https://gallica.bnf.fr/services/ContentSearch',
             numWorkers=numWorkers
@@ -140,13 +135,13 @@ class ContentWrapper(GallicaWrapper):
 
 class PapersWrapper(GallicaWrapper):
 
-    def preInit(self, kwargs):
-        self.parser = self.buildParser()
+    def postInit(self, kwargs):
+        self.parser = buildParser('paper')
         self.issuesWrapper = IssuesWrapper()
 
     def get(self, argCodes, stateHooks=None, **kwargs):
         queries = self.queryBuilder.buildQueriesForArgs(argCodes)
-        recordGenerator = self.getFromQueries(
+        recordGenerator = self.fetchFromQueries(
             queries,
             parser=self.parser,
         )
@@ -161,20 +156,43 @@ class PapersWrapper(GallicaWrapper):
     def getNumResultsForArgs(self, **kwargs):
         pass
 
-    def buildAPI(self, numWorkers):
+    def getAPI(self, numWorkers):
         return ConcurrentFetch(
             baseUrl='https://gallica.bnf.fr/SRU',
             numWorkers=numWorkers
         )
 
-    def buildQueryBuilder(self):
+    def getQueryBuilder(self):
         return PaperQueryBuilder(gallicaAPI=self.api)
 
+
+class FullTextWrapper(GallicaWrapper):
+
+    def postInit(self, kwargs):
+        self.parser = buildParser('fullText')
+
+    def get(self, arkCodes, generate=False):
+        queries = self.queryBuilder.buildQueriesForArkCodes(arkCodes)
+        recordGen = self.fetchFromQueries(
+            queries=queries,
+            parser=self.parser
+        )
+        return recordGen if generate else list(recordGen)
+
+    def getQueryBuilder(self):
+        return FullTextQueryBuilder()
+
     def buildParser(self):
-        return buildParser('paper')
+        return 
+
+    def getAPI(self, numWorkers):
+        return ConcurrentFetch(
+            baseUrl='https://gallica.bnf.fr/',
+            numWorkers=numWorkers
+        )
 
 
 if __name__ == '__main__':
-    wrapper = SRUWrapper()
-    test = wrapper.get(terms='brazza', startDate='1905-4-10', endDate='1905-4-01', grouping='all')
-    print(len(test))
+    wrapper = FullTextWrapper()
+    test = wrapper.get('bpt6k5891662')
+    print(test)

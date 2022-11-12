@@ -12,19 +12,17 @@ def buildRequest(identifier, argsBundles):
         identifier=identifier,
         argsBundles=argsBundles,
         statKeeper=initProgressStats,
-        searchBuilder=buildSearch,
-        conn=getConn()
+        searchBuilder=buildSearch
     )
 
 
 class Request(threading.Thread):
-    def __init__(self, identifier, argsBundles, statKeeper, searchBuilder, conn):
+    def __init__(self, identifier, argsBundles, statKeeper, searchBuilder):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.state = 'RUNNING'
         self.requestID = identifier
         self.estimateNumRecords = 0
-        self.dbConn = conn
         self.argsBundles = argsBundles
         self.searches = None
         self.statBuilder = statKeeper
@@ -72,7 +70,8 @@ class Request(threading.Thread):
         return numRecords < min(dbSpaceRemainingWithBuffer, RECORD_LIMIT)
 
     def getNumberRowsStoredInAllTables(self):
-        with self.dbConn.cursor() as curs:
+        conn = getConn()
+        with conn.cursor() as curs:
             curs.execute(
                 """
                 SELECT sum(reltuples)::bigint AS estimate
@@ -101,3 +100,18 @@ class Request(threading.Thread):
             for key, argsBundle in self.argsBundles.items()
         }
         return progressDict
+
+
+if __name__ == '__main__':
+    request = buildRequest(
+        identifier='test',
+        argsBundles={
+            '0': {
+                'terms': 'brazza',
+                'grouping': 'year',
+                'startDate': None,
+                'endDate': None
+            }
+        }
+    )
+    request.run()

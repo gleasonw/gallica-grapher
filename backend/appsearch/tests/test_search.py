@@ -1,7 +1,7 @@
-from search import AllSearch
-from search import buildSearch
-from search import GroupedSearch
-from search import PaperSearch
+from appsearch.search import AllSearch
+from appsearch.search import buildSearch
+from appsearch.search import GroupedSearch
+from appsearch.search import PaperSearch
 from unittest import TestCase
 from unittest.mock import MagicMock
 

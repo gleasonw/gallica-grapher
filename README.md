@@ -2,7 +2,7 @@
 
 Culture and identity were once local, the products of community and conversation. The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Culture became national as individual opinions ascended to group opinions; “public opinion” rose into being, looming over the political class, and the press was its handler.
 
-This app integrates with the French National Archives Gallica API, allowing for rapid text searches over thousands of periodicals. The app routes requests to Gallica, parses the responses, and creates a trend line. Selecting a point will bring up the associated records in a table beneath the graph.
+This app integrates with the French National Archives Gallica API to allow rapid text searches over thousands of periodicals. The app routes requests to Gallica, parses the responses, and creates a trend line. Selecting a point will bring up the associated records in a table beneath the graph.
 
 
 ### Do I need to speak French to use it?
@@ -23,9 +23,6 @@ European editions in English, such as the New York Herald. Play around with it!
 blasting the French national library's servers, I have erred on a smaller number of worker threads.
 
 ### What do I see on the results page?
-
-The Gallica API returns a record for any occurrence of a term in a periodical issue. I parse these records
-and group occurrences for a given bin size (year, month, or day) to create a time series for each request.  
 
 Beneath the chart is a table of records pulled from Gallica, with links to the scanned periodical. Clicking on
 a point in the chart will list the corresponding records. You can also make direct requests by entering

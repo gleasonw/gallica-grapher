@@ -1,5 +1,4 @@
 from celery import Celery
-from appsearch.request import Request
 import time
 from appsearch.request import buildRequest
 
