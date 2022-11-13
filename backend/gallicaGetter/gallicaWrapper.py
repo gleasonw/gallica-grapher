@@ -76,9 +76,9 @@ class SRUWrapper(GallicaWrapper):
         )
         return recordGenerator if generate else list(recordGenerator)
 
-    def buildQueries(self, kwargs, queriesWithCounts):
-        if queriesWithCounts:
-            return self.queryBuilder.indexQueriesWithNumResults(queriesWithCounts)
+    def buildQueries(self, kwargs, queries_with_counts):
+        if queries_with_counts:
+            return self.queryBuilder.indexQueriesWithNumResults(queries_with_counts)
         else:
             return self.queryBuilder.buildQueriesForArgs(kwargs)
 
@@ -184,6 +184,5 @@ class FullTextWrapper(GallicaWrapper):
 
 
 if __name__ == '__main__':
-    wrapper = FullTextWrapper()
-    test = wrapper.get(['bpt6k5891662', 'bpt6k5881238'])
-    print(test[1].get_ocr_quality())
+    wrapper = SRUWrapper()
+    test = wrapper.get('brazza', codes='cb32895690j', grouping='all')

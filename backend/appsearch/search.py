@@ -1,6 +1,5 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 import gallicaGetter
-from gallicaGetter.queryBuilder import NUM_CODES_PER_BUNDLE
 
 
 def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
@@ -23,7 +22,6 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
         search = bundle.get('grouping')
         runner = searches[search](**initParams)
         if search != 'all' and runner.moreDateIntervalsThanRecordBatches() and len(argBundles.items()) == 1:
-            #TODO: save num results and pass to all search to avoid duplicate work
             bundle['grouping'] = 'all'
             runner = AllSearch(**initParams)
             stateHooks.onSearchChangeToAll(key)
