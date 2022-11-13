@@ -13,8 +13,7 @@ class Response:
 
 class Get:
 
-    def __init__(self, baseUrl, maxSize=50):
-        self.baseUrl = baseUrl
+    def __init__(self, maxSize=50):
         self.maxSize = maxSize
         self.http = self.buildUrllib3()
 
@@ -34,7 +33,7 @@ class Get:
         start = time.perf_counter()
         response = self.http.request(
             "GET",
-            self.baseUrl,
+            query.getBaseURL(),
             fields=query.getFetchParams()
         )
         end = time.perf_counter()

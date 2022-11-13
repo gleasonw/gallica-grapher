@@ -12,8 +12,8 @@ NUM_CODES_PER_BUNDLE = 10
 
 class QueryBuilder:
 
-    def __init__(self, gallicaAPI=None):
-        self.callbackAPI = gallicaAPI
+    def __init__(self, props):
+        self.props = props
         self.parser = GallicaXMLparse()
 
     def createIndexedQueriesFromRootQueries(self, queries, limit=None) -> list:
@@ -34,7 +34,7 @@ class QueryBuilder:
         return indexedQueries
 
     def getNumResultsForEachQuery(self, queries) -> list:
-        responses = self.callbackAPI.get(queries)
+        responses = self.props.api.get(queries)
         numResultsForQueries = [
             (response.query, self.parser.getNumRecords(response.data))
             for response in responses
@@ -69,7 +69,7 @@ class OccurrenceQueryBuilder(QueryBuilder):
                 startDate=startDate,
                 endDate=endDate,
                 searchMetaData=args,
-                codes=codeBundle
+                codes=codeBundle,
             )
             for term in terms
             for startDate, endDate in DateGrouping(
@@ -86,6 +86,7 @@ class OccurrenceQueryBuilder(QueryBuilder):
             for i in range(0, len(codes), NUM_CODES_PER_BUNDLE)
         ]
 
+    #TODO: use fewer args, reference props instead
     def makeQuery(self, term, startDate, endDate, searchMetaData, startIndex=0, numRecords=1, codes=None):
         codes = codes or []
         return OccurrenceQuery(
@@ -96,6 +97,7 @@ class OccurrenceQueryBuilder(QueryBuilder):
             codes=codes,
             startDate=startDate,
             endDate=endDate,
+            baseURL=self.props.getBaseURL()
         )
 
 
@@ -116,7 +118,8 @@ class PaperQueryBuilder(QueryBuilder):
             sruQuery = PaperQuery(
                 startIndex=0,
                 numRecords=NUM_CODES_PER_BUNDLE,
-                codes=codesForQuery
+                codes=codesForQuery,
+                baseURL=self.props.getBaseURL()
             )
             sruQueries.append(sruQuery)
         return sruQueries
@@ -125,7 +128,8 @@ class PaperQueryBuilder(QueryBuilder):
         return self.createIndexedQueriesFromRootQueries([
             PaperQuery(
                 startIndex=0,
-                numRecords=1
+                numRecords=1,
+                baseURL=self.props.getBaseURL()
             )
         ])
 
@@ -133,7 +137,10 @@ class PaperQueryBuilder(QueryBuilder):
         if type(codes) == str:
             codes = [codes]
         return [
-            ArkQueryForNewspaperYears(code=code)
+            ArkQueryForNewspaperYears(
+                code=code,
+                baseURL=self.props.getBaseURL()
+            )
             for code in codes
         ]
 
@@ -141,25 +148,36 @@ class PaperQueryBuilder(QueryBuilder):
         return PaperQuery(
             startIndex=startIndex,
             numRecords=numRecords,
-            codes=codes
+            codes=codes,
+            baseURL=self.props.getBaseURL()
         )
 
 
 class ContentQueryBuilder:
 
+    def __init__(self, props):
+        self.props = props
+
     def buildQueryForArkAndTerm(self, ark, term):
         return ContentQuery(
             ark=ark,
-            term=term
+            term=term,
+            baseURL=self.props.baseURL
         )
 
 
 class FullTextQueryBuilder:
 
+    def __init__(self, props):
+        self.props = props
+
     def buildQueriesForArkCodes(self, arkCodes):
         if type(arkCodes) is not list:
             arkCodes = [arkCodes]
         return [
-            FullTextQuery(ark=code)
+            FullTextQuery(
+                ark=code,
+                baseURL=self.props.baseURL
+            )
             for code in arkCodes
         ]

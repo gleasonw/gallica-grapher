@@ -26,6 +26,7 @@ class TestQueryBuilder(TestCase):
                     term='test',
                     startIndex=0,
                     numRecords=1,
+                    baseURL='test'
                 ),
                 1205
             ),
@@ -37,6 +38,7 @@ class TestQueryBuilder(TestCase):
                     term='test',
                     startIndex=0,
                     numRecords=1,
+                    baseURL='test'
                 ),
                 1895
             ),

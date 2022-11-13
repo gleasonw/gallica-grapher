@@ -1,13 +1,64 @@
 class Query:
 
-    def __init__(self, **kwargs):
+    def __init__(self, baseURL, **kwargs):
+        self.baseURL = baseURL
         self.postInit(kwargs)
+
+    def getBaseURL(self):
+        return self.baseURL
 
     def getFetchParams(self):
         raise NotImplementedError
 
     def postInit(self, kwargs):
         pass
+
+
+class FullTextQuery(Query):
+
+    def postInit(self, kwargs):
+        self.ark = kwargs["ark"]
+
+    def getBaseURL(self):
+        return f'{self.baseURL}/ark:/12148/{self.ark}.texteBrut'
+
+    def getFetchParams(self):
+        return {}
+
+    def __repr__(self) -> str:
+        return f'RawTextQuery({self.ark})'
+
+
+class ArkQueryForNewspaperYears(Query):
+
+    def postInit(self, kwargs):
+        self.ark = f'ark:/12148/{kwargs["code"]}/date'
+        self.code = kwargs['code']
+
+    def getCode(self):
+        return self.code
+
+    def getFetchParams(self):
+        return {"ark": self.ark}
+
+    def __repr__(self):
+        return f'ArkQuery({self.ark})'
+
+
+class ContentQuery(Query):
+
+    def postInit(self, kwargs):
+        self.ark = kwargs['ark']
+        self.term = kwargs['term']
+
+    def getFetchParams(self):
+        return {
+            "ark": self.ark,
+            "query": self.term
+        }
+
+    def __repr__(self):
+        return f'OCRQuery({self.ark}, {self.term})'
 
 
 class SRUQuery(Query):
@@ -104,34 +155,6 @@ class OccurrenceQuery(SRUQuery):
         return f"Query({self.getCQL()})"
 
 
-class ArkQueryForNewspaperYears(Query):
-
-    def postInit(self, kwargs):
-        self.ark = f'ark:/12148/{kwargs["code"]}/date'
-        self.code = kwargs['code']
-
-    def getCode(self):
-        return self.code
-
-    def getFetchParams(self):
-        return {"ark": self.ark}
-
-    def __repr__(self):
-        return f'ArkQuery({self.ark})'
-
-
-class FullTextQuery(Query):
-
-    def postInit(self, kwargs):
-        self.ark = f'ark:/12148/{kwargs["ark"]}.texteBrut'
-
-    def getFetchParams(self):
-        return {"ark": self.ark}
-
-    def __repr__(self) -> str:
-        return f'RawTextQuery({self.ark})'
-
-
 class PaperQuery(SRUQuery):
 
     def postInit(self, kwargs):
@@ -150,20 +173,6 @@ class PaperQuery(SRUQuery):
         return f'PaperQuery({self.codes}, {self.startIndex}, {self.numRecords})'
 
 
-class ContentQuery(Query):
-
-    def postInit(self, kwargs):
-        self.ark = kwargs['ark']
-        self.term = kwargs['term']
-
-    def getFetchParams(self):
-        return {
-            "ark": self.ark,
-            "query": self.term
-        }
-
-    def __repr__(self):
-        return f'OCRQuery({self.ark}, {self.term})'
 
 
 

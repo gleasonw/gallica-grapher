@@ -25,22 +25,6 @@ class TestGallicaWrapper(TestCase):
         ]
 
     #Liskov tests
-    def test_responds_to_get(self):
-        [self.assertTrue(hasattr(api, 'get')) for api in self.gallicaAPIs]
-
-    #subclass responsibility tests
-    def test_responds_to_preInit(self):
-        [self.assertTrue(hasattr(api, 'preInit')) for api in self.gallicaAPIs]
-
-    def test_responds_to_buildAPI(self):
-        [self.assertTrue(hasattr(api, 'buildAPI')) for api in self.gallicaAPIs]
-
-    def test_responds_to_buildQueryBuilder(self):
-        [self.assertTrue(hasattr(api, 'buildQueryBuilder')) for api in self.gallicaAPIs]
-
-    def test_responds_to_buildParser(self):
-        [self.assertTrue(hasattr(api, 'buildParser')) for api in self.gallicaAPIs]
-
     def test_connect(self):
         self.assertIsInstance(connect('sru'), SRUWrapper)
         self.assertIsInstance(connect('issues'), IssuesWrapper)
@@ -49,23 +33,18 @@ class TestGallicaWrapper(TestCase):
         with self.assertRaises(ValueError):
             connect('not an api')
 
-#subclass state tests
-
 
 class TestSRUWrapper(TestCase):
 
     def setUp(self) -> None:
         self.api = SRUWrapper()
 
-    def test_buildAPI(self):
-        self.assertIsInstance(self.api.buildAPI(10), ConcurrentFetch)
-
-    def test_buildQueryBuilder(self):
-        self.assertIsInstance(self.api.buildQueryBuilder(), OccurrenceQueryBuilder)
+    def test_getQueryBuilder(self):
+        self.assertIsInstance(self.api.getQueryBuilder(), OccurrenceQueryBuilder)
 
     def test_get(self):
         getter = SRUWrapper()
-        getter.getFromQueries = MagicMock()
+        getter.fetchFromQueries = MagicMock()
 
         self.assertIsInstance(
             getter.get(terms='a term'),
@@ -78,11 +57,8 @@ class TestIssuesWrapper(TestCase):
     def setUp(self) -> None:
         self.api = IssuesWrapper()
 
-    def test_buildAPI(self):
-        self.assertIsInstance(self.api.buildAPI(10), ConcurrentFetch)
-
-    def test_buildQueryBuilder(self):
-        self.assertIsInstance(self.api.buildQueryBuilder(), PaperQueryBuilder)
+    def test_getQueryBuilder(self):
+        self.assertIsInstance(self.api.getQueryBuilder(), PaperQueryBuilder)
 
     def test_buildParser(self):
         self.assertIsInstance(self.api.parser, ParseArkRecord)
@@ -90,7 +66,7 @@ class TestIssuesWrapper(TestCase):
     def test_get(self):
         getter = IssuesWrapper()
         getter.queryBuilder = MagicMock()
-        getter.getFromQueries = MagicMock()
+        getter.fetchFromQueries = MagicMock()
 
         self.assertIsInstance(
             getter.get('a paper code'),
@@ -103,11 +79,8 @@ class TestContentWrapper(TestCase):
         def setUp(self) -> None:
             self.api = ContentWrapper()
 
-        def test_buildAPI(self):
-            self.assertIsInstance(self.api.buildAPI(10), ConcurrentFetch)
-
-        def test_buildQueryBuilder(self):
-            self.assertIsInstance(self.api.buildQueryBuilder(), ContentQueryBuilder)
+        def test_getQueryBuilder(self):
+            self.assertIsInstance(self.api.getQueryBuilder(), ContentQueryBuilder)
 
         def test_buildParser(self):
             self.assertIsInstance(self.api.parser, ParseContentRecord)
@@ -115,7 +88,7 @@ class TestContentWrapper(TestCase):
         def test_get(self):
             getter = ContentWrapper()
             getter.queryBuilder = MagicMock()
-            getter.getFromQueries = MagicMock()
+            getter.fetchFromQueries = MagicMock()
 
             self.assertIsInstance(
                 getter.get(
@@ -131,20 +104,13 @@ class TestPapersWrapper(TestCase):
         def setUp(self) -> None:
             self.paperWrapper = PapersWrapper()
 
-        def test_buildAPI(self):
-            self.assertIsInstance(self.paperWrapper.buildAPI(10), ConcurrentFetch)
-
-        def test_buildQueryBuilder(self):
-            self.assertIsInstance(self.paperWrapper.buildQueryBuilder(), PaperQueryBuilder)
-
-        def test_buildParser(self):
-            self.assertIsInstance(self.paperWrapper.buildParser(), ParsePaperRecords)
+        def test_getQueryBuilder(self):
+            self.assertIsInstance(self.paperWrapper.getQueryBuilder(), PaperQueryBuilder)
 
         def test_get(self):
-            #TODO: many dependencies.
             getter = PapersWrapper()
             getter.queryBuilder = MagicMock()
-            getter.getFromQueries = MagicMock()
+            getter.fetchFromQueries = MagicMock()
             getter.issuesWrapper = MagicMock()
 
             self.assertIsInstance(getter.get('a paper code'), list)

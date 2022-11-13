@@ -4,11 +4,13 @@ from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from gallicaGetter.build.queryBuilder import PaperQueryBuilder
 from gallicaGetter.build.queryBuilder import FullTextQueryBuilder
 from gallicaGetter.parse.parseRecord import buildParser
+from typing import List
 
 
 class GallicaWrapper:
     def __init__(self, **kwargs):
-        self.api = self.getAPI(kwargs.get('numWorkers', 10))
+        self.api = ConcurrentFetch(numWorkers=kwargs.get('numWorkers', 10))
+        self.baseURL = self.getBaseURL()
         self.parser = None
         self.queryBuilder = self.getQueryBuilder()
         self.postInit(kwargs)
@@ -19,11 +21,11 @@ class GallicaWrapper:
     def get(self, **kwargs):
         raise NotImplementedError(f'get() not implemented for {self.__class__.__name__}')
 
-    def getAPI(self, numWorkers):
-        raise NotImplementedError(f'buildAPI() not implemented for {self.__class__.__name__}')
-
     def getQueryBuilder(self):
         raise NotImplementedError(f'buildQueryBuilder() not implemented for {self.__class__.__name__}')
+
+    def getBaseURL(self):
+        raise NotImplementedError(f'getBaseURL() not implemented for {self.__class__.__name__}')
         
     def fetchFromQueries(self, queries, parser, onUpdateProgress=None):
         rawResponse = self.api.get(
@@ -51,14 +53,24 @@ class SRUWrapper(GallicaWrapper):
             requestID=kwargs.get('requestID')
         )
 
-    def get(self, terms, onUpdateProgress=None, generate=False, queriesWithCounts=None, **kwargs):
+    def getQueryBuilder(self):
+        return OccurrenceQueryBuilder(props=self)
+
+    def getBaseURL(self):
+        return 'https://gallica.bnf.fr/SRU'
+
+    def get(self, terms, onUpdateProgress=None, generate=False, queriesWithCounts=None, **kwargs) -> List:
         grouping = kwargs.get('grouping')
         kwargs['terms'] = terms
         if grouping is None:
             grouping = 'year'
             kwargs['grouping'] = grouping
+        queries = self.buildQueries(
+            kwargs,
+            queriesWithCounts
+        )
         recordGenerator = self.fetchFromQueries(
-            queries=self.buildQueries(kwargs, queriesWithCounts),
+            queries=queries,
             parser=self.soloRecordParser if grouping == 'all' else self.groupedRecordParser,
             onUpdateProgress=onUpdateProgress
         )
@@ -74,20 +86,17 @@ class SRUWrapper(GallicaWrapper):
         baseQueries = self.queryBuilder.buildBaseQueriesFromArgs(args)
         return self.queryBuilder.getNumResultsForEachQuery(baseQueries)
 
-    def getAPI(self, numWorkers):
-        return ConcurrentFetch(
-            baseUrl='https://gallica.bnf.fr/SRU',
-            numWorkers=numWorkers
-        )
-
-    def getQueryBuilder(self):
-        return OccurrenceQueryBuilder(gallicaAPI=self.api)
-
 
 class IssuesWrapper(GallicaWrapper):
 
     def postInit(self, kwargs):
         self.parser = buildParser('ark')
+
+    def getQueryBuilder(self):
+        return PaperQueryBuilder(props=self)
+
+    def getBaseURL(self):
+        return 'https://gallica.bnf.fr/services/Issues'
 
     def get(self, codes, generate=False):
         queries = self.queryBuilder.buildArkQueriesForCodes(codes)
@@ -97,20 +106,17 @@ class IssuesWrapper(GallicaWrapper):
         )
         return recordGenerator if generate else list(recordGenerator)
 
-    def getAPI(self, numWorkers):
-        return ConcurrentFetch(
-            'https://gallica.bnf.fr/services/Issues',
-            numWorkers=numWorkers
-        )
-
-    def getQueryBuilder(self):
-        return PaperQueryBuilder(gallicaAPI=self.api)
-
 
 class ContentWrapper(GallicaWrapper):
 
     def postInit(self, kwargs):
         self.parser = buildParser('content')
+
+    def getQueryBuilder(self):
+        return ContentQueryBuilder(props=self)
+
+    def getBaseURL(self):
+        return 'https://gallica.bnf.fr/services/ContentSearch'
 
     def get(self, ark, term, generate=False):
         query = self.queryBuilder.buildQueryForArkAndTerm(
@@ -123,21 +129,18 @@ class ContentWrapper(GallicaWrapper):
         )
         return recordGen if generate else list(recordGen)
 
-    def getQueryBuilder(self):
-        return ContentQueryBuilder()
-
-    def getAPI(self, numWorkers):
-        return ConcurrentFetch(
-            baseUrl='https://gallica.bnf.fr/services/ContentSearch',
-            numWorkers=numWorkers
-        )
-
 
 class PapersWrapper(GallicaWrapper):
 
     def postInit(self, kwargs):
         self.parser = buildParser('paper')
         self.issuesWrapper = IssuesWrapper()
+
+    def getQueryBuilder(self):
+        return PaperQueryBuilder(props=self)
+
+    def getBaseURL(self):
+        return 'https://gallica.bnf.fr/SRU'
 
     def get(self, argCodes, stateHooks=None, **kwargs):
         queries = self.queryBuilder.buildQueriesForArgs(argCodes)
@@ -156,20 +159,17 @@ class PapersWrapper(GallicaWrapper):
     def getNumResultsForArgs(self, **kwargs):
         pass
 
-    def getAPI(self, numWorkers):
-        return ConcurrentFetch(
-            baseUrl='https://gallica.bnf.fr/SRU',
-            numWorkers=numWorkers
-        )
-
-    def getQueryBuilder(self):
-        return PaperQueryBuilder(gallicaAPI=self.api)
-
 
 class FullTextWrapper(GallicaWrapper):
 
     def postInit(self, kwargs):
         self.parser = buildParser('fullText')
+
+    def getBaseURL(self):
+        return 'https://gallica.bnf.fr'
+
+    def getQueryBuilder(self):
+        return FullTextQueryBuilder(props=self)
 
     def get(self, arkCodes, generate=False):
         queries = self.queryBuilder.buildQueriesForArkCodes(arkCodes)
@@ -179,20 +179,11 @@ class FullTextWrapper(GallicaWrapper):
         )
         return recordGen if generate else list(recordGen)
 
-    def getQueryBuilder(self):
-        return FullTextQueryBuilder()
-
     def buildParser(self):
-        return 
-
-    def getAPI(self, numWorkers):
-        return ConcurrentFetch(
-            baseUrl='https://gallica.bnf.fr/',
-            numWorkers=numWorkers
-        )
+        return
 
 
 if __name__ == '__main__':
     wrapper = FullTextWrapper()
-    test = wrapper.get('bpt6k5891662')
-    print(test)
+    test = wrapper.get(['bpt6k5891662', 'bpt6k5881238'])
+    print(test[1].get_ocr_quality())

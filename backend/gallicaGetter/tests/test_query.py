@@ -7,7 +7,8 @@ class TestOCRQuery(TestCase):
     def setUp(self) -> None:
         self.ocrQuery = ContentQuery(
             ark='test',
-            term='test'
+            term='test',
+            baseURL='test'
         )
 
     def test_get_fetch_params(self):
@@ -28,6 +29,7 @@ class TestPaperQuery(TestCase):
         self.paperQuery = PaperQuery(
             startIndex=0,
             numRecords=10,
+            baseURL='test'
         )
 
     def test_get_cql_all_papers(self):
@@ -42,7 +44,8 @@ class TestArkQueryForNewspaperYears(TestCase):
 
     def setUp(self) -> None:
         self.arkQuery = ArkQueryForNewspaperYears(
-            code='test'
+            code='test',
+            baseURL='test'
         )
 
     def test_get_fetch_params(self):
@@ -68,6 +71,7 @@ class TestQuery(TestCase):
                 'linkDistance': 0,
                 'linkTerm': ''
             },
+            baseURL='test'
         )
         self.queryWithoutCodes = OccurrenceQuery(
             term='test',
@@ -80,7 +84,8 @@ class TestQuery(TestCase):
                 'linkDistance': 0,
                 'linkTerm': ''
             },
-            codes=[]
+            codes=[],
+            baseURL='test'
         )
         self.queryWithLinkTermAndDistance = OccurrenceQuery(
             term='test',
@@ -93,7 +98,8 @@ class TestQuery(TestCase):
                 'linkDistance': 0,
                 'linkTerm': ''
             },
-            codes=[]
+            codes=[],
+            baseURL='test'
         )
 
     def test_get_fetch_params_given_codes(self):
