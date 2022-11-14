@@ -6,8 +6,8 @@ from gallicaGetter.parse.groupedCountRecord import GroupedCountRecord
 def get(**kwargs):
     convertedArgs = {
         'recherche': kwargs['terms'],
-        'corpus': 'presse',
-        'somme': True
+        'somme': True,
+        'corpus': 'presse'
     }
     if start := kwargs.get('startDate'):
         convertedArgs['debut'] = Date(start).getYear()
