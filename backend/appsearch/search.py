@@ -1,5 +1,6 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 import gallicaGetter
+import pyllicaWrapper
 
 
 def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
@@ -10,21 +11,15 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
     }
     searchObjs = []
     for key, bundle in argBundles.items():
+        search = bundle.get('grouping')
+        api = wrapper if search == 'all' else pyllicaWrapper
         initParams = {
             'identifier': key,
             'args': bundle,
             'stateHooks': stateHooks,
-            'connectable': wrapper
+            'connectable': api
         }
-        if not bundle.get('startDate') and not bundle.get('endDate'):
-            bundle['grouping'] = 'all'
-            stateHooks.onSearchChangeToAll(key)
-        search = bundle.get('grouping')
         runner = searches[search](**initParams)
-        if search != 'all' and runner.moreDateIntervalsThanRecordBatches() and len(argBundles.items()) == 1:
-            bundle['grouping'] = 'all'
-            runner = AllSearch(**initParams)
-            stateHooks.onSearchChangeToAll(key)
         searchObjs.append(runner)
     return searchObjs
 
@@ -117,25 +112,14 @@ class AllSearch(Search):
 
 class GroupedSearch(Search):
 
-    def getAPIWrapper(self, wrapper):
-        return wrapper.connect(
-            gallicaAPIselect='sru',
-            ticketID=self.identifier,
-            requestID=self.stateHooks.requestID
-        )
+    def getAPIWrapper(self, connectable):
+        return connectable
 
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-        if not self.args.get('endDate') or not self.args.get('startDate'):
-            numRecords = 1
-        else:
-            numRecords = int(self.args['endDate'][0:4]) + 1 - int(self.args['startDate'][0:4]) + 1
-            if self.args['grouping'] == 'month':
-                numRecords *= 12
-            if self.args.get('codes'):
-                numRecords *= (len(self.args['codes']) // NUM_CODES_PER_BUNDLE) + 1
+        numRecords = 5
         onNumRecordsFound and onNumRecordsFound(self, numRecords)
         return numRecords
 
@@ -154,6 +138,21 @@ class PaperSearch(Search):
 
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoPapers
+
+
+if __name__=='__main__':
+    testSearch = buildSearch(
+        argBundles={
+            'test': {
+                'terms': 'brazza',
+                'startDate': '1900-01-01',
+                'endDate': '1900-12-31',
+                'grouping': 'year',
+                'requestID': 'test'
+            }
+        },
+    )
+    print(testSearch)
 
 
 

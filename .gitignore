@@ -38,6 +38,9 @@ MANIFEST
 *.manifest
 *.spec
 
+# PyCharm
+.idea/
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -105,6 +108,9 @@ celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
+
+# Forked pyllicagram
+pyllicagram/
 
 # Environments
 .env
