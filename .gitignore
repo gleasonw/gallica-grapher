@@ -115,9 +115,6 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Forked pyllicagram
-pyllicagram/
-
 # Environments
 .env
 .venv
