@@ -123,13 +123,6 @@ class GroupedSearch(Search):
         onNumRecordsFound and onNumRecordsFound(self, numRecords)
         return numRecords
 
-    def moreDateIntervalsThanRecordBatches(self):
-        args = {**self.args, 'grouping': 'all'}
-        firstResult = self.api.getNumResultsForArgs(args)[0]
-        numResults = firstResult[1]
-        numIntervals = self.getNumRecordsToBeInserted()
-        return int(numResults / 50) < numIntervals
-
 
 class PaperSearch(Search):
 
