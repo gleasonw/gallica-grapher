@@ -1,4 +1,4 @@
-from gallicaGetter.gallicaxmlparse import GallicaXMLparse
+from gallicaGetter.parse.gallicaxmlparse import GallicaXMLparse
 from dbops.connContext import getConn
 import gallicaGetter
 

@@ -1,6 +1,6 @@
 from dbops.schemaLinkForSearch import SchemaLinkForSearch
 import gallicaGetter
-import pyllicaWrapper
+import appsearch.pyllicaWrapper as pyllicaWrapper
 
 
 def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
@@ -132,20 +132,7 @@ class PaperSearch(Search):
     def getDBinsert(self):
         return self.dbLink.insertRecordsIntoPapers
 
-
-if __name__=='__main__':
-    testSearch = buildSearch(
-        argBundles={
-            'test': {
-                'terms': 'brazza',
-                'startDate': '1900-01-01',
-                'endDate': '1900-12-31',
-                'grouping': 'year',
-                'requestID': 'test'
-            }
-        },
-    )
-    print(testSearch)
-
+    def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
+        return 5
 
 

@@ -108,7 +108,7 @@ if __name__ == '__main__':
         argsBundles={
             '0': {
                 'terms': 'brazza',
-                'grouping': 'year',
+                'grouping': 'month',
                 'startDate': None,
                 'endDate': None
             }

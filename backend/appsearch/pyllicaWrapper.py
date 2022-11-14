@@ -18,6 +18,7 @@ def get(**kwargs):
     return convert_data_frame_to_grouped_record(pyllica(**convertedArgs))
 
 
+#TODO: requestid and ticketid passing
 def convert_data_frame_to_grouped_record(df):
     if 'mois' not in df.columns:
         dates = df.annee

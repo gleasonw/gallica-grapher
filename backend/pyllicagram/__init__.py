@@ -1,11 +1,12 @@
 import urllib
-import ssl
 import pandas as pd
-
-ssl._create_default_https_context = ssl._create_unverified_context
 
 
 def pyllicagram(recherche, corpus="presse", debut=1789, fin=1950, resolution="default", somme=False):
+
+    # forked from https://github.com/regicid/pyllicagram
+    # credits Benjamin Azoulay and Benoît de Courson
+
     if not isinstance(recherche, str) and not isinstance(recherche, list):
         raise ValueError("La recherche doit être une chaîne de caractères ou une liste")
     if not isinstance(recherche, list):
