@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+#PyCharm... kill it with fire!
+
+.idea/
+.idea
+
 # Distribution / packaging
 .Python
 build/
