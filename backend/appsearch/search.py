@@ -119,11 +119,7 @@ class GroupedSearch(Search):
         return self.dbLink.insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-<<<<<<< HEAD
         numRecords = 5
-=======
-        numRecords = 0
->>>>>>> b47b2ff73479e7250ba94d24d6ef0f92145089cb
         onNumRecordsFound and onNumRecordsFound(self, numRecords)
         return numRecords
 
