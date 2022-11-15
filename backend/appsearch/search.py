@@ -1,4 +1,7 @@
-from dbops.schemaLinkForSearch import SchemaLinkForSearch
+from dbops.insertRecordsOps import (
+    insertRecordsIntoGroupCounts,
+    insertRecordsIntoResults,
+)
 import gallicaGetter
 import appsearch.pyllicaWrapper as pyllicaWrapper
 
@@ -15,7 +18,7 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
         api = wrapper if search == 'all' else pyllicaWrapper
         initParams = {
             'identifier': key,
-            'args': bundle,
+            'input_args': bundle,
             'stateHooks': stateHooks,
             'connectable': api
         }
@@ -24,18 +27,16 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
     return searchObjs
 
 
-#refactor, move the specifics of state hooks and identifiers down to grouped search and all search
 class Search:
 
-    def __init__(self, identifier, stateHooks, args, connectable):
+    def __init__(self, input_args, connectable, stateHooks, identifier):
+        self.args = {
+            **input_args,
+            'startDate': input_args['startDate'],
+            'endDate': input_args['endDate']
+        }
         self.identifier = identifier
         self.stateHooks = stateHooks
-        self.args = {
-            **args,
-            'startDate': args['startDate'],
-            'endDate': args['endDate']
-        }
-        self.dbLink = SchemaLinkForSearch(requestID=stateHooks.requestID)
         self.insertRecordsToDB = self.getDBinsert()
         self.api = self.getAPIWrapper(connectable)
         self.postInit()
@@ -60,17 +61,8 @@ class Search:
         raise NotImplementedError
 
     def buildAPIFetchArgs(self):
-        baseArgs= {
-            'onUpdateProgress': lambda progressStats: self.stateHooks.setSearchProgressStats(
-                progressStats={
-                    **progressStats,
-                    "ticketID": self.identifier
-                }
-            ),
-            **self.args
-        }
-        baseArgs.update(self.getLocalFetchArgs())
-        return baseArgs
+        self.args.update(self.getLocalFetchArgs())
+        return self.args
 
     def postInit(self):
         pass
@@ -102,12 +94,18 @@ class AllSearch(Search):
         )
 
     def getDBinsert(self):
-        return self.dbLink.insertRecordsIntoResults
+        return insertRecordsIntoResults
 
     def getLocalFetchArgs(self):
         return {
             'queriesWithCounts': self.baseQueriesWithNumResults,
-            'generate': True
+            'generate': True,
+            'onUpdateProgress': lambda progressStats: self.stateHooks.setSearchProgressStats(
+                progressStats={
+                    **progressStats,
+                    "ticketID": self.identifier
+                }
+            )
         }
 
 
@@ -117,7 +115,7 @@ class GroupedSearch(Search):
         return connectable
 
     def getDBinsert(self):
-        return self.dbLink.insertRecordsIntoGroupCounts
+        return insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
         numRecords = 5
@@ -129,24 +127,3 @@ class GroupedSearch(Search):
             'ticketID': self.identifier,
             'requestID': self.stateHooks.requestID
         }
-
-
-class PaperSearch(Search):
-
-    def getAPIWrapper(self, wrapper):
-        return wrapper.connect('papers')
-
-    def getDBinsert(self):
-        return self.dbLink.insertRecordsIntoPapers
-
-    def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-        return 5
-
-
-if __name__ == '__main__':
-    getAllPapers = PaperSearch(
-        identifier='all',
-        stateHooks=None
-    )
-
-

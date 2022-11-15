@@ -108,9 +108,9 @@ if __name__ == '__main__':
         argsBundles={
             '1': {
                 'terms': 'brazza',
-                'grouping': 'month',
-                'startDate': None,
-                'endDate': None
+                'grouping': 'all',
+                'startDate': 1880,
+                'endDate': 1881
             }
         }
     )

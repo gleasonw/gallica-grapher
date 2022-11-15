@@ -1,7 +1,6 @@
 from appsearch.search import AllSearch
 from appsearch.search import buildSearch
 from appsearch.search import GroupedSearch
-from appsearch.search import PaperSearch
 from unittest import TestCase
 from unittest.mock import MagicMock
 
@@ -37,14 +36,12 @@ class TestSearch(TestCase):
     def setUp(self) -> None:
         initArgs = {
             'identifier': MagicMock(),
-            'args': MagicMock(),
+            'input_args': MagicMock(),
             'stateHooks': MagicMock(),
             'connectable': MagicMock()
         }
         self.searches = [
             AllSearch(**initArgs),
-            GroupedSearch(**initArgs),
-            PaperSearch(**initArgs)
         ]
 
     #Liskov tests
@@ -75,7 +72,7 @@ class TestAllSearch(TestCase):
     def setUp(self):
         self.search = AllSearch(
             identifier=MagicMock(),
-            args=MagicMock(),
+            input_args=MagicMock(),
             stateHooks=MagicMock(),
             connectable=MagicMock()
         )
@@ -91,69 +88,7 @@ class TestAllSearch(TestCase):
         onNumRecordsFound.assert_called_once_with(self.search, 3)
 
     def test_getLocalFetchArgs(self):
-        self.assertDictEqual(
-            self.search.getLocalFetchArgs(),
-            {
-                'queriesWithCounts' : self.search.baseQueriesWithNumResults,
-                'generate': True
-            }
-        )
-
-
-class TestGroupedSearch(TestCase):
-
-    def setUp(self) -> None:
-        initArgs = {
-            'identifier': MagicMock(),
-            'args': MagicMock(),
-            'stateHooks': MagicMock(),
-            'connectable': MagicMock()
-        }
-        self.yearSearch = GroupedSearch(
-            **{
-                **initArgs,
-                'args': {
-                    'grouping': 'year',
-                    'startDate': '1900',
-                    'endDate': '1901'
-                }
-            }
-        )
-        self.monthSearch = GroupedSearch(
-            **{
-                **initArgs,
-                'args': {
-                    'grouping': 'month',
-                    'startDate': '1900',
-                    'endDate': '1901'
-                }
-            }
-        )
-
-    def test_get_num_records_to_be_inserted_when_month_grouped(self):
-        onNumRecordsFound = MagicMock()
-        self.assertEqual(
-            self.monthSearch.getNumRecordsToBeInserted(onNumRecordsFound),
-            24
-        )
-        onNumRecordsFound.assert_called_once_with(self.monthSearch, 24)
-
-    def test_get_num_records_to_be_inserted_when_year_grouped(self):
-        onNumRecordsFound = MagicMock()
-        self.assertEqual(
-            self.yearSearch.getNumRecordsToBeInserted(onNumRecordsFound),
-            2
-        )
-        onNumRecordsFound.assert_called_once_with(self.yearSearch, 2)
-
-    def test_more_date_intervals_than_record_batches_when_many_results(self):
-        self.monthSearch.api.getNumResultsForArgs = MagicMock(return_value=[(None, 10000)])
-        self.assertFalse(self.monthSearch.moreDateIntervalsThanRecordBatches())
-
-    def test_more_date_intervals_than_record_batches_when_few_results(self):
-        self.monthSearch.api.getNumResultsForArgs = MagicMock(return_value=[(None, 1)])
-        self.assertTrue(self.monthSearch.moreDateIntervalsThanRecordBatches())
-
-
-
-
+        local_args = self.search.getLocalFetchArgs()
+        self.assertEqual(local_args['generate'], True)
+        self.assertEqual(local_args['queriesWithCounts'], self.search.baseQueriesWithNumResults)
+        self.assertIn('onUpdateProgress', local_args)
