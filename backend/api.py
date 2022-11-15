@@ -87,7 +87,7 @@ def getContinuousPapersOverRange():
     startDate = request.args.get('startDate')
     endDate = request.args.get('endDate')
     search = PaperLocalSearch()
-    selectPapers = search.selectPapersContinuousOverRange(
+    selectPapers = search.select_continuous_papers(
         startDate,
         endDate,
         limit

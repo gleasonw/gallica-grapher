@@ -14,29 +14,7 @@ export function DateInputBox(props) {
                 placeholder={1880}
                 onChange={(e) => props.onStartYearChange(e.target.value)}
             />
-            /
-            <ShadowedFocusInput
-                selected
-                type={'text'}
-                value={props.startMonth}
-                id={'month'}
-                className={'dateInput'}
-                placeholder={1}
-                onChange={(e) => props.onStartMonthChange(e.target.value)}
-            />
-            /
-            <ShadowedFocusInput
-                selected
-                type={'text'}
-                value={props.startDay}
-                id={'day'}
-                className={'dateInput'}
-                placeholder={1}
-                onChange={(e) => props.onStartDayChange(e.target.value)}
-            />
-
             and
-
             <ShadowedFocusInput
                 selected
                 type={'text'}
@@ -45,26 +23,6 @@ export function DateInputBox(props) {
                 className={'dateInput'}
                 placeholder={1900}
                 onChange={(e) => props.onEndYearChange(e.target.value)}
-            />
-            /
-            <ShadowedFocusInput
-                selected
-                type={'text'}
-                value={props.endMonth}
-                id={'endMonth'}
-                className={'dateInput'}
-                placeholder={12}
-                onChange={(e) => props.onEndMonthChange(e.target.value)}
-            />
-            /
-            <ShadowedFocusInput
-                selected
-                type={'text'}
-                value={props.endDay}
-                id={'endDay'}
-                className={'dateInput'}
-                placeholder={31}
-                onChange={(e) => props.onEndDayChange(e.target.value)}
             />
         </StyledDateInputs>
     )
@@ -76,6 +34,7 @@ const StyledDateInputs = styled.div`
     justify-content: space-between;
     align-items: center;
     margin: 0.5rem 0;
-    font-size: 1.5rem;
+    font-size: 30px;
     gap: 0.5rem;
+    width: auto;
    `;

@@ -3,11 +3,11 @@ from dbops.connContext import getConn
 
 class PaperLocalSearch:
 
-    def selectPapersContinuousOverRange(self, firstInputYear, secondInputYear, limit):
-        biggerYear = max(firstInputYear, secondInputYear)
-        smallerYear = min(firstInputYear, secondInputYear)
-        biggerYear = biggerYear or 9999
-        smallerYear = smallerYear or 0
+    def select_continuous_papers(self, start_year, end_year, limit):
+        bigger_year = max(start_year, end_year)
+        smaller_year = min(start_year, end_year)
+        bigger_year = bigger_year or 9999
+        smaller_year = smaller_year or 0
         query = """
         SELECT title, code, startdate, enddate
         FROM papers
@@ -18,14 +18,14 @@ class PaperLocalSearch:
         if limit:
             limit = int(limit)
             query += " LIMIT %s"
-            args = (smallerYear, biggerYear, limit,)
+            args = (smaller_year, bigger_year, limit,)
         else:
-            args = (smallerYear, biggerYear,)
-        dbConn = getConn()
-        with dbConn.cursor() as curs:
+            args = (smaller_year, bigger_year,)
+        conn = getConn()
+        with conn.cursor() as curs:
             curs.execute(query, args)
-            papersContinuousOverRange = curs.fetchall()
-            return paperDataToJSON(papersContinuousOverRange)
+            continuous_papers = curs.fetchall()
+            return paperDataToJSON(continuous_papers)
 
     def selectPapersSimilarToKeyword(self, keyword):
         dbConn = getConn()

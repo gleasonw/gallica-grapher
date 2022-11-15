@@ -1,6 +1,6 @@
 import {StyledOptionInput} from './StyledOptionInput';
 import OptionWrap from './OptionWrap';
-import {DateSelect} from '../shared/DateSelect';
+import {DateInputBox} from './DateInputBox';
 import LesserButton from '../shared/LesserButton';
 
 export default function DateRangeSelect(props) {
@@ -23,16 +23,11 @@ export default function DateRangeSelect(props) {
                     justifyContent={props.justifyContent}
                     display={'flex'}
                 >
-                    <DateSelect
-                        year={props.startYear}
-                        onYearChange={props.onStartYearChange}
-                        flexDirection={props.flexDirection}
-                    />
-                    and
-                    <DateSelect
-                        year={props.endYear}
-                        onYearChange={props.onEndYearChange}
-                        flexDirection={props.flexDirection}
+                    <DateInputBox
+                        startYear={props.startYear}
+                        endYear={props.endYear}
+                        onStartYearChange={props.onStartYearChange}
+                        onEndYearChange={props.onEndYearChange}
                     />
                 </OptionWrap>
             </StyledOptionInput>

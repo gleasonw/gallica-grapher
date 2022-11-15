@@ -47,12 +47,12 @@ class TestAPI(unittest.TestCase):
 
     @patch('backend.api.PaperLocalSearch')
     def test_get_continuous_papers_over_range(self, mock_search):
-        mock_search.selectPapersContinuousOverRange = MagicMock(return_value=1)
+        mock_search.select_continuous_papers = MagicMock(return_value=1)
         mock_search.return_value = mock_search
 
         testContinuousPapersOverRange = self.app.get('/api/continuousPapers?limit=1&startDate=0&endDate=100')
 
-        mock_search.selectPapersContinuousOverRange.assert_called_once_with('0', '100', '1')
+        mock_search.select_continuous_papers.assert_called_once_with('0', '100', '1')
         assert testContinuousPapersOverRange.status_code == 200
         self.assertEqual(testContinuousPapersOverRange.json['continuousPapers'], 1)
 

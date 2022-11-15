@@ -24,6 +24,7 @@ def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
     return searchObjs
 
 
+#refactor, move the specifics of state hooks and identifiers down to grouped search and all search
 class Search:
 
     def __init__(self, identifier, stateHooks, args, connectable):
@@ -140,5 +141,12 @@ class PaperSearch(Search):
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
         return 5
+
+
+if __name__ == '__main__':
+    getAllPapers = PaperSearch(
+        identifier='all',
+        stateHooks=None
+    )
 
 
