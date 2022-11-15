@@ -1,7 +1,7 @@
-from dbops.sqlForGraph import SQLforGraph
+from database.sqlForGraph import SQLforGraph
 import datetime
 import ciso8601
-from dbops.connContext import getConn
+from database.connContext import getConn
 
 
 class GraphSeriesBatch:

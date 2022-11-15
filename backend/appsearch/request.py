@@ -1,7 +1,7 @@
 import threading
 from appsearch.search import buildSearch
 from appsearch.searchprogressstats import initProgressStats
-from dbops.connContext import getConn
+from database.connContext import getConn
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000

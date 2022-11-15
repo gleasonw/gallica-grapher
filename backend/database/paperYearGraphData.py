@@ -1,5 +1,5 @@
 import json
-from dbops.connContext import getConn
+from database.connContext import getConn
 
 
 class PaperYearGraphData:

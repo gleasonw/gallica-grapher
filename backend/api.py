@@ -4,10 +4,10 @@ from flask import request
 from flask_cors import CORS
 import random
 import json
-from dbops.localPaperSearch import PaperLocalSearch
-from dbops.graphSeriesBatch import GraphSeriesBatch
+from database.paperSearchResolver import PaperLocalSearch
+from database.graphDataResolver import GraphSeriesBatch
 from tasks import spawnRequest
-from dbops.recordDataForUser import RecordDataForUser
+from database.displayDataResolvers import RecordDataForUser
 
 app = Flask(__name__)
 CORS(app)
