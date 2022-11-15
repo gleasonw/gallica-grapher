@@ -1,12 +1,12 @@
 from database.recordInsertResolvers import (
-    insertRecordsIntoGroupCounts,
-    insertRecordsIntoResults,
+    insert_records_into_groupcounts,
+    insert_records_into_results
 )
 import gallicaGetter
 import appsearch.pyllicaWrapper as pyllicaWrapper
 
 
-def build_searches_for_tickets(args_for_tickets, stateHooks):
+def build_searches_for_tickets(args_for_tickets, stateHooks, conn):
     # Pyllica has no support for specific periodical codes, so we must route requests with codes to
     # the less-accurate gallicaGetter. Bool = True if codes provided.
     search_routes = {
@@ -22,7 +22,8 @@ def build_searches_for_tickets(args_for_tickets, stateHooks):
         initParams = {
             'identifier': ticketID,
             'input_args': params,
-            'stateHooks': stateHooks
+            'stateHooks': stateHooks,
+            'conn': conn,
         }
         SearchClass = search_routes[
             (params.get('grouping'), bool(params.get('codes')))
@@ -39,7 +40,7 @@ def build_searches_for_tickets(args_for_tickets, stateHooks):
 
 class Search:
 
-    def __init__(self, input_args, stateHooks, identifier):
+    def __init__(self, input_args, stateHooks, identifier, conn):
         self.args = {
             **input_args,
             'startDate': input_args['startDate'],
@@ -47,6 +48,7 @@ class Search:
         }
         self.identifier = identifier
         self.stateHooks = stateHooks
+        self.conn = conn
         self.insertRecordsToDB = self.getDBinsert()
         self.api = self.getAPIWrapper()
         self.postInit()
@@ -58,7 +60,8 @@ class Search:
         return self.insertRecordsToDB(
             records=self.api.get(**self.buildAPIFetchArgs()),
             identifier=self.identifier,
-            stateHooks=self.stateHooks
+            stateHooks=self.stateHooks,
+            conn=self.conn
         )
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound):
@@ -104,7 +107,7 @@ class AllSearch(Search):
         )
 
     def getDBinsert(self):
-        return insertRecordsIntoResults
+        return insert_records_into_results
 
     def getLocalFetchArgs(self):
         return {
@@ -125,7 +128,7 @@ class PyllicaSearch(Search):
         return pyllicaWrapper
 
     def getDBinsert(self):
-        return insertRecordsIntoGroupCounts
+        return insert_records_into_groupcounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
         return get_num_periods_in_range_for_grouping(
@@ -151,7 +154,7 @@ class GallicaGroupedSearch(Search):
         )
 
     def getDBinsert(self):
-        return insertRecordsIntoGroupCounts
+        return insert_records_into_groupcounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
         return get_num_periods_in_range_for_grouping(

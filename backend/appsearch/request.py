@@ -1,23 +1,23 @@
 import threading
 from appsearch.search import build_searches_for_tickets
 from appsearch.searchprogressstats import initProgressStats
-from database.connContext import getConn
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
 
 
-def buildRequest(identifier, argsBundles):
+def buildRequest(identifier, argsBundles, conn):
     return Request(
         identifier=identifier,
         argsBundles=argsBundles,
         statKeeper=initProgressStats,
-        searchBuilder=build_searches_for_tickets
+        searchBuilder=build_searches_for_tickets,
+        conn=conn
     )
 
 
 class Request(threading.Thread):
-    def __init__(self, identifier, argsBundles, statKeeper, searchBuilder):
+    def __init__(self, identifier, argsBundles, statKeeper, searchBuilder, conn):
         self.numResultsDiscovered = 0
         self.numResultsRetrieved = 0
         self.state = 'RUNNING'
@@ -28,6 +28,7 @@ class Request(threading.Thread):
         self.statBuilder = statKeeper
         self.searchBuilder = searchBuilder
         self.searchProgressStats = self.initProgressStats()
+        self.conn = conn
         super().__init__()
 
     def getProgressStats(self):
@@ -49,7 +50,8 @@ class Request(threading.Thread):
     def run(self):
         self.searches = self.searchBuilder(
             args_for_tickets=self.argsBundles,
-            stateHooks=self
+            stateHooks=self,
+            conn=self.conn
         )
         self.estimateNumRecords = sum(
             search.getNumRecordsToBeInserted(onNumRecordsFound=lambda search, numRecordsDiscovered:
@@ -66,12 +68,11 @@ class Request(threading.Thread):
                 self.state = 'TOO_MANY_RECORDS'
 
     def numRecordsUnderLimit(self, numRecords):
-        dbSpaceRemainingWithBuffer = MAX_DB_SIZE - self.getNumberRowsStoredInAllTables() - 10000
+        dbSpaceRemainingWithBuffer = MAX_DB_SIZE - self.get_number_rows_in_db() - 10000
         return numRecords < min(dbSpaceRemainingWithBuffer, RECORD_LIMIT)
 
-    def getNumberRowsStoredInAllTables(self):
-        conn = getConn()
-        with conn.cursor() as curs:
+    def get_number_rows_in_db(self):
+        with self.conn.cursor() as curs:
             curs.execute(
                 """
                 SELECT sum(reltuples)::bigint AS estimate

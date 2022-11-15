@@ -1,4 +1,7 @@
-from database.sqlForGraph import SQLforGraph
+from database.sqlForGraph import (
+    get_sql_for_settings,
+    get_params_for_ticket_and_settings
+)
 import datetime
 import ciso8601
 

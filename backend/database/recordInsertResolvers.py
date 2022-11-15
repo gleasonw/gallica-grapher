@@ -1,11 +1,9 @@
 import io
 import gallicaGetter
-from database.connContext import getConn
 
 
-def insertRecordsIntoPapers(records):
+def insert_records_into_papers(records, conn):
     csvStream = buildCSVstream(records)
-    conn = getConn()
     with conn.cursor() as curs:
         curs.copy_from(
             csvStream,
@@ -14,20 +12,25 @@ def insertRecordsIntoPapers(records):
         )
 
 
-def insertRecordsIntoResults(records, identifier, stateHooks):
+def insert_records_into_results(records, identifier, stateHooks, conn):
     stream, codes = build_csv_stream_ensure_no_issue_duplicates(records)
-    insertMissingPapersToDB(
-        codes,
-        onAddingMissingPapers=lambda: stateHooks.setSearchState(
-            state='ADDING_MISSING_PAPERS',
+    codes_in_db = set(
+        match[0] for match in get_db_codes_that_match_these_codes(codes)
+    )
+    missing_codes = codes - codes_in_db
+    if missing_codes:
+        insert_missing_codes_into_db(
+            codes,
+            onAddingMissingPapers=lambda: stateHooks.setSearchState(
+                state='ADDING_MISSING_PAPERS',
+                ticketID=identifier
+            ),
+            conn=conn
+        )
+        stateHooks.setSearchState(
+            state='ADDING_RESULTS',
             ticketID=identifier
         )
-    )
-    stateHooks.setSearchState(
-        state='ADDING_RESULTS',
-        ticketID=identifier
-    )
-    conn = getConn()
     with conn.cursor() as curs:
         curs.copy_from(
             stream,
@@ -47,13 +50,12 @@ def insertRecordsIntoResults(records, identifier, stateHooks):
         )
 
 
-def insertRecordsIntoGroupCounts(records, identifier, stateHooks):
+def insert_records_into_groupcounts(records, identifier, stateHooks, conn):
     csvStream = buildCSVstream(records)
     stateHooks.setSearchState(
         state='ADDING_RESULTS',
         ticketID=identifier
     )
-    conn = getConn()
     with conn.cursor() as curs:
         curs.copy_from(
             csvStream,
@@ -71,18 +73,14 @@ def insertRecordsIntoGroupCounts(records, identifier, stateHooks):
         )
 
 
-def insertMissingPapersToDB(codes, onAddingMissingPapers):
-    codes_in_db = set(match[0] for match in getPaperCodesThatMatch(codes))
-    missingCodes = codes - codes_in_db
+def insert_missing_codes_into_db(codes, onAddingMissingPapers, conn):
     paperAPI = gallicaGetter.connect('papers')
-    if missingCodes:
-        onAddingMissingPapers()
-        paperRecords = paperAPI.get(list(missingCodes))
-        insertRecordsIntoPapers(paperRecords)
+    onAddingMissingPapers()
+    paperRecords = paperAPI.get(list(codes))
+    insert_records_into_papers(paperRecords, conn)
 
 
-def getPaperCodesThatMatch(codes):
-    conn = getConn()
+def get_db_codes_that_match_these_codes(codes, conn):
     with conn.cursor() as curs:
         curs.execute(
             'SELECT code FROM papers WHERE code IN %s',
