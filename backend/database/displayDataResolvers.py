@@ -1,5 +1,5 @@
 from gallicaGetter.parse.gallicaxmlparse import GallicaXMLparse
-from dbops.connContext import getConn
+from database.connContext import getConn
 import gallicaGetter
 
 

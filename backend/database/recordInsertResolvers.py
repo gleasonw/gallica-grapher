@@ -1,6 +1,6 @@
 import io
 import gallicaGetter
-from dbops.connContext import getConn
+from database.connContext import getConn
 
 
 def insertRecordsIntoPapers(records):

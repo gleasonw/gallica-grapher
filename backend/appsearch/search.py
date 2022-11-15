@@ -1,4 +1,4 @@
-from dbops.insertRecordsOps import (
+from database.recordInsertResolvers import (
     insertRecordsIntoGroupCounts,
     insertRecordsIntoResults,
 )
