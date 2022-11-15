@@ -1,13 +1,17 @@
-import os
 from flask import Flask
 from flask import request
 from flask_cors import CORS
 import random
 import json
-from database.paperSearchResolver import PaperLocalSearch
 from database.graphDataResolver import GraphSeriesBatch
 from tasks import spawnRequest
 from database.displayDataResolvers import RecordDataForUser
+from database.connContext import build_db_conn
+from database.paperSearchResolver import (
+    select_continuous_papers,
+    get_papers_similar_to_keyword,
+    get_num_papers_in_range,
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -25,9 +29,9 @@ def index():
 def init():
     global requestIDSeed
     requestIDSeed += 1
-    tickets = request.get_json()["tickets"]
-    print(tickets)
-    task = spawnRequest.delay(tickets, requestIDSeed)
+    with build_db_conn() as conn:
+        tickets = request.get_json()["tickets"]
+        task = spawnRequest.delay(tickets, requestIDSeed, conn)
     return {"taskid": task.id, "requestid": requestIDSeed}
 
 
@@ -51,33 +55,28 @@ def getRequestState(taskID):
 
 @app.route('/api/revokeTask/<taskID>/<reqID>')
 def revokeTask(taskID, reqID):
-    task = spawnRequest.AsyncResult(taskID)
-    task.revoke(terminate=True)
-    RecordDataForUser().clearUserRecordsAfterCancel(reqID)
+    with build_db_conn() as conn:
+        task = spawnRequest.AsyncResult(taskID)
+        task.revoke(terminate=True)
+        clear_records_for_requestID(reqID, conn)
     return {'state': "REVOKED"}
-
-
-@app.route('/api/paperchartjson')
-def paperChart():
-    with open(os.path.join(os.path.dirname(__file__), 'static/paperJSON.json'), 'r') as outFile:
-        paperChartJSON = outFile.read()
-    return paperChartJSON
 
 
 @app.route('/api/papers/<keyword>')
 def papers(keyword):
-    search = PaperLocalSearch()
-    similarPapers = search.selectPapersSimilarToKeyword(keyword)
+    with build_db_conn() as conn:
+        similarPapers = get_papers_similar_to_keyword(keyword, conn)
     return similarPapers
 
 
 @app.route('/api/numPapersOverRange/<startDate>/<endDate>')
 def numPapersOverRange(startDate, endDate):
-    search = PaperLocalSearch()
-    numPapers = search.getNumPapersInRange(
-        startDate,
-        endDate
-    )
+    with build_db_conn() as conn:
+        numPapers = get_num_papers_in_range(
+            startDate,
+            endDate,
+            conn
+        )
     return {'numPapersOverRange': numPapers}
 
 
@@ -86,12 +85,13 @@ def getContinuousPapersOverRange():
     limit = request.args.get('limit')
     startDate = request.args.get('startDate')
     endDate = request.args.get('endDate')
-    search = PaperLocalSearch()
-    selectPapers = search.select_continuous_papers(
-        startDate,
-        endDate,
-        limit
-    )
+    with build_db_conn() as conn:
+        selectPapers = select_continuous_papers(
+            startDate,
+            endDate,
+            limit,
+            conn
+        )
     return selectPapers
 
 
@@ -106,26 +106,33 @@ def getGraphData():
         'endDate': request.args["endDate"],
         'requestID': request.args["requestID"]
     }
-    items = {'series': graphBatchGetter.getSeriesForSettings(settings)}
-    return items
+    with build_db_conn() as conn:
+        items = get_series_for_settings(settings, conn)
+    return {'series': items}
 
 
 @app.route('/api/topPapers')
 def getTopPapersFromID():
     ticketIDS = tuple(request.args["tickets"].split(","))
-    topPapers = recordDataGetter.getTopPapers(
-        tickets=ticketIDS,
-        requestID=request.args["requestID"],
-    )
-    items = {"topPapers": topPapers}
-    return items
+    with build_db_conn() as conn:
+        topPapers = get_top_papers_for_tickets(
+            tickets=ticketIDS,
+            requestID=request.args["requestID"],
+            conn=conn
+        )
+    return {"topPapers": topPapers}
 
 
 @app.route('/api/getcsv')
 def getCSV():
     tickets = request.args["tickets"]
     requestID = request.args["requestID"]
-    csvData = recordDataGetter.getCSVData(tickets, requestID)
+    with build_db_conn() as conn:
+        csvData = get_csv_data_for_request(
+            tickets,
+            requestID,
+            conn=conn
+        )
     return {"csvData": csvData}
 
 
@@ -134,7 +141,8 @@ def getCSV():
 def getDisplayRecords():
     tableArgs = dict(request.args)
     tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
-    displayRecords, count = recordDataGetter.getRecordsForDisplay(tableArgs)
+    with build_db_conn() as conn:
+        displayRecords, count = get_display_records(tableArgs, conn)
     return {
         "displayRecords": displayRecords,
         "count": count
@@ -146,7 +154,7 @@ def getGallicaRecordsForDisplay():
     args = dict(request.args)
     tickets = json.loads(args['tickets'])
     del args['tickets']
-    records = recordDataGetter.getGallicaRecordsForDisplay(
+    records = get_gallica_records_for_display(
         tickets=tickets,
         filters=args
     )

@@ -1,43 +1,31 @@
 from database.sqlForGraph import SQLforGraph
 import datetime
 import ciso8601
-from database.connContext import getConn
 
 
-class GraphSeriesBatch:
-
-    def __init__(self):
-        self.sqlGetter = SQLforGraph()
-
-    def getSeriesForSettings(self, settings):
-        ticketIDs = settings['ticketIDs'].split(',')
-        dataBatches = list(map(
-            lambda ticketID: self.selectOneSeries(
-                ticketID=ticketID,
-                settings=settings,
-            ),
-            ticketIDs
-        ))
-        return {
-            dataBatch.getTicketID(): dataBatch.getSeries()
-            for dataBatch in dataBatches
-        }
-
-    def selectOneSeries(self, ticketID, settings):
-        return HighchartsSeriesForTicket(
+def getSeriesForSettings(self, settings, conn):
+    ticketIDs = settings['ticketIDs'].split(',')
+    dataBatches = list(map(
+        lambda ticketID: HighchartsSeriesForTicket(
             ticketID=ticketID,
             settings=settings,
-            sqlGetter=self.sqlGetter,
-        )
+            conn=conn
+        ),
+        ticketIDs
+    ))
+    return {
+        dataBatch.getTicketID(): dataBatch.getSeries()
+        for dataBatch in dataBatches
+    }
 
 
 class HighchartsSeriesForTicket:
 
-    def __init__(self, ticketID, settings, sqlGetter):
+    def __init__(self, ticketID, settings, conn):
         self.ticketID = ticketID
         self.requestID = settings["requestID"]
-        self.sqlGetter = sqlGetter
         self.series = self.buildHighchartsSeries(settings)
+        self.conn = conn
 
     def getTicketID(self):
         return self.ticketID
@@ -47,11 +35,11 @@ class HighchartsSeriesForTicket:
 
     def buildHighchartsSeries(self, settings):
         data = self.getFromDB(
-            params=self.sqlGetter.getParamsForTicketWithSettings(
+            params=get_params_for_ticket_and_settings(
                 ticketID=self.ticketID,
                 settings=settings
             ),
-            sql=self.sqlGetter.getSQLforSettings(
+            sql=get_sql_for_settings(
                 timeBin=settings["groupBy"],
                 continuous=settings["continuous"],
             )
@@ -70,8 +58,7 @@ class HighchartsSeriesForTicket:
         WHERE requestid=%s 
         AND ticketid = %s;
         """
-        conn = getConn()
-        with conn.cursor() as curs:
+        with self.conn.cursor() as curs:
             curs.execute(getSearchTerms, (
                 self.requestID,
                 self.ticketID
@@ -79,8 +66,7 @@ class HighchartsSeriesForTicket:
             return curs.fetchone()[0]
 
     def getFromDB(self, params, sql):
-        conn = getConn()
-        with conn.cursor() as curs:
+        with self.conn.cursor() as curs:
             curs.execute(
                 sql,
                 params
