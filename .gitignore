@@ -6,16 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
-<<<<<<< HEAD
 #PyCharm... kill it with fire!
 
 .idea/
 .idea
-=======
-# PyCharm
-.idea
-.idea/
->>>>>>> b47b2ff73479e7250ba94d24d6ef0f92145089cb
 
 # Distribution / packaging
 .Python
