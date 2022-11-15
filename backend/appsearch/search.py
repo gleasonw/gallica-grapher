@@ -123,6 +123,12 @@ class GroupedSearch(Search):
         onNumRecordsFound and onNumRecordsFound(self, numRecords)
         return numRecords
 
+    def getLocalFetchArgs(self):
+        return {
+            'ticketID': self.identifier,
+            'requestID': self.stateHooks.requestID
+        }
+
 
 class PaperSearch(Search):
 

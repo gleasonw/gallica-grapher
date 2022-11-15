@@ -15,11 +15,15 @@ def get(**kwargs):
         convertedArgs['fin'] = Date(end).getYear()
     if kwargs.get('grouping') == 'year':
         convertedArgs['resolution'] = 'annee'
-    return convert_data_frame_to_grouped_record(pyllica(**convertedArgs))
+    return convert_data_frame_to_grouped_record(
+        pyllica(**convertedArgs),
+        ticketID=kwargs['ticketID'],
+        requestID=kwargs['requestID']
+    )
 
 
 #TODO: requestid and ticketid passing
-def convert_data_frame_to_grouped_record(df):
+def convert_data_frame_to_grouped_record(df, ticketID, requestID):
     if 'mois' not in df.columns:
         dates = df.annee
     else:
@@ -31,9 +35,9 @@ def convert_data_frame_to_grouped_record(df):
         GroupedCountRecord(
             date=Date(date),
             count=count,
-            ticketID=0,
+            ticketID=ticketID,
             term=term,
-            requestID=0
+            requestID=requestID
         )
         for date, count, term in zip(dates, df.ratio, df.gram)
     )

@@ -25,21 +25,13 @@ export default function DateRangeSelect(props) {
                 >
                     <DateSelect
                         year={props.startYear}
-                        month={props.startMonth}
-                        day={props.startDay}
                         onYearChange={props.onStartYearChange}
-                        onMonthChange={props.onStartMonthChange}
-                        onDayChange={props.onStartDayChange}
                         flexDirection={props.flexDirection}
                     />
                     and
                     <DateSelect
                         year={props.endYear}
-                        month={props.endMonth}
-                        day={props.endDay}
                         onYearChange={props.onEndYearChange}
-                        onMonthChange={props.onEndMonthChange}
-                        onDayChange={props.onEndDayChange}
                         flexDirection={props.flexDirection}
                     />
                 </OptionWrap>

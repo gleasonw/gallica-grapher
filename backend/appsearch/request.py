@@ -104,9 +104,9 @@ class Request(threading.Thread):
 
 if __name__ == '__main__':
     request = buildRequest(
-        identifier='test',
+        identifier='56',
         argsBundles={
-            '0': {
+            '1': {
                 'terms': 'brazza',
                 'grouping': 'month',
                 'startDate': None,
