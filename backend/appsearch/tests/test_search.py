@@ -1,6 +1,6 @@
-from appsearch.search import AllSearch
-from appsearch.search import buildSearch
-from appsearch.search import GroupedSearch
+from appsearch.search import AllSearch, GallicaGroupedSearch
+from appsearch.search import build_searches_for_tickets
+from appsearch.search import PyllicaSearch
 from unittest import TestCase
 from unittest.mock import MagicMock
 
@@ -22,14 +22,28 @@ class Test(TestCase):
                 'grouping': 'month',
                 'startDate': '1900',
                 'endDate': '1901'
+            },
+            'yearWithCodes': {
+                'grouping': 'year',
+                'startDate': '1900',
+                'endDate': '1901',
+                'codes': ['A', 'B']
+            },
+            'monthWithCodes': {
+                'grouping': 'month',
+                'startDate': '1900',
+                'endDate': '1901',
+                'codes': ['A', 'B']
             }
         }
         stateHooks = MagicMock()
-        searchObjs = buildSearch(argBundles, stateHooks, wrapper=MagicMock())
-        self.assertEqual(len(searchObjs), 3)
+        searchObjs = build_searches_for_tickets(argBundles, stateHooks)
+        self.assertEqual(len(searchObjs), 5)
         self.assertIsInstance(searchObjs[0], AllSearch)
-        self.assertIsInstance(searchObjs[1], GroupedSearch)
-        self.assertIsInstance(searchObjs[2], GroupedSearch)
+        self.assertIsInstance(searchObjs[1], PyllicaSearch)
+        self.assertIsInstance(searchObjs[2], PyllicaSearch)
+        self.assertIsInstance(searchObjs[3], GallicaGroupedSearch)
+        self.assertIsInstance(searchObjs[4], GallicaGroupedSearch)
 
 
 class TestSearch(TestCase):
@@ -38,8 +52,8 @@ class TestSearch(TestCase):
             'identifier': MagicMock(),
             'input_args': MagicMock(),
             'stateHooks': MagicMock(),
-            'connectable': MagicMock()
         }
+        AllSearch.getAPIWrapper = MagicMock()
         self.searches = [
             AllSearch(**initArgs),
         ]
@@ -70,11 +84,11 @@ class TestSearch(TestCase):
 class TestAllSearch(TestCase):
 
     def setUp(self):
+        AllSearch.getAPIWrapper = MagicMock()
         self.search = AllSearch(
             identifier=MagicMock(),
             input_args=MagicMock(),
             stateHooks=MagicMock(),
-            connectable=MagicMock()
         )
 
     def test_get_num_records_to_be_inserted(self):

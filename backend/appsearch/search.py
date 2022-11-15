@@ -6,30 +6,40 @@ import gallicaGetter
 import appsearch.pyllicaWrapper as pyllicaWrapper
 
 
-def buildSearch(argBundles, stateHooks, wrapper=gallicaGetter):
-    searches = {
-        'all': AllSearch,
-        'year': GroupedSearch,
-        'month': GroupedSearch
+def build_searches_for_tickets(args_for_tickets, stateHooks):
+    # Pyllica has no support for specific periodical codes, so we must route requests with codes to
+    # the less-accurate gallicaGetter. Bool = True if codes provided.
+    search_routes = {
+        ('all', True): AllSearch,
+        ('all', False): AllSearch,
+        ('year', False): PyllicaSearch,
+        ('month', False): PyllicaSearch,
+        ('year', True): GallicaGroupedSearch,
+        ('month', True): GallicaGroupedSearch,
     }
     searchObjs = []
-    for key, bundle in argBundles.items():
-        search = bundle.get('grouping')
-        api = wrapper if search == 'all' else pyllicaWrapper
+    for ticketID, params in args_for_tickets.items():
         initParams = {
-            'identifier': key,
-            'input_args': bundle,
-            'stateHooks': stateHooks,
-            'connectable': api
+            'identifier': ticketID,
+            'input_args': params,
+            'stateHooks': stateHooks
         }
-        runner = searches[search](**initParams)
-        searchObjs.append(runner)
+        SearchClass = search_routes[
+            (params.get('grouping'), bool(params.get('codes')))
+        ]
+        searchObj = SearchClass(**initParams)
+        if isinstance(searchObj, GallicaGroupedSearch):
+            if searchObj.moreDateIntervalsThanRecordBatches() and len(args_for_tickets.items()) == 1:
+                params['grouping'] = 'all'
+                searchObj = AllSearch(**initParams)
+                stateHooks.onSearchChangeToAll(ticketID)
+        searchObjs.append(searchObj)
     return searchObjs
 
 
 class Search:
 
-    def __init__(self, input_args, connectable, stateHooks, identifier):
+    def __init__(self, input_args, stateHooks, identifier):
         self.args = {
             **input_args,
             'startDate': input_args['startDate'],
@@ -38,7 +48,7 @@ class Search:
         self.identifier = identifier
         self.stateHooks = stateHooks
         self.insertRecordsToDB = self.getDBinsert()
-        self.api = self.getAPIWrapper(connectable)
+        self.api = self.getAPIWrapper()
         self.postInit()
 
     def __repr__(self):
@@ -54,7 +64,7 @@ class Search:
     def getNumRecordsToBeInserted(self, onNumRecordsFound):
         raise NotImplementedError
 
-    def getAPIWrapper(self, wrapper):
+    def getAPIWrapper(self):
         raise NotImplementedError
 
     def getDBinsert(self):
@@ -86,8 +96,8 @@ class AllSearch(Search):
         onNumRecordsFound(self, found)
         return found
 
-    def getAPIWrapper(self, wrapper):
-        return wrapper.connect(
+    def getAPIWrapper(self):
+        return gallicaGetter.connect(
             gallicaAPIselect='sru',
             ticketID=self.identifier,
             requestID=self.stateHooks.requestID
@@ -109,21 +119,70 @@ class AllSearch(Search):
         }
 
 
-class GroupedSearch(Search):
+class PyllicaSearch(Search):
 
-    def getAPIWrapper(self, connectable):
-        return connectable
+    def getAPIWrapper(self):
+        return pyllicaWrapper
 
     def getDBinsert(self):
         return insertRecordsIntoGroupCounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-        numRecords = 5
-        onNumRecordsFound and onNumRecordsFound(self, numRecords)
-        return numRecords
+        return get_num_periods_in_range_for_grouping(
+            grouping=self.args['grouping'],
+            start=self.args['startDate'],
+            end=self.args['endDate']
+        )
 
     def getLocalFetchArgs(self):
         return {
             'ticketID': self.identifier,
             'requestID': self.stateHooks.requestID
         }
+
+
+class GallicaGroupedSearch(Search):
+
+    def getAPIWrapper(self):
+        return gallicaGetter.connect(
+            'sru',
+            ticketID=self.identifier,
+            requestID=self.stateHooks.requestID
+        )
+
+    def getDBinsert(self):
+        return insertRecordsIntoGroupCounts
+
+    def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
+        return get_num_periods_in_range_for_grouping(
+            grouping=self.args['grouping'],
+            start=self.args['startDate'],
+            end=self.args['endDate']
+        )
+
+    def moreDateIntervalsThanRecordBatches(self):
+        args = {**self.args, 'grouping': 'all'}
+        firstResult = self.api.getNumResultsForArgs(args)[0]
+        numResults = firstResult[1]
+        numIntervals = self.getNumRecordsToBeInserted()
+        return int(numResults / 50) < numIntervals
+
+    def getLocalFetchArgs(self):
+        return {
+            'onUpdateProgress': lambda progressStats: self.stateHooks.setSearchProgressStats(
+                progressStats={
+                    **progressStats,
+                    "ticketID": self.identifier
+                }
+            )
+        }
+
+
+def get_num_periods_in_range_for_grouping(grouping, start, end) -> int:
+    start, end = int(start), int(end)
+    if grouping == 'year':
+        return end - start + 1
+    elif grouping == 'month':
+        return (end - start) * 12 + end - start + 1
+    else:
+        raise ValueError(f'Invalid grouping: {grouping}')

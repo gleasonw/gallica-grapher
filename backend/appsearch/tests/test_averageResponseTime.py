@@ -1,5 +1,5 @@
 from unittest import TestCase
-from averageResponseTime import AverageResponseTime
+from appsearch.averageResponseTime import AverageResponseTime
 
 
 class TestAverageResponseTime(TestCase):

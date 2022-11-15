@@ -1,5 +1,5 @@
 import threading
-from appsearch.search import buildSearch
+from appsearch.search import build_searches_for_tickets
 from appsearch.searchprogressstats import initProgressStats
 from database.connContext import getConn
 
@@ -12,7 +12,7 @@ def buildRequest(identifier, argsBundles):
         identifier=identifier,
         argsBundles=argsBundles,
         statKeeper=initProgressStats,
-        searchBuilder=buildSearch
+        searchBuilder=build_searches_for_tickets
     )
 
 
@@ -48,7 +48,7 @@ class Request(threading.Thread):
 
     def run(self):
         self.searches = self.searchBuilder(
-            argBundles=self.argsBundles,
+            args_for_tickets=self.argsBundles,
             stateHooks=self
         )
         self.estimateNumRecords = sum(
@@ -110,7 +110,8 @@ if __name__ == '__main__':
                 'terms': 'brazza',
                 'grouping': 'all',
                 'startDate': 1880,
-                'endDate': 1881
+                'endDate': 1881,
+                'codes': 'cb32895690j'
             }
         }
     )
