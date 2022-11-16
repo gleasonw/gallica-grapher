@@ -1,0 +1,10 @@
+amqp==5.1.1
+beautifulsoup4==4.11.1
+ciso8601==2.2.0
+Flask==2.2.2
+Flask-Cors==3.0.10
+lxml==4.9.1
+pandas==1.5.1
+psycopg2-binary==2.9.5
+redis==4.3.4
+urllib3==1.26.12
