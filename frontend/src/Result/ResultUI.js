@@ -29,20 +29,6 @@ function ResultUI(props){
                         onClick={props.onHomeClick}
                         children={'Return to request page'}
                     />
-                    {Object.keys(props.tickets).length > 1  &&
-                        <FormGroup>
-                            <FormControlLabel
-                                labelPlacement="bottom"
-                                control={
-                                    <Switch
-                                        checked={grouped}
-                                        onChange={handleGroupToggle}
-                                    />
-                                }
-                                label={grouped ? 'Ungroup series' : 'Group series'}
-                            />
-                        </FormGroup>
-                    }
                     {grouped ? (
                         <GroupedTicketResults
                             tickets={props.tickets}
