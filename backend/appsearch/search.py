@@ -33,6 +33,7 @@ def build_searches_for_tickets(args_for_tickets, stateHooks, conn):
             if searchObj.moreDateIntervalsThanRecordBatches() and len(args_for_tickets.items()) == 1:
                 params['grouping'] = 'all'
                 searchObj = AllSearch(**initParams)
+                #TODO: this is broken
                 stateHooks.onSearchChangeToAll(ticketID)
         searchObjs.append(searchObj)
     return searchObjs

@@ -111,7 +111,7 @@ if __name__ == '__main__':
             identifier='56',
             argsBundles={
                 '1': {
-                    'terms': 'paris',
+                    'terms': 'brazza',
                     'grouping': 'year',
                     'startDate': 1880,
                     'endDate': 1990,
@@ -120,4 +120,7 @@ if __name__ == '__main__':
             },
             conn=conn
         )
-        request.run()
+        request.start()
+        while not request.state == 'COMPLETED':
+            print(request.getProgressStats())
+            print(request.state)

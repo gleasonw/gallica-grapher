@@ -5,6 +5,7 @@ import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import ClassicUIBox from "../shared/ClassicUIBox";
 
 
+//TODO: improve grouping change communication, perhaps on the backend. If the search is too fast, the front end won't have time to update the grouping before the search is complete.
 function RunningQueriesUI(props) {
     const initialProgressStats = {}
     Object.keys(props.tickets).map((ticketId) => (
@@ -21,7 +22,7 @@ function RunningQueriesUI(props) {
     const [cancelMessage, setCancelMessage] = useState('Cancel');
     const [progressStats, setProgressStats] = useState({});
     const [timeBeforeResponse, setTimeBeforeResponse] = useState(0);
-    const refreshInterval = 1000;
+    const refreshInterval = 500;
     const timeBeforeWarning = 30000;
     const responseReceived = Object.keys(progressStats).some((ticketID) => (
         progressStats[ticketID].progressPercent > 0
