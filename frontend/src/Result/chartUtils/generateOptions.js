@@ -1,4 +1,4 @@
-export default function generateOptions(series, settings, onSeriesClick) {
+export default function generateOptions(series, settings, onSeriesClick, from_pyllicagram) {
     let options = {
         chart: {
             type: 'line',
@@ -33,7 +33,7 @@ export default function generateOptions(series, settings, onSeriesClick) {
         },
         yAxis: {
             title: {
-                text: 'Mentions'
+                text: from_pyllicagram ? 'occurrences / total words in period' : 'volumes with at least one occurrence'
             }
         },
         series: series,

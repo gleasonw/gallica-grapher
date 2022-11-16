@@ -87,8 +87,6 @@ const StyledFullOptions = styled.div`
     flex: none;
     padding: 16px;
     border-radius: 3px;
-    align-items: stretch;
-    max-height: 100%;
 `;
 
 const StyledOptionsFilterPop = styled.div`

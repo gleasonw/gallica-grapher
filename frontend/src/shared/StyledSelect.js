@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const StyledInputAndLabel = styled.div`
     display: ${props => props.display || "flex"};
     flex-direction: column;
+    max-width: 100%;
     `;
 
 export const StyledSelect = styled.select`

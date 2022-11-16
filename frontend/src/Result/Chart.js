@@ -9,6 +9,7 @@ import generateOptions from "./chartUtils/generateOptions";
 import NavBarWrap from "./NavBarWrap";
 import {StyledSelect} from "../shared/StyledSelect";
 import {StyledInputAndLabel} from "../shared/StyledSelect";
+import {GallicaGramShoutOut, DataLimitationWarning} from "./ChartMessages";
 
 require("highcharts/modules/exporting")(Highcharts);
 require("highcharts/modules/export-data")(Highcharts);
@@ -19,6 +20,10 @@ function Chart(props) {
     const startDate = Object.values(props.tickets)[0].startDate;
     const endDate = Object.values(props.tickets)[0].endDate;
     const chartRef = useRef(null);
+    const data_is_from_pyllicagram = (
+        chartSettings.timeBin === 'gallicaYear' ||
+        chartSettings.timeBin === 'gallicaMonth')
+        && props.tickets[0].papersAndCodes.length === 0;
     let query =
         "/api/graphData?keys=" + Object.keys(props.tickets) +
         "&requestID=" + props.requestID +
@@ -37,7 +42,8 @@ function Chart(props) {
         const highchartsOptions = generateOptions(
             graphDataWithSyncedColors,
             chartSettings,
-            props.onSeriesClick
+            props.onSeriesClick,
+            data_is_from_pyllicagram
         );
         return (
             <StyledChartUI>
@@ -51,6 +57,11 @@ function Chart(props) {
                     ref={chartRef}
                     constructorType={'chart'}
                 />
+                {
+                    data_is_from_pyllicagram ?
+                    <GallicaGramShoutOut/> :
+                    <DataLimitationWarning/>
+                }
             </StyledChartUI>
         );
     } else {

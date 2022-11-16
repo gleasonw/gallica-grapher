@@ -19,9 +19,6 @@ export default function DateRangeSelect(props) {
                 <OptionWrap
                     selected
                     borderRadius={'10px'}
-                    flexDirection={props.flexDirection}
-                    justifyContent={props.justifyContent}
-                    display={'flex'}
                 >
                     <DateInputBox
                         startYear={props.startYear}

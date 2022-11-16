@@ -98,7 +98,7 @@ export default function DisplayRecordsTable(props) {
                         [props.year, props.month, props.day, props.periodical, props.ticket].some(Boolean) ?
                             ' occurrences for these filters'
                             :
-                            ' total occurrences'
+                            ' occurrences'
                     }
                 </h3>
                 {
