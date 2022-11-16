@@ -28,7 +28,7 @@ def get_csv_data_for_request(ticketIDs, requestID, conn):
     return csvData
 
 
-def get_display_records(tableArgs, conn):
+def select_display_records(tableArgs, conn):
     year = tableArgs.get('year')
     month = tableArgs.get('month')
     day = tableArgs.get('day')

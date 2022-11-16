@@ -1,17 +1,22 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
 from gallicaGetter import connect
-from gallicaGetter.gallicaWrapper import SRUWrapper
-from gallicaGetter.gallicaWrapper import IssuesWrapper
-from gallicaGetter.gallicaWrapper import ContentWrapper
-from gallicaGetter.gallicaWrapper import PapersWrapper
-from gallicaGetter.parse.parseRecord import ParseArkRecord
-from gallicaGetter.parse.parseRecord import ParsePaperRecords
-from gallicaGetter.parse.parseRecord import ParseContentRecord
-from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from gallicaGetter.build.queryBuilder import OccurrenceQueryBuilder
-from gallicaGetter.build.queryBuilder import PaperQueryBuilder
-from gallicaGetter.build.queryBuilder import ContentQueryBuilder
+from gallicaGetter.gallicaWrapper import (
+    SRUWrapper,
+    IssuesWrapper,
+    ContentWrapper,
+    PapersWrapper,
+    FullTextWrapper,
+)
+from gallicaGetter.parse.parseRecord import (
+    ParseArkRecord,
+    ParseContentRecord
+)
+from gallicaGetter.build.queryBuilder import (
+    OccurrenceQueryBuilder,
+    PaperQueryBuilder,
+    ContentQueryBuilder
+)
 
 
 class TestGallicaWrapper(TestCase):
@@ -30,6 +35,7 @@ class TestGallicaWrapper(TestCase):
         self.assertIsInstance(connect('issues'), IssuesWrapper)
         self.assertIsInstance(connect('content'), ContentWrapper)
         self.assertIsInstance(connect('papers'), PapersWrapper)
+        self.assertIsInstance(connect('text'), FullTextWrapper)
         with self.assertRaises(ValueError):
             connect('not an api')
 
@@ -114,3 +120,15 @@ class TestPapersWrapper(TestCase):
             getter.issuesWrapper = MagicMock()
 
             self.assertIsInstance(getter.get('a paper code'), list)
+
+
+class TestFullTextWrapper(TestCase):
+
+    def setUp(self) -> None:
+        self.fullTextWrapper = FullTextWrapper()
+
+    def test_getQueryBuilder(self):
+        self.fail()
+
+    def test_get(self):
+        self.fail()

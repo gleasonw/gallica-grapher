@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from backend.tasks import spawnRequest
+from backend.tasks import spawn_request
 
 
 class TestSpawnRequest(TestCase):
@@ -10,7 +10,7 @@ class TestSpawnRequest(TestCase):
         mock_request.return_value = mock_request
         mock_request.finished = True
 
-        returnTest = spawnRequest("tests")
+        returnTest = spawn_request("tests")
 
         self.assertEqual(returnTest["status"], "Complete!")
         self.assertEqual(returnTest["result"], 42)
@@ -22,7 +22,7 @@ class TestSpawnRequest(TestCase):
         mock_request.tooManyRecords = True
         mock_request.estimateNumRecords = 100
 
-        returnTest = spawnRequest("tests")
+        returnTest = spawn_request("tests")
 
         self.assertEqual(returnTest["status"], "Too many records!")
         self.assertEqual(returnTest["getNumRecords"], 100)
@@ -34,4 +34,4 @@ class TestSpawnRequest(TestCase):
         mock_request.tooManyRecords = False
 
         with self.assertRaises(TypeError):
-            spawnRequest("tests")
+            spawn_request("tests")

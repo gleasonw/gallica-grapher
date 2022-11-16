@@ -104,16 +104,20 @@ class Request(threading.Thread):
 
 
 if __name__ == '__main__':
-    request = buildRequest(
-        identifier='56',
-        argsBundles={
-            '1': {
-                'terms': 'brazza',
-                'grouping': 'all',
-                'startDate': 1880,
-                'endDate': 1881,
-                'codes': 'cb32895690j'
-            }
-        }
-    )
-    request.run()
+    from database.connContext import build_db_conn
+
+    with build_db_conn() as conn:
+        request = buildRequest(
+            identifier='56',
+            argsBundles={
+                '1': {
+                    'terms': 'paris',
+                    'grouping': 'year',
+                    'startDate': 1880,
+                    'endDate': 1990,
+                    'codes': ['cb32895690j']
+                }
+            },
+            conn=conn
+        )
+        request.run()

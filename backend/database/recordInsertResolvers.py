@@ -15,7 +15,7 @@ def insert_records_into_papers(records, conn):
 def insert_records_into_results(records, identifier, stateHooks, conn):
     stream, codes = build_csv_stream_ensure_no_issue_duplicates(records)
     codes_in_db = set(
-        match[0] for match in get_db_codes_that_match_these_codes(codes)
+        match[0] for match in get_db_codes_that_match_these_codes(codes, conn)
     )
     missing_codes = codes - codes_in_db
     if missing_codes:

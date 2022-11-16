@@ -59,7 +59,7 @@ class TestAPI(unittest.TestCase):
     @patch("backend.api.TicketGraphSeriesBatch")
     def test_getGraphData(self, mock_series):
         mockedSeries = mock_series.return_value
-        mockedSeries.getSeriesForSettings.return_value = []
+        mockedSeries.get_series_for_tickets.return_value = []
         query = '/api/graphData?keys=tests&averageWindow=tests&timeBin=tests&continuous=tests&dateRange=tests'
 
         response = self.app.get(query)

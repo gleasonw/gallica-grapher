@@ -3,21 +3,26 @@ from flask import request
 from flask_cors import CORS
 import random
 import json
-from database.graphDataResolver import GraphSeriesBatch
-from tasks import spawnRequest
-from database.displayDataResolvers import RecordDataForUser
+from tasks import spawn_request
 from database.connContext import build_db_conn
 from database.paperSearchResolver import (
     select_continuous_papers,
     get_papers_similar_to_keyword,
     get_num_papers_in_range,
 )
+from database.graphDataResolver import get_series_for_tickets
+from database.displayDataResolvers import (
+    select_display_records,
+    get_gallica_records_for_display,
+    clear_records_for_requestid,
+    get_top_papers_for_tickets,
+    get_ocr_text_for_record,
+    get_csv_data_for_request
+)
 
 app = Flask(__name__)
 CORS(app)
 requestIDSeed = random.randint(0, 10000)
-graphBatchGetter = GraphSeriesBatch()
-recordDataGetter = RecordDataForUser()
 
 
 @app.route('/')
@@ -29,15 +34,14 @@ def index():
 def init():
     global requestIDSeed
     requestIDSeed += 1
-    with build_db_conn() as conn:
-        tickets = request.get_json()["tickets"]
-        task = spawnRequest.delay(tickets, requestIDSeed, conn)
+    tickets = request.get_json()["tickets"]
+    task = spawn_request.delay(tickets, requestIDSeed)
     return {"taskid": task.id, "requestid": requestIDSeed}
 
 
-@app.route('/poll/progress/<taskID>')
-def getRequestState(taskID):
-    task = spawnRequest.AsyncResult(taskID)
+@app.route('/poll/progress/<task_id>')
+def get_request_state(task_id):
+    task = spawn_request.AsyncResult(task_id)
     if task.ready():
         response = {
             'state': task.result.get('state'),
@@ -53,50 +57,50 @@ def getRequestState(taskID):
     return response
 
 
-@app.route('/api/revokeTask/<taskID>/<reqID>')
-def revokeTask(taskID, reqID):
+@app.route('/api/revokeTask/<celery_task_id>/<request_id>')
+def revoke_task(celery_task_id, request_id):
     with build_db_conn() as conn:
-        task = spawnRequest.AsyncResult(taskID)
+        task = spawn_request.AsyncResult(celery_task_id)
         task.revoke(terminate=True)
-        clear_records_for_requestID(reqID, conn)
+        clear_records_for_requestid(request_id, conn)
     return {'state': "REVOKED"}
 
 
 @app.route('/api/papers/<keyword>')
 def papers(keyword):
     with build_db_conn() as conn:
-        similarPapers = get_papers_similar_to_keyword(keyword, conn)
-    return similarPapers
+        similar_papers = get_papers_similar_to_keyword(keyword, conn)
+    return similar_papers
 
 
-@app.route('/api/numPapersOverRange/<startDate>/<endDate>')
-def numPapersOverRange(startDate, endDate):
+@app.route('/api/numPapersOverRange/<start>/<end>')
+def get_num_papers_publishing_in_range(start, end):
     with build_db_conn() as conn:
-        numPapers = get_num_papers_in_range(
-            startDate,
-            endDate,
+        count = get_num_papers_in_range(
+            start,
+            end,
             conn
         )
-    return {'numPapersOverRange': numPapers}
+    return {'numPapersOverRange': count}
 
 
 @app.route('/api/continuousPapers')
-def getContinuousPapersOverRange():
+def get_continuous_papers_for_range():
     limit = request.args.get('limit')
-    startDate = request.args.get('startDate')
-    endDate = request.args.get('endDate')
+    start = request.args.get('startDate')
+    end = request.args.get('endDate')
     with build_db_conn() as conn:
-        selectPapers = select_continuous_papers(
-            startDate,
-            endDate,
+        continuous_papers = select_continuous_papers(
+            start,
+            end,
             limit,
             conn
         )
-    return selectPapers
+    return continuous_papers
 
 
 @app.route('/api/graphData')
-def getGraphData():
+def get_graph_series_for_tickets():
     settings = {
         'ticketIDs': request.args["keys"],
         'averageWindow': request.args["averageWindow"],
@@ -107,50 +111,50 @@ def getGraphData():
         'requestID': request.args["requestID"]
     }
     with build_db_conn() as conn:
-        items = get_series_for_settings(settings, conn)
+        items = get_series_for_tickets(settings, conn)
     return {'series': items}
 
 
 @app.route('/api/topPapers')
-def getTopPapersFromID():
-    ticketIDS = tuple(request.args["tickets"].split(","))
+def get_top_papers_for_tickets():
+    ticket_ids = tuple(request.args["tickets"].split(","))
     with build_db_conn() as conn:
-        topPapers = get_top_papers_for_tickets(
-            tickets=ticketIDS,
+        top_papers = get_top_papers_for_tickets(
+            tickets=ticket_ids,
             requestID=request.args["requestID"],
             conn=conn
         )
-    return {"topPapers": topPapers}
+    return {"topPapers": top_papers}
 
 
 @app.route('/api/getcsv')
-def getCSV():
+def get_csv():
     tickets = request.args["tickets"]
-    requestID = request.args["requestID"]
+    request_id = request.args["requestID"]
     with build_db_conn() as conn:
-        csvData = get_csv_data_for_request(
+        csv_data = get_csv_data_for_request(
             tickets,
-            requestID,
+            request_id,
             conn=conn
         )
-    return {"csvData": csvData}
+    return {"csvData": csv_data}
 
 
-#TODO: enlist celery worker?
 @app.route('/api/getDisplayRecords')
-def getDisplayRecords():
-    tableArgs = dict(request.args)
-    tableArgs['tickets'] = tuple(tableArgs['tickets'].split(','))
+def get_display_records():
+    table_filters = dict(request.args)
+    table_filters['tickets'] = tuple(table_filters['tickets'].split(','))
     with build_db_conn() as conn:
-        displayRecords, count = get_display_records(tableArgs, conn)
+        records, count = select_display_records(table_filters, conn)
     return {
-        "displayRecords": displayRecords,
+        "displayRecords": records,
         "count": count
     }
 
 
+#TODO: enlist celery worker?
 @app.route('/api/getGallicaRecords')
-def getGallicaRecordsForDisplay():
+def fetch_gallica_records():
     args = dict(request.args)
     tickets = json.loads(args['tickets'])
     del args['tickets']
@@ -162,13 +166,13 @@ def getGallicaRecordsForDisplay():
     return {"displayRecords": records}
 
 
-@app.route('/api/ocrtext/<arkCode>/<term>')
-def getOCRtext(arkCode, term):
-    numResults, text = recordDataGetter.getOCRTextForRecord(
-        arkCode,
+@app.route('/api/ocrtext/<ark_code>/<term>')
+def get_ocr_text(ark_code, term):
+    count, text = get_ocr_text_for_record(
+        ark_code,
         term
     )
-    return {"numResults": numResults, "text": text}
+    return {"numResults": count, "text": text}
 
 
 if __name__ == "__main__":

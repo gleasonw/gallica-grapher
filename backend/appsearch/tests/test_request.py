@@ -13,7 +13,8 @@ class TestRequest(TestCase):
                 2: {'grouping': 'all'}
             },
             statKeeper=MagicMock(),
-            searchBuilder=MagicMock()
+            searchBuilder=MagicMock(),
+            conn=MagicMock()
         )
 
     def test_get_progress_stats(self):

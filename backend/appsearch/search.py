@@ -157,11 +157,14 @@ class GallicaGroupedSearch(Search):
         return insert_records_into_groupcounts
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
-        return get_num_periods_in_range_for_grouping(
+        num_records = get_num_periods_in_range_for_grouping(
             grouping=self.args['grouping'],
             start=self.args['startDate'],
             end=self.args['endDate']
         )
+        if onNumRecordsFound:
+            onNumRecordsFound(self, num_records)
+        return num_records
 
     def moreDateIntervalsThanRecordBatches(self):
         args = {**self.args, 'grouping': 'all'}
@@ -186,6 +189,6 @@ def get_num_periods_in_range_for_grouping(grouping, start, end) -> int:
     if grouping == 'year':
         return end - start + 1
     elif grouping == 'month':
-        return (end - start) * 12 + end - start + 1
+        return (end - start + 1) * 12
     else:
         raise ValueError(f'Invalid grouping: {grouping}')

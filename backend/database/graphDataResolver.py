@@ -6,38 +6,38 @@ import datetime
 import ciso8601
 
 
-def getSeriesForSettings(self, settings, conn):
-    ticketIDs = settings['ticketIDs'].split(',')
-    dataBatches = list(map(
-        lambda ticketID: HighchartsSeriesForTicket(
-            ticketID=ticketID,
+def get_series_for_tickets(settings, conn):
+    ticket_ids = settings['ticketIDs'].split(',')
+    data_batches = list(map(
+        lambda ticket_id: HighchartsSeriesForTicket(
+            ticketID=ticket_id,
             settings=settings,
             conn=conn
         ),
-        ticketIDs
+        ticket_ids
     ))
     return {
-        dataBatch.getTicketID(): dataBatch.getSeries()
-        for dataBatch in dataBatches
+        dataBatch.get_ticket_id(): dataBatch.get()
+        for dataBatch in data_batches
     }
 
 
 class HighchartsSeriesForTicket:
 
     def __init__(self, ticketID, settings, conn):
+        self.conn = conn
         self.ticketID = ticketID
         self.requestID = settings["requestID"]
-        self.series = self.buildHighchartsSeries(settings)
-        self.conn = conn
+        self.series = self.build_highcharts_series(settings)
 
-    def getTicketID(self):
+    def get_ticket_id(self):
         return self.ticketID
 
-    def getSeries(self):
+    def get(self):
         return self.series
 
-    def buildHighchartsSeries(self, settings):
-        data = self.getFromDB(
+    def build_highcharts_series(self, settings):
+        data = self.get_from_db(
             params=get_params_for_ticket_and_settings(
                 ticketID=self.ticketID,
                 settings=settings
@@ -47,28 +47,31 @@ class HighchartsSeriesForTicket:
                 continuous=settings["continuous"],
             )
         )
-        dataWithProperDateFormat = self.transformDateForSettings(data, settings)
+        data_with_proper_date_format = self.transform_date_for_settings(data, settings)
         return {
-            'name': f"{self.ticketID}: {self.getSearchTermsByGrouping(settings['groupBy'])}",
-            'data': dataWithProperDateFormat,
+            'name': f"{self.ticketID}: {self.get_search_terms_by_grouping(settings['groupBy'])}",
+            'data': data_with_proper_date_format,
         }
 
-    def getSearchTermsByGrouping(self, grouping):
-        dbSource = 'FROM results' if grouping in ['day', 'month', 'year'] else 'FROM groupcounts'
-        getSearchTerms = f"""
+    def get_search_terms_by_grouping(self, grouping):
+
+        table = 'FROM results' if grouping in ['day', 'month', 'year'] else 'FROM groupcounts'
+
+        get_terms = f"""
         SELECT array_agg(DISTINCT searchterm) 
-        {dbSource}
+        {table}
         WHERE requestid=%s 
         AND ticketid = %s;
         """
+
         with self.conn.cursor() as curs:
-            curs.execute(getSearchTerms, (
+            curs.execute(get_terms, (
                 self.requestID,
                 self.ticketID
             ))
             return curs.fetchone()[0]
 
-    def getFromDB(self, params, sql):
+    def get_from_db(self, params, sql):
         with self.conn.cursor() as curs:
             curs.execute(
                 sql,
@@ -76,7 +79,7 @@ class HighchartsSeriesForTicket:
             )
             return curs.fetchall()
 
-    def transformDateForSettings(self, data, settings):
+    def transform_date_for_settings(self, data, settings):
         if settings["groupBy"] == "day":
             return list(map(self.getRowsWithYMDtimestamp, data))
         elif settings["groupBy"] == "month" or settings["groupBy"] == "gallicaMonth":
