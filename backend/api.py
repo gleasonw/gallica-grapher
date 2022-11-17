@@ -153,6 +153,7 @@ def get_display_records():
 
 
 #TODO: enlist celery worker?
+#TODO: clarify arguments
 @app.route('/api/getGallicaRecords')
 def fetch_gallica_records():
     args = dict(request.args)
