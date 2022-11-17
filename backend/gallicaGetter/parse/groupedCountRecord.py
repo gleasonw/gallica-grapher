@@ -19,6 +19,15 @@ class GroupedCountRecord:
         row.append(self.count)
         return tuple(row)
 
+    def getDisplayRow(self):
+        return (
+            self.term,
+            self.date.getYear(),
+            self.date.getMonth(),
+            self.date.getDay(),
+            self.count
+        )
+
     def __repr__(self):
         return f'GroupedCountRecord({self.date}, {self.term}, {self.count})'
 
