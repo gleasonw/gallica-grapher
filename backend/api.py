@@ -152,7 +152,7 @@ def get_display_records():
     }
 
 
-#TODO: enlist celery worker?
+#TODO: enlist celery worker to make request async -- flask blocks while responding to this
 #TODO: clarify arguments
 @app.route('/api/getGallicaRecords')
 def fetch_gallica_records():
