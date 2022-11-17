@@ -155,12 +155,29 @@ def get_display_records():
 #TODO: enlist celery worker?
 @app.route('/api/getGallicaRecords')
 def fetch_gallica_records():
+    """
+    Fetches a batch of volume occurrence records from Gallica.
+
+    Params are passed in the query string like so:
+    /api/getGallicaRecords?tickets=[{"terms":["brazza"],"grouping":"all","startDate":"1899","codes":[]}]&limit=5&offset=0
+
+    :param tickets: JSON-encoded array of search parameters:
+        :param terms: a list of search terms,
+        :param startDate: start date for the search,
+        :param codes: periodicals to restrict search (optional),
+        :param linkTerm: link for proximity search (optional),
+        :param linkDistance: distance for proximity search (optional),
+    :param limit: number of records to fetch
+    :param offset: offset for the records to fetch
+
+    :return: List[(terms, periodical, year, month, day, gallica url)...]
+    """
     args = dict(request.args)
     tickets = json.loads(args['tickets'])
-    del args['tickets']
     records = get_gallica_records_for_display(
         tickets=tickets,
-        filters=args
+        limit=args['limit'],
+        offset=args['offset'],
     )
     records = [record.getDisplayRow() for record in records]
     return {"displayRecords": records}
@@ -176,4 +193,4 @@ def get_ocr_text(ark_code, term):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run()

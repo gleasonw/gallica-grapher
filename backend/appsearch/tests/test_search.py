@@ -84,7 +84,7 @@ class TestSearch(TestCase):
             AllSearch(**initArgs),
         ]
 
-    #Liskov tests
+    # Liskov tests
     def test_responds_to_getNumRecordsToBeInserted(self):
         for search in self.searches:
             self.assertTrue(hasattr(search, 'getNumRecordsToBeInserted'))
@@ -97,7 +97,7 @@ class TestSearch(TestCase):
         for search in self.searches:
             self.assertTrue(hasattr(search, 'getDBinsert'))
 
-    #subclass responsibility tests
+    # subclass responsibility tests
     def test_responds_to_post_init(self):
         for search in self.searches:
             self.assertTrue(hasattr(search, 'postInit'))
@@ -129,7 +129,14 @@ class TestAllSearch(TestCase):
         onNumRecordsFound.assert_called_once_with(self.search, 3)
 
     def test_getLocalFetchArgs(self):
-        self.fail()
+        self.search.baseQueriesWithNumResults = [
+            ('query1', 1),
+            ('query2', 2),
+        ]
+        result = self.search.getLocalFetchArgs()
+        self.assertEqual(result['queriesWithCounts'], self.search.baseQueriesWithNumResults)
+        self.assertTrue(result['generate'])
+        self.assertIn('onUpdateProgress', result)
 
 
 class TestPyllicaSearch(TestCase):
@@ -144,22 +151,34 @@ class TestPyllicaSearch(TestCase):
         )
 
     def test_getLocalFetchArgs(self):
-        self.fail()
+        self.assertDictEqual(
+            self.search.getLocalFetchArgs(),
+            {
+                'ticketID': self.search.identifier,
+                'requestID': self.search.stateHooks.requestID,
+            }
+        )
 
 
 class TestGallicaGroupedSearch(TestCase):
 
-        def setUp(self):
-            GallicaGroupedSearch.getAPIWrapper = MagicMock()
-            self.search = GallicaGroupedSearch(
-                identifier=MagicMock(),
-                input_args=MagicMock(),
-                stateHooks=MagicMock(),
-                conn=MagicMock()
-            )
+    def setUp(self):
+        GallicaGroupedSearch.getAPIWrapper = MagicMock()
+        self.search = GallicaGroupedSearch(
+            identifier=MagicMock(),
+            input_args=MagicMock(),
+            stateHooks=MagicMock(),
+            conn=MagicMock()
+        )
 
-        def test_getLocalFetchArgs(self):
-            self.fail()
+    def test_get_num_records_to_be_inserted(self):
+        self.search.args = {
+            'grouping': 'year',
+            'startDate': '1900',
+            'endDate': '1901'
+        }
+        onRecordFound = MagicMock()
+        result = self.search.getNumRecordsToBeInserted(onRecordFound)
 
-        def test_get_num_records_to_be_inserted(self):
-            self.fail()
+        self.assertEqual(result, 2)
+        onRecordFound.assert_called_once_with(self.search, 2)

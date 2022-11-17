@@ -71,16 +71,16 @@ def get_ocr_text_for_record(ark, term):
     return wrapper.get(ark, term)[0]
 
 
-def get_gallica_records_for_display(tickets, filters):
+def get_gallica_records_for_display(tickets, limit, offset):
     wrapper = gallicaGetter.connect('sru')
     records = []
     for ticket in tickets:
-        argsBundle = {
+        args_bundle = {
             **ticket,
-            'numRecords': filters.get('limit'),
-            'startRecord': filters.get('offset'),
+            'numRecords': limit,
+            'startRecord': offset
         }
-        records.extend(wrapper.get(**argsBundle))
+        records.extend(wrapper.get(**args_bundle))
     records.sort(key=lambda record: record.date.getDate())
     return records
 
