@@ -8,11 +8,11 @@ class TestOCRQuery(TestCase):
         self.ocrQuery = ContentQuery(
             ark='test',
             term='test',
-            baseURL='test'
+            endpoint='test'
         )
 
     def test_get_fetch_params(self):
-        test = self.ocrQuery.getFetchParams()
+        test = self.ocrQuery.get_params_for_fetch()
 
         self.assertDictEqual(
             test,
@@ -29,11 +29,11 @@ class TestPaperQuery(TestCase):
         self.paperQuery = PaperQuery(
             startIndex=0,
             numRecords=10,
-            baseURL='test'
+            endpoint='test'
         )
 
     def test_get_cql_all_papers(self):
-        test = self.paperQuery.getCQL()
+        test = self.paperQuery.get_cql()
         self.assertEqual(
             test,
             "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
@@ -45,11 +45,11 @@ class TestArkQueryForNewspaperYears(TestCase):
     def setUp(self) -> None:
         self.arkQuery = ArkQueryForNewspaperYears(
             code='test',
-            baseURL='test'
+            endpoint='test'
         )
 
     def test_get_fetch_params(self):
-        test = self.arkQuery.getFetchParams()
+        test = self.arkQuery.get_params_for_fetch()
         self.assertDictEqual(
             test,
             {'ark': 'ark:/12148/test/date'}
@@ -71,7 +71,7 @@ class TestQuery(TestCase):
                 'linkDistance': 0,
                 'linkTerm': ''
             },
-            baseURL='test'
+            endpoint='test'
         )
         self.queryWithoutCodes = OccurrenceQuery(
             term='test',
@@ -85,7 +85,7 @@ class TestQuery(TestCase):
                 'linkTerm': ''
             },
             codes=[],
-            baseURL='test'
+            endpoint='test'
         )
         self.queryWithLinkTermAndDistance = OccurrenceQuery(
             term='test',
@@ -99,11 +99,11 @@ class TestQuery(TestCase):
                 'linkTerm': ''
             },
             codes=[],
-            baseURL='test'
+            endpoint='test'
         )
 
     def test_get_fetch_params_given_codes(self):
-        test = self.queryWithCodes.getFetchParams()
+        test = self.queryWithCodes.get_params_for_fetch()
         self.assertDictEqual(
             test,
             {
@@ -118,15 +118,15 @@ class TestQuery(TestCase):
         )
 
     def test_get_fetch_params_without_codes(self):
-        test = self.queryWithoutCodes.getFetchParams()
+        test = self.queryWithoutCodes.get_params_for_fetch()
         self.assertIsInstance(test, dict)
 
     def test_get_fetch_params_with_link_term_and_distance(self):
-        test = self.queryWithLinkTermAndDistance.getFetchParams()
+        test = self.queryWithLinkTermAndDistance.get_params_for_fetch()
         self.assertIsInstance(test, dict)
 
     def test_get_essential_data_for_making_aquery(self):
-        test = self.queryWithCodes.getEssentialDataForMakingAQuery()
+        test = self.queryWithCodes.get_cql_params()
         self.assertDictEqual(
             test,
             {
@@ -134,6 +134,6 @@ class TestQuery(TestCase):
                 'codes': ['test', 'neat'],
                 'endDate': '1902',
                 'startDate': '1901',
-                "searchMetaData": self.queryWithCodes.searchMetaData
+                "searchMetaData": self.queryWithCodes.search_meta
             }
         )

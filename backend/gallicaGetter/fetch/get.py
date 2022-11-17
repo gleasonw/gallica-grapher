@@ -33,8 +33,8 @@ class Get:
         start = time.perf_counter()
         response = self.http.request(
             "GET",
-            query.getBaseURL(),
-            fields=query.getFetchParams()
+            query.get_endpoint_url(),
+            fields=query.get_params_for_fetch()
         )
         end = time.perf_counter()
         if response.status != 200:

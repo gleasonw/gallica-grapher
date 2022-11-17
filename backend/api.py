@@ -168,11 +168,11 @@ def fetch_gallica_records():
 
 @app.route('/api/ocrtext/<ark_code>/<term>')
 def get_ocr_text(ark_code, term):
-    count, text = get_ocr_text_for_record(
+    record = get_ocr_text_for_record(
         ark_code,
         term
     )
-    return {"numResults": count, "text": text}
+    return {"numResults": record.num_results, "text": record.get_pages()}
 
 
 if __name__ == "__main__":

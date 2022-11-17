@@ -15,7 +15,8 @@ from gallicaGetter.parse.parseRecord import (
 from gallicaGetter.build.queryBuilder import (
     OccurrenceQueryBuilder,
     PaperQueryBuilder,
-    ContentQueryBuilder
+    ContentQueryBuilder,
+    FullTextQueryBuilder
 )
 
 
@@ -46,11 +47,11 @@ class TestSRUWrapper(TestCase):
         self.api = SRUWrapper()
 
     def test_getQueryBuilder(self):
-        self.assertIsInstance(self.api.getQueryBuilder(), OccurrenceQueryBuilder)
+        self.assertIsInstance(self.api.get_query_builder(), OccurrenceQueryBuilder)
 
     def test_get(self):
         getter = SRUWrapper()
-        getter.fetchFromQueries = MagicMock()
+        getter.fetch_from_queries = MagicMock()
 
         self.assertIsInstance(
             getter.get(terms='a term'),
@@ -64,7 +65,7 @@ class TestIssuesWrapper(TestCase):
         self.api = IssuesWrapper()
 
     def test_getQueryBuilder(self):
-        self.assertIsInstance(self.api.getQueryBuilder(), PaperQueryBuilder)
+        self.assertIsInstance(self.api.get_query_builder(), PaperQueryBuilder)
 
     def test_buildParser(self):
         self.assertIsInstance(self.api.parser, ParseArkRecord)
@@ -72,7 +73,7 @@ class TestIssuesWrapper(TestCase):
     def test_get(self):
         getter = IssuesWrapper()
         getter.queryBuilder = MagicMock()
-        getter.fetchFromQueries = MagicMock()
+        getter.fetch_from_queries = MagicMock()
 
         self.assertIsInstance(
             getter.get('a paper code'),
@@ -86,7 +87,7 @@ class TestContentWrapper(TestCase):
             self.api = ContentWrapper()
 
         def test_getQueryBuilder(self):
-            self.assertIsInstance(self.api.getQueryBuilder(), ContentQueryBuilder)
+            self.assertIsInstance(self.api.get_query_builder(), ContentQueryBuilder)
 
         def test_buildParser(self):
             self.assertIsInstance(self.api.parser, ParseContentRecord)
@@ -94,7 +95,7 @@ class TestContentWrapper(TestCase):
         def test_get(self):
             getter = ContentWrapper()
             getter.queryBuilder = MagicMock()
-            getter.fetchFromQueries = MagicMock()
+            getter.fetch_from_queries = MagicMock()
 
             self.assertIsInstance(
                 getter.get(
@@ -111,13 +112,13 @@ class TestPapersWrapper(TestCase):
             self.paperWrapper = PapersWrapper()
 
         def test_getQueryBuilder(self):
-            self.assertIsInstance(self.paperWrapper.getQueryBuilder(), PaperQueryBuilder)
+            self.assertIsInstance(self.paperWrapper.get_query_builder(), PaperQueryBuilder)
 
         def test_get(self):
             getter = PapersWrapper()
             getter.queryBuilder = MagicMock()
-            getter.fetchFromQueries = MagicMock()
-            getter.issuesWrapper = MagicMock()
+            getter.fetch_from_queries = MagicMock()
+            getter.issues_wrapper = MagicMock()
 
             self.assertIsInstance(getter.get('a paper code'), list)
 
@@ -126,9 +127,11 @@ class TestFullTextWrapper(TestCase):
 
     def setUp(self) -> None:
         self.fullTextWrapper = FullTextWrapper()
+        self.fullTextWrapper.fetch_from_queries = MagicMock()
 
     def test_getQueryBuilder(self):
-        self.fail()
+        self.assertIsInstance(self.fullTextWrapper.get_query_builder(), FullTextQueryBuilder)
 
     def test_get(self):
-        self.fail()
+        records = self.fullTextWrapper.get('test')
+        self.assertIsInstance(records, list)

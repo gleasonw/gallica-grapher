@@ -134,6 +134,5 @@ class TestParseContentRecord(unittest.TestCase):
             test = self.testParse.parseResponsesToRecords(responses)
 
             for testResult in test:
-                numResults, pages = testResult
-                self.assertEqual(numResults, 2)
-                self.assertEqual(pages, 'test')
+                self.assertEqual(testResult.num_results, 2)
+                self.assertEqual(testResult.get_pages(), 'test')

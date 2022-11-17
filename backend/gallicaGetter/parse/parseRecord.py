@@ -5,6 +5,7 @@ from gallicaGetter.parse.groupedCountRecord import GroupedCountRecord
 from gallicaGetter.parse.occurrenceRecord import OccurrenceRecord
 from gallicaGetter.parse.paperRecord import PaperRecord
 from gallicaGetter.parse.parseHTML import parse_html
+from gallicaGetter.parse.contentRecord import ContentRecord
 
 
 #TODO: refactor records into PeriodCount and VolumeOccurrence
@@ -97,7 +98,7 @@ class ParseGroupedRecordCounts(ParseRecord):
             count = self.parser.getNumRecords(response.data)
             query = response.query
             yield GroupedCountRecord(
-                date=Date(query.getStartDate()),
+                date=Date(query.get_start_date()),
                 count=count,
                 ticketID=self.ticketID,
                 term=query.term,
@@ -108,10 +109,12 @@ class ParseGroupedRecordCounts(ParseRecord):
 class ParseContentRecord(ParseRecord):
 
     def parseResponsesToRecords(self, responses):
-        return (
-            self.parser.getNumResultsAndPagesForOccurrenceInPeriodical(response.data)
-            for response in responses
-        )
+        for response in responses:
+            num_results_and_pages = self.parser.getNumResultsAndPagesForOccurrenceInPeriodical(response.data)
+            yield ContentRecord(
+                num_results=num_results_and_pages[0],
+                pages=num_results_and_pages[1]
+            )
 
 
 class ParseFullText(ParseRecord):

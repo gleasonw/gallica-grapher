@@ -66,7 +66,7 @@ def select_display_records(tableArgs, conn):
     return records, count
 
 
-def get_ocr_text_for_record(ark, term) -> tuple:
+def get_ocr_text_for_record(ark, term):
     wrapper = gallicaGetter.connect('content')
     return wrapper.get(ark, term)[0]
 

@@ -88,7 +88,7 @@ class Search:
 class AllSearch(Search):
 
     def postInit(self):
-        self.baseQueriesWithNumResults = self.api.getNumResultsForArgs(
+        self.baseQueriesWithNumResults = self.api.get_num_results_for_args(
             args={
                 **self.args,
                 'numRecords':1
@@ -169,7 +169,7 @@ class GallicaGroupedSearch(Search):
 
     def moreDateIntervalsThanRecordBatches(self):
         args = {**self.args, 'grouping': 'all'}
-        firstResult = self.api.getNumResultsForArgs(args)[0]
+        firstResult = self.api.get_num_results_for_args(args)[0]
         numResults = firstResult[1]
         numIntervals = self.getNumRecordsToBeInserted()
         return int(numResults / 50) < numIntervals

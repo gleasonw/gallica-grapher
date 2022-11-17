@@ -1,28 +1,28 @@
 class Query:
 
-    def __init__(self, baseURL, **kwargs):
-        self.baseURL = baseURL
-        self.postInit(kwargs)
+    def __init__(self, endpoint, **kwargs):
+        self.endpoint_url = endpoint
+        self.post_init(kwargs)
 
-    def getBaseURL(self):
-        return self.baseURL
+    def get_endpoint_url(self):
+        return self.endpoint_url
 
-    def getFetchParams(self):
+    def get_params_for_fetch(self):
         raise NotImplementedError
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         pass
 
 
 class FullTextQuery(Query):
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         self.ark = kwargs["ark"]
 
-    def getBaseURL(self):
-        return f'{self.baseURL}/ark:/12148/{self.ark}.texteBrut'
+    def get_endpoint_url(self):
+        return f'{self.endpoint_url}/ark:/12148/{self.ark}.texteBrut'
 
-    def getFetchParams(self):
+    def get_params_for_fetch(self):
         return {}
 
     def __repr__(self) -> str:
@@ -31,14 +31,14 @@ class FullTextQuery(Query):
 
 class ArkQueryForNewspaperYears(Query):
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         self.ark = f'ark:/12148/{kwargs["code"]}/date'
         self.code = kwargs['code']
 
     def getCode(self):
         return self.code
 
-    def getFetchParams(self):
+    def get_params_for_fetch(self):
         return {"ark": self.ark}
 
     def __repr__(self):
@@ -47,11 +47,11 @@ class ArkQueryForNewspaperYears(Query):
 
 class ContentQuery(Query):
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         self.ark = kwargs['ark']
         self.term = kwargs['term']
 
-    def getFetchParams(self):
+    def get_params_for_fetch(self):
         return {
             "ark": self.ark,
             "query": self.term
@@ -70,103 +70,106 @@ class SRUQuery(Query):
         self.codes = kwargs.get('codes')
         super().__init__(**kwargs)
 
-    def getFetchParams(self):
+    def get_params_for_fetch(self):
         base = {
             "operation": "searchRetrieve",
             "exactSearch": "True",
             "version": 1.2,
             "startRecord": self.startIndex,
             "maximumRecords": self.numRecords,
-            "query": self.getCQL()
+            "query": self.get_cql()
         }
-        base.update(self.getCollapsingSetting())
+        base.update(self.get_collapsing())
         return base
 
-    def getCQL(self):
+    def get_cql(self):
         if not self.cql:
-            self.cql = self.generateCQL()
+            self.cql = self.generate_cql()
         return self.cql
 
-    def generateCQL(self):
+    def generate_cql(self):
         raise NotImplementedError
 
-    def buildPaperCQL(self):
+    def build_periodical_cql(self):
         if self.codes and self.codes[0]:
-            formattedCodes = [f"{code}_date" for code in self.codes]
-            return 'arkPress adj "' + '" or arkPress adj "'.join(formattedCodes) + '"'
+            formatted_codes = [f"{code}_date" for code in self.codes]
+            return 'arkPress adj "' + '" or arkPress adj "'.join(formatted_codes) + '"'
         else:
             return "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
 
-    def getCollapsingSetting(self):
+    def get_collapsing(self):
         return {"collapsing": "false"}
+
+    def get_cql_params(self):
+        raise NotImplementedError(f'{self.__class__.__name__} does not implement get_cql_params()')
 
 
 class OccurrenceQuery(SRUQuery):
 
-    def postInit(self, kwargs):
-        self.startDate = kwargs['startDate']
-        self.endDate = kwargs['endDate']
+    def post_init(self, kwargs):
+        self.start_date = kwargs['startDate']
+        self.end_date = kwargs['endDate']
         self.term = kwargs['term']
 
-        self.searchMetaData = kwargs['searchMetaData']
-        self.linkDistance = self.searchMetaData.get('linkDistance', 10)
-        self.linkTerm = self.searchMetaData.get('linkTerm')
-        self.identifier = self.searchMetaData.get('identifier')
+        self.search_meta = kwargs['searchMetaData']
+        self.link_distance = self.search_meta.get('linkDistance', 10)
+        self.link_term = self.search_meta.get('linkTerm')
+        self.identifier = self.search_meta.get('identifier')
 
-    def getIdentifier(self):
+    def get_id(self):
         return self.identifier
 
-    def getEssentialDataForMakingAQuery(self):
+    def get_cql_params(self):
         return {
             "term": self.term,
-            "endDate": self.endDate,
-            "startDate": self.startDate,
+            "endDate": self.end_date,
+            "startDate": self.start_date,
             "codes": self.codes,
-            "searchMetaData": self.searchMetaData
+            "searchMetaData": self.search_meta
         }
 
-    def getStartDate(self):
-        return self.startDate
+    def get_start_date(self):
+        return self.start_date
 
-    def generateCQL(self):
-        cqlList = []
-        (termCQL := self.buildTermCQL()) and cqlList.append(termCQL)
-        (dateCQL := self.buildDateCQL()) and cqlList.append(dateCQL)
-        (paperCQL := self.buildPaperCQL()) and cqlList.append(paperCQL)
-        return ' and '.join(cqlList)
+    def generate_cql(self):
+        cql_components = []
+        (termCQL := self.build_gram_cql()) and cql_components.append(termCQL)
+        (dateCQL := self.build_date_cql()) and cql_components.append(dateCQL)
+        (paperCQL := self.build_periodical_cql()) and cql_components.append(paperCQL)
+        return ' and '.join(cql_components)
 
-    def buildDateCQL(self):
-        if self.startDate and self.endDate:
-            return f'gallicapublication_date>="{self.startDate}" and gallicapublication_date<"{self.endDate}"'
-        elif self.startDate:
-            return f'gallicapublication_date="{self.startDate}"'
+    def build_date_cql(self):
+        if self.start_date and self.end_date:
+            return f'gallicapublication_date>="{self.start_date}" and gallicapublication_date<"{self.end_date}"'
+        elif self.start_date:
+            return f'gallicapublication_date="{self.start_date}"'
         else:
             return ''
 
-    def buildTermCQL(self) -> str:
-        if self.linkTerm:
-            return f'text adj "{self.term}" prox/unit=word/distance={self.linkDistance} "{self.linkTerm}"'
+    def build_gram_cql(self) -> str:
+        if self.link_term:
+            return f'text adj "{self.term}" prox/unit=word/distance={self.link_distance} "{self.link_term}"'
         elif self.term:
             return f'text adj "{self.term}"'
         else:
             return ''
 
     def __repr__(self):
-        return f"Query({self.getCQL()})"
+        return f"Query({self.get_cql()})"
 
 
 class PaperQuery(SRUQuery):
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         self.codes = kwargs.get('codes') or []
 
-    def generateCQL(self):
-        return self.buildPaperCQL()
+    def generate_cql(self):
+        return self.build_periodical_cql()
 
-    def getCollapsingSetting(self):
+    def get_collapsing(self):
         return {"collapsing": "true"}
 
-    def getEssentialDataForMakingAQuery(self):
+    def get_cql_params(self):
         return {"codes": self.codes}
 
     def __repr__(self):

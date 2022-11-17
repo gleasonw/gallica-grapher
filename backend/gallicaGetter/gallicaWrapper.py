@@ -1,62 +1,64 @@
-from gallicaGetter.build.queryBuilder import OccurrenceQueryBuilder
-from gallicaGetter.build.queryBuilder import ContentQueryBuilder
-from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from gallicaGetter.build.queryBuilder import PaperQueryBuilder
-from gallicaGetter.build.queryBuilder import FullTextQueryBuilder
+from gallicaGetter.build.queryBuilder import (
+    OccurrenceQueryBuilder,
+    ContentQueryBuilder,
+    PaperQueryBuilder,
+    FullTextQueryBuilder
+)
 from gallicaGetter.parse.parseRecord import buildParser
+from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from typing import List
 
 
 class GallicaWrapper:
     def __init__(self, **kwargs):
         self.api = ConcurrentFetch(numWorkers=kwargs.get('numWorkers', 10))
-        self.baseURL = self.getBaseURL()
+        self.endpoint_url = self.get_endpoint_url()
         self.parser = None
-        self.queryBuilder = self.getQueryBuilder()
-        self.postInit(kwargs)
+        self.queryBuilder = self.get_query_builder()
+        self.post_init(kwargs)
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         pass
 
     def get(self, **kwargs):
         raise NotImplementedError(f'get() not implemented for {self.__class__.__name__}')
 
-    def getQueryBuilder(self):
+    def get_query_builder(self):
         raise NotImplementedError(f'buildQueryBuilder() not implemented for {self.__class__.__name__}')
 
-    def getBaseURL(self):
+    def get_endpoint_url(self):
         raise NotImplementedError(f'getBaseURL() not implemented for {self.__class__.__name__}')
         
-    def fetchFromQueries(self, queries, parser, onUpdateProgress=None):
-        rawResponse = self.api.get(
+    def fetch_from_queries(self, queries, parser, onUpdateProgress=None):
+        raw_response = self.api.get(
             queries,
             onUpdateProgress=onUpdateProgress
         )
-        records = parser.parseResponsesToRecords(rawResponse)
+        records = parser.parseResponsesToRecords(raw_response)
         return records
 
-    def buildParser(self):
+    def get_parser(self):
         pass
 
 
 class SRUWrapper(GallicaWrapper):
 
-    def postInit(self, kwargs):
-        self.groupedRecordParser = buildParser(
+    def post_init(self, kwargs):
+        self.group_record_parser = buildParser(
             desiredRecord='groupedCount',
             ticketID=kwargs.get('ticketID'),
             requestID=kwargs.get('requestID')
         )
-        self.soloRecordParser = buildParser(
+        self.solo_record_parser = buildParser(
             desiredRecord='occurrence',
             ticketID=kwargs.get('ticketID'),
             requestID=kwargs.get('requestID')
         )
 
-    def getQueryBuilder(self):
+    def get_query_builder(self):
         return OccurrenceQueryBuilder(props=self)
 
-    def getBaseURL(self):
+    def get_endpoint_url(self):
         return 'https://gallica.bnf.fr/SRU'
 
     def get(self, terms, onUpdateProgress=None, generate=False, queriesWithCounts=None, **kwargs) -> List:
@@ -65,124 +67,113 @@ class SRUWrapper(GallicaWrapper):
         if grouping is None:
             grouping = 'year'
             kwargs['grouping'] = grouping
-        queries = self.buildQueries(
+        queries = self.build_queries(
             kwargs,
             queriesWithCounts
         )
-        recordGenerator = self.fetchFromQueries(
+        record_generator = self.fetch_from_queries(
             queries=queries,
-            parser=self.soloRecordParser if grouping == 'all' else self.groupedRecordParser,
+            parser=self.solo_record_parser if grouping == 'all' else self.group_record_parser,
             onUpdateProgress=onUpdateProgress
         )
-        return recordGenerator if generate else list(recordGenerator)
+        return record_generator if generate else list(record_generator)
 
-    def buildQueries(self, kwargs, queries_with_counts):
+    def build_queries(self, kwargs, queries_with_counts):
         if queries_with_counts:
-            return self.queryBuilder.indexQueriesWithNumResults(queries_with_counts)
+            return self.queryBuilder.index_queries_by_num_results(queries_with_counts)
         else:
-            return self.queryBuilder.buildQueriesForArgs(kwargs)
+            return self.queryBuilder.build_queries_for_args(kwargs)
 
-    def getNumResultsForArgs(self, args):
-        baseQueries = self.queryBuilder.buildBaseQueriesFromArgs(args)
-        return self.queryBuilder.getNumResultsForEachQuery(baseQueries)
+    def get_num_results_for_args(self, args):
+        base_queries = self.queryBuilder.build_base_queries(args)
+        return self.queryBuilder.get_num_results_for_query(base_queries)
 
 
 class IssuesWrapper(GallicaWrapper):
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         self.parser = buildParser('ark')
 
-    def getQueryBuilder(self):
+    def get_query_builder(self):
         return PaperQueryBuilder(props=self)
 
-    def getBaseURL(self):
+    def get_endpoint_url(self):
         return 'https://gallica.bnf.fr/services/Issues'
 
     def get(self, codes, generate=False):
-        queries = self.queryBuilder.buildArkQueriesForCodes(codes)
-        recordGenerator = self.fetchFromQueries(
+        queries = self.queryBuilder.build_ark_queries_for_codes(codes)
+        record_generator = self.fetch_from_queries(
             queries,
             parser=self.parser
         )
-        return recordGenerator if generate else list(recordGenerator)
+        return record_generator if generate else list(record_generator)
 
 
 class ContentWrapper(GallicaWrapper):
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         self.parser = buildParser('content')
 
-    def getQueryBuilder(self):
+    def get_query_builder(self):
         return ContentQueryBuilder(props=self)
 
-    def getBaseURL(self):
+    def get_endpoint_url(self):
         return 'https://gallica.bnf.fr/services/ContentSearch'
 
     def get(self, ark, term, generate=False):
-        query = self.queryBuilder.buildQueryForArkAndTerm(
+        query = self.queryBuilder.build_query_for_ark_and_term(
             ark=ark,
             term=term
         )
-        recordGen = self.fetchFromQueries(
+        record_generator = self.fetch_from_queries(
             queries=query,
             parser=self.parser
         )
-        return recordGen if generate else list(recordGen)
+        return record_generator if generate else list(record_generator)
 
 
 class PapersWrapper(GallicaWrapper):
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         self.parser = buildParser('paper')
-        self.issuesWrapper = IssuesWrapper()
+        self.issues_wrapper = IssuesWrapper()
 
-    def getQueryBuilder(self):
+    def get_query_builder(self):
         return PaperQueryBuilder(props=self)
 
-    def getBaseURL(self):
+    def get_endpoint_url(self):
         return 'https://gallica.bnf.fr/SRU'
 
     def get(self, argCodes, stateHooks=None, **kwargs):
-        queries = self.queryBuilder.buildQueriesForArgs(argCodes)
-        recordGenerator = self.fetchFromQueries(
+        queries = self.queryBuilder.build_queries_for_args(argCodes)
+        record_generator = self.fetch_from_queries(
             queries,
             parser=self.parser,
         )
-        sruPaperRecords = list(recordGenerator)
-        codes = [record.code for record in sruPaperRecords]
-        yearRecords = self.issuesWrapper.get(codes)
-        yearsAsDict = {record.code: record.years for record in yearRecords}
-        for record in sruPaperRecords:
-            record.addYearsFromArk(yearsAsDict[record.code])
-        return sruPaperRecords
-
-    def getNumResultsForArgs(self, **kwargs):
-        pass
+        sru_paper_records = list(record_generator)
+        codes = [record.code for record in sru_paper_records]
+        year_records = self.issues_wrapper.get(codes)
+        years_as_dict = {record.code: record.years for record in year_records}
+        for record in sru_paper_records:
+            record.addYearsFromArk(years_as_dict[record.code])
+        return sru_paper_records
 
 
 class FullTextWrapper(GallicaWrapper):
 
-    def postInit(self, kwargs):
+    def post_init(self, kwargs):
         self.parser = buildParser('fullText')
 
-    def getBaseURL(self):
+    def get_endpoint_url(self):
         return 'https://gallica.bnf.fr'
 
-    def getQueryBuilder(self):
+    def get_query_builder(self):
         return FullTextQueryBuilder(props=self)
 
-    def get(self, arkCodes, generate=False):
-        queries = self.queryBuilder.buildQueriesForArkCodes(arkCodes)
-        recordGen = self.fetchFromQueries(
+    def get(self, ark_codes, generate=False):
+        queries = self.queryBuilder.build_queries_for_ark_codes(ark_codes)
+        record_generator = self.fetch_from_queries(
             queries=queries,
             parser=self.parser
         )
-        return recordGen if generate else list(recordGen)
-
-    def buildParser(self):
-        return
-
-
-if __name__ == '__main__':
-    wrapper = SRUWrapper()
-    test = wrapper.get('brazza', codes='cb32895690j', grouping='all')
+        return record_generator if generate else list(record_generator)
