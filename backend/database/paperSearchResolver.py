@@ -22,7 +22,7 @@ def select_continuous_papers(start_year, end_year, limit, conn) -> dict:
         return paperDataToJSON(continuous_papers)
 
 
-def get_papers_similar_to_keyword(keyword, conn) -> dict:
+def select_papers_similar_to_keyword(keyword, conn) -> dict:
     keyword = keyword.lower()
     with conn.cursor() as curs:
         curs.execute("""

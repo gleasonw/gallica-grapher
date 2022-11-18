@@ -6,7 +6,7 @@ import datetime
 import ciso8601
 
 
-def get_series_for_tickets(settings, conn):
+def select_series_for_tickets(settings, conn):
     ticket_ids = settings['ticketIDs'].split(',')
     data_batches = list(map(
         lambda ticket_id: HighchartsSeriesForTicket(

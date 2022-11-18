@@ -16,7 +16,7 @@ AND requestid = %(requestID)s
 """
 
 
-def get_csv_data_for_request(ticketIDs, requestID, conn):
+def select_csv_data_for_tickets(ticketIDs, requestID, conn):
     tupledTickets = tuple(ticketIDs.split(','))
     with conn.cursor() as cur:
         cur.execute(f"""
@@ -93,7 +93,7 @@ def clear_records_for_requestid(requestID, conn):
         """, (requestID,))
 
 
-def get_top_papers_for_tickets(tickets, requestID, conn):
+def select_top_papers_for_tickets(tickets, requestID, conn):
     with conn.cursor() as cursor:
         cursor.execute("""
         WITH resultCounts AS (

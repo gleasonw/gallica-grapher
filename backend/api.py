@@ -7,17 +7,17 @@ from tasks import spawn_request
 from database.connContext import build_db_conn
 from database.paperSearchResolver import (
     select_continuous_papers,
-    get_papers_similar_to_keyword,
+    select_papers_similar_to_keyword,
     get_num_papers_in_range,
 )
-from database.graphDataResolver import get_series_for_tickets
+from database.graphDataResolver import select_series_for_tickets
 from database.displayDataResolvers import (
     select_display_records,
     get_gallica_records_for_display,
     clear_records_for_requestid,
     get_ocr_text_for_record,
-    get_csv_data_for_request,
-    get_top_papers_for_tickets
+    select_csv_data_for_tickets,
+    select_top_papers_for_tickets
 )
 import time
 
@@ -70,7 +70,7 @@ def revoke_task(celery_task_id, request_id):
 @app.route('/api/papers/<keyword>')
 def papers(keyword):
     with build_db_conn() as conn:
-        similar_papers = get_papers_similar_to_keyword(keyword, conn)
+        similar_papers = select_papers_similar_to_keyword(keyword, conn)
     return similar_papers
 
 
@@ -113,7 +113,7 @@ def get_graph_series_for_tickets():
     }
     start = time.perf_counter()
     with build_db_conn() as conn:
-        items = get_series_for_tickets(settings, conn)
+        items = select_series_for_tickets(settings, conn)
     end = time.perf_counter()
     print(f"get_series_for_tickets {request.args['requestID']} took {end - start} seconds")
     return {'series': items}
@@ -124,7 +124,7 @@ def get_top_papers():
     ticket_ids = tuple(request.args["tickets"].split(","))
     start = time.perf_counter()
     with build_db_conn() as conn:
-        top_papers = get_top_papers_for_tickets(
+        top_papers = select_top_papers_for_tickets(
             tickets=ticket_ids,
             requestID=request.args["requestID"],
             conn=conn
@@ -139,7 +139,7 @@ def get_csv():
     tickets = request.args["tickets"]
     request_id = request.args["requestID"]
     with build_db_conn() as conn:
-        csv_data = get_csv_data_for_request(
+        csv_data = select_csv_data_for_tickets(
             tickets,
             request_id,
             conn=conn
