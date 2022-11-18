@@ -181,17 +181,15 @@ function App() {
         const nameToId = {
             "Colors": -1,
             "Arts": -2,
-            "Pastries": -3,
             "Scandal": -4,
             "Colonialism": -5,
             "Capitals": -6,
-            "Far West": -7
         }
         const [id, tickets] = Object.entries(example)[0];
         const ticketData = tickets['tickets'];
         const requestWithUniqueTicketIDs = {}
         Object.keys(ticketData).map((ticketID, index) => {
-            ticketData[ticketID].grouping = 'month';
+            ticketData[ticketID].grouping = 'year';
             requestWithUniqueTicketIDs[index] = ticketData[ticketID];
         })
         setTickets(requestWithUniqueTicketIDs);

@@ -17,16 +17,6 @@
           "papersAndCodes": [],
           "startDate": 1865,
           "endDate" : 1910
-        },
-        "rose": {
-          "terms": [
-            "rose"
-          ],
-          "papersAndCodes": [],
-          "startDate": 1865,
-          "endDate" : 1910,
-          "linkTerm": "pantalon",
-          "linkDistance": 2
         }
       }
     },
@@ -50,36 +40,6 @@
         }
       }
     },
-    "Pastries": {
-      "tickets": {
-        "patiserrie": {
-          "terms": [
-            "patisserie"
-          ],
-          "papersAndCodes": [],
-          "startDate": 1865,
-          "endDate" : 1910
-        },
-        "brioche": {
-          "terms": [
-            "brioche"
-          ],
-          "papersAndCodes": [],
-          "startDate": 1865,
-          "endDate" : 1910
-        },
-        "croissant": {
-          "terms": [
-            "croissant"
-          ],
-          "papersAndCodes": [],
-          "linkTerm": "patisserie",
-          "startDate": 1865,
-          "endDate" : 1910,
-          "linkDistance": 5
-        }
-      }
-    },
     "Scandal": {
       "tickets": {
         "empoissonement": {
@@ -88,19 +48,7 @@
           ],
           "papersAndCodes": [],
           "startDate": 1865,
-          "endDate" : 1910,
-          "linkTerm": "empoisonnement",
-          "linkDistance": 30
-        },
-        "corruption": {
-          "terms": [
-            "scandale"
-          ],
-          "papersAndCodes": [],
-          "startDate": 1865,
-          "endDate" : 1910,
-          "linkTerm": "corruption",
-          "linkDistance": 30
+          "endDate" : 1910
         }
       }
     },
@@ -110,38 +58,7 @@
           "terms": [
             "algerie"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            },
-            {
-              "code": "cb328066631",
-              "endDate": 1940,
-              "startDate": 1865,
-              "title": "La Liberté"
-            },
-            {
-              "code": "cb328123058",
-              "endDate": 1944,
-              "startDate": 1884,
-              "title": "Le Matin (Paris. 1884)"
-            },
-            {
-              "code": "cb34355551z",
-              "endDate": 1951,
-              "startDate": 1854,
-              "title": "Le Figaro (Paris. 1854)"
-            },
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
+          "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
         },
@@ -149,38 +66,7 @@
           "terms": [
             "congo"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            },
-            {
-              "code": "cb328066631",
-              "endDate": 1940,
-              "startDate": 1865,
-              "title": "La Liberté"
-            },
-            {
-              "code": "cb328123058",
-              "endDate": 1944,
-              "startDate": 1884,
-              "title": "Le Matin (Paris. 1884)"
-            },
-            {
-              "code": "cb34355551z",
-              "endDate": 1951,
-              "startDate": 1854,
-              "title": "Le Figaro (Paris. 1854)"
-            },
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
+          "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
         },
@@ -188,82 +74,9 @@
           "terms": [
             "indochine"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32757974m",
-              "endDate": 1921,
-              "startDate": 1871,
-              "title": "Le XIXe siècle (Paris. 1871)"
-            },
-            {
-              "code": "cb328066631",
-              "endDate": 1940,
-              "startDate": 1865,
-              "title": "La Liberté"
-            },
-            {
-              "code": "cb328123058",
-              "endDate": 1944,
-              "startDate": 1884,
-              "title": "Le Matin (Paris. 1884)"
-            },
-            {
-              "code": "cb34355551z",
-              "endDate": 1951,
-              "startDate": 1854,
-              "title": "Le Figaro (Paris. 1854)"
-            },
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
+          "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
-        },
-        "conquete": {
-            "terms": [
-              "colonie",
-              "colonial"
-            ],
-            "papersAndCodes": [
-                {
-                "code": "cb32757974m",
-                "endDate": 1921,
-                "startDate": 1871,
-                "title": "Le XIXe siècle (Paris. 1871)"
-                },
-                {
-                "code": "cb328066631",
-                "endDate": 1940,
-                "startDate": 1865,
-                "title": "La Liberté"
-                },
-                {
-                "code": "cb328123058",
-                "endDate": 1944,
-                "startDate": 1884,
-                "title": "Le Matin (Paris. 1884)"
-                },
-                {
-                "code": "cb34355551z",
-                "endDate": 1951,
-                "startDate": 1854,
-                "title": "Le Figaro (Paris. 1854)"
-                },
-                {
-                "code": "cb32895690j",
-                "endDate": 1944,
-                "startDate": 1863,
-                "title": "Le Petit journal (Paris. 1863)"
-                }
-            ],
-            "startDate": 1854,
-            "endDate" : 1951,
-            "linkTerm": "conquete",
-            "linkDistance": 20
         }
       }
     },
@@ -308,36 +121,6 @@
           "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
-        }
-      }
-    },
-    "Far West": {
-      "tickets": {
-        "seattle": {
-          "terms": [
-            "seattle"
-          ],
-          "papersAndCodes": [],
-          "startDate": 1854,
-          "endDate" : 1951
-        },
-        "san francisco": {
-          "terms": [
-            "\"los angeles\""
-          ],
-          "papersAndCodes": [],
-          "startDate": 1854,
-          "endDate" : 1951
-        },
-        "portland": {
-          "terms": [
-            "portland"
-          ],
-          "papersAndCodes": [],
-          "startDate": 1854,
-          "endDate" : 1951,
-          "linkTerm": "oregon",
-          "linkDistance": 20
         }
       }
     }

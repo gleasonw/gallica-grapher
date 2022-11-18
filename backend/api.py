@@ -19,7 +19,6 @@ from database.displayDataResolvers import (
     select_csv_data_for_tickets,
     select_top_papers_for_tickets
 )
-import time
 
 app = Flask(__name__)
 CORS(app)

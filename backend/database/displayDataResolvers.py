@@ -68,6 +68,8 @@ def select_display_records(tableArgs, conn):
 
 def get_ocr_text_for_record(ark, term):
     wrapper = gallicaGetter.connect('content')
+    if ' ' in term:
+        term = '"' + term + '"'
     return wrapper.get(ark, term)[0]
 
 
