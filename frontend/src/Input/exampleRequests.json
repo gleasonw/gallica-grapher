@@ -273,14 +273,7 @@
           "terms": [
             "berlin"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
+          "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
         },
@@ -288,14 +281,7 @@
           "terms": [
             "washington"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
+          "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
         },
@@ -303,14 +289,7 @@
           "terms": [
             "londres"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
+          "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
         },
@@ -318,14 +297,7 @@
           "terms": [
             "tokyo"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
+          "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
         },
@@ -333,14 +305,7 @@
           "terms": [
             "rome"
           ],
-          "papersAndCodes": [
-            {
-              "code": "cb32895690j",
-              "endDate": 1944,
-              "startDate": 1863,
-              "title": "Le Petit journal (Paris. 1863)"
-            }
-          ],
+          "papersAndCodes": [],
           "startDate": 1854,
           "endDate" : 1951
         }

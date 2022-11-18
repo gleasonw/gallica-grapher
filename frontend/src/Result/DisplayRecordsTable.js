@@ -178,6 +178,11 @@ function StyledFilterAndTable(props) {
                 />
                 {!props.compact && !props.isGallicaGrouped &&
                     <div>
+                        <TicketPaperOccurrenceStats
+                            tickets={Object.keys(props.tickets)}
+                            requestID={props.requestID}
+                            cacheID={props.cacheID}
+                        />
                         <DownloadCSVButton
                             tickets={props.tickets}
                             requestID={props.requestID}

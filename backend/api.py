@@ -111,26 +111,20 @@ def get_graph_series_for_tickets():
         'endDate': request.args["endDate"],
         'requestID': request.args["requestID"]
     }
-    start = time.perf_counter()
     with build_db_conn() as conn:
         items = select_series_for_tickets(settings, conn)
-    end = time.perf_counter()
-    print(f"get_series_for_tickets {request.args['requestID']} took {end - start} seconds")
     return {'series': items}
 
 
 @app.route('/api/topPapers')
 def get_top_papers():
     ticket_ids = tuple(request.args["tickets"].split(","))
-    start = time.perf_counter()
     with build_db_conn() as conn:
         top_papers = select_top_papers_for_tickets(
             tickets=ticket_ids,
             requestID=request.args["requestID"],
             conn=conn
         )
-    end = time.perf_counter()
-    print(f"get_top_papers_for_tickets {request.args['requestID']} took {end - start} seconds")
     return {"topPapers": top_papers}
 
 
@@ -151,11 +145,8 @@ def get_csv():
 def get_display_records():
     table_filters = dict(request.args)
     table_filters['tickets'] = tuple(table_filters['tickets'].split(','))
-    start= time.perf_counter()
     with build_db_conn() as conn:
         records, count = select_display_records(table_filters, conn)
-    end = time.perf_counter()
-    print(f"select_display_records {request.args['requestID']} took {end - start} seconds")
     return {
         "displayRecords": records,
         "count": count
@@ -185,14 +176,11 @@ def fetch_gallica_records():
     """
     args = dict(request.args)
     tickets = json.loads(args['tickets'])
-    start= time.perf_counter()
     records = get_gallica_records_for_display(
         tickets=tickets,
         limit=args['limit'],
         offset=args['offset'],
     )
-    end = time.perf_counter()
-    print(f"get_gallica_records_for_display {request.args['requestID']} took {end - start} seconds")
     records = [record.getDisplayRow() for record in records]
     return {"displayRecords": records}
 
