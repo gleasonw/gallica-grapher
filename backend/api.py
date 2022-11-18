@@ -15,9 +15,9 @@ from database.displayDataResolvers import (
     select_display_records,
     get_gallica_records_for_display,
     clear_records_for_requestid,
-    get_top_papers_for_tickets,
     get_ocr_text_for_record,
-    get_csv_data_for_request
+    get_csv_data_for_request,
+    get_top_papers_for_tickets
 )
 import time
 
@@ -120,7 +120,7 @@ def get_graph_series_for_tickets():
 
 
 @app.route('/api/topPapers')
-def get_top_papers_for_tickets():
+def get_top_papers():
     ticket_ids = tuple(request.args["tickets"].split(","))
     start = time.perf_counter()
     with build_db_conn() as conn:
