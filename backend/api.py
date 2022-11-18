@@ -186,6 +186,11 @@ def fetch_gallica_records():
 
 @app.route('/api/ocrtext/<ark_code>/<term>')
 def get_ocr_text(ark_code, term):
+    """
+    :param ark_code: an issue code on Gallica (e.g. bpt6k592067f)
+    :param term: a term to search for in the volume
+
+    """
     record = get_ocr_text_for_record(
         ark_code,
         term

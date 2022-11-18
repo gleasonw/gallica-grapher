@@ -8,7 +8,7 @@ from gallicaGetter.parse.parseRecord import buildParser
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from typing import List
 
-
+#TODO: add graceful timeouts
 class GallicaWrapper:
     def __init__(self, **kwargs):
         self.api = ConcurrentFetch(numWorkers=kwargs.get('numWorkers', 10))
