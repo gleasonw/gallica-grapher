@@ -13,11 +13,20 @@ export default function Ticket(props){
         !props.isMutable && (borderRadius[1] = '10px');
     }
     borderRadius = borderRadius.join(' ');
+    let ticketIsMismatched;
+    if (props.mismatchedDataOrigin) {
+        const [mismatchPresent, attemptedInput] = props.mismatchedDataOrigin;
+        ticketIsMismatched = mismatchPresent && attemptedInput !== props.ticket.dataFromPyllica
+    }else{
+        ticketIsMismatched = false;
+    }
+
     return(
         <DecorativeTicket
             borderRadius={borderRadius}
             maxWidth={props.maxWidth}
             isMutable={props.isMutable}
+            ticketIsMismatched={ticketIsMismatched}
         >
             <SeriesColorBubble color={props.color}/>
             {props.actionIcon}

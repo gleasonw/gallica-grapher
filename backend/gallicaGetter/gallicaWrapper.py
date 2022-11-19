@@ -1,12 +1,13 @@
-from gallicaGetter.build.queryBuilder import (
+from gallicaGetter.build.sruQueryBuilder import (
     OccurrenceQueryBuilder,
-    ContentQueryBuilder,
-    PaperQueryBuilder,
-    FullTextQueryBuilder
+    PaperQueryBuilder
 )
+from gallicaGetter.build.contentQueryBuilder import ContentQueryBuilder
+from gallicaGetter.build.fullTextQueryBuilder import FullTextQueryBuilder
 from gallicaGetter.parse.parseRecord import buildParser
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from typing import List
+
 
 #TODO: add graceful timeouts
 class GallicaWrapper:

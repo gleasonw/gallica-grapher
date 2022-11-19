@@ -40,7 +40,7 @@ class ParseRecord:
 class ParsePaperRecords(ParseRecord):
 
     def getNumResults(self, xml):
-        return self.parser.getNumRecords(xml)
+        return self.parser.get_num_records(xml)
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
@@ -62,7 +62,7 @@ class ParseOccurrenceRecords(ParseRecord):
         self.ticketID = args['ticketID']
 
     def getNumResults(self, xml):
-        return self.parser.getNumRecords(xml)
+        return self.parser.get_num_records(xml)
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
@@ -95,7 +95,7 @@ class ParseGroupedRecordCounts(ParseRecord):
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
-            count = self.parser.getNumRecords(response.data)
+            count = self.parser.get_num_records(response.data)
             query = response.query
             yield GroupedCountRecord(
                 date=Date(query.get_start_date()),

@@ -12,12 +12,12 @@ from gallicaGetter.parse.parseRecord import (
     ParseArkRecord,
     ParseContentRecord
 )
-from gallicaGetter.build.queryBuilder import (
+from gallicaGetter.build.sruQueryBuilder import (
     OccurrenceQueryBuilder,
-    PaperQueryBuilder,
-    ContentQueryBuilder,
-    FullTextQueryBuilder
+    PaperQueryBuilder
 )
+from gallicaGetter.build.contentQueryBuilder import ContentQueryBuilder
+from gallicaGetter.build.fullTextQueryBuilder import FullTextQueryBuilder
 
 
 class TestGallicaWrapper(TestCase):

@@ -74,6 +74,7 @@ function TicketForm(props) {
                         onTicketClick={props.onTicketClick}
                         className={'requestBox'}
                         onCreateTicketClick={handleCreateTicketClick}
+                        mismatchedDataOrigin={props.mismatchedDataOrigin}
                     />
                 </div>
             </div>

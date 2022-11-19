@@ -26,6 +26,7 @@ export default function TicketLabelRow(props) {
                     lastInRow={index === numTickets - 1}
                     isMutable={props.isMutable}
                     maxWidth={props.maxWidth}
+                    mismatchedDataOrigin={props.mismatchedDataOrigin}
                     actionIcon={
                         props.isMutable ?
                         <SmallIconStyle onClick={() => props.onTicketClick(ticketID)}>

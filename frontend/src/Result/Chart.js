@@ -9,7 +9,7 @@ import generateOptions from "./chartUtils/generateOptions";
 import NavBarWrap from "./NavBarWrap";
 import {StyledSelect} from "../shared/StyledSelect";
 import {StyledInputAndLabel} from "../shared/StyledSelect";
-import {GallicaGramShoutOut, DataLimitationWarning} from "./ChartMessages";
+import {GallicaGramShoutOut, DataLimitationWarning} from "../shared/Messages";
 
 require("highcharts/modules/exporting")(Highcharts);
 require("highcharts/modules/export-data")(Highcharts);

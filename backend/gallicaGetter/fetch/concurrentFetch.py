@@ -1,16 +1,15 @@
 from concurrent.futures import ThreadPoolExecutor
-from gallicaGetter.fetch.get import Get
+from gallicaGetter.fetch.gallicasession import GallicaSession
 
-NUM_WORKERS = 10
+NUM_WORKERS = 20
 
 
 class ConcurrentFetch:
 
     def __init__(self, numWorkers=NUM_WORKERS):
         self.numWorkers = numWorkers
-        self.api = Get(maxSize=numWorkers)
+        self.api = GallicaSession(maxSize=numWorkers)
 
-    #TODO: implement text snippets every 20 seconds or so. Fun way to pass the time
     def get(self, queries, onUpdateProgress=None) -> list:
         if type(queries) is not list:
             queries = [queries]

@@ -188,7 +188,7 @@ def fetch_gallica_records():
 def get_ocr_text(ark_code, term):
     """
     :param ark_code: an issue code on Gallica (e.g. bpt6k592067f)
-    :param term: a term to search for in the volume
+    :param term: a term to search for in the that issue
 
     """
     record = get_ocr_text_for_record(

@@ -17,11 +17,6 @@ export default function DateGroupSelect(props){
                 children={'month'}
                 selected = {props.selected === 1}
                 onClick={() => props.onDateGroupClick(1)}
-            />
-            <OptionWrap
-                selected = {props.selected === 2}
-                children={'no grouping, fetch all'}
-                onClick={() => props.onDateGroupClick(2)}
                 borderRadius={'0 10px 10px 0'}
             />
         </StyledOptionInput>

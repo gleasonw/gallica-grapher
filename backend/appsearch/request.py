@@ -116,6 +116,13 @@ if __name__ == '__main__':
                     'startDate': 1880,
                     'endDate': 1990,
                     'codes': ['cb32895690j']
+                },
+                '2': {
+                    'terms': 'brazza',
+                    'grouping': 'year',
+                    'startDate': 1880,
+                    'endDate': 1990,
+                    'codes': ['cb34448033b']
                 }
             },
             conn=conn

@@ -4,7 +4,7 @@ import LesserButton from "../shared/LesserButton";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import TicketLabelRow from "./TicketLabelRow";
 
-export function RequestBox(props) {
+function RequestBox(props) {
     return(
         <StyledTicketRow>
             <TicketLabelRow
@@ -12,6 +12,7 @@ export function RequestBox(props) {
                 onTicketClick={props.onTicketClick}
                 isMutable={true}
                 maxWidth={'200px'}
+                mismatchedDataOrigin={props.mismatchedDataOrigin}
             />
             {Object.keys(props.tickets).length < 5 &&
             <LesserButton

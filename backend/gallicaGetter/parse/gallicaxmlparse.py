@@ -31,12 +31,12 @@ class GallicaXMLparse:
         return elements.find('html').text
 
     @staticmethod
-    def getNumRecords(xml) -> int:
-        xmlRoot = etree.fromstring(xml)
-        numResults = xmlRoot.find(
+    def get_num_records(xml) -> int:
+        xml_root = etree.fromstring(xml)
+        num_results = xml_root.find(
             "{http://www.loc.gov/zing/srw/}numberOfRecords")
-        if numResults is not None:
-            return int(numResults.text)
+        if num_results is not None:
+            return int(num_results.text)
         else:
             return 0
 

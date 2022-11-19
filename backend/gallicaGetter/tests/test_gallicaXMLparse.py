@@ -36,7 +36,7 @@ class TestGallicaXMLparse(TestCase):
 
     def test_get_num_records(self):
         self.assertEqual(
-            self.parse.getNumRecords(self.occurrencesXML),
+            self.parse.get_num_records(self.occurrencesXML),
             78514
         )
 

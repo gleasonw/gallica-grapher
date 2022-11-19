@@ -6,7 +6,7 @@ const DecorativeTicket = styled.div`
         background-color: ${props => props.isMutable ? 'rgba(255, 255, 255, 0.5)' : 'rgb(255, 255, 255)'};
         padding: 15px;
         border-radius: ${props => props.borderRadius ? props.borderRadius : '10px'};
-        border: 1px solid #d9d9d9;
+        border: ${props => props.ticketIsMismatched ? '1px solid red' : '1px solid #d9d9d9'};
         overflow: hidden;
         height: ${props => props.height ? props.height : 'auto'};
         max-width: ${props => props.maxWidth ? props.maxWidth : '100%'};

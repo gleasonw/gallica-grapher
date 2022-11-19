@@ -168,10 +168,10 @@ class GallicaGroupedSearch(Search):
 
     def moreDateIntervalsThanRecordBatches(self):
         args = {**self.args, 'grouping': 'all'}
-        firstResult = self.api.get_num_results_for_args(args)[0]
-        numResults = firstResult[1]
-        numIntervals = self.getNumRecordsToBeInserted()
-        return int(numResults / 50) < numIntervals
+        first_result = self.api.get_num_results_for_args(args)[0]
+        num_results = first_result[1]
+        num_intervals = self.getNumRecordsToBeInserted()
+        return int(num_results / 50) < num_intervals
 
     def getLocalFetchArgs(self):
         return {

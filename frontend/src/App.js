@@ -20,6 +20,7 @@ function App() {
     const [progressID, setProgressID] = useState(null);
     const [currentPage, setCurrentPage] = useState('input');
     const [numRecords, setNumRecords] = useState(0);
+    const [mismatchedDataOrigin, setMismatchedDataOrigin] = useState([false, false]);
     const requestBoxRef = useRef(null);
     const pages = {
         'input':
@@ -37,6 +38,7 @@ function App() {
                 onStartYearChange={(year) => setStartYear(year)}
                 onEndYearChange={(year) => setEndYear(year)}
                 onSearchTypeChange={(i) => setSelectedSearchType(i)}
+                mismatchedDataOrigin={mismatchedDataOrigin}
             />,
         'running':
             <RunningQueriesUI
@@ -96,12 +98,23 @@ function App() {
             </ClassicUIBox>
     }
 
-    //TODO: ensure no periodical searches and all searches are mixed
     function getUpdatedTickets(ticket) {
         const newTicketID = Object.keys(tickets).length;
+        const dataFromPyllica = ticket.papersAndCodes.length === 0;
+        const ticketsDontMatch = Object.values(tickets).some(t => t.dataFromPyllica !== dataFromPyllica);
+        if(ticketsDontMatch) {
+            alert('Searches over specific periodicals are, for now, not comparable with searches over all periodicals. Mismatching tickets are highlighted in red.')
+            setMismatchedDataOrigin([true, dataFromPyllica]);
+            return tickets;
+        }else{
+            setMismatchedDataOrigin([false, dataFromPyllica]);
+        }
         return {
             ...tickets,
-            [newTicketID]: ticket
+            [newTicketID]: {
+                ...ticket,
+                dataFromPyllica: dataFromPyllica,
+            }
         };
     }
 
@@ -117,7 +130,7 @@ function App() {
     }
 
     async function initRequest(tickets) {
-        const completedTickets = addGroupingToTickets(tickets);
+        const completedTickets = addSearchTypeToTickets(tickets);
         const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
         const {request} = await axios.post('/api/init', {
             tickets: ticketsWithPaperNamesRemoved
@@ -133,12 +146,14 @@ function App() {
         setCurrentPage('running');
     }
 
-    function addGroupingToTickets(someTickets) {
+    function addSearchTypeToTickets(someTickets) {
+        const searchTypes = ['year', 'month', 'all']
+        const searchType = searchTypes[selectedSearchType];
         const ticketsWithSearchType = {}
         Object.keys(someTickets).forEach((ticketID) => {
             ticketsWithSearchType[ticketID] = {
                 ...someTickets[ticketID],
-                grouping: getSearchTypeForIndex(selectedSearchType),
+                grouping: searchType
             }
         })
         return ticketsWithSearchType;
@@ -155,11 +170,6 @@ function App() {
         ))
         delete ticketsWithPaperNamesRemoved['papersAndCodes'];
         return ticketsWithPaperNamesRemoved;
-    }
-
-    function getSearchTypeForIndex(index) {
-        const searchTypes = ['year', 'month', 'all']
-        return searchTypes[index]
     }
 
     function handleCreateTicketClick(items) {
