@@ -8,7 +8,6 @@ from gallicaGetter.parse.parseHTML import parse_html
 from gallicaGetter.parse.contentRecord import ContentRecord
 
 
-#TODO: refactor records into PeriodCount and VolumeOccurrence
 def buildParser(desiredRecord, **kwargs):
     recordParsers = {
         'ark': ParseArkRecord,

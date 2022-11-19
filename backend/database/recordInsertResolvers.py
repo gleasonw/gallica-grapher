@@ -11,7 +11,7 @@ def insert_records_into_papers(records, conn):
             sep='|'
         )
 
-
+#TODO: this doesn't appear to be working
 def insert_records_into_results(records, identifier, stateHooks, conn):
     stream, codes = build_csv_stream_ensure_no_issue_duplicates(records)
     codes_in_db = set(

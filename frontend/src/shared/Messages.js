@@ -12,7 +12,7 @@ export function GallicaGramShoutOut(props){
 export function DataLimitationWarning(props){
     return(
         <StyledMessage>
-            When searching specific periodicals, only one occurrence is counted per volume. Soon, we hope to divide the number of occurrences by the number of words published to create a more accurate measure of frequency.
+            When searching specific periodicals, only one occurrence is counted per volume.
         </StyledMessage>
     )
 }
