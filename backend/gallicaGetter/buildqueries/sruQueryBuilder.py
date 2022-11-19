@@ -5,7 +5,7 @@ from gallicaGetter.fetch.query import (
     OccurrenceQuery,
     SRUQuery
 )
-from gallicaGetter.build.dateGrouping import DateGrouping
+from gallicaGetter.buildqueries.dateGrouping import DateGrouping
 import logging
 from typing import Tuple, List
 

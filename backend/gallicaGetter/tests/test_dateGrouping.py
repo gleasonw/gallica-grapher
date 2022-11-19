@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallicaGetter.build.dateGrouping import DateGrouping
+from gallicaGetter.buildqueries.dateGrouping import DateGrouping
 
 
 class TestDateGrouping(TestCase):

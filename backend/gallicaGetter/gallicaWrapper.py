@@ -1,9 +1,9 @@
-from gallicaGetter.build.sruQueryBuilder import (
+from gallicaGetter.buildqueries.sruQueryBuilder import (
     OccurrenceQueryBuilder,
     PaperQueryBuilder
 )
-from gallicaGetter.build.contentQueryBuilder import ContentQueryBuilder
-from gallicaGetter.build.fullTextQueryBuilder import FullTextQueryBuilder
+from gallicaGetter.buildqueries.contentQueryBuilder import ContentQueryBuilder
+from gallicaGetter.buildqueries.fullTextQueryBuilder import FullTextQueryBuilder
 from gallicaGetter.parse.parseRecord import buildParser
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from typing import List
