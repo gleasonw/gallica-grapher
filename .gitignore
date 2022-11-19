@@ -16,7 +16,7 @@ __pycache__
 
 # Distribution / packaging
 .Python
-backend/gallicaGetter/buildqueries/
+build/
 develop-eggs/
 dist/
 downloads/
