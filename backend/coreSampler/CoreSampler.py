@@ -2,16 +2,25 @@ from typing import Dict
 from io import StringIO
 import gallicaGetter
 import random
-from collections import deque, Counter
+from collections import Counter
+import os
+
+here = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(here, 'stopwordsFR.txt'), 'r') as stopwords_file:
+    stopwords_fr = set(stopwords_file.read().splitlines())
+with open(os.path.join(here, 'stopwordsEN.txt'), 'r') as stopwords_file:
+    stopwords_en = set(stopwords_file.read().splitlines())
 
 
-def get_gallica_core(root_gram, distance, sample_size, start_date, end_date) -> Dict:
+#TODO: implement batch fetch for scattered indices in gallicaWrapper, test, fix
+def get_gallica_core(root_gram: str, distance: int, sample_size: int, start_date: str, end_date: str) -> Dict:
     text_to_analyze = get_sample_text(root_gram, sample_size, start_date, end_date)
     notable_words_in_distance = get_associated_words(text_to_analyze, root_gram, distance)
     return notable_words_in_distance
 
 
-def get_sample_text(root_gram, sample_size, start_date, end_date) -> StringIO:
+def get_sample_text(root_gram: str, sample_size: int, start_date: str, end_date: str) -> StringIO:
 
     def get_text_for_codes(volume_codes) -> str:
         text_wrapper = gallicaGetter.connect('text')
@@ -38,34 +47,41 @@ def get_sample_text(root_gram, sample_size, start_date, end_date) -> StringIO:
     return StringIO(get_text_for_codes(volume_codes))
 
 
-def get_associated_words(text_to_analyze: StringIO, root_gram, distance) -> Dict:
+def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: int) -> Dict:
     text_to_analyze.seek(0)
     word_counts = {}
     words_in_window = []
     current_word = ''
+    root_behind = False
+
+    def add_word_window_to_counts(word_window):
+        for word, count in Counter(word_window).items():
+            if word != root_gram:
+                if word in word_counts:
+                    word_counts[word] += count
+                else:
+                    word_counts[word] = count
+        return []
+
     for char in text_to_analyze.read():
         char = char.lower()
         if char == ' ':
             if current_word != '':
-                words_in_window.append(current_word)
+                if current_word not in stopwords_fr and current_word not in stopwords_en:
+                    if len(words_in_window) == distance:
+                        if root_behind:
+                            root_behind = False
+                            words_in_window = add_word_window_to_counts(words_in_window)
+                        else:
+                            words_in_window.pop(0)
+                    words_in_window.append(current_word)
                 current_word = ''
-                if len(words_in_window) > distance:
-                    words_in_window.pop(0)
         else:
             current_word += char
             if current_word == root_gram:
-                next_words = []
                 current_word = ''
-                while len(next_words) < distance:
-                    char = text_to_analyze.read(1)
-                    if char == ' ':
-                        next_words.append(current_word)
-                        current_word = ''
-                    else:
-                        current_word += char
-                words_in_window += next_words
-                word_counts.update(Counter(words_in_window))
-                words_in_window = next_words
+                words_in_window = add_word_window_to_counts(words_in_window)
+                root_behind = True
     return word_counts
 
 
