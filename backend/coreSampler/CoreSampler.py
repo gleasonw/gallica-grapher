@@ -83,7 +83,7 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
                 current_word = ''
         else:
             current_word += char
-            if current_word == root_gram:
+            if current_word == root_gram: #TODO: check this iteratively for current word... can then get similar words
                 current_word = ''
                 words_in_window = add_word_window_to_counts(words_in_window)
                 root_behind = True
