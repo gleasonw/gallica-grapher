@@ -49,15 +49,6 @@ def get_sample_text(root_gram: str, sample_size: int, start_date: str, end_date:
 
 def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: int) -> Dict:
     word_counts = {}
-
-    def add_word_window_to_counts(word_window):
-        for word, count in Counter(word_window).items():
-            if word in word_counts:
-                word_counts[word] += count
-            else:
-                word_counts[word] = count
-        return []
-
     text_to_analyze.seek(0)
     words_in_window = []
     current_word = ''
@@ -65,7 +56,15 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
     compare_index = 0
     current_word_delta = 0
 
-    def handle_update_window(new_word):
+    def count_window(word_window):
+        for word, count in Counter(word_window).items():
+            if word in word_counts:
+                word_counts[word] += count
+            else:
+                word_counts[word] = count
+        return []
+
+    def update_window(new_word):
         nonlocal words_in_window
         if new_word not in stopwords_fr and new_word not in stopwords_en:
             words_in_window.append(new_word)
@@ -73,7 +72,7 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
                 words_in_window.pop(0)
         return words_in_window
 
-    def handle_reset_current_word():
+    def reset_current_word():
         nonlocal current_word
         nonlocal current_word_delta
         nonlocal compare_index
@@ -81,29 +80,32 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
         current_word_delta = 0
         compare_index = 0
 
+    def verify_new_word(word):
+        nonlocal words_in_window
+        nonlocal root_behind
+        words_in_window = update_window(word)
+        if len(words_in_window) == distance:
+            if root_behind:
+                words_in_window = count_window(words_in_window)
+                root_behind = False
+        reset_current_word()
+
     for char in text_to_analyze.read():
         char = char.lower()
         if not char.isalpha():
             if current_word:
-                words_in_window = handle_update_window(current_word)
-                if len(words_in_window) == distance:
-                    if root_behind:
-                        add_word_window_to_counts(words_in_window)
-                        root_behind = False
-                        words_in_window = []
-                handle_reset_current_word()
+                verify_new_word(current_word)
         else:
             if compare_index < len(root_gram) and root_gram[compare_index] != char:
                 current_word_delta += 1
             compare_index += 1
             current_word += char
             if compare_index == len(root_gram) and current_word_delta <= 1:
-                handle_reset_current_word()
-                words_in_window = add_word_window_to_counts(words_in_window)
+                reset_current_word()
+                words_in_window = count_window(words_in_window)
                 root_behind = True
     if current_word:
-        handle_update_window(current_word)
-
+        verify_new_word(current_word)
     return word_counts
 
 

@@ -11,15 +11,16 @@ class Test(TestCase):
         self.fail()
 
     def test_get_associated_words(self):
-        test_sentence = StringIO('the quick brown fox fox the jumped alors over fox lazy dog frx neat neat')
+        test_sentence = StringIO('the quick brown fox fox the jumped alors over fox lazy neat frx neat neat')
         expected_dict = {
             'brown': 1,
             'lazy': 1,
-            'jumped': 1
+            'jumped': 1,
+            'neat': 2,
         }
         actual_dict = get_associated_words(test_sentence, 'fox', 1)
 
-        self.assertEqual(expected_dict, actual_dict)
+        self.assertDictEqual(expected_dict, actual_dict)
 
         test_sentence = StringIO("""« Qui connaît un nègre les connaît tous : hâbleurs par nature, puis flatteurs 
         jusqu'à la bassesse, surtout avec les nouveaux venus. Que ce soit à Saint-Louis, au Gabon ou ailleurs, 
@@ -50,7 +51,7 @@ class Test(TestCase):
                 'alfred': 1,
                 'marche': 1,
                 'société': 1,
-                'malheureusement': 1,
+                'même': 1,
                 'objet': 1
             }
         )
