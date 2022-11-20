@@ -64,14 +64,6 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
                 word_counts[word] = count
         return []
 
-    def update_window(new_word):
-        nonlocal words_in_window
-        if new_word not in stopwords_fr and new_word not in stopwords_en:
-            words_in_window.append(new_word)
-            if len(words_in_window) > distance:
-                words_in_window.pop(0)
-        return words_in_window
-
     def reset_current_word():
         nonlocal current_word
         nonlocal current_word_delta
@@ -80,10 +72,13 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
         current_word_delta = 0
         compare_index = 0
 
-    def verify_new_word(word):
+    def update_window(new_word):
         nonlocal words_in_window
         nonlocal root_behind
-        words_in_window = update_window(word)
+        if new_word not in stopwords_fr and new_word not in stopwords_en:
+            words_in_window.append(new_word)
+            if len(words_in_window) > distance:
+                words_in_window.pop(0)
         if len(words_in_window) == distance:
             if root_behind:
                 words_in_window = count_window(words_in_window)
@@ -94,7 +89,7 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
         char = char.lower()
         if not char.isalpha():
             if current_word:
-                verify_new_word(current_word)
+                update_window(current_word)
         else:
             if compare_index < len(root_gram) and root_gram[compare_index] != char:
                 current_word_delta += 1
@@ -105,7 +100,7 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
                 words_in_window = count_window(words_in_window)
                 root_behind = True
     if current_word:
-        verify_new_word(current_word)
+        update_window(current_word)
     return word_counts
 
 
