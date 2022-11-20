@@ -62,33 +62,47 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
     words_in_window = []
     current_word = ''
     root_behind = False
+    compare_index = 0
+    current_word_delta = 0
 
-    def update_window(new_word):
+    def handle_update_window(new_word):
+        nonlocal words_in_window
         if new_word not in stopwords_fr and new_word not in stopwords_en:
             words_in_window.append(new_word)
             if len(words_in_window) > distance:
                 words_in_window.pop(0)
         return words_in_window
 
+    def handle_reset_current_word():
+        nonlocal current_word
+        nonlocal current_word_delta
+        nonlocal compare_index
+        current_word = ''
+        current_word_delta = 0
+        compare_index = 0
+
     for char in text_to_analyze.read():
         char = char.lower()
         if not char.isalpha():
             if current_word:
-                words_in_window = update_window(current_word)
+                words_in_window = handle_update_window(current_word)
                 if len(words_in_window) == distance:
                     if root_behind:
                         add_word_window_to_counts(words_in_window)
                         root_behind = False
                         words_in_window = []
-                current_word = ''
+                handle_reset_current_word()
         else:
+            if compare_index < len(root_gram) and root_gram[compare_index] != char:
+                current_word_delta += 1
+            compare_index += 1
             current_word += char
-            if current_word == root_gram: #TODO: check this iteratively for current word... can then get similar words
-                current_word = ''
+            if compare_index == len(root_gram) and current_word_delta <= 1:
+                handle_reset_current_word()
                 words_in_window = add_word_window_to_counts(words_in_window)
                 root_behind = True
     if current_word:
-        update_window(current_word)
+        handle_update_window(current_word)
 
     return word_counts
 

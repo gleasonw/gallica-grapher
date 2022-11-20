@@ -11,7 +11,7 @@ class Test(TestCase):
         self.fail()
 
     def test_get_associated_words(self):
-        test_sentence = StringIO('the quick brown fox fox the jumped alors over fox lazy dog')
+        test_sentence = StringIO('the quick brown fox fox the jumped alors over fox lazy dog frx neat neat')
         expected_dict = {
             'brown': 1,
             'lazy': 1,
