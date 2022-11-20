@@ -63,23 +63,23 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
     current_word = ''
     root_behind = False
 
-    def update_window(new_word, is_right_half_window):
+    def update_window(new_word):
         if new_word not in stopwords_fr and new_word not in stopwords_en:
-            if len(words_in_window) == distance:
-                if is_right_half_window:
-                    add_word_window_to_counts(words_in_window)
-                    is_right_half_window = False
-                    return [new_word], is_right_half_window
             words_in_window.append(new_word)
             if len(words_in_window) > distance:
                 words_in_window.pop(0)
-        return words_in_window, is_right_half_window
+        return words_in_window
 
     for char in text_to_analyze.read():
         char = char.lower()
         if not char.isalpha():
             if current_word:
-                words_in_window, root_behind = update_window(current_word, root_behind)
+                words_in_window = update_window(current_word)
+                if len(words_in_window) == distance:
+                    if root_behind:
+                        add_word_window_to_counts(words_in_window)
+                        root_behind = False
+                        words_in_window = []
                 current_word = ''
         else:
             current_word += char
@@ -88,7 +88,7 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
                 words_in_window = add_word_window_to_counts(words_in_window)
                 root_behind = True
     if current_word:
-        update_window(current_word, root_behind)
+        update_window(current_word)
 
     return word_counts
 
