@@ -25,10 +25,9 @@ class SRUQueryBuilder:
             queries_with_num_results = self.get_num_results_for_query(queries)
         return self.index_queries_by_num_results(queries_with_num_results)
 
-    def index_queries_by_num_results(self, queries_num_results: List[Tuple[SRUQuery, str]]) -> List[SRUQuery]:
+    def index_queries_by_num_results(self, queries_num_results: List[Tuple[SRUQuery, int]]) -> List[SRUQuery]:
         indexed_queries = []
         for query, num_results in queries_num_results:
-            num_results = int(num_results)
             for i in range(0, num_results, 50):
                 base_data = query.get_cql_params()
                 base_data['startIndex'] = i
@@ -38,7 +37,7 @@ class SRUQueryBuilder:
                 )
         return indexed_queries
 
-    def get_num_results_for_query(self, queries) -> List[Tuple[SRUQuery, str]]:
+    def get_num_results_for_query(self, queries) -> List[Tuple[SRUQuery, int]]:
         responses = self.props.api.get(queries)
         num_results_for_queries = [
             (response.query, self.parser.get_num_records(response.data))
@@ -52,18 +51,24 @@ class SRUQueryBuilder:
 
 class OccurrenceQueryBuilder(SRUQueryBuilder):
 
-    def build_queries_for_args(self, args) -> List:
+    def build_queries_for_args(self, args) -> List[SRUQuery]:
         base_queries = self.build_base_queries(args)
         if args['grouping'] == 'all':
             return self.create_indexed_queries_from_root_queries(
                 queries=base_queries,
                 limit=args.get('numRecords')
             )
+        if args['grouping'] == 'index_selection':
+            for query in base_queries:
+                query.numRecords = 1
         return base_queries
 
     def build_base_queries(self, args) -> List[SRUQuery]:
         terms = args.get('terms')
         codes = args.get('codes')
+        indices = args.get('startIndex', [0])
+        if not isinstance(indices, list):
+            indices = [indices]
         if not isinstance(terms, list):
             terms = [terms]
         if codes and not isinstance(codes, list):
@@ -75,6 +80,7 @@ class OccurrenceQueryBuilder(SRUQueryBuilder):
                 endDate=endDate,
                 searchMetaData=args,
                 codes=codeBundle,
+                startIndex=startIndex
             )
             for term in terms
             for startDate, endDate in DateGrouping(
@@ -83,6 +89,7 @@ class OccurrenceQueryBuilder(SRUQueryBuilder):
                 args.get('grouping')
             )
             for codeBundle in self.bundle_codes(codes)
+            for startIndex in indices
         ]
 
     def bundle_codes(self, codes: List[str]) -> List[List[str]]:
@@ -112,12 +119,12 @@ class PaperQueryBuilder(SRUQueryBuilder):
     def build_queries_for_args(self, codes):
         if codes == '':
             logging.warning('No codes provided (get(["..."]) or get("something") Proceeding to fetch all papers on Gallica. Stop me if you wish!')
-            return self.build_SRU_queries_for_all()
+            return self.build_sru_queries_for_all()
         if not isinstance(codes, list):
             codes = [codes]
-        return self.build_SRU_queries_for_codes(codes)
+        return self.build_sru_queries_for_codes(codes)
 
-    def build_SRU_queries_for_codes(self, codes) -> List[PaperQuery]:
+    def build_sru_queries_for_codes(self, codes) -> List[PaperQuery]:
         sru_queries = []
         for i in range(0, len(codes), NUM_CODES_PER_BUNDLE):
             codes_for_query = codes[i:i + NUM_CODES_PER_BUNDLE]
@@ -130,7 +137,7 @@ class PaperQueryBuilder(SRUQueryBuilder):
             sru_queries.append(sru_query)
         return sru_queries
 
-    def build_SRU_queries_for_all(self):
+    def build_sru_queries_for_all(self) -> List[SRUQuery]:
         return self.create_indexed_queries_from_root_queries([
             PaperQuery(
                 startIndex=0,
@@ -139,7 +146,7 @@ class PaperQueryBuilder(SRUQueryBuilder):
             )
         ])
 
-    def build_ark_queries_for_codes(self, codes):
+    def build_ark_queries_for_codes(self, codes) -> List[ArkQueryForNewspaperYears]:
         if type(codes) == str:
             codes = [codes]
         return [
@@ -150,7 +157,7 @@ class PaperQueryBuilder(SRUQueryBuilder):
             for code in codes
         ]
 
-    def make_query(self, codes, startIndex, numRecords):
+    def make_query(self, codes, startIndex, numRecords) -> PaperQuery:
         return PaperQuery(
             startIndex=startIndex,
             numRecords=numRecords,

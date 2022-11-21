@@ -17,3 +17,15 @@ def connect(gallicaAPIselect, **kwargs):
     if api not in apiWrappers:
         raise ValueError(f'API "{api}" not supported. Options are {apiWrappers.keys()}')
     return apiWrappers[api](**kwargs)
+
+
+if __name__ == '__main__':
+    test = connect('sru')
+    records = test.get(
+        'brazza',
+        startDate=1886,
+        endDate=1890,
+        startIndex=[0, 50, 214, 1008],
+        grouping='index_selection'
+    )
+    print(records)

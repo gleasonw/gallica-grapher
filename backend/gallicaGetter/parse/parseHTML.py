@@ -10,7 +10,7 @@ class ParsedGallicaHTML:
     def __init__(self, htmlData):
         self.html = htmlData
         self.soup = BeautifulSoup(htmlData, 'html.parser')
-        self.text = None
+        self.text = ''
         self.ocrQuality = None
 
     def __repr__(self):
@@ -18,8 +18,10 @@ class ParsedGallicaHTML:
 
     def get_text(self) -> str:
         if not self.text:
-            itemParas = self.soup.find('hr').find_next_siblings('p')
-            self.text = '\n'.join([para.text for para in itemParas])
+            hr_break_before_paras = self.soup.find('hr')
+            if hr_break_before_paras:
+                item_paras = hr_break_before_paras.find_next_siblings('p')
+                self.text = '\n'.join([para.text for para in item_paras])
         return self.text
 
     def get_ocr_quality(self) -> int:

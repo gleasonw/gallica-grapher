@@ -25,7 +25,7 @@ class TestQueryBuilder(TestCase):
                     numRecords=1,
                     endpoint='test'
                 ),
-                '1205'
+                1205
             ),
             (
                 OccurrenceQuery(
@@ -37,7 +37,7 @@ class TestQueryBuilder(TestCase):
                     numRecords=1,
                     endpoint='test'
                 ),
-                '1895'
+                1895
             ),
         ]
         results= self.builders[0].index_queries_by_num_results(test_queries)

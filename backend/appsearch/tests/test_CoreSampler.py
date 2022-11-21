@@ -1,11 +1,26 @@
 from unittest import TestCase
 from io import StringIO
-from backend.coreSampler.CoreSampler import get_associated_words
+from backend.coreSampler.CoreSampler import (
+    get_gallica_core,
+    get_associated_words,
+    get_sample_text
+)
 
 
 class Test(TestCase):
     def test_get_gallica_core(self):
-        self.fail()
+        test = get_gallica_core(
+            root_gram='banane',
+            distance=20,
+            start_date='1900',
+            end_date='1931',
+            sample_size=50
+        )
+        print(test)
+        tupled_items = list(test.items())
+        tupled_items.sort(key=lambda x: x[1], reverse=True)
+        print(tupled_items)
+
 
     def test_get_sample_text(self):
         self.fail()
@@ -51,7 +66,7 @@ class Test(TestCase):
                 'alfred': 1,
                 'marche': 1,
                 'société': 1,
-                'même': 1,
+                'malheureusement': 1,
                 'objet': 1
             }
         )

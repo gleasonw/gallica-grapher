@@ -16,6 +16,7 @@ def DateGrouping(startDate, endDate, grouping) -> List[Tuple]:
     endDate = Date(endDate)
     groupings = {
         'all': makeWideGroupingsForAllSearch,
+        'index_selection': makeWideGroupingsForAllSearch,
         'year': makeYearGroupings,
         'month': makeMonthGroupings
     }

@@ -72,9 +72,13 @@ class SRUWrapper(GallicaWrapper):
             kwargs,
             queriesWithCounts
         )
+        if grouping == 'all' or 'index_selection':
+            parser = self.solo_record_parser
+        else:
+            parser = self.group_record_parser
         record_generator = self.fetch_from_queries(
             queries=queries,
-            parser=self.solo_record_parser if grouping == 'all' else self.group_record_parser,
+            parser=parser,
             onUpdateProgress=onUpdateProgress
         )
         return record_generator if generate else list(record_generator)
@@ -85,8 +89,8 @@ class SRUWrapper(GallicaWrapper):
         else:
             return self.queryBuilder.build_queries_for_args(kwargs)
 
-    def get_num_results_for_args(self, args):
-        base_queries = self.queryBuilder.build_base_queries(args)
+    def get_num_results_for_args(self, **kwargs):
+        base_queries = self.queryBuilder.build_base_queries(kwargs)
         return self.queryBuilder.get_num_results_for_query(base_queries)
 
 
@@ -178,3 +182,4 @@ class FullTextWrapper(GallicaWrapper):
             parser=self.parser
         )
         return record_generator if generate else list(record_generator)
+

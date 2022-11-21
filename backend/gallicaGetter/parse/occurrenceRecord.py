@@ -18,11 +18,14 @@ class OccurrenceRecord:
         self.ticketID = ticketID
         self.requestID = requestID
 
-    def getDate(self):
+    def get_date(self):
         return self.date
 
-    def getPaperCode(self):
+    def get_paper_code(self):
         return self.paperCode
+
+    def get_volume_code(self):
+        return self.url.split('/')[-1]
 
     def __repr__(self):
         return f'OccurrenceRecord({self.term}, {self.paperTitle}, {self.url}, {self.date})'

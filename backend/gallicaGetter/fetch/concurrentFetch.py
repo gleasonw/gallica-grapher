@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from gallicaGetter.fetch.gallicasession import GallicaSession
 
-NUM_WORKERS = 20
+NUM_WORKERS = 50
 
 
 class ConcurrentFetch:

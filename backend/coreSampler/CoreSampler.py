@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from io import StringIO
 import gallicaGetter
 import random
@@ -13,7 +13,6 @@ with open(os.path.join(here, 'stopwordsEN.txt'), 'r') as stopwords_file:
     stopwords_en = set(stopwords_file.read().splitlines())
 
 
-#TODO: implement batch fetch for scattered indices in gallicaWrapper, test, fix
 def get_gallica_core(root_gram: str, distance: int, sample_size: int, start_date: str, end_date: str) -> Dict:
     text_to_analyze = get_sample_text(root_gram, sample_size, start_date, end_date)
     notable_words_in_distance = get_associated_words(text_to_analyze, root_gram, distance)
@@ -22,28 +21,31 @@ def get_gallica_core(root_gram: str, distance: int, sample_size: int, start_date
 
 def get_sample_text(root_gram: str, sample_size: int, start_date: str, end_date: str) -> StringIO:
 
-    def get_text_for_codes(volume_codes) -> str:
+    def get_text_for_codes(codes: List[str]) -> str:
         text_wrapper = gallicaGetter.connect('text')
         text = ''
-        for code in volume_codes:
-            text_record = text_wrapper.get(code)
-            text += text_record.get_text()
+        text_records = text_wrapper.get(codes)
+        for record in text_records:
+            text += record.get_text()
         return text
 
     sru_wrapper = gallicaGetter.connect('sru')
-    num_volumes_with_root_gram = sru_wrapper.get(
-        term=root_gram,
-        startDate=start_date,
-        endDate=end_date
-    )
-    indices_to_sample = random.sample(range(num_volumes_with_root_gram), sample_size)
-    volumes_with_root_gram = sru_wrapper.get(
-        term=root_gram,
+    num_volumes_with_root_gram = sru_wrapper.get_num_results_for_args(
+        terms=root_gram,
         startDate=start_date,
         endDate=end_date,
-        startRecord=indices_to_sample
+        grouping='all'
     )
-    volume_codes = (volume_record.get_code() for volume_record in volumes_with_root_gram)
+    num_volumes = num_volumes_with_root_gram[0][1]
+    indices_to_sample = random.sample(range(num_volumes), sample_size)
+    volumes_with_root_gram = sru_wrapper.get(
+        terms=root_gram,
+        startDate=start_date,
+        endDate=end_date,
+        startIndex=indices_to_sample,
+        grouping='index_selection'
+    )
+    volume_codes = [volume_record.get_volume_code() for volume_record in volumes_with_root_gram]
     return StringIO(get_text_for_codes(volume_codes))
 
 

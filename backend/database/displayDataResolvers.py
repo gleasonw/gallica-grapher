@@ -83,7 +83,7 @@ def get_gallica_records_for_display(tickets, limit, offset):
             'startRecord': offset
         }
         records.extend(wrapper.get(**args_bundle))
-    records.sort(key=lambda record: record.date.getDate())
+    records.sort(key=lambda record: record.date.get_date())
     return records
 
 

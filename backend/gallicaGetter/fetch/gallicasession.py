@@ -23,6 +23,8 @@ class GallicaSession:
             total=3,
             status_forcelist=[500, 502, 503, 504],
             backoff_factor=1,
+            connect=5,
+            read=5,
         )
         adapter = HTTPAdapter(
             max_retries=retry_strategy,
@@ -43,6 +45,7 @@ class GallicaSession:
         end = time.perf_counter()
         if response.status_code != 200:
             print(f"Gallica HTTP response Error: {response.status_code}")
+        print(f'time: {end - start}')
         return Response(
             data=response.content,
             query=query,

@@ -94,18 +94,18 @@ def build_csv_stream_ensure_no_issue_duplicates(records):
     codes = set()
     codeDates = {}
     for record in records:
-        recordPaper = record.getPaperCode()
+        recordPaper = record.get_paper_code()
         if recordPaper in codes:
             if datesForCode := codeDates.get(recordPaper):
-                recordDate = record.getDate()
+                recordDate = record.get_date()
                 if datesForCode.get(recordDate):
                     continue
                 else:
                     datesForCode[recordDate] = True
             else:
-                codeDates[record.getPaperCode()] = {record.getDate(): True}
+                codeDates[record.get_paper_code()] = {record.get_date(): True}
         else:
-            codes.add(record.getPaperCode())
+            codes.add(record.get_paper_code())
         writeToCSVstream(csvFileLikeObject, record)
     csvFileLikeObject.seek(0)
     return csvFileLikeObject, codes
