@@ -21,17 +21,17 @@ class TestGallicaXMLparse(TestCase):
 
     def test_get_one_paper_from_record_batch(self):
         self.assertEqual(
-            self.parse.getOnePaperFromRecordBatch(self.occurrencesXML),
+            self.parse.get_one_paper_from_record_batch(self.occurrencesXML),
             'Revue maritime et coloniale / Ministère de la marine et des colonies'
         )
 
     def test_get_num_results_and_pages_for_occurrence_in_periodical(self):
-        countAndResults = self.parse.getNumResultsAndPagesForOccurrenceInPeriodical(self.ocrTextXML)
+        countAndResults = self.parse.get_num_results_and_pages_for_context(self.ocrTextXML)
         self.assertEqual(countAndResults[0], '364')
         self.assertEqual(len(countAndResults[1]), 5)
 
     def test_get_records_from_xml(self):
-        test = self.parse.getRecordsFromXML(self.occurrencesXML)
+        test = self.parse.get_records_from_xml(self.occurrencesXML)
         self.assertEqual(len(test), 6)
 
     def test_get_num_records(self):
@@ -42,38 +42,38 @@ class TestGallicaXMLparse(TestCase):
 
     def test_get_years_published(self):
         self.assertEqual(
-            self.parse.getYearsPublished(self.issuesXML),
+            self.parse.get_years_published(self.issuesXML),
             list(str(year) for year in range(1861,1943))
         )
 
     def test_get_paper_code(self):
-        records = self.parse.getRecordsFromXML(self.papersXML)
+        records = self.parse.get_records_from_xml(self.papersXML)
         oneRecord = records[0]
         self.assertEqual(
-            self.parse.getPaperCodeFromRecord(oneRecord),
+            self.parse.get_paper_code_from_record_xml(oneRecord),
             'cb32699739p'
         )
 
     def test_get_url(self):
-        records = self.parse.getRecordsFromXML(self.occurrencesXML)
+        records = self.parse.get_records_from_xml(self.occurrencesXML)
         oneRecord = records[0]
         self.assertEqual(
-            self.parse.getURLfromRecord(oneRecord),
+            self.parse.get_url_from_record(oneRecord),
             'https://gallica.bnf.fr/ark:/12148/bpt6k34565h'
         )
 
     def test_get_paper_title(self):
-        records = self.parse.getRecordsFromXML(self.papersXML)
+        records = self.parse.get_records_from_xml(self.papersXML)
         oneRecord = records[0]
         self.assertEqual(
-            self.parse.getPaperTitleFromRecord(oneRecord),
+            self.parse.get_paper_title_from_record_xml(oneRecord),
             "L'Anti-cafard. Revue anti-boche, publiée très irrégulièrement avec le concours de toutes les bonnes volontés"
         )
 
     def test_get_date(self):
-        records = self.parse.getRecordsFromXML(self.occurrencesXML)
+        records = self.parse.get_records_from_xml(self.occurrencesXML)
         oneRecord = records[0]
         self.assertListEqual(
-            self.parse.getDateFromRecord(oneRecord).getDateAsList(),
+            self.parse.get_date_from_record_xml(oneRecord).getDateAsList(),
             Date('1883-04').getDateAsList()
         )

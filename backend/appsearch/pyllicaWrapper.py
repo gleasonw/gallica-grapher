@@ -1,6 +1,6 @@
 from pyllicagram import pyllicagram as pyllica
 from gallicaGetter.parse.date import Date
-from gallicaGetter.parse.groupedCountRecord import GroupedCountRecord
+from gallicaGetter.parse.record import PeriodOccurrenceRecord
 
 
 def get(**kwargs):
@@ -31,7 +31,7 @@ def convert_data_frame_to_grouped_record(df, ticketID, requestID):
             axis=1
         )
     return (
-        GroupedCountRecord(
+        PeriodOccurrenceRecord(
             date=Date(date),
             count=count,
             ticketID=ticketID,

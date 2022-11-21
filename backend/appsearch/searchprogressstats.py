@@ -75,7 +75,7 @@ class SearchProgressStats:
         self.progressPercent = ceil(self.numBatchesRetrieved / self.numBatches * 100)
         self.numResultsRetrieved = self.numBatchesRetrieved * 50 if self.grouping == 'all' else self.numBatchesRetrieved
         self.estimateSecondsToCompletion = self.getEstimateSecondsToCompletion(numWorkers)
-        self.randomPaperForDisplay = self.parse.getOnePaperFromRecordBatch(xml)
+        self.randomPaperForDisplay = self.parse.get_one_paper_from_record_batch(xml)
 
     def getEstimateSecondsToCompletion(self, numWorkers):
         numCycles = (self.numBatches - self.numBatchesRetrieved) / numWorkers

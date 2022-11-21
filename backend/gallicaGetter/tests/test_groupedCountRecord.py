@@ -1,12 +1,12 @@
 from unittest.mock import MagicMock
 import unittest
-from gallicaGetter.parse.groupedCountRecord import GroupedCountRecord
+from gallicaGetter.parse.record import PeriodOccurrenceRecord
 
 
 class TestGroupedCountRecord(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.testRecord = GroupedCountRecord(
+        self.testRecord = PeriodOccurrenceRecord(
             date=MagicMock(
                 getYear=MagicMock(return_value=2020),
                 getMonth=MagicMock(return_value=1),

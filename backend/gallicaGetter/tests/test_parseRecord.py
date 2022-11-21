@@ -1,10 +1,7 @@
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
-from gallicaGetter.parse.arkRecord import ArkRecord
-from gallicaGetter.parse.groupedCountRecord import GroupedCountRecord
-from gallicaGetter.parse.occurrenceRecord import OccurrenceRecord
-from gallicaGetter.parse.paperRecord import PaperRecord
+from gallicaGetter.parse.record import VolumeOccurrenceRecord, PeriodOccurrenceRecord, PaperRecord, ArkRecord
 from gallicaGetter.parse.parseRecord import ParseArkRecord
 from gallicaGetter.parse.parseRecord import ParseGroupedRecordCounts
 from gallicaGetter.parse.parseRecord import ParseOccurrenceRecords
@@ -68,7 +65,7 @@ class TestParseGroupedRecordCounts(unittest.TestCase):
             ]
         )
         for testResult in test:
-            self.assertIsInstance(testResult, GroupedCountRecord)
+            self.assertIsInstance(testResult, PeriodOccurrenceRecord)
 
 
 class TestParseOccurrenceRecords(unittest.TestCase):
@@ -88,7 +85,7 @@ class TestParseOccurrenceRecords(unittest.TestCase):
         self.testParse.parser.return_value = ['test1', 'test2']
         testResults = self.testParse.parseResponsesToRecords(testResponses)
         for result in testResults:
-            self.assertIsInstance(result, OccurrenceRecord)
+            self.assertIsInstance(result, VolumeOccurrenceRecord)
 
 
 class TestParsePaperRecords(unittest.TestCase):
@@ -103,7 +100,7 @@ class TestParsePaperRecords(unittest.TestCase):
             MagicMock(),
             MagicMock(),
         ]
-        self.testParse.parser.getRecordsFromXML.return_value = [
+        self.testParse.parser.get_records_from_xml.return_value = [
             'record1',
             'record2',
         ]
@@ -126,7 +123,7 @@ class TestParseContentRecord(unittest.TestCase):
                 MagicMock(),
                 MagicMock(),
             ]
-            self.testParse.parser.getNumResultsAndPagesForOccurrenceInPeriodical.return_value = [
+            self.testParse.parser.get_num_results_and_pages_for_context.return_value = [
                 2,
                 'test',
             ]

@@ -1,11 +1,8 @@
-from gallicaGetter.parse.arkRecord import ArkRecord
 from gallicaGetter.parse.date import Date
 from gallicaGetter.parse.gallicaxmlparse import GallicaXMLparse
-from gallicaGetter.parse.groupedCountRecord import GroupedCountRecord
-from gallicaGetter.parse.occurrenceRecord import OccurrenceRecord
-from gallicaGetter.parse.paperRecord import PaperRecord
+from gallicaGetter.parse.record import VolumeOccurrenceRecord, PeriodOccurrenceRecord, PaperRecord, ContentRecord, \
+    ArkRecord
 from gallicaGetter.parse.parseHTML import parse_html
-from gallicaGetter.parse.contentRecord import ContentRecord
 
 
 def buildParser(desiredRecord, **kwargs):
@@ -46,11 +43,11 @@ class ParsePaperRecords(ParseRecord):
             yield from self.generatePaperRecords(response.data)
 
     def generatePaperRecords(self, xml):
-        for record in self.parser.getRecordsFromXML(xml):
+        for record in self.parser.get_records_from_xml(xml):
             yield PaperRecord(
-                code=self.parser.getPaperCodeFromRecord(record),
-                title=self.parser.getPaperTitleFromRecord(record),
-                url=self.parser.getURLfromRecord(record),
+                code=self.parser.get_paper_code_from_record_xml(record),
+                title=self.parser.get_paper_title_from_record_xml(record),
+                url=self.parser.get_url_from_record(record),
             )
 
 
@@ -71,15 +68,15 @@ class ParseOccurrenceRecords(ParseRecord):
             )
 
     def generateOccurrenceRecords(self, xml, query):
-        for record in self.parser.getRecordsFromXML(xml):
-            paperTitle = self.parser.getPaperTitleFromRecord(record)
-            paperCode = self.parser.getPaperCodeFromRecord(record)
-            date = self.parser.getDateFromRecord(record)
-            yield OccurrenceRecord(
+        for record in self.parser.get_records_from_xml(xml):
+            paperTitle = self.parser.get_paper_title_from_record_xml(record)
+            paperCode = self.parser.get_paper_code_from_record_xml(record)
+            date = self.parser.get_date_from_record_xml(record)
+            yield VolumeOccurrenceRecord(
                 paperTitle=paperTitle,
                 paperCode=paperCode,
                 date=date,
-                url=self.parser.getURLfromRecord(record),
+                url=self.parser.get_url_from_record(record),
                 term=query.term,
                 requestID=self.requestID,
                 ticketID=self.ticketID
@@ -96,7 +93,7 @@ class ParseGroupedRecordCounts(ParseRecord):
         for response in responses:
             count = self.parser.get_num_records(response.data)
             query = response.query
-            yield GroupedCountRecord(
+            yield PeriodOccurrenceRecord(
                 date=Date(query.get_start_date()),
                 count=count,
                 ticketID=self.ticketID,
@@ -109,7 +106,7 @@ class ParseContentRecord(ParseRecord):
 
     def parseResponsesToRecords(self, responses):
         for response in responses:
-            num_results_and_pages = self.parser.getNumResultsAndPagesForOccurrenceInPeriodical(response.data)
+            num_results_and_pages = self.parser.get_num_results_and_pages_for_context(response.data)
             yield ContentRecord(
                 num_results=num_results_and_pages[0],
                 pages=num_results_and_pages[1]
@@ -132,7 +129,7 @@ class ParseArkRecord(ParseRecord):
             yield from self.generateArkRecord(response.data, response.query)
 
     def generateArkRecord(self, xml, query):
-        years = self.parser.getYearsPublished(xml)
+        years = self.parser.get_years_published(xml)
         code = query.getCode()
         yield ArkRecord(
             code=code,

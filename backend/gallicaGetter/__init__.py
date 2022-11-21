@@ -1,22 +1,26 @@
-from gallicaGetter.gallicaWrapper import SRUWrapper
-from gallicaGetter.gallicaWrapper import IssuesWrapper
-from gallicaGetter.gallicaWrapper import ContentWrapper
-from gallicaGetter.gallicaWrapper import PapersWrapper
-from gallicaGetter.gallicaWrapper import FullTextWrapper
+from gallicaGetter.gallicaWrapper import (
+    VolumeOccurrenceWrapper,
+    PeriodOccurrenceWrapper,
+    IssuesWrapper,
+    ContentWrapper,
+    PapersWrapper,
+    FullTextWrapper
+)
 
 
 def connect(gallicaAPIselect, **kwargs):
-    apiWrappers = {
-        'sru': SRUWrapper,
+    api_wrappers = {
+        'volume': VolumeOccurrenceWrapper,
+        'period_count': PeriodOccurrenceWrapper,
         'issues': IssuesWrapper,
         'content': ContentWrapper,
         'papers': PapersWrapper,
         'text': FullTextWrapper
     }
     api = gallicaAPIselect.lower()
-    if api not in apiWrappers:
-        raise ValueError(f'API "{api}" not supported. Options are {apiWrappers.keys()}')
-    return apiWrappers[api](**kwargs)
+    if api not in api_wrappers:
+        raise ValueError(f'API "{api}" not supported. Options are {api_wrappers.keys()}')
+    return api_wrappers[api](**kwargs)
 
 
 if __name__ == '__main__':

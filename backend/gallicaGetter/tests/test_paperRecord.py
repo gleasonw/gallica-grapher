@@ -1,5 +1,5 @@
 import unittest
-from gallicaGetter.parse.paperRecord import PaperRecord
+from gallicaGetter.parse.record import PaperRecord
 
 
 class TestPaperRecord(unittest.TestCase):

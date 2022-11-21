@@ -10,11 +10,11 @@ from backend.coreSampler.CoreSampler import (
 class Test(TestCase):
     def test_get_gallica_core(self):
         test = get_gallica_core(
-            root_gram='banane',
-            distance=20,
-            start_date='1900',
-            end_date='1931',
-            sample_size=50
+            root_gram='londres',
+            distance=5,
+            start_date='1939',
+            end_date='1940',
+            sample_size=30
         )
         print(test)
         tupled_items = list(test.items())

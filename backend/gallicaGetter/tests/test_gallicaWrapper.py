@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 from gallicaGetter import connect
 from gallicaGetter.gallicaWrapper import (
-    SRUWrapper,
+    VolumeOccurrenceWrapper,
     IssuesWrapper,
     ContentWrapper,
     PapersWrapper,
@@ -24,7 +24,7 @@ class TestGallicaWrapper(TestCase):
 
     def setUp(self) -> None:
         self.gallicaAPIs = [
-            SRUWrapper(),
+            VolumeOccurrenceWrapper(),
             IssuesWrapper(),
             ContentWrapper(),
             PapersWrapper()
@@ -32,7 +32,7 @@ class TestGallicaWrapper(TestCase):
 
     #Liskov tests
     def test_connect(self):
-        self.assertIsInstance(connect('sru'), SRUWrapper)
+        self.assertIsInstance(connect('sru'), VolumeOccurrenceWrapper)
         self.assertIsInstance(connect('issues'), IssuesWrapper)
         self.assertIsInstance(connect('content'), ContentWrapper)
         self.assertIsInstance(connect('papers'), PapersWrapper)
@@ -44,13 +44,13 @@ class TestGallicaWrapper(TestCase):
 class TestSRUWrapper(TestCase):
 
     def setUp(self) -> None:
-        self.api = SRUWrapper()
+        self.api = VolumeOccurrenceWrapper()
 
     def test_getQueryBuilder(self):
         self.assertIsInstance(self.api.get_query_builder(), OccurrenceQueryBuilder)
 
     def test_get(self):
-        getter = SRUWrapper()
+        getter = VolumeOccurrenceWrapper()
         getter.fetch_from_queries = MagicMock()
 
         self.assertIsInstance(

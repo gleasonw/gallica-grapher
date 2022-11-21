@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import MagicMock
-from gallicaGetter.parse.occurrenceRecord import OccurrenceRecord
+from gallicaGetter.parse.record import VolumeOccurrenceRecord
 
 
 class TestOccurrenceRecord(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.testRecord = OccurrenceRecord(
+        self.testRecord = VolumeOccurrenceRecord(
             paperTitle='testTitle',
             paperCode='testCode',
             url='testUrl',

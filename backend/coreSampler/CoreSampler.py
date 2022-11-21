@@ -13,18 +13,27 @@ with open(os.path.join(here, 'stopwordsEN.txt'), 'r') as stopwords_file:
     stopwords_en = set(stopwords_file.read().splitlines())
 
 
-def get_gallica_core(root_gram: str, distance: int, sample_size: int, start_date: str, end_date: str) -> Dict:
-    text_to_analyze = get_sample_text(root_gram, sample_size, start_date, end_date)
+def get_gallica_core(root_gram: str, distance: int,
+                     sample_size: int, start_date: str,
+                     end_date: str, onUpdateProgress=None) -> Dict:
+    text_to_analyze = get_sample_text(
+        root_gram,
+        sample_size,
+        start_date,
+        end_date,
+        onUpdateProgress
+    )
     notable_words_in_distance = get_associated_words(text_to_analyze, root_gram, distance)
     return notable_words_in_distance
 
 
-def get_sample_text(root_gram: str, sample_size: int, start_date: str, end_date: str) -> StringIO:
+def get_sample_text(root_gram: str, sample_size: int,
+                    start_date: str, end_date: str, onUpdateProgress=None) -> StringIO:
 
     def get_text_for_codes(codes: List[str]) -> str:
         text_wrapper = gallicaGetter.connect('text')
         text = ''
-        text_records = text_wrapper.get(codes)
+        text_records = text_wrapper.get(codes, onUpdateProgress=lambda x: print(x['elapsedTime']))
         for record in text_records:
             text += record.get_text()
         return text
@@ -34,7 +43,8 @@ def get_sample_text(root_gram: str, sample_size: int, start_date: str, end_date:
         terms=root_gram,
         startDate=start_date,
         endDate=end_date,
-        grouping='all'
+        grouping='all',
+        onUpdateProgress=onUpdateProgress
     )
     num_volumes = num_volumes_with_root_gram[0][1]
     indices_to_sample = random.sample(range(num_volumes), sample_size)
@@ -43,7 +53,8 @@ def get_sample_text(root_gram: str, sample_size: int, start_date: str, end_date:
         startDate=start_date,
         endDate=end_date,
         startIndex=indices_to_sample,
-        grouping='index_selection'
+        grouping='index_selection',
+        onUpdateProgress=onUpdateProgress
     )
     volume_codes = [volume_record.get_volume_code() for volume_record in volumes_with_root_gram]
     return StringIO(get_text_for_codes(volume_codes))
