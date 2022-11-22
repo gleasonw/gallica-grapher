@@ -12,7 +12,7 @@ from gallicaGetter.parse.parseRecord import (
     ParseArkRecord,
     ParseContentRecord
 )
-from gallicaGetter.buildqueries.sruQueryBuilder import (
+from gallicaGetter.buildqueries.argToQueryTransformations import (
     OccurrenceQueryBuilder,
     PaperQueryBuilder
 )

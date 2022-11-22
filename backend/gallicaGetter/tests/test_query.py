@@ -1,4 +1,4 @@
-from gallicaGetter.fetch.query import OccurrenceQuery, ArkQueryForNewspaperYears, PaperQuery, ContentQuery
+from gallicaGetter.fetch.query import OccurrenceQuery, IssueQueryForNewspaperYears, PaperQuery, ContentQuery
 from unittest import TestCase
 
 
@@ -43,7 +43,7 @@ class TestPaperQuery(TestCase):
 class TestArkQueryForNewspaperYears(TestCase):
 
     def setUp(self) -> None:
-        self.arkQuery = ArkQueryForNewspaperYears(
+        self.arkQuery = IssueQueryForNewspaperYears(
             code='test',
             endpoint='test'
         )

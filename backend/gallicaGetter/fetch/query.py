@@ -29,7 +29,7 @@ class FullTextQuery(Query):
         return f'RawTextQuery({self.ark})'
 
 
-class ArkQueryForNewspaperYears(Query):
+class IssueQueryForNewspaperYears(Query):
 
     def post_init(self, kwargs):
         self.ark = f'ark:/12148/{kwargs["code"]}/date'
