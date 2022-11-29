@@ -2,25 +2,25 @@ from gallicaGetter.parse.date import Date
 from typing import List, Tuple
 
 
-def DateGrouping(startDate, endDate, grouping) -> List[Tuple]:
+def build_date_grouping(start_date, end_date, grouping) -> List[Tuple]:
     """
     Build date ranges to be used in a search query.
-    :param startDate: string date format YYYY-MM-DD
-    :param endDate: string date format YYYY-MM-DD
+    :param start_date: string date format YYYY-MM-DD
+    :param end_date: string date format YYYY-MM-DD
     :param grouping: string in ('year', 'month', 'all')
     :return: list of tuples of date ranges
     """
-    if not startDate and not endDate:
+    if not start_date and not end_date:
         return [(None, None)]
-    startDate = Date(startDate)
-    endDate = Date(endDate)
+    start_date = Date(start_date)
+    end_date = Date(end_date)
     groupings = {
         'all': makeWideGroupingsForAllSearch,
         'index_selection': makeWideGroupingsForAllSearch,
         'year': makeYearGroupings,
         'month': makeMonthGroupings
     }
-    return groupings[grouping](startDate, endDate)
+    return groupings[grouping](start_date, end_date)
 
 
 def makeWideGroupingsForAllSearch(startDate, endDate):

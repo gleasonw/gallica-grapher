@@ -1,5 +1,4 @@
 from typing import List
-
 from gallicaGetter.fetch.query import IssueQueryForNewspaperYears
 
 

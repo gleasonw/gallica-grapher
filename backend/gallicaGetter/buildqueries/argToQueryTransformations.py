@@ -6,26 +6,30 @@ from typing import Tuple, List
 NUM_CODES_PER_BUNDLE = 10
 
 
-def build_indexed_queries(queries: List[SRUQuery], api: ConcurrentFetch, limit=None) -> List[SRUQuery]:
+def build_indexed_queries(queries: List[SRUQuery], api: ConcurrentFetch,
+                          endpoint_url: str, limit=None) -> List[SRUQuery]:
+    queries_with_num_results = limit and ((query, limit) for query in queries) or \
+                               get_num_results_for_query(queries, api)
+    return index_queries_by_num_results(queries_with_num_results, endpoint_url=endpoint_url)
 
-    def index_queries_by_num_results(queries_num_results: List[Tuple[SRUQuery, int]]) -> List[SRUQuery]:
-        make_query = type(queries_num_results[0][0])
-        indexed_queries = []
-        for query, num_results in queries_num_results:
-            for i in range(0, num_results, 50):
-                base_data = query.get_cql_params()
-                base_data['startIndex'] = i
-                base_data["numRecords"] = min(50, num_results - i)
-                indexed_queries.append(
-                    make_query(**base_data)
+
+def index_queries_by_num_results(queries_num_results: List[Tuple[SRUQuery, int]], endpoint_url: str) -> List[SRUQuery]:
+    if not queries_num_results:
+        return []
+    make_query = type(queries_num_results[0][0])
+    indexed_queries = []
+    for query, num_results in queries_num_results:
+        for i in range(0, num_results, 50):
+            base_data = query.get_cql_params()
+            base_data['startIndex'] = i
+            base_data["numRecords"] = min(50, num_results - i)
+            indexed_queries.append(
+                make_query(
+                    **base_data,
+                    endpoint=endpoint_url
                 )
-        return indexed_queries
-
-    if limit:
-        queries_with_num_results = ((query, limit) for query in queries)
-    else:
-        queries_with_num_results = get_num_results_for_query(queries, api)
-    return index_queries_by_num_results(queries_with_num_results)
+            )
+    return indexed_queries
 
 
 def bundle_codes(codes: List[str]) -> List[List[str]]:

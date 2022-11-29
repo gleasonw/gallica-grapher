@@ -1,13 +1,15 @@
 import logging
 from typing import List
-
-from gallicaGetter.buildqueries.argToQueryTransformations import NUM_CODES_PER_BUNDLE, \
-    build_indexed_queries, bundle_codes
+from gallicaGetter.buildqueries.argToQueryTransformations import (
+    NUM_CODES_PER_BUNDLE,
+    build_indexed_queries,
+    bundle_codes
+)
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from gallicaGetter.fetch.query import PaperQuery
+from gallicaGetter.fetch.query import PaperQuery, SRUQuery
 
 
-def build_paper_queries_for_codes(codes, endpoint_url: str, api: ConcurrentFetch):
+def build_paper_queries_for_codes(codes, endpoint_url: str, api: ConcurrentFetch) -> List[PaperQuery or SRUQuery]:
     def build_sru_queries_for_codes() -> List[PaperQuery]:
         sru_queries = []
         for code_bundle in bundle_codes(codes):

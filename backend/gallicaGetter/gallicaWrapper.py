@@ -1,5 +1,9 @@
-from gallicaGetter.buildqueries.argToQueryTransformations import get_num_results_for_query
-from gallicaGetter.buildqueries.buildSRUqueries import build_queries
+from gallicaGetter.buildqueries.argToQueryTransformations import (
+    build_indexed_queries,
+    get_num_results_for_query,
+    index_queries_by_num_results,
+)
+from gallicaGetter.buildqueries.buildSRUqueries import build_base_queries
 from gallicaGetter.buildqueries.buildPaperQueries import build_paper_queries_for_codes
 from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
 from gallicaGetter.buildqueries.buildContentQuery import build_query_for_ark_and_term
@@ -60,11 +64,24 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get(self, terms, onUpdateProgress=None,
             generate=False, query_cache=None, **kwargs) -> List[VolumeOccurrenceRecord]:
         kwargs['terms'] = terms
-        queries = build_queries(
-            args=kwargs,
-            endpoint_url=self.endpoint_url,
-            query_cache=query_cache
-        )
+        if query_cache:
+            queries = index_queries_by_num_results(query_cache)
+        else:
+            base_queries = build_base_queries(
+                args=kwargs,
+                endpoint_url=self.endpoint_url,
+            )
+            if kwargs.get('startIndex'):
+                queries = build_period_sample_queries_at_indices(
+                    base_queries,
+                    kwargs.get('startIndex')
+                )
+            else:
+                queries = build_indexed_queries(
+                    base_queries,
+                    api=self.api,
+                    endpoint_url=self.endpoint_url
+                )
         record_generator = self.fetch_from_queries(
             queries=queries,
             onUpdateProgress=onUpdateProgress
@@ -72,7 +89,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         return record_generator if generate else list(record_generator)
 
     def get_num_results_for_args(self, **kwargs):
-        base_queries = build_queries(
+        base_queries = build_base_queries(
             args=kwargs,
             endpoint_url=self.endpoint_url
         )
@@ -81,10 +98,13 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
 
 class PeriodOccurrenceWrapper(GallicaWrapper):
 
-    def get(self, terms, onUpdateProgress=None, generate=False, **kwargs) -> List[PeriodOccurrenceRecord]:
+    def get(self, terms, grouping='year', onUpdateProgress=None, generate=False, **kwargs) -> List[
+        PeriodOccurrenceRecord]:
         kwargs['terms'] = terms
-        kwargs['grouping'] = 'period'
-        queries = build_queries(kwargs, endpoint_url=self.endpoint_url)
+        if grouping not in ['year', 'month']:
+            raise ValueError(f'grouping must be either "year" or "month", not {grouping}')
+        kwargs['grouping'] = grouping
+        queries = build_base_queries(kwargs, endpoint_url=self.endpoint_url)
         record_generator = self.fetch_from_queries(
             queries=queries,
             onUpdateProgress=onUpdateProgress
