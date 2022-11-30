@@ -13,9 +13,9 @@ with open(os.path.join(here, 'stopwordsEN.txt'), 'r') as stopwords_file:
     stopwords_en = set(stopwords_file.read().splitlines())
 
 
-def get_gallica_core(root_gram: str, distance: int,
-                     sample_size: int, start_date: str,
-                     end_date: str, onUpdateProgress=None) -> Dict:
+def get_gallica_core(root_gram: str, distance: int, start_date: str,
+                     end_date: str, sample_size: int = 20,
+                     onUpdateProgress=None) -> Dict:
     text_to_analyze = get_sample_text(
         root_gram,
         sample_size,
@@ -115,6 +115,3 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
     if current_word:
         update_window(current_word)
     return word_counts
-
-
-

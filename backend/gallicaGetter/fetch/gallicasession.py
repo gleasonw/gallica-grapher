@@ -2,6 +2,7 @@ import time
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 import requests
+from requests.exceptions import RetryError
 
 
 class Response:
@@ -21,10 +22,10 @@ class GallicaSession:
     def build_session(self):
         retry_strategy = Retry(
             total=3,
-            status_forcelist=[500, 502, 503, 504],
+            status_forcelist=[502, 503, 504],
             backoff_factor=1,
-            connect=5,
-            read=5,
+            connect=20,
+            read=20,
         )
         adapter = HTTPAdapter(
             max_retries=retry_strategy,
@@ -38,10 +39,14 @@ class GallicaSession:
 
     def get(self, query) -> Response:
         start = time.perf_counter()
-        response = self.session.get(
-            query.get_endpoint_url(),
-            params=query.get_params_for_fetch()
-        )
+        try:
+            response = self.session.get(
+                query.get_endpoint_url(),
+                params=query.get_params_for_fetch()
+            )
+        except RetryError:
+            print('retry error')
+            return Response(None, query, 0)
         end = time.perf_counter()
         if response.status_code != 200:
             print(f"Gallica HTTP response Error: {response.status_code}")

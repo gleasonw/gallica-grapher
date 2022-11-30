@@ -34,15 +34,17 @@ def build_base_queries(args: Dict, endpoint_url: str) -> List[SRUQuery]:
 
 
 def build_base_queries_at_indices(queries, indices, endpoint_url):
+    indexed_queries = []
     if type(indices) is not list:
         indices = [indices]
     for index in indices:
         for query in queries:
             params = query.get_cql_params()
-            yield OccurrenceQuery(
+            indexed_queries.append(OccurrenceQuery(
                 **params,
                 startIndex=index,
-                numRecords=50,
+                numRecords=1,
                 endpoint=endpoint_url
             )
-
+            )
+    return indexed_queries

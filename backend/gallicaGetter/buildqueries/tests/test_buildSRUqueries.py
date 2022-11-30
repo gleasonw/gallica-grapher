@@ -54,4 +54,5 @@ class Test(TestCase):
         self.assertEqual(len(list(indexed_test)), 72)
         for query in indexed_test:
             self.assertEqual(query.startIndex, 0)
+            self.assertEqual(query.numRecords, 1)
             self.assertIsInstance(query, OccurrenceQuery)
