@@ -167,7 +167,11 @@ class PapersWrapper(GallicaWrapper):
         return 'https://gallica.bnf.fr/SRU'
 
     def get(self, arg_codes, stateHooks=None, **kwargs) -> List[PaperRecord]:
-        queries = build_paper_queries_for_codes(arg_codes)
+        queries = build_paper_queries_for_codes(
+            arg_codes,
+            endpoint_url=self.endpoint_url,
+            api=self.api
+        )
         record_generator = self.fetch_from_queries(queries)
         sru_paper_records = list(record_generator)
         codes = [record.code for record in sru_paper_records]

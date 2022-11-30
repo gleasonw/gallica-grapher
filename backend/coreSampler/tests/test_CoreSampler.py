@@ -1,29 +1,10 @@
-from unittest import TestCase
 from io import StringIO
-from backend.coreSampler.CoreSampler import (
-    get_gallica_core,
-    get_associated_words,
-    get_sample_text
-)
+from unittest import TestCase
+
+from coreSampler.CoreSampler import get_associated_words
 
 
-class Test(TestCase):
-    def test_get_gallica_core(self):
-        test = get_gallica_core(
-            root_gram='londres',
-            distance=5,
-            start_date='1939',
-            end_date='1940',
-            sample_size=30
-        )
-        print(test)
-        tupled_items = list(test.items())
-        tupled_items.sort(key=lambda x: x[1], reverse=True)
-        print(tupled_items)
-
-
-    def test_get_sample_text(self):
-        self.fail()
+class TestCoreSampler(TestCase):
 
     def test_get_associated_words(self):
         test_sentence = StringIO('the quick brown fox fox the jumped alors over fox lazy neat frx neat neat')

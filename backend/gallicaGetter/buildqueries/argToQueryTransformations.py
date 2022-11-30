@@ -1,4 +1,4 @@
-import gallicaGetter.parse.gallicaxmlparse as parser
+import gallicaGetter.parse.parseXML as parser
 from gallicaGetter.fetch.query import SRUQuery
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from typing import Tuple, List

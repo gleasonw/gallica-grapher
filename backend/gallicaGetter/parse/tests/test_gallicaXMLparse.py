@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallicaGetter.parse.gallicaxmlparse import *
+from gallicaGetter.parse.parseXML import *
 from gallicaGetter.parse.date import Date
 import os
 

@@ -1,6 +1,6 @@
 import threading
 from appsearch.search import build_searches_for_tickets
-from appsearch.searchprogressstats import initProgressStats
+from appsearch.searchprogressstats import init_progress_stats
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -10,7 +10,7 @@ def buildRequest(identifier, argsBundles, conn):
     return Request(
         identifier=identifier,
         argsBundles=argsBundles,
-        statKeeper=initProgressStats,
+        statKeeper=init_progress_stats,
         searchBuilder=build_searches_for_tickets,
         conn=conn
     )

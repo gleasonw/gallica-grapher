@@ -1,9 +1,9 @@
 from math import ceil
-from gallicaGetter.parse.gallicaxmlparse import GallicaXMLparse
+from gallicaGetter.parse.parseXML import *
 from appsearch.averageResponseTime import AverageResponseTime
 
 
-def initProgressStats(ticketID, grouping):
+def init_progress_stats(ticketID, grouping):
     return SearchProgressStats(
         ticketID=ticketID,
         grouping=grouping,

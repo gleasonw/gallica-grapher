@@ -97,11 +97,6 @@ class TestSearch(TestCase):
         for search in self.searches:
             self.assertTrue(hasattr(search, 'getDBinsert'))
 
-    # subclass responsibility tests
-    def test_responds_to_post_init(self):
-        for search in self.searches:
-            self.assertTrue(hasattr(search, 'post_init'))
-
     def test_responds_to_getLocalFetchArgs(self):
         for search in self.searches:
             self.assertTrue(hasattr(search, 'getLocalFetchArgs'))

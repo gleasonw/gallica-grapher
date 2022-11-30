@@ -1,4 +1,4 @@
-from gallicaGetter.parse.gallicaxmlparse import (
+from gallicaGetter.parse.parseXML import (
     get_num_records,
     get_records_from_xml,
     get_paper_code_from_record_xml,

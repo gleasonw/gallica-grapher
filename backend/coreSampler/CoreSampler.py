@@ -38,7 +38,7 @@ def get_sample_text(root_gram: str, sample_size: int,
             text += record.get_text()
         return text
 
-    sru_wrapper = gallicaGetter.connect('sru')
+    sru_wrapper = gallicaGetter.connect('volume')
     num_volumes_with_root_gram = sru_wrapper.get_num_results_for_args(
         terms=root_gram,
         startDate=start_date,
