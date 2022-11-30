@@ -67,8 +67,9 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get(self, terms, onUpdateProgress=None,
             generate=False, query_cache=None, **kwargs) -> List[VolumeOccurrenceRecord]:
         kwargs['terms'] = terms
+        kwargs['grouping'] = 'all'
         if query_cache:
-            queries = index_queries_by_num_results(query_cache)
+            queries = index_queries_by_num_results(query_cache, endpoint_url=self.endpoint_url)
         else:
             base_queries = build_base_queries(
                 args=kwargs,
@@ -119,7 +120,7 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
         return 'https://gallica.bnf.fr/SRU'
 
     def get_parser(self, kwargs):
-        self.parser = build_parser(
+        return build_parser(
             desired_record='groupedCount',
             ticketID=kwargs.get('ticketID'),
             requestID=kwargs.get('requestID')
@@ -200,3 +201,14 @@ class FullTextWrapper(GallicaWrapper):
             onUpdateProgress=onUpdateProgress
         )
         return record_generator if generate else list(record_generator)
+
+
+if __name__ == '__main__':
+    test = PeriodOccurrenceWrapper()
+    records = test.get(
+        'brazza',
+        startDate='1900',
+        endDate='1901',
+        grouping='month'
+    )
+    print(records)

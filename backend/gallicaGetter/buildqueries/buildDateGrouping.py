@@ -15,15 +15,15 @@ def build_date_grouping(start_date, end_date, grouping) -> List[Tuple]:
     start_date = Date(start_date)
     end_date = Date(end_date)
     groupings = {
-        'all': makeWideGroupingsForAllSearch,
-        'index_selection': makeWideGroupingsForAllSearch,
+        'all': make_wide_groupings_for_all_search,
+        'index_selection': make_wide_groupings_for_all_search,
         'year': makeYearGroupings,
         'month': makeMonthGroupings
     }
     return groupings[grouping](start_date, end_date)
 
 
-def makeWideGroupingsForAllSearch(startDate, endDate):
+def make_wide_groupings_for_all_search(startDate, endDate):
     if not startDate.getYear() or not endDate.getYear():
         markerDate = startDate if startDate.getYear() else endDate
         if markerDate.getDay():

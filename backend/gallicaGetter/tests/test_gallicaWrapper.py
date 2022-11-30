@@ -11,7 +11,9 @@ from gallicaGetter.gallicaWrapper import (
 )
 from gallicaGetter.parse.parseRecord import (
     ParseArkRecord,
-    ParseContentRecord
+    ParseContentRecord,
+    ParseOccurrenceRecords,
+    ParseGroupedRecordCounts
 )
 
 
@@ -37,13 +39,41 @@ class TestGallicaWrapper(TestCase):
             connect('not an api')
 
 
-class TestSRUWrapper(TestCase):
+class TestVolumeOccurrenceWrapper(TestCase):
 
     def setUp(self) -> None:
         self.api = VolumeOccurrenceWrapper()
 
+    def test_get_parser(self):
+        self.assertIsInstance(
+            self.api.get_parser({}),
+            ParseOccurrenceRecords
+        )
+
     def test_get(self):
         getter = VolumeOccurrenceWrapper()
+        getter.api = MagicMock()
+        getter.fetch_from_queries = MagicMock()
+
+        self.assertIsInstance(
+            getter.get(terms='a term'),
+            list
+        )
+
+
+class TestPeriodOccurrenceWrapper(TestCase):
+
+    def setUp(self) -> None:
+        self.api = PeriodOccurrenceWrapper()
+
+    def test_get_parser(self):
+        self.assertIsInstance(
+            self.api.get_parser({}),
+            ParseGroupedRecordCounts
+        )
+
+    def test_get(self):
+        getter = PeriodOccurrenceWrapper()
         getter.api = MagicMock()
         getter.fetch_from_queries = MagicMock()
 
