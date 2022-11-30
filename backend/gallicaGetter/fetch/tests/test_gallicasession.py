@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from unittest import TestCase
 
 
-class TestGet(TestCase):
+class TestGallicaSession(TestCase):
 
     def setUp(self) -> None:
         self.getter = GallicaSession('test')

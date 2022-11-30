@@ -1,5 +1,6 @@
 from lxml import etree
 from gallicaGetter.parse.date import Date
+from typing import List, Tuple
 
 
 def get_one_paper_from_record_batch(xml) -> str:
@@ -10,7 +11,7 @@ def get_one_paper_from_record_batch(xml) -> str:
         return ''
 
 
-def get_num_results_and_pages_for_context(xml) -> tuple:
+def get_num_results_and_pages_for_context(xml) -> Tuple[int, List[Tuple[str, str]]]:
     elements = etree.fromstring(xml)
     top_level = elements.find('.')
     num_results = top_level.attrib.get('countResults')
@@ -19,7 +20,7 @@ def get_num_results_and_pages_for_context(xml) -> tuple:
     return num_results, pages
 
 
-def get_records_from_xml(xml) -> list:
+def get_records_from_xml(xml) -> List[etree.Element]:
     elements = etree.fromstring(xml)
     records_root = elements.find("{http://www.loc.gov/zing/srw/}records")
     if records_root is None:
@@ -42,7 +43,7 @@ def get_num_records(xml) -> int:
         return 0
 
 
-def get_years_published(xml) -> list:
+def get_years_published(xml) -> List[str]:
     root = etree.fromstring(xml)
     years = [
         get_year_from_element(yearElement)
@@ -51,7 +52,7 @@ def get_years_published(xml) -> list:
     return list(filter(None, years))
 
 
-def get_year_from_element(year_element):
+def get_year_from_element(year_element) -> str:
     if year_element is not None:
         year = year_element.text
         return year if year.isdigit() else None
@@ -59,7 +60,7 @@ def get_year_from_element(year_element):
         return None
 
 
-def get_data_from_record_root(root):
+def get_data_from_record_root(root) -> etree.Element:
     root = root[2]
     data = root[0]
     return data
@@ -101,7 +102,7 @@ def get_date_from_record_xml(record) -> Date:
         return Date(date_element.text)
 
 
-def get_page_and_context_for_occurrence(xml_items) -> list:
+def get_page_and_context_for_occurrence(xml_items) -> List[Tuple[str, str]]:
     items = []
     for item in xml_items:
         page = item.find('p_id')

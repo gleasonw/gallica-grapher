@@ -1,9 +1,5 @@
 from typing import Dict, List, Tuple
-from gallicaGetter.buildqueries.argToQueryTransformations import (
-    bundle_codes,
-    build_indexed_queries,
-    index_queries_by_num_results
-)
+from gallicaGetter.buildqueries.argToQueryTransformations import bundle_codes
 from gallicaGetter.buildqueries.buildDateGrouping import build_date_grouping
 from gallicaGetter.fetch.query import SRUQuery, OccurrenceQuery
 
@@ -28,11 +24,25 @@ def build_base_queries(args: Dict, endpoint_url: str) -> List[SRUQuery]:
                         codes=code_bundle,
                         startDate=start,
                         endDate=end,
-                        endpoint=endpoint_url
+                        endpoint=endpoint_url,
+                        searchMetaData=args,
+                        startIndex=0,
+                        numRecords=1
                     )
                 )
     return base_queries
 
 
-def build_period_sample_at_indices_queries(query: SRUQuery, indices: List[int]) -> List[SRUQuery]:
-    return query
+def build_base_queries_at_indices(queries, indices, endpoint_url):
+    if type(indices) is not list:
+        indices = [indices]
+    for index in indices:
+        for query in queries:
+            params = query.get_cql_params()
+            yield OccurrenceQuery(
+                **params,
+                startIndex=index,
+                numRecords=50,
+                endpoint=endpoint_url
+            )
+

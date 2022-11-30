@@ -1,12 +1,26 @@
-from gallicaGetter.parse.date import Date
-from gallicaGetter.parse.gallicaxmlparse import GallicaXMLparse
-from gallicaGetter.parse.record import VolumeOccurrenceRecord, PeriodOccurrenceRecord, PaperRecord, ContentRecord, \
+from gallicaGetter.parse.gallicaxmlparse import (
+    get_num_records,
+    get_records_from_xml,
+    get_paper_code_from_record_xml,
+    get_paper_title_from_record_xml,
+    get_url_from_record,
+    get_date_from_record_xml,
+    get_num_results_and_pages_for_context,
+    get_years_published
+)
+from gallicaGetter.parse.record import (
+    VolumeOccurrenceRecord,
+    PeriodOccurrenceRecord,
+    PaperRecord,
+    ContentRecord,
     ArkRecord
+)
 from gallicaGetter.parse.parseHTML import parse_html
+from gallicaGetter.parse.date import Date
 
 
-def buildParser(desiredRecord, **kwargs):
-    recordParsers = {
+def build_parser(desired_record, **kwargs):
+    record_parsers = {
         'ark': ParseArkRecord,
         'groupedCount': ParseGroupedRecordCounts,
         'occurrence': ParseOccurrenceRecords,
@@ -14,69 +28,68 @@ def buildParser(desiredRecord, **kwargs):
         'content': ParseContentRecord,
         'fullText': ParseFullText,
     }
-    if desiredRecord not in recordParsers:
-        raise ValueError(f'Unrecognized record type: {desiredRecord}. Options include: {recordParsers.keys()}')
-    parser = GallicaXMLparse()
-    return recordParsers[desiredRecord](parser, **kwargs)
+    if desired_record not in record_parsers:
+        raise ValueError(f'Unrecognized record type: {desired_record}. Options include: {record_parsers.keys()}')
+    return record_parsers[desired_record](**kwargs)
 
 
 class ParseRecord:
 
-    def __init__(self, parser, **kwargs):
-        self.parser = parser
-        self.postInit(kwargs)
+    def __init__(self, **kwargs):
+        self.post_init(kwargs)
 
-    def postInit(self, args):
+    def post_init(self, args):
         pass
 
-    def parseResponsesToRecords(self, responses):
-        raise NotImplementedError(f'ParseRecord.parseResponsesToRecords() must be implemented by subclass {self.__class__.__name__}.')
+    def parse_responses_to_records(self, responses):
+        raise NotImplementedError(
+            f'ParseRecord.parse_responses_to_records() must be implemented by subclass {self.__class__.__name__}.')
 
 
 class ParsePaperRecords(ParseRecord):
 
-    def getNumResults(self, xml):
-        return self.parser.get_num_records(xml)
+    def get_num_results(self, xml):
+        return get_num_records(xml)
 
-    def parseResponsesToRecords(self, responses):
+    def parse_responses_to_records(self, responses):
         for response in responses:
-            yield from self.generatePaperRecords(response.data)
+            yield from self.generate_paper_records(response.data)
 
-    def generatePaperRecords(self, xml):
-        for record in self.parser.get_records_from_xml(xml):
+    def generate_paper_records(self, xml):
+        for record in get_records_from_xml(xml):
             yield PaperRecord(
-                code=self.parser.get_paper_code_from_record_xml(record),
-                title=self.parser.get_paper_title_from_record_xml(record),
-                url=self.parser.get_url_from_record(record),
+                code=get_paper_code_from_record_xml(record),
+                title=get_paper_title_from_record_xml(record),
+                url=get_url_from_record(record),
             )
 
 
 class ParseOccurrenceRecords(ParseRecord):
 
-    def postInit(self, args):
+    def post_init(self, args):
         self.requestID = args['requestID']
         self.ticketID = args['ticketID']
 
-    def getNumResults(self, xml):
-        return self.parser.get_num_records(xml)
+    def get_num_results(self, xml):
+        return get_num_records(xml)
 
-    def parseResponsesToRecords(self, responses):
+    def parse_responses_to_records(self, responses):
         for response in responses:
-            yield from self.generateOccurrenceRecords(
+            yield from self.generate_occurrence_records(
                 query=response.query,
                 xml=response.data
             )
 
-    def generateOccurrenceRecords(self, xml, query):
-        for record in self.parser.get_records_from_xml(xml):
-            paperTitle = self.parser.get_paper_title_from_record_xml(record)
-            paperCode = self.parser.get_paper_code_from_record_xml(record)
-            date = self.parser.get_date_from_record_xml(record)
+    def generate_occurrence_records(self, xml, query):
+        for record in get_records_from_xml(xml):
+            paperTitle = get_paper_title_from_record_xml(record)
+            paperCode = get_paper_code_from_record_xml(record)
+            date = get_date_from_record_xml(record)
             yield VolumeOccurrenceRecord(
                 paperTitle=paperTitle,
                 paperCode=paperCode,
                 date=date,
-                url=self.parser.get_url_from_record(record),
+                url=get_url_from_record(record),
                 term=query.term,
                 requestID=self.requestID,
                 ticketID=self.ticketID
@@ -85,13 +98,13 @@ class ParseOccurrenceRecords(ParseRecord):
 
 class ParseGroupedRecordCounts(ParseRecord):
 
-    def postInit(self, args):
+    def post_init(self, args):
         self.ticketID = args['ticketID']
         self.requestID = args['requestID']
 
-    def parseResponsesToRecords(self, responses):
+    def parse_responses_to_records(self, responses):
         for response in responses:
-            count = self.parser.get_num_records(response.data)
+            count = get_num_records(response.data)
             query = response.query
             yield PeriodOccurrenceRecord(
                 date=Date(query.get_start_date()),
@@ -104,9 +117,9 @@ class ParseGroupedRecordCounts(ParseRecord):
 
 class ParseContentRecord(ParseRecord):
 
-    def parseResponsesToRecords(self, responses):
+    def parse_responses_to_records(self, responses):
         for response in responses:
-            num_results_and_pages = self.parser.get_num_results_and_pages_for_context(response.data)
+            num_results_and_pages = get_num_results_and_pages_for_context(response.data)
             yield ContentRecord(
                 num_results=num_results_and_pages[0],
                 pages=num_results_and_pages[1]
@@ -115,7 +128,7 @@ class ParseContentRecord(ParseRecord):
 
 class ParseFullText(ParseRecord):
 
-    def parseResponsesToRecords(self, responses):
+    def parse_responses_to_records(self, responses):
         return (
             parse_html(response.data)
             for response in responses
@@ -124,14 +137,11 @@ class ParseFullText(ParseRecord):
 
 class ParseArkRecord(ParseRecord):
 
-    def parseResponsesToRecords(self, responses):
+    def parse_responses_to_records(self, responses):
         for response in responses:
-            yield from self.generateArkRecord(response.data, response.query)
-
-    def generateArkRecord(self, xml, query):
-        years = self.parser.get_years_published(xml)
-        code = query.getCode()
-        yield ArkRecord(
-            code=code,
-            years=years
-        )
+            years = get_years_published(response.data)
+            code = response.query.getCode()
+            yield ArkRecord(
+                code=code,
+                years=years
+            )
