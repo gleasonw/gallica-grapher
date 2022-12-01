@@ -1,13 +1,12 @@
-from typing import List
+from typing import List, Optional
 from gallicaGetter.fetch.sruQueryMixin import SRUQueryMixin
 
 
 class OccurrenceQuery(SRUQueryMixin):
 
-    def __init__(self, term: str, codes: List[str],
-                 start_date: str, end_date: str,
-                 endpoint: str, start_index: int,
-                 num_records: int, link_term: str = None,
+    def __init__(self, term: str, start_date: str,
+                 end_date: str, endpoint: str, start_index: int,
+                 num_records: int, link_term: str = None, codes: Optional[List[str]] = None,
                  link_distance: int = 0):
         self.start_date = start_date
         self.end_date = end_date
@@ -21,16 +20,10 @@ class OccurrenceQuery(SRUQueryMixin):
         self.endpoint = endpoint
         self.collapsing = False
 
-    def get_cql_params(self):
-        return {
-            "term": self.term,
-            "endDate": self.end_date,
-            "startDate": self.start_date,
-            "codes": self.codes,
-        }
-
-    def get_start_date(self):
-        return self.start_date
+    def make_copy(self, start_index: int, num_records: int):
+        return OccurrenceQuery(self.term, self.start_date, self.end_date,
+                               self.endpoint, start_index, num_records,
+                               self.link_term, self.codes, self.link_distance)
 
     def generate_cql(self):
         cql_components = []
@@ -56,4 +49,5 @@ class OccurrenceQuery(SRUQueryMixin):
             return ''
 
     def __repr__(self):
-        return f"Query({self.cql})"
+        return f"Occurrence Query ({self.cql})"
+

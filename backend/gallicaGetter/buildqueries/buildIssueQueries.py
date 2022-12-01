@@ -8,7 +8,7 @@ def build_issue_queries_for_codes(codes, endpoint_url) -> List[IssueQueryForNews
     return [
         IssueQueryForNewspaperYears(
             code=code,
-            endpoint=endpoint_url
+            endpoint_url=endpoint_url
         )
         for code in codes
     ]

@@ -14,8 +14,8 @@ class PaperQuery(SRUQueryMixin):
         self.collapsing = True
         self.cql = self.build_periodical_cql()
 
-    def get_cql_params(self):
-        return {"codes": self.codes}
+    def make_copy(self, start_index: int, num_records: int):
+        return PaperQuery(start_index, num_records, self.endpoint, self.codes)
 
     def __repr__(self):
         return f'PaperQuery({self.codes}, {self.startIndex}, {self.numRecords})'

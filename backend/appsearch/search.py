@@ -87,10 +87,7 @@ class Search:
 class AllSearch(Search):
 
     def postInit(self):
-        self.baseQueriesWithNumResults = self.api.get_num_results_for_args(
-            **self.args,
-            numRecords=1
-        )
+        self.baseQueriesWithNumResults = self.api.get_num_results_for_args(**self.args)
 
     def getNumRecordsToBeInserted(self, onNumRecordsFound):
         found = sum(queryWithResult[1] for queryWithResult in self.baseQueriesWithNumResults)

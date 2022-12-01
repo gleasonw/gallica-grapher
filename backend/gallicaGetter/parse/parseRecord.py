@@ -107,7 +107,7 @@ class ParseGroupedRecordCounts(ParseRecord):
             count = get_num_records(response.data)
             query = response.query
             yield PeriodOccurrenceRecord(
-                date=Date(query.get_start_date()),
+                date=Date(query.start_date),
                 count=count,
                 ticketID=self.ticketID,
                 term=query.term,

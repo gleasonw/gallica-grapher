@@ -14,18 +14,16 @@ class TestArgQueryTransformations(TestCase):
 
     def setUp(self):
         self.test_1 = OccurrenceQuery(
-            searchMetaData=MagicMock(),
-            startDate=1900,
-            endDate=1901,
+            start_date='1900',
+            end_date='1901',
             term='test',
             start_index=0,
             num_records=1,
             endpoint='test'
         )
         self.test_2 = OccurrenceQuery(
-            searchMetaData=MagicMock(),
-            startDate=1900,
-            endDate=1905,
+            start_date='1900',
+            end_date='1905',
             term='test',
             start_index=0,
             num_records=1,
@@ -37,7 +35,7 @@ class TestArgQueryTransformations(TestCase):
             (self.test_1, 1205),
             (self.test_2, 1895)
         ]
-        results = index_queries_by_num_results(test_queries, endpoint_url='nonsense')
+        results = index_queries_by_num_results(test_queries)
         self.assertEqual(len(results), 63)
         self.assertIsInstance(results[0], OccurrenceQuery)
 
@@ -45,7 +43,6 @@ class TestArgQueryTransformations(TestCase):
         results = build_indexed_queries(
             queries=[self.test_1, self.test_2],
             api=MagicMock(),
-            endpoint_url='nonsense'
         )
         self.assertEqual(len(results), 0)
 

@@ -20,13 +20,10 @@ from gallicaGetter.parse.record import (
     ContentRecord,
     ArkRecord
 )
-from typing import List, Optional, Union
-from pydantic import BaseModel
+from typing import List, Optional
+from gallicaGetter.queryArgModel import QueryArgModel
 
 
-
-
-# TODO: add graceful timeouts
 class GallicaWrapper:
     def __init__(self, **kwargs):
         self.api = ConcurrentFetch(numWorkers=kwargs.get('numWorkers', 15))
@@ -48,25 +45,10 @@ class GallicaWrapper:
             queries,
             onUpdateProgress=onUpdateProgress
         )
-        records = self.parser.parse_responses_to_records(raw_response)
-        return records
+        return self.parser.parse_responses_to_records(raw_response)
 
     def get_parser(self, kwargs):
         raise NotImplementedError(f'getParser() not implemented for {self.__class__.__name__}')
-
-
-class SRUArgs(BaseModel):
-    terms: Union[List[str], str]
-    startDate: Optional[str] = None
-    endDate: Optional[str] = None
-    codes: Optional[List[str] or str] = None
-    grouping: Optional[str] = None
-    generate: bool = False
-    numResults: Optional[int] = None
-    startIndex: Optional[int] = None
-    numWorkers: Optional[int] = None
-    linkTerm: Optional[str] = None
-    linkDistance: Optional[int] = None
 
 
 class VolumeOccurrenceWrapper(GallicaWrapper):
@@ -81,22 +63,29 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get_endpoint_url(self):
         return 'https://gallica.bnf.fr/SRU'
 
-    def get(self, terms, onUpdateProgress=None,
-            generate=False, query_cache=None, **kwargs) -> List[VolumeOccurrenceRecord]:
-        kwargs['terms'] = terms
-        kwargs['grouping'] = 'all'
-        requestArgs = SRUArgs(**kwargs)
+    def get(self, terms: List[str] | str, start_date: Optional[str] = None, end_date: Optional[str] = None,
+            codes: Optional[List[str] | str] = None, generate: bool = False, num_results: Optional[int] = None,
+            start_index: Optional[int] = 0, num_workers: Optional[int] = 15, link_term: Optional[str] = None,
+            link_distance: Optional[int] = None, onUpdateProgress=None, query_cache=None) -> List[VolumeOccurrenceRecord]:
         if query_cache:
             queries = index_queries_by_num_results(query_cache, endpoint_url=self.endpoint_url)
         else:
             base_queries = build_base_queries(
-                args=requestArgs,
-                endpoint_url=self.endpoint_url,
+                QueryArgModel(
+                    terms=terms,
+                    start_date=start_date,
+                    end_date=end_date,
+                    codes=codes,
+                    link_term=link_term,
+                    link_distance=link_distance,
+                    endpoint_url=self.endpoint_url,
+                    grouping='all'
+                )
             )
-            if kwargs.get('startIndex'):
+            if start_index:
                 queries = build_base_queries_at_indices(
                     base_queries,
-                    kwargs.get('startIndex'),
+                    start_index,
                     endpoint_url=self.endpoint_url
                 )
             else:
@@ -111,11 +100,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         )
         return record_generator if generate else list(record_generator)
 
-    def get_num_results_for_args(self, **kwargs):
-        base_queries = build_base_queries(
-            args=kwargs,
-            endpoint_url=self.endpoint_url
-        )
+    def get_num_results_for_args(self, args: QueryArgModel):
+        base_queries = build_base_queries(args)
         return get_num_results_for_query(base_queries, api=self.api)
 
 

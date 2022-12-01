@@ -59,15 +59,3 @@ class TestOccurrenceQuery(TestCase):
     def test_get_fetch_params_with_link_term_and_distance(self):
         test = self.queryWithLinkTermAndDistance.get_params_for_fetch()
         self.assertIsInstance(test, dict)
-
-    def test_get_essential_data_for_making_aquery(self):
-        test = self.queryWithCodes.get_cql_params()
-        self.assertDictEqual(
-            test,
-            {
-                'term': 'test',
-                'codes': ['test', 'neat'],
-                'endDate': '1902',
-                'startDate': '1901',
-            }
-        )
