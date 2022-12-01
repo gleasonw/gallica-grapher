@@ -37,6 +37,19 @@ class TestOccurrenceQuery(TestCase):
             endpoint='test'
         )
 
+    def test_make_copy(self):
+        test = self.queryWithCodes.make_copy(start_index=1, num_records=1)
+        self.assertIsInstance(test, OccurrenceQuery)
+        self.assertEqual(test.start_index, 1)
+        self.assertEqual(test.num_records, 1)
+        self.assertEqual(test.term, self.queryWithCodes.term)
+        self.assertEqual(test.codes, self.queryWithCodes.codes)
+        self.assertEqual(test.start_date, self.queryWithCodes.start_date)
+        self.assertEqual(test.end_date, self.queryWithCodes.end_date)
+        self.assertEqual(test.endpoint_url, self.queryWithCodes.endpoint_url)
+        self.assertEqual(test.link_term, self.queryWithCodes.link_term)
+        self.assertEqual(test.link_distance, self.queryWithCodes.link_distance)
+
     def test_get_fetch_params_given_codes(self):
         test = self.queryWithCodes.get_params_for_fetch()
         self.assertDictEqual(

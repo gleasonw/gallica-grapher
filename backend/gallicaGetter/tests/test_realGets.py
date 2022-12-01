@@ -6,15 +6,15 @@ class TestRealGets(unittest.TestCase):
 
     def test_get_volume_occurrences(self):
         getter = gallicaGetter.connect('volume')
-        records = getter.get('brazza', startDate='1900', endDate='1901')
+        records = getter.get('brazza', start_date='1900', end_date='1901')
         self.assertEqual(
             len(records),
-            689
+            690
         )
 
     def test_get_period_occurrences(self):
         getter = gallicaGetter.connect('period_count')
-        records = getter.get('brazza', startDate='1900', endDate='1901')
+        records = getter.get('brazza', start_date='1900', end_date='1901')
         self.assertEqual(
             len(records),
             2

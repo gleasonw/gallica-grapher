@@ -7,7 +7,7 @@ def build_text_queries_for_codes(endpoint, ark_codes):
     return [
         FullTextQuery(
             ark=code,
-            endpoint=endpoint
+            endpoint_url=endpoint
         )
         for code in ark_codes
     ]

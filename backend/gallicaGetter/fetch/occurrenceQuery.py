@@ -17,12 +17,12 @@ class OccurrenceQuery(SRUQueryMixin):
         self.cql = self.generate_cql()
         self.start_index = start_index
         self.num_records = num_records
-        self.endpoint = endpoint
+        self.endpoint_url = endpoint
         self.collapsing = False
 
     def make_copy(self, start_index: int, num_records: int):
         return OccurrenceQuery(self.term, self.start_date, self.end_date,
-                               self.endpoint, start_index, num_records,
+                               self.endpoint_url, start_index, num_records,
                                self.link_term, self.codes, self.link_distance)
 
     def generate_cql(self):

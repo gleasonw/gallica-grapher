@@ -8,14 +8,14 @@ class PaperQuery(SRUQueryMixin):
     def __init__(self, start_index: int, num_records: int,
                  endpoint: str, codes: List[str] = None):
         self.codes = codes
-        self.startIndex = start_index
-        self.numRecords = num_records
-        self.endpoint = endpoint
+        self.start_index = start_index
+        self.num_records = num_records
+        self.endpoint_url = endpoint
         self.collapsing = True
         self.cql = self.build_periodical_cql()
 
     def make_copy(self, start_index: int, num_records: int):
-        return PaperQuery(start_index, num_records, self.endpoint, self.codes)
+        return PaperQuery(start_index, num_records, self.endpoint_url, self.codes)
 
     def __repr__(self):
-        return f'PaperQuery({self.codes}, {self.startIndex}, {self.numRecords})'
+        return f'PaperQuery({self.codes}, {self.start_index}, {self.num_records})'

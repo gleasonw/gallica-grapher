@@ -13,16 +13,16 @@ class Test(TestCase):
         self.month_args = QueryArgModel(
             terms='test',
             codes='test',
-            startDate='1980',
-            endDate='1985',
+            start_date='1980',
+            end_date='1985',
             grouping='month',
             endpoint_url='test',
         )
         self.year_args = QueryArgModel(
             terms='test',
             codes='test',
-            startDate='1980',
-            endDate='1985',
+            start_date='1980',
+            end_date='1985',
             grouping='year',
             endpoint_url='test',
         )

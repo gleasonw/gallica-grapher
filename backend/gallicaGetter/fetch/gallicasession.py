@@ -41,7 +41,7 @@ class GallicaSession:
         start = time.perf_counter()
         try:
             response = self.session.get(
-                query.get_endpoint_url(),
+                query.endpoint_url,
                 params=query.get_params_for_fetch()
             )
         except RetryError:
