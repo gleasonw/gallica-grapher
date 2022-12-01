@@ -6,7 +6,7 @@ from gallicaGetter.buildqueries.argToQueryTransformations import (
     bundle_codes
 )
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from gallicaGetter.fetch.query import PaperQuery, SRUQuery
+from gallicaGetter.fetch.PaperQuery import PaperQuery
 
 
 def build_paper_queries_for_codes(codes, endpoint_url: str, api: ConcurrentFetch) -> List[PaperQuery or SRUQuery]:
@@ -30,10 +30,11 @@ def build_paper_queries_for_codes(codes, endpoint_url: str, api: ConcurrentFetch
                 PaperQuery(
                     startIndex=0,
                     numRecords=1,
-                    baseURL=endpoint_url
+                    endpoint=endpoint_url
                 )
             ],
-            api=api
+            api=api,
+            endpoint_url=endpoint_url
         )
     if not isinstance(codes, list):
         codes = [codes]

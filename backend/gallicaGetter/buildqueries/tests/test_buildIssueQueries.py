@@ -1,6 +1,6 @@
 from unittest import TestCase
 from gallicaGetter.buildqueries.buildIssueQueries import build_issue_queries_for_codes
-from gallicaGetter.fetch.query import IssueQueryForNewspaperYears
+from gallicaGetter.fetch.issueQuery import IssueQueryForNewspaperYears
 
 
 class Test(TestCase):

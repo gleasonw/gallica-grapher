@@ -1,4 +1,7 @@
-from gallicaGetter.fetch.query import OccurrenceQuery, IssueQueryForNewspaperYears, PaperQuery, ContentQuery
+from gallicaGetter.fetch.issueQuery import IssueQueryForNewspaperYears
+from gallicaGetter.fetch.contentQuery import ContentQuery
+from gallicaGetter.fetch.PaperQuery import PaperQuery
+from gallicaGetter.fetch.OccurrenceQuery import OccurrenceQuery
 from unittest import TestCase
 
 
@@ -134,6 +137,5 @@ class TestQuery(TestCase):
                 'codes': ['test', 'neat'],
                 'endDate': '1902',
                 'startDate': '1901',
-                "searchMetaData": self.queryWithCodes.search_meta
             }
         )

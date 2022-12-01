@@ -4,7 +4,7 @@ from gallicaGetter.buildqueries.buildSRUqueries import (
     build_base_queries_at_indices
 )
 from unittest.mock import MagicMock
-from gallicaGetter.fetch.query import OccurrenceQuery
+from gallicaGetter.fetch.OccurrenceQuery import OccurrenceQuery
 
 
 class Test(TestCase):

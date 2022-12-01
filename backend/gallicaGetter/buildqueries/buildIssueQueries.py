@@ -1,5 +1,5 @@
 from typing import List
-from gallicaGetter.fetch.query import IssueQueryForNewspaperYears
+from gallicaGetter.fetch.issueQuery import IssueQueryForNewspaperYears
 
 
 def build_issue_queries_for_codes(codes, endpoint_url) -> List[IssueQueryForNewspaperYears]:

@@ -1,6 +1,6 @@
 from unittest import TestCase
 from gallicaGetter.buildqueries.buildContentQuery import build_query_for_ark_and_term
-from gallicaGetter.fetch.query import ContentQuery
+from gallicaGetter.fetch.contentQuery import ContentQuery
 
 
 class Test(TestCase):

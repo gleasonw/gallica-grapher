@@ -20,7 +20,10 @@ from gallicaGetter.parse.record import (
     ContentRecord,
     ArkRecord
 )
-from typing import List
+from typing import List, Optional, Union
+from pydantic import BaseModel
+
+
 
 
 # TODO: add graceful timeouts
@@ -52,6 +55,20 @@ class GallicaWrapper:
         raise NotImplementedError(f'getParser() not implemented for {self.__class__.__name__}')
 
 
+class SRUArgs(BaseModel):
+    terms: Union[List[str], str]
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
+    codes: Optional[List[str] or str] = None
+    grouping: Optional[str] = None
+    generate: bool = False
+    numResults: Optional[int] = None
+    startIndex: Optional[int] = None
+    numWorkers: Optional[int] = None
+    linkTerm: Optional[str] = None
+    linkDistance: Optional[int] = None
+
+
 class VolumeOccurrenceWrapper(GallicaWrapper):
 
     def get_parser(self, kwargs):
@@ -68,11 +85,12 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             generate=False, query_cache=None, **kwargs) -> List[VolumeOccurrenceRecord]:
         kwargs['terms'] = terms
         kwargs['grouping'] = 'all'
+        requestArgs = SRUArgs(**kwargs)
         if query_cache:
             queries = index_queries_by_num_results(query_cache, endpoint_url=self.endpoint_url)
         else:
             base_queries = build_base_queries(
-                args=kwargs,
+                args=requestArgs,
                 endpoint_url=self.endpoint_url,
             )
             if kwargs.get('startIndex'):

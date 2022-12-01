@@ -1,6 +1,6 @@
 from unittest import TestCase
 from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
-from gallicaGetter.fetch.query import FullTextQuery
+from gallicaGetter.fetch.fullTextQuery import FullTextQuery
 
 
 class Test(TestCase):

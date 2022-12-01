@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallicaGetter.fetch.query import OccurrenceQuery
+from gallicaGetter.fetch.OccurrenceQuery import OccurrenceQuery
 from gallicaGetter.buildqueries.argToQueryTransformations import (
     index_queries_by_num_results,
     build_indexed_queries,
