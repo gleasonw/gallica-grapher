@@ -1,19 +1,21 @@
 import gallicaGetter.parse.parseXML as parser
-from gallicaGetter.fetch.query import SRUQuery
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from typing import Tuple, List
+from typing import Tuple, List, Union
+from gallicaGetter.fetch.paperQuery import PaperQuery
+from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 
 NUM_CODES_PER_BUNDLE = 10
 
 
-def build_indexed_queries(queries: List[SRUQuery], api: ConcurrentFetch,
-                          endpoint_url: str, limit=None) -> List[SRUQuery]:
+def build_indexed_queries(queries: Union[List[OccurrenceQuery], List[PaperQuery]], api: ConcurrentFetch,
+                          endpoint_url: str, limit=None) -> Union[List[OccurrenceQuery], List[PaperQuery]]:
     queries_with_num_results = limit and ((query, limit) for query in queries) or \
                                get_num_results_for_query(queries, api)
     return index_queries_by_num_results(queries_with_num_results, endpoint_url=endpoint_url)
 
 
-def index_queries_by_num_results(queries_num_results: List[Tuple[SRUQuery, int]], endpoint_url: str) -> List[SRUQuery]:
+def index_queries_by_num_results(queries_num_results: List[Tuple[PaperQuery, int] | Tuple[OccurrenceQuery, int]],
+                                 endpoint_url: str) -> List[PaperQuery | OccurrenceQuery]:
     if not queries_num_results:
         return []
     make_query = type(queries_num_results[0][0])
@@ -41,7 +43,8 @@ def bundle_codes(codes: List[str]) -> List[List[str]]:
     ]
 
 
-def get_num_results_for_query(queries: List[SRUQuery], api: ConcurrentFetch) -> List[Tuple[SRUQuery, int]]:
+def get_num_results_for_query(queries: List[PaperQuery | OccurrenceQuery],
+                              api: ConcurrentFetch) -> List[Tuple[PaperQuery | OccurrenceQuery, int]]:
     responses = api.get(queries)
     num_results_for_queries = [
         (response.query, parser.get_num_records(response.data))

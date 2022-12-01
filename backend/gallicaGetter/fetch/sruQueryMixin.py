@@ -8,7 +8,7 @@ class SRUQueryMixin:
             "startRecord": self.start_index,
             "maximumRecords": self.num_records,
             "query": self.cql and self.cql or self.generate_cql(),
-            "collapsing": self.collapsing
+            "collapsing": self.collapsing and "true" or "false",
         }
         return base
 

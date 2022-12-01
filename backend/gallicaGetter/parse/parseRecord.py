@@ -140,7 +140,7 @@ class ParseArkRecord(ParseRecord):
     def parse_responses_to_records(self, responses):
         for response in responses:
             years = get_years_published(response.data)
-            code = response.query.getCode()
+            code = response.query.get_code()
             yield ArkRecord(
                 code=code,
                 years=years

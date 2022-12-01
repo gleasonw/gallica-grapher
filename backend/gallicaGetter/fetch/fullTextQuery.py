@@ -7,8 +7,5 @@ class FullTextQuery:
     def get_endpoint_url(self):
         return f'{self.endpoint_url}/ark:/12148/{self.ark}.texteBrut'
 
-    def get_cql_params(self):
-        return {}
-
     def __repr__(self) -> str:
         return f'RawTextQuery({self.ark})'

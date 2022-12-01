@@ -6,7 +6,7 @@ from gallicaGetter.buildqueries.argToQueryTransformations import (
     bundle_codes
 )
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from gallicaGetter.fetch.PaperQuery import PaperQuery
+from gallicaGetter.fetch.paperQuery import PaperQuery
 
 
 def build_paper_queries_for_codes(codes, endpoint_url: str, api: ConcurrentFetch) -> List[PaperQuery or SRUQuery]:
@@ -14,8 +14,8 @@ def build_paper_queries_for_codes(codes, endpoint_url: str, api: ConcurrentFetch
         sru_queries = []
         for code_bundle in bundle_codes(codes):
             sru_query = PaperQuery(
-                startIndex=0,
-                numRecords=NUM_CODES_PER_BUNDLE,
+                start_index=0,
+                num_records=NUM_CODES_PER_BUNDLE,
                 codes=code_bundle,
                 endpoint=endpoint_url
             )
@@ -28,8 +28,8 @@ def build_paper_queries_for_codes(codes, endpoint_url: str, api: ConcurrentFetch
         return build_indexed_queries(
             [
                 PaperQuery(
-                    startIndex=0,
-                    numRecords=1,
+                    start_index=0,
+                    num_records=1,
                     endpoint=endpoint_url
                 )
             ],

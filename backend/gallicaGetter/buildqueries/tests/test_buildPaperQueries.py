@@ -1,6 +1,6 @@
 from unittest import TestCase
 from gallicaGetter.buildqueries.buildPaperQueries import build_paper_queries_for_codes
-from gallicaGetter.fetch.PaperQuery import PaperQuery
+from gallicaGetter.fetch.paperQuery import PaperQuery
 from unittest.mock import MagicMock
 from gallicaGetter.buildqueries.argToQueryTransformations import NUM_CODES_PER_BUNDLE
 

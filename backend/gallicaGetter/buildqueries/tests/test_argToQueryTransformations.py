@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallicaGetter.fetch.OccurrenceQuery import OccurrenceQuery
+from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.buildqueries.argToQueryTransformations import (
     index_queries_by_num_results,
     build_indexed_queries,
@@ -18,8 +18,8 @@ class TestArgQueryTransformations(TestCase):
             startDate=1900,
             endDate=1901,
             term='test',
-            startIndex=0,
-            numRecords=1,
+            start_index=0,
+            num_records=1,
             endpoint='test'
         )
         self.test_2 = OccurrenceQuery(
@@ -27,8 +27,8 @@ class TestArgQueryTransformations(TestCase):
             startDate=1900,
             endDate=1905,
             term='test',
-            startIndex=0,
-            numRecords=1,
+            start_index=0,
+            num_records=1,
             endpoint='test'
         )
 

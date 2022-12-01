@@ -1,12 +1,12 @@
-from typing import Dict, List, Tuple
+from typing import List
 from gallicaGetter.buildqueries.argToQueryTransformations import bundle_codes
 from gallicaGetter.buildqueries.buildDateGrouping import build_date_grouping
-from gallicaGetter.fetch.query import SRUQuery
-from gallicaGetter.fetch.OccurrenceQuery import OccurrenceQuery
+from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
+from gallicaGetter.fetch.paperQuery import PaperQuery
 from gallicaGetter.gallicaWrapper import SRUArgs
 
 
-def build_base_queries(args: SRUArgs, endpoint_url: str) -> List[SRUQuery]:
+def build_base_queries(args: SRUArgs, endpoint_url: str) -> List[OccurrenceQuery | PaperQuery]:
     if not isinstance(args.terms, list):
         args.terms = [args.terms]
     if args.codes and not isinstance(args.codes, list):
@@ -25,8 +25,8 @@ def build_base_queries(args: SRUArgs, endpoint_url: str) -> List[SRUQuery]:
                         start_date=start,
                         end_date=end,
                         endpoint=endpoint_url,
-                        startIndex=0,
-                        numRecords=1,
+                        start_index=0,
+                        num_records=1,
                     )
                 )
     return base_queries
@@ -41,8 +41,8 @@ def build_base_queries_at_indices(queries, indices, endpoint_url):
             params = query.get_cql_params()
             indexed_queries.append(OccurrenceQuery(
                 **params,
-                startIndex=index,
-                numRecords=1,
+                start_index=index,
+                num_records=1,
                 endpoint=endpoint_url
             )
             )

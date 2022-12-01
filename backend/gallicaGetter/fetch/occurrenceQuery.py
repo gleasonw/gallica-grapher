@@ -1,5 +1,4 @@
 from typing import List
-
 from gallicaGetter.fetch.sruQueryMixin import SRUQueryMixin
 
 
@@ -7,9 +6,9 @@ class OccurrenceQuery(SRUQueryMixin):
 
     def __init__(self, term: str, codes: List[str],
                  start_date: str, end_date: str,
-                 link_term: str, link_distance: int,
-                 endpoint: str, startIndex: int,
-                 numRecords: int):
+                 endpoint: str, start_index: int,
+                 num_records: int, link_term: str = None,
+                 link_distance: int = 0):
         self.start_date = start_date
         self.end_date = end_date
         self.term = term
@@ -17,8 +16,8 @@ class OccurrenceQuery(SRUQueryMixin):
         self.link_distance = link_distance
         self.link_term = link_term
         self.cql = self.generate_cql()
-        self.start_index = startIndex
-        self.num_records = numRecords
+        self.start_index = start_index
+        self.num_records = num_records
         self.endpoint = endpoint
         self.collapsing = False
 
