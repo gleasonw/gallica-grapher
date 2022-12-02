@@ -3,7 +3,6 @@ import TicketForm from './TicketForm';
 import useData from "../shared/hooks/useData";
 import {ExampleBox} from "./ExampleBox";
 
-//TODO: add a reducer
 function Input(props){
     const exampleBoxRef = useRef(null);
     const [terms, setTerms] = useState([]);

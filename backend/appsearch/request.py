@@ -54,8 +54,9 @@ class Request(threading.Thread):
             conn=self.conn
         )
         self.estimateNumRecords = sum(
-            search.getNumRecordsToBeInserted(onNumRecordsFound=lambda search, numRecordsDiscovered:
-                self.searchProgressStats[search.identifier].setNumRecordsToFetch(numRecordsDiscovered)
+            search.get_total_records_to_insert(
+                onNumRecordsFound=lambda search, numRecordsDiscovered:
+                    self.searchProgressStats[search.identifier].setNumRecordsToFetch(numRecordsDiscovered)
             )
             for search in self.searches
         )
@@ -85,7 +86,7 @@ class Request(threading.Thread):
     def doEachSearch(self):
         for search in self.searches:
             self.state = 'RUNNING'
-            search.getRecordsFromAPIAndInsertToDB()
+            search.get_records_and_insert()
             self.setSearchState(
                 ticketID=search.identifier,
                 state='COMPLETED'

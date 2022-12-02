@@ -4,8 +4,10 @@ from database.recordInsertResolvers import (
 )
 import gallicaGetter
 import appsearch.pyllicaWrapper as pyllicaWrapper
+from appsearch.searchMixin import SearchMixin
 
-
+#TODO: clarify the hooks
+#TODO: the essential mission: get the records and insert them, track progress
 def build_searches_for_tickets(args_for_tickets, stateHooks, conn):
     # Pyllica has no support for specific periodical codes, so we must route requests with codes to
     # the less-accurate gallicaGetter. Bool = True if codes provided.
@@ -17,9 +19,9 @@ def build_searches_for_tickets(args_for_tickets, stateHooks, conn):
         ('year', True): GallicaGroupedSearch,
         ('month', True): GallicaGroupedSearch,
     }
-    searchObjs = []
+    search_objs = []
     for ticketID, params in args_for_tickets.items():
-        initParams = {
+        init_params = {
             'identifier': ticketID,
             'input_args': params,
             'stateHooks': stateHooks,
@@ -28,85 +30,52 @@ def build_searches_for_tickets(args_for_tickets, stateHooks, conn):
         SearchClass = search_routes[
             (params.get('grouping'), bool(params.get('codes')))
         ]
-        searchObj = SearchClass(**initParams)
-        if isinstance(searchObj, GallicaGroupedSearch):
-            if searchObj.moreDateIntervalsThanRecordBatches() and len(args_for_tickets.items()) == 1:
+        search = SearchClass(**init_params)
+        #TODO: this is something GallicaGroupedSearch should take care of itself
+        if isinstance(search, GallicaGroupedSearch):
+            if search.more_date_intervals_than_record_batches() and len(args_for_tickets.items()) == 1:
                 params['grouping'] = 'all'
-                searchObj = AllSearch(**initParams)
+                search = AllSearch(**init_params)
                 stateHooks.onSearchChangeToAll(ticketID)
-        searchObjs.append(searchObj)
-    return searchObjs
+        search_objs.append(search)
+    return search_objs
 
+def all_volume_occurrence_search(args, requestID, ticketID, conn, onProgressUpdate):
+    pass
 
-class Search:
+def pyllica_search(args, requestID, ticketID, conn, onProgressUpdate):
+    pass
 
-    def __init__(self, input_args, stateHooks, identifier, conn):
-        self.args = {
-            **input_args,
-            'startDate': input_args['startDate'],
-            'endDate': input_args['endDate']
-        }
+def period_occurrence_search(args, requestID, ticketID, conn, onProgressUpdate):
+    pass
+
+#Components?
+class AllSearch(SearchMixin):
+
+    def __init__(self, input_args, requestID, onProgressUpdate, identifier, conn):
+        self.args = input_args
         self.identifier = identifier
         self.stateHooks = stateHooks
         self.conn = conn
-        self.insertRecordsToDB = self.getDBinsert()
-        self.api = self.getAPIWrapper()
-        self.postInit()
+        self.api = self.get_api_wrapper()
+        self.base_queries_with_num_results = self.api.get_num_results_for_args(**self.args)
+        self.insert_records = insert_records_into_results
 
-    def __repr__(self):
-        return f'{self.__class__.__name__}({self.args})'
-
-    def getRecordsFromAPIAndInsertToDB(self):
-        return self.insertRecordsToDB(
-            records=self.api.get(**self.buildAPIFetchArgs()),
-            identifier=self.identifier,
-            stateHooks=self.stateHooks,
-            conn=self.conn
-        )
-
-    def getNumRecordsToBeInserted(self, onNumRecordsFound):
-        raise NotImplementedError
-
-    def getAPIWrapper(self):
-        raise NotImplementedError
-
-    def getDBinsert(self):
-        raise NotImplementedError
-
-    def buildAPIFetchArgs(self):
-        self.args.update(self.getLocalFetchArgs())
-        return self.args
-
-    def postInit(self):
-        pass
-
-    def getLocalFetchArgs(self):
-        return {}
-
-
-class AllSearch(Search):
-
-    def postInit(self):
-        self.baseQueriesWithNumResults = self.api.get_num_results_for_args(**self.args)
-
-    def getNumRecordsToBeInserted(self, onNumRecordsFound):
-        found = sum(queryWithResult[1] for queryWithResult in self.baseQueriesWithNumResults)
+    def get_total_records_to_insert(self, onNumRecordsFound):
+        found = sum(queryWithResult[1] for queryWithResult in self.base_queries_with_num_results)
         onNumRecordsFound(self, found)
         return found
 
-    def getAPIWrapper(self):
+    def get_api_wrapper(self):
         return gallicaGetter.connect(
             gallicaAPIselect='sru',
             ticketID=self.identifier,
             requestID=self.stateHooks.requestID
         )
 
-    def getDBinsert(self):
-        return insert_records_into_results
-
-    def getLocalFetchArgs(self):
+    def get_local_fetch_args(self):
         return {
-            'queriesWithCounts': self.baseQueriesWithNumResults,
+            'queriesWithCounts': self.base_queries_with_num_results,
             'generate': True,
             'onUpdateProgress': lambda progressStats: self.stateHooks.setSearchProgressStats(
                 progressStats={
@@ -117,22 +86,32 @@ class AllSearch(Search):
         }
 
 
-class PyllicaSearch(Search):
+class PyllicaSearch(SearchMixin):
 
-    def getAPIWrapper(self):
-        return pyllicaWrapper
+    def __init__(self, input_args, identifier, stateHooks, conn):
+        self.args = input_args
+        self.identifier = identifier
+        self.stateHooks = stateHooks
+        self.conn = conn
+        self.api = pyllicaWrapper
+        self.insert_records = insert_records_into_groupcounts
+        self.total_records_to_insert = self.get_total_records_to_insert()
+        self.stateHooks.setSearchProgressStats(
+            progressStats={
+                'ticketID': self.identifier,
+                'totalRecords': self.total_records_to_insert,
+                'insertedRecords': 0
+            }
+        )
 
-    def getDBinsert(self):
-        return insert_records_into_groupcounts
-
-    def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
+    def get_total_records_to_insert(self, onNumRecordsFound=None):
         return get_num_periods_in_range_for_grouping(
             grouping=self.args['grouping'],
             start=self.args['startDate'],
             end=self.args['endDate']
         )
 
-    def getLocalFetchArgs(self):
+    def get_local_fetch_args(self):
         return {
             'ticketID': self.identifier,
             'requestID': self.stateHooks.requestID
@@ -141,17 +120,17 @@ class PyllicaSearch(Search):
 
 class GallicaGroupedSearch(Search):
 
-    def getAPIWrapper(self):
+    def get_api_wrapper(self):
         return gallicaGetter.connect(
             'sru',
             ticketID=self.identifier,
             requestID=self.stateHooks.requestID
         )
 
-    def getDBinsert(self):
+    def get_db_insert(self):
         return insert_records_into_groupcounts
 
-    def getNumRecordsToBeInserted(self, onNumRecordsFound=None):
+    def get_total_records_to_insert(self, onNumRecordsFound=None):
         num_records = get_num_periods_in_range_for_grouping(
             grouping=self.args['grouping'],
             start=self.args['startDate'],
@@ -161,14 +140,14 @@ class GallicaGroupedSearch(Search):
             onNumRecordsFound(self, num_records)
         return num_records
 
-    def moreDateIntervalsThanRecordBatches(self):
+    def more_date_intervals_than_record_batches(self):
         args = {**self.args, 'grouping': 'all'}
         first_result = self.api.get_num_results_for_args(**args)[0]
         num_results = first_result[1]
-        num_intervals = self.getNumRecordsToBeInserted()
+        num_intervals = self.get_total_records_to_insert()
         return int(num_results / 50) < num_intervals
 
-    def getLocalFetchArgs(self):
+    def get_local_fetch_args(self):
         return {
             'onUpdateProgress': lambda progressStats: self.stateHooks.setSearchProgressStats(
                 progressStats={

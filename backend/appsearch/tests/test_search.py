@@ -8,9 +8,9 @@ from appsearch.search import get_num_periods_in_range_for_grouping
 
 class Test(TestCase):
     def test_build(self):
-        AllSearch.getAPIWrapper = MagicMock()
-        PyllicaSearch.getAPIWrapper = MagicMock()
-        GallicaGroupedSearch.getAPIWrapper = MagicMock()
+        AllSearch.get_api_wrapper = MagicMock()
+        PyllicaSearch.get_api_wrapper = MagicMock()
+        GallicaGroupedSearch.get_api_wrapper = MagicMock()
         argBundles = {
             'all': {
                 'grouping': 'all',
@@ -79,7 +79,7 @@ class TestSearch(TestCase):
             'stateHooks': MagicMock(),
             'conn': MagicMock()
         }
-        AllSearch.getAPIWrapper = MagicMock()
+        AllSearch.get_api_wrapper = MagicMock()
         self.searches = [
             AllSearch(**initArgs),
         ]
@@ -87,25 +87,25 @@ class TestSearch(TestCase):
     # Liskov tests
     def test_responds_to_getNumRecordsToBeInserted(self):
         for search in self.searches:
-            self.assertTrue(hasattr(search, 'getNumRecordsToBeInserted'))
+            self.assertTrue(hasattr(search, 'get_total_records_to_insert'))
 
     def test_responds_to_getAPIWrapper(self):
         for search in self.searches:
-            self.assertTrue(hasattr(search, 'getAPIWrapper'))
+            self.assertTrue(hasattr(search, 'get_api_wrapper'))
 
     def test_responds_to_getDBinsert(self):
         for search in self.searches:
-            self.assertTrue(hasattr(search, 'getDBinsert'))
+            self.assertTrue(hasattr(search, 'get_db_insert'))
 
     def test_responds_to_getLocalFetchArgs(self):
         for search in self.searches:
-            self.assertTrue(hasattr(search, 'getLocalFetchArgs'))
+            self.assertTrue(hasattr(search, 'get_local_fetch_args'))
 
 
 class TestAllSearch(TestCase):
 
     def setUp(self):
-        AllSearch.getAPIWrapper = MagicMock()
+        AllSearch.get_api_wrapper = MagicMock()
         self.search = AllSearch(
             identifier=MagicMock(),
             input_args=MagicMock(),
@@ -114,22 +114,22 @@ class TestAllSearch(TestCase):
         )
 
     def test_get_num_records_to_be_inserted(self):
-        self.search.baseQueriesWithNumResults = [
+        self.search.base_queries_with_num_results = [
             ('query1', 1),
             ('query2', 2),
         ]
         onNumRecordsFound = MagicMock()
-        result = self.search.getNumRecordsToBeInserted(onNumRecordsFound)
+        result = self.search.get_total_records_to_insert(onNumRecordsFound)
         self.assertEqual(result, 3)
         onNumRecordsFound.assert_called_once_with(self.search, 3)
 
     def test_getLocalFetchArgs(self):
-        self.search.baseQueriesWithNumResults = [
+        self.search.base_queries_with_num_results = [
             ('query1', 1),
             ('query2', 2),
         ]
-        result = self.search.getLocalFetchArgs()
-        self.assertEqual(result['queriesWithCounts'], self.search.baseQueriesWithNumResults)
+        result = self.search.get_local_fetch_args()
+        self.assertEqual(result['queriesWithCounts'], self.search.base_queries_with_num_results)
         self.assertTrue(result['generate'])
         self.assertIn('onUpdateProgress', result)
 
@@ -137,7 +137,7 @@ class TestAllSearch(TestCase):
 class TestPyllicaSearch(TestCase):
 
     def setUp(self):
-        PyllicaSearch.getAPIWrapper = MagicMock()
+        PyllicaSearch.get_api_wrapper = MagicMock()
         self.search = PyllicaSearch(
             identifier=MagicMock(),
             input_args=MagicMock(),
@@ -147,7 +147,7 @@ class TestPyllicaSearch(TestCase):
 
     def test_getLocalFetchArgs(self):
         self.assertDictEqual(
-            self.search.getLocalFetchArgs(),
+            self.search.get_local_fetch_args(),
             {
                 'ticketID': self.search.identifier,
                 'requestID': self.search.stateHooks.requestID,
@@ -158,7 +158,7 @@ class TestPyllicaSearch(TestCase):
 class TestGallicaGroupedSearch(TestCase):
 
     def setUp(self):
-        GallicaGroupedSearch.getAPIWrapper = MagicMock()
+        GallicaGroupedSearch.get_api_wrapper = MagicMock()
         self.search = GallicaGroupedSearch(
             identifier=MagicMock(),
             input_args=MagicMock(),
@@ -173,7 +173,7 @@ class TestGallicaGroupedSearch(TestCase):
             'endDate': '1901'
         }
         onRecordFound = MagicMock()
-        result = self.search.getNumRecordsToBeInserted(onRecordFound)
+        result = self.search.get_total_records_to_insert(onRecordFound)
 
         self.assertEqual(result, 2)
         onRecordFound.assert_called_once_with(self.search, 2)
