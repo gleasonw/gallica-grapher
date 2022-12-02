@@ -3,7 +3,6 @@ from typing import List, Optional, Union
 
 
 class QueryArgModel(BaseModel):
-    endpoint_url: str
     terms: List[str] | str
     grouping: str
     start_date: Optional[str] = None
@@ -11,3 +10,4 @@ class QueryArgModel(BaseModel):
     codes: Optional[List[str] | str] = None
     link_term: Optional[str] = None
     link_distance: Optional[int] = None
+    endpoint_url: str

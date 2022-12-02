@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 import unittest
-from gallicaGetter.parse.record import PeriodOccurrenceRecord
+from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
 
 
 class TestGroupedCountRecord(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestGroupedCountRecord(unittest.TestCase):
         )
 
     def test_getRow(self):
-        row = self.testRecord.getRow()
+        row = self.testRecord.get_row()
         self.assertEqual(
             row,
             (2020, 1, 1, 'test', 'testticketid', 'testrequestid', 1)

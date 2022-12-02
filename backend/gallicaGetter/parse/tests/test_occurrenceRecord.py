@@ -1,14 +1,14 @@
 import unittest
 from unittest.mock import MagicMock
-from gallicaGetter.parse.record import VolumeOccurrenceRecord
+from gallicaGetter.parse.volumeOccurrenceRecord import VolumeOccurrenceRecord
 
 
 class TestOccurrenceRecord(unittest.TestCase):
 
     def setUp(self) -> None:
         self.testRecord = VolumeOccurrenceRecord(
-            paperTitle='testTitle',
-            paperCode='testCode',
+            paper_title='testTitle',
+            paper_code='testCode',
             url='testUrl',
             date=MagicMock(
                 getYear=MagicMock(return_value='testYear'),
@@ -21,7 +21,7 @@ class TestOccurrenceRecord(unittest.TestCase):
         )
 
     def test_getRow(self):
-        row = self.testRecord.getRow()
+        row = self.testRecord.get_row()
 
         self.assertEqual(
             row,

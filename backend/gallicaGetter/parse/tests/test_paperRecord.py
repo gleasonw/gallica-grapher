@@ -1,5 +1,5 @@
 import unittest
-from gallicaGetter.parse.record import PaperRecord
+from gallicaGetter.parse.paperRecord import PaperRecord
 
 
 class TestPaperRecord(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestPaperRecord(unittest.TestCase):
         self.testPaperRecord.addYearsFromArk(['1900', '1901', '1902'])
 
         self.assertEqual(
-            self.testPaperRecord.getRow(),
+            self.testPaperRecord.get_row(),
             (
                 'testTitle',
                 '1900',
@@ -29,7 +29,7 @@ class TestPaperRecord(unittest.TestCase):
         self.testPaperRecord.addYearsFromArk(['1900', '1901', '1903'])
 
         self.assertEqual(
-            self.testPaperRecord.getRow(),
+            self.testPaperRecord.get_row(),
             (
                 'testTitle',
                 '1900',

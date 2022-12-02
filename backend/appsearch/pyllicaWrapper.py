@@ -1,6 +1,6 @@
 from pyllicagram import pyllicagram as pyllica
 from gallicaGetter.parse.date import Date
-from gallicaGetter.parse.record import PeriodOccurrenceRecord
+from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
 
 
 def get(**kwargs):

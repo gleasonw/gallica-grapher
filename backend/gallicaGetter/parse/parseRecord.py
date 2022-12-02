@@ -8,13 +8,11 @@ from gallicaGetter.parse.parseXML import (
     get_num_results_and_pages_for_context,
     get_years_published
 )
-from gallicaGetter.parse.record import (
-    VolumeOccurrenceRecord,
-    PeriodOccurrenceRecord,
-    PaperRecord,
-    ContentRecord,
-    ArkRecord
-)
+from gallicaGetter.parse.arkRecord import ArkRecord
+from gallicaGetter.parse.contentRecord import ContentRecord
+from gallicaGetter.parse.paperRecord import PaperRecord
+from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
+from gallicaGetter.parse.volumeOccurrenceRecord import VolumeOccurrenceRecord
 from gallicaGetter.parse.parseHTML import parse_html
 from gallicaGetter.parse.date import Date
 
@@ -34,16 +32,10 @@ def build_parser(desired_record, **kwargs):
 
 
 class ParseRecord:
-
-    def __init__(self, **kwargs):
-        self.post_init(kwargs)
-
-    def post_init(self, args):
-        pass
+    # Mixin to remind me to always add a parse_responses method
 
     def parse_responses_to_records(self, responses):
-        raise NotImplementedError(
-            f'ParseRecord.parse_responses_to_records() must be implemented by subclass {self.__class__.__name__}.')
+        raise NotImplementedError(f'parse_responses_to_records not implemented for {self.__class__.__name__}')
 
 
 class ParsePaperRecords(ParseRecord):
@@ -66,9 +58,9 @@ class ParsePaperRecords(ParseRecord):
 
 class ParseOccurrenceRecords(ParseRecord):
 
-    def post_init(self, args):
-        self.requestID = args['requestID']
-        self.ticketID = args['ticketID']
+    def __init__(self, requestID, ticketID):
+        self.requestID = requestID
+        self.ticketID = ticketID
 
     def get_num_results(self, xml):
         return get_num_records(xml)
@@ -82,12 +74,12 @@ class ParseOccurrenceRecords(ParseRecord):
 
     def generate_occurrence_records(self, xml, query):
         for record in get_records_from_xml(xml):
-            paperTitle = get_paper_title_from_record_xml(record)
-            paperCode = get_paper_code_from_record_xml(record)
+            paper_title = get_paper_title_from_record_xml(record)
+            paper_code = get_paper_code_from_record_xml(record)
             date = get_date_from_record_xml(record)
             yield VolumeOccurrenceRecord(
-                paperTitle=paperTitle,
-                paperCode=paperCode,
+                paper_title=paper_title,
+                paper_code=paper_code,
                 date=date,
                 url=get_url_from_record(record),
                 term=query.term,
@@ -98,9 +90,9 @@ class ParseOccurrenceRecords(ParseRecord):
 
 class ParseGroupedRecordCounts(ParseRecord):
 
-    def post_init(self, args):
-        self.ticketID = args['ticketID']
-        self.requestID = args['requestID']
+    def __init__(self, ticketID, requestID):
+        self.ticketID = ticketID
+        self.requestID = requestID
 
     def parse_responses_to_records(self, responses):
         for response in responses:

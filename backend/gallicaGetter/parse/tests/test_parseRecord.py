@@ -1,13 +1,13 @@
 import unittest
 from unittest import TestCase
 from unittest.mock import MagicMock
-from gallicaGetter.parse.record import (
-    VolumeOccurrenceRecord,
-    PeriodOccurrenceRecord,
-    PaperRecord,
+from gallicaGetter.parse.arkRecord import (
     ArkRecord,
-    ContentRecord,
 )
+from gallicaGetter.parse.contentRecord import ContentRecord
+from gallicaGetter.parse.paperRecord import PaperRecord
+from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
+from gallicaGetter.parse.volumeOccurrenceRecord import VolumeOccurrenceRecord
 from gallicaGetter.parse.parseRecord import ParseArkRecord
 from gallicaGetter.parse.parseRecord import ParseGroupedRecordCounts
 from gallicaGetter.parse.parseRecord import ParseOccurrenceRecords
@@ -58,7 +58,6 @@ class TestParseGroupedRecordCounts(unittest.TestCase):
 
     def setUp(self) -> None:
         self.testParse = ParseGroupedRecordCounts(
-            parser=MagicMock(),
             ticketID='test',
             requestID='test'
         )

@@ -180,7 +180,7 @@ def fetch_gallica_records():
         limit=args['limit'],
         offset=args['offset'],
     )
-    records = [record.getDisplayRow() for record in records]
+    records = [record.get_display_row() for record in records]
     return {"displayRecords": records}
 
 
@@ -195,7 +195,7 @@ def get_ocr_text(ark_code, term):
         ark_code,
         term
     )
-    return {"numResults": record.num_results, "text": record.get_pages()}
+    return {"numResults": record.num_results, "text": record.pages}
 
 
 if __name__ == "__main__":

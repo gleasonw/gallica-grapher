@@ -14,14 +14,12 @@ from gallicaGetter.buildqueries.buildSRUqueries import (
 )
 from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
+from gallicaGetter.parse.arkRecord import ArkRecord
+from gallicaGetter.parse.contentRecord import ContentRecord
+from gallicaGetter.parse.paperRecord import PaperRecord
 from gallicaGetter.parse.parseRecord import build_parser
-from gallicaGetter.parse.record import (
-    VolumeOccurrenceRecord,
-    PaperRecord,
-    PeriodOccurrenceRecord,
-    ContentRecord,
-    ArkRecord
-)
+from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
+from gallicaGetter.parse.volumeOccurrenceRecord import VolumeOccurrenceRecord
 from gallicaGetter.queryArgModel import QueryArgModel
 
 
@@ -64,7 +62,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get_endpoint_url(self):
         return 'https://gallica.bnf.fr/SRU'
 
-    def get(self,
+    def get(
+            self,
             terms: List[str] | str,
             start_date: Optional[str] = None,
             end_date: Optional[str] = None,
@@ -76,7 +75,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             link_term: Optional[str] = None,
             link_distance: Optional[int] = None,
             onUpdateProgress=None,
-            query_cache=None) -> List[VolumeOccurrenceRecord]:
+            query_cache=None
+    ) -> List[VolumeOccurrenceRecord]:
         if query_cache:
             queries = index_queries_by_num_results(query_cache)
         else:
@@ -108,14 +108,33 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         )
         return record_generator if generate else list(record_generator)
 
-    def get_num_results_for_args(self, args: QueryArgModel):
-        base_queries = build_base_queries(args)
+    def get_num_results_for_args(
+            self,
+            terms: List[str] | str,
+            start_date: Optional[str] = None,
+            end_date: Optional[str] = None,
+            codes: Optional[List[str] | str] = None,
+            link_term: Optional[str] = None,
+            link_distance: Optional[int] = None,
+            grouping: str = 'all',
+    ):
+        base_queries = build_base_queries(QueryArgModel(
+            terms=terms,
+            start_date=start_date,
+            end_date=end_date,
+            codes=codes,
+            link_term=link_term,
+            link_distance=link_distance,
+            endpoint_url=self.endpoint_url,
+            grouping=grouping,
+        ))
         return get_num_results_for_query(base_queries, api=self.api)
 
 
 class PeriodOccurrenceWrapper(GallicaWrapper):
 
-    def get(self,
+    def get(
+            self,
             terms: List[str] | str,
             start_date: Optional[str] = None,
             end_date: Optional[str] = None,
@@ -125,7 +144,8 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
             grouping: str = 'year',
             start_index: Optional[int] = 0,
             num_workers: Optional[int] = 15,
-            onUpdateProgress=None) -> List[PeriodOccurrenceRecord]:
+            onUpdateProgress=None
+    ) -> List[PeriodOccurrenceRecord]:
         if grouping not in ['year', 'month']:
             raise ValueError(f'grouping must be either "year" or "month", not {grouping}')
         queries = build_base_queries(
@@ -229,14 +249,3 @@ class FullTextWrapper(GallicaWrapper):
             onUpdateProgress=onUpdateProgress
         )
         return record_generator if generate else list(record_generator)
-
-
-if __name__ == '__main__':
-    test = PeriodOccurrenceWrapper()
-    records = test.get(
-        'brazza',
-        startDate='1900',
-        endDate='1901',
-        grouping='month'
-    )
-    print(records)

@@ -3,6 +3,7 @@ from io import StringIO
 import gallicaGetter
 import random
 from collections import Counter
+from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -13,47 +14,65 @@ with open(os.path.join(here, 'stopwordsEN.txt'), 'r') as stopwords_file:
     stopwords_en = set(stopwords_file.read().splitlines())
 
 
-def get_gallica_core(root_gram: str, distance: int, start_date: str,
-                     end_date: str, sample_size: int = 20,
-                     onUpdateProgress=None) -> Dict:
+def get_gallica_core(
+    root_gram: str,
+    distance: int,
+    start_date: str,
+    end_date: str,
+    sample_size: int = 20,
+    api_wrapper=gallicaGetter,
+    onUpdateProgress=None) -> Dict:
+
     text_to_analyze = get_sample_text(
         root_gram,
         sample_size,
         start_date,
         end_date,
+        api_wrapper,
         onUpdateProgress
     )
-    notable_words_in_distance = get_associated_words(text_to_analyze, root_gram, distance)
+    notable_words_in_distance = get_associated_words(
+        text_to_analyze,
+        root_gram,
+        distance
+    )
     return notable_words_in_distance
 
 
-def get_sample_text(root_gram: str, sample_size: int,
-                    start_date: str, end_date: str, onUpdateProgress=None) -> StringIO:
+def get_sample_text(
+    root_gram: str,
+    sample_size: int,
+    start_date: str,
+    end_date: str,
+    api_wrapper,
+    onUpdateProgress=None
+) -> StringIO:
 
     def get_text_for_codes(codes: List[str]) -> str:
-        text_wrapper = gallicaGetter.connect('text')
+        text_wrapper = api_wrapper.connect('text')
         text = ''
-        text_records = text_wrapper.get(codes, onUpdateProgress=lambda x: print(x['elapsedTime']))
+        text_records = text_wrapper.get(
+            codes,
+            onUpdateProgress=lambda x: print(x['elapsedTime']
+        ))
         for record in text_records:
             text += record.get_text()
         return text
 
-    sru_wrapper = gallicaGetter.connect('volume')
+    sru_wrapper: VolumeOccurrenceWrapper = api_wrapper.connect('volume')
     num_volumes_with_root_gram = sru_wrapper.get_num_results_for_args(
         terms=root_gram,
-        startDate=start_date,
-        endDate=end_date,
+        start_date=start_date,
+        end_date=end_date,
         grouping='all',
-        onUpdateProgress=onUpdateProgress
     )
     num_volumes = num_volumes_with_root_gram[0][1]
     indices_to_sample = random.sample(range(num_volumes), sample_size)
     volumes_with_root_gram = sru_wrapper.get(
         terms=root_gram,
-        startDate=start_date,
-        endDate=end_date,
-        startIndex=indices_to_sample,
-        grouping='index_selection',
+        start_date=start_date,
+        end_date=end_date,
+        start_index=indices_to_sample,
         onUpdateProgress=onUpdateProgress
     )
     volume_codes = [volume_record.get_volume_code() for volume_record in volumes_with_root_gram]

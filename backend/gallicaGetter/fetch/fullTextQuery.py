@@ -4,6 +4,9 @@ class FullTextQuery:
         self.ark = ark
         self.endpoint_url = endpoint_url
 
+    def get_params_for_fetch(self):
+        return {}
+
     def get_endpoint_url(self):
         return f'{self.endpoint_url}/ark:/12148/{self.ark}.texteBrut'
 

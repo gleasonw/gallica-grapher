@@ -11,6 +11,7 @@ def insert_records_into_papers(records, conn):
             sep='|'
         )
 
+
 #TODO: this doesn't appear to be working
 def insert_records_into_results(records, identifier, stateHooks, conn):
     stream, codes = build_csv_stream_ensure_no_issue_duplicates(records)
@@ -94,7 +95,7 @@ def build_csv_stream_ensure_no_issue_duplicates(records):
     codes = set()
     codeDates = {}
     for record in records:
-        recordPaper = record.get_paper_code()
+        recordPaper = record.paper_code
         if recordPaper in codes:
             if datesForCode := codeDates.get(recordPaper):
                 recordDate = record.get_date()
@@ -122,7 +123,7 @@ def buildCSVstream(records):
 def writeToCSVstream(stream, record):
     stream.write("|".join(map(
         cleanCSVrow,
-        record.getRow()
+        record.get_row()
     )) + '\n')
 
 
