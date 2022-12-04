@@ -18,12 +18,12 @@ class TestRequest(TestCase):
         )
 
     def test_get_progress_stats(self):
-        self.request.searchProgressStats = {
+        self.request.progress_stats = {
             1: MagicMock(get=MagicMock(return_value='stats')),
             2: MagicMock(get=MagicMock(return_value='stats')),
         }
         self.assertEqual(
-            self.request.getProgressStats(),
+            self.request.get_progress_stats(),
             {
                 1: 'stats',
                 2: 'stats',
@@ -34,11 +34,11 @@ class TestRequest(TestCase):
         self.request.run()
 
     def test_set_ticket_progress_stats(self):
-        self.request.searchProgressStats = {
+        self.request.progress_stats = {
             1: MagicMock(),
             2: MagicMock(),
         }
         self.request.setSearchProgressStats(
             progressStats={'ticketID': 1}
         )
-        self.request.searchProgressStats[1].update.assert_called_once()
+        self.request.progress_stats[1].update.assert_called_once()

@@ -5,12 +5,12 @@ from gallicaGetter.buildqueries.buildSRUqueries import (
 )
 from unittest.mock import MagicMock
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
-from gallicaGetter.queryArgModel import QueryArgModel
+from gallicaGetter.queryArgs import QueryArgs
 
 
 class Test(TestCase):
     def setUp(self) -> None:
-        self.month_args = QueryArgModel(
+        self.month_args = QueryArgs(
             terms='test',
             codes='test',
             start_date='1980',
@@ -18,7 +18,7 @@ class Test(TestCase):
             grouping='month',
             endpoint_url='test',
         )
-        self.year_args = QueryArgModel(
+        self.year_args = QueryArgs(
             terms='test',
             codes='test',
             start_date='1980',
@@ -26,7 +26,7 @@ class Test(TestCase):
             grouping='year',
             endpoint_url='test',
         )
-        self.all_args = QueryArgModel(
+        self.all_args = QueryArgs(
             terms='test',
             codes='test',
             startDate='1980',

@@ -3,10 +3,10 @@ from gallicaGetter.buildqueries.argToQueryTransformations import bundle_codes
 from gallicaGetter.buildqueries.buildDateGrouping import build_date_grouping
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.paperQuery import PaperQuery
-from gallicaGetter.queryArgModel import QueryArgModel
+from gallicaGetter.queryArgs import QueryArgs
 
 
-def build_base_queries(args: QueryArgModel) -> List[OccurrenceQuery | PaperQuery]:
+def build_base_queries(args: QueryArgs) -> List[OccurrenceQuery | PaperQuery]:
     if not isinstance(args.terms, list):
         args.terms = [args.terms]
     if args.codes and not isinstance(args.codes, list):

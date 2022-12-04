@@ -1,6 +1,6 @@
 from celery import Celery
 import time
-from appsearch.request import buildRequest
+from appsearch.request import Request
 from database.connContext import build_db_conn
 
 app = Celery()
@@ -10,7 +10,7 @@ app.config_from_object('celery_settings')
 @app.task(bind=True)
 def spawn_request(self, tickets, request_id):
     with build_db_conn() as conn:
-        request = buildRequest(
+        request = Request(
             argsBundles=tickets,
             identifier=request_id,
             conn=conn
@@ -19,15 +19,15 @@ def spawn_request(self, tickets, request_id):
         poll_state_router = {
             'RUNNING': lambda: self.update_state(
                 state='RUNNING',
-                meta={'progress': request.getProgressStats()}
+                meta={'progress': request.get_progress_stats()}
             ),
             'ADDING_MISSING_PAPERS': lambda: self.update_state(
                 state='ADDING_MISSING_PAPERS',
-                meta={'progress': request.getProgressStats()}
+                meta={'progress': request.get_progress_stats()}
             ),
             'ADDING_RESULTS': lambda: self.update_state(
                 state='ADDING_RESULTS',
-                meta={'progress': request.getProgressStats()}
+                meta={'progress': request.get_progress_stats()}
             )
         }
         while True:
@@ -36,7 +36,7 @@ def spawn_request(self, tickets, request_id):
             else:
                 return {
                     'state': request.state,
-                    'numRecords': request.estimateNumRecords
+                    'numRecords': request.sum_records_for_searches
                 }
             time.sleep(1)
 

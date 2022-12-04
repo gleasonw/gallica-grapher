@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
-from appsearch.searchprogressstats import SearchProgressStats
+from appsearch.request import SearchProgressStats
 
 
 class TestSearchProgressStats(TestCase):
@@ -35,6 +35,6 @@ class TestSearchProgressStats(TestCase):
         self.assertEqual(self.ticketProgressStats.numRecordsToFetch, 20)
         self.assertEqual(self.ticketProgressStats.state, 'RUNNING')
         self.assertEqual(self.ticketProgressStats.numBatches, 1)
-        self.assertEqual(self.ticketProgressStats.numBatchesRetrieved, 1)
+        self.assertEqual(self.ticketProgressStats.num_retrieved_batches, 1)
         self.assertEqual(self.ticketProgressStats.progressPercent, 100)
         self.assertEqual(self.ticketProgressStats.estimateSecondsToCompletion, 0)

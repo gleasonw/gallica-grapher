@@ -13,7 +13,7 @@ def build_indexed_queries(queries: Union[List[OccurrenceQuery], List[PaperQuery]
     if limit:
         queries_with_num_results = ((query, limit) for query in queries)
     else:
-        queries_with_num_results = get_num_results_for_query(queries, api)
+        queries_with_num_results = get_num_results_for_queries(queries, api)
     return index_queries_by_num_results(queries_with_num_results)
 
 
@@ -39,8 +39,9 @@ def bundle_codes(codes: List[str]) -> List[List[str]]:
     ]
 
 
-def get_num_results_for_query(queries: List[PaperQuery | OccurrenceQuery],
-                              api: ConcurrentFetch) -> List[Tuple[PaperQuery | OccurrenceQuery, int]]:
+def get_num_results_for_queries(
+        queries: List[PaperQuery | OccurrenceQuery],
+        api: ConcurrentFetch) -> List[Tuple[PaperQuery | OccurrenceQuery, int]]:
     responses = api.get(queries)
     num_results_for_queries = [
         (response.query, parser.get_num_records(response.data))

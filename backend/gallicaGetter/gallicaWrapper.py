@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from gallicaGetter.buildqueries.argToQueryTransformations import (
     build_indexed_queries,
-    get_num_results_for_query,
+    get_num_results_for_queries,
     index_queries_by_num_results,
 )
 from gallicaGetter.buildqueries.buildContentQuery import build_query_for_ark_and_term
@@ -20,7 +20,7 @@ from gallicaGetter.parse.paperRecord import PaperRecord
 from gallicaGetter.parse.parseRecord import build_parser
 from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
 from gallicaGetter.parse.volumeOccurrenceRecord import VolumeOccurrenceRecord
-from gallicaGetter.queryArgModel import QueryArgModel
+from gallicaGetter.queryArgs import QueryArgs
 
 
 class GallicaWrapper:
@@ -63,25 +63,25 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         return 'https://gallica.bnf.fr/SRU'
 
     def get(
-            self,
-            terms: List[str] | str,
-            start_date: Optional[str] = None,
-            end_date: Optional[str] = None,
-            codes: Optional[List[str] | str] = None,
-            generate: bool = False,
-            num_results: Optional[int] = None,
-            start_index: Optional[int] = 0,
-            num_workers: Optional[int] = 15,
-            link_term: Optional[str] = None,
-            link_distance: Optional[int] = None,
-            onUpdateProgress=None,
-            query_cache=None
+        self,
+        terms: List[str] | str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        codes: Optional[List[str] | str] = None,
+        generate: bool = False,
+        num_results: Optional[int] = None,
+        start_index: Optional[int] = 0,
+        num_workers: Optional[int] = 15,
+        link_term: Optional[str] = None,
+        link_distance: Optional[int] = None,
+        onUpdateProgress=None,
+        query_cache=None
     ) -> List[VolumeOccurrenceRecord]:
         if query_cache:
             queries = index_queries_by_num_results(query_cache)
         else:
             base_queries = build_base_queries(
-                QueryArgModel(
+                QueryArgs(
                     terms=terms,
                     start_date=start_date,
                     end_date=end_date,
@@ -109,16 +109,16 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         return record_generator if generate else list(record_generator)
 
     def get_num_results_for_args(
-            self,
-            terms: List[str] | str,
-            start_date: Optional[str] = None,
-            end_date: Optional[str] = None,
-            codes: Optional[List[str] | str] = None,
-            link_term: Optional[str] = None,
-            link_distance: Optional[int] = None,
-            grouping: str = 'all',
+        self,
+        terms: List[str] | str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        codes: Optional[List[str] | str] = None,
+        link_term: Optional[str] = None,
+        link_distance: Optional[int] = None,
+        grouping: str = 'all',
     ):
-        base_queries = build_base_queries(QueryArgModel(
+        base_queries = build_base_queries(QueryArgs(
             terms=terms,
             start_date=start_date,
             end_date=end_date,
@@ -128,28 +128,28 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             endpoint_url=self.endpoint_url,
             grouping=grouping,
         ))
-        return get_num_results_for_query(base_queries, api=self.api)
+        return get_num_results_for_queries(base_queries, api=self.api)
 
 
 class PeriodOccurrenceWrapper(GallicaWrapper):
 
     def get(
-            self,
-            terms: List[str] | str,
-            start_date: Optional[str] = None,
-            end_date: Optional[str] = None,
-            codes: Optional[List[str] | str] = None,
-            generate: bool = False,
-            num_results: Optional[int] = None,
-            grouping: str = 'year',
-            start_index: Optional[int] = 0,
-            num_workers: Optional[int] = 15,
-            onUpdateProgress=None
+        self,
+        terms: List[str] | str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        codes: Optional[List[str] | str] = None,
+        generate: bool = False,
+        num_results: Optional[int] = None,
+        grouping: str = 'year',
+        start_index: Optional[int] = 0,
+        num_workers: Optional[int] = 15,
+        onUpdateProgress=None
     ) -> List[PeriodOccurrenceRecord]:
         if grouping not in ['year', 'month']:
             raise ValueError(f'grouping must be either "year" or "month", not {grouping}')
         queries = build_base_queries(
-            QueryArgModel(
+            QueryArgs(
                 terms=terms,
                 start_date=start_date,
                 end_date=end_date,

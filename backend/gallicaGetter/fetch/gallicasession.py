@@ -3,15 +3,14 @@ from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 import requests
 from requests.exceptions import RetryError
+from dataclasses import dataclass
 
 
+@dataclass
 class Response:
-
-    def __init__(self, data, query, elapsed):
-        self.data = data
-        self.query = query
-        self.elapsed = elapsed
-
+    data: str
+    query: any
+    elapsed: float
 
 class GallicaSession:
 

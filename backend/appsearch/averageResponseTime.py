@@ -1,15 +1,13 @@
+from dataclasses import dataclass
+
+@dataclass
 class AverageResponseTime:
-
-    def __init__(self):
-        self.averageResponseTime = 0
-
-    def get(self):
-        return self.averageResponseTime
+    average_response_time: float = 0
 
     def update(self, time):
-        if self.averageResponseTime:
-            self.averageResponseTime = (self.averageResponseTime + time) / 2
+        if self.average_response_time:
+            self.average_response_time = (self.averageResponseTime + time) / 2
         else:
-            self.averageResponseTime = time
-        return self.averageResponseTime
+            self.average_response_time = time
+        return self.average_response_time
 

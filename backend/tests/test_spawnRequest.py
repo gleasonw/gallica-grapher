@@ -20,7 +20,7 @@ class TestSpawnRequest(TestCase):
         mock_request.return_value = mock_request
         mock_request.finished = False
         mock_request.tooManyRecords = True
-        mock_request.estimateNumRecords = 100
+        mock_request.sum_records_for_searches = 100
 
         returnTest = spawn_request("tests")
 

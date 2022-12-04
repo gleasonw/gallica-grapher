@@ -1,8 +1,8 @@
 from pydantic import BaseModel
-from typing import List, Optional, Union
+from typing import List, Optional
 
 
-class QueryArgModel(BaseModel):
+class QueryArgs(BaseModel):
     terms: List[str] | str
     grouping: str
     start_date: Optional[str] = None
