@@ -1,20 +1,19 @@
 from bs4 import BeautifulSoup
+from dataclasses import dataclass
 
 
-def parse_html(htmlData):
-    return ParsedGallicaHTML(htmlData)
+def parse_html(html):
+    return ParsedGallicaHTML(html)
 
 
-class ParsedGallicaHTML:
+@dataclass
+class ParsedGallicaHTML(slots=True):
+    html: str
+    text: str = None
+    ocr_quality: int = None
 
-    def __init__(self, htmlData):
-        self.html = htmlData
-        self.soup = BeautifulSoup(htmlData, 'html.parser')
-        self.text = ''
-        self.ocrQuality = None
-
-    def __repr__(self):
-        return f'ParsedGallicaHTML({self.soup.title.string})'
+    def __post_init__(self):
+        self.soup = BeautifulSoup(self.html, 'html.parser')
 
     def get_text(self) -> str:
         if not self.text:
@@ -25,14 +24,14 @@ class ParsedGallicaHTML:
         return self.text
 
     def get_ocr_quality(self) -> int:
-        if self.ocrQuality is None:
+        if self.ocr_quality is None:
             ocrPara = self.soup.find('hr').find_previous_sibling('p').text
             if ocrPara[-6:-3].isdigit():
-                self.ocrQuality = int(ocrPara[-6:-3])
+                self.ocr_quality = int(ocrPara[-6:-3])
             elif ocrPara[-5:-3].isdigit():
-                self.ocrQuality = int(ocrPara[-5:-3])
+                self.ocr_quality = int(ocrPara[-5:-3])
             elif ocrPara[-4:-3].isdigit():
-                self.ocrQuality = int(ocrPara[-4:-3])
+                self.ocr_quality = int(ocrPara[-4:-3])
             else:
-                self.ocrQuality = 0
-        return self.ocrQuality
+                self.ocr_quality = 0
+        return self.ocr_quality

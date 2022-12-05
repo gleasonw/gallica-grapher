@@ -1,8 +1,9 @@
-from pydantic import BaseModel
 from typing import List, Optional
+from dataclasses import dataclass
 
 
-class SearchArgs(BaseModel):
+@dataclass
+class SearchArgs(slots=True):
     terms: List[str] | str
     start_date: Optional[str] = None
     end_date: Optional[str] = None

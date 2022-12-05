@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 import unittest
-from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
+from gallicaGetter.parse.periodRecords import PeriodOccurrenceRecord
 
 
 class TestGroupedCountRecord(unittest.TestCase):

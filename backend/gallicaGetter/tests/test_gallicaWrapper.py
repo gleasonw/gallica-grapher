@@ -9,12 +9,10 @@ from gallicaGetter.gallicaWrapper import (
     FullTextWrapper,
     PeriodOccurrenceWrapper
 )
-from gallicaGetter.parse.parseRecord import (
-    ParseArkRecord,
-    ParseContentRecord,
-    ParseOccurrenceRecords,
-    ParseGroupedRecordCounts
-)
+from gallicaGetter.parse.arkRecord import ParseArkRecord
+from gallicaGetter.parse.contentRecord import ParseContentRecord
+from gallicaGetter.parse.periodRecords import ParseGroupedRecordCounts
+from gallicaGetter.parse.occurrenceRecords import ParseOccurrenceRecords
 
 
 class TestGallicaWrapper(TestCase):

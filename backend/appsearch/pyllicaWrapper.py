@@ -1,35 +1,29 @@
 from pyllicagram import pyllicagram as pyllica
 from gallicaGetter.parse.date import Date
-from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
+from gallicaGetter.parse.periodRecords import PeriodOccurrenceRecord
 from gallicaGetter.searchArgs import SearchArgs
 
 
-def get(
-        args: SearchArgs
-):
-    convertedArgs = {
+def get(args: SearchArgs):
+    converted_args = {
         'recherche': args.terms,
         'somme': True,
         'corpus': 'presse'
     }
     if start := args.start_date:
-        convertedArgs['debut'] = Date(start).getYear()
+        converted_args['debut'] = Date(start).getYear()
     if end := args.end_date:
-        convertedArgs['fin'] = Date(end).getYear()
+        converted_args['fin'] = Date(end).getYear()
     if args.grouping == 'year':
-        convertedArgs['resolution'] = 'annee'
-    return convert_data_frame_to_grouped_record(
-        pyllica(**convertedArgs),
-        ticketID=args.ticketID,
-        requestID=args.requestID
-    )
+        converted_args['resolution'] = 'annee'
+    return convert_data_frame_to_grouped_record(pyllica(**converted_args))
 
 
-def convert_data_frame_to_grouped_record(df, ticketID, requestID):
-    if 'mois' not in df.columns:
-        dates = df.annee
+def convert_data_frame_to_grouped_record(frame):
+    if 'mois' not in frame.columns:
+        dates = frame.annee
     else:
-        dates = df.apply(
+        dates = frame.apply(
             lambda row: f'{row.annee}-{row.mois:02}',
             axis=1
         )
@@ -37,9 +31,7 @@ def convert_data_frame_to_grouped_record(df, ticketID, requestID):
         PeriodOccurrenceRecord(
             date=Date(date),
             count=count,
-            ticketID=ticketID,
             term=term,
-            requestID=requestID
         )
-        for date, count, term in zip(dates, df.ratio, df.gram)
+        for date, count, term in zip(dates, frame.ratio, frame.gram)
     )

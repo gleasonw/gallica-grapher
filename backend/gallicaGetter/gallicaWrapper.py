@@ -14,10 +14,10 @@ from gallicaGetter.buildqueries.buildSRUqueries import (
 from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
 from gallicaGetter.parse.arkRecord import ArkRecord
 from gallicaGetter.parse.contentRecord import ContentRecord
-from gallicaGetter.parse.paperRecord import PaperRecord
+from gallicaGetter.parse.paperRecords import PaperRecord
 from gallicaGetter.parse.parseRecord import build_parser
-from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
-from gallicaGetter.parse.volumeOccurrenceRecord import VolumeOccurrenceRecord
+from gallicaGetter.parse.periodRecords import PeriodOccurrenceRecord
+from gallicaGetter.parse.occurrenceRecords import VolumeOccurrenceRecord
 from gallicaGetter.queryArgs import QueryArgs
 
 

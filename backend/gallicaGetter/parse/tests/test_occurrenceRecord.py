@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
-from gallicaGetter.parse.volumeOccurrenceRecord import VolumeOccurrenceRecord
+from gallicaGetter.parse.occurrenceRecords import VolumeOccurrenceRecord
 
 
 class TestOccurrenceRecord(unittest.TestCase):
