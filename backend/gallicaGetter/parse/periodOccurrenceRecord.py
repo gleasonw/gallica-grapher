@@ -3,7 +3,7 @@ from gallicaGetter.parse.date import Date
 
 
 @dataclass
-class PeriodOccurrenceRecord:
+class PeriodOccurrenceRecord(slots=True):
     date: Date
     count: int
     term: str

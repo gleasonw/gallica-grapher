@@ -1,5 +1,4 @@
 from typing import List, Optional
-
 from gallicaGetter.buildqueries.argToQueryTransformations import (
     build_indexed_queries,
     get_num_results_for_queries,
@@ -23,15 +22,13 @@ from gallicaGetter.parse.volumeOccurrenceRecord import VolumeOccurrenceRecord
 from gallicaGetter.queryArgs import QueryArgs
 
 
+#TODO: different way to share behavior
+#TODO: pass api in constructor... should ease testing
 class GallicaWrapper:
-    def __init__(self, **kwargs):
-        self.api = ConcurrentFetch(numWorkers=kwargs.get('numWorkers', 15))
+    def __init__(self, api, **kwargs):
+        self.api = api
         self.endpoint_url = self.get_endpoint_url()
         self.parser = self.get_parser(kwargs)
-        self.post_init(kwargs)
-
-    def post_init(self, kwargs):
-        pass
 
     def get(self, **kwargs):
         raise NotImplementedError(f'get() not implemented for {self.__class__.__name__}')
@@ -209,7 +206,7 @@ class ContentWrapper(GallicaWrapper):
 
 class PapersWrapper(GallicaWrapper):
 
-    def post_init(self, kwargs):
+    def __post_init__(self):
         self.issues_wrapper = IssuesWrapper()
 
     def get_endpoint_url(self):

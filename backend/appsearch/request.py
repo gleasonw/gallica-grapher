@@ -35,7 +35,7 @@ class Request(threading.Thread):
 
     def run(self):
         db_space_remaining = MAX_DB_SIZE - self.get_number_rows_in_db() - 10000
-        num_records = get_num_records_for_args(self.args_for_searches.values())
+        num_records = get_num_records_for_args(list(self.args_for_searches.values()))
         if num_records == 0:
             self.state = 'NO_RECORDS'
         elif num_records > min(db_space_remaining, RECORD_LIMIT):
@@ -101,7 +101,7 @@ def get_num_records_all_volume_occurrence(args: SearchArgs) -> int:
 
 
 @dataclass
-class SearchProgressStats:
+class SearchProgressStats(slots=True):
     ticketID: str
     num_retrieved_batches: int = 0
     total_records = 0

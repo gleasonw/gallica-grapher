@@ -3,7 +3,7 @@ from gallicaGetter.parse.date import Date
 
 
 @dataclass
-class VolumeOccurrenceRecord:
+class VolumeOccurrenceRecord(slots=True):
     paper_title: str
     paper_code: str
     url: str

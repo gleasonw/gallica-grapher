@@ -1,3 +1,4 @@
+from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from gallicaGetter.gallicaWrapper import (
     VolumeOccurrenceWrapper,
     PeriodOccurrenceWrapper,
@@ -17,10 +18,14 @@ def connect(gallicaAPIselect, **kwargs):
         'papers': PapersWrapper,
         'text': FullTextWrapper
     }
-    api = gallicaAPIselect.lower()
-    if api not in api_wrappers:
-        raise ValueError(f'API "{api}" not supported. Options are {api_wrappers.keys()}')
-    return api_wrappers[api](**kwargs)
+    select_api = gallicaAPIselect.lower()
+    api = ConcurrentFetch(numWorkers=kwargs.get('numWorkers', 15))
+    if select_api not in api_wrappers:
+        raise ValueError(f'API "{select_api}" not supported. Options are {api_wrappers.keys()}')
+    return api_wrappers[select_api](
+        api=api,
+        **kwargs
+    )
 
 
 if __name__ == '__main__':
