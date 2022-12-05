@@ -53,8 +53,8 @@ def get_sample_text(
         text = ''
         text_records = text_wrapper.get(
             codes,
-            onUpdateProgress=lambda x: print(x['elapsedTime']
-        ))
+            onProgressUpdate=lambda x: print(x['elapsedTime']
+                                             ))
         for record in text_records:
             text += record.get_text()
         return text
@@ -73,7 +73,7 @@ def get_sample_text(
         start_date=start_date,
         end_date=end_date,
         start_index=indices_to_sample,
-        onUpdateProgress=onUpdateProgress
+        onProgressUpdate=onUpdateProgress
     )
     volume_codes = [volume_record.get_volume_code() for volume_record in volumes_with_root_gram]
     return StringIO(get_text_for_codes(volume_codes))

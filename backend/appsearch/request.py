@@ -46,7 +46,8 @@ class Request(threading.Thread):
                     ticketID=ticketID,
                     args=args,
                     onProgressUpdate=lambda progressStats:
-                        self.progress_stats[ticketID].update_progress(**progressStats)
+                        self.progress_stats[ticketID].update_progress(**progressStats),
+                    conn=self.conn
                 )
                 self.progress_stats[ticketID].state = 'COMPLETED'
             self.state = 'COMPLETED'

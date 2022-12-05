@@ -1,24 +1,27 @@
 from pyllicagram import pyllicagram as pyllica
 from gallicaGetter.parse.date import Date
 from gallicaGetter.parse.periodOccurrenceRecord import PeriodOccurrenceRecord
+from gallicaGetter.searchArgs import SearchArgs
 
 
-def get(**kwargs):
+def get(
+        args: SearchArgs
+):
     convertedArgs = {
-        'recherche': kwargs['terms'],
+        'recherche': args.terms,
         'somme': True,
         'corpus': 'presse'
     }
-    if start := kwargs.get('startDate'):
+    if start := args.start_date:
         convertedArgs['debut'] = Date(start).getYear()
-    if end := kwargs.get('endDate'):
+    if end := args.end_date:
         convertedArgs['fin'] = Date(end).getYear()
-    if kwargs.get('grouping') == 'year':
+    if args.grouping == 'year':
         convertedArgs['resolution'] = 'annee'
     return convert_data_frame_to_grouped_record(
         pyllica(**convertedArgs),
-        ticketID=kwargs['ticketID'],
-        requestID=kwargs['requestID']
+        ticketID=args.ticketID,
+        requestID=args.requestID
     )
 
 

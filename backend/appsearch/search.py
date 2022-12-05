@@ -1,43 +1,88 @@
+from typing import List
+
+import gallicaGetter
 from database.recordInsertResolvers import (
-    insert_records_into_groupcounts,
     insert_records_into_results
 )
-import gallicaGetter
-import appsearch.pyllicaWrapper as pyllicaWrapper
+from gallicaGetter.gallicaWrapper import (
+    VolumeOccurrenceWrapper
+)
+from gallicaGetter.searchArgs import SearchArgs
 
 
-def get_and_insert_records_for_args(ticketID, args, onProgressUpdate):
-    pass
+def get_and_insert_records_for_args(
+        ticketID: str,
+        args: SearchArgs,
+        onProgressUpdate: callable,
+        conn):
+    match [args.grouping, bool(args.codes)]:
+        case ['all', True] | ['all', False]:
+            all_volume_occurrence_search_ticket(
+                args=args,
+                requestID='test',
+                ticketID=ticketID,
+                conn=conn,
+                onProgressUpdate=onProgressUpdate
+            )
+        case ['year', False] | ['month', False]:
+            pyllica_search_ticket(
+                args=args,
+                requestID='test',
+                ticketID=ticketID,
+                conn=conn,
+                onProgressUpdate=onProgressUpdate,
+            )
+        case ['year', True] | ['month', True]:
+            period_occurrence_search_ticket(
+                args=args,
+                requestID='test',
+                ticketID=ticketID,
+                conn=conn,
+                onProgressUpdate=onProgressUpdate
+            )
+        case _:
+            raise ValueError(f'Invalid search type: {args.grouping}, {args.codes}')
 
 
-def all_volume_occurrence_search(
-        args,
-        requestID,
-        ticketID,
+def all_volume_occurrence_search_ticket(
+        args: SearchArgs,
         conn,
-        onProgressUpdate):
-    pass
-
-
-def pyllica_search(
-        args,
+        onProgressUpdate: callable,
         requestID,
-        ticketID,
-        conn,
-        onProgressUpdate,
-        onNumResultFound
+        ticketID
 ):
-    api = gallicaGetter.connect(
-        gallicaAPIselect='volume',
-        ticketID=ticketID,
-        requestID=requestID,
+    api: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
+    records = api.get(
+        terms=args.terms,
+        start_date=args.start_date,
+        end_date=args.end_date,
+        codes=args.codes,
+        link_term=args.link_term,
+        link_distance=args.link_distance,
+        onProgressUpdate=onProgressUpdate,
+        query_cache=args.query_cache,
+        generate=True,
+        num_workers=50
     )
-    base_queries_with_num_results = api.get_num_results_for_args(**args)
-    total_records_to_insert = sum(query.num_results for query in base_queries_with_num_results)
-    onNumResultFound(total_records_to_insert)
+    insert_records_into_db(
+        records=records,
+        insert_hook=insert_records_into_results,
+        conn=conn,
+        requestID=requestID,
+        ticketID=ticketID,
+    )
 
 
-def period_occurrence_search(
+def pyllica_search_ticket(
+        args,
+        conn,
+        requestID,
+        ticketID,
+        onProgressUpdate):
+    pass
+
+
+def period_occurrence_search_ticket(
         args,
         requestID,
         ticketID,
@@ -45,89 +90,20 @@ def period_occurrence_search(
         onProgressUpdate):
     pass
 
-    # Components?
-    def get_local_fetch_args(self):
-        return {
-            'queriesWithCounts': self.base_queries_with_num_results,
-            'generate': True,
-            'onUpdateProgress': lambda progressStats: self.stateHooks.setSearchProgressStats(
-                progressStats={
-                    **progressStats,
-                    "ticketID": self.identifier
-                }
-            )
-        }
 
-
-class PyllicaSearch(SearchMixin):
-
-    def __init__(self, input_args, identifier, stateHooks, conn):
-        self.args = input_args
-        self.identifier = identifier
-        self.stateHooks = stateHooks
-        self.conn = conn
-        self.api = pyllicaWrapper
-        self.insert_records = insert_records_into_groupcounts
-        self.total_records_to_insert = self.get_total_records_to_insert()
-        self.stateHooks.setSearchProgressStats(
-            progressStats={
-                'ticketID': self.identifier,
-                'totalRecords': self.total_records_to_insert,
-                'insertedRecords': 0
-            }
-        )
-
-    def get_total_records_to_insert(self, onNumRecordsFound=None):
-        return get_num_periods_in_range_for_grouping(
-            grouping=self.args['grouping'],
-            start=self.args['startDate'],
-            end=self.args['endDate']
-        )
-
-    def get_local_fetch_args(self):
-        return {
-            'ticketID': self.identifier,
-            'requestID': self.stateHooks.requestID
-        }
-
-
-class GallicaGroupedSearch(Search):
-
-    def get_api_wrapper(self):
-        return gallicaGetter.connect(
-            'sru',
-            ticketID=self.identifier,
-            requestID=self.stateHooks.requestID
-        )
-
-    def get_db_insert(self):
-        return insert_records_into_groupcounts
-
-    def get_total_records_to_insert(self, onNumRecordsFound=None):
-        num_records = get_num_periods_in_range_for_grouping(
-            grouping=self.args['grouping'],
-            start=self.args['startDate'],
-            end=self.args['endDate']
-        )
-        if onNumRecordsFound:
-            onNumRecordsFound(self, num_records)
-        return num_records
-
-    def more_date_intervals_than_record_batches(self):
-        args = {**self.args, 'grouping': 'all'}
-        first_result = self.api.get_num_results_for_args(**args)[0]
-        num_results = first_result[1]
-        num_intervals = self.get_total_records_to_insert()
-        return int(num_results / 50) < num_intervals
-
-    def get_local_fetch_args(self):
-        return {
-            'onUpdateProgress': lambda progressStats: self.stateHooks.setSearchProgressStats(
-                progressStats={
-                    **progressStats,
-                    "ticketID": self.identifier
-                }
-            )
-        }
-
-
+def insert_records_into_db(
+        records: List,
+        insert_hook: callable,
+        conn,
+        requestID: str,
+        ticketID: str,
+        onAddingResults: callable = None,
+        onAddingMissingPapers: callable = None):
+    return insert_hook(
+        records=records,
+        conn=conn,
+        onAddingResults=onAddingResults,
+        onAddingMissingPapers=onAddingMissingPapers,
+        requestID=requestID,
+        ticketID=ticketID
+    )

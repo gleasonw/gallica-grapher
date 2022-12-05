@@ -12,7 +12,6 @@ from gallicaGetter.buildqueries.buildSRUqueries import (
     build_base_queries_at_indices
 )
 from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
-from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from gallicaGetter.parse.arkRecord import ArkRecord
 from gallicaGetter.parse.contentRecord import ContentRecord
 from gallicaGetter.parse.paperRecord import PaperRecord
@@ -23,7 +22,6 @@ from gallicaGetter.queryArgs import QueryArgs
 
 
 #TODO: different way to share behavior
-#TODO: pass api in constructor... should ease testing
 class GallicaWrapper:
     def __init__(self, api, **kwargs):
         self.api = api
@@ -39,7 +37,7 @@ class GallicaWrapper:
     def fetch_from_queries(self, queries, onUpdateProgress=None):
         raw_response = self.api.get(
             queries,
-            onUpdateProgress=onUpdateProgress
+            onProgressUpdate=onUpdateProgress
         )
         return self.parser.parse_responses_to_records(raw_response)
 
@@ -71,7 +69,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         num_workers: Optional[int] = 15,
         link_term: Optional[str] = None,
         link_distance: Optional[int] = None,
-        onUpdateProgress=None,
+        onProgressUpdate=None,
         query_cache=None
     ) -> List[VolumeOccurrenceRecord]:
         if query_cache:
@@ -101,7 +99,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 )
         record_generator = self.fetch_from_queries(
             queries=queries,
-            onUpdateProgress=onUpdateProgress
+            onUpdateProgress=onProgressUpdate
         )
         return record_generator if generate else list(record_generator)
 
