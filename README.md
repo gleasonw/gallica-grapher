@@ -4,7 +4,7 @@
 > made it more fruitful, than print-capitalism, which made it possible for
 > rapidly growing numbers of people to think about themselves, and to
 > relate themselves to others, in profoundly new ways."
-Benedict Anderson, *Imagined Communities*, [36](https://is.muni.cz/el/1423/jaro2016/SOC757/um/61816961/Benedict_Anderson_Imagined_Communities.pdf).
+-- Benedict Anderson, *Imagined Communities*, [36](https://is.muni.cz/el/1423/jaro2016/SOC757/um/61816961/Benedict_Anderson_Imagined_Communities.pdf).
 
 The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Prior to mass media, culture and identity were local, the products of face-to-face community and conversation. Wide distribution of the printed word elevated individual opinions to group opinions. Culture and identity became nationally cohesive; “public opinion” rose into being, looming over the political class, and the press was its handler.
 
