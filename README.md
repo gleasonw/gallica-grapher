@@ -6,7 +6,7 @@
 > relate themselves to others, in profoundly new ways."
 -- Benedict Anderson, *Imagined Communities*, [36](https://is.muni.cz/el/1423/jaro2016/SOC757/um/61816961/Benedict_Anderson_Imagined_Communities.pdf).
 
-The industrial press, developed throughout the early 19th century, brought daily or even twice-a-day updates to French citizens. Prior to mass media, culture and identity were local, the products of face-to-face community and conversation. Wide distribution elevated individual opinions to group opinions. Culture and identity became nationally cohesive; “public opinion” rose into being, looming over the political class, and the press was its handler.
+The 19th-century industrial press brought daily or even twice-a-day updates to French citizens. Prior to mass media, culture and identity were local, the products of face-to-face community and conversation. Wide distribution elevated individual opinions to group opinions. Culture and identity became nationally cohesive; “public opinion” rose into being, looming over the political class, and the press was its handler.
 
 This app integrates with the French National Archives [Gallica API](https://api.bnf.fr/fr/api-document-de-gallica) and [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram) to allow rapid exploration of trends across thousands of periodicals. 
 
