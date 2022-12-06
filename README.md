@@ -1,7 +1,6 @@
 # The Gallica Grapher
 
-> "... the search was on, so to speak, for a new way of linking fraternity, power and time mean-
-> ingfully together. Nothing perhaps more precipitated this search, nor
+> "... the search was on, so to speak, for a new way of linking fraternity, power and time meaningfully together. Nothing perhaps more precipitated this search, nor
 > made it more fruitful, than print-capitalism, which made it possible for
 > rapidly growing numbers of people to think about themselves, and to
 > relate themselves to others, in profoundly new ways."
