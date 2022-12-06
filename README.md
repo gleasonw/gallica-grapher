@@ -1,7 +1,6 @@
 # The Gallica Grapher
 
-> "... the search was on, so to speak, for a new way of linking fraternity, power and time meaningfully together. Nothing perhaps more precipitated this search, nor
-> made it more fruitful, than print-capitalism, which made it possible for
+> "... a new way of linking fraternity, power and time meaningfully together ... [print-capitalism] made it possible for
 > rapidly growing numbers of people to think about themselves, and to
 > relate themselves to others, in profoundly new ways."
 -- Benedict Anderson, *Imagined Communities*, [36](https://is.muni.cz/el/1423/jaro2016/SOC757/um/61816961/Benedict_Anderson_Imagined_Communities.pdf).
