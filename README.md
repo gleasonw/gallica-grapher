@@ -7,7 +7,7 @@
 
 Prior to mass media, culture and identity were local, the products of face-to-face community and conversation. The 19th-century industrial press brought daily or even twice-a-day updates to French citizens. Wide distribution elevated individual opinions to group opinions. Culture and identity became nationally cohesive; “public opinion” rose into being, looming over the political class, and the press was its handler.
 
-This app integrates with the French National Archives [Gallica API](https://api.bnf.fr/fr/api-document-de-gallica) and [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram) to allow rapid exploration of trends across thousands of periodicals. 
+This app integrates with the French National Archives [Gallica API](https://api.bnf.fr/fr/api-document-de-gallica) and [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram) to allow rapid exploration of trends across thousands of periodicals. Clicking on the graph pulls a sample of occurrences from that period.
 
 
 ### Do I need to speak French to use it?
