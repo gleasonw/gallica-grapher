@@ -1,9 +1,12 @@
 import io
+from gallicaGetter.parse.volumeRecords import VolumeRecord
+from gallicaGetter.parse.paperRecords import PaperRecord
+from gallicaGetter.parse.periodRecords import PeriodRecord
 import gallicaGetter
 
 
 def insert_records_into_papers(records, conn):
-    csvStream = buildCSVstream(records)
+    csvStream = build_csv_stream(records)
     with conn.cursor() as curs:
         curs.copy_from(
             csvStream,
@@ -12,25 +15,23 @@ def insert_records_into_papers(records, conn):
         )
 
 
-#TODO: this doesn't appear to be working
-def insert_records_into_results(records, identifier, stateHooks, conn):
-    stream, codes = build_csv_stream_ensure_no_issue_duplicates(records)
-    codes_in_db = set(
-        match[0] for match in get_db_codes_that_match_these_codes(codes, conn)
+def insert_records_into_results(
+        records,
+        requestID,
+        ticketID,
+        onAddingMissingPapers,
+        conn):
+    stream, codes = build_csv_stream_ensure_no_issue_duplicates(
+        records=records,
+        requestID=requestID,
+        ticketID=ticketID,
     )
+    codes_in_db = set(match[0] for match in get_db_codes_that_match_these_codes(codes, conn))
     missing_codes = codes - codes_in_db
     if missing_codes:
-        insert_missing_codes_into_db(
-            codes,
-            onAddingMissingPapers=lambda: stateHooks.setSearchState(
-                state='ADDING_MISSING_PAPERS',
-                ticketID=identifier
-            ),
+        onAddingMissingPapers() and insert_missing_codes_into_db(
+            missing_codes,
             conn=conn
-        )
-        stateHooks.setSearchState(
-            state='ADDING_RESULTS',
-            ticketID=identifier
         )
     with conn.cursor() as curs:
         curs.copy_from(
@@ -51,12 +52,8 @@ def insert_records_into_results(records, identifier, stateHooks, conn):
         )
 
 
-def insert_records_into_groupcounts(records, identifier, stateHooks, conn):
-    csvStream = buildCSVstream(records)
-    stateHooks.setSearchState(
-        state='ADDING_RESULTS',
-        ticketID=identifier
-    )
+def insert_records_into_groupcounts(records, requestID, ticketID, conn):
+    csvStream = build_csv_stream(records=records, requestID=requestID, ticketID=ticketID)
     with conn.cursor() as curs:
         curs.copy_from(
             csvStream,
@@ -74,9 +71,8 @@ def insert_records_into_groupcounts(records, identifier, stateHooks, conn):
         )
 
 
-def insert_missing_codes_into_db(codes, onAddingMissingPapers, conn):
+def insert_missing_codes_into_db(codes, conn):
     paperAPI = gallicaGetter.connect('papers')
-    onAddingMissingPapers()
     paperRecords = paperAPI.get(list(codes))
     insert_records_into_papers(paperRecords, conn)
 
@@ -90,44 +86,86 @@ def get_db_codes_that_match_these_codes(codes, conn):
         return curs.fetchall()
 
 
-def build_csv_stream_ensure_no_issue_duplicates(records):
-    csvFileLikeObject = io.StringIO()
+def build_csv_stream_ensure_no_issue_duplicates(records, requestID, ticketID):
+    csv_file_like_object = io.StringIO()
     codes = set()
-    codeDates = {}
+    code_dates = {}
     for record in records:
-        recordPaper = record.paper_code
-        if recordPaper in codes:
-            if datesForCode := codeDates.get(recordPaper):
-                recordDate = record.get_date()
-                if datesForCode.get(recordDate):
+        record_paper = record.paper_code
+        if record_paper in codes:
+            if datesForCode := code_dates.get(record_paper):
+                record_date = record.get_date()
+                if datesForCode.get(record_date):
                     continue
                 else:
-                    datesForCode[recordDate] = True
+                    datesForCode[record_date] = True
             else:
-                codeDates[record.get_paper_code()] = {record.get_date(): True}
+                code_dates[record.get_paper_code()] = {record.get_date(): True}
         else:
             codes.add(record.get_paper_code())
-        writeToCSVstream(csvFileLikeObject, record)
-    csvFileLikeObject.seek(0)
-    return csvFileLikeObject, codes
+        write_to_csv_stream(
+            stream=csv_file_like_object,
+            record=record,
+            requestID=requestID,
+            ticketID=ticketID
+        )
+    csv_file_like_object.seek(0)
+    return csv_file_like_object, codes
 
 
-def buildCSVstream(records):
-    csvFileLikeObject = io.StringIO()
+def build_csv_stream(records, requestID=None, ticketID=None):
+    csv_file_like_object = io.StringIO()
     for record in records:
-        writeToCSVstream(csvFileLikeObject, record)
-    csvFileLikeObject.seek(0)
-    return csvFileLikeObject
+        write_to_csv_stream(
+            stream=csv_file_like_object,
+            record=record,
+            requestID=requestID,
+            ticketID=ticketID
+        )
+    csv_file_like_object.seek(0)
+    return csv_file_like_object
 
 
-def writeToCSVstream(stream, record):
+def write_to_csv_stream(stream, record, requestID, ticketID):
+    if isinstance(record, VolumeRecord):
+        row = (
+            record.url,
+            record.date.getYear(),
+            record.date.getMonth(),
+            record.date.getDay(),
+            record.term,
+            ticketID,
+            requestID,
+            record.paper_code,
+            record.paper_title
+        )
+    elif isinstance(record, PeriodRecord):
+        row = (
+            record.date.getYear(),
+            record.date.getMonth(),
+            record.date.getDay(),
+            record.term,
+            ticketID,
+            requestID,
+            record.count
+        )
+    elif isinstance(record, PaperRecord):
+        row = (
+            record.title,
+            record.publishing_years[0],
+            record.publishing_years[1],
+            record.continuous,
+            record.code
+        )
+    else:
+        raise Exception(f'Unknown record type{type(record)}')
     stream.write("|".join(map(
-        cleanCSVrow,
-        record.get_row()
+        clean_csv_row,
+        row
     )) + '\n')
 
 
-def cleanCSVrow(value):
+def clean_csv_row(value):
     if value is None:
         return r'\N'
     return str(value).replace('|', '\\|')

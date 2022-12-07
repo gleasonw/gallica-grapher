@@ -2,8 +2,8 @@ from typing import List, Optional
 from dataclasses import dataclass
 
 
-@dataclass
-class QueryArgs(slots=True):
+@dataclass(slots=True)
+class QueryArgs:
     terms: List[str] | str
     grouping: str
     endpoint_url: str

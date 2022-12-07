@@ -1,9 +1,8 @@
-import gallicaGetter.parse.parseXML as parser
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from typing import Tuple, List, Union
 from gallicaGetter.fetch.paperQuery import PaperQuery
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
-from ujson import loads, dumps
+import gallicaGetter.parse.parseXML as parseXML
 
 NUM_CODES_PER_BUNDLE = 10
 
@@ -44,7 +43,7 @@ def get_num_results_for_queries(
         api: ConcurrentFetch) -> List[Tuple[PaperQuery | OccurrenceQuery, int]]:
     responses = api.get(queries)
     num_results_for_queries = [
-        (response.query, parser.get_num_records(response.data))
+        (response.query, parseXML.get_num_records(response.xml))
         for response in responses
     ]
     return num_results_for_queries

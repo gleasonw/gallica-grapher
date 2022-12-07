@@ -11,7 +11,7 @@ app.config_from_object('celery_settings')
 def spawn_request(self, tickets, request_id):
     with build_db_conn() as conn:
         request = Request(
-            argsBundles=tickets,
+            arg_bundles=tickets,
             identifier=request_id,
             conn=conn
         )

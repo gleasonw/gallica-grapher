@@ -9,25 +9,21 @@ from gallicaGetter.gallicaWrapper import (
     FullTextWrapper,
     PeriodOccurrenceWrapper
 )
-from gallicaGetter.parse.arkRecord import ParseArkRecord
-from gallicaGetter.parse.contentRecord import ParseContentRecord
-from gallicaGetter.parse.periodRecords import ParseGroupedRecordCounts
-from gallicaGetter.parse.occurrenceRecords import ParseOccurrenceRecords
 
 
 class TestGallicaWrapper(TestCase):
 
     def setUp(self) -> None:
         self.gallicaAPIs = [
-            VolumeOccurrenceWrapper(),
-            IssuesWrapper(),
-            ContentWrapper(),
-            PapersWrapper()
+            VolumeOccurrenceWrapper(api=MagicMock()),
+            IssuesWrapper(api=MagicMock()),
+            ContentWrapper(api=MagicMock()),
+            PapersWrapper(api=MagicMock())
         ]
 
     #Liskov tests
     def test_connect(self):
-        self.assertIsInstance(connect('period_count'), PeriodOccurrenceWrapper)
+        self.assertIsInstance(connect('period'), PeriodOccurrenceWrapper)
         self.assertIsInstance(connect('volume'), VolumeOccurrenceWrapper)
         self.assertIsInstance(connect('issues'), IssuesWrapper)
         self.assertIsInstance(connect('content'), ContentWrapper)
@@ -40,16 +36,10 @@ class TestGallicaWrapper(TestCase):
 class TestVolumeOccurrenceWrapper(TestCase):
 
     def setUp(self) -> None:
-        self.api = VolumeOccurrenceWrapper()
-
-    def test_get_parser(self):
-        self.assertIsInstance(
-            self.api.get_parser({}),
-            ParseOccurrenceRecords
-        )
+        self.api = VolumeOccurrenceWrapper(api=MagicMock())
 
     def test_get(self):
-        getter = VolumeOccurrenceWrapper()
+        getter = VolumeOccurrenceWrapper(api=MagicMock())
         getter.api = MagicMock()
         getter.fetch_from_queries = MagicMock()
 
@@ -62,16 +52,10 @@ class TestVolumeOccurrenceWrapper(TestCase):
 class TestPeriodOccurrenceWrapper(TestCase):
 
     def setUp(self) -> None:
-        self.api = PeriodOccurrenceWrapper()
-
-    def test_get_parser(self):
-        self.assertIsInstance(
-            self.api.get_parser({}),
-            ParseGroupedRecordCounts
-        )
+        self.api = PeriodOccurrenceWrapper(api=MagicMock())
 
     def test_get(self):
-        getter = PeriodOccurrenceWrapper()
+        getter = PeriodOccurrenceWrapper(api=MagicMock())
         getter.api = MagicMock()
         getter.fetch_from_queries = MagicMock()
 
@@ -84,13 +68,10 @@ class TestPeriodOccurrenceWrapper(TestCase):
 class TestIssuesWrapper(TestCase):
 
     def setUp(self) -> None:
-        self.api = IssuesWrapper()
-
-    def test_buildParser(self):
-        self.assertIsInstance(self.api.parser, ParseArkRecord)
+        self.api = IssuesWrapper(api=MagicMock())
 
     def test_get(self):
-        getter = IssuesWrapper()
+        getter = IssuesWrapper(api=MagicMock())
         getter.queryBuilder = MagicMock()
         getter.fetch_from_queries = MagicMock()
 
@@ -103,13 +84,11 @@ class TestIssuesWrapper(TestCase):
 class TestContentWrapper(TestCase):
 
         def setUp(self) -> None:
-            self.api = ContentWrapper()
+            self.api = ContentWrapper(api=MagicMock())
 
-        def test_buildParser(self):
-            self.assertIsInstance(self.api.parser, ParseContentRecord)
 
         def test_get(self):
-            getter = ContentWrapper()
+            getter = ContentWrapper(api=MagicMock())
             getter.queryBuilder = MagicMock()
             getter.fetch_from_queries = MagicMock()
 
@@ -125,10 +104,10 @@ class TestContentWrapper(TestCase):
 class TestPapersWrapper(TestCase):
 
         def setUp(self) -> None:
-            self.paperWrapper = PapersWrapper()
+            self.paperWrapper = PapersWrapper(api=MagicMock())
 
         def test_get(self):
-            getter = PapersWrapper()
+            getter = PapersWrapper(api=MagicMock())
             getter.queryBuilder = MagicMock()
             getter.fetch_from_queries = MagicMock()
             getter.issues_wrapper = MagicMock()
@@ -139,7 +118,7 @@ class TestPapersWrapper(TestCase):
 class TestFullTextWrapper(TestCase):
 
     def setUp(self) -> None:
-        self.fullTextWrapper = FullTextWrapper()
+        self.fullTextWrapper = FullTextWrapper(api=MagicMock())
         self.fullTextWrapper.fetch_from_queries = MagicMock()
 
     def test_get(self):

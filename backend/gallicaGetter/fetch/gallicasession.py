@@ -8,9 +8,10 @@ from dataclasses import dataclass
 
 @dataclass
 class Response:
-    data: str
+    xml: bytes
     query: any
     elapsed: float
+
 
 class GallicaSession:
 
@@ -50,7 +51,7 @@ class GallicaSession:
         if response.status_code != 200:
             print(f"Gallica HTTP response Error: {response.status_code}")
         return Response(
-            data=response.content,
+            xml=response.content,
             query=query,
             elapsed=end - start
         )

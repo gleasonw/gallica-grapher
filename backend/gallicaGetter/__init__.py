@@ -12,7 +12,7 @@ from gallicaGetter.gallicaWrapper import (
 def connect(gallicaAPIselect, **kwargs):
     api_wrappers = {
         'volume': VolumeOccurrenceWrapper,
-        'period_count': PeriodOccurrenceWrapper,
+        'period': PeriodOccurrenceWrapper,
         'issues': IssuesWrapper,
         'content': ContentWrapper,
         'papers': PapersWrapper,

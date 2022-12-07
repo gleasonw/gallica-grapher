@@ -1,6 +1,6 @@
 from pyllicagram import pyllicagram as pyllica
 from gallicaGetter.parse.date import Date
-from gallicaGetter.parse.periodRecords import PeriodOccurrenceRecord
+from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.searchArgs import SearchArgs
 
 
@@ -28,7 +28,7 @@ def convert_data_frame_to_grouped_record(frame):
             axis=1
         )
     return (
-        PeriodOccurrenceRecord(
+        PeriodRecord(
             date=Date(date),
             count=count,
             term=term,

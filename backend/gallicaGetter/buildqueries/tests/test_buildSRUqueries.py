@@ -29,8 +29,8 @@ class Test(TestCase):
         self.all_args = QueryArgs(
             terms='test',
             codes='test',
-            startDate='1980',
-            endDate='1985',
+            start_date='1980',
+            end_date='1985',
             grouping='all',
             endpoint_url='test',
         )

@@ -12,13 +12,13 @@ MAX_DB_SIZE = 10000000
 
 
 class Request(threading.Thread):
-    def __init__(self, identifier, argsBundles, conn):
+    def __init__(self, identifier, arg_bundles, conn):
         self.numResultsDiscovered = 0
         self.state = 'RUNNING'
         self.requestID = identifier
         self.args_for_searches = {
-            ticketID: SearchArgs(**argsBundle)
-            for ticketID, argsBundle in argsBundles.items()
+            ticketID: SearchArgs(**args)
+            for ticketID, args in arg_bundles.items()
         }
         self.progress_stats = {
             key: SearchProgressStats(ticketID=key)
@@ -101,8 +101,8 @@ def get_num_records_all_volume_occurrence(args: SearchArgs) -> int:
     return sum(query.num_results for query in base_queries_with_num_results)
 
 
-@dataclass
-class SearchProgressStats(slots=True):
+@dataclass(slots=True)
+class SearchProgressStats:
     ticketID: str
     num_retrieved_batches: int = 0
     total_records = 0

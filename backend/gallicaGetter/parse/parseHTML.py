@@ -6,8 +6,8 @@ def parse_html(html):
     return ParsedGallicaHTML(html)
 
 
-@dataclass
-class ParsedGallicaHTML(slots=True):
+@dataclass(slots=True)
+class ParsedGallicaHTML:
     html: str
     text: str = None
     ocr_quality: int = None

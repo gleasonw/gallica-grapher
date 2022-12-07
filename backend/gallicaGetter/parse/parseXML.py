@@ -20,7 +20,7 @@ def get_num_results_and_pages_for_context(xml) -> Tuple[int, List[Tuple[str, str
     return num_results, pages
 
 
-def get_records_from_xml(xml) -> List[etree.Element]:
+def get_records_from_xml(xml: str) -> List[etree.Element]:
     elements = etree.fromstring(xml)
     records_root = elements.find("{http://www.loc.gov/zing/srw/}records")
     if records_root is None:
@@ -28,7 +28,7 @@ def get_records_from_xml(xml) -> List[etree.Element]:
     return records_root.findall("{http://www.loc.gov/zing/srw/}record")
 
 
-def get_html(xml) -> str:
+def get_html(xml: str) -> str:
     elements = etree.fromstring(xml)
     return elements.find('html').text
 

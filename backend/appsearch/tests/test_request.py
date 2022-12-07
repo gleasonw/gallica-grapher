@@ -8,12 +8,10 @@ class TestRequest(TestCase):
     def setUp(self) -> None:
         self.request = Request(
             identifier=1,
-            argsBundles={
-                1: {'grouping': 'all'},
-                2: {'grouping': 'all'}
+            arg_bundles={
+                1: {'terms': 'nice', 'grouping': 'all'},
+                2: {'terms': 'nice', 'grouping': 'all'}
             },
-            statKeeper=MagicMock(),
-            searchBuilder=MagicMock(),
             conn=MagicMock()
         )
 
@@ -32,13 +30,3 @@ class TestRequest(TestCase):
 
     def test_run(self):
         self.request.run()
-
-    def test_set_ticket_progress_stats(self):
-        self.request.progress_stats = {
-            1: MagicMock(),
-            2: MagicMock(),
-        }
-        self.request.setSearchProgressStats(
-            progressStats={'ticketID': 1}
-        )
-        self.request.progress_stats[1].update.assert_called_once()

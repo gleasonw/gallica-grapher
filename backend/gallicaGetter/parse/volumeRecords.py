@@ -15,7 +15,7 @@ def parse_responses_to_records(responses):
             paper_title = get_paper_title_from_record_xml(record)
             paper_code = get_paper_code_from_record_xml(record)
             date = get_date_from_record_xml(record)
-            yield VolumeOccurrenceRecord(
+            yield VolumeRecord(
                 paper_title=paper_title,
                 paper_code=paper_code,
                 date=date,
@@ -24,8 +24,8 @@ def parse_responses_to_records(responses):
             )
 
 
-@dataclass
-class VolumeOccurrenceRecord(slots=True):
+@dataclass(slots=True)
+class VolumeRecord:
     paper_title: str
     paper_code: str
     url: str

@@ -23,11 +23,11 @@ class PaperRecord:
     code: str
     title: str
     url: str
-    publishingYears: Optional[List[int]] = None
+    publishing_years: Optional[List[int]] = None
 
     @property
     def continuous(self):
-        if self.publishingYears:
-            return int(self.publishingYears[-1]) - int(self.publishingYears[0]) + 1 == len(self.publishingYears)
+        if self.publishing_years:
+            return int(self.publishing_years[-1]) - int(self.publishing_years[0]) + 1 == len(self.publishing_years)
         else:
             return False

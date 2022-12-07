@@ -2,8 +2,8 @@ from typing import List, Optional
 from dataclasses import dataclass
 
 
-@dataclass
-class SearchArgs(slots=True):
+@dataclass(slots=True)
+class SearchArgs:
     terms: List[str] | str
     start_date: Optional[str] = None
     end_date: Optional[str] = None
