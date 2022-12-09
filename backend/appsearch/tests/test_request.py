@@ -50,18 +50,14 @@ class TestRequest(TestCase):
             108
         )
 
-    def test_run(self):
-        self.request.run()
-
 
 class TestSearchProgressStats(TestCase):
     def setUp(self) -> None:
         self.stats = SearchProgressStats(
             ticketID='test',
             num_retrieved_batches=1,
-            total_records=1,
+            total_records=567,
             average_response_time=1,
-            estimate_seconds_to_completion=1,
             randomPaper='test paper',
             search_state='testing'
         )
@@ -70,31 +66,40 @@ class TestSearchProgressStats(TestCase):
         self.assertEqual(
             self.stats.to_dict(),
             {
-                'numResultsDiscovered': 1,
+                'numResultsDiscovered': 567,
                 'numResultsRetrieved': 50,
-                'progressPercent': 0.02,
-                'estimateSecondsToCompletion': 1,
-                'randomPaper': 1,
+                'progressPercent': 1/12,
+                'estimateSecondsToCompletion': None,
+                'randomPaper': 'test paper',
                 'randomText': None,
                 'active': False
             }
         )
 
     def test_update_progress(self):
-        self.stats.update_progress(
-            elapsedTime=1,
-            numWorkers=1,
+        #given
+        stats = SearchProgressStats(
+            ticketID='test',
+            num_retrieved_batches=2,
+            total_records=1000,
+            average_response_time=2,
+        )
+        #when
+        stats.update_progress(
+            elapsed_time=1,
+            num_workers=1,
             xml=b'<test></test>'
         )
+        #then
         self.assertEqual(
-            self.stats.to_dict(),
+            stats.to_dict(),
             {
-                'numResultsDiscovered': 1,
-                'numResultsRetrieved': 100,
-                'progressPercent': 0.04,
-                'estimateSecondsToCompletion': 1,
-                'randomPaper': 1,
+                'numResultsDiscovered': 1000,
+                'numResultsRetrieved': 150,
+                'progressPercent': 3/21,
+                'estimateSecondsToCompletion': 27,
+                'randomPaper': '',
                 'randomText': None,
-                'active': False
+                'active': True
             }
         )

@@ -111,11 +111,15 @@ class SearchProgressStats:
     randomPaper: Optional[str] = None
     search_state: str = 'PENDING'
 
+    @property
+    def total_batches(self):
+        return (self.total_records // 50) + 1
+
     def to_dict(self):
         return {
             'numResultsDiscovered': self.total_records,
             'numResultsRetrieved': self.num_retrieved_batches * 50,
-            'progressPercent': self.num_retrieved_batches / ((self.total_records // 50) + 1),
+            'progressPercent': self.num_retrieved_batches / self.total_batches,
             'estimateSecondsToCompletion': self.estimate_seconds_to_completion,
             'randomPaper': self.randomPaper,
             'randomText': None,
@@ -124,17 +128,17 @@ class SearchProgressStats:
 
     def update_progress(
             self,
-            elapsedTime,
-            numWorkers,
+            elapsed_time,
+            num_workers,
             xml
     ):
         if self.search_state == 'PENDING':
             self.search_state = 'RUNNING'
         self.num_retrieved_batches += 1
         if self.average_response_time:
-            self.average_response_time = (self.average_response_time + elapsedTime) / 2
+            self.average_response_time = (self.average_response_time + elapsed_time) / 2
         else:
-            self.average_response_time = elapsedTime
+            self.average_response_time = elapsed_time
         self.randomPaper = get_one_paper_from_record_batch(xml)
-        num_remaining_cycles = ((self.total_records // 50) + 1 - self.num_retrieved_batches) / numWorkers
+        num_remaining_cycles = (self.total_batches - self.num_retrieved_batches) / num_workers
         self.estimate_seconds_to_completion = self.average_response_time * num_remaining_cycles
