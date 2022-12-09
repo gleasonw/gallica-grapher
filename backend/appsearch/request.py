@@ -105,7 +105,7 @@ def get_num_records_all_volume_occurrence(args: SearchArgs) -> int:
 class SearchProgressStats:
     ticketID: str
     num_retrieved_batches: int = 0
-    total_records = 0
+    total_records: int = 0
     average_response_time: float = 0
     estimate_seconds_to_completion: Optional[float] = None
     randomPaper: Optional[str] = None
@@ -115,7 +115,7 @@ class SearchProgressStats:
         return {
             'numResultsDiscovered': self.total_records,
             'numResultsRetrieved': self.num_retrieved_batches * 50,
-            'progressPercent': self.num_retrieved_batches / self.num_batches,
+            'progressPercent': self.num_retrieved_batches / ((self.total_records // 50) + 1),
             'estimateSecondsToCompletion': self.estimate_seconds_to_completion,
             'randomPaper': self.randomPaper,
             'randomText': None,
@@ -136,5 +136,5 @@ class SearchProgressStats:
         else:
             self.average_response_time = elapsedTime
         self.randomPaper = get_one_paper_from_record_batch(xml)
-        num_remaining_cycles = (self.num_batches - self.num_retrieved_batches) / numWorkers
+        num_remaining_cycles = ((self.total_records // 50) + 1 - self.num_retrieved_batches) / numWorkers
         self.estimate_seconds_to_completion = self.average_response_time * num_remaining_cycles

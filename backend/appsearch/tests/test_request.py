@@ -2,7 +2,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 from appsearch.request import (
     Request,
-    get_num_periods_in_range_for_grouping
+    get_num_periods_in_range_for_grouping,
+    SearchProgressStats
 )
 
 
@@ -51,3 +52,49 @@ class TestRequest(TestCase):
 
     def test_run(self):
         self.request.run()
+
+
+class TestSearchProgressStats(TestCase):
+    def setUp(self) -> None:
+        self.stats = SearchProgressStats(
+            ticketID='test',
+            num_retrieved_batches=1,
+            total_records=1,
+            average_response_time=1,
+            estimate_seconds_to_completion=1,
+            randomPaper='test paper',
+            search_state='testing'
+        )
+
+    def test_to_dict(self):
+        self.assertEqual(
+            self.stats.to_dict(),
+            {
+                'numResultsDiscovered': 1,
+                'numResultsRetrieved': 50,
+                'progressPercent': 0.02,
+                'estimateSecondsToCompletion': 1,
+                'randomPaper': 1,
+                'randomText': None,
+                'active': False
+            }
+        )
+
+    def test_update_progress(self):
+        self.stats.update_progress(
+            elapsedTime=1,
+            numWorkers=1,
+            xml=b'<test></test>'
+        )
+        self.assertEqual(
+            self.stats.to_dict(),
+            {
+                'numResultsDiscovered': 1,
+                'numResultsRetrieved': 100,
+                'progressPercent': 0.04,
+                'estimateSecondsToCompletion': 1,
+                'randomPaper': 1,
+                'randomText': None,
+                'active': False
+            }
+        )
