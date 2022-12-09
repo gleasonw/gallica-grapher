@@ -24,7 +24,7 @@ def build_base_queries(args: QueryArgs) -> List[OccurrenceQuery | PaperQuery]:
                         codes=code_bundle,
                         start_date=start,
                         end_date=end,
-                        endpoint=args.endpoint_url,
+                        endpoint_url=args.endpoint_url,
                         start_index=0,
                         num_records=1,
                         link_term=args.link_term,

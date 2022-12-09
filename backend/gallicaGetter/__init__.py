@@ -9,7 +9,7 @@ from gallicaGetter.gallicaWrapper import (
 )
 
 
-def connect(gallicaAPIselect, **kwargs):
+def connect(gallicaAPIselect, custom_api=None, **kwargs):
     api_wrappers = {
         'volume': VolumeOccurrenceWrapper,
         'period': PeriodOccurrenceWrapper,
@@ -19,7 +19,7 @@ def connect(gallicaAPIselect, **kwargs):
         'text': FullTextWrapper
     }
     select_api = gallicaAPIselect.lower()
-    api = ConcurrentFetch(numWorkers=kwargs.get('numWorkers', 15))
+    api = custom_api or ConcurrentFetch(numWorkers=kwargs.get('numWorkers', 15))
     if select_api not in api_wrappers:
         raise ValueError(f'API "{select_api}" not supported. Options are {api_wrappers.keys()}')
     return api_wrappers[select_api](

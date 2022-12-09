@@ -14,32 +14,37 @@ from gallicaGetter.searchArgs import SearchArgs
 
 def get_and_insert_records_for_args(
         ticketID: str,
+        requestID: str,
         args: SearchArgs,
         onProgressUpdate: callable,
-        conn):
+        conn,
+        api=None
+):
     match [args.grouping, bool(args.codes)]:
         case ['all', True] | ['all', False]:
             all_volume_occurrence_search_ticket(
                 args=args,
-                requestID='test',
+                requestID=requestID,
                 ticketID=ticketID,
                 conn=conn,
-                onProgressUpdate=onProgressUpdate
+                onProgressUpdate=onProgressUpdate,
+                api=api
             )
         case ['year', False] | ['month', False]:
             pyllica_search_ticket(
                 args=args,
-                requestID='test',
+                requestID=requestID,
                 ticketID=ticketID,
                 conn=conn
             )
         case ['year', True] | ['month', True]:
             period_occurrence_search_ticket(
                 args=args,
-                requestID='test',
+                requestID=requestID,
                 ticketID=ticketID,
                 conn=conn,
-                onProgressUpdate=onProgressUpdate
+                onProgressUpdate=onProgressUpdate,
+                api=api
             )
         case _:
             raise ValueError(f'Invalid search type: {args.grouping}, {args.codes}')
@@ -50,7 +55,8 @@ def all_volume_occurrence_search_ticket(
         conn,
         onProgressUpdate: callable,
         requestID: str,
-        ticketID: str
+        ticketID: str,
+        api=None
 ):
     api: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
     records = api.get(
@@ -93,7 +99,9 @@ def period_occurrence_search_ticket(
         requestID: str,
         ticketID: str,
         conn,
-        onProgressUpdate: callable):
+        onProgressUpdate: callable,
+        api=None
+):
     api: PeriodOccurrenceWrapper = gallicaGetter.connect('period')
     records = api.get(
         terms=args.terms,
@@ -118,15 +126,14 @@ def insert_records_into_db(
         requestID: str,
         ticketID: str,
         insert_into_results: bool = False,
-        onAddingResults: callable = None,
-        onAddingMissingPapers: callable = None):
+        onAddingMissingPapers: callable = None
+):
     if insert_into_results:
         insert_records_into_results(
             records=records,
             conn=conn,
             requestID=requestID,
             ticketID=ticketID,
-            onAddingResults=onAddingResults,
             onAddingMissingPapers=onAddingMissingPapers
         )
     else:

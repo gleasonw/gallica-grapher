@@ -46,7 +46,7 @@ class GallicaSession:
             )
         except RetryError:
             print('retry error')
-            return Response(None, query, 0)
+            return Response(b'', query, 0)
         end = time.perf_counter()
         if response.status_code != 200:
             print(f"Gallica HTTP response Error: {response.status_code}")

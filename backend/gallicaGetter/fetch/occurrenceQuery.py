@@ -1,29 +1,36 @@
 from typing import List, Optional
 from gallicaGetter.fetch.sruQueryMixin import SRUQueryMixin
+from dataclasses import dataclass
 
 
+@dataclass
 class OccurrenceQuery(SRUQueryMixin):
+    term: str
+    start_date: str
+    end_date: str
+    endpoint_url: str
+    start_index: int
+    num_records: int
+    link_term: str
+    link_distance: int
+    codes: Optional[List[str]]
+    num_results: int = 0
+    collapsing = False
 
-    def __init__(self, term: str, start_date: str,
-                 end_date: str, endpoint: str, start_index: int,
-                 num_records: int, link_term: str = None, codes: Optional[List[str]] = None,
-                 link_distance: int = 0):
-        self.start_date = start_date
-        self.end_date = end_date
-        self.term = term
-        self.codes = codes
-        self.link_distance = link_distance
-        self.link_term = link_term
+    def __post_init__(self):
         self.cql = self.generate_cql()
-        self.start_index = start_index
-        self.num_records = num_records
-        self.endpoint_url = endpoint
-        self.collapsing = False
 
     def make_copy(self, start_index: int, num_records: int):
-        return OccurrenceQuery(self.term, self.start_date, self.end_date,
-                               self.endpoint_url, start_index, num_records,
-                               self.link_term, self.codes, self.link_distance)
+        return OccurrenceQuery(
+            term=self.term,
+            codes=self.codes,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            endpoint_url=self.endpoint_url,
+            start_index=start_index,
+            num_records=num_records,
+            link_term=self.link_term,
+            link_distance=self.link_distance)
 
     def generate_cql(self):
         cql_components = []

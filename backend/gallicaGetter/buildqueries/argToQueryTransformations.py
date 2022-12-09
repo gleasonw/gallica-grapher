@@ -40,10 +40,8 @@ def bundle_codes(codes: List[str]) -> List[List[str]]:
 
 def get_num_results_for_queries(
         queries: List[PaperQuery | OccurrenceQuery],
-        api: ConcurrentFetch) -> List[Tuple[PaperQuery | OccurrenceQuery, int]]:
+        api: ConcurrentFetch) -> List[PaperQuery | OccurrenceQuery]:
     responses = api.get(queries)
-    num_results_for_queries = [
-        (response.query, parseXML.get_num_records(response.xml))
-        for response in responses
-    ]
-    return num_results_for_queries
+    for response in responses:
+        response.query.num_results = parseXML.get_num_records(response.xml)
+    return [response.query for response in responses]
