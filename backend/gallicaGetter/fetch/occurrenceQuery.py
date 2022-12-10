@@ -3,7 +3,7 @@ from gallicaGetter.fetch.sruQueryMixin import SRUQueryMixin
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(slots=True)
 class OccurrenceQuery(SRUQueryMixin):
     term: str
     start_date: str
