@@ -103,7 +103,6 @@ class TestSearchProgressStats(TestCase):
                 'active': True
             }
         )
-
         #when
         stats.update_progress(
             elapsed_time=10,
@@ -117,7 +116,7 @@ class TestSearchProgressStats(TestCase):
                 'numResultsDiscovered': 1000,
                 'numResultsRetrieved': 200,
                 'progressPercent': 4/21,
-                'estimateSecondsToCompletion': 18,
+                'estimateSecondsToCompletion': 48.875,
                 'randomPaper': '',
                 'randomText': None,
                 'active': True

@@ -56,7 +56,6 @@ class Test(TestCase):
             terms=['test'],
             start_date='1860',
             end_date='1880',
-            codes=['test'],
             grouping='year',
         )
         search.insert_records_into_db = MagicMock()

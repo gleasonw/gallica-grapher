@@ -19,7 +19,7 @@ class TestArgQueryTransformations(TestCase):
             term='test',
             start_index=0,
             num_records=1,
-            endpoint='test'
+            endpoint_url='test'
         )
         self.test_2 = OccurrenceQuery(
             start_date='1900',
@@ -27,7 +27,7 @@ class TestArgQueryTransformations(TestCase):
             term='test',
             start_index=0,
             num_records=1,
-            endpoint='test'
+            endpoint_url='test'
         )
 
     def test_index_queries_by_num_results(self):

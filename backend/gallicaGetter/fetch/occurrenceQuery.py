@@ -11,10 +11,10 @@ class OccurrenceQuery(SRUQueryMixin):
     endpoint_url: str
     start_index: int
     num_records: int
-    link_term: str
-    link_distance: int
-    codes: Optional[List[str]]
+    codes: Optional[List[str]] = None
     num_results: int = 0
+    link_term: Optional[str] = ''
+    link_distance: Optional[int] = 0
     collapsing = False
 
     def __post_init__(self):

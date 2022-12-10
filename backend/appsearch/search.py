@@ -58,7 +58,7 @@ def all_volume_occurrence_search_ticket(
         ticketID: str,
         api=None
 ):
-    api: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
+    api: VolumeOccurrenceWrapper = gallicaGetter.connect('volume', api=api)
     records = api.get(
         terms=args.terms,
         start_date=args.start_date,
@@ -102,7 +102,7 @@ def period_occurrence_search_ticket(
         onProgressUpdate: callable,
         api=None
 ):
-    api: PeriodOccurrenceWrapper = gallicaGetter.connect('period')
+    api: PeriodOccurrenceWrapper = gallicaGetter.connect('period', api=api)
     records = api.get(
         terms=args.terms,
         codes=args.codes,

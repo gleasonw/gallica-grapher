@@ -21,7 +21,7 @@ from gallicaGetter.queryArgs import QueryArgs
 from gallicaGetter.parse import build_parser
 
 
-#TODO: different way to share behavior
+#TODO: different way to share behavior... fetch from queries function?
 class GallicaWrapper:
     def __init__(self, api):
         self.api = api

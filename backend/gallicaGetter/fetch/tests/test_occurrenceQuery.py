@@ -12,7 +12,7 @@ class TestOccurrenceQuery(TestCase):
             num_records=10,
             start_date='1901',
             end_date='1902',
-            endpoint='test',
+            endpoint_url='test',
         )
         self.queryWithoutCodes = OccurrenceQuery(
             term='test',
@@ -21,7 +21,7 @@ class TestOccurrenceQuery(TestCase):
             start_date='1901',
             end_date='1902',
             codes=[],
-            endpoint='test',
+            endpoint_url='test',
             link_term='test',
             link_distance=1
         )
@@ -34,7 +34,7 @@ class TestOccurrenceQuery(TestCase):
             link_term='test',
             link_distance=1,
             codes=[],
-            endpoint='test'
+            endpoint_url='test'
         )
 
     def test_make_copy(self):
