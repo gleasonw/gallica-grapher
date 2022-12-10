@@ -1,6 +1,6 @@
 import threading
 from dataclasses import dataclass
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 import gallicaGetter
 from appsearch.search import get_and_insert_records_for_args
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
@@ -12,7 +12,7 @@ MAX_DB_SIZE = 10000000
 
 
 class Request(threading.Thread):
-    def __init__(self, identifier: str, arg_bundles: Dict[str, Dict], conn):
+    def __init__(self, identifier: int, arg_bundles: Dict[int, Dict], conn):
         self.numResultsDiscovered = 0
         self.state = 'RUNNING'
         self.requestID = identifier
@@ -35,7 +35,7 @@ class Request(threading.Thread):
 
     def run(self):
         db_space_remaining = MAX_DB_SIZE - self.get_number_rows_in_db() - 10000
-        num_records = get_num_records_for_args(self.args_for_searches)
+        num_records, self.args_for_searches = get_num_records_for_args(self.args_for_searches)
         if num_records == 0:
             self.state = 'NO_RECORDS'
         elif num_records > min(db_space_remaining, RECORD_LIMIT):
@@ -46,11 +46,10 @@ class Request(threading.Thread):
                     ticketID=ticketID,
                     requestID=self.requestID,
                     args=args,
-                    onProgressUpdate=lambda stats:
-                    self.progress_stats[ticketID].update_progress(**stats),
+                    onProgressUpdate=self.progress_stats[ticketID].update_progress,
                     conn=self.conn
                 )
-                self.progress_stats[ticketID].state = 'COMPLETED'
+                self.progress_stats[ticketID].search_state = 'COMPLETED'
             self.state = 'COMPLETED'
 
     def get_number_rows_in_db(self):
@@ -65,14 +64,14 @@ class Request(threading.Thread):
             return curs.fetchone()[0]
 
 
-def get_num_records_for_args(args_for_tickets: Dict[str, SearchArgs]) -> int:
+def get_num_records_for_args(args_for_tickets: Dict[str, SearchArgs]) -> Tuple[int, Dict[str, SearchArgs]]:
     total_records = 0
     cachable_responses = {}
     for ticket_id, args in args_for_tickets.items():
         if args.grouping == 'all':
             base_queries_with_num_results = get_num_records_all_volume_occurrence(args)
             total_records += sum(query.num_results for query in base_queries_with_num_results)
-            cachable_responses.update({args: base_queries_with_num_results})
+            cachable_responses.update({ticket_id: base_queries_with_num_results})
         else:
             total_records += get_num_periods_in_range_for_grouping(
                 grouping=args.grouping,
@@ -81,9 +80,10 @@ def get_num_records_for_args(args_for_tickets: Dict[str, SearchArgs]) -> int:
             )
     if cachable_responses:
         # create new args for args with cached responses
+        new_args_for_tickets = {}
         for ticket_id, args in args_for_tickets.items():
-            if args in cachable_responses:
-                args_for_tickets[ticket_id] = SearchArgs(
+            if cached_queries := cachable_responses.get(ticket_id):
+                new_args_for_tickets[ticket_id] = SearchArgs(
                     terms=args.terms,
                     start_date=args.start_date,
                     end_date=args.end_date,
@@ -91,10 +91,12 @@ def get_num_records_for_args(args_for_tickets: Dict[str, SearchArgs]) -> int:
                     grouping=args.grouping,
                     link_term=args.link_term,
                     link_distance=args.link_distance,
-                    query_cache=cachable_responses[args]
+                    query_cache=cached_queries
                 )
-
-    return total_records
+            else:
+                new_args_for_tickets[ticket_id] = args
+        args_for_tickets = new_args_for_tickets
+    return total_records, args_for_tickets
 
 
 def get_num_periods_in_range_for_grouping(grouping: str, start: str, end: str) -> int:
@@ -169,13 +171,14 @@ if __name__ == '__main__':
 
     with build_db_conn() as conn:
         test_request = Request(
-            identifier='test',
+            identifier=1,
             arg_bundles={
                 '0': {
                     'terms': 'brazza',
                     'start_date': '1900',
                     'end_date': '1901',
-                    'grouping': 'all',
+                    'grouping': 'month',
+                    'codes' : ['cb32895690j']
                 },
             },
             conn=conn

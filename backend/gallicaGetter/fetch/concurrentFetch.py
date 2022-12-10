@@ -18,10 +18,8 @@ class ConcurrentFetch:
         with ThreadPoolExecutor(max_workers=self.numWorkers) as executor:
             for response in executor.map(self.api.get, queries):
                 onProgressUpdate and onProgressUpdate(
-                    {
-                        "elapsedTime": response.elapsed,
-                        "numWorkers": self.numWorkers,
-                        "xml": response.xml,
-                    }
+                    elapsed_time=response.elapsed,
+                    num_workers=self.numWorkers,
+                    xml=response.xml
                 )
                 yield response

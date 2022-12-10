@@ -1,4 +1,5 @@
 import io
+from typing import List
 from gallicaGetter.parse.volumeRecords import VolumeRecord
 from gallicaGetter.parse.paperRecords import PaperRecord
 from gallicaGetter.parse.periodRecords import PeriodRecord
@@ -29,7 +30,8 @@ def insert_records_into_results(
     codes_in_db = set(match[0] for match in get_db_codes_that_match_these_codes(codes, conn))
     missing_codes = codes - codes_in_db
     if missing_codes:
-        onAddingMissingPapers() and insert_missing_codes_into_db(
+        onAddingMissingPapers and onAddingMissingPapers(missing_codes)
+        insert_missing_codes_into_db(
             missing_codes,
             conn=conn
         )
@@ -86,7 +88,7 @@ def get_db_codes_that_match_these_codes(codes, conn):
         return curs.fetchall()
 
 
-def build_csv_stream_ensure_no_issue_duplicates(records, requestID, ticketID):
+def build_csv_stream_ensure_no_issue_duplicates(records: List[VolumeRecord], requestID: str, ticketID: str):
     csv_file_like_object = io.StringIO()
     codes = set()
     code_dates = {}
@@ -94,15 +96,15 @@ def build_csv_stream_ensure_no_issue_duplicates(records, requestID, ticketID):
         record_paper = record.paper_code
         if record_paper in codes:
             if datesForCode := code_dates.get(record_paper):
-                record_date = record.get_date()
+                record_date = record.date.getDate()
                 if datesForCode.get(record_date):
                     continue
                 else:
                     datesForCode[record_date] = True
             else:
-                code_dates[record.get_paper_code()] = {record.get_date(): True}
+                code_dates[record.paper_code] = {record.paper_code: True}
         else:
-            codes.add(record.get_paper_code())
+            codes.add(record.paper_code)
         write_to_csv_stream(
             stream=csv_file_like_object,
             record=record,
