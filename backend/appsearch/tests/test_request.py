@@ -103,3 +103,23 @@ class TestSearchProgressStats(TestCase):
                 'active': True
             }
         )
+
+        #when
+        stats.update_progress(
+            elapsed_time=10,
+            num_workers=2,
+            xml=b'<test></test>'
+        )
+        #then
+        self.assertEqual(
+            stats.to_dict(),
+            {
+                'numResultsDiscovered': 1000,
+                'numResultsRetrieved': 200,
+                'progressPercent': 4/21,
+                'estimateSecondsToCompletion': 18,
+                'randomPaper': '',
+                'randomText': None,
+                'active': True
+            }
+        )

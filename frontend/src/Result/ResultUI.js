@@ -1,8 +1,5 @@
 import React, {useReducer, useState} from 'react';
 import GroupedTicketResults from "./GroupedTicketResults";
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from "@mui/material/Switch";
 import SoloTickets from "./SoloTickets";
 import {GraphSettingsContext, GraphSettingsDispatchContext} from "./GraphSettingsContext";
 import {settingsReducer} from "./SettingsReducer";
