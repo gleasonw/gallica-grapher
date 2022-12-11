@@ -30,8 +30,11 @@ class Request(threading.Thread):
             for ticketID, args in arg_bundles.items()
         }
         self.progress_stats = {
-            key: SearchProgressStats(ticketID=key)
-            for key, _ in self.args_for_searches.items()
+            key: SearchProgressStats(
+                ticketID=key,
+                grouping=args.grouping
+            )
+            for key, args in self.args_for_searches.items()
         }
         self.conn = conn
         self.num_records = 0
@@ -58,6 +61,24 @@ class Request(threading.Thread):
             self.state = 'TOO_MANY_RECORDS'
         else:
             for ticketID, args in self.args_for_searches.items():
+
+                # Ensure number of periods is less than number of requests to send for all occurrences
+                if args.grouping in ['year', 'month']:
+                    num_volume_occurrences = sum(
+                        query.num_results for query in get_num_records_all_volume_occurrence(args)
+                    )
+                    if self.progress_stats[ticketID].total_items > (num_volume_occurrences // 50) + 1:
+                        self.progress_stats[ticketID].grouping = 'all'
+                        args = SearchArgs(
+                            terms=args.terms,
+                            start_date=args.start_date,
+                            end_date=args.end_date,
+                            codes=args.codes,
+                            grouping='all',
+                            link_term=args.link_term,
+                            link_distance=args.link_distance,
+                        )
+
                 get_and_insert_records_for_args(
                     ticketID=ticketID,
                     requestID=self.requestID,
@@ -68,6 +89,7 @@ class Request(threading.Thread):
                     conn=self.conn
                 )
                 self.progress_stats[ticketID].search_state = 'COMPLETED'
+
             self.state = 'COMPLETED'
 
     def get_number_rows_in_db(self):
@@ -148,6 +170,7 @@ def get_num_records_all_volume_occurrence(args: SearchArgs) -> List[OccurrenceQu
 @dataclass(slots=True)
 class SearchProgressStats:
     ticketID: str
+    grouping: str
     num_items_fetched: int = 0
     total_items: int = 0
     average_response_time: float = 0
@@ -166,7 +189,8 @@ class SearchProgressStats:
             'estimateSecondsToCompletion': self.estimate_seconds_to_completion,
             'randomPaper': self.randomPaper,
             'randomText': None,
-            'state': self.search_state
+            'state': self.search_state,
+            'grouping': self.grouping,
         }
 
     def update_progress(
@@ -196,10 +220,10 @@ if __name__ == '__main__':
             identifier=1,
             arg_bundles={
                 0: {
-                    'terms': 'brazza',
+                    'terms': 'malamine',
                     'startDate': '1880',
                     'endDate': '1930',
-                    'grouping': 'all'
+                    'grouping': 'month'
                 },
             },
             conn=conn

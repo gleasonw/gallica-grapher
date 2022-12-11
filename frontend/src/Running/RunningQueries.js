@@ -60,6 +60,7 @@ function RunningQueriesUI(props) {
             props.onCancelRequest
         )
     }
+
     return (
         <div className='queryProgressUI'>
             {timeBeforeResponse > timeBeforeWarning && !responseReceived && <ClassicUIBox>
