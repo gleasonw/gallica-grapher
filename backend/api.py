@@ -19,6 +19,8 @@ from database.displayDataResolvers import (
     select_csv_data_for_tickets,
     select_top_papers_for_tickets
 )
+from gallicaGetter.parse.volumeRecords import VolumeRecord
+from gallicaGetter.parse.periodRecords import PeriodRecord
 
 app = Flask(__name__)
 CORS(app)
@@ -179,8 +181,35 @@ def fetch_gallica_records():
         limit=args['limit'],
         offset=args['offset'],
     )
-    records = [record.get_display_row() for record in records]
-    return {"displayRecords": records}
+    display_records = []
+    if records:
+        # a procedural implementation. I feel records should not know how they are displayed
+        if isinstance(records[0], VolumeRecord):
+            for volume_occurrence in records:
+                display_records.append(
+                    (
+                        volume_occurrence.term,
+                        volume_occurrence.paper_title,
+                        volume_occurrence.date.getYear(),
+                        volume_occurrence.date.getMonth(),
+                        volume_occurrence.date.getDay(),
+                        volume_occurrence.url
+                    )
+                )
+        elif isinstance(records[0], PeriodRecord):
+            for period_record in records:
+                display_records.append(
+                    (
+                        period_record.term,
+                        period_record.date.getYear(),
+                        period_record.date.getMonth(),
+                        period_record.date.getDay(),
+                        period_record.count
+                    )
+                )
+        else:
+            raise ValueError(f"Unknown record type: {type(records[0])}")
+    return {"displayRecords": display_records}
 
 
 @app.route('/api/ocrtext/<ark_code>/<term>')

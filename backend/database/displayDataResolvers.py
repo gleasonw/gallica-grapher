@@ -1,4 +1,5 @@
 import gallicaGetter
+from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
 
 
 ticketResultsWithPaperName = """
@@ -73,17 +74,20 @@ def get_ocr_text_for_record(ark, term):
     return wrapper.get(ark, term)[0]
 
 
-def get_gallica_records_for_display(tickets, limit, offset):
-    wrapper = gallicaGetter.connect('sru')
+def get_gallica_records_for_display(tickets, limit : int, offset: int):
+    wrapper: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
     records = []
     for ticket in tickets:
-        args_bundle = {
-            **ticket,
-            'numRecords': limit,
-            'startRecord': offset
-        }
-        records.extend(wrapper.get(**args_bundle))
-    records.sort(key=lambda record: record.date.get_date())
+        records.extend(wrapper.get(
+            terms=ticket['terms'],
+            start_date=ticket['startDate'],
+            codes=ticket['codes'],
+            link_term=ticket['linkTerm'],
+            link_distance=ticket['linkDistance'],
+            num_results=int(limit),
+            start_index=int(offset),
+        ))
+    records.sort(key=lambda record: record.date.getDate())
     return records
 
 

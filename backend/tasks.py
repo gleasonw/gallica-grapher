@@ -36,7 +36,7 @@ def spawn_request(self, tickets, request_id):
             else:
                 return {
                     'state': request.state,
-                    'numRecords': request.sum_records_for_searches
+                    'numRecords': request.num_records
                 }
             time.sleep(1)
 

@@ -18,7 +18,8 @@ def get_and_insert_records_for_args(
         args: SearchArgs,
         onProgressUpdate: callable,
         conn,
-        api=None
+        api=None,
+        onAddingMissingPapers: callable = None,
 ):
     match [args.grouping, bool(args.codes)]:
         case ['all', True] | ['all', False]:
@@ -28,6 +29,7 @@ def get_and_insert_records_for_args(
                 ticketID=ticketID,
                 conn=conn,
                 onProgressUpdate=onProgressUpdate,
+                onAddingMissingPapers=onAddingMissingPapers,
                 api=api
             )
         case ['year', False] | ['month', False]:
@@ -54,6 +56,7 @@ def all_volume_occurrence_search_ticket(
         args: SearchArgs,
         conn,
         onProgressUpdate: callable,
+        onAddingMissingPapers: callable,
         requestID: int,
         ticketID: int,
         api=None
@@ -77,6 +80,7 @@ def all_volume_occurrence_search_ticket(
         conn=conn,
         requestID=requestID,
         ticketID=ticketID,
+        onAddingMissingPapers=onAddingMissingPapers
     )
 
 

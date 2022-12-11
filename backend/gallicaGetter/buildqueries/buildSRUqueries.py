@@ -1,34 +1,43 @@
-from typing import List
+from typing import List, Optional
+
 from gallicaGetter.buildqueries.argToQueryTransformations import bundle_codes
 from gallicaGetter.buildqueries.buildDateGrouping import build_date_grouping
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.paperQuery import PaperQuery
-from gallicaGetter.queryArgs import QueryArgs
 
 
-def build_base_queries(args: QueryArgs) -> List[OccurrenceQuery | PaperQuery]:
-    if not isinstance(args.terms, list):
-        args.terms = [args.terms]
-    if args.codes and not isinstance(args.codes, list):
-        args.codes = [args.codes]
+def build_base_queries(
+        terms: List[str] | str,
+        endpoint_url: str,
+        grouping: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        codes: Optional[List[str] | str] = None,
+        link_term: Optional[str] = None,
+        link_distance: Optional[int] = None,
+) -> List[OccurrenceQuery | PaperQuery]:
+    if not isinstance(terms, list):
+        terms = [terms]
+    if codes and not isinstance(codes, list):
+        codes = [codes]
     base_queries = []
-    for term in args.terms:
+    for term in terms:
         for start, end in build_date_grouping(
-                args.start_date,
-                args.end_date,
-                args.grouping):
-            for code_bundle in bundle_codes(args.codes):
+                start_date,
+                end_date,
+                grouping):
+            for code_bundle in bundle_codes(codes):
                 base_queries.append(
                     OccurrenceQuery(
                         term=term,
                         codes=code_bundle,
                         start_date=start,
                         end_date=end,
-                        endpoint_url=args.endpoint_url,
+                        endpoint_url=endpoint_url,
                         start_index=0,
                         num_records=1,
-                        link_term=args.link_term,
-                        link_distance=args.link_distance
+                        link_term=link_term,
+                        link_distance=link_distance
                     )
                 )
     return base_queries

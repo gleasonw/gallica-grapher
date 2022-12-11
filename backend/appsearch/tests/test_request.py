@@ -55,8 +55,8 @@ class TestSearchProgressStats(TestCase):
     def setUp(self) -> None:
         self.stats = SearchProgressStats(
             ticketID='test',
-            num_retrieved_batches=1,
-            total_records=567,
+            num_items_fetched=1,
+            total_items=567,
             average_response_time=1,
             randomPaper='test paper',
             search_state='testing'
@@ -80,8 +80,8 @@ class TestSearchProgressStats(TestCase):
         #given
         stats = SearchProgressStats(
             ticketID='test',
-            num_retrieved_batches=2,
-            total_records=1000,
+            num_items_fetched=2,
+            total_items=1000,
             average_response_time=2,
         )
         #when

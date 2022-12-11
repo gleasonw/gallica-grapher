@@ -6,6 +6,7 @@ import ClassicUIBox from "../shared/ClassicUIBox";
 import {CircularProgress} from "@mui/material";
 
 export function TicketProgressBox(props) {
+    console.log(props.progressStats)
     const secondsToCompletion = props.progressStats.estimateSecondsToCompletion
     const minutesToCompletion = Math.floor(secondsToCompletion / 60)
     const hoursToCompletion = Math.floor(minutesToCompletion / 60)

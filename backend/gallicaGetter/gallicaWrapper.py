@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 from gallicaGetter.buildqueries.argToQueryTransformations import (
     build_indexed_queries,
     get_num_results_for_queries,
@@ -12,16 +13,15 @@ from gallicaGetter.buildqueries.buildSRUqueries import (
     build_base_queries_at_indices
 )
 from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
-from gallicaGetter.parse.issueYearRecord import IssueYearRecord
+from gallicaGetter.parse import build_parser
 from gallicaGetter.parse.contentRecord import ContentRecord
+from gallicaGetter.parse.issueYearRecord import IssueYearRecord
 from gallicaGetter.parse.paperRecords import PaperRecord
 from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.parse.volumeRecords import VolumeRecord
-from gallicaGetter.queryArgs import QueryArgs
-from gallicaGetter.parse import build_parser
 
 
-#TODO: different way to share behavior... fetch from queries function?
+# TODO: different way to share behavior... fetch from queries function?
 class GallicaWrapper:
     def __init__(self, api):
         self.api = api
@@ -58,36 +58,34 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         return 'https://gallica.bnf.fr/SRU'
 
     def get(
-        self,
-        terms: List[str] | str,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        codes: Optional[List[str] | str] = None,
-        generate: bool = False,
-        num_results: Optional[int] = None,
-        start_index: Optional[int] = 0,
-        num_workers: Optional[int] = 15,
-        link_term: Optional[str] = None,
-        link_distance: Optional[int] = None,
-        onProgressUpdate=None,
-        query_cache=None
+            self,
+            terms: List[str] | str,
+            start_date: Optional[str] = None,
+            end_date: Optional[str] = None,
+            codes: Optional[List[str] | str] = None,
+            generate: bool = False,
+            num_results: Optional[int] = None,
+            start_index: Optional[int] = 0,
+            num_workers: Optional[int] = 15,
+            link_term: Optional[str] = None,
+            link_distance: Optional[int] = None,
+            onProgressUpdate=None,
+            query_cache=None
     ) -> List[VolumeRecord]:
         if query_cache:
             queries = index_queries_by_num_results(query_cache)
         else:
             base_queries = build_base_queries(
-                QueryArgs(
-                    terms=terms,
-                    start_date=start_date,
-                    end_date=end_date,
-                    codes=codes,
-                    link_term=link_term,
-                    link_distance=link_distance,
-                    endpoint_url=self.endpoint_url,
-                    grouping='all',
-                )
+                terms=terms,
+                start_date=start_date,
+                end_date=end_date,
+                codes=codes,
+                link_term=link_term,
+                link_distance=link_distance,
+                endpoint_url=self.endpoint_url,
+                grouping='all',
             )
-            if start_index:
+            if isinstance(start_index, list):
                 queries = build_base_queries_at_indices(
                     base_queries,
                     start_index,
@@ -96,6 +94,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 queries = build_indexed_queries(
                     base_queries,
                     api=self.api,
+                    limit=num_results,
+                    offset=start_index,
                 )
         record_generator = self.fetch_from_queries(
             queries=queries,
@@ -104,16 +104,16 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         return record_generator if generate else list(record_generator)
 
     def get_num_results_for_args(
-        self,
-        terms: List[str] | str,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        codes: Optional[List[str] | str] = None,
-        link_term: Optional[str] = None,
-        link_distance: Optional[int] = None,
-        grouping: str = 'all',
+            self,
+            terms: List[str] | str,
+            start_date: Optional[str] = None,
+            end_date: Optional[str] = None,
+            codes: Optional[List[str] | str] = None,
+            link_term: Optional[str] = None,
+            link_distance: Optional[int] = None,
+            grouping: str = 'all',
     ):
-        base_queries = build_base_queries(QueryArgs(
+        base_queries = build_base_queries(
             terms=terms,
             start_date=start_date,
             end_date=end_date,
@@ -122,36 +122,34 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             link_distance=link_distance,
             endpoint_url=self.endpoint_url,
             grouping=grouping,
-        ))
+        )
         return get_num_results_for_queries(base_queries, api=self.api)
 
 
 class PeriodOccurrenceWrapper(GallicaWrapper):
 
     def get(
-        self,
-        terms: List[str] | str,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        codes: Optional[List[str] | str] = None,
-        generate: bool = False,
-        num_results: Optional[int] = None,
-        grouping: str = 'year',
-        start_index: Optional[int] = 0,
-        num_workers: Optional[int] = 15,
-        onProgressUpdate=None
+            self,
+            terms: List[str] | str,
+            start_date: Optional[str] = None,
+            end_date: Optional[str] = None,
+            codes: Optional[List[str] | str] = None,
+            generate: bool = False,
+            num_results: Optional[int] = None,
+            grouping: str = 'year',
+            start_index: Optional[int] = 0,
+            num_workers: Optional[int] = 15,
+            onProgressUpdate=None
     ) -> List[PeriodRecord]:
         if grouping not in ['year', 'month']:
             raise ValueError(f'grouping must be either "year" or "month", not {grouping}')
         queries = build_base_queries(
-            QueryArgs(
-                terms=terms,
-                start_date=start_date,
-                end_date=end_date,
-                codes=codes,
-                endpoint_url=self.endpoint_url,
-                grouping=grouping,
-            )
+            terms=terms,
+            start_date=start_date,
+            end_date=end_date,
+            codes=codes,
+            endpoint_url=self.endpoint_url,
+            grouping=grouping,
         )
         record_generator = self.fetch_from_queries(
             queries=queries,

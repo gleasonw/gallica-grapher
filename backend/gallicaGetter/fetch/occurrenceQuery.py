@@ -20,7 +20,7 @@ class OccurrenceQuery(SRUQueryMixin):
     def __post_init__(self):
         self.cql = self.generate_cql()
 
-    def make_copy(self, start_index: int, num_records: int):
+    def make_copy(self, start_index: int, num_records: int = 1):
         return OccurrenceQuery(
             term=self.term,
             codes=self.codes,

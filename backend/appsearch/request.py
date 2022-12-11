@@ -1,6 +1,7 @@
 import threading
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Callable
+
 import gallicaGetter
 from appsearch.search import get_and_insert_records_for_args
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
@@ -17,7 +18,15 @@ class Request(threading.Thread):
         self.state = 'RUNNING'
         self.requestID = identifier
         self.args_for_searches = {
-            ticketID: SearchArgs(**args)
+            ticketID: SearchArgs(
+                terms=args['terms'],
+                start_date=args['startDate'],
+                end_date=args['endDate'],
+                codes=args.get('codes'),
+                grouping=args.get('grouping'),
+                link_term=args.get('linkTerm'),
+                link_distance=args.get('linkDistance'),
+            )
             for ticketID, args in arg_bundles.items()
         }
         self.progress_stats = {
@@ -25,6 +34,7 @@ class Request(threading.Thread):
             for key, _ in self.args_for_searches.items()
         }
         self.conn = conn
+        self.num_records = 0
         super().__init__()
 
     def get_progress_stats(self):
@@ -33,12 +43,18 @@ class Request(threading.Thread):
             for key in self.args_for_searches.keys()
         }
 
+    def set_total_records_for_ticket_progress(self, ticketID: int, total_records: int):
+        self.progress_stats[ticketID].total_items = total_records
+
     def run(self):
         db_space_remaining = MAX_DB_SIZE - self.get_number_rows_in_db() - 10000
-        num_records, self.args_for_searches = get_num_records_for_args(self.args_for_searches)
-        if num_records == 0:
+        self.num_records, self.args_for_searches = get_num_records_for_args(
+            self.args_for_searches,
+            onNumRecordsFound=self.set_total_records_for_ticket_progress,
+        )
+        if self.num_records == 0:
             self.state = 'NO_RECORDS'
-        elif num_records > min(db_space_remaining, RECORD_LIMIT):
+        elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
             self.state = 'TOO_MANY_RECORDS'
         else:
             for ticketID, args in self.args_for_searches.items():
@@ -47,6 +63,8 @@ class Request(threading.Thread):
                     requestID=self.requestID,
                     args=args,
                     onProgressUpdate=self.progress_stats[ticketID].update_progress,
+                    onAddingMissingPapers=lambda: self.progress_stats[ticketID].set_search_state(
+                        'ADDING_MISSING_PAPERS'),
                     conn=self.conn
                 )
                 self.progress_stats[ticketID].search_state = 'COMPLETED'
@@ -64,7 +82,11 @@ class Request(threading.Thread):
             return curs.fetchone()[0]
 
 
-def get_num_records_for_args(args_for_tickets: Dict[str, SearchArgs]) -> Tuple[int, Dict[str, SearchArgs]]:
+#TODO: if num records too low, switch to volume search instead of period search
+def get_num_records_for_args(
+        args_for_tickets: Dict[int, SearchArgs],
+        onNumRecordsFound: Optional[Callable[[int, int], None]] = None
+) -> Tuple[int, Dict[int, SearchArgs]]:
     total_records = 0
     cachable_responses = {}
     for ticket_id, args in args_for_tickets.items():
@@ -78,6 +100,7 @@ def get_num_records_for_args(args_for_tickets: Dict[str, SearchArgs]) -> Tuple[i
                 start=args.start_date,
                 end=args.end_date
             )
+        onNumRecordsFound and onNumRecordsFound(ticket_id, total_records)
     if cachable_responses:
         # create new args for args with cached responses
         new_args_for_tickets = {}
@@ -125,26 +148,25 @@ def get_num_records_all_volume_occurrence(args: SearchArgs) -> List[OccurrenceQu
 @dataclass(slots=True)
 class SearchProgressStats:
     ticketID: str
-    num_retrieved_batches: int = 0
-    total_records: int = 0
+    num_items_fetched: int = 0
+    total_items: int = 0
     average_response_time: float = 0
     estimate_seconds_to_completion: Optional[float] = None
     randomPaper: Optional[str] = None
     search_state: str = 'PENDING'
 
-    @property
-    def total_batches(self):
-        return (self.total_records // 50) + 1
+    def set_search_state(self, state: str):
+        self.search_state = state
 
     def to_dict(self):
         return {
-            'numResultsDiscovered': self.total_records,
-            'numResultsRetrieved': self.num_retrieved_batches * 50,
-            'progressPercent': self.num_retrieved_batches / self.total_batches,
+            'numResultsDiscovered': self.total_items,
+            'numResultsRetrieved': self.num_items_fetched,
+            'progressPercent': self.total_items and (self.num_items_fetched / self.total_items) * 100 or 0,
             'estimateSecondsToCompletion': self.estimate_seconds_to_completion,
             'randomPaper': self.randomPaper,
             'randomText': None,
-            'active': self.search_state == 'RUNNING'
+            'state': self.search_state
         }
 
     def update_progress(
@@ -155,13 +177,13 @@ class SearchProgressStats:
     ):
         if self.search_state == 'PENDING':
             self.search_state = 'RUNNING'
-        self.num_retrieved_batches += 1
+        self.num_items_fetched += 1
         if self.average_response_time:
             self.average_response_time = (self.average_response_time + elapsed_time) / 2
         else:
             self.average_response_time = elapsed_time
         self.randomPaper = get_one_paper_from_record_batch(xml)
-        num_remaining_cycles = (self.total_batches - self.num_retrieved_batches) / num_workers
+        num_remaining_cycles = (self.total_items - self.num_items_fetched) / num_workers
         self.estimate_seconds_to_completion = self.average_response_time * num_remaining_cycles
 
 
@@ -173,12 +195,11 @@ if __name__ == '__main__':
         test_request = Request(
             identifier=1,
             arg_bundles={
-                '0': {
+                0: {
                     'terms': 'brazza',
-                    'start_date': '1900',
-                    'end_date': '1901',
-                    'grouping': 'month',
-                    'codes' : ['cb32895690j']
+                    'startDate': '1880',
+                    'endDate': '1930',
+                    'grouping': 'all'
                 },
             },
             conn=conn

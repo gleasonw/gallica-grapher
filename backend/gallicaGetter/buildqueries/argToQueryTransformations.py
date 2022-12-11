@@ -1,30 +1,39 @@
-from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from typing import Tuple, List, Union
-from gallicaGetter.fetch.paperQuery import PaperQuery
-from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
+from typing import List
+
 import gallicaGetter.parse.parseXML as parseXML
+from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
+from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
+from gallicaGetter.fetch.paperQuery import PaperQuery
 
 NUM_CODES_PER_BUNDLE = 10
 
 
-def build_indexed_queries(queries: Union[List[OccurrenceQuery], List[PaperQuery]],
-                          api: ConcurrentFetch, limit=None) -> Union[List[OccurrenceQuery], List[PaperQuery]]:
+def build_indexed_queries(
+        queries: [List[OccurrenceQuery | PaperQuery]],
+        api: ConcurrentFetch, limit=None, offset=None
+) -> [List[OccurrenceQuery | PaperQuery]]:
     if limit:
-        queries_with_num_results = ((query, limit) for query in queries)
+        queries_with_num_results = []
+        for query in queries:
+            new_query = query.make_copy(start_index=offset)
+            new_query.num_results = limit
+            queries_with_num_results.append(new_query)
     else:
         queries_with_num_results = get_num_results_for_queries(queries, api)
-    return index_queries_by_num_results(queries_with_num_results)
+    return index_queries_by_num_results(queries_with_num_results, records_per_query=limit or 50)
 
 
 def index_queries_by_num_results(
-        queries_num_results: List[PaperQuery | OccurrenceQuery]) -> List[PaperQuery | OccurrenceQuery]:
+        queries_num_results: List[PaperQuery | OccurrenceQuery],
+        records_per_query: int = 50
+) -> List[PaperQuery | OccurrenceQuery]:
     if not queries_num_results:
         return []
     indexed_queries = []
     for query in queries_num_results:
-        for i in range(0, query.num_results, 50):
+        for i in range(0, query.num_results, records_per_query):
             indexed_queries.append(
-                query.make_copy(start_index=i, num_records=50)
+                query.make_copy(start_index=i, num_records=records_per_query)
             )
     return indexed_queries
 

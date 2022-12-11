@@ -30,7 +30,7 @@ def insert_records_into_results(
     codes_in_db = set(match[0] for match in get_db_codes_that_match_these_codes(codes, conn))
     missing_codes = codes - codes_in_db
     if missing_codes:
-        onAddingMissingPapers and onAddingMissingPapers(missing_codes)
+        onAddingMissingPapers and onAddingMissingPapers()
         insert_missing_codes_into_db(
             missing_codes,
             conn=conn
@@ -155,7 +155,7 @@ def write_to_csv_stream(stream, record, requestID, ticketID):
         row = (
             record.title,
             record.publishing_years[0],
-            record.publishing_years[1],
+            record.publishing_years[-1],
             record.continuous,
             record.code
         )

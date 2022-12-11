@@ -15,14 +15,14 @@ class Response:
 
 class GallicaSession:
 
-    def __init__(self, maxSize=50):
-        self.maxSize = maxSize
+    def __init__(self):
+        self.maxSize = 15
         self.session = self.build_session()
 
     def build_session(self):
         retry_strategy = Retry(
-            total=3,
-            status_forcelist=[502, 503, 504],
+            total=10,
+            status_forcelist=[429, 500, 502, 503, 504],
             backoff_factor=1,
             connect=20,
             read=20,
@@ -50,6 +50,7 @@ class GallicaSession:
         end = time.perf_counter()
         if response.status_code != 200:
             print(f"Gallica HTTP response Error: {response.status_code}")
+            return Response(b'', query, 0)
         return Response(
             xml=response.content,
             query=query,
