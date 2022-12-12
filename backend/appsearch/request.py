@@ -63,7 +63,7 @@ class Request(threading.Thread):
             for ticketID, args in self.args_for_searches.items():
 
                 # Ensure number of periods is less than number of requests to send for all occurrences
-                if args.grouping in ['year', 'month']:
+                if args.codes and args.grouping in ['year', 'month']:
                     num_volume_occurrences = sum(
                         query.num_results for query in get_num_records_all_volume_occurrence(args)
                     )

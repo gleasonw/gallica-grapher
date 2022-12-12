@@ -16,9 +16,8 @@ export function TicketProgressBox(props) {
     const resultsRetrieved = props.progressStats.numResultsRetrieved
     const estimateTotal = props.progressStats.numResultsDiscovered
     const ticketSearchState = props.progressStats.state
-    const progress = ticketSearchState === 'COMPLETED' ? 100 : props.progressStats.progressPercent
+    const progress = ticketSearchState === 'COMPLETED' ? 100 : props.progressStats.progressPercent;
     const backendGrouping = props.progressStats.grouping;
-    console.log(backendGrouping);
     backendGrouping && backendGrouping !== props.ticket.grouping && props.onBackendGroupingChange()
 
     return (
@@ -81,8 +80,8 @@ export function TicketProgressBox(props) {
 }
 
 const StyledProgressStats = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    margin-top: 20px;
-    `;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 20px;
+`;
