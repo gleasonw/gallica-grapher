@@ -9,3 +9,4 @@ psycopg2==2.9.5
 psycopg2_binary==2.9.5
 requests==2.25.1
 urllib3==1.26.5
+redis==4.4.0
