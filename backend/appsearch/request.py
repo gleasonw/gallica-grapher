@@ -20,8 +20,8 @@ class Request(threading.Thread):
         self.args_for_searches = {
             ticketID: SearchArgs(
                 terms=args['terms'],
-                start_date=args['startDate'],
-                end_date=args['endDate'],
+                start_date=args.get('startDate'),
+                end_date=args.get('endDate'),
                 codes=args.get('codes'),
                 grouping=args.get('grouping'),
                 link_term=args.get('linkTerm'),
@@ -201,13 +201,25 @@ class SearchProgressStats:
     ):
         if self.search_state == 'PENDING':
             self.search_state = 'RUNNING'
-        self.num_items_fetched += 1
+
+        # all search items measured in records, other searches in requests fetched. a bit confusing, maybe.
+        if self.grouping == 'all':
+            self.num_items_fetched += 50
+        else:
+            self.num_items_fetched += 1
+
+        # estimate number of seconds to completion
+        num_remaining_cycles = (self.total_items - self.num_items_fetched) / num_workers
+        if self.grouping == 'all':
+            num_remaining_cycles /= 50
+
         if self.average_response_time:
             self.average_response_time = (self.average_response_time + elapsed_time) / 2
         else:
             self.average_response_time = elapsed_time
+
+        # a bit of reader fluff to make the wait enjoyable
         self.randomPaper = get_one_paper_from_record_batch(xml)
-        num_remaining_cycles = (self.total_items - self.num_items_fetched) / num_workers
         self.estimate_seconds_to_completion = self.average_response_time * num_remaining_cycles
 
 
@@ -220,10 +232,10 @@ if __name__ == '__main__':
             identifier=1,
             arg_bundles={
                 0: {
-                    'terms': 'malamine',
+                    'terms': 'brazza',
                     'startDate': '1880',
                     'endDate': '1930',
-                    'grouping': 'month'
+                    'grouping': 'all'
                 },
             },
             conn=conn

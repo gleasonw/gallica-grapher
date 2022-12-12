@@ -1,5 +1,6 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
+
 from appsearch.request import (
     Request,
     get_num_periods_in_range_for_grouping,
@@ -52,73 +53,112 @@ class TestRequest(TestCase):
 
 
 class TestSearchProgressStats(TestCase):
-    def setUp(self) -> None:
-        self.stats = SearchProgressStats(
+
+    def test_to_dict(self):
+        stats = SearchProgressStats(
             ticketID='test',
-            num_items_fetched=1,
+            num_items_fetched=50,
             total_items=567,
             average_response_time=1,
             randomPaper='test paper',
-            search_state='testing'
+            search_state='testing',
+            grouping='all',
         )
-
-    def test_to_dict(self):
         self.assertEqual(
-            self.stats.to_dict(),
+            stats.to_dict(),
             {
                 'numResultsDiscovered': 567,
                 'numResultsRetrieved': 50,
-                'progressPercent': 1/12,
+                'progressPercent': (50 / 567) * 100,
                 'estimateSecondsToCompletion': None,
                 'randomPaper': 'test paper',
                 'randomText': None,
-                'active': False
+                'grouping': 'all',
+                'state': 'testing'
             }
         )
 
-    def test_update_progress(self):
-        #given
+    def test_update_progress_all_search(self):
+        # given
         stats = SearchProgressStats(
             ticketID='test',
-            num_items_fetched=2,
+            num_items_fetched=100,
             total_items=1000,
             average_response_time=2,
+            grouping='all',
         )
-        #when
+        # when
         stats.update_progress(
             elapsed_time=1,
             num_workers=1,
             xml=b'<test></test>'
         )
-        #then
+        # then
         self.assertEqual(
             stats.to_dict(),
             {
                 'numResultsDiscovered': 1000,
                 'numResultsRetrieved': 150,
-                'progressPercent': 3/21,
-                'estimateSecondsToCompletion': 27,
+                'progressPercent': (150 / 1000) * 100,
+                'estimateSecondsToCompletion': 25.5,
                 'randomPaper': '',
                 'randomText': None,
-                'active': True
+                'grouping': 'all',
+                'state': 'RUNNING'
             }
         )
-        #when
+
+    def test_update_response_time_all_search(self):
+        stats = SearchProgressStats(
+            ticketID='test',
+            num_items_fetched=150,
+            total_items=1000,
+            average_response_time=1.5,
+            grouping='all',
+        )
+        # when
         stats.update_progress(
             elapsed_time=10,
             num_workers=2,
             xml=b'<test></test>'
         )
-        #then
+        # then
+        self.assertEqual(
+            stats.average_response_time,
+            5.75
+        )
+        self.assertEqual(
+            stats.estimate_seconds_to_completion,
+            46
+        )
+
+    def test_update_progress_grouped_search(self):
+        # given
+        stats = SearchProgressStats(
+            ticketID='test',
+            num_items_fetched=100,
+            total_items=200,
+            average_response_time=2,
+            grouping='year',
+        )
+        # when
+        stats.update_progress(
+            elapsed_time=1,
+            num_workers=1,
+            xml=b'<test></test>'
+        )
+        # then
         self.assertEqual(
             stats.to_dict(),
             {
-                'numResultsDiscovered': 1000,
-                'numResultsRetrieved': 200,
-                'progressPercent': 4/21,
-                'estimateSecondsToCompletion': 48.875,
+                'numResultsDiscovered': 200,
+                'numResultsRetrieved': 101,
+                'progressPercent': (101 / 200) * 100,
+                'estimateSecondsToCompletion': 148.5,
                 'randomPaper': '',
                 'randomText': None,
-                'active': True
+                'grouping': 'year',
+                'state': 'RUNNING'
             }
         )
+

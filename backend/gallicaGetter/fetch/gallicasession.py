@@ -15,8 +15,8 @@ class Response:
 
 class GallicaSession:
 
-    def __init__(self):
-        self.maxSize = 15
+    def __init__(self, maxSize):
+        self.maxSize = maxSize
         self.session = self.build_session()
 
     def build_session(self):
