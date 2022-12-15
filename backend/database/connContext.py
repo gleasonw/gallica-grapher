@@ -10,7 +10,7 @@ class ConnectionContext:
 
     def __init__(self):
         if os.environ.get('DATABASE_URL'):
-            self.conn = init_heroku()
+            self.conn = init_prod()
         else:
             self.conn = init_local()
         self.conn.set_session(autocommit=True)
@@ -35,8 +35,7 @@ def init_local():
     return conn
 
 
-def init_heroku():
-    print("Connecting to Heroku database...")
+def init_prod():
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL)
     return conn
