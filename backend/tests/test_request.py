@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from appsearch.request import (
+from request import (
     Request,
     get_num_periods_in_range_for_grouping,
     SearchProgressStats

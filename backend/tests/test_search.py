@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
 from gallicaGetter.searchArgs import SearchArgs
-import appsearch.search as search
+import search as search
 
 
 class Test(TestCase):

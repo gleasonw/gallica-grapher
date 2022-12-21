@@ -1,3 +1,6 @@
+from typing import List
+
+
 def select_continuous_papers(start_year, end_year, limit, conn) -> dict:
     bigger_year = max(start_year, end_year)
     smaller_year = min(start_year, end_year)
@@ -56,9 +59,9 @@ def get_num_papers_in_range(startDate, endDate, conn) -> int:
         return numPapersOverRange[0]
 
 
-def paperDataToJSON(similarPapers) -> dict:
+def paperDataToJSON(similar_papers) -> dict:
     papers = []
-    for paperData in similarPapers:
+    for paperData in similar_papers:
         title = paperData[0]
         code = paperData[1]
         startDate = paperData[2]
@@ -70,4 +73,4 @@ def paperDataToJSON(similarPapers) -> dict:
             'endDate': endDate
         }
         papers.append(paper)
-    return {'paperNameCodes': papers}
+    return {'papers': papers}

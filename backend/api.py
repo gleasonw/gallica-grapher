@@ -83,7 +83,7 @@ def get_num_papers_publishing_in_range(start, end):
             end,
             conn
         )
-    return {'numPapersOverRange': count}
+    return str(count)
 
 
 @app.route('/api/continuousPapers')

@@ -3,8 +3,6 @@ import unittest
 from unittest.mock import patch, MagicMock
 import json
 
-from recordDataForUser import getTopPapers
-
 
 class TestAPI(unittest.TestCase):
 

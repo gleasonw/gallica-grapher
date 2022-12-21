@@ -1,6 +1,6 @@
 from celery import Celery
 import time
-from appsearch.request import Request
+from request import Request
 from database.connContext import build_db_conn
 
 app = Celery()

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Dict, Tuple, Callable
 
 import gallicaGetter
-from appsearch.search import get_and_insert_records_for_args
+from search import get_and_insert_records_for_args
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from gallicaGetter.searchArgs import SearchArgs

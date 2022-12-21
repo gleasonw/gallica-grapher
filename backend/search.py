@@ -1,5 +1,5 @@
 from typing import List
-import appsearch.pyllicaWrapper as pyllicaWrapper
+import pyllicaWrapper as pyllicaWrapper
 import gallicaGetter
 from database.recordInsertResolvers import (
     insert_records_into_results,
