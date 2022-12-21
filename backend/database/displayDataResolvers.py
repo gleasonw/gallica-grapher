@@ -83,7 +83,7 @@ def get_gallica_records_for_display(tickets, limit : str, offset: str):
             start_date=ticket.get('startDate'),
             codes=ticket.get('codes'),
             link_term=ticket.get('linkTerm'),
-            link_distance=ticket('linkDistance'),
+            link_distance=ticket.get('linkDistance'),
             num_results=int(limit),
             start_index=int(offset),
         ))
