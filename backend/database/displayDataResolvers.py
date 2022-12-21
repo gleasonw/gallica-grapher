@@ -74,16 +74,16 @@ def get_ocr_text_for_record(ark, term):
     return wrapper.get(ark, term)[0]
 
 
-def get_gallica_records_for_display(tickets, limit : int, offset: int):
+def get_gallica_records_for_display(tickets, limit : str, offset: str):
     wrapper: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
     records = []
     for ticket in tickets:
         records.extend(wrapper.get(
             terms=ticket['terms'],
-            start_date=ticket['startDate'],
-            codes=ticket['codes'],
-            link_term=ticket['linkTerm'],
-            link_distance=ticket['linkDistance'],
+            start_date=ticket.get('startDate'),
+            codes=ticket.get('codes'),
+            link_term=ticket.get('linkTerm'),
+            link_distance=ticket('linkDistance'),
             num_results=int(limit),
             start_index=int(offset),
         ))
