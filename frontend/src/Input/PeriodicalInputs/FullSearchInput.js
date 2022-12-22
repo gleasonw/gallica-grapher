@@ -4,13 +4,7 @@ import React from "react";
 
 export function FullSearchInput(props) {
     const urlForPapersInRange = `/api/numPapersOverRange/${props.startYear}/${props.endYear}`;
-    const result = useData(urlForPapersInRange);
-    let numPapersOverRange;
-    if (result) {
-        numPapersOverRange = result['numPapersOverRange'];
-    } else {
-        numPapersOverRange = "0";
-    }
+    const numPapersOverRange = useData(urlForPapersInRange);
     return (
         <OptionWrap
             selected={props.selected === 2}
@@ -20,7 +14,7 @@ export function FullSearchInput(props) {
             onFocus={() => props.onFocus(2)}
         >
             <span className={'paperOptionHeader'}>
-                {numPapersOverRange} periodicals publishing
+                {numPapersOverRange || '...'} periodicals publishing
                 at any point
             </span>
         </OptionWrap>

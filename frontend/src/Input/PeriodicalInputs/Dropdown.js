@@ -3,7 +3,7 @@ import React from "react";
 export function Dropdown(props) {
     if (props.error) {
         return <div>Error: {props.error.message}</div>
-    } else if (props.papers) {
+    } else if (props.papers && props.papers.length > 0) {
         return (
             <ul className='paperDropdown'>
                 {props.papers.map(paper => (
@@ -16,7 +16,7 @@ export function Dropdown(props) {
             </ul>
         );
     } else {
-        return (<div/>)
+        return null
     }
 }
 

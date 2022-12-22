@@ -3,7 +3,6 @@ import {SelectionBox} from "../SelectionBox";
 import {Dropdown} from "./Dropdown";
 import React from "react";
 import {ShadowedFocusInput} from "../../shared/ShadowedFocusInput";
-import { DataOriginMismatch} from "../../shared/Messages";
 
 export function UserSelectPaperInput(props) {
     const paperNames = props.userSelectedPapers.map(paper => paper.title);
@@ -37,7 +36,7 @@ export function UserSelectPaperInput(props) {
             </div>
             <div className='dropdownContainer'>
                 <Dropdown
-                    papers={props.papersForDropdown['paperNameCodes']}
+                    papers={props.papersForDropdown}
                     error={props.dropdownError}
                     onClick={props.onDropdownClick}
                 />

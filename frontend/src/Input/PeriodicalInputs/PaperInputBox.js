@@ -39,23 +39,20 @@ export class PaperInputBox extends React.Component {
         }
     }
 
-    getPaperDropdownItems(searchString) {
-        fetch("/api/papers/" + searchString)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        dropdownError: null,
-                        papersForDropdown: result
-                    });
-                },
-                (dropdownError) => {
-                    this.setState({
-                        dropdownError
-                    })
-
-                }
-            )
+    async getPaperDropdownItems(searchString) {
+        const res = await fetch("/api/papers/" + searchString);
+        const data = await res.json();
+        console.log(data);
+        if (data.error) {
+            this.setState({
+                dropdownError: data.error,
+            })
+        }else{
+            this.setState({
+                papersForDropdown: data.papers,
+                dropdownError: null,
+            })
+        }
     }
 
     handleDropdownClick(paperNameCode) {
