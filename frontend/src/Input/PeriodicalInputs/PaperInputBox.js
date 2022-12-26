@@ -1,5 +1,4 @@
 import React from "react";
-import {ContinuousTrendInput} from "./ContinuousTrendInput";
 import {UserSelectPaperInput} from "./UserSelectPaperInput";
 import {FullSearchInput} from "./FullSearchInput";
 import {StyledOptionInput} from "../StyledOptionInput";
