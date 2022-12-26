@@ -6,7 +6,6 @@ export function FullSearchInput(props) {
     const urlForPapersInRange = `/api/numPapersOverRange/${props.startYear}/${props.endYear}`;
     const result = useData(urlForPapersInRange);
     let numPapersOverRange;
-    console.log(result);
     if (result) {
         numPapersOverRange = result['numPapersOverRange'];
     } else {
