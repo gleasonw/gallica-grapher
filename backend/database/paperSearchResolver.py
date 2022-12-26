@@ -1,6 +1,3 @@
-from typing import List
-
-
 def select_continuous_papers(start_year, end_year, limit, conn) -> dict:
     bigger_year = max(start_year, end_year)
     smaller_year = min(start_year, end_year)
@@ -38,9 +35,7 @@ def select_papers_similar_to_keyword(keyword, conn) -> dict:
     return paperDataToJSON(papersSimilarToKeyword)
 
 
-def get_num_papers_in_range(startDate, endDate, conn) -> int:
-    startDate = startDate or 0
-    endDate = endDate or 9999
+def get_num_papers_in_range(conn, start: int = 0, end: int = 9999) -> int:
     with conn.cursor() as curs:
         curs.execute("""
             SELECT COUNT(*) FROM papers
@@ -49,14 +44,14 @@ def get_num_papers_in_range(startDate, endDate, conn) -> int:
                     OR (startdate < %s AND enddate > %s)
                 ;
             """, (
-            startDate,
-            endDate,
-            startDate,
-            endDate,
-            startDate,
-            endDate))
-        numPapersOverRange = curs.fetchone()
-        return numPapersOverRange[0]
+            start,
+            end,
+            start,
+            end,
+            start,
+            end))
+        num_papers_over_range = curs.fetchone()
+        return num_papers_over_range[0]
 
 
 def paperDataToJSON(similar_papers) -> dict:

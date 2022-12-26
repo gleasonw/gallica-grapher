@@ -2,6 +2,23 @@ from typing import List, Optional
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+from tasks import spawn_request
+from database.connContext import build_db_conn
+from database.paperSearchResolver import (
+    select_papers_similar_to_keyword,
+    get_num_papers_in_range,
+)
+from database.graphDataResolver import select_series_for_tickets
+from database.displayDataResolvers import (
+    select_display_records,
+    get_gallica_records_for_display,
+    clear_records_for_requestid,
+    get_ocr_text_for_record,
+    select_csv_data_for_tickets,
+    select_top_papers_for_tickets
+)
+from gallicaGetter.parse.volumeRecords import VolumeRecord
+from gallicaGetter.parse.periodRecords import PeriodRecord
 
 app = FastAPI()
 requestID = 0
@@ -81,7 +98,7 @@ async def get_num_papers_over_range(start: int, end: int):
 
 @app.get('/api/graphData')
 def get_graph_series_for_tickets(
-        tickets: int | List[int],
+        ticket_ids: int | List[int],
         request_id: int,
         grouping: Optional[str] = 'year',
         average_window: Optional[int] = 0,
@@ -90,7 +107,7 @@ def get_graph_series_for_tickets(
 ):
     with build_db_conn() as conn:
         items = select_series_for_tickets(
-            tickets=tickets,
+            ticket_ids=ticket_ids,
             request_id=request_id,
             grouping=grouping,
             average_window=average_window,

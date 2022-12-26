@@ -6,7 +6,6 @@ import json
 from tasks import spawn_request
 from database.connContext import build_db_conn
 from database.paperSearchResolver import (
-    select_continuous_papers,
     select_papers_similar_to_keyword,
     get_num_papers_in_range,
 )
