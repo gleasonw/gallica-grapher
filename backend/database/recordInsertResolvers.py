@@ -112,6 +112,7 @@ def build_csv_stream_ensure_no_issue_duplicates(records: List[VolumeRecord], req
             ticketID=ticketID
         )
     csv_file_like_object.seek(0)
+    print(f'unique codes: {codes}')
     return csv_file_like_object, codes
 
 
