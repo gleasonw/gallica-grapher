@@ -86,21 +86,6 @@ def get_num_papers_publishing_in_range(start, end):
     return str(count)
 
 
-@app.route('/api/continuousPapers')
-def get_continuous_papers_for_range():
-    limit = request.args.get('limit')
-    start = request.args.get('startDate')
-    end = request.args.get('endDate')
-    with build_db_conn() as conn:
-        continuous_papers = select_continuous_papers(
-            start,
-            end,
-            limit,
-            conn
-        )
-    return continuous_papers
-
-
 @app.route('/api/graphData')
 def get_graph_series_for_tickets():
     settings = {
@@ -154,7 +139,6 @@ def get_display_records():
     }
 
 
-#TODO: enlist celery worker to make request async -- flask blocks while responding to this
 @app.route('/api/getGallicaRecords')
 def fetch_gallica_records():
     """
