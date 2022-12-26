@@ -1,31 +1,23 @@
 import datetime
-from typing import List
+from dataclasses import dataclass
+from typing import List, Literal, Tuple
 
 import ciso8601
-
-from database.sqlForGraph import (
-    get_sql_for_settings,
-    get_params_for_ticket_and_settings
-)
 
 
 def select_series_for_tickets(
         ticket_ids: int | List[int],
         request_id: int,
-        grouping: str,
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
         average_window: int,
-        start_date: str,
-        end_date: str,
         conn
 ):
     batch_series = list(map(
         lambda ticket_id: build_highcharts_series(
             ticket_id=ticket_id,
-            requestID=request_id,
+            request_id=request_id,
             grouping=grouping,
             average_window=average_window,
-            start_date=start_date,
-            end_date=end_date,
             conn=conn
         ),
         ticket_ids
@@ -36,32 +28,77 @@ def select_series_for_tickets(
     }
 
 
+@dataclass(slots=True, frozen=True)
+class Series:
+    ticket_id: int
+    data: List[Tuple[int, float]]
+    name: str
+
+
 def build_highcharts_series(
         ticket_id: int,
         request_id: int,
-        grouping: Literal["day", "month", "year", "gallicaMonth"],
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
         average_window: int,
-        start_date: str,
-        end_date: str,
+        conn
+) -> Series:
+    if grouping == 'gallicaYear' or grouping == 'gallicaMonth':
+        psycop_params = (
+            average_window,
+            request_id,
+            ticket_id
+        )
+    else:
+        psycop_params = (
+            request_id,
+            ticket_id,
+            average_window
+        )
+    data = get_from_db(
+        params=psycop_params,
+        sql=get_sql_for_grouping(grouping),
+        conn=conn
+    )
+    match grouping:
+        case "day":
+            data_with_proper_date_format = list(map(get_rows_ymd_timestamp, data))
+        case ["month" | "gallicaMonth"]:
+            data_with_proper_date_format = list(map(get_rows_ym_timestamp, data))
+        case _:
+            data_with_proper_date_format = data
+    search_terms = get_search_terms_by_grouping(
+        grouping=grouping,
+        ticket_id=ticket_id,
+        request_id=request_id,
+        conn=conn
+    )
+    return Series(
+        name=f"{ticket_id}: {search_terms}",
+        data=data_with_proper_date_format,
+        ticket_id=ticket_id
+    )
+
+
+def get_sql_for_grouping(grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"]):
+    match grouping:
+        case "day":
+            return getDayGroupedSQL()
+        case "month":
+            return getMonthGroupedSQL()
+        case "year":
+            return getYearGroupedSQL()
+        case "gallicaYear":
+            return getGallicaGroupedYears()
+        case "gallicaMonth":
+            return getGallicaGroupedMonths()
+
+
+def get_search_terms_by_grouping(
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
+        ticket_id: int,
+        request_id: int,
         conn
 ):
-    data = get_from_db(
-        params=get_params_for_ticket_and_settings(
-            ticketID=ticket_id,
-        ),
-        sql=get_sql_for_settings(
-            timeBin=settings["groupBy"],
-            continuous=settings["continuous"],
-        )
-    )
-    data_with_proper_date_format = self.transform_date_for_settings(data, settings)
-    return {
-        'name': f"{self.ticket_id}: {self.get_search_terms_by_grouping(settings['groupBy'])}",
-        'data': data_with_proper_date_format,
-    }
-
-
-def get_search_terms_by_grouping(self, grouping):
     table = 'FROM results' if grouping in ['day', 'month', 'year'] else 'FROM groupcounts'
 
     get_terms = f"""
@@ -71,16 +108,16 @@ def get_search_terms_by_grouping(self, grouping):
         AND ticketid = %s;
         """
 
-    with self.conn.cursor() as curs:
+    with conn.cursor() as curs:
         curs.execute(get_terms, (
-            self.request_id,
-            self.ticket_id
+            request_id,
+            ticket_id
         ))
         return curs.fetchone()[0]
 
 
-def get_from_db(self, params, sql):
-    with self.conn.cursor() as curs:
+def get_from_db(conn, params: Tuple, sql: str):
+    with conn.cursor() as curs:
         curs.execute(
             sql,
             params
@@ -88,38 +125,256 @@ def get_from_db(self, params, sql):
         return curs.fetchall()
 
 
-def transform_date_for_settings(self, data, settings):
-    if settings["groupBy"] == "day":
-        return list(map(self.getRowsWithYMDtimestamp, data))
-    elif settings["groupBy"] == "month" or settings["groupBy"] == "gallicaMonth":
-        return list(map(self.getRowsWithYearMonthTimestamp, data))
-    else:
-        return data
-
-
-def getRowsWithYMDtimestamp(self, row):
+def get_rows_ymd_timestamp(row):
     year = row[0]
     month = row[1]
     day = row[2]
     frequency = row[3]
     date = f'{year}-{month:02d}-{day:02d}'
-    return self.dateToTimestamp(date), frequency
+    return get_timestamp(date), frequency
 
 
-def getRowsWithYearMonthTimestamp(self, row):
+def get_rows_ym_timestamp(row):
     year = row[0]
     month = row[1]
     frequency = row[2]
     date = f'{year}-{month:02d}-01'
-    return self.dateToTimestamp(date), frequency
+    return get_timestamp(date), frequency
 
 
-def dateToTimestamp(self, date):
+def get_timestamp(date):
     try:
-        dateObject = ciso8601.parse_datetime(date)
-        dateObject = dateObject.replace(tzinfo=datetime.timezone.utc)
-        timestamp = datetime.datetime.timestamp(dateObject) * 1000
+        date_object = ciso8601.parse_datetime(date)
+        date_object = date_object.replace(tzinfo=datetime.timezone.utc)
+        timestamp = datetime.datetime.timestamp(date_object) * 1000
     except ValueError:
         print(f"erred with date: {date}")
         return None
     return timestamp
+
+
+def get_params_for_ticket_and_settings(ticketID, settings):
+    if settings["continuous"] == 'true':
+        return (
+            settings["requestID"],
+            ticketID,
+            settings["startDate"],
+            settings["endDate"],
+            settings["averageWindow"]
+        )
+    elif settings["groupBy"] in ["gallicaYear", "gallicaMonth"]:
+        return (
+            settings["averageWindow"],
+            settings["requestID"],
+            ticketID
+        )
+    else:
+        return (
+            settings["requestID"],
+            ticketID,
+            settings["averageWindow"]
+        )
+
+
+def getDayGroupedSQL():
+    return """
+
+    WITH binned_frequencies AS (
+        SELECT year, month, day, count(*) AS mentions 
+        FROM results 
+        WHERE requestid = %s
+        AND ticketid = %s 
+        AND month IS NOT NULL
+        AND day IS NOT NULL
+        GROUP BY year, month, day 
+        ORDER BY year, month, day),
+
+        averaged_frequencies AS (
+        SELECT year, month, day, AVG(mentions) 
+        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM binned_frequencies)
+
+    SELECT year, month, day, avgFrequency::float8
+    FROM averaged_frequencies;
+
+    """
+
+
+def getDayGroupedExcludeIncompletePapersSQL():
+    return """
+
+    WITH ticket_results AS 
+        (SELECT year, month, day, papercode
+        FROM results 
+        WHERE requestid=%s
+        AND ticketid=%s
+        AND month IS NOT NULL 
+        AND day IS NOT NULL),
+
+        binned_results_only_continuous AS 
+        (SELECT year, month, day, count(*) AS mentions 
+        FROM 
+            ticket_results
+
+            JOIN papers 
+            ON ticket_results.papercode = papers.code
+                AND papers.startdate <= %s
+                AND papers.enddate >= %s
+                AND continuous IS TRUE
+            GROUP BY year, month, day 
+            ORDER BY year, month, day),
+
+        averaged_frequencies AS 
+        (SELECT year, month, day, 
+            AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM binned_results_only_continuous)
+
+    SELECT year, month, day, avgFrequency::float8
+    FROM averaged_frequencies;
+    """
+
+
+def getMonthGroupedSQL():
+    return """
+
+    WITH binned_frequencies AS
+        (SELECT year, month, count(*) AS mentions 
+        FROM results continuous
+        WHERE requestid = %s
+        AND ticketid = %s 
+        AND month IS NOT NULL
+        GROUP BY year, month
+        ORDER BY year,month),
+
+        averaged_frequencies AS 
+        (SELECT year, month, 
+                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM binned_frequencies)
+
+    SELECT year, month, avgFrequency::float8 
+    FROM averaged_frequencies;
+    """
+
+
+def getMonthGroupedExcludeIncompletePapersSQL():
+    return """
+
+    WITH ticket_results AS
+        (SELECT year, month, papercode
+        FROM results 
+        WHERE requestid=%s
+        AND ticketid=%s
+        AND month IS NOT NULL),
+
+        binned_frequencies_only_continuous AS
+            (SELECT year, month, count(*) AS mentions 
+            FROM 
+                ticket_results
+
+                JOIN papers 
+                ON ticket_results.papercode = papers.code
+                    AND papers.startdate <= %s
+                    AND papers.enddate >= %s
+                    AND continuous IS TRUE
+            GROUP BY year, month
+            ORDER BY year, month),
+
+        averaged_frequencies AS
+            (SELECT year, month, 
+                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+            FROM binned_frequencies_only_continuous)
+
+    SELECT year, month, avgFrequency::float8
+    FROM averaged_frequencies;
+    """
+
+
+def getYearGroupedSQL():
+    return """
+
+    WITH binned_frequencies AS
+        (SELECT year, count(*) AS mentions 
+        FROM results 
+        WHERE requestid=%s
+        AND ticketid = %s
+        AND year IS NOT NULL
+        GROUP BY year 
+        ORDER BY year),
+
+        averaged_frequencies AS
+        (SELECT year, 
+                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM binned_frequencies)
+
+    SELECT year, avgFrequency::float8
+    FROM averaged_frequencies;
+    """
+
+
+def getYearGroupedExcludeIncompletePapersSQL():
+    return """
+
+    WITH ticket_results AS
+        (SELECT year, papercode
+        FROM results 
+        WHERE requestid=%s
+        AND ticketid=%s
+        AND year IS NOT NULL),
+
+        binned_frequencies_only_continuous AS
+        (SELECT year, count(*) AS mentions 
+        FROM 
+            ticket_results
+
+            JOIN papers 
+            ON ticket_results.papercode = papers.code
+                AND papers.startdate <= %s
+                AND papers.enddate >= %s
+                AND continuous IS TRUE
+            GROUP BY year
+            ORDER BY year),
+
+        averaged_frequencies AS
+        (SELECT year,
+            AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM binned_frequencies_only_continuous)
+
+    SELECT year, avgFrequency::float8
+    FROM averaged_frequencies;
+    """
+
+
+def getGallicaGroupedYears():
+    return """
+    SELECT year, avgFrequency::float8 
+    FROM (
+        SELECT year, AVG(count) 
+        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM (
+            SELECT year, sum(count) as count
+            FROM groupcounts
+            WHERE requestid = %s
+            AND ticketid = %s
+            GROUP BY year
+            ORDER BY year
+        ) AS counts
+    ) AS avgedCounts;
+    """
+
+
+def getGallicaGroupedMonths():
+    return """
+    SELECT year, month, avgFrequency::float8
+    FROM (
+        SELECT year, month, AVG(count) 
+        OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+        FROM (
+            SELECT year, month, sum(count) as count
+            FROM groupcounts
+            WHERE requestid = %s
+            AND ticketid = %s
+            GROUP BY year, month
+            ORDER BY year, month
+        ) AS counts
+    ) AS avgedCounts;
+    """
