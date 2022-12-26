@@ -1,7 +1,7 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
 from typing import List, Optional
 
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI()
 requestID = 0
@@ -61,102 +61,114 @@ async def revoke_task(celery_task_id: int, request_id: int):
     return {'state': "REVOKED"}
 
 
-@app.get("/api/papers/{keyword")
+@app.get("/api/papers")
 async def papers(keyword: str):
     with build_db_conn() as conn:
         similar_papers = select_papers_similar_to_keyword(keyword, conn)
     return similar_papers
 
 
-@app.get("/api/numPapersOverRange/{start}/{end}")
+@app.get("/api/numPapersOverRange")
 async def get_num_papers_over_range(start: int, end: int):
     with build_db_conn() as conn:
         count = get_num_papers_in_range(
-            start,
-            end,
-            conn
+            start=start,
+            end=end,
+            conn=conn
         )
     return str(count)
 
 
 @app.get('/api/graphData')
-def get_graph_series_for_tickets():
-    settings = {
-        'ticketIDs': request.args["keys"],
-        'averageWindow': request.args["averageWindow"],
-        'groupBy': request.args["timeBin"],
-        'continuous': request.args["continuous"],
-        'startDate': request.args["startDate"],
-        'endDate': request.args["endDate"],
-        'requestID': request.args["requestID"]
-    }
+def get_graph_series_for_tickets(
+        tickets: int | List[int],
+        request_id: int,
+        grouping: Optional[str] = 'year',
+        average_window: Optional[int] = 0,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None
+):
     with build_db_conn() as conn:
-        items = select_series_for_tickets(settings, conn)
+        items = select_series_for_tickets(
+            tickets=tickets,
+            request_id=request_id,
+            grouping=grouping,
+            average_window=average_window,
+            start_date=start_date,
+            end_date=end_date,
+            conn=conn
+        )
     return {'series': items}
 
 
 @app.get('/api/topPapers')
-def get_top_papers():
-    ticket_ids = tuple(request.args["tickets"].split(","))
+def get_top_papers(tickets: int | List[int], request_id: int, num_results: int = 10):
     with build_db_conn() as conn:
         top_papers = select_top_papers_for_tickets(
-            tickets=ticket_ids,
-            requestID=request.args["requestID"],
+            tickets=tickets,
+            requestID=request_id,
+            num_results=num_results,
             conn=conn
         )
     return {"topPapers": top_papers}
 
 
 @app.get('/api/getcsv')
-def get_csv():
-    tickets = request.args["tickets"]
-    request_id = request.args["requestID"]
+def get_csv(tickets: int | List[int], requestID: int):
     with build_db_conn() as conn:
         csv_data = select_csv_data_for_tickets(
-            tickets,
-            request_id,
+            tickets=tickets,
+            requestID=requestID,
             conn=conn
         )
     return {"csvData": csv_data}
 
 
 @app.get('/api/getDisplayRecords')
-def records():
-    table_filters = dict(request.args)
-    table_filters['tickets'] = tuple(table_filters['tickets'].split(','))
+def records(
+        ticketID: int | List[int],
+        requestID: int,
+        term: str = None,
+        periodical: str = None,
+        year: int = None,
+        month: int = None,
+        day: int = None
+):
     with build_db_conn() as conn:
-        records, count = select_display_records(table_filters, conn)
+        records, count = select_display_records(
+            tickets=ticketID,
+            requestID=requestID,
+            term=term,
+            periodical=periodical,
+            year=year,
+            month=month,
+            day=day,
+            conn=conn
+        )
     return {
         "displayRecords": records,
         "count": count
     }
-    
-    #TODO: add request params
+
+
 @app.get('/api/getGallicaRecords')
-def fetch_gallica_records(terms: str | List[str], start_date: int = None, codes: str | List[str], link_term: str=None, link_distance: str=None, num_results: int=None, start_index: int=None):
-    """
-    Fetches a batch of volume occurrence records from Gallica.
-
-    Params are passed in the query string like so:
-    /api/getGallicaRecords?tickets=[{"terms":["brazza"],"grouping":"all","startDate":"1899","codes":[]}]&limit=5&offset=0
-
-    :param tickets: JSON-encoded array of search parameters:
-        :param terms: a list of search terms,
-        :param startDate: start date for the search,
-        :param codes: periodicals to restrict search (optional),
-        :param linkTerm: link for proximity search (optional),
-        :param linkDistance: distance for proximity search (optional),
-    :param limit: number of records to fetch
-    :param offset: offset for the records to fetch
-
-    :return: List[(terms, periodical, year, month, day, gallica url)...]
-    """
-    args = dict(request.args)
-    tickets = json.loads(args['tickets'])
+def fetch_gallica_records(
+        terms: str | List[str],
+        codes: str | List[str] = None,
+        start_date: int = None,
+        link_term: str = None,
+        link_distance: str = None,
+        num_results: int = None,
+        start_index: int = None
+):
     records = get_gallica_records_for_display(
-        tickets=tickets,
-        limit=args['limit'],
-        offset=args['offset'],
+        terms=terms,
+        codes=codes,
+        start_date=start_date,
+        link_term=link_term,
+        link_distance=link_distance,
+        num_results=num_results,
+        start_index=start_index
     )
     display_records = []
     if records:
@@ -187,3 +199,12 @@ def fetch_gallica_records(terms: str | List[str], start_date: int = None, codes:
         else:
             raise ValueError(f"Unknown record type: {type(records[0])}")
     return {"displayRecords": display_records}
+
+
+@app.get('/api/ocrtext')
+def ocr_text(ark_code: int, term: str):
+    record = get_ocr_text_for_record(
+        ark_code=ark_code,
+        term=term
+    )
+    return {"numResults": record.num_results, "text": record.pages}
