@@ -107,7 +107,7 @@ def get_top_papers():
     with build_db_conn() as conn:
         top_papers = select_top_papers_for_tickets(
             tickets=ticket_ids,
-            requestID=request.args["requestID"],
+            request_id=request.args["requestID"],
             conn=conn
         )
     return {"topPapers": top_papers}

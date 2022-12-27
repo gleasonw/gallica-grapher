@@ -1,7 +1,6 @@
 import datetime
 from dataclasses import dataclass
 from typing import List, Literal, Tuple
-
 import ciso8601
 
 

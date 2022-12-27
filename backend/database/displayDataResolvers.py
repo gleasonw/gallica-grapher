@@ -1,6 +1,7 @@
+from typing import List, Optional, Tuple
+from ticket import Ticket
 import gallicaGetter
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
-
 
 ticketResultsWithPaperName = """
 SELECT searchterm, papertitle, year, month, day, identifier
@@ -17,64 +18,84 @@ AND requestid = %(requestID)s
 """
 
 
-def select_csv_data_for_tickets(ticketIDs, requestID, conn):
-    tupledTickets = tuple(ticketIDs.split(','))
+def select_csv_data_for_tickets(ticket_ids: int | List[int], request_id: int, conn):
+    tupled_ids = tuple(ticket_ids) if isinstance(ticket_ids, list) else (ticket_ids,)
     with conn.cursor() as cur:
         cur.execute(f"""
         {ticketResultsWithPaperName}
-        """, {'tickets': tupledTickets, 'requestID': requestID})
-        csvData = cur.fetchall()
-    rowLabels = ['ngram', 'identifier', 'periodical', 'year', 'month', 'day']
-    csvData.insert(0, rowLabels)
-    return csvData
+        """, {'tickets': tupled_ids, 'requestID': request_id})
+        data = cur.fetchall()
+    row_labels = ['ngram', 'identifier', 'periodical', 'year', 'month', 'day']
+    data.insert(0, row_labels)
+    return data
 
 
-def select_display_records(tableArgs, conn):
-    year = tableArgs.get('year')
-    month = tableArgs.get('month')
-    day = tableArgs.get('day')
-    term = tableArgs.get('term')
-    periodical = tableArgs.get('periodical')
+def select_display_records(
+        ticket_ids: int | List[int],
+        request_id: int,
+        conn,
+        term: Optional[str] = None,
+        periodical: Optional[str] = None,
+        year: Optional[int] = None,
+        month: Optional[int] = None,
+        day: Optional[int] = None,
+        limit: int = 10,
+        offset: int = 0,
+) -> Tuple[List, int]:
+    args = [tuple(ticket_ids) if isinstance(ticket_ids, list) else (ticket_ids,), request_id]
     if periodical:
-        tableArgs['periodical'] = '%' + periodical.lower() + '%'
-    tableArgsSelect = f"""
+        periodical = '%' + periodical.lower() + '%'
+        args.append(periodical)
+    if term:
+        term = '%' + term.lower() + '%'
+        args.append(term)
+    year and args.append(year)
+    month and args.append(month)
+    day and args.append(day)
+    args.append(limit)
+    args.append(offset)
+    args = tuple(args)
+    selects = f"""
     {'AND year = %(year)s' if year else ''}
     {'AND month = %(month)s' if month else ''}
     {'AND day = %(day)s' if day else ''}
     {'AND searchterm = %(term)s' if term else ''}
     {'AND LOWER(papertitle) LIKE %(periodical)s' if periodical else ''}
     """
-    limitOrderingOffset = f"""
+    limit_ordering_offset = f"""
     ORDER BY year, month, day
     LIMIT %(limit)s
     OFFSET %(offset)s
     """
     with conn.cursor() as cur:
-
         cur.execute(f"""
         {ticketResultsWithPaperName}
-        {tableArgsSelect}
-        {limitOrderingOffset}
-        """, tableArgs)
+        {selects}
+        {limit_ordering_offset}
+        """, args)
         records = cur.fetchall()
 
         cur.execute(f"""
         {countResultsSelect}
-        {tableArgsSelect}
-        """, tableArgs)
-        count = cur.fetchone()[0]
+        {selects}
+        """, args)
+        total = cur.fetchone()[0]
 
-    return records, count
+    return records, total
 
 
-def get_ocr_text_for_record(ark, term):
+def get_ocr_text_for_record(ark_code: int, term: str):
     wrapper = gallicaGetter.connect('content')
     if ' ' in term:
         term = '"' + term + '"'
-    return wrapper.get(ark, term)[0]
+    return wrapper.get(ark_code, term)[0]
 
 
-def get_gallica_records_for_display(tickets, limit : str, offset: str):
+def get_gallica_records_for_display(
+        tickets: Ticket | List[Ticket],
+        limit: int = None,
+        offset: int = None,
+):
     wrapper: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
     records = []
     for ticket in tickets:
@@ -99,7 +120,12 @@ def clear_records_for_requestid(requestID, conn):
         """, (requestID,))
 
 
-def select_top_papers_for_tickets(tickets, requestID, conn):
+def select_top_papers_for_tickets(
+        tickets: int | List[int],
+        request_id: int,
+        conn,
+        num_results: int = 10,
+):
     with conn.cursor() as cursor:
         cursor.execute("""
         WITH resultCounts AS (
@@ -109,13 +135,12 @@ def select_top_papers_for_tickets(tickets, requestID, conn):
             AND ticketid in %s
             GROUP BY papercode
             ORDER BY papercount DESC
-            LIMIT 10
+            LIMIT %s
         )
         SELECT title, papercount
             FROM resultCounts
             JOIN
             papers
             ON resultCounts.papercode = papers.code;
-        """, (requestID, tickets,))
+        """, (request_id, tickets, num_results))
         return cursor.fetchall()
-
