@@ -59,13 +59,12 @@ def build_highcharts_series(
         sql=get_sql_for_grouping(grouping),
         conn=conn
     )
-    match grouping:
-        case "day":
-            data_with_proper_date_format = list(map(get_rows_ymd_timestamp, data))
-        case ["month" | "gallicaMonth"]:
-            data_with_proper_date_format = list(map(get_rows_ym_timestamp, data))
-        case _:
-            data_with_proper_date_format = data
+    if grouping == 'day':
+        data_with_proper_date_format = list(map(get_rows_ymd_timestamp, data))
+    elif grouping == 'month' or grouping =='gallicaMonth':
+        data_with_proper_date_format = list(map(get_rows_ym_timestamp, data))
+    else:
+        data_with_proper_date_format = data
     search_terms = get_search_terms_by_grouping(
         grouping=grouping,
         ticket_id=ticket_id,
@@ -82,15 +81,105 @@ def build_highcharts_series(
 def get_sql_for_grouping(grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"]):
     match grouping:
         case "day":
-            return getDayGroupedSQL()
+            return """
+
+            WITH binned_frequencies AS (
+                SELECT year, month, day, count(*) AS mentions 
+                FROM results 
+                WHERE requestid = %s
+                AND ticketid = %s 
+                AND month IS NOT NULL
+                AND day IS NOT NULL
+                GROUP BY year, month, day 
+                ORDER BY year, month, day),
+
+                averaged_frequencies AS (
+                SELECT year, month, day, AVG(mentions) 
+                OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+                FROM binned_frequencies)
+
+            SELECT year, month, day, avgFrequency::float8
+            FROM averaged_frequencies;
+
+            """
         case "month":
-            return getMonthGroupedSQL()
+            return """
+
+            WITH binned_frequencies AS
+                (SELECT year, month, count(*) AS mentions 
+                FROM results continuous
+                WHERE requestid = %s
+                AND ticketid = %s 
+                AND month IS NOT NULL
+                GROUP BY year, month
+                ORDER BY year,month),
+
+                averaged_frequencies AS 
+                (SELECT year, month, 
+                        AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+                FROM binned_frequencies)
+
+            SELECT year, month, avgFrequency::float8 
+            FROM averaged_frequencies;
+            
+            """
         case "year":
-            return getYearGroupedSQL()
+            return """
+
+            WITH binned_frequencies AS
+                (SELECT year, count(*) AS mentions 
+                FROM results 
+                WHERE requestid=%s
+                AND ticketid = %s
+                AND year IS NOT NULL
+                GROUP BY year 
+                ORDER BY year),
+
+                averaged_frequencies AS
+                (SELECT year, 
+                        AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+                FROM binned_frequencies)
+
+            SELECT year, avgFrequency::float8
+            FROM averaged_frequencies;
+            
+            """
         case "gallicaYear":
-            return getGallicaGroupedYears()
+            return """
+            
+            SELECT year, avgFrequency::float8 
+            FROM (
+                SELECT year, AVG(count) 
+                OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+                FROM (
+                    SELECT year, sum(count) as count
+                    FROM groupcounts
+                    WHERE requestid = %s
+                    AND ticketid = %s
+                    GROUP BY year
+                    ORDER BY year
+                ) AS counts
+            ) AS avgedCounts;
+            
+            """
         case "gallicaMonth":
-            return getGallicaGroupedMonths()
+            return """
+            
+            SELECT year, month, avgFrequency::float8
+            FROM (
+                SELECT year, month, AVG(count) 
+                OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
+                FROM (
+                    SELECT year, month, sum(count) as count
+                    FROM groupcounts
+                    WHERE requestid = %s
+                    AND ticketid = %s
+                    GROUP BY year, month
+                    ORDER BY year, month
+                ) AS counts
+            ) AS avgedCounts;
+            
+            """
 
 
 def get_search_terms_by_grouping(
@@ -174,207 +263,3 @@ def get_params_for_ticket_and_settings(ticketID, settings):
             ticketID,
             settings["averageWindow"]
         )
-
-
-def getDayGroupedSQL():
-    return """
-
-    WITH binned_frequencies AS (
-        SELECT year, month, day, count(*) AS mentions 
-        FROM results 
-        WHERE requestid = %s
-        AND ticketid = %s 
-        AND month IS NOT NULL
-        AND day IS NOT NULL
-        GROUP BY year, month, day 
-        ORDER BY year, month, day),
-
-        averaged_frequencies AS (
-        SELECT year, month, day, AVG(mentions) 
-        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM binned_frequencies)
-
-    SELECT year, month, day, avgFrequency::float8
-    FROM averaged_frequencies;
-
-    """
-
-
-def getDayGroupedExcludeIncompletePapersSQL():
-    return """
-
-    WITH ticket_results AS 
-        (SELECT year, month, day, papercode
-        FROM results 
-        WHERE requestid=%s
-        AND ticketid=%s
-        AND month IS NOT NULL 
-        AND day IS NOT NULL),
-
-        binned_results_only_continuous AS 
-        (SELECT year, month, day, count(*) AS mentions 
-        FROM 
-            ticket_results
-
-            JOIN papers 
-            ON ticket_results.papercode = papers.code
-                AND papers.startdate <= %s
-                AND papers.enddate >= %s
-                AND continuous IS TRUE
-            GROUP BY year, month, day 
-            ORDER BY year, month, day),
-
-        averaged_frequencies AS 
-        (SELECT year, month, day, 
-            AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM binned_results_only_continuous)
-
-    SELECT year, month, day, avgFrequency::float8
-    FROM averaged_frequencies;
-    """
-
-
-def getMonthGroupedSQL():
-    return """
-
-    WITH binned_frequencies AS
-        (SELECT year, month, count(*) AS mentions 
-        FROM results continuous
-        WHERE requestid = %s
-        AND ticketid = %s 
-        AND month IS NOT NULL
-        GROUP BY year, month
-        ORDER BY year,month),
-
-        averaged_frequencies AS 
-        (SELECT year, month, 
-                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM binned_frequencies)
-
-    SELECT year, month, avgFrequency::float8 
-    FROM averaged_frequencies;
-    """
-
-
-def getMonthGroupedExcludeIncompletePapersSQL():
-    return """
-
-    WITH ticket_results AS
-        (SELECT year, month, papercode
-        FROM results 
-        WHERE requestid=%s
-        AND ticketid=%s
-        AND month IS NOT NULL),
-
-        binned_frequencies_only_continuous AS
-            (SELECT year, month, count(*) AS mentions 
-            FROM 
-                ticket_results
-
-                JOIN papers 
-                ON ticket_results.papercode = papers.code
-                    AND papers.startdate <= %s
-                    AND papers.enddate >= %s
-                    AND continuous IS TRUE
-            GROUP BY year, month
-            ORDER BY year, month),
-
-        averaged_frequencies AS
-            (SELECT year, month, 
-                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-            FROM binned_frequencies_only_continuous)
-
-    SELECT year, month, avgFrequency::float8
-    FROM averaged_frequencies;
-    """
-
-
-def getYearGroupedSQL():
-    return """
-
-    WITH binned_frequencies AS
-        (SELECT year, count(*) AS mentions 
-        FROM results 
-        WHERE requestid=%s
-        AND ticketid = %s
-        AND year IS NOT NULL
-        GROUP BY year 
-        ORDER BY year),
-
-        averaged_frequencies AS
-        (SELECT year, 
-                AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM binned_frequencies)
-
-    SELECT year, avgFrequency::float8
-    FROM averaged_frequencies;
-    """
-
-
-def getYearGroupedExcludeIncompletePapersSQL():
-    return """
-
-    WITH ticket_results AS
-        (SELECT year, papercode
-        FROM results 
-        WHERE requestid=%s
-        AND ticketid=%s
-        AND year IS NOT NULL),
-
-        binned_frequencies_only_continuous AS
-        (SELECT year, count(*) AS mentions 
-        FROM 
-            ticket_results
-
-            JOIN papers 
-            ON ticket_results.papercode = papers.code
-                AND papers.startdate <= %s
-                AND papers.enddate >= %s
-                AND continuous IS TRUE
-            GROUP BY year
-            ORDER BY year),
-
-        averaged_frequencies AS
-        (SELECT year,
-            AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM binned_frequencies_only_continuous)
-
-    SELECT year, avgFrequency::float8
-    FROM averaged_frequencies;
-    """
-
-
-def getGallicaGroupedYears():
-    return """
-    SELECT year, avgFrequency::float8 
-    FROM (
-        SELECT year, AVG(count) 
-        OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM (
-            SELECT year, sum(count) as count
-            FROM groupcounts
-            WHERE requestid = %s
-            AND ticketid = %s
-            GROUP BY year
-            ORDER BY year
-        ) AS counts
-    ) AS avgedCounts;
-    """
-
-
-def getGallicaGroupedMonths():
-    return """
-    SELECT year, month, avgFrequency::float8
-    FROM (
-        SELECT year, month, AVG(count) 
-        OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-        FROM (
-            SELECT year, month, sum(count) as count
-            FROM groupcounts
-            WHERE requestid = %s
-            AND ticketid = %s
-            GROUP BY year, month
-            ORDER BY year, month
-        ) AS counts
-    ) AS avgedCounts;
-    """
