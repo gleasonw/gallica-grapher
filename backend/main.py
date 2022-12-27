@@ -27,19 +27,20 @@ requestID = 0
 
 @app.get("/")
 def index():
-    return {"message": "Hello World"}
+    return {"message": "ok"}
 
 
 @app.post("/api/init")
-def init(ticket: Ticket):
+def init(ticket: Ticket | List[Ticket]):
     global requestID
     requestID += 1
     print(ticket)
-    return {"taskid": requestID, "requestid": requestID}
+    task = spawn_request.delay(ticket, requestID)
+    return {"taskid": task.id, "requestid": requestID}
 
 
 @app.get("/poll/progress/{task_id}")
-def get_request_state(task_id: int):
+def poll_request_state(task_id: int):
     task = spawn_request.AsyncResult(task_id)
     if task.ready():
         response = {
@@ -57,7 +58,7 @@ def get_request_state(task_id: int):
 
 
 @app.get("api/revokeTask/{celery_task_id}/{request_id}")
-async def revoke_task(celery_task_id: int, request_id: int):
+def revoke_task(celery_task_id: int, request_id: int):
     with build_db_conn() as conn:
         task = spawn_request.AsyncResult(celery_task_id)
         task.revoke(terminate=True)
@@ -65,15 +66,15 @@ async def revoke_task(celery_task_id: int, request_id: int):
     return {'state': "REVOKED"}
 
 
-@app.get("/api/papers")
-async def papers(keyword: str):
+@app.get("/api/papers/{keyword}")
+def papers(keyword: str):
     with build_db_conn() as conn:
         similar_papers = select_papers_similar_to_keyword(keyword, conn)
     return similar_papers
 
 
-@app.get("/api/numPapersOverRange")
-async def get_num_papers_over_range(start: int, end: int):
+@app.get("/api/numPapersOverRange/{start}/{end}")
+def get_num_papers_over_range(start: int, end: int):
     with build_db_conn() as conn:
         count = get_num_papers_in_range(
             start=start,
@@ -114,11 +115,11 @@ def get_top_papers(tickets: int | List[int], request_id: int, num_results: int =
 
 
 @app.get('/api/getcsv')
-def get_csv(tickets: int | List[int], requestID: int):
+def get_csv(tickets: int | List[int], request_id: int):
     with build_db_conn() as conn:
         csv_data = select_csv_data_for_tickets(
             ticket_ids=tickets,
-            request_id=requestID,
+            request_id=request_id,
             conn=conn
         )
     return {"csvData": csv_data}
