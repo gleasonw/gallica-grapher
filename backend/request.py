@@ -1,6 +1,8 @@
 import threading
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Callable, Dict
+from typing import List, Optional, Tuple, Callable
+
+import redis
 
 import gallicaGetter
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
@@ -9,7 +11,7 @@ from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from search import get_and_insert_records_for_args
 from ticket import Ticket
 from ticketWithCachedResponse import TicketWithCachedResponse
-from database.connContext import build_db_conn
+from database import connContext
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -20,7 +22,7 @@ class Request(threading.Thread):
         self.numResultsDiscovered = 0
         self.state = 'RUNNING'
         self.requestID = identifier
-        self.tickets : List[Ticket] = tickets
+        self.tickets: List[Ticket] = tickets
         self.progress_stats = {
             ticket.id: SearchProgressStats(
                 ticketID=ticket.id,
@@ -36,7 +38,7 @@ class Request(threading.Thread):
         self.progress_stats[ticket_id].total_items = total_records
 
     def run(self):
-        with self.conn or build_db_conn() as db_conn:
+        with self.conn or connContext.build_db_conn() as db_conn:
             db_space_remaining = MAX_DB_SIZE - self.get_number_rows_in_db(conn=db_conn) - 10000
             self.num_records, self.tickets = get_num_records_for_args(
                 self.tickets,
@@ -83,7 +85,16 @@ class Request(threading.Thread):
 
     def update_progress_and_post_redis(self, ticket_id: int, progress_stats: ProgressUpdate):
         self.progress_stats[ticket_id].update_progress(progress_stats)
-        self.post_redis()
+        # update redis
+        redis_conn = redis.Redis(host='localhost', port=6379, db=0)
+        progress_dict = {
+            ticket.id: self.progress_stats[ticket.id].to_dict()
+            for ticket in self.tickets
+        }
+        redis_conn.set(
+            f'request:{self.requestID}:progress',
+            str(progress_dict)
+        )
 
     def get_number_rows_in_db(self, conn):
         with conn.cursor() as curs:
