@@ -1,13 +1,14 @@
 import threading
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Callable
-from database.connContext import build_db_conn
 
 import gallicaGetter
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from search import get_and_insert_records_for_args
 from ticket import Ticket
+from ticketWithCachedResponse import TicketWithCachedResponse
+from database.connContext import build_db_conn
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -18,7 +19,7 @@ class Request(threading.Thread):
         self.numResultsDiscovered = 0
         self.state = 'RUNNING'
         self.requestID = identifier
-        self.tickets = tickets
+        self.tickets : List[Ticket] = tickets
         self.progress_stats = {
             ticket.id: SearchProgressStats(
                 ticketID=ticket.id,
@@ -118,23 +119,23 @@ def get_num_records_for_args(
         onNumRecordsFound and onNumRecordsFound(ticket.id, total_records)
     if cachable_responses:
         # create new args for args with cached responses
-        new_args_for_tickets = {}
+        new_tickets = []
         for ticket in tickets:
             if cached_queries := cachable_responses.get(ticket.id):
-                new_args_for_tickets[ticket.id] = Ticket(
+                new_tickets.append(TicketWithCachedResponse(
                     id=ticket.id,
                     terms=ticket.terms,
                     start_date=ticket.start_date,
                     end_date=ticket.end_date,
                     codes=ticket.codes,
-                    grouping=ticket.grouping,
                     link_term=ticket.link_term,
                     link_distance=ticket.link_distance,
-                    query_cache=cached_queries
-                )
+                    grouping=ticket.grouping,
+                    cached_response=cached_queries
+                ))
             else:
-                new_args_for_tickets[ticket.id] = ticket
-        tickets = new_args_for_tickets
+                new_tickets.append(ticket)
+        tickets = new_tickets
     return total_records, tickets
 
 

@@ -1,13 +1,16 @@
+from dataclasses import dataclass
 from typing import List, Optional
 
-from pydantic import BaseModel
+from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 
 
-class Ticket(BaseModel):
+@dataclass(frozen=True, slots=True)
+class TicketWithCachedResponse:
     id: int
     terms: List[str] | str
     start_date: str
     end_date: str
+    cached_response: List[OccurrenceQuery]
     codes: Optional[List[str] | str] = None
     grouping: str = 'year'
     num_results: Optional[int] = None
