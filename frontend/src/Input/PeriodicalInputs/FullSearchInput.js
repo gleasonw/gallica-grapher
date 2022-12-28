@@ -3,14 +3,12 @@ import OptionWrap from "../OptionWrap";
 import React from "react";
 
 export function FullSearchInput(props) {
-    const urlForPapersInRange = `/api/numPapersOverRange/${props.startYear}/${props.endYear}`;
+    const urlForPapersInRange = `/api/numPapersOverRange/${props.startYear || 0}/${props.endYear || 0}`;
     const result = useData(urlForPapersInRange);
-    let numPapersOverRange;
-    if (result) {
-        numPapersOverRange = result['numPapersOverRange'];
-    } else {
-        numPapersOverRange = "0";
+    if (!result) {
+        return <div>Loading...</div>;
     }
+    const numPapersInRange = result;
     return (
         <OptionWrap
             selected={props.selected === 2}
@@ -20,7 +18,7 @@ export function FullSearchInput(props) {
             onFocus={() => props.onFocus(2)}
         >
             <span className={'paperOptionHeader'}>
-                {numPapersOverRange || '...'} periodicals publishing
+                {numPapersInRange || '...'} periodicals publishing
                 at any point
             </span>
         </OptionWrap>

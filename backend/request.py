@@ -1,40 +1,29 @@
 import threading
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Tuple, Callable
+from typing import List, Optional, Tuple, Callable
 
 import gallicaGetter
-from search import get_and_insert_records_for_args
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
-from gallicaGetter.searchArgs import SearchArgs
+from search import get_and_insert_records_for_args
+from ticket import Ticket
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
 
 
 class Request(threading.Thread):
-    def __init__(self, identifier: int, arg_bundles: Dict[int, Dict], conn):
+    def __init__(self, identifier: int, tickets: List[Ticket], conn):
         self.numResultsDiscovered = 0
         self.state = 'RUNNING'
         self.requestID = identifier
-        self.args_for_searches = {
-            ticketID: SearchArgs(
-                terms=args['terms'],
-                start_date=args.get('startDate'),
-                end_date=args.get('endDate'),
-                codes=args.get('codes'),
-                grouping=args.get('grouping'),
-                link_term=args.get('linkTerm'),
-                link_distance=args.get('linkDistance'),
-            )
-            for ticketID, args in arg_bundles.items()
-        }
+        self.tickets = tickets
         self.progress_stats = {
-            key: SearchProgressStats(
-                ticketID=key,
-                grouping=args.grouping
+            ticket.id: SearchProgressStats(
+                ticketID=ticket.id,
+                grouping=ticket.grouping
             )
-            for key, args in self.args_for_searches.items()
+            for ticket in self.tickets
         }
         self.conn = conn
         self.num_records = 0
@@ -42,17 +31,17 @@ class Request(threading.Thread):
 
     def get_progress_stats(self):
         return {
-            key: self.progress_stats[key].to_dict()
-            for key in self.args_for_searches.keys()
+            ticket.id: self.progress_stats[ticket.id].to_dict()
+            for ticket in self.tickets
         }
 
-    def set_total_records_for_ticket_progress(self, ticketID: int, total_records: int):
-        self.progress_stats[ticketID].total_items = total_records
+    def set_total_records_for_ticket_progress(self, ticket_id: int, total_records: int):
+        self.progress_stats[ticket_id].total_items = total_records
 
     def run(self):
         db_space_remaining = MAX_DB_SIZE - self.get_number_rows_in_db() - 10000
-        self.num_records, self.args_for_searches = get_num_records_for_args(
-            self.args_for_searches,
+        self.num_records, self.tickets = get_num_records_for_args(
+            self.tickets,
             onNumRecordsFound=self.set_total_records_for_ticket_progress,
         )
         if self.num_records == 0:
@@ -60,35 +49,35 @@ class Request(threading.Thread):
         elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
             self.state = 'TOO_MANY_RECORDS'
         else:
-            for ticketID, args in self.args_for_searches.items():
+            for ticket in self.tickets:
 
                 # Ensure number of periods is less than number of requests to send for all occurrences
-                if args.codes and args.grouping in ['year', 'month']:
+                if ticket.codes and ticket.grouping in ['year', 'month']:
                     num_volume_occurrences = sum(
-                        query.num_results for query in get_num_records_all_volume_occurrence(args)
+                        query.num_results for query in get_num_records_all_volume_occurrence(ticket)
                     )
-                    if self.progress_stats[ticketID].total_items > (num_volume_occurrences // 50) + 1:
-                        self.progress_stats[ticketID].grouping = 'all'
-                        args = SearchArgs(
-                            terms=args.terms,
-                            start_date=args.start_date,
-                            end_date=args.end_date,
-                            codes=args.codes,
+                    if self.progress_stats[ticket.id].total_items > (num_volume_occurrences // 50) + 1:
+                        self.progress_stats[ticket.id].grouping = 'all'
+                        switched_all_ticket = Ticket(
+                            terms=ticket.terms,
+                            start_date=ticket.start_date,
+                            end_date=ticket.end_date,
+                            codes=ticket.codes,
                             grouping='all',
-                            link_term=args.link_term,
-                            link_distance=args.link_distance,
+                            link_term=ticket.link_term,
+                            link_distance=ticket.link_distance,
                         )
 
                 get_and_insert_records_for_args(
-                    ticketID=ticketID,
+                    ticketID=ticket.id,
                     requestID=self.requestID,
-                    args=args,
-                    onProgressUpdate=self.progress_stats[ticketID].update_progress,
-                    onAddingMissingPapers=lambda: self.progress_stats[ticketID].set_search_state(
+                    args=ticket,
+                    onProgressUpdate=self.progress_stats[ticket.id].update_progress,
+                    onAddingMissingPapers=lambda: self.progress_stats[ticket.id].set_search_state(
                         'ADDING_MISSING_PAPERS'),
                     conn=self.conn
                 )
-                self.progress_stats[ticketID].search_state = 'COMPLETED'
+                self.progress_stats[ticket.id].search_state = 'COMPLETED'
 
             self.state = 'COMPLETED'
 
@@ -104,44 +93,44 @@ class Request(threading.Thread):
             return curs.fetchone()[0]
 
 
-#TODO: if num records too low, switch to volume search instead of period search
+# TODO: if num records too low, switch to volume search instead of period search
 def get_num_records_for_args(
-        args_for_tickets: Dict[int, SearchArgs],
+        tickets: List[Ticket],
         onNumRecordsFound: Optional[Callable[[int, int], None]] = None
-) -> Tuple[int, Dict[int, SearchArgs]]:
+) -> Tuple[int, List[Ticket]]:
     total_records = 0
     cachable_responses = {}
-    for ticket_id, args in args_for_tickets.items():
-        if args.grouping == 'all':
-            base_queries_with_num_results = get_num_records_all_volume_occurrence(args)
+    for ticket in tickets:
+        if ticket.grouping == 'all':
+            base_queries_with_num_results = get_num_records_all_volume_occurrence(ticket)
             total_records += sum(query.num_results for query in base_queries_with_num_results)
-            cachable_responses.update({ticket_id: base_queries_with_num_results})
+            cachable_responses.update({ticket.id: base_queries_with_num_results})
         else:
             total_records += get_num_periods_in_range_for_grouping(
-                grouping=args.grouping,
-                start=args.start_date,
-                end=args.end_date
+                grouping=ticket.grouping,
+                start=ticket.start_date,
+                end=ticket.end_date
             )
-        onNumRecordsFound and onNumRecordsFound(ticket_id, total_records)
+        onNumRecordsFound and onNumRecordsFound(ticket.id, total_records)
     if cachable_responses:
         # create new args for args with cached responses
         new_args_for_tickets = {}
-        for ticket_id, args in args_for_tickets.items():
-            if cached_queries := cachable_responses.get(ticket_id):
-                new_args_for_tickets[ticket_id] = SearchArgs(
-                    terms=args.terms,
-                    start_date=args.start_date,
-                    end_date=args.end_date,
-                    codes=args.codes,
-                    grouping=args.grouping,
-                    link_term=args.link_term,
-                    link_distance=args.link_distance,
+        for ticket in tickets:
+            if cached_queries := cachable_responses.get(ticket.id):
+                new_args_for_tickets[ticket.id] = Ticket(
+                    terms=ticket.terms,
+                    start_date=ticket.start_date,
+                    end_date=ticket.end_date,
+                    codes=ticket.codes,
+                    grouping=ticket.grouping,
+                    link_term=ticket.link_term,
+                    link_distance=ticket.link_distance,
                     query_cache=cached_queries
                 )
             else:
-                new_args_for_tickets[ticket_id] = args
-        args_for_tickets = new_args_for_tickets
-    return total_records, args_for_tickets
+                new_args_for_tickets[ticket.id] = ticket
+        tickets = new_args_for_tickets
+    return total_records, tickets
 
 
 def get_num_periods_in_range_for_grouping(grouping: str, start: str, end: str) -> int:
@@ -154,7 +143,7 @@ def get_num_periods_in_range_for_grouping(grouping: str, start: str, end: str) -
         raise ValueError(f'Invalid grouping: {grouping}')
 
 
-def get_num_records_all_volume_occurrence(args: SearchArgs) -> List[OccurrenceQuery]:
+def get_num_records_all_volume_occurrence(args: Ticket) -> List[OccurrenceQuery]:
     api = gallicaGetter.connect('volume')
     base_queries_with_num_results = api.get_num_results_for_args(
         terms=args.terms,
@@ -169,7 +158,7 @@ def get_num_records_all_volume_occurrence(args: SearchArgs) -> List[OccurrenceQu
 
 @dataclass(slots=True)
 class SearchProgressStats:
-    ticketID: str
+    ticketID: int
     grouping: str
     num_items_fetched: int = 0
     total_items: int = 0

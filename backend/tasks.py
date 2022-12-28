@@ -2,13 +2,15 @@ from celery import Celery
 import time
 from request import Request
 from database.connContext import build_db_conn
+from ticket import Ticket
+from typing import List
 
 app = Celery()
 app.config_from_object('celery_settings')
 
 
 @app.task(bind=True)
-def spawn_request(self, tickets, request_id):
+def spawn_request(self, tickets: List[Ticket], request_id: int):
     with build_db_conn() as conn:
         request = Request(
             arg_bundles=tickets,

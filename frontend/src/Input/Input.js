@@ -11,16 +11,7 @@ function Input(props){
     const [termInput, setTermInput] = useState('');
     const [userSelectedPapers, setUserSelectedPapers] = useState([]);
     const [selectedPaperInput, setSelectedPaperInput] = useState(2);
-    const queryForContinuousPapers = getContinuousPaperQuery();
-    const result = useData(queryForContinuousPapers);
-    const continuousPapers = result ? result['paperNameCodes'] : [];
     const boundaryYearsForUserPapers = setUserPapersYearBoundary();
-
-    function getContinuousPaperQuery(){
-        return "api/continuousPapers?limit=2000" +
-            "&startDate=" + props.startYear +
-            "&endDate=" + props.endYear;
-    }
 
     function setUserPapersYearBoundary(){
         if(userSelectedPapers.length > 0) {
@@ -98,9 +89,7 @@ function Input(props){
     }
 
     function getPapersFor(paperInputIndex){
-        if(paperInputIndex === 0){
-            return continuousPapers
-        }else if(paperInputIndex === 1){
+        if(paperInputIndex === 1){
             return userSelectedPapers
         }else if(paperInputIndex === 2){
             return []
@@ -151,10 +140,6 @@ function Input(props){
                     selectedPaperInput={selectedPaperInput}
                     selectedSearchType={props.selectedSearchType}
                     onSearchTypeClick={(selectIndex) => props.onSearchTypeChange(selectIndex)}
-                    numContinuousPapers={continuousPapers ?
-                        continuousPapers.length :
-                        '...'
-                    }
                     requestBoxRef={props.requestBoxRef}
                     mismatchedDataOrigin={props.mismatchedDataOrigin}
                 />

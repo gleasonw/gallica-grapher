@@ -35,8 +35,7 @@ def init(ticket: Ticket | List[Ticket]):
     global requestID
     requestID += 1
     print(ticket)
-    task = spawn_request.delay(ticket, requestID)
-    return {"taskid": task.id, "requestid": requestID}
+    return {"taskid": 'nice', "requestid": requestID}
 
 
 @app.get("/poll/progress/{task_id}")
