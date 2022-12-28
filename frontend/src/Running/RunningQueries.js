@@ -37,7 +37,7 @@ function RunningQueriesUI(props) {
             "PENDING": () => null,
             "ERROR": props.onBackendError,
         }
-        const response = await fetch("/poll/progress/" + props.progressID);
+        const response = await fetch("/poll/progress/" + props.requestID);
         if (response.status === 500) {
             props.onBackendError();
         }
@@ -56,7 +56,7 @@ function RunningQueriesUI(props) {
 
     function handleCancelRequest() {
         setCancelMessage('Cancelling...');
-        fetch(`/api/revokeTask/${props.progressID}/${props.requestID}`).then(
+        fetch(`/api/revokeTask/${props.requestID}`).then(
             props.onCancelRequest
         )
     }

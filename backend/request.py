@@ -1,8 +1,7 @@
 import threading
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Callable
-
-import redis
+import json
 
 import gallicaGetter
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
@@ -49,52 +48,59 @@ class Request(threading.Thread):
             elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
                 self.state = 'TOO_MANY_RECORDS'
             else:
-                for ticket in self.tickets:
+                with connContext.build_redis_conn() as redis_conn:
+                    for ticket in self.tickets:
 
-                    # Ensure number of periods is less than number of requests to send for all occurrences
-                    if ticket.codes and ticket.grouping in ['year', 'month']:
-                        num_volume_occurrences = sum(
-                            query.num_results for query in get_num_records_all_volume_occurrence(ticket)
-                        )
-                        if self.progress_stats[ticket.id].total_items > (num_volume_occurrences // 50) + 1:
-                            self.progress_stats[ticket.id].grouping = 'all'
-                            ticket = Ticket(
-                                id=ticket.id,
-                                terms=ticket.terms,
-                                start_date=ticket.start_date,
-                                end_date=ticket.end_date,
-                                codes=ticket.codes,
-                                grouping='all',
-                                link_term=ticket.link_term,
-                                link_distance=ticket.link_distance,
+                        # Ensure number of periods is less than number of requests to send for all occurrences
+                        if ticket.codes and ticket.grouping in ['year', 'month']:
+                            num_volume_occurrences = sum(
+                                query.num_results for query in get_num_records_all_volume_occurrence(ticket)
                             )
+                            if self.progress_stats[ticket.id].total_items > (num_volume_occurrences // 50) + 1:
+                                self.progress_stats[ticket.id].grouping = 'all'
+                                ticket = Ticket(
+                                    id=ticket.id,
+                                    terms=ticket.terms,
+                                    start_date=ticket.start_date,
+                                    end_date=ticket.end_date,
+                                    codes=ticket.codes,
+                                    grouping='all',
+                                    link_term=ticket.link_term,
+                                    link_distance=ticket.link_distance,
+                                )
 
-                    get_and_insert_records_for_args(
-                        ticketID=ticket.id,
-                        requestID=self.requestID,
-                        args=ticket,
-                        onProgressUpdate=lambda stats: self.update_progress_and_post_redis(ticket.id, stats),
-                        onAddingMissingPapers=lambda: self.progress_stats[ticket.id].set_search_state(
-                            'ADDING_MISSING_PAPERS'),
-                        conn=db_conn
-                    )
-                    self.progress_stats[ticket.id].search_state = 'COMPLETED'
+                        get_and_insert_records_for_args(
+                            ticketID=ticket.id,
+                            requestID=self.requestID,
+                            args=ticket,
+                            onProgressUpdate=lambda stats: self.update_progress_and_post_redis(
+                                redis_conn=redis_conn,
+                                ticket_id=ticket.id,
+                                progress=stats
+                            ),
+                            onAddingMissingPapers=lambda: self.progress_stats[ticket.id].set_search_state(
+                                'ADDING_MISSING_PAPERS'),
+                            conn=db_conn
+                        )
+                        self.progress_stats[ticket.id].search_state = 'COMPLETED'
 
                 print('done')
                 self.state = 'COMPLETED'
 
-    def update_progress_and_post_redis(self, ticket_id: int, progress_stats: ProgressUpdate):
-        self.progress_stats[ticket_id].update_progress(progress_stats)
+    def update_progress_and_post_redis(self, ticket_id: int, progress: ProgressUpdate, redis_conn):
+        self.progress_stats[ticket_id].update_progress(progress)
         # update redis
-        redis_conn = redis.Redis(host='localhost', port=6379, db=0)
         progress_dict = {
             ticket.id: self.progress_stats[ticket.id].to_dict()
             for ticket in self.tickets
         }
         redis_conn.set(
             f'request:{self.requestID}:progress',
-            str(progress_dict)
+            json.dumps(progress_dict)
         )
+        if redis_conn.get(f'request:{self.requestID}:cancelled') == b"true":
+            redis_conn.delete(f'request:{self.requestID}:cancelled')
+            raise KeyboardInterrupt
 
     def get_number_rows_in_db(self, conn):
         with conn.cursor() as curs:
@@ -202,7 +208,6 @@ class SearchProgressStats:
             self,
             stats: ProgressUpdate
     ):
-        print(self.to_dict())
         if self.search_state == 'PENDING':
             self.search_state = 'RUNNING'
 

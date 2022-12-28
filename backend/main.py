@@ -1,9 +1,13 @@
 from typing import List, Optional, Literal
 import uvicorn
+import json
 
 from fastapi import FastAPI
 
-from database.connContext import build_db_conn
+from database.connContext import (
+    build_db_conn,
+    build_redis_conn
+)
 from database.displayDataResolvers import (
     select_display_records,
     get_gallica_records_for_display,
@@ -44,16 +48,20 @@ def init(ticket: Ticket | List[Ticket]):
     return {"requestid": requestID}
 
 
-@app.get("/poll/progress/{task_id}")
-def poll_request_state(task_id: str):
-    return {"state": "RUNNING"}
+@app.get("/poll/progress/{request_id}")
+def poll_request_state(request_id: str):
+    with build_redis_conn() as redis_conn:
+        progress = redis_conn.get(f'request:{request_id}:progress')
+    if progress is None:
+        return {"state": "PENDING"}
+    return {"state": "RUNNING", "progress": json.loads(progress)}
 
 
-@app.get("api/revokeTask/{celery_task_id}/{request_id}")
-def revoke_task(celery_task_id: int, request_id: int):
+@app.get("/api/revokeTask/{request_id}")
+def revoke_task(request_id: int):
+    with build_redis_conn() as redis_conn:
+        redis_conn.set(f"request:{request_id}:cancelled", "true")
     with build_db_conn() as conn:
-        task = spawn_request.AsyncResult(celery_task_id)
-        task.revoke(terminate=True)
         clear_records_for_requestid(request_id, conn)
     return {'state': "REVOKED"}
 
