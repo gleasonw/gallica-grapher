@@ -34,12 +34,12 @@ def index():
 def init(ticket: Ticket | List[Ticket]):
     global requestID
     requestID += 1
-    print(ticket)
-    return {"taskid": 'nice', "requestid": requestID}
+    task = spawn_request.delay(ticket, requestID)
+    return {"taskid": task.id, "requestid": requestID}
 
 
 @app.get("/poll/progress/{task_id}")
-def poll_request_state(task_id: int):
+def poll_request_state(task_id: str):
     task = spawn_request.AsyncResult(task_id)
     if task.ready():
         response = {

@@ -8,8 +8,8 @@ from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 class Ticket(BaseModel):
     id: int
     terms: List[str] | str
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
+    start_date: str
+    end_date: str
     codes: Optional[List[str] | str] = None
     grouping: str = 'year'
     num_results: Optional[int] = None

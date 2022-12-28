@@ -9,13 +9,12 @@ from gallicaGetter.gallicaWrapper import (
     VolumeOccurrenceWrapper,
     PeriodOccurrenceWrapper
 )
-from gallicaGetter.searchArgs import SearchArgs
-
+from ticket import Ticket
 
 def get_and_insert_records_for_args(
         ticketID: int,
         requestID: int,
-        args: SearchArgs,
+        args: Ticket,
         onProgressUpdate: callable,
         conn,
         api=None,
@@ -53,7 +52,7 @@ def get_and_insert_records_for_args(
 
 
 def all_volume_occurrence_search_ticket(
-        args: SearchArgs,
+        args: Ticket,
         conn,
         onProgressUpdate: callable,
         onAddingMissingPapers: callable,
@@ -85,7 +84,7 @@ def all_volume_occurrence_search_ticket(
 
 
 def pyllica_search_ticket(
-        args: SearchArgs,
+        args: Ticket,
         conn,
         requestID: int,
         ticketID: int):
@@ -99,7 +98,7 @@ def pyllica_search_ticket(
 
 
 def period_occurrence_search_ticket(
-        args: SearchArgs,
+        args: Ticket,
         requestID: int,
         ticketID: int,
         conn,

@@ -134,7 +134,9 @@ function App() {
         const completedTickets = addSearchTypeToTickets(tickets);
         const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
         //flatten tickets, make index ticketid for each ticket
-        const ticketsArray = Object.entries(ticketsWithPaperNamesRemoved).map(([id, ticket]) => ({id, ...ticket}));
+        const ticketsArray = Object.entries(ticketsWithPaperNamesRemoved).map(([id, ticket]) => (
+            {id, ...ticket, start_date: ticket.startDate, end_date: ticket.endDate}
+        ));
         const {request} = await axios.post('/api/init', ticketsArray);
         const progressID = JSON.parse(request.response)["taskid"];
         const requestID = JSON.parse(request.response)["requestid"];

@@ -58,7 +58,8 @@ class Request(threading.Thread):
                     )
                     if self.progress_stats[ticket.id].total_items > (num_volume_occurrences // 50) + 1:
                         self.progress_stats[ticket.id].grouping = 'all'
-                        switched_all_ticket = Ticket(
+                        ticket = Ticket(
+                            id=ticket.id,
                             terms=ticket.terms,
                             start_date=ticket.start_date,
                             end_date=ticket.end_date,
