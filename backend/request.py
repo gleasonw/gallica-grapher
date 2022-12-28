@@ -1,9 +1,10 @@
 import threading
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Callable
+from typing import List, Optional, Tuple, Callable, Dict
 
 import gallicaGetter
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
+from gallicaGetter.fetch.progressUpdate import ProgressUpdate
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from search import get_and_insert_records_for_args
 from ticket import Ticket
@@ -30,12 +31,6 @@ class Request(threading.Thread):
         self.conn = conn
         self.num_records = 0
         super().__init__()
-
-    def get_progress_stats(self):
-        return {
-            ticket.id: self.progress_stats[ticket.id].to_dict()
-            for ticket in self.tickets
-        }
 
     def set_total_records_for_ticket_progress(self, ticket_id: int, total_records: int):
         self.progress_stats[ticket_id].total_items = total_records
@@ -76,7 +71,7 @@ class Request(threading.Thread):
                         ticketID=ticket.id,
                         requestID=self.requestID,
                         args=ticket,
-                        onProgressUpdate=self.progress_stats[ticket.id].update_progress,
+                        onProgressUpdate=lambda stats: self.update_progress_and_post_redis(ticket.id, stats),
                         onAddingMissingPapers=lambda: self.progress_stats[ticket.id].set_search_state(
                             'ADDING_MISSING_PAPERS'),
                         conn=db_conn
@@ -85,6 +80,10 @@ class Request(threading.Thread):
 
                 print('done')
                 self.state = 'COMPLETED'
+
+    def update_progress_and_post_redis(self, ticket_id: int, progress_stats: ProgressUpdate):
+        self.progress_stats[ticket_id].update_progress(progress_stats)
+        self.post_redis()
 
     def get_number_rows_in_db(self, conn):
         with conn.cursor() as curs:
@@ -190,9 +189,7 @@ class SearchProgressStats:
 
     def update_progress(
             self,
-            elapsed_time,
-            num_workers,
-            xml
+            stats: ProgressUpdate
     ):
         print(self.to_dict())
         if self.search_state == 'PENDING':
@@ -205,17 +202,17 @@ class SearchProgressStats:
             self.num_items_fetched += 1
 
         # estimate number of seconds to completion
-        num_remaining_cycles = (self.total_items - self.num_items_fetched) / num_workers
+        num_remaining_cycles = (self.total_items - self.num_items_fetched) / stats.num_workers
         if self.grouping == 'all':
             num_remaining_cycles /= 50
 
         if self.average_response_time:
-            self.average_response_time = (self.average_response_time + elapsed_time) / 2
+            self.average_response_time = (self.average_response_time + stats.elapsed_time) / 2
         else:
-            self.average_response_time = elapsed_time
+            self.average_response_time = stats.elapsed_time
 
         # a bit of reader fluff to make the wait enjoyable
-        self.randomPaper = get_one_paper_from_record_batch(xml)
+        self.randomPaper = get_one_paper_from_record_batch(stats.xml)
         self.estimate_seconds_to_completion = self.average_response_time * num_remaining_cycles
 
 
