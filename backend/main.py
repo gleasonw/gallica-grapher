@@ -1,4 +1,5 @@
 from typing import List, Optional, Literal
+import uvicorn
 
 from fastapi import FastAPI
 
@@ -20,6 +21,7 @@ from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.parse.volumeRecords import VolumeRecord
 from tasks import spawn_request
 from ticket import Ticket
+from request import Request
 
 app = FastAPI()
 requestID = 0
@@ -34,26 +36,17 @@ def index():
 def init(ticket: Ticket | List[Ticket]):
     global requestID
     requestID += 1
-    task = spawn_request.delay(ticket, requestID)
-    return {"taskid": task.id, "requestid": requestID}
+    request = Request(
+        tickets=ticket,
+        identifier=requestID,
+    )
+    request.start()
+    return {"requestid": requestID}
 
 
 @app.get("/poll/progress/{task_id}")
 def poll_request_state(task_id: str):
-    task = spawn_request.AsyncResult(task_id)
-    if task.ready():
-        response = {
-            'state': task.result.get('state'),
-            'numRecords': task.result.get('numRecords')
-        }
-    else:
-        if task.info.get('progress') is None:
-            print('no progress')
-        response = {
-            'state': task.state,
-            'progress': task.info.get('progress', 0)
-        }
-    return response
+    return {"state": "RUNNING"}
 
 
 @app.get("api/revokeTask/{celery_task_id}/{request_id}")
@@ -197,3 +190,7 @@ def ocr_text(ark_code: int, term: str):
         term=term
     )
     return {"numResults": record.num_results, "text": record.pages}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)
