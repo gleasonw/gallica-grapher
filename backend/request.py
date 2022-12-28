@@ -99,7 +99,6 @@ class Request(threading.Thread):
             json.dumps(progress_dict)
         )
         if redis_conn.get(f'request:{self.requestID}:cancelled') == b"true":
-            redis_conn.delete(f'request:{self.requestID}:cancelled')
             raise KeyboardInterrupt
 
     def get_number_rows_in_db(self, conn):

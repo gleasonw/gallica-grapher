@@ -40,6 +40,9 @@ def index():
 def init(ticket: Ticket | List[Ticket]):
     global requestID
     requestID += 1
+    with build_redis_conn() as redis_conn:
+        redis_conn.delete(f"request:{requestID}:progress")
+        redis_conn.delete(f"request:{requestID}:cancelled")
     request = Request(
         tickets=ticket,
         identifier=requestID,
