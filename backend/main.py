@@ -191,7 +191,7 @@ def fetch_records_from_gallica(tickets: Ticket | List[Ticket]):
     return {"displayRecords": display_records}
 
 
-@app.get('/api/ocrtext')
+@app.get('/api/ocrtext/{ark_code}/{term}')
 def ocr_text(ark_code: int, term: str):
     record = get_ocr_text_for_record(
         ark_code=ark_code,
