@@ -1,9 +1,10 @@
 import io
 from typing import List
-from gallicaGetter.parse.volumeRecords import VolumeRecord
+
+import gallicaGetter
 from gallicaGetter.parse.paperRecords import PaperRecord
 from gallicaGetter.parse.periodRecords import PeriodRecord
-import gallicaGetter
+from gallicaGetter.parse.volumeRecords import VolumeRecord
 
 
 def insert_records_into_papers(records, conn):
