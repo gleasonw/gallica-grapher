@@ -22,7 +22,7 @@ function RunningQueriesUI(props) {
     const [cancelMessage, setCancelMessage] = useState('Cancel');
     const [progressStats, setProgressStats] = useState({});
     const [timeBeforeResponse, setTimeBeforeResponse] = useState(0);
-    const refreshInterval = 500;
+    const refreshInterval = 1000;
     const timeBeforeWarning = 30000;
     const responseReceived = Object.keys(progressStats).some((ticketID) => (
         progressStats[ticketID].progressPercent > 0

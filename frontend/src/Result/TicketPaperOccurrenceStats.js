@@ -4,8 +4,8 @@ import styled from "styled-components";
 
 export function TicketPaperOccurrenceStats(props) {
     const topPapersQuery =
-        "/api/topPapers?tickets=" + props.tickets +
-        "&requestID=" + props.requestID +
+        "/api/topPapers?ticket_ids=" + props.tickets +
+        "&request_id=" + props.requestID +
         "&uuid=" + props.cacheID;
 
     const result = useData(topPapersQuery);

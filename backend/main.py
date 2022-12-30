@@ -112,10 +112,14 @@ def graph_data(
 
 
 @app.get('/api/topPapers')
-def get_top_papers(tickets: List[int], request_id: int, num_results: int = 10):
+def get_top_papers(
+        request_id: int,
+        ticket_ids: List[int] = Query(),
+        num_results: int = 10
+):
     with build_db_conn() as conn:
         top_papers = select_top_papers_for_tickets(
-            tickets=tickets,
+            tickets=ticket_ids,
             request_id=request_id,
             num_results=num_results,
             conn=conn
@@ -136,8 +140,8 @@ def get_csv(tickets: int | List[int], request_id: int):
 
 @app.get('/api/getDisplayRecords')
 def records(
-        ticket_ids: int | List[int],
         request_id: int,
+        ticket_ids: List[int] = Query(),
         term: str = None,
         periodical: str = None,
         year: int = None,

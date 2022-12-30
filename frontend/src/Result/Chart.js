@@ -28,9 +28,9 @@ function Chart(props) {
         "&grouping=" + chartSettings.timeBin +
         "&average_window=" + chartSettings.averageWindow
     const result = useData(query);
-    console.log(result);
+    console.log({result});
     if (result) {
-        const series = result.series;
+        const series = result['series'];
         const graphDataWithSyncedColors = syncColors(
             series,
             allSettings);
@@ -40,6 +40,7 @@ function Chart(props) {
             props.onSeriesClick,
             data_is_from_pyllicagram
         );
+        console.log(highchartsOptions)
         return (
             <StyledChartUI>
                 <ChartSettings

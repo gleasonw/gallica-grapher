@@ -33,11 +33,12 @@ export default function DisplayRecordsTable(props) {
     function buildDBQuery(tickets) {
         let query =
             "/api/getDisplayRecords?" +
-            "tickets=" + Object.keys(tickets) +
-            "&requestID=" + props.requestID +
+            "ticket_ids=" + Object.keys(tickets) +
+            "&request_id=" + props.requestID +
+            "&term=" + props.term +
+            "&periodical=" + props.periodical +
             "&limit=" + limit +
-            "&offset=" + offset +
-            "&uniqueforcache=" + props.cacheID;
+            "&offset=" + offset
         return addFiltersToQuery(query);
     }
 
@@ -54,14 +55,17 @@ export default function DisplayRecordsTable(props) {
         } else {
             start_date = focusTicketData.startDate;
         }
-        return "/api/getGallicaRecords?" +
+        let query = "/api/getGallicaRecords?" +
             "start_date=" + start_date +
             "&terms=" + focusTicketData.terms +
             "&codes=" + focusTicketData.papersAndCodes.map(paperAndCode => paperAndCode.code) +
             "&start_index=" + offset +
-            "&num_results=" + limit +
-            "&link_term=" + focusTicketData.linkTerm +
-            "&link_distance=" + focusTicketData.linkDistance
+            "&num_results=" + limit
+        if (focusTicket.linkTerm){
+            query += "&link_term=" + focusTicket.linkTerm
+            query += "&link_distance=" + focusTicket.linkDistance
+        }
+        return query
     }
 
     function addFiltersToQuery(query) {

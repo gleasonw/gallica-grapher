@@ -1,6 +1,7 @@
 import datetime
 from dataclasses import dataclass
 from typing import List, Literal, Tuple
+
 import ciso8601
 
 
@@ -21,10 +22,13 @@ def select_series_for_tickets(
         ),
         ticket_ids
     ))
-    return {
-        series.ticket_id: series.data
+    return [
+        {
+            "name": series.name,
+            "data": series.data
+        }
         for series in batch_series
-    }
+    ]
 
 
 @dataclass(slots=True, frozen=True)
@@ -60,7 +64,7 @@ def build_highcharts_series(
     )
     if grouping == 'day':
         data_with_proper_date_format = list(map(get_rows_ymd_timestamp, data))
-    elif grouping == 'month' or grouping =='gallicaMonth':
+    elif grouping == 'month' or grouping == 'gallicaMonth':
         data_with_proper_date_format = list(map(get_rows_ym_timestamp, data))
     else:
         data_with_proper_date_format = data

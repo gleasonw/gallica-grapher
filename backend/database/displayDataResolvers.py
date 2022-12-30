@@ -31,7 +31,7 @@ def select_csv_data_for_tickets(ticket_ids: int | List[int], request_id: int, co
 
 
 def select_display_records(
-        ticket_ids: int | List[int],
+        ticket_ids: List[int],
         request_id: int,
         conn,
         term: Optional[str] = None,
@@ -129,6 +129,8 @@ def select_top_papers_for_tickets(
         conn,
         num_results: int = 10,
 ):
+    if type(tickets) is int:
+        tickets = [tickets]
     with conn.cursor() as cursor:
         cursor.execute("""
         WITH resultCounts AS (
