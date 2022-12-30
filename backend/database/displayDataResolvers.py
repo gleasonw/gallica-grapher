@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from ticket import Ticket
+
 import gallicaGetter
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
 
@@ -92,22 +92,25 @@ def get_ocr_text_for_record(ark_code: int, term: str):
 
 
 def get_gallica_records_for_display(
-        tickets: Ticket | List[Ticket],
+        terms: List[str],
+        start_date: int,
+        link_term: Optional[str],
+        link_distance: Optional[int],
+        codes: List[str] = None,
         limit: int = None,
         offset: int = None,
 ):
     wrapper: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
     records = []
-    for ticket in tickets:
-        records.extend(wrapper.get(
-            terms=ticket['terms'],
-            start_date=ticket.get('startDate'),
-            codes=ticket.get('codes'),
-            link_term=ticket.get('linkTerm'),
-            link_distance=ticket.get('linkDistance'),
-            num_results=int(limit),
-            start_index=int(offset),
-        ))
+    records.extend(wrapper.get(
+        terms=terms,
+        start_date=start_date,
+        codes=codes,
+        link_term=link_term,
+        link_distance=link_distance,
+        num_results=limit,
+        start_index=offset,
+    ))
     records.sort(key=lambda record: record.date.getDate())
     return records
 

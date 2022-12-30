@@ -1,6 +1,5 @@
 import React, {useRef, useState} from "react";
 import TicketForm from './TicketForm';
-import useData from "../shared/hooks/useData";
 import {ExampleBox} from "./ExampleBox";
 
 function Input(props){

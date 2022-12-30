@@ -17,8 +17,6 @@ require("highcharts/modules/export-data")(Highcharts);
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
-    const startDate = Object.values(props.tickets)[0].startDate;
-    const endDate = Object.values(props.tickets)[0].endDate;
     const chartRef = useRef(null);
     const data_is_from_pyllicagram = (
         chartSettings.timeBin === 'gallicaYear' ||
@@ -28,9 +26,9 @@ function Chart(props) {
         "/api/graphData?ticket_ids=" + Object.keys(props.tickets) +
         "&request_id=" + props.requestID +
         "&grouping=" + chartSettings.timeBin +
-        "&averageWindow=" + chartSettings.averageWindow
-    if(props.requestID > 0) query += `&uniqueforcache=${props.uuid}`
+        "&average_window=" + chartSettings.averageWindow
     const result = useData(query);
+    console.log(result);
     if (result) {
         const series = result.series;
         const graphDataWithSyncedColors = syncColors(
