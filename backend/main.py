@@ -55,9 +55,16 @@ def init(ticket: Ticket | List[Ticket]):
 def poll_request_state(request_id: str):
     with build_redis_conn() as redis_conn:
         progress = redis_conn.get(f'request:{request_id}:progress')
+        if progress:
+            progress = json.loads(progress)
+            request_state = progress["request_state"]
+            ticket_state = progress["ticket_state"]
+        else:
+            request_state = "PENDING"
+            ticket_state = {}
     if progress is None:
         return {"state": "PENDING"}
-    return {"state": "RUNNING", "progress": json.loads(progress)}
+    return {"state": request_state, "progress": ticket_state}
 
 
 @app.get("/api/revokeTask/{request_id}")

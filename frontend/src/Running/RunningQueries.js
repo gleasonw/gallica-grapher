@@ -31,7 +31,7 @@ function RunningQueriesUI(props) {
     useInterval(async () => {
         const requestStateCallbacks = {
             "RUNNING": () => setProgressStats(progressJSON.progress ? progressJSON.progress : progressStats),
-            "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON['numRecords']),
+            "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON.numRecords),
             "NO_RECORDS": props.onNoRecords,
             "COMPLETED": props.onFinish,
             "PENDING": () => null,
@@ -42,8 +42,7 @@ function RunningQueriesUI(props) {
             props.onBackendError();
         }
         const progressJSON = await response.json();
-        console.log(progressJSON);
-        const state = progressJSON["state"]
+        const state = progressJSON.state
         if (requestStateCallbacks.hasOwnProperty(state)) {
             requestStateCallbacks[state]()
         } else {
