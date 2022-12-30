@@ -1,7 +1,9 @@
 from concurrent.futures import ThreadPoolExecutor
-from gallicaGetter.fetch.gallicasession import GallicaSession
 from typing import List
+
+from gallicaGetter.fetch.gallicasession import GallicaSession
 from gallicaGetter.fetch.gallicasession import Response
+from gallicaGetter.fetch.progressUpdate import ProgressUpdate
 
 NUM_WORKERS = 20
 
@@ -18,8 +20,10 @@ class ConcurrentFetch:
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             for response in executor.map(self.api.get, queries):
                 onProgressUpdate and onProgressUpdate(
-                    elapsed_time=response.elapsed,
-                    num_workers=NUM_WORKERS,
-                    xml=response.xml
+                    ProgressUpdate(
+                        elapsed_time=response.elapsed,
+                        num_workers=NUM_WORKERS,
+                        xml=response.xml
+                    )
                 )
                 yield response

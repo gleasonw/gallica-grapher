@@ -1,9 +1,10 @@
 import io
 from typing import List
-from gallicaGetter.parse.volumeRecords import VolumeRecord
+
+import gallicaGetter
 from gallicaGetter.parse.paperRecords import PaperRecord
 from gallicaGetter.parse.periodRecords import PeriodRecord
-import gallicaGetter
+from gallicaGetter.parse.volumeRecords import VolumeRecord
 
 
 def insert_records_into_papers(records, conn):
@@ -112,6 +113,7 @@ def build_csv_stream_ensure_no_issue_duplicates(records: List[VolumeRecord], req
             ticketID=ticketID
         )
     csv_file_like_object.seek(0)
+    print(f'unique codes: {codes}')
     return csv_file_like_object, codes
 
 

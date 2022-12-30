@@ -9,13 +9,14 @@ from gallicaGetter.gallicaWrapper import (
     VolumeOccurrenceWrapper,
     PeriodOccurrenceWrapper
 )
-from gallicaGetter.searchArgs import SearchArgs
+from ticket import Ticket
+from ticketWithCachedResponse import TicketWithCachedResponse
 
 
 def get_and_insert_records_for_args(
         ticketID: int,
         requestID: int,
-        args: SearchArgs,
+        args: Ticket,
         onProgressUpdate: callable,
         conn,
         api=None,
@@ -24,7 +25,7 @@ def get_and_insert_records_for_args(
     match [args.grouping, bool(args.codes)]:
         case ['all', True] | ['all', False]:
             all_volume_occurrence_search_ticket(
-                args=args,
+                ticket=args,
                 requestID=requestID,
                 ticketID=ticketID,
                 conn=conn,
@@ -53,7 +54,7 @@ def get_and_insert_records_for_args(
 
 
 def all_volume_occurrence_search_ticket(
-        args: SearchArgs,
+        ticket: TicketWithCachedResponse,
         conn,
         onProgressUpdate: callable,
         onAddingMissingPapers: callable,
@@ -63,14 +64,14 @@ def all_volume_occurrence_search_ticket(
 ):
     api: VolumeOccurrenceWrapper = gallicaGetter.connect('volume', api=api)
     records = api.get(
-        terms=args.terms,
-        start_date=args.start_date,
-        end_date=args.end_date,
-        codes=args.codes,
-        link_term=args.link_term,
-        link_distance=args.link_distance,
+        terms=ticket.terms,
+        start_date=ticket.start_date,
+        end_date=ticket.end_date,
+        codes=ticket.codes,
+        link_term=ticket.link_term,
+        link_distance=ticket.link_distance,
         onProgressUpdate=onProgressUpdate,
-        query_cache=args.query_cache,
+        query_cache=ticket.cached_response,
         generate=True,
         num_workers=50
     )
@@ -85,7 +86,7 @@ def all_volume_occurrence_search_ticket(
 
 
 def pyllica_search_ticket(
-        args: SearchArgs,
+        args: Ticket,
         conn,
         requestID: int,
         ticketID: int):
@@ -99,7 +100,7 @@ def pyllica_search_ticket(
 
 
 def period_occurrence_search_ticket(
-        args: SearchArgs,
+        args: Ticket,
         requestID: int,
         ticketID: int,
         conn,

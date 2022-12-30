@@ -68,7 +68,8 @@ function App() {
                 <section>
                     <br/>
                     <p>I can't retrieve all these records for you. There are just too many of them. Try
-                    running the same request, but group by year. I don't have to pull as many records from Paris for that.</p>
+                        running the same request, but group by year. I don't have to pull as many records from Paris for
+                        that.</p>
                     <br/>
                 </section>
                 <ImportantButtonWrap
@@ -102,11 +103,11 @@ function App() {
         const newTicketID = Object.keys(tickets).length;
         const dataFromPyllica = ticket.papersAndCodes.length === 0;
         const ticketsDontMatch = Object.values(tickets).some(t => t.dataFromPyllica !== dataFromPyllica);
-        if(ticketsDontMatch) {
+        if (ticketsDontMatch) {
             alert('Searches over specific periodicals are, for now, not comparable with searches over all periodicals. Mismatching tickets are highlighted in red.')
             setMismatchedDataOrigin([true, dataFromPyllica]);
             return tickets;
-        }else{
+        } else {
             setMismatchedDataOrigin([false, dataFromPyllica]);
         }
         return {
@@ -132,9 +133,11 @@ function App() {
     async function initRequest(tickets) {
         const completedTickets = addSearchTypeToTickets(tickets);
         const ticketsWithPaperNamesRemoved = removePaperNamesFromTickets(completedTickets);
-        const {request} = await axios.post('/api/init', {
-            tickets: ticketsWithPaperNamesRemoved
-        })
+        //flatten tickets, make index ticketid for each ticket
+        const ticketsArray = Object.entries(ticketsWithPaperNamesRemoved).map(([id, ticket]) => (
+            {id, ...ticket, start_date: ticket.startDate, end_date: ticket.endDate}
+        ));
+        const {request} = await axios.post('/api/init', ticketsArray);
         const progressID = JSON.parse(request.response)["taskid"];
         const requestID = JSON.parse(request.response)["requestid"];
         if (progressID === null) {

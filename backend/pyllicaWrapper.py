@@ -1,10 +1,10 @@
 from pyllicagram import pyllicagram as pyllica
 from gallicaGetter.parse.date import Date
 from gallicaGetter.parse.periodRecords import PeriodRecord
-from gallicaGetter.searchArgs import SearchArgs
+from ticket import Ticket
 
 
-def get(args: SearchArgs):
+def get(args: Ticket):
     converted_args = {
         'recherche': args.terms,
         'somme': True,

@@ -1,4 +1,3 @@
-import backend.api as flaskAPI
 import unittest
 from unittest.mock import patch, MagicMock
 import json
