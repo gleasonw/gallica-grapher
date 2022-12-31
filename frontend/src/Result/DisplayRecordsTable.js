@@ -9,7 +9,6 @@ import LesserButton from "../shared/LesserButton";
 import {FilterOptions} from "./FilterOptions";
 import {RecordRows} from "./RecordRows";
 import {SelectionBubble} from "../shared/SelectionBubble";
-import DownloadCSVButton from "./DownloadCSVButton";
 
 export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(15);
@@ -23,7 +22,6 @@ export default function DisplayRecordsTable(props) {
     );
     const displayRecords = result ? result['displayRecords'] : null;
     const count = result ? result['count'] : null;
-    console.log(result);
 
     function handleFilterChange() {
         setOffset(0);
