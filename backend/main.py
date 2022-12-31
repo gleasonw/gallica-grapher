@@ -3,6 +3,7 @@ from typing import List, Optional, Literal
 import random
 import uvicorn
 from fastapi import FastAPI, Query
+import os
 
 from database.connContext import (
     build_db_conn,
@@ -230,4 +231,4 @@ def ocr_text(ark_code: str, term: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
