@@ -42,6 +42,10 @@ function RunningQueriesUI(props) {
             props.onBackendError();
         }
         const progressJSON = await response.json();
+        const backendGrouping = progressJSON.grouping;
+        if (backendGrouping !== props.grouping) {
+            props.onBackendGroupingChange(backendGrouping);
+        }
         const state = progressJSON.state
         if (requestStateCallbacks.hasOwnProperty(state)) {
             requestStateCallbacks[state]()

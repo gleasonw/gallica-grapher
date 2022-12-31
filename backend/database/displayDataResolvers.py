@@ -147,6 +147,7 @@ def select_top_papers_for_tickets(
             FROM resultCounts
             JOIN
             papers
-            ON resultCounts.papercode = papers.code;
+            ON resultCounts.papercode = papers.code
+            ORDER BY papercount DESC;
         """, (request_id, tickets, num_results))
         return cursor.fetchall()

@@ -1,6 +1,6 @@
 import json
 from typing import List, Optional, Literal
-
+import random
 import uvicorn
 from fastapi import FastAPI, Query
 
@@ -27,7 +27,7 @@ from request import Request
 from ticket import Ticket
 
 app = FastAPI()
-requestID = 0
+requestID = random.randint(0, 1000000000)
 
 
 @app.get("/")
@@ -221,7 +221,7 @@ def fetch_records_from_gallica(
 
 
 @app.get('/api/ocrtext/{ark_code}/{term}')
-def ocr_text(ark_code: int, term: str):
+def ocr_text(ark_code: str, term: str):
     record = get_ocr_text_for_record(
         ark_code=ark_code,
         term=term
