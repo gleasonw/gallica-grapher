@@ -184,7 +184,9 @@ def records(
 
 @app.get('/api/getGallicaRecords')
 def fetch_records_from_gallica(
-        start_date: int,
+        year: int = None,
+        month: int = None,
+        day: int = None,
         terms: List[str] = Query(),
         codes: Optional[List[str]] = Query(None),
         start_index: int = 0,
@@ -195,7 +197,9 @@ def fetch_records_from_gallica(
     gallica_records = get_gallica_records_for_display(
         terms=terms,
         codes=codes,
-        start_date=start_date,
+        year=year,
+        month=month,
+        day=day,
         offset=start_index,
         limit=num_results,
         link_term=link_term,

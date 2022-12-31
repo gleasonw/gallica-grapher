@@ -83,7 +83,7 @@ def select_display_records(
     return records, total
 
 
-def get_ocr_text_for_record(ark_code: int, term: str):
+def get_ocr_text_for_record(ark_code: str, term: str):
     wrapper = gallicaGetter.connect('content')
     if ' ' in term:
         term = '"' + term + '"'
@@ -92,15 +92,25 @@ def get_ocr_text_for_record(ark_code: int, term: str):
 
 def get_gallica_records_for_display(
         terms: List[str],
-        start_date: int,
         link_term: Optional[str],
         link_distance: Optional[int],
+        year: int,
+        month: int=None,
+        day: int=None,
         codes: List[str] = None,
         limit: int = None,
         offset: int = None,
 ):
     wrapper: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
     records = []
+    if year and month and day:
+        start_date = f'{year}-{month}-{day}'
+    elif year and month:
+        start_date = f'{year}-{month}'
+    elif year:
+        start_date = f'{year}'
+    else:
+        start_date = None
     records.extend(wrapper.get(
         terms=terms,
         start_date=start_date,
