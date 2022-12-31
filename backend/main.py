@@ -30,13 +30,7 @@ from ticket import Ticket
 
 app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "https://www.gallicagrapher.com/",
-    "https://gallicagrapher.com/",
-    "https://gallica-grapher.vercel.app/"
-]
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
