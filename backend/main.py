@@ -32,6 +32,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost",
+    "http://localhost:3000",
     "https://www.gallicagrapher.com/",
     "https://gallicagrapher.com/"
 ]
