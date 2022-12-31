@@ -9,6 +9,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
 import ClassicUIBox from "./shared/ClassicUIBox";
 import ImportantButtonWrap from "./shared/ImportantButtonWrap";
+import { Analytics } from "@vercel/analytics/react";
 
 
 function App() {
@@ -226,6 +227,7 @@ function App() {
 
     return (
         <div className="App">
+            <Analytics/>
             <Header
                 onHomeClick={handleResetValuesAndGoHome}
                 onInfoClick={() => setCurrentPage('info')}
