@@ -60,6 +60,7 @@ class Request(threading.Thread):
             )
             if self.num_records == 0:
                 self.state = 'NO_RECORDS'
+                print("NO RECORDS ~~)(~)($")
             elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
                 self.state = 'TOO_MANY_RECORDS'
             else:
