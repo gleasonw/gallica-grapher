@@ -3,6 +3,7 @@ from typing import List, Optional, Literal
 import random
 import uvicorn
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from database.connContext import (
@@ -28,6 +29,21 @@ from request import Request
 from ticket import Ticket
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "https://www.gallicagrapher.com/",
+    "https://gallicagrapher.com/"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+    
+
 requestID = random.randint(0, 1000000000)
 
 

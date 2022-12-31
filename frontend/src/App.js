@@ -137,7 +137,7 @@ function App() {
         const ticketsArray = Object.entries(ticketsWithPaperNamesRemoved).map(([id, ticket]) => (
             {id, ...ticket, start_date: ticket.startDate, end_date: ticket.endDate}
         ));
-        const {request} = await axios.post('/api/init', ticketsArray);
+        const {request} = await axios.post(`${process.env.REACT_APP_API_URL}/api/init`, ticketsArray);
         const progressID = JSON.parse(request.response)["taskid"];
         const requestID = JSON.parse(request.response)["requestid"];
         if (progressID === null) {

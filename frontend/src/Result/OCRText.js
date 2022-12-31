@@ -14,7 +14,7 @@ export default function OCRText(props) {
 
     async function handleClick() {
         setButtonText('Loading...');
-        const ocrText = await fetch(`/api/ocrtext/${props.arkCode}/${props.term}`).then(
+        const ocrText = await fetch(`${process.env.REACT_APP_API_URL}/api/ocrtext/${props.arkCode}/${props.term}`).then(
             response => response.json()
         )
         setOcrInfo(ocrText['text']);
