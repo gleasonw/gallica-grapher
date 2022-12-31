@@ -39,7 +39,7 @@ export class PaperInputBox extends React.Component {
     }
 
     async getPaperDropdownItems(searchString) {
-        const res = await fetch("/api/papers/" + searchString);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/papers/` + searchString);
         const data = await res.json();
         if (data.error) {
             this.setState({
