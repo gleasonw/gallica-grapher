@@ -23,11 +23,15 @@ function Chart(props) {
         chartSettings.timeBin === 'gallicaMonth')
         && props.tickets[0].papersAndCodes.length === 0;
     let query =
-        `${process.env.REACT_APP_API_URL}/api/graphData?ticket_ids=` + Object.keys(props.tickets) +
+        `${process.env.REACT_APP_API_URL}/api/graphData?` +
         "&request_id=" + props.requestID +
         "&grouping=" + chartSettings.timeBin +
         "&average_window=" + chartSettings.averageWindow
+    Object.keys(props.tickets).forEach(id => {
+        query += "&ticket_ids=" + id
+    });
     const result = useData(query);
+    console.log(result);
     if (result) {
         const series = result['series'];
         const graphDataWithSyncedColors = syncColors(

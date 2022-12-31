@@ -493,3 +493,14 @@ label[for="papers"],label[for="searchTerm"]{
     background-color: white;
     margin: 100px;
 }
+
+.migration-notice{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 50px;
+    border-radius: 10px;
+    background-color: white;
+    margin: 50px;
+    gap: 20px;
+}
