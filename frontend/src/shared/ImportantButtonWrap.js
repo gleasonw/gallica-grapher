@@ -8,7 +8,7 @@ const ImportantButtonWrap = styled.button`
     text-shadow: 0 1px 0 #fff;
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.225);
     transition: all 150ms;
-    color: ${props => props.color ? props.color: '#4d4d4d'};
+    color: ${props => props.color ? props.color: '#18181B'};
     border-radius: 10px;
     font-size: 30px;
     padding: 20px;

@@ -4,7 +4,7 @@ const InlineBubble = styled.div`
     padding: 5px;
     outline: none;
     appearance: none;
-    color: ${props => props.selected ? "#4d4d4d" : "#d9d9d9"};
+    color: ${props => props.selected ? "#18181B" : "#d9d9d9"};
     border: ${props => props.selected ? "0.2rem solid #ece9e2" : 'none'};
     border-radius: 5px;
     ${props => props.selected && !props.focus ? `&:hover{

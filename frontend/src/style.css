@@ -1,6 +1,6 @@
 body{
     background: #edebe9 linear-gradient(to bottom, #dbd7d1, #edebe9 116px) no-repeat;
-    color: #4d4d4d;
+    color: #18181B;
     direction: ltr;
     text-align: left;
     overflow-x: hidden;
@@ -84,11 +84,9 @@ header{
     font-size: 35px;
     margin-left: auto;
     margin-right: auto;
-    color: #4d4d4d
+    color: #18181B
 }
-.inputBody{
-    padding: 0 32px;
-}
+
 .inputUI{
     width: 100%;
     display: flex;
@@ -147,7 +145,7 @@ header{
     cursor: pointer;
     border: 1px solid #404040;
     background: rgba(186,186,186,0.05);
-    color: #4d4d4d;
+    color: #18181B;
     transition: all 150ms;
     border-radius: 10px;
     font-size: 40px;
@@ -200,7 +198,7 @@ header{
 #placeHolderTicket{
     width: 100px;
     height: 100px;
-    color: #4d4d4d;
+    color: #18181B;
     border-radius: 10px;
     border: 1px dashed #404040;
     margin: 10px;
@@ -240,7 +238,7 @@ input[type='text'],input[type='number']{
     max-width: 100%;
 }
 input#selectedPaperInput{
-    color: #4d4d4d !important;
+    color: #18181B !important;
 }
 
 .graphWarningBoxBoundary{
@@ -290,7 +288,7 @@ button, input[type="submit"], input[type="button"] {
     margin-bottom: 50px;
 }
 .seeExamplesText{
-    color: #4d4d4d;
+    color: #18181B;
     font-size: 20px;
 }
 .exampleBox{
@@ -308,7 +306,7 @@ button, input[type="submit"], input[type="button"] {
 
 .exampleBoxTitle{
     font-size: 40px;
-    color: #4d4d4d;
+    color: #18181B;
     margin-bottom: 10px;
 }
 
@@ -471,7 +469,7 @@ label[for="papers"],label[for="searchTerm"]{
     border-radius: 10px;
     border: 1px solid #d9d9d9;
     background: rgba(255,255,255,0.5);
-    color: #4d4d4d;
+    color: #18181B;
 }
 .groupedLabel{
     flex: 1;

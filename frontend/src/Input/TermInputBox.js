@@ -16,7 +16,7 @@ export function TermInputBox(props) {
             <TextInputBubble
                 noTermsReminder={props.noTermsReminder}
                 focus={focus}
-                borderRadius={'10px 10px 10px 0px'}
+                borderRadius={'10px'}
             >
                 <input
                     autoFocus
