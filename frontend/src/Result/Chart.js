@@ -126,21 +126,6 @@ function ChartSettings(props) {
                     <option value={14}>50</option>
                 </StyledSelect>
             </StyledInputAndLabel>
-            <StyledInputAndLabel display={props.periodicalRestricted || isGallicaGrouped ? 'none' : 'flex'}>
-                <label htmlFor='continuous'>Only continuous periodicals publishing over range</label>
-                <input
-                    id='continuous'
-                    type='checkbox'
-                    checked={settingsForID.continuous}
-                    onChange={e => {
-                        dispatch({
-                            type: 'setContinuous',
-                            key: props.settingsID,
-                            continuous: e.target.checked,
-                        });
-                    }}
-                />
-            </StyledInputAndLabel>
         </NavBarWrap>
     )
 }

@@ -179,10 +179,6 @@ function StyledFilterAndTable(props) {
                             requestID={props.requestID}
                             cacheID={props.cacheID}
                         />
-                        <DownloadCSVButton
-                            tickets={props.tickets}
-                            requestID={props.requestID}
-                        />
                     </div>
                 }
             </StyledFilterAndTopPapersWrap>
