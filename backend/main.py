@@ -96,8 +96,8 @@ def get_num_papers_over_range(start: int, end: int):
 
 @app.get('/api/graphData')
 def graph_data(
-        ticket_ids: int | List[int],
         request_id: int,
+        ticket_ids: int | List[int],
         grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"] = 'year',
         average_window: Optional[int] = 0,
 ):
