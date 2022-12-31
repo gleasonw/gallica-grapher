@@ -35,10 +35,10 @@ export default function DisplayRecordsTable(props) {
             "/api/getDisplayRecords?" +
             "ticket_ids=" + Object.keys(tickets) +
             "&request_id=" + props.requestID +
-            "&term=" + props.term +
-            "&periodical=" + props.periodical +
             "&limit=" + limit +
             "&offset=" + offset
+        if (props.periodical){query+="&periodical="+props.periodical}
+        if (props.term){query+="&term="+props.term}
         return addFiltersToQuery(query);
     }
 

@@ -42,19 +42,18 @@ def select_display_records(
         limit: int = 10,
         offset: int = 0,
 ) -> Tuple[List, int]:
-    args = [tuple(ticket_ids) if isinstance(ticket_ids, list) else (ticket_ids,), request_id]
+    args = {'tickets': tuple(ticket_ids), 'requestID': request_id, 'limit': limit, 'offset': offset}
     if periodical:
         periodical = '%' + periodical.lower() + '%'
-        args.append(periodical)
+        args['periodical'] = periodical
     if term:
-        term = '%' + term.lower() + '%'
-        args.append(term)
-    year and args.append(year)
-    month and args.append(month)
-    day and args.append(day)
-    args.append(limit)
-    args.append(offset)
-    args = tuple(args)
+        args['searchterm'] = term
+    if year:
+        args['year'] = year
+    if month:
+        args['month'] = month
+    if day:
+        args['day'] = day
     selects = f"""
     {'AND year = %(year)s' if year else ''}
     {'AND month = %(month)s' if month else ''}
@@ -130,7 +129,9 @@ def select_top_papers_for_tickets(
         num_results: int = 10,
 ):
     if type(tickets) is int:
-        tickets = [tickets]
+        tickets = (tickets,)
+    if type(tickets) is list:
+        tickets = tuple(tickets)
     with conn.cursor() as cursor:
         cursor.execute("""
         WITH resultCounts AS (
