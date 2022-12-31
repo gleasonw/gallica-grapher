@@ -102,12 +102,11 @@ class Request(threading.Thread):
                     self.state = 'COMPLETED'
         self.post_progress_to_redis(redis_conn)
 
-
-def update_progress_and_post_redis(self, ticket_id: int, progress: ProgressUpdate, redis_conn):
-    self.progress_stats[ticket_id].update_progress(progress)
-    self.post_progress_to_redis(redis_conn)
-    if redis_conn.get(f'request:{self.requestID}:cancelled') == b"true":
-        raise KeyboardInterrupt
+    def update_progress_and_post_redis(self, ticket_id: int, progress: ProgressUpdate, redis_conn):
+        self.progress_stats[ticket_id].update_progress(progress)
+        self.post_progress_to_redis(redis_conn)
+        if redis_conn.get(f'request:{self.requestID}:cancelled') == b"true":
+            raise KeyboardInterrupt
 
 
 def get_number_rows_in_db(conn):
@@ -163,7 +162,7 @@ def get_num_records_for_args(
     return total_records, tickets
 
 
-def get_num_periods_in_range_for_grouping(grouping: str, start: str, end: str) -> int:
+def get_num_periods_in_range_for_grouping(grouping: str, start: int, end: int) -> int:
     start, end = int(start), int(end)
     if grouping == 'year':
         return end - start + 1
@@ -240,24 +239,3 @@ class SearchProgressStats:
         self.estimate_seconds_to_completion = self.average_response_time * num_remaining_cycles
 
 
-if __name__ == '__main__':
-    import time
-    from database.connContext import build_db_conn
-
-    with build_db_conn() as conn:
-        test_request = Request(
-            identifier=1,
-            arg_bundles={
-                0: {
-                    'terms': 'brazza',
-                    'startDate': '1880',
-                    'endDate': '1930',
-                    'grouping': 'all'
-                },
-            },
-            conn=conn
-        )
-        test_request.start()
-        while test_request.is_alive():
-            print(test_request.get_progress_stats())
-            time.sleep(1)

@@ -8,8 +8,8 @@ from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 class TicketWithCachedResponse:
     id: int
     terms: List[str] | str
-    start_date: str
-    end_date: str
+    start_date: int
+    end_date: int
     cached_response: List[OccurrenceQuery]
     codes: Optional[List[str] | str] = None
     grouping: str = 'year'
