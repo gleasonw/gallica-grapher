@@ -23,7 +23,7 @@ function Chart(props) {
         chartSettings.timeBin === 'gallicaMonth')
         && props.tickets[0].papersAndCodes.length === 0;
     let query =
-        "/api/graphData?ticket_ids=" + Object.keys(props.tickets) +
+        `${process.env.REACT_APP_API_URL}/api/graphData?ticket_ids=` + Object.keys(props.tickets) +
         "&request_id=" + props.requestID +
         "&grouping=" + chartSettings.timeBin +
         "&average_window=" + chartSettings.averageWindow

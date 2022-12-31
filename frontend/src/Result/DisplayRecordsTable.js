@@ -30,7 +30,7 @@ export default function DisplayRecordsTable(props) {
 
     function buildDBQuery(tickets) {
         let query =
-            "/api/getDisplayRecords?" +
+            `${process.env.REACT_APP_API_URL}/api/getDisplayRecords?` +
             "ticket_ids=" + Object.keys(tickets) +
             "&request_id=" + props.requestID +
             "&limit=" + limit +
@@ -53,7 +53,7 @@ export default function DisplayRecordsTable(props) {
         } else {
             start_date = focusTicketData.startDate;
         }
-        let query = "/api/getGallicaRecords?" +
+        let query = `${process.env.REACT_APP_API_URL}/api/getGallicaRecords?` +
             "start_date=" + start_date +
             "&terms=" + focusTicketData.terms +
             "&codes=" + focusTicketData.papersAndCodes.map(paperAndCode => paperAndCode.code) +
