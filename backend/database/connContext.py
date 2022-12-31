@@ -53,6 +53,7 @@ def init_local_redis():
 
 
 def init_prod_redis():
+    print("Connecting to prod redis...")
     REDIS_URL = os.environ['REDIS_URL']
     conn = redis.Redis.from_url(REDIS_URL)
     return conn
