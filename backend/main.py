@@ -1,8 +1,9 @@
-from typing import List, Optional, Literal
-import uvicorn
 import json
-
-from fastapi import FastAPI
+from typing import List, Optional, Literal
+import random
+import uvicorn
+from fastapi import FastAPI, Query
+import os
 
 from database.connContext import (
     build_db_conn,
@@ -23,12 +24,11 @@ from database.paperSearchResolver import (
 )
 from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.parse.volumeRecords import VolumeRecord
-from tasks import spawn_request
-from ticket import Ticket
 from request import Request
+from ticket import Ticket
 
 app = FastAPI()
-requestID = 0
+requestID = random.randint(0, 1000000000)
 
 
 @app.get("/")
@@ -97,7 +97,7 @@ def get_num_papers_over_range(start: int, end: int):
 @app.get('/api/graphData')
 def graph_data(
         request_id: int,
-        ticket_ids: int | List[int],
+        ticket_ids: List[int] = Query(None),
         grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"] = 'year',
         average_window: Optional[int] = 0,
 ):
@@ -113,10 +113,14 @@ def graph_data(
 
 
 @app.get('/api/topPapers')
-def get_top_papers(tickets: int | List[int], request_id: int, num_results: int = 10):
+def get_top_papers(
+        request_id: int,
+        ticket_ids: List[int] = Query(),
+        num_results: int = 10
+):
     with build_db_conn() as conn:
         top_papers = select_top_papers_for_tickets(
-            tickets=tickets,
+            tickets=ticket_ids,
             request_id=request_id,
             num_results=num_results,
             conn=conn
@@ -137,8 +141,8 @@ def get_csv(tickets: int | List[int], request_id: int):
 
 @app.get('/api/getDisplayRecords')
 def records(
-        ticket_ids: int | List[int],
         request_id: int,
+        ticket_ids: List[int] = Query(),
         term: str = None,
         periodical: str = None,
         year: int = None,
@@ -167,8 +171,24 @@ def records(
 
 
 @app.get('/api/getGallicaRecords')
-def fetch_records_from_gallica(tickets: Ticket | List[Ticket]):
-    gallica_records = get_gallica_records_for_display(tickets)
+def fetch_records_from_gallica(
+        start_date: int,
+        terms: List[str] = Query(),
+        codes: Optional[List[str]] = Query(None),
+        start_index: int = 0,
+        num_results: int = 10,
+        link_term: str = None,
+        link_distance: int = None,
+):
+    gallica_records = get_gallica_records_for_display(
+        terms=terms,
+        codes=codes,
+        start_date=start_date,
+        offset=start_index,
+        limit=num_results,
+        link_term=link_term,
+        link_distance=link_distance,
+    )
     if gallica_records:
         # a procedural implementation. I feel records should not know how they should be displayed
         if isinstance(gallica_records[0], VolumeRecord):
@@ -202,7 +222,7 @@ def fetch_records_from_gallica(tickets: Ticket | List[Ticket]):
 
 
 @app.get('/api/ocrtext/{ark_code}/{term}')
-def ocr_text(ark_code: int, term: str):
+def ocr_text(ark_code: str, term: str):
     record = get_ocr_text_for_record(
         ark_code=ark_code,
         term=term
@@ -211,4 +231,4 @@ def ocr_text(ark_code: int, term: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))

@@ -17,8 +17,6 @@ require("highcharts/modules/export-data")(Highcharts);
 function Chart(props) {
     const allSettings = useContext(GraphSettingsContext)
     const chartSettings = allSettings[props.settingsID];
-    const startDate = Object.values(props.tickets)[0].startDate;
-    const endDate = Object.values(props.tickets)[0].endDate;
     const chartRef = useRef(null);
     const data_is_from_pyllicagram = (
         chartSettings.timeBin === 'gallicaYear' ||
@@ -28,11 +26,11 @@ function Chart(props) {
         "/api/graphData?ticket_ids=" + Object.keys(props.tickets) +
         "&request_id=" + props.requestID +
         "&grouping=" + chartSettings.timeBin +
-        "&averageWindow=" + chartSettings.averageWindow
-    if(props.requestID > 0) query += `&uniqueforcache=${props.uuid}`
+        "&average_window=" + chartSettings.averageWindow
     const result = useData(query);
+    console.log({result});
     if (result) {
-        const series = result.series;
+        const series = result['series'];
         const graphDataWithSyncedColors = syncColors(
             series,
             allSettings);
@@ -42,6 +40,7 @@ function Chart(props) {
             props.onSeriesClick,
             data_is_from_pyllicagram
         );
+        console.log(highchartsOptions)
         return (
             <StyledChartUI>
                 <ChartSettings
@@ -126,21 +125,6 @@ function ChartSettings(props) {
                     <option value={13}>40</option>
                     <option value={14}>50</option>
                 </StyledSelect>
-            </StyledInputAndLabel>
-            <StyledInputAndLabel display={props.periodicalRestricted || isGallicaGrouped ? 'none' : 'flex'}>
-                <label htmlFor='continuous'>Only continuous periodicals publishing over range</label>
-                <input
-                    id='continuous'
-                    type='checkbox'
-                    checked={settingsForID.continuous}
-                    onChange={e => {
-                        dispatch({
-                            type: 'setContinuous',
-                            key: props.settingsID,
-                            continuous: e.target.checked,
-                        });
-                    }}
-                />
             </StyledInputAndLabel>
         </NavBarWrap>
     )

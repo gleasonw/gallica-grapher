@@ -6,8 +6,8 @@ from pydantic import BaseModel
 class Ticket(BaseModel):
     id: int
     terms: List[str] | str
-    start_date: str
-    end_date: str
+    start_date: int
+    end_date: int
     codes: Optional[List[str] | str] = None
     grouping: str = 'year'
     num_results: Optional[int] = None
