@@ -22,6 +22,7 @@ function App() {
     const [numRecords, setNumRecords] = useState(0);
     const [mismatchedDataOrigin, setMismatchedDataOrigin] = useState([false, false]);
     const requestBoxRef = useRef(null);
+    console.log(process.env.REACT_APP_API_URL)
     const pages = {
         'input':
             <Input
