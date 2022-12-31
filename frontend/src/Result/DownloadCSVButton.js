@@ -35,8 +35,8 @@ function DownloadCSVButton(props) {
 function ExportCSV(props) {
     const ticketIDs = Object.keys(props.tickets);
     const query = "/api/getcsv?" +
-        "tickets=" + ticketIDs.join(",") +
-        "&requestID=" + props.requestID;
+        "ticket_ids=" + ticketIDs.join(",") +
+        "&request_id=" + props.requestID;
     const response = useData(query);
 
     if (response) {

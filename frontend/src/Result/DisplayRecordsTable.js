@@ -23,56 +23,52 @@ export default function DisplayRecordsTable(props) {
     );
     const displayRecords = result ? result['displayRecords'] : null;
     const count = result ? result['count'] : null;
+    console.log(result);
 
     function handleFilterChange() {
         setOffset(0);
         setLimit(10);
     }
 
-    function buildDBQuery(tickets){
+    function buildDBQuery(tickets) {
         let query =
             "/api/getDisplayRecords?" +
-            "tickets=" + Object.keys(tickets) +
-            "&requestID=" + props.requestID +
+            "ticket_ids=" + Object.keys(tickets) +
+            "&request_id=" + props.requestID +
             "&limit=" + limit +
-            "&offset=" + offset +
-            "&uniqueforcache=" + props.cacheID;
+            "&offset=" + offset
+        if (props.periodical){query+="&periodical="+props.periodical}
+        if (props.term){query+="&term="+props.term}
         return addFiltersToQuery(query);
     }
 
-    function buildGallicaQuery(tickets){
-        let argsForQuery = Object.keys(tickets).map((key) => {
-            const ticket = tickets[key];
-            return {
-                terms: ticket.terms,
-                linkTerm: ticket.linkTerm,
-                linkDistance: ticket.linkDistance,
-                grouping: 'all',
-                startDate: buildDateStringForFilters() || ticket.startDate,
-                codes: ticket.papersAndCodes.map((paperAndCode) => paperAndCode.code)
-            }
-        });
-        argsForQuery = JSON.stringify(argsForQuery);
-        return "/api/getGallicaRecords?" +
-            "tickets=" + argsForQuery +
-            "&limit=" + limit +
-            "&offset=" + offset;
-    }
-
-    function buildDateStringForFilters(){
-        if(props.year && props.month && props.day){
-            return `${props.year}-${props.month}-${props.day}`
-        }else if(props.year && props.month){
-            return `${props.year}-${props.month}`
-        }else if(props.year){
-            return `${props.year}`
-        }else{
-            return null
+    function buildGallicaQuery(tickets) {
+        const focusTicket = Object.keys(tickets)[0];
+        const focusTicketData = tickets[focusTicket];
+        let start_date;
+        if (props.year && props.month && props.day) {
+            start_date = `${props.year}-${props.month}-${props.day}`
+        } else if (props.year && props.month) {
+            start_date = `${props.year}-${props.month}`
+        } else if (props.year) {
+            start_date = `${props.year}`
+        } else {
+            start_date = focusTicketData.startDate;
         }
+        let query = "/api/getGallicaRecords?" +
+            "start_date=" + start_date +
+            "&terms=" + focusTicketData.terms +
+            "&codes=" + focusTicketData.papersAndCodes.map(paperAndCode => paperAndCode.code) +
+            "&start_index=" + offset +
+            "&num_results=" + limit
+        if (focusTicket.linkTerm){
+            query += "&link_term=" + focusTicket.linkTerm
+            query += "&link_distance=" + focusTicket.linkDistance
+        }
+        return query
     }
 
-
-    function addFiltersToQuery(query){
+    function addFiltersToQuery(query) {
         if (props.year) {
             query += "&year=" + props.year;
         }
@@ -182,10 +178,6 @@ function StyledFilterAndTable(props) {
                             tickets={Object.keys(props.tickets)}
                             requestID={props.requestID}
                             cacheID={props.cacheID}
-                        />
-                        <DownloadCSVButton
-                            tickets={props.tickets}
-                            requestID={props.requestID}
                         />
                     </div>
                 }
@@ -302,28 +294,28 @@ function AppliedFilters(props) {
 }
 
 const StyledFilterAndTableWrap = styled.div`
-    display: flex;
-    flex-direction: ${props => props.compact ? 'column' : 'row'};
-    gap: 1em;
+  display: flex;
+  flex-direction: ${props => props.compact ? 'column' : 'row'};
+  gap: 1em;
 `;
 
 const StyledFilterAndTopPapersWrap = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    max-width: 20%;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  max-width: 20%;
 `;
 
 const StyledRecordsViewer = styled.div`
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    `;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
 
 const StyledAppliedFiltersTableWrap = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 `;
 
 

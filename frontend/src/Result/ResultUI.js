@@ -8,15 +8,12 @@ import LesserButton from "../shared/LesserButton";
 import {v4 as uuidv4} from 'uuid';
 
 function ResultUI(props){
-    const [grouped, setGrouped] = useState(Object.keys(props.tickets).length > 1);
+    const [grouped] = useState(Object.keys(props.tickets).length > 1);
     const [graphSettings, dispatch] = useReducer(
         settingsReducer,
         props.tickets,
         initGraphSettings)
     const [cacheID] = useState(props.requestID < 0 ? 'example' : uuidv4());
-    function handleGroupToggle(){
-        setGrouped(!grouped)
-    }
 
     return(
         <GraphSettingsContext.Provider value={graphSettings}>

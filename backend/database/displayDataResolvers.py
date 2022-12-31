@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from ticket import Ticket
+
 import gallicaGetter
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
 
@@ -31,7 +31,7 @@ def select_csv_data_for_tickets(ticket_ids: int | List[int], request_id: int, co
 
 
 def select_display_records(
-        ticket_ids: int | List[int],
+        ticket_ids: List[int],
         request_id: int,
         conn,
         term: Optional[str] = None,
@@ -42,19 +42,18 @@ def select_display_records(
         limit: int = 10,
         offset: int = 0,
 ) -> Tuple[List, int]:
-    args = [tuple(ticket_ids) if isinstance(ticket_ids, list) else (ticket_ids,), request_id]
+    args = {'tickets': tuple(ticket_ids), 'requestID': request_id, 'limit': limit, 'offset': offset}
     if periodical:
         periodical = '%' + periodical.lower() + '%'
-        args.append(periodical)
+        args['periodical'] = periodical
     if term:
-        term = '%' + term.lower() + '%'
-        args.append(term)
-    year and args.append(year)
-    month and args.append(month)
-    day and args.append(day)
-    args.append(limit)
-    args.append(offset)
-    args = tuple(args)
+        args['searchterm'] = term
+    if year:
+        args['year'] = year
+    if month:
+        args['month'] = month
+    if day:
+        args['day'] = day
     selects = f"""
     {'AND year = %(year)s' if year else ''}
     {'AND month = %(month)s' if month else ''}
@@ -92,22 +91,25 @@ def get_ocr_text_for_record(ark_code: int, term: str):
 
 
 def get_gallica_records_for_display(
-        tickets: Ticket | List[Ticket],
+        terms: List[str],
+        start_date: int,
+        link_term: Optional[str],
+        link_distance: Optional[int],
+        codes: List[str] = None,
         limit: int = None,
         offset: int = None,
 ):
     wrapper: VolumeOccurrenceWrapper = gallicaGetter.connect('volume')
     records = []
-    for ticket in tickets:
-        records.extend(wrapper.get(
-            terms=ticket['terms'],
-            start_date=ticket.get('startDate'),
-            codes=ticket.get('codes'),
-            link_term=ticket.get('linkTerm'),
-            link_distance=ticket.get('linkDistance'),
-            num_results=int(limit),
-            start_index=int(offset),
-        ))
+    records.extend(wrapper.get(
+        terms=terms,
+        start_date=start_date,
+        codes=codes,
+        link_term=link_term,
+        link_distance=link_distance,
+        num_results=limit,
+        start_index=offset,
+    ))
     records.sort(key=lambda record: record.date.getDate())
     return records
 
@@ -126,6 +128,10 @@ def select_top_papers_for_tickets(
         conn,
         num_results: int = 10,
 ):
+    if type(tickets) is int:
+        tickets = (tickets,)
+    if type(tickets) is list:
+        tickets = tuple(tickets)
     with conn.cursor() as cursor:
         cursor.execute("""
         WITH resultCounts AS (
@@ -141,6 +147,7 @@ def select_top_papers_for_tickets(
             FROM resultCounts
             JOIN
             papers
-            ON resultCounts.papercode = papers.code;
+            ON resultCounts.papercode = papers.code
+            ORDER BY papercount DESC;
         """, (request_id, tickets, num_results))
         return cursor.fetchall()

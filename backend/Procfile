@@ -1,3 +1,2 @@
-web: gunicorn wsgi:app -w 4
-worker: celery -A tasks worker --loglevel=INFO --max-memory-per-child=400000
+web: python3 main.py
 

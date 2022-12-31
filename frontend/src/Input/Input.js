@@ -1,13 +1,12 @@
 import React, {useRef, useState} from "react";
 import TicketForm from './TicketForm';
-import useData from "../shared/hooks/useData";
 import {ExampleBox} from "./ExampleBox";
 
 function Input(props){
     const exampleBoxRef = useRef(null);
     const [terms, setTerms] = useState([]);
-    const [linkTerm, setLinkTerm] = useState(null);
-    const [linkDistance, setLinkDistance] = useState(10);
+    const [linkTerm, setLinkTerm] = useState();
+    const [linkDistance, setLinkDistance] = useState();
     const [termInput, setTermInput] = useState('');
     const [userSelectedPapers, setUserSelectedPapers] = useState([]);
     const [selectedPaperInput, setSelectedPaperInput] = useState(2);

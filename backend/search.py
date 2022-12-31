@@ -54,7 +54,7 @@ def get_and_insert_records_for_args(
 
 
 def all_volume_occurrence_search_ticket(
-        ticket: TicketWithCachedResponse,
+        ticket: Ticket | TicketWithCachedResponse,
         conn,
         onProgressUpdate: callable,
         onAddingMissingPapers: callable,
@@ -71,7 +71,7 @@ def all_volume_occurrence_search_ticket(
         link_term=ticket.link_term,
         link_distance=ticket.link_distance,
         onProgressUpdate=onProgressUpdate,
-        query_cache=ticket.cached_response,
+        query_cache=type(ticket) == TicketWithCachedResponse and ticket.cached_response,
         generate=True,
         num_workers=50
     )

@@ -22,7 +22,7 @@ function RunningQueriesUI(props) {
     const [cancelMessage, setCancelMessage] = useState('Cancel');
     const [progressStats, setProgressStats] = useState({});
     const [timeBeforeResponse, setTimeBeforeResponse] = useState(0);
-    const refreshInterval = 500;
+    const refreshInterval = 1000;
     const timeBeforeWarning = 30000;
     const responseReceived = Object.keys(progressStats).some((ticketID) => (
         progressStats[ticketID].progressPercent > 0
@@ -31,7 +31,7 @@ function RunningQueriesUI(props) {
     useInterval(async () => {
         const requestStateCallbacks = {
             "RUNNING": () => setProgressStats(progressJSON.progress ? progressJSON.progress : progressStats),
-            "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON['numRecords']),
+            "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON.numRecords),
             "NO_RECORDS": props.onNoRecords,
             "COMPLETED": props.onFinish,
             "PENDING": () => null,
@@ -42,8 +42,11 @@ function RunningQueriesUI(props) {
             props.onBackendError();
         }
         const progressJSON = await response.json();
-        console.log(progressJSON);
-        const state = progressJSON["state"]
+        const backendGrouping = progressJSON.grouping;
+        if (backendGrouping !== props.grouping) {
+            props.onBackendGroupingChange(backendGrouping);
+        }
+        const state = progressJSON.state
         if (requestStateCallbacks.hasOwnProperty(state)) {
             requestStateCallbacks[state]()
         } else {

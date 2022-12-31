@@ -33,6 +33,21 @@ class Request(threading.Thread):
         self.num_records = 0
         super().__init__()
 
+    def post_progress_to_redis(self, redis_conn):
+        ticket_state = {
+            ticket.id: self.progress_stats[ticket.id].to_dict()
+            for ticket in self.tickets
+        }
+        progress_dict = {
+                "request_state" : self.state,
+                "ticket_state" : ticket_state
+                }
+        redis_conn.set(
+            f'request:{self.requestID}:progress',
+            json.dumps(progress_dict)
+        )
+
+
     def set_total_records_for_ticket_progress(self, ticket_id: int, total_records: int):
         self.progress_stats[ticket_id].total_items = total_records
 
@@ -83,21 +98,15 @@ class Request(threading.Thread):
                             conn=db_conn
                         )
                         self.progress_stats[ticket.id].search_state = 'COMPLETED'
+                        self.post_progress_to_redis(redis_conn)
 
                 print('done')
                 self.state = 'COMPLETED'
+            self.post_progress_to_redis(redis_conn)
 
     def update_progress_and_post_redis(self, ticket_id: int, progress: ProgressUpdate, redis_conn):
         self.progress_stats[ticket_id].update_progress(progress)
-        # update redis
-        progress_dict = {
-            ticket.id: self.progress_stats[ticket.id].to_dict()
-            for ticket in self.tickets
-        }
-        redis_conn.set(
-            f'request:{self.requestID}:progress',
-            json.dumps(progress_dict)
-        )
+        self.post_progress_to_redis(redis_conn)
         if redis_conn.get(f'request:{self.requestID}:cancelled') == b"true":
             raise KeyboardInterrupt
 
