@@ -34,7 +34,8 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "https://www.gallicagrapher.com/",
-    "https://gallicagrapher.com/"
+    "https://gallicagrapher.com/",
+    "https://gallica-grapher.vercel.app/"
 ]
 app.add_middleware(
     CORSMiddleware,
