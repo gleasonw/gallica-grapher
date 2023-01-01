@@ -9,7 +9,6 @@ import LesserButton from "../shared/LesserButton";
 import {FilterOptions} from "./FilterOptions";
 import {RecordRows} from "./RecordRows";
 import {SelectionBubble} from "../shared/SelectionBubble";
-import DownloadCSVButton from "./DownloadCSVButton";
 
 export default function DisplayRecordsTable(props) {
     const [limit, setLimit] = useState(15);
@@ -23,7 +22,6 @@ export default function DisplayRecordsTable(props) {
     );
     const displayRecords = result ? result['displayRecords'] : null;
     const count = result ? result['count'] : null;
-    console.log(result);
 
     function handleFilterChange() {
         setOffset(0);
@@ -32,7 +30,7 @@ export default function DisplayRecordsTable(props) {
 
     function buildDBQuery(tickets) {
         let query =
-            "/api/getDisplayRecords?" +
+            `${process.env.REACT_APP_API_URL}/api/getDisplayRecords?` +
             "ticket_ids=" + Object.keys(tickets) +
             "&request_id=" + props.requestID +
             "&limit=" + limit +
@@ -45,19 +43,8 @@ export default function DisplayRecordsTable(props) {
     function buildGallicaQuery(tickets) {
         const focusTicket = Object.keys(tickets)[0];
         const focusTicketData = tickets[focusTicket];
-        let start_date;
-        if (props.year && props.month && props.day) {
-            start_date = `${props.year}-${props.month}-${props.day}`
-        } else if (props.year && props.month) {
-            start_date = `${props.year}-${props.month}`
-        } else if (props.year) {
-            start_date = `${props.year}`
-        } else {
-            start_date = focusTicketData.startDate;
-        }
-        let query = "/api/getGallicaRecords?" +
-            "start_date=" + start_date +
-            "&terms=" + focusTicketData.terms +
+        let query = `${process.env.REACT_APP_API_URL}/api/getGallicaRecords?` +
+            "terms=" + focusTicketData.terms +
             "&codes=" + focusTicketData.papersAndCodes.map(paperAndCode => paperAndCode.code) +
             "&start_index=" + offset +
             "&num_results=" + limit
@@ -65,7 +52,8 @@ export default function DisplayRecordsTable(props) {
             query += "&link_term=" + focusTicket.linkTerm
             query += "&link_distance=" + focusTicket.linkDistance
         }
-        return query
+        return addFiltersToQuery(query);
+
     }
 
     function addFiltersToQuery(query) {

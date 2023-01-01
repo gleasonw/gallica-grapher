@@ -9,6 +9,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
 import ClassicUIBox from "./shared/ClassicUIBox";
 import ImportantButtonWrap from "./shared/ImportantButtonWrap";
+import {Analytics} from "@vercel/analytics/react";
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
     const [numRecords, setNumRecords] = useState(0);
     const [mismatchedDataOrigin, setMismatchedDataOrigin] = useState([false, false]);
     const requestBoxRef = useRef(null);
+    console.log(process.env.REACT_APP_API_URL)
     const pages = {
         'input':
             <Input
@@ -137,7 +139,7 @@ function App() {
         const ticketsArray = Object.entries(ticketsWithPaperNamesRemoved).map(([id, ticket]) => (
             {id, ...ticket, start_date: ticket.startDate, end_date: ticket.endDate}
         ));
-        const {request} = await axios.post('/api/init', ticketsArray);
+        const {request} = await axios.post(`${process.env.REACT_APP_API_URL}/api/init`, ticketsArray);
         const progressID = JSON.parse(request.response)["taskid"];
         const requestID = JSON.parse(request.response)["requestid"];
         if (progressID === null) {
@@ -225,6 +227,7 @@ function App() {
 
     return (
         <div className="App">
+            <Analytics/>
             <Header
                 onHomeClick={handleResetValuesAndGoHome}
                 onInfoClick={() => setCurrentPage('info')}

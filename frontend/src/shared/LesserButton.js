@@ -9,7 +9,7 @@ const LesserButton = styled.div`
     text-shadow: 0 1px 0 #fff;
     border: 1px solid #d9d9d9;
     transition: all 150ms;
-    color: #4d4d4d;
+    color: #18181B;
     border-radius: ${props => props.borderRadius || "10px"};
     border-top: ${props => props.borderTop || "1px solid #d9d9d9"};
     font-size: 15px;

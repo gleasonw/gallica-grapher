@@ -37,7 +37,7 @@ function RunningQueriesUI(props) {
             "PENDING": () => null,
             "ERROR": props.onBackendError,
         }
-        const response = await fetch("/poll/progress/" + props.requestID);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/progress/` + props.requestID);
         if (response.status === 500) {
             props.onBackendError();
         }

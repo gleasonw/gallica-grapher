@@ -3,6 +3,7 @@ from typing import List, Optional, Literal
 import random
 import uvicorn
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from database.connContext import (
@@ -28,6 +29,17 @@ from request import Request
 from ticket import Ticket
 
 app = FastAPI()
+
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+    
+
 requestID = random.randint(0, 1000000000)
 
 
@@ -172,7 +184,9 @@ def records(
 
 @app.get('/api/getGallicaRecords')
 def fetch_records_from_gallica(
-        start_date: int,
+        year: int = None,
+        month: int = None,
+        day: int = None,
         terms: List[str] = Query(),
         codes: Optional[List[str]] = Query(None),
         start_index: int = 0,
@@ -183,7 +197,9 @@ def fetch_records_from_gallica(
     gallica_records = get_gallica_records_for_display(
         terms=terms,
         codes=codes,
-        start_date=start_date,
+        year=year,
+        month=month,
+        day=day,
         offset=start_index,
         limit=num_results,
         link_term=link_term,

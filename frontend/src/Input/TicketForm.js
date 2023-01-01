@@ -38,7 +38,7 @@ function TicketForm(props) {
     return (
         <StyledTicketForm onSubmit={handleSubmit}>
             <StyledLabeledInput>
-                <label>View occurrences of this word:</label>
+                <StyledLabel>View occurrences of this word:</StyledLabel>
                 <TermInputBox
                     onEnterPress={handleSubmit}
                     selectedTerms={props.selectedTerms}
@@ -54,7 +54,7 @@ function TicketForm(props) {
             </StyledLabeledInput>
             <div>
                 <StyledLabeledInput>
-                    <label>in these periodicals:</label>
+                    <StyledLabel>in these periodicals:</StyledLabel>
                     <PaperInputBox
                         onClick={props.onPaperDropItemClick}
                         deletePaperBubble={props.deletePaperBubble}
@@ -67,19 +67,19 @@ function TicketForm(props) {
                         startYear={props.startYear}
                         endYear={props.endYear}
                     />
+                    <div ref={props.requestBoxRef}>
+                        <StyledRequestBox
+                            tickets={props.tickets}
+                            onTicketClick={props.onTicketClick}
+                            className={'requestBox'}
+                            onCreateTicketClick={handleCreateTicketClick}
+                            mismatchedDataOrigin={props.mismatchedDataOrigin}
+                        />
+                    </div>
                 </StyledLabeledInput>
-                <div ref={props.requestBoxRef}>
-                    <StyledRequestBox
-                        tickets={props.tickets}
-                        onTicketClick={props.onTicketClick}
-                        className={'requestBox'}
-                        onCreateTicketClick={handleCreateTicketClick}
-                        mismatchedDataOrigin={props.mismatchedDataOrigin}
-                    />
-                </div>
             </div>
             <StyledLabeledInput>
-                <label>between:</label>
+                <StyledLabel>between:</StyledLabel>
                 <DateRangeSelect
                     startYear={props.startYear}
                     endYear={props.endYear}
@@ -89,7 +89,9 @@ function TicketForm(props) {
                     justifyContent={'space-between'}
                     flexDirection={'row'}
                 />
-                <label>grouped by: </label>
+            </StyledLabeledInput>
+            <StyledLabeledInput>
+                <StyledLabel>grouped by: </StyledLabel>
                 <DateGroupSelect
                     selectedSearchType={props.selectedSearchType}
                     onDateGroupClick={props.onSearchTypeClick}
@@ -112,16 +114,23 @@ const StyledTicketForm = styled.form`
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    gap: 1rem;
+    gap: 20px;
     width: calc(100% - 2rem);
     max-width: 800px;
 `;
 
 const StyledLabeledInput = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2rem;
+  margin-top: 20px;
+  margin-bottom: 20px;
+`;
+
+const StyledLabel = styled.label`
     font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #18181B;
 `;
 
 export default TicketForm;

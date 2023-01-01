@@ -1,16 +1,16 @@
+import json
 import threading
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Callable
-import json
 
 import gallicaGetter
+from database import connContext
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.progressUpdate import ProgressUpdate
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from search import get_and_insert_records_for_args
 from ticket import Ticket
 from ticketWithCachedResponse import TicketWithCachedResponse
-from database import connContext
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -39,31 +39,30 @@ class Request(threading.Thread):
             for ticket in self.tickets
         }
         progress_dict = {
-                "request_state" : self.state,
-                "ticket_state" : ticket_state
-                }
+            "request_state": self.state,
+            "ticket_state": ticket_state
+        }
         redis_conn.set(
             f'request:{self.requestID}:progress',
             json.dumps(progress_dict)
         )
 
-
     def set_total_records_for_ticket_progress(self, ticket_id: int, total_records: int):
         self.progress_stats[ticket_id].total_items = total_records
 
     def run(self):
-        with self.conn or connContext.build_db_conn() as db_conn:
-            db_space_remaining = MAX_DB_SIZE - self.get_number_rows_in_db(conn=db_conn) - 10000
-            self.num_records, self.tickets = get_num_records_for_args(
-                self.tickets,
-                onNumRecordsFound=self.set_total_records_for_ticket_progress,
-            )
-            if self.num_records == 0:
-                self.state = 'NO_RECORDS'
-            elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
-                self.state = 'TOO_MANY_RECORDS'
-            else:
-                with connContext.build_redis_conn() as redis_conn:
+        with connContext.build_redis_conn() as redis_conn:
+            with self.conn or connContext.build_db_conn() as db_conn:
+                db_space_remaining = MAX_DB_SIZE - get_number_rows_in_db(conn=db_conn) - 10000
+                self.num_records, self.tickets = get_num_records_for_args(
+                    self.tickets,
+                    onNumRecordsFound=self.set_total_records_for_ticket_progress,
+                )
+                if self.num_records == 0:
+                    self.state = 'NO_RECORDS'
+                elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
+                    self.state = 'TOO_MANY_RECORDS'
+                else:
                     for ticket in self.tickets:
 
                         # Ensure number of periods is less than number of requests to send for all occurrences
@@ -99,10 +98,9 @@ class Request(threading.Thread):
                         )
                         self.progress_stats[ticket.id].search_state = 'COMPLETED'
                         self.post_progress_to_redis(redis_conn)
-
-                print('done')
-                self.state = 'COMPLETED'
-            self.post_progress_to_redis(redis_conn)
+                    print('done')
+                    self.state = 'COMPLETED'
+        self.post_progress_to_redis(redis_conn)
 
     def update_progress_and_post_redis(self, ticket_id: int, progress: ProgressUpdate, redis_conn):
         self.progress_stats[ticket_id].update_progress(progress)
@@ -110,16 +108,17 @@ class Request(threading.Thread):
         if redis_conn.get(f'request:{self.requestID}:cancelled') == b"true":
             raise KeyboardInterrupt
 
-    def get_number_rows_in_db(self, conn):
-        with conn.cursor() as curs:
-            curs.execute(
-                """
-                SELECT sum(reltuples)::bigint AS estimate
-                FROM pg_class
-                WHERE relname IN ('results', 'papers');
-                """
-            )
-            return curs.fetchone()[0]
+
+def get_number_rows_in_db(conn):
+    with conn.cursor() as curs:
+        curs.execute(
+            """
+            SELECT sum(reltuples)::bigint AS estimate
+            FROM pg_class
+            WHERE relname IN ('results', 'papers');
+            """
+        )
+        return curs.fetchone()[0]
 
 
 # TODO: if num records too low, switch to volume search instead of period search
@@ -163,7 +162,7 @@ def get_num_records_for_args(
     return total_records, tickets
 
 
-def get_num_periods_in_range_for_grouping(grouping: str, start: str, end: str) -> int:
+def get_num_periods_in_range_for_grouping(grouping: str, start: int, end: int) -> int:
     start, end = int(start), int(end)
     if grouping == 'year':
         return end - start + 1
@@ -240,24 +239,3 @@ class SearchProgressStats:
         self.estimate_seconds_to_completion = self.average_response_time * num_remaining_cycles
 
 
-if __name__ == '__main__':
-    import time
-    from database.connContext import build_db_conn
-
-    with build_db_conn() as conn:
-        test_request = Request(
-            identifier=1,
-            arg_bundles={
-                0: {
-                    'terms': 'brazza',
-                    'startDate': '1880',
-                    'endDate': '1930',
-                    'grouping': 'all'
-                },
-            },
-            conn=conn
-        )
-        test_request.start()
-        while test_request.is_alive():
-            print(test_request.get_progress_stats())
-            time.sleep(1)

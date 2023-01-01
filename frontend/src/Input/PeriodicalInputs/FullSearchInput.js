@@ -3,12 +3,8 @@ import OptionWrap from "../OptionWrap";
 import React from "react";
 
 export function FullSearchInput(props) {
-    const urlForPapersInRange = `/api/numPapersOverRange/${props.startYear || 0}/${props.endYear || 0}`;
-    const result = useData(urlForPapersInRange);
-    if (!result) {
-        return <div>Loading...</div>;
-    }
-    const numPapersInRange = result;
+    const urlForPapersInRange = `${process.env.REACT_APP_API_URL}/api/numPapersOverRange/${props.startYear || 0}/${props.endYear || 0}`;
+    const numPapersInRange = useData(urlForPapersInRange);
     return (
         <OptionWrap
             selected={props.selected === 2}

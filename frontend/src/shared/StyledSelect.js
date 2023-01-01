@@ -14,6 +14,6 @@ export const StyledSelect = styled.select`
     cursor: pointer;
     border: 0.2rem solid #ece9e2;
     border-radius: 5px;
-    color: #4d4d4d;
+    color: #18181B;
     height: 42px;
     `;

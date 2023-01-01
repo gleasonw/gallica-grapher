@@ -60,8 +60,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get(
             self,
             terms: List[str] | str,
-            start_date: Optional[int] = None,
-            end_date: Optional[int] = None,
+            start_date: Optional[str] = None,
+            end_date: Optional[str] = None,
             codes: Optional[List[str] | str] = None,
             generate: bool = False,
             num_results: Optional[int] = None,
