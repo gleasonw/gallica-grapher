@@ -18,7 +18,7 @@ def parse_responses_to_records(responses):
             )
 
 
-@dataclass
+@dataclass(slots=True)
 class PaperRecord:
     code: str
     title: str
