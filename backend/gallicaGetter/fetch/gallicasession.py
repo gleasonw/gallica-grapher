@@ -6,7 +6,7 @@ from requests.exceptions import RetryError
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(slots=True)
 class Response:
     xml: bytes
     query: any
