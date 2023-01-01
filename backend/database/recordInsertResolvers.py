@@ -28,6 +28,8 @@ def insert_records_into_results(
         requestID=requestID,
         ticketID=ticketID,
     )
+    if not codes:
+        return
     codes_in_db = set(match[0] for match in get_db_codes_that_match_these_codes(codes, conn))
     missing_codes = codes - codes_in_db
     if missing_codes:
