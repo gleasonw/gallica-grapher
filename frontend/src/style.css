@@ -87,6 +87,12 @@ header{
     color: #18181B
 }
 
+.github {
+    width: 30px;
+    height: 30px;
+    margin-right: 20px;
+}
+
 .inputUI{
     width: 100%;
     display: flex;

@@ -5,11 +5,12 @@ import RunningQueriesUI from "./Running/RunningQueries";
 import ResultUI from "./Result/ResultUI";
 import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
 import ClassicUIBox from "./shared/ClassicUIBox";
 import ImportantButtonWrap from "./shared/ImportantButtonWrap";
 import {Analytics} from "@vercel/analytics/react";
+import github from './assets/github.svg';
+import infoIcon from './assets/info.svg';
 
 
 function App() {
@@ -23,7 +24,6 @@ function App() {
     const [numRecords, setNumRecords] = useState(0);
     const [mismatchedDataOrigin, setMismatchedDataOrigin] = useState([false, false]);
     const requestBoxRef = useRef(null);
-    console.log(process.env.REACT_APP_API_URL)
     const pages = {
         'input':
             <Input
@@ -248,13 +248,17 @@ function Header(props) {
                 >
                     Graphing Gallica
                 </button>
-                <button
-                    className="info"
-                    onClick={props.onInfoClick}
-                    aria-label="Information page button"
-                >
-                    <InfoIcon/>
-                </button>
+                <div>
+                    <button className="info"
+                            onClick={props.onInfoClick}
+                            aria-label="Information page button"
+                    >
+                        <img src={infoIcon} alt="info icon" className={'github'}/>
+                    </button>
+                    <a href={'https://github.com/gleasonw/gallica-grapher'} target={'_blank'} rel="noopener noreferrer">
+                        <img src={github} alt={'github'} className={'github'}/>
+                    </a>
+                </div>
             </div>
         </header>
     )
