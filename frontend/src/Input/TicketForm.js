@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import DateGroupSelect from './DateGroupSelect.tsx';
+import DateGroupSelect from './DateGroupSelect.js';
 import DateRangeSelect from './DateRangeSelect.js';
 import ImportantButtonWrap from "../shared/ImportantButtonWrap";
 import {StyledRequestBox} from "./RequestBox";
