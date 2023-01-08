@@ -8,10 +8,7 @@ def parse_responses_to_records(responses: List[Response]):
     for response in responses:
         years = get_years_published(response.xml)
         code = response.query.get_code()
-        yield IssueYearRecord(
-            code=code,
-            years=years
-        )
+        yield IssueYearRecord(code=code, years=years)
 
 
 @dataclass

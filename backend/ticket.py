@@ -9,7 +9,7 @@ class Ticket(BaseModel):
     start_date: int
     end_date: int
     codes: Optional[List[str] | str] = None
-    grouping: str = 'year'
+    grouping: str = "year"
     num_results: Optional[int] = None
     start_index: Optional[int] = 0
     num_workers: Optional[int] = 15

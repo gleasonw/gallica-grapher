@@ -8,7 +8,7 @@ class Date:
     dateFormats = [
         re.compile(r"^\d{4}-\d{1,2}-\d{1,2}$"),
         re.compile(r"^\d{4}-\d{1,2}$"),
-        re.compile(r"^\d{4}$")
+        re.compile(r"^\d{4}$"),
     ]
 
     @staticmethod
@@ -29,7 +29,7 @@ class Date:
         date = [None, None, None]
         for dateFormat in Date.dateFormats:
             if dateFormat.match(dateText):
-                for index, entry in enumerate(dateText.split('-')):
+                for index, entry in enumerate(dateText.split("-")):
                     date[index] = entry
                 return date
         return date
@@ -38,7 +38,7 @@ class Date:
         pass
 
     def __repr__(self):
-        return f'Date({self.date})'
+        return f"Date({self.date})"
 
     def getDateAsList(self) -> list:
         return self.date
@@ -57,4 +57,3 @@ class Date:
 
     def __del__(self):
         del Date._cache[self.dateText]
-

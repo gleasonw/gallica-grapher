@@ -5,28 +5,21 @@ from ticket import Ticket
 
 
 def get(args: Ticket):
-    converted_args = {
-        'recherche': args.terms,
-        'somme': True,
-        'corpus': 'presse'
-    }
+    converted_args = {"recherche": args.terms, "somme": True, "corpus": "presse"}
     if start := args.start_date:
-        converted_args['debut'] = Date(start).getYear()
+        converted_args["debut"] = Date(start).getYear()
     if end := args.end_date:
-        converted_args['fin'] = Date(end).getYear()
-    if args.grouping == 'year':
-        converted_args['resolution'] = 'annee'
+        converted_args["fin"] = Date(end).getYear()
+    if args.grouping == "year":
+        converted_args["resolution"] = "annee"
     return convert_data_frame_to_grouped_record(pyllica(**converted_args))
 
 
 def convert_data_frame_to_grouped_record(frame):
-    if 'mois' not in frame.columns:
+    if "mois" not in frame.columns:
         dates = frame.annee
     else:
-        dates = frame.apply(
-            lambda row: f'{row.annee}-{row.mois:02}',
-            axis=1
-        )
+        dates = frame.apply(lambda row: f"{row.annee}-{row.mois:02}", axis=1)
     return (
         PeriodRecord(
             date=Date(date),

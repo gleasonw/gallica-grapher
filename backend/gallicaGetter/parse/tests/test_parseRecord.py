@@ -8,12 +8,11 @@ import gallicaGetter.parse.paperRecords as paperRecords
 
 
 class TestParseArkRecord(unittest.TestCase):
-
     def test_parseResponsesToRecords(self):
         test_result_generator = issues.parse_responses_to_records(
             [
-                MagicMock(xml='<test></test>'),
-                MagicMock(xml='<test></test>'),
+                MagicMock(xml="<test></test>"),
+                MagicMock(xml="<test></test>"),
             ]
         )
         for testResult in test_result_generator:
@@ -21,12 +20,11 @@ class TestParseArkRecord(unittest.TestCase):
 
 
 class TestParseGroupedRecordCounts(unittest.TestCase):
-
     def test_parse(self):
         test = periodRecords.parse_responses_to_records(
             [
-                MagicMock(xml='<test></test>'),
-                MagicMock(xml='<test></test>'),
+                MagicMock(xml="<test></test>"),
+                MagicMock(xml="<test></test>"),
             ]
         )
         for testResult in test:
@@ -34,11 +32,10 @@ class TestParseGroupedRecordCounts(unittest.TestCase):
 
 
 class TestParseOccurrenceRecords(unittest.TestCase):
-
     def test_parseResponsesToRecords(self):
         testResponses = [
-            MagicMock(xml='<test></test>'),
-            MagicMock(xml='<test></test>'),
+            MagicMock(xml="<test></test>"),
+            MagicMock(xml="<test></test>"),
         ]
         test_results = volumeRecords.parse_responses_to_records(testResponses)
         for result in test_results:
@@ -46,11 +43,10 @@ class TestParseOccurrenceRecords(unittest.TestCase):
 
 
 class TestParsePaperRecords(unittest.TestCase):
-
     def test_parseResponsesToRecords(self):
         responses = [
-            MagicMock(xml='<test></test>'),
-            MagicMock(xml='<test></test>'),
+            MagicMock(xml="<test></test>"),
+            MagicMock(xml="<test></test>"),
         ]
 
         test = paperRecords.parse_responses_to_records(responses)

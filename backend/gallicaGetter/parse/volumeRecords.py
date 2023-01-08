@@ -5,7 +5,7 @@ from gallicaGetter.parse.parseXML import (
     get_paper_title_from_record_xml,
     get_paper_code_from_record_xml,
     get_date_from_record_xml,
-    get_url_from_record
+    get_url_from_record,
 )
 
 

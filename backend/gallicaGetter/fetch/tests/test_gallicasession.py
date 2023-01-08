@@ -4,15 +4,12 @@ from unittest import TestCase
 
 
 class TestGallicaSession(TestCase):
-
     def setUp(self) -> None:
-        self.getter = GallicaSession('test')
+        self.getter = GallicaSession("test")
 
     def test_get(self):
-        self.getter.session = MagicMock(request=MagicMock(
-            return_value=MagicMock(status=200)))
+        self.getter.session = MagicMock(
+            request=MagicMock(return_value=MagicMock(status=200))
+        )
         response = self.getter.get(MagicMock())
         self.assertIsInstance(response, Response)
-
-
-

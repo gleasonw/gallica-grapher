@@ -5,6 +5,5 @@ from gallicaGetter.fetch.contentQuery import ContentQuery
 
 class Test(TestCase):
     def test_build_query_for_ark_and_term(self):
-        result = build_query_for_ark_and_term('test', 'test', 'test')
+        result = build_query_for_ark_and_term("test", "test", "test")
         self.assertIsInstance(result, ContentQuery)
-

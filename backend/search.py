@@ -3,27 +3,27 @@ import pyllicaWrapper as pyllicaWrapper
 import gallicaGetter
 from database.recordInsertResolvers import (
     insert_records_into_results,
-    insert_records_into_groupcounts
+    insert_records_into_groupcounts,
 )
 from gallicaGetter.gallicaWrapper import (
     VolumeOccurrenceWrapper,
-    PeriodOccurrenceWrapper
+    PeriodOccurrenceWrapper,
 )
 from ticket import Ticket
 from ticketWithCachedResponse import TicketWithCachedResponse
 
 
 def get_and_insert_records_for_args(
-        ticketID: int,
-        requestID: int,
-        args: Ticket,
-        onProgressUpdate: callable,
-        conn,
-        api=None,
-        onAddingMissingPapers: callable = None,
+    ticketID: int,
+    requestID: int,
+    args: Ticket,
+    onProgressUpdate: callable,
+    conn,
+    api=None,
+    onAddingMissingPapers: callable = None,
 ):
     match [args.grouping, bool(args.codes)]:
-        case ['all', True] | ['all', False]:
+        case ["all", True] | ["all", False]:
             all_volume_occurrence_search_ticket(
                 ticket=args,
                 requestID=requestID,
@@ -31,38 +31,35 @@ def get_and_insert_records_for_args(
                 conn=conn,
                 onProgressUpdate=onProgressUpdate,
                 onAddingMissingPapers=onAddingMissingPapers,
-                api=api
+                api=api,
             )
-        case ['year', False] | ['month', False]:
+        case ["year", False] | ["month", False]:
             pyllica_search_ticket(
-                args=args,
-                requestID=requestID,
-                ticketID=ticketID,
-                conn=conn
+                args=args, requestID=requestID, ticketID=ticketID, conn=conn
             )
-        case ['year', True] | ['month', True]:
+        case ["year", True] | ["month", True]:
             period_occurrence_search_ticket(
                 args=args,
                 requestID=requestID,
                 ticketID=ticketID,
                 conn=conn,
                 onProgressUpdate=onProgressUpdate,
-                api=api
+                api=api,
             )
         case _:
-            raise ValueError(f'Invalid search type: {args.grouping}, {args.codes}')
+            raise ValueError(f"Invalid search type: {args.grouping}, {args.codes}")
 
 
 def all_volume_occurrence_search_ticket(
-        ticket: Ticket | TicketWithCachedResponse,
-        conn,
-        onProgressUpdate: callable,
-        onAddingMissingPapers: callable,
-        requestID: int,
-        ticketID: int,
-        api=None
+    ticket: Ticket | TicketWithCachedResponse,
+    conn,
+    onProgressUpdate: callable,
+    onAddingMissingPapers: callable,
+    requestID: int,
+    ticketID: int,
+    api=None,
 ):
-    api: VolumeOccurrenceWrapper = gallicaGetter.connect('volume', api=api)
+    api: VolumeOccurrenceWrapper = gallicaGetter.connect("volume", api=api)
     records = api.get(
         terms=ticket.terms,
         start_date=ticket.start_date,
@@ -73,7 +70,7 @@ def all_volume_occurrence_search_ticket(
         onProgressUpdate=onProgressUpdate,
         query_cache=type(ticket) == TicketWithCachedResponse and ticket.cached_response,
         generate=True,
-        num_workers=50
+        num_workers=50,
     )
     insert_records_into_db(
         records=records,
@@ -81,15 +78,11 @@ def all_volume_occurrence_search_ticket(
         conn=conn,
         requestID=requestID,
         ticketID=ticketID,
-        onAddingMissingPapers=onAddingMissingPapers
+        onAddingMissingPapers=onAddingMissingPapers,
     )
 
 
-def pyllica_search_ticket(
-        args: Ticket,
-        conn,
-        requestID: int,
-        ticketID: int):
+def pyllica_search_ticket(args: Ticket, conn, requestID: int, ticketID: int):
     records = pyllicaWrapper.get(args)
     insert_records_into_db(
         records=records,
@@ -100,14 +93,14 @@ def pyllica_search_ticket(
 
 
 def period_occurrence_search_ticket(
-        args: Ticket,
-        requestID: int,
-        ticketID: int,
-        conn,
-        onProgressUpdate: callable,
-        api=None
+    args: Ticket,
+    requestID: int,
+    ticketID: int,
+    conn,
+    onProgressUpdate: callable,
+    api=None,
 ):
-    api: PeriodOccurrenceWrapper = gallicaGetter.connect('period', api=api)
+    api: PeriodOccurrenceWrapper = gallicaGetter.connect("period", api=api)
     records = api.get(
         terms=args.terms,
         codes=args.codes,
@@ -126,12 +119,12 @@ def period_occurrence_search_ticket(
 
 
 def insert_records_into_db(
-        records: List,
-        conn,
-        requestID: int,
-        ticketID: int,
-        insert_into_results: bool = False,
-        onAddingMissingPapers: callable = None
+    records: List,
+    conn,
+    requestID: int,
+    ticketID: int,
+    insert_into_results: bool = False,
+    onAddingMissingPapers: callable = None,
 ):
     if insert_into_results:
         insert_records_into_results(
@@ -139,12 +132,9 @@ def insert_records_into_db(
             conn=conn,
             requestID=requestID,
             ticketID=ticketID,
-            onAddingMissingPapers=onAddingMissingPapers
+            onAddingMissingPapers=onAddingMissingPapers,
         )
     else:
         insert_records_into_groupcounts(
-            records=records,
-            conn=conn,
-            requestID=requestID,
-            ticketID=ticketID
+            records=records, conn=conn, requestID=requestID, ticketID=ticketID
         )

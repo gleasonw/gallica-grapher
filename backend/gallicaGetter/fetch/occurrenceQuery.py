@@ -13,7 +13,7 @@ class OccurrenceQuery(SRUQueryMixin):
     num_records: int
     codes: Optional[List[str]] = None
     num_results: int = 0
-    link_term: Optional[str] = ''
+    link_term: Optional[str] = ""
     link_distance: Optional[int] = 0
     collapsing = False
 
@@ -30,14 +30,15 @@ class OccurrenceQuery(SRUQueryMixin):
             start_index=start_index,
             num_records=num_records,
             link_term=self.link_term,
-            link_distance=self.link_distance)
+            link_distance=self.link_distance,
+        )
 
     def generate_cql(self):
         cql_components = []
         (termCQL := self.build_gram_cql()) and cql_components.append(termCQL)
         (dateCQL := self.build_date_cql()) and cql_components.append(dateCQL)
         (paperCQL := self.build_periodical_cql()) and cql_components.append(paperCQL)
-        return ' and '.join(cql_components)
+        return " and ".join(cql_components)
 
     def build_date_cql(self):
         if self.start_date and self.end_date:
@@ -45,7 +46,7 @@ class OccurrenceQuery(SRUQueryMixin):
         elif self.start_date:
             return f'gallicapublication_date="{self.start_date}"'
         else:
-            return ''
+            return ""
 
     def build_gram_cql(self) -> str:
         if self.link_term:
@@ -53,8 +54,7 @@ class OccurrenceQuery(SRUQueryMixin):
         elif self.term:
             return f'text adj "{self.term}"'
         else:
-            return ''
+            return ""
 
     def __repr__(self):
         return f"Occurrence Query ({self.cql})"
-

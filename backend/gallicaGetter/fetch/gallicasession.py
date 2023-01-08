@@ -14,7 +14,6 @@ class Response:
 
 
 class GallicaSession:
-
     def __init__(self, maxSize):
         self.maxSize = maxSize
         self.session = self.build_session()
@@ -30,7 +29,7 @@ class GallicaSession:
         adapter = HTTPAdapter(
             max_retries=retry_strategy,
             pool_maxsize=self.maxSize,
-            pool_connections=self.maxSize
+            pool_connections=self.maxSize,
         )
         session = requests.Session()
         session.mount("https://", adapter)
@@ -41,19 +40,13 @@ class GallicaSession:
         start = time.perf_counter()
         try:
             response = self.session.get(
-                query.endpoint_url,
-                params=query.get_params_for_fetch()
+                query.endpoint_url, params=query.get_params_for_fetch()
             )
         except RetryError:
-            print('retry error')
-            return Response(b'', query, 0)
+            print("retry error")
+            return Response(b"", query, 0)
         end = time.perf_counter()
         if response.status_code != 200:
             print(f"Gallica HTTP response Error: {response.status_code}")
-            return Response(b'', query, 0)
-        return Response(
-            xml=response.content,
-            query=query,
-            elapsed=end - start
-        )
-
+            return Response(b"", query, 0)
+        return Response(xml=response.content, query=query, elapsed=end - start)

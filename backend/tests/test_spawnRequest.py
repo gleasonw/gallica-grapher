@@ -4,7 +4,6 @@ from backend.tasks import spawn_request
 
 
 class TestSpawnRequest(TestCase):
-
     @patch("backend.tasks.Request")
     def test_success(self, mock_request):
         mock_request.return_value = mock_request

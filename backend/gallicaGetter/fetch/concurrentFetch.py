@@ -9,7 +9,6 @@ NUM_WORKERS = 20
 
 
 class ConcurrentFetch:
-
     def __init__(self, numWorkers=NUM_WORKERS):
         self.num_workers = numWorkers
         self.api = GallicaSession(numWorkers)
@@ -23,7 +22,7 @@ class ConcurrentFetch:
                     ProgressUpdate(
                         elapsed_time=response.elapsed,
                         num_workers=NUM_WORKERS,
-                        xml=response.xml
+                        xml=response.xml,
                     )
                 )
                 yield response

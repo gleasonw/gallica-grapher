@@ -4,9 +4,9 @@ from gallicaGetter.fetch.sruQueryMixin import SRUQueryMixin
 
 
 class PaperQuery(SRUQueryMixin):
-
-    def __init__(self, start_index: int, num_records: int,
-                 endpoint: str, codes: List[str] = None):
+    def __init__(
+        self, start_index: int, num_records: int, endpoint: str, codes: List[str] = None
+    ):
         self.codes = codes
         self.start_index = start_index
         self.num_records = num_records
@@ -18,4 +18,4 @@ class PaperQuery(SRUQueryMixin):
         return PaperQuery(start_index, num_records, self.endpoint_url, self.codes)
 
     def __repr__(self):
-        return f'PaperQuery({self.codes}, {self.start_index}, {self.num_records})'
+        return f"PaperQuery({self.codes}, {self.start_index}, {self.num_records})"

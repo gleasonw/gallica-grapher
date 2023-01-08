@@ -1,5 +1,4 @@
 class SRUQueryMixin:
-
     def get_params_for_fetch(self):
         base = {
             "operation": "searchRetrieve",
@@ -17,4 +16,4 @@ class SRUQueryMixin:
             formatted_codes = [f"{code}_date" for code in self.codes]
             return 'arkPress adj "' + '" or arkPress adj "'.join(formatted_codes) + '"'
         else:
-            return "dc.type all \"fascicule\" and ocr.quality all \"Texte disponible\""
+            return 'dc.type all "fascicule" and ocr.quality all "Texte disponible"'

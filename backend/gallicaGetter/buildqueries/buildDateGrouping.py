@@ -15,10 +15,10 @@ def build_date_grouping(start_date, end_date, grouping) -> List[Tuple]:
     start_date = Date(start_date)
     end_date = Date(end_date)
     groupings = {
-        'all': make_wide_groupings_for_all_search,
-        'index_selection': make_wide_groupings_for_all_search,
-        'year': makeYearGroupings,
-        'month': makeMonthGroupings
+        "all": make_wide_groupings_for_all_search,
+        "index_selection": make_wide_groupings_for_all_search,
+        "year": makeYearGroupings,
+        "month": makeMonthGroupings,
     }
     return groupings[grouping](start_date, end_date)
 
@@ -30,10 +30,9 @@ def make_wide_groupings_for_all_search(startDate, endDate):
             return [(markerDate.getDate(), None)]
         if month := markerDate.getMonth():
             return getOneMonthInterval(month, markerDate.getYear())
-        return [(
-            f"{markerDate.getYear()}-01-01",
-            f"{int(markerDate.getYear()) + 1}-01-01"
-        )]
+        return [
+            (f"{markerDate.getYear()}-01-01", f"{int(markerDate.getYear()) + 1}-01-01")
+        ]
     else:
         start = min(startDate.getDate(), endDate.getDate())
         end = max(startDate.getDate(), endDate.getDate())
@@ -44,11 +43,12 @@ def makeYearGroupings(startDate, endDate):
     if not startDate.getYear() or not endDate.getYear():
         markerDate = startDate if startDate.getYear() else endDate
         return [
-            (f"{markerDate.getYear()}-01-01",
-             f"{int(markerDate.getYear()) + 1}-01-01")
+            (f"{markerDate.getYear()}-01-01", f"{int(markerDate.getYear()) + 1}-01-01")
         ]
     lowEnd, highEnd = sorted([int(startDate.getYear()), int(endDate.getYear())])
-    return [(f"{year}-01-01", f"{year + 1}-01-01") for year in range(lowEnd, highEnd + 1)]
+    return [
+        (f"{year}-01-01", f"{year + 1}-01-01") for year in range(lowEnd, highEnd + 1)
+    ]
 
 
 def makeMonthGroupings(startDate, endDate):

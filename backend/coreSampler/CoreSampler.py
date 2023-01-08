@@ -8,9 +8,9 @@ import os
 
 here = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(here, 'stopwordsFR.txt'), 'r') as stopwords_file:
+with open(os.path.join(here, "stopwordsFR.txt"), "r") as stopwords_file:
     stopwords_fr = set(stopwords_file.read().splitlines())
-with open(os.path.join(here, 'stopwordsEN.txt'), 'r') as stopwords_file:
+with open(os.path.join(here, "stopwordsEN.txt"), "r") as stopwords_file:
     stopwords_en = set(stopwords_file.read().splitlines())
 
 
@@ -21,20 +21,14 @@ def get_gallica_core(
     end_date: str,
     sample_size: int = 20,
     api_wrapper=gallicaGetter,
-    onUpdateProgress=None) -> Dict:
+    onUpdateProgress=None,
+) -> Dict:
 
     text_to_analyze = get_sample_text(
-        root_gram,
-        sample_size,
-        start_date,
-        end_date,
-        api_wrapper,
-        onUpdateProgress
+        root_gram, sample_size, start_date, end_date, api_wrapper, onUpdateProgress
     )
     notable_words_in_distance = get_associated_words(
-        text_to_analyze,
-        root_gram,
-        distance
+        text_to_analyze, root_gram, distance
     )
     return notable_words_in_distance
 
@@ -45,26 +39,24 @@ def get_sample_text(
     start_date: str,
     end_date: str,
     api_wrapper,
-    onUpdateProgress=None
+    onUpdateProgress=None,
 ) -> StringIO:
-
     def get_text_for_codes(codes: List[str]) -> str:
-        text_wrapper = api_wrapper.connect('text')
-        text = ''
+        text_wrapper = api_wrapper.connect("text")
+        text = ""
         text_records = text_wrapper.get(
-            codes,
-            onProgressUpdate=lambda x: print(x['elapsedTime']
-                                             ))
+            codes, onProgressUpdate=lambda x: print(x["elapsedTime"])
+        )
         for record in text_records:
             text += record.get_text()
         return text
 
-    sru_wrapper: VolumeOccurrenceWrapper = api_wrapper.connect('volume')
+    sru_wrapper: VolumeOccurrenceWrapper = api_wrapper.connect("volume")
     num_volumes_with_root_gram = sru_wrapper.get_num_results_for_args(
         terms=root_gram,
         start_date=start_date,
         end_date=end_date,
-        grouping='all',
+        grouping="all",
     )
     num_volumes = num_volumes_with_root_gram[0][1]
     indices_to_sample = random.sample(range(num_volumes), sample_size)
@@ -73,17 +65,21 @@ def get_sample_text(
         start_date=start_date,
         end_date=end_date,
         start_index=indices_to_sample,
-        onProgressUpdate=onUpdateProgress
+        onProgressUpdate=onUpdateProgress,
     )
-    volume_codes = [volume_record.get_volume_code() for volume_record in volumes_with_root_gram]
+    volume_codes = [
+        volume_record.get_volume_code() for volume_record in volumes_with_root_gram
+    ]
     return StringIO(get_text_for_codes(volume_codes))
 
 
-def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: int) -> Dict:
+def get_associated_words(
+    text_to_analyze: StringIO, root_gram: str, distance: int
+) -> Dict:
     word_counts = {}
     text_to_analyze.seek(0)
     words_in_window = []
-    current_word = ''
+    current_word = ""
     root_behind = False
     compare_index = 0
     current_word_delta = 0
@@ -100,7 +96,7 @@ def get_associated_words(text_to_analyze: StringIO, root_gram: str, distance: in
         nonlocal current_word
         nonlocal current_word_delta
         nonlocal compare_index
-        current_word = ''
+        current_word = ""
         current_word_delta = 0
         compare_index = 0
 

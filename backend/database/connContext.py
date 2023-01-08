@@ -12,9 +12,8 @@ def build_redis_conn():
 
 
 class Postgres:
-
     def __init__(self):
-        if os.environ.get('DATABASE_URL'):
+        if os.environ.get("DATABASE_URL"):
             self.conn = init_prod()
         else:
             self.conn = init_local()
@@ -30,9 +29,8 @@ class Postgres:
 
 
 class Redis:
-
     def __init__(self):
-        if os.environ.get('REDIS_URL'):
+        if os.environ.get("REDIS_URL"):
             self.conn = init_prod_redis()
         else:
             self.conn = init_local_redis()
@@ -48,13 +46,13 @@ class Redis:
 
 def init_local_redis():
     print("Connecting to local redis...")
-    conn = redis.Redis(host='localhost', port=6379, db=0)
+    conn = redis.Redis(host="localhost", port=6379, db=0)
     return conn
 
 
 def init_prod_redis():
     print("Connecting to prod redis...")
-    REDIS_URL = os.environ['REDIS_URL']
+    REDIS_URL = os.environ["REDIS_URL"]
     conn = redis.Redis.from_url(REDIS_URL)
     return conn
 
@@ -62,17 +60,15 @@ def init_prod_redis():
 def init_local():
     print("Connecting to local database...")
     conn = psycopg2.connect(
-        host='localhost',
-        database='gallicagrapher',
-        user='wgleason',
-        password='postgres',
+        host="localhost",
+        database="gallicagrapher",
+        user="wgleason",
+        password="postgres",
     )
     return conn
 
 
 def init_prod():
-    DATABASE_URL = os.environ['DATABASE_URL']
+    DATABASE_URL = os.environ["DATABASE_URL"]
     conn = psycopg2.connect(DATABASE_URL)
     return conn
-
-

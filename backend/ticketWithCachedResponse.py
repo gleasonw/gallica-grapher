@@ -12,7 +12,7 @@ class TicketWithCachedResponse:
     end_date: int
     cached_response: List[OccurrenceQuery]
     codes: Optional[List[str] | str] = None
-    grouping: str = 'year'
+    grouping: str = "year"
     num_results: Optional[int] = None
     start_index: Optional[int] = 0
     num_workers: Optional[int] = 15
