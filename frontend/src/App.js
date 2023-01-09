@@ -47,12 +47,23 @@ function App() {
                 tickets={tickets}
                 progressID={progressID}
                 requestID={requestID}
-                onFinish={() => setCurrentPage('result')}
+                onFinish={(progressJSON) => {
+                    const backendGrouping = progressJSON.progress[0].grouping;
+                    if(backendGrouping){
+                        if(backendGrouping !== tickets[0].grouping){
+                            handleGroupingChange(backendGrouping);
+                        }
+                        setCurrentPage('result');
+                    }
+                    else{
+                        throw(new Error('No grouping in progressJSON'))
+                    }
+                }}
                 onTooManyRecords={handleTooManyRecords}
                 onNoRecords={() => setCurrentPage('noRecords')}
                 onCancelRequest={handleResetValuesAndGoHome}
                 onBackendError={() => setCurrentPage('backendError')}
-                onBackendGroupingChange={handleBackendGroupingChange}
+                onBackendGroupingChange={handleGroupingChange}
             />,
         'result':
             <ResultUI
@@ -121,15 +132,16 @@ function App() {
         };
     }
 
-    function handleBackendGroupingChange(ticketID) {
-        const updatedTickets = {
-            ...tickets,
-            [ticketID]: {
+    function handleGroupingChange() {
+        console.log('handleGroupingChange');
+        const newTickets= {}
+        Object.keys(tickets).forEach(ticketID => {
+            newTickets[ticketID] = {
                 ...tickets[ticketID],
-                grouping: 'all'
+                grouping: 'all',
             }
-        }
-        setTickets(updatedTickets);
+        });
+        setTickets(newTickets);
     }
 
     async function initRequest(tickets) {
@@ -152,6 +164,7 @@ function App() {
     }
 
     function addSearchTypeToTickets(someTickets) {
+        console.log('addSearchType', selectedSearchType);
         const searchTypes = ['year', 'month', 'all']
         const searchType = searchTypes[selectedSearchType];
         const ticketsWithSearchType = {}

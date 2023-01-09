@@ -31,7 +31,6 @@ function Chart(props) {
         query += "&ticket_ids=" + id
     });
     const result = useData(query);
-    console.log(result);
     if (result) {
         const series = result['series'];
         const graphDataWithSyncedColors = syncColors(

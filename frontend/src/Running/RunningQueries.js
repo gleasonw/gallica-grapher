@@ -33,7 +33,9 @@ function RunningQueriesUI(props) {
             "RUNNING": () => setProgressStats(progressJSON.progress ? progressJSON.progress : progressStats),
             "TOO_MANY_RECORDS": () => props.onTooManyRecords(progressJSON.numRecords),
             "NO_RECORDS": props.onNoRecords,
-            "COMPLETED": props.onFinish,
+            "COMPLETED": () => {
+                props.onFinish(progressJSON)
+            },
             "PENDING": () => null,
             "ERROR": props.onBackendError,
         }
@@ -42,12 +44,10 @@ function RunningQueriesUI(props) {
             props.onBackendError();
         }
         const progressJSON = await response.json();
-        const backendGrouping = progressJSON.grouping;
-        if (backendGrouping !== props.grouping) {
-            props.onBackendGroupingChange(backendGrouping);
-        }
         const state = progressJSON.state
         if (requestStateCallbacks.hasOwnProperty(state)) {
+            console.log(state);
+            console.log(progressJSON);
             requestStateCallbacks[state]()
         } else {
             console.log("Unknown state: " + state)

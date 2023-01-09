@@ -34,7 +34,8 @@ export default function generateOptions(series, settings, onSeriesClick, from_py
         yAxis: {
             title: {
                 text: from_pyllicagram ? 'occurrences / total words in period' : 'volumes with at least one occurrence'
-            }
+            },
+            visible: false
         },
         series: series,
         tooltip: {
