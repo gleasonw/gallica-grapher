@@ -35,7 +35,7 @@ class GallicaWrapper:
 
     def get_endpoint_url(self):
         raise NotImplementedError(
-            f"getBaseURL() not implemented for {self.__class__.__name__}"
+            f"get_endpoint_url() not implemented for {self.__class__.__name__}"
         )
 
     def fetch_from_queries(self, queries, onUpdateProgress=None):
@@ -44,7 +44,7 @@ class GallicaWrapper:
 
     def get_parser(self):
         raise NotImplementedError(
-            f"getParser() not implemented for {self.__class__.__name__}"
+            f"get_parser() not implemented for {self.__class__.__name__}"
         )
 
     def post_init(self):
