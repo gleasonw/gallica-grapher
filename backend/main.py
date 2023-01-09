@@ -192,7 +192,7 @@ def fetch_records_from_gallica(
         link_distance=link_distance,
     )
     if gallica_records:
-        # a procedural implementation. I feel records should not know how they should be displayed
+        # a procedural implementation. I feel records should not know how they are displayed
         if isinstance(gallica_records[0], VolumeRecord):
             display_records = [
                 (
