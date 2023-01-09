@@ -21,7 +21,6 @@ from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.parse.volumeRecords import VolumeRecord
 
 
-# TODO: different way to share behavior... fetch from queries function?
 class GallicaWrapper:
     def __init__(self, api):
         self.api = api
