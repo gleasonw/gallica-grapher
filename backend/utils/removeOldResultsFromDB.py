@@ -12,11 +12,11 @@ def removeOldResultsFromDB():
             AND requestid > 0;
             """
             )
-            # curs.execute("""
-            # DELETE FROM groupcounts
-            # WHERE created < NOW() - INTERVAL '1 hour'
-            # AND requestid > 0;
-            # """)
+            curs.execute("""
+            DELETE FROM groupcounts
+            WHERE created < NOW() - INTERVAL '1 hour'
+            AND requestid > 0;
+            """)
         conn.commit()
 
 

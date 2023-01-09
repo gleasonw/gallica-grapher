@@ -45,6 +45,13 @@ def index():
     return {"message": "ok"}
 
 
+#TODO: gallica records retrieving data, but nothing showing on graph?
+# Londres in echo de la presse
+#TODO: fix multi-word search, perhaps route to all search if no pyllica support
+#TODO: shorten y axis numbers
+#TODO: add home button
+#TODO: link search
+#TODO: easier comparison
 @app.post("/api/init")
 def init(ticket: Ticket | List[Ticket]):
     global requestID
@@ -192,7 +199,7 @@ def fetch_records_from_gallica(
         link_distance=link_distance,
     )
     if gallica_records:
-        # a procedural implementation. I feel records should not know how they should be displayed
+        # a procedural implementation. I feel records should not know how they are displayed
         if isinstance(gallica_records[0], VolumeRecord):
             display_records = [
                 (
