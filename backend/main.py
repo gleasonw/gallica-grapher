@@ -45,6 +45,13 @@ def index():
     return {"message": "ok"}
 
 
+#TODO: gallica records retrieving data, but nothing showing on graph?
+# Londres in echo de la presse
+#TODO: fix multi-word search, perhaps route to all search if no pyllica support
+#TODO: shorten y axis numbers
+#TODO: add home button
+#TODO: link search
+#TODO: easier comparison
 @app.post("/api/init")
 def init(ticket: Ticket | List[Ticket]):
     global requestID
