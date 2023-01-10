@@ -114,12 +114,8 @@ def get_num_records_for_args(
     for index, ticket in enumerate(tickets):
 
         # get total record so we can tell the user if there are no records, regardless of search type
-        base_queries_with_num_results = get_num_records_all_volume_occurrence(
-            ticket
-        )
-        num_records = sum(
-            query.num_results for query in base_queries_with_num_results
-        )
+        base_queries_with_num_results = get_num_records_all_volume_occurrence(ticket)
+        num_records = sum(query.num_results for query in base_queries_with_num_results)
 
         if ticket.grouping == "all" or ticket.codes:
 
@@ -128,7 +124,9 @@ def get_num_records_for_args(
 
             if ticket.codes and ticket.grouping in ["year", "month"]:
                 num_periods_to_fetch = get_num_periods_in_range_for_grouping(
-                    grouping=ticket.grouping, start=ticket.start_date, end=ticket.end_date
+                    grouping=ticket.grouping,
+                    start=ticket.start_date,
+                    end=ticket.end_date,
                 )
                 if num_periods_to_fetch > (num_records // 50) + 1:
 
@@ -152,7 +150,9 @@ def get_num_records_for_args(
         else:
             if num_records:
                 total_records += get_num_periods_in_range_for_grouping(
-                    grouping=ticket.grouping, start=ticket.start_date, end=ticket.end_date
+                    grouping=ticket.grouping,
+                    start=ticket.start_date,
+                    end=ticket.end_date,
                 )
             else:
                 total_records += num_records

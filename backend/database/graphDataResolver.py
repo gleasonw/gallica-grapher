@@ -6,45 +6,33 @@ import ciso8601
 
 
 def select_series_for_tickets(
-    ticket_ids: int | List[int],
-    request_id: int,
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
-    average_window: int,
-    conn,
+        request_id: int,
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
+        average_window: int,
+        conn,
 ):
-    batch_series = list(
-        map(
-            lambda ticket_id: build_highcharts_series(
-                ticket_id=ticket_id,
-                request_id=request_id,
-                grouping=grouping,
-                average_window=average_window,
-                conn=conn,
-            ),
-            ticket_ids,
-        )
-    )
-    return [{"name": series.name, "data": series.data} for series in batch_series]
+    batch_series = build_highcharts_series(request_id=request_id, grouping=grouping, average_window=average_window,
+                                           conn=conn)
+    return {"name": batch_series.name, "data": batch_series.data}
 
 
 @dataclass(slots=True, frozen=True)
 class Series:
-    ticket_id: int
+    request_id: int
     data: List[Tuple[int, float]]
     name: str
 
 
 def build_highcharts_series(
-    ticket_id: int,
-    request_id: int,
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
-    average_window: int,
-    conn,
+        request_id: int,
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
+        average_window: int,
+        conn,
 ) -> Series:
     if grouping == "gallicaYear" or grouping == "gallicaMonth":
-        psycop_params = (average_window, request_id, ticket_id)
+        psycop_params = (average_window, request_id)
     else:
-        psycop_params = (request_id, ticket_id, average_window)
+        psycop_params = (request_id, average_window)
     data = get_from_db(
         params=psycop_params, sql=get_sql_for_grouping(grouping), conn=conn
     )
@@ -55,17 +43,17 @@ def build_highcharts_series(
     else:
         data_with_proper_date_format = data
     search_terms = get_search_terms_by_grouping(
-        grouping=grouping, ticket_id=ticket_id, request_id=request_id, conn=conn
+        grouping=grouping, request_id=request_id, conn=conn
     )
     return Series(
-        name=f"{ticket_id}: {search_terms}",
+        name=f"{search_terms}",
         data=data_with_proper_date_format,
-        ticket_id=ticket_id,
+        request_id=request_id
     )
 
 
 def get_sql_for_grouping(
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"]
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"]
 ):
     match grouping:
         case "day":
@@ -75,7 +63,6 @@ def get_sql_for_grouping(
                 SELECT year, month, day, count(*) AS mentions 
                 FROM results 
                 WHERE requestid = %s
-                AND ticketid = %s 
                 AND month IS NOT NULL
                 AND day IS NOT NULL
                 GROUP BY year, month, day 
@@ -97,7 +84,6 @@ def get_sql_for_grouping(
                 (SELECT year, month, count(*) AS mentions 
                 FROM results continuous
                 WHERE requestid = %s
-                AND ticketid = %s 
                 AND month IS NOT NULL
                 GROUP BY year, month
                 ORDER BY year,month),
@@ -118,8 +104,6 @@ def get_sql_for_grouping(
                 (SELECT year, count(*) AS mentions 
                 FROM results 
                 WHERE requestid=%s
-                AND ticketid = %s
-                AND year IS NOT NULL
                 GROUP BY year 
                 ORDER BY year),
 
@@ -143,7 +127,6 @@ def get_sql_for_grouping(
                     SELECT year, sum(count) as count
                     FROM groupcounts
                     WHERE requestid = %s
-                    AND ticketid = %s
                     GROUP BY year
                     ORDER BY year
                 ) AS counts
@@ -161,7 +144,6 @@ def get_sql_for_grouping(
                     SELECT year, month, sum(count) as count
                     FROM groupcounts
                     WHERE requestid = %s
-                    AND ticketid = %s
                     GROUP BY year, month
                     ORDER BY year, month
                 ) AS counts
@@ -171,10 +153,9 @@ def get_sql_for_grouping(
 
 
 def get_search_terms_by_grouping(
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
-    ticket_id: int,
-    request_id: int,
-    conn,
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
+        request_id: int,
+        conn,
 ):
     table = (
         "FROM results" if grouping in ["day", "month", "year"] else "FROM groupcounts"
@@ -184,11 +165,10 @@ def get_search_terms_by_grouping(
         SELECT array_agg(DISTINCT searchterm) 
         {table}
         WHERE requestid=%s 
-        AND ticketid = %s;
         """
 
     with conn.cursor() as curs:
-        curs.execute(get_terms, (request_id, ticket_id))
+        curs.execute(get_terms, (request_id))
         return curs.fetchone()[0]
 
 
@@ -226,16 +206,15 @@ def get_timestamp(date):
     return timestamp
 
 
-def get_params_for_ticket_and_settings(ticketID, settings):
+def get_params_for_ticket_and_settings(settings):
     if settings["continuous"] == "true":
         return (
             settings["requestID"],
-            ticketID,
             settings["startDate"],
             settings["endDate"],
             settings["averageWindow"],
         )
     elif settings["groupBy"] in ["gallicaYear", "gallicaMonth"]:
-        return (settings["averageWindow"], settings["requestID"], ticketID)
+        return settings["averageWindow"], settings["requestID"]
     else:
-        return (settings["requestID"], ticketID, settings["averageWindow"])
+        return settings["requestID"], settings["averageWindow"]

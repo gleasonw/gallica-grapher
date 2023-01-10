@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Optional
+from ticket import Ticket
 
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 
