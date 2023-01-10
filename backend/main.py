@@ -6,6 +6,8 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
+from pydantic import BaseModel
+
 from database.connContext import build_db_conn, build_redis_conn
 from database.displayDataResolvers import (
     select_display_records,
@@ -23,7 +25,6 @@ from database.paperSearchResolver import (
 from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.parse.volumeRecords import VolumeRecord
 from request import Request
-from ticket import Ticket
 
 app = FastAPI()
 
@@ -45,26 +46,42 @@ def index():
     return {"message": "ok"}
 
 
-# TODO: gallica records retrieving data, but nothing showing on graph?
-# Londres in echo de la presse
-# TODO: fix multi-word search, perhaps route to all search if no pyllica support
-# TODO: shorten y axis numbers
-# TODO: add home button
-# TODO: link search
-# TODO: easier comparison
+class Ticket(BaseModel):
+    id: int
+    terms: List[str] | str
+    start_date: int
+    end_date: int
+    codes: Optional[List[str] | str] = None
+    grouping: str = "year"
+    num_results: Optional[int] = None
+    start_index: Optional[int] = 0
+    num_workers: Optional[int] = 15
+    link_term: Optional[str] = None
+    link_distance: Optional[int] = None
+
+
 @app.post("/api/init")
 def init(ticket: Ticket | List[Ticket]):
     global requestID
     requestID += 1
+    ticket.id = requestID
     with build_redis_conn() as redis_conn:
         redis_conn.delete(f"request:{requestID}:progress")
         redis_conn.delete(f"request:{requestID}:cancelled")
-    request = Request(
-        tickets=ticket,
-        identifier=requestID,
-    )
+    request = Request(ticket=ticket)
     request.start()
     return {"requestid": requestID}
+
+
+class Progress(BaseModel):
+    num_results_discovered: int
+    num_results_retrieved: int
+    estimate_seconds_to_completion: int
+    random_paper: Optional[dict] = None
+    random_text: Optional[str] = None
+    state: Literal["running", "completed", "error", "no_records", "too_many_records"] = "running"
+    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"] = "year"
+    error_message: Optional[str] = None
 
 
 @app.get("/poll/progress/{request_id}")
@@ -90,6 +107,13 @@ def revoke_task(request_id: int):
     with build_db_conn() as conn:
         clear_records_for_requestid(request_id, conn)
     return {"state": "REVOKED"}
+
+
+class Paper(BaseModel):
+    title: str
+    code: str
+    start_date: str
+    end_date: str
 
 
 @app.get("/api/papers/{keyword}")
@@ -197,7 +221,6 @@ def fetch_records_from_gallica(
         link_distance=link_distance,
     )
     if gallica_records:
-        # a procedural implementation. I feel records should not know how they are displayed
         if isinstance(gallica_records[0], VolumeRecord):
             display_records = [
                 (
@@ -236,3 +259,5 @@ def ocr_text(ark_code: str, term: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+
+

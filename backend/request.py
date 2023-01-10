@@ -9,7 +9,7 @@ from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.progressUpdate import ProgressUpdate
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from search import get_and_insert_records_for_args
-from ticket import Ticket
+from main import Ticket
 from ticketWithCachedResponse import TicketWithCachedResponse
 
 RECORD_LIMIT = 1000000
@@ -17,15 +17,14 @@ MAX_DB_SIZE = 10000000
 
 
 class Request(threading.Thread):
-    def __init__(self, identifier: int, tickets: List[Ticket], conn=None):
+    def __init__(self, identifier: int, ticket: Ticket, conn=None):
         self.numResultsDiscovered = 0
         self.state = "RUNNING"
         self.requestID = identifier
-        self.tickets: List[Ticket] = tickets
-        self.progress_stats = {
-            ticket.id: SearchProgressStats(ticketID=ticket.id, grouping=ticket.grouping)
-            for ticket in self.tickets
-        }
+        self.ticket = ticket
+        self.progress_stats = SearchProgressStats(
+            ticketID=ticket.id, grouping=ticket.grouping
+        )
         self.conn = conn
         self.num_records = 0
         super().__init__()

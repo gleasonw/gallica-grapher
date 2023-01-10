@@ -9,7 +9,7 @@ from gallicaGetter.gallicaWrapper import (
     VolumeOccurrenceWrapper,
     PeriodOccurrenceWrapper,
 )
-from ticket import Ticket
+from main import Ticket
 from ticketWithCachedResponse import TicketWithCachedResponse
 
 

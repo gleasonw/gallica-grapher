@@ -1,7 +1,7 @@
 from pyllicagram import pyllicagram as pyllica
 from gallicaGetter.parse.date import Date
 from gallicaGetter.parse.periodRecords import PeriodRecord
-from ticket import Ticket
+from main import Ticket
 
 
 def get(args: Ticket):
