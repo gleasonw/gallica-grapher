@@ -1,13 +1,14 @@
 import json
+import os
 import random
 import threading
+from dataclasses import dataclass
 from typing import List, Optional, Literal, Callable, Tuple
-import os
 
+import uvicorn
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import uvicorn
 
 import gallicaGetter
 import pyllicaWrapper as pyllicaWrapper
@@ -31,12 +32,11 @@ from database.recordInsertResolvers import (
     insert_records_into_groupcounts,
 )
 from gallicaGetter import VolumeOccurrenceWrapper, PeriodOccurrenceWrapper
-from gallicaGetter.fetch.progressUpdate import ProgressUpdate
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
+from gallicaGetter.fetch.progressUpdate import ProgressUpdate
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.parse.volumeRecords import VolumeRecord
-from dataclasses import dataclass
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -61,7 +61,6 @@ def index():
 
 
 class Ticket(BaseModel):
-    id: int
     terms: List[str] | str
     start_date: int
     end_date: int
@@ -72,10 +71,11 @@ class Ticket(BaseModel):
     num_workers: Optional[int] = 15
     link_term: Optional[str] = None
     link_distance: Optional[int] = None
+    id: Optional[int] = None
 
 
 @app.post("/api/init")
-def init(ticket: Ticket | List[Ticket]):
+def init(ticket: Ticket):
     global requestID
     requestID += 1
     ticket.id = requestID
@@ -93,7 +93,14 @@ class Progress(BaseModel):
     estimate_seconds_to_completion: int
     random_paper: str
     random_text: str
-    state: Literal["too_many_records", "completed", "error", "no_records", "running"]
+    state: Literal[
+        "too_many_records",
+        "completed",
+        "error",
+        "no_records",
+        "running",
+        "adding_missing_papers",
+    ]
     grouping: Literal["month", "year", "gallicaMonth", "gallicaYear", "all"]
 
 
@@ -285,11 +292,7 @@ class Request(threading.Thread):
         ] = "running"
         super().__init__()
 
-    # TODO: centralize redis posts to this function
     def update_progress_state(self, stats: ProgressUpdate):
-        if self.state == "PENDING":
-            self.state = "RUNNING"
-
         self.num_requests_sent += 1
 
         # estimate number of seconds to completion
@@ -341,9 +344,9 @@ class Request(threading.Thread):
                 self.post_progress_to_redis(redis_conn=redis_conn)
 
                 if self.num_records == 0:
-                    self.state = "NO_RECORDS"
+                    self.state = "no_records"
                 elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
-                    self.state = "TOO_MANY_RECORDS"
+                    self.state = "too_many_records"
                 else:
                     get_and_insert_records_for_ticket(
                         ticket=self.ticket,
@@ -355,11 +358,11 @@ class Request(threading.Thread):
                         conn=db_conn,
                     )
                     self.post_progress_to_redis(redis_conn)
-                    self.state = "COMPLETED"
+                    self.state = "completed"
         self.post_progress_to_redis(redis_conn)
 
     def set_adding_missing_papers(self):
-        self.state = "ADDING_MISSING_PAPERS"
+        self.state = "adding_missing_papers"
 
     def set_total_records_for_ticket_progress(self, num_records):
         self.num_records = num_records
@@ -404,6 +407,7 @@ def get_num_records_for_args(
     cached_queries = []
 
     # get total record so we can tell the user if there are no records, regardless of search type
+    # TODO: only do this if not pyllica. if pyllica, pass a callback during the get, trigger if no records = no waiting for API
     base_queries_with_num_results = get_num_records_all_volume_occurrence(ticket)
     num_records = sum(query.num_results for query in base_queries_with_num_results)
 
@@ -447,7 +451,7 @@ def get_num_records_for_args(
         else:
             total_records += num_records
 
-    on_num_records_found and on_num_records_found(ticket.id, total_records)
+    on_num_records_found and on_num_records_found(total_records)
 
     if cached_queries:
         ticket = TicketWithCachedResponse(
