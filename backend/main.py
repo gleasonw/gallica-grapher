@@ -2,10 +2,12 @@ import json
 import random
 import threading
 from typing import List, Optional, Literal, Callable, Tuple
+import os
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import uvicorn
 
 import gallicaGetter
 import pyllicaWrapper as pyllicaWrapper
@@ -64,7 +66,7 @@ class Ticket(BaseModel):
     start_date: int
     end_date: int
     codes: Optional[List[str] | str] = None
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"] = "year"
+    grouping: Literal["all", "month", "year", "gallicaMonth", "gallicaYear"] = "year"
     num_results: Optional[int] = None
     start_index: Optional[int] = 0
     num_workers: Optional[int] = 15
@@ -92,7 +94,7 @@ class Progress(BaseModel):
     random_paper: str
     random_text: str
     state: Literal["too_many_records", "completed", "error", "no_records", "running"]
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"]
+    grouping: Literal["month", "year", "gallicaMonth", "gallicaYear", "all"]
 
 
 @app.get("/poll/progress/{request_id}")
@@ -283,6 +285,7 @@ class Request(threading.Thread):
         ] = "running"
         super().__init__()
 
+    # TODO: centralize redis posts to this function
     def update_progress_state(self, stats: ProgressUpdate):
         if self.state == "PENDING":
             self.state = "RUNNING"
@@ -331,7 +334,7 @@ class Request(threading.Thread):
 
                 self.num_records, self.ticket = get_num_records_for_args(
                     ticket=self.ticket,
-                    onNumRecordsFound=self.set_total_records_for_ticket_progress,
+                    on_num_records_found=self.set_total_records_for_ticket_progress,
                 )
 
                 # Inform frontend of any state changes
@@ -342,14 +345,13 @@ class Request(threading.Thread):
                 elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
                     self.state = "TOO_MANY_RECORDS"
                 else:
-                    get_and_insert_records_for_args(
-                        requestID=self.ticket.id,
-                        args=self.ticket,
-                        onProgressUpdate=lambda stats: self.update_progress_and_post_redis(
+                    get_and_insert_records_for_ticket(
+                        ticket=self.ticket,
+                        on_progress_update=lambda stats: self.update_progress_and_post_redis(
                             redis_conn=redis_conn,
                             progress=stats,
                         ),
-                        onAddingMissingPapers=self.set_adding_missing_papers,
+                        on_adding_missing_papers=self.set_adding_missing_papers,
                         conn=db_conn,
                     )
                     self.post_progress_to_redis(redis_conn)
@@ -376,7 +378,7 @@ class Request(threading.Thread):
             self.total_requests = 1
 
     def update_progress_and_post_redis(self, progress: ProgressUpdate, redis_conn):
-        self.progress_stats.update_progress_state(progress)
+        self.update_progress_state(stats=progress)
         self.post_progress_to_redis(redis_conn)
         if redis_conn.get(f"request:{self.ticket.id}:cancelled") == b"true":
             raise KeyboardInterrupt
@@ -396,7 +398,7 @@ def get_number_rows_in_db(conn):
 
 def get_num_records_for_args(
     ticket: Ticket,
-    onNumRecordsFound: Optional[Callable[[int, int], None]] = None,
+    on_num_records_found: Optional[Callable[[int, int], None]] = None,
 ) -> Tuple[int, Ticket]:
     total_records = 0
     cached_queries = []
@@ -445,7 +447,7 @@ def get_num_records_for_args(
         else:
             total_records += num_records
 
-    onNumRecordsFound and onNumRecordsFound(ticket.id, total_records)
+    on_num_records_found and on_num_records_found(ticket.id, total_records)
 
     if cached_queries:
         ticket = TicketWithCachedResponse(
@@ -472,51 +474,49 @@ def get_num_periods_in_range_for_grouping(grouping: str, start: int, end: int) -
         raise ValueError(f"Invalid grouping: {grouping}")
 
 
-def get_num_records_all_volume_occurrence(args: Ticket) -> List[OccurrenceQuery]:
+def get_num_records_all_volume_occurrence(ticket: Ticket) -> List[OccurrenceQuery]:
     api = gallicaGetter.connect("volume")
     base_queries_with_num_results = api.get_num_results_for_args(
-        terms=args.terms,
-        start_date=args.start_date,
-        end_date=args.end_date,
-        codes=args.codes,
-        link_term=args.link_term,
-        link_distance=args.link_distance,
+        terms=ticket.terms,
+        start_date=ticket.start_date,
+        end_date=ticket.end_date,
+        codes=ticket.codes,
+        link_term=ticket.link_term,
+        link_distance=ticket.link_distance,
     )
     return base_queries_with_num_results
 
 
-def get_and_insert_records_for_args(
-    requestID: int,
-    args: Ticket,
-    onProgressUpdate: callable,
+def get_and_insert_records_for_ticket(
+    ticket: Ticket,
+    on_progress_update: callable,
     conn,
     api=None,
-    onAddingMissingPapers: callable = None,
+    on_adding_missing_papers: callable = None,
 ):
-    match [args.grouping, bool(args.codes)]:
+    match [ticket.grouping, bool(ticket.codes)]:
         case ["all", True] | ["all", False]:
             all_volume_occurrence_search_ticket(
-                ticket=args,
-                requestID=requestID,
+                ticket=ticket,
                 conn=conn,
-                onProgressUpdate=onProgressUpdate,
-                onAddingMissingPapers=onAddingMissingPapers,
+                onProgressUpdate=on_progress_update,
+                onAddingMissingPapers=on_adding_missing_papers,
                 api=api,
             )
         case ["year", False] | ["month", False]:
-            pyllica_search_ticket(args=args, requestID=requestID, conn=conn)
+            pyllica_search_ticket(ticket=ticket, conn=conn)
         case ["year", True] | ["month", True]:
             period_occurrence_search_ticket(
-                args=args,
-                requestID=requestID,
+                ticket=ticket,
                 conn=conn,
-                onProgressUpdate=onProgressUpdate,
+                on_progress_update=on_progress_update,
                 api=api,
             )
         case _:
-            raise ValueError(f"Invalid search type: {args.grouping}, {args.codes}")
+            raise ValueError(f"Invalid search type: {ticket.grouping}, {ticket.codes}")
 
 
+# TODO: gross. Figure out inheritance for base models or do something else
 @dataclass(frozen=True, slots=True)
 class TicketWithCachedResponse:
     id: int
@@ -538,8 +538,6 @@ def all_volume_occurrence_search_ticket(
     conn,
     onProgressUpdate: callable,
     onAddingMissingPapers: callable,
-    requestID: int,
-    ticketID: int,
     api=None,
 ):
     api: VolumeOccurrenceWrapper = gallicaGetter.connect("volume", api=api)
@@ -556,70 +554,61 @@ def all_volume_occurrence_search_ticket(
         num_workers=50,
     )
     insert_records_into_db(
-        records=records,
+        records_for_db=records,
         insert_into_results=True,
         conn=conn,
-        requestID=requestID,
-        ticketID=ticketID,
-        onAddingMissingPapers=onAddingMissingPapers,
+        request_id=requestID,
+        on_adding_missing_papers=onAddingMissingPapers,
     )
 
 
-def pyllica_search_ticket(args: Ticket, conn, requestID: int, ticketID: int):
-    records = pyllicaWrapper.get(args)
+def pyllica_search_ticket(ticket: Ticket, conn):
+    pyllica_records = pyllicaWrapper.get(ticket)
     insert_records_into_db(
-        records=records,
-        conn=conn,
-        requestID=requestID,
-        ticketID=ticketID,
+        records_for_db=pyllica_records, conn=conn, request_id=ticket.id
     )
 
 
 def period_occurrence_search_ticket(
-    args: Ticket,
-    requestID: int,
-    ticketID: int,
+    ticket: Ticket,
     conn,
-    onProgressUpdate: callable,
+    on_progress_update: callable,
     api=None,
 ):
     api: PeriodOccurrenceWrapper = gallicaGetter.connect("period", api=api)
-    records = api.get(
-        terms=args.terms,
-        codes=args.codes,
-        start_date=args.start_date,
-        end_date=args.end_date,
-        onProgressUpdate=onProgressUpdate,
+    period_records = api.get(
+        terms=ticket.terms,
+        codes=ticket.codes,
+        start_date=ticket.start_date,
+        end_date=ticket.end_date,
+        onProgressUpdate=on_progress_update,
         num_workers=50,
-        grouping=args.grouping,
+        grouping=ticket.grouping,
     )
     insert_records_into_db(
-        records=records,
+        records_for_db=period_records,
         conn=conn,
-        requestID=requestID,
-        ticketID=ticketID,
+        request_id=ticket.id,
     )
 
 
 def insert_records_into_db(
-    records: List,
+    records_for_db: List,
     conn,
-    requestID: int,
-    ticketID: int,
+    request_id: int,
     insert_into_results: bool = False,
-    onAddingMissingPapers: callable = None,
+    on_adding_missing_papers: callable = None,
 ):
     if insert_into_results:
         insert_records_into_results(
-            records=records,
+            records=records_for_db,
             conn=conn,
-            requestID=requestID,
-            ticketID=ticketID,
-            onAddingMissingPapers=onAddingMissingPapers,
+            request_id=request_id,
+            on_adding_missing_papers=on_adding_missing_papers,
         )
     else:
         insert_records_into_groupcounts(
-            records=records, conn=conn, requestID=requestID, ticketID=ticketID
+            records=records_for_db, conn=conn, request_id=request_id
         )
 
 

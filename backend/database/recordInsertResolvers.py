@@ -13,13 +13,10 @@ def insert_records_into_papers(records, conn):
         curs.copy_from(csvStream, "papers", sep="|")
 
 
-def insert_records_into_results(
-    records, requestID, ticketID, onAddingMissingPapers, conn
-):
+def insert_records_into_results(records, request_id, on_adding_missing_papers, conn):
     stream, codes = build_csv_stream_ensure_no_issue_duplicates(
         records=records,
-        requestID=requestID,
-        ticketID=ticketID,
+        request_id=request_id,
     )
     if not codes:
         return
@@ -28,7 +25,7 @@ def insert_records_into_results(
     )
     missing_codes = codes - codes_in_db
     if missing_codes:
-        onAddingMissingPapers and onAddingMissingPapers()
+        on_adding_missing_papers and on_adding_missing_papers()
         insert_missing_codes_into_db(missing_codes, conn=conn)
     with conn.cursor() as curs:
         curs.copy_from(
@@ -41,7 +38,6 @@ def insert_records_into_results(
                 "month",
                 "day",
                 "searchterm",
-                "ticketid",
                 "requestid",
                 "papercode",
                 "papertitle",
@@ -49,13 +45,11 @@ def insert_records_into_results(
         )
 
 
-def insert_records_into_groupcounts(records, requestID, ticketID, conn):
-    csvStream = build_csv_stream(
-        records=records, requestID=requestID, ticketID=ticketID
-    )
+def insert_records_into_groupcounts(records, request_id, conn):
+    stream = build_csv_stream(records=records, request_id=request_id)
     with conn.cursor() as curs:
         curs.copy_from(
-            csvStream,
+            stream,
             "groupcounts",
             sep="|",
             columns=(
@@ -63,7 +57,6 @@ def insert_records_into_groupcounts(records, requestID, ticketID, conn):
                 "month",
                 "day",
                 "searchterm",
-                "ticketid",
                 "requestid",
                 "count",
             ),
@@ -71,9 +64,9 @@ def insert_records_into_groupcounts(records, requestID, ticketID, conn):
 
 
 def insert_missing_codes_into_db(codes, conn):
-    paperAPI = gallicaGetter.connect("papers")
-    paperRecords = paperAPI.get(list(codes))
-    insert_records_into_papers(paperRecords, conn)
+    paper_api = gallicaGetter.connect("papers")
+    paper_records = paper_api.get(list(codes))
+    insert_records_into_papers(paper_records, conn)
 
 
 def get_db_codes_that_match_these_codes(codes, conn):
@@ -83,7 +76,7 @@ def get_db_codes_that_match_these_codes(codes, conn):
 
 
 def build_csv_stream_ensure_no_issue_duplicates(
-    records: List[VolumeRecord], requestID: str, ticketID: str
+    records: List[VolumeRecord], request_id: str
 ):
     csv_file_like_object = io.StringIO()
     codes = set()
@@ -104,28 +97,26 @@ def build_csv_stream_ensure_no_issue_duplicates(
         write_to_csv_stream(
             stream=csv_file_like_object,
             record=record,
-            requestID=requestID,
-            ticketID=ticketID,
+            request_id=request_id,
         )
     csv_file_like_object.seek(0)
     print(f"unique codes: {codes}")
     return csv_file_like_object, codes
 
 
-def build_csv_stream(records, requestID=None, ticketID=None):
+def build_csv_stream(records, request_id=None):
     csv_file_like_object = io.StringIO()
     for record in records:
         write_to_csv_stream(
             stream=csv_file_like_object,
             record=record,
-            requestID=requestID,
-            ticketID=ticketID,
+            request_id=request_id,
         )
     csv_file_like_object.seek(0)
     return csv_file_like_object
 
 
-def write_to_csv_stream(stream, record, requestID, ticketID):
+def write_to_csv_stream(stream, record, request_id):
     if isinstance(record, VolumeRecord):
         row = (
             record.url,
@@ -133,8 +124,7 @@ def write_to_csv_stream(stream, record, requestID, ticketID):
             record.date.getMonth(),
             record.date.getDay(),
             record.term,
-            ticketID,
-            requestID,
+            request_id,
             record.paper_code,
             record.paper_title,
         )
@@ -144,8 +134,7 @@ def write_to_csv_stream(stream, record, requestID, ticketID):
             record.date.getMonth(),
             record.date.getDay(),
             record.term,
-            ticketID,
-            requestID,
+            request_id,
             record.count,
         )
     elif isinstance(record, PaperRecord):
