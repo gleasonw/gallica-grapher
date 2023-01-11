@@ -110,14 +110,18 @@ def poll_request_state(request_id: str):
         progress = redis_conn.get(f"request:{request_id}:progress")
         if progress:
             progress = json.loads(progress)
-            request_state = progress["request_state"]
-            ticket_state = progress["ticket_state"]
+            progress = Progress(**progress)
         else:
-            request_state = "PENDING"
-            ticket_state = {}
-    if progress is None:
-        return {"state": "PENDING"}
-    return {"state": request_state, "progress": ticket_state}
+            progress = Progress(
+                num_results_discovered=0,
+                num_results_retrieved=0,
+                estimate_seconds_to_completion=0,
+                random_paper="",
+                random_text="",
+                state="running",
+                grouping="year",
+            )
+    return progress
 
 
 @app.get("/api/revokeTask/{request_id}")
