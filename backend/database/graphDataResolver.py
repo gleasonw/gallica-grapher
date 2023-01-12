@@ -1,37 +1,16 @@
 import datetime
-from dataclasses import dataclass
-from typing import List, Literal, Tuple
+from typing import Literal, Tuple
 
 import ciso8601
 
-
-def select_series_for_tickets(
-    request_id: int,
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
-    average_window: int,
-    conn,
-):
-    batch_series = build_highcharts_series(
-        request_id=request_id,
-        grouping=grouping,
-        average_window=average_window,
-        conn=conn,
-    )
-    return {"name": batch_series.name, "data": batch_series.data}
-
-
-@dataclass(slots=True, frozen=True)
-class Series:
-    request_id: int
-    data: List[Tuple[int, float]]
-    name: str
+from database.series import Series
 
 
 def build_highcharts_series(
-    request_id: int,
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
-    average_window: int,
-    conn,
+        request_id: int,
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
+        average_window: int,
+        conn,
 ) -> Series:
     if grouping == "gallicaYear" or grouping == "gallicaMonth":
         psycop_params = (average_window, request_id)
@@ -55,7 +34,7 @@ def build_highcharts_series(
 
 
 def get_sql_for_grouping(
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"]
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"]
 ):
     match grouping:
         case "day":
@@ -155,9 +134,9 @@ def get_sql_for_grouping(
 
 
 def get_search_terms_by_grouping(
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
-    request_id: int,
-    conn,
+        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
+        request_id: int,
+        conn,
 ):
     table = (
         "FROM results" if grouping in ["day", "month", "year"] else "FROM groupcounts"
@@ -170,7 +149,7 @@ def get_search_terms_by_grouping(
         """
 
     with conn.cursor() as curs:
-        curs.execute(get_terms, (request_id))
+        curs.execute(get_terms, (request_id,))
         return curs.fetchone()[0]
 
 

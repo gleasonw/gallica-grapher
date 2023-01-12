@@ -4,6 +4,7 @@ import random
 import threading
 from dataclasses import dataclass
 from typing import List, Optional, Literal, Callable, Tuple
+from database.series import Series
 
 import uvicorn
 from fastapi import FastAPI, Query
@@ -22,7 +23,7 @@ from database.displayDataResolvers import (
     select_csv_data_for_tickets,
     select_top_papers_for_tickets,
 )
-from database.graphDataResolver import select_series_for_tickets
+from database.graphDataResolver import build_highcharts_series
 from database.paperSearchResolver import (
     select_papers_similar_to_keyword,
     get_num_papers_in_range,
@@ -161,13 +162,12 @@ def graph_data(
     average_window: Optional[int] = 0,
 ):
     with build_db_conn() as conn:
-        items = select_series_for_tickets(
+        return build_highcharts_series(
             request_id=request_id,
             grouping=grouping,
             average_window=average_window,
             conn=conn,
         )
-    return {"series": items}
 
 
 @app.get("/api/topPapers")
