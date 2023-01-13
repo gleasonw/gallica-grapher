@@ -61,8 +61,8 @@ def index():
 
 class Ticket(BaseModel):
     terms: List[str] | str
-    start_date: int
-    end_date: int
+    start_date: Optional[int]
+    end_date: Optional[int]
     codes: Optional[List[str] | str] = None
     grouping: Literal["all", "month", "year", "gallicaMonth", "gallicaYear"] = "year"
     num_results: Optional[int] = None
@@ -448,7 +448,7 @@ def get_num_records_for_args(
         total_records += num_records
         cached_queries = base_queries_with_num_results
     else:
-        if num_records:
+        if num_records and ticket.grouping in ["gallicaMonth", "gallicaYear"]:
             total_records += get_num_periods_in_range_for_grouping(
                 grouping=ticket.grouping,
                 start=ticket.start_date,
