@@ -10,11 +10,11 @@ from database.series import (
 
 
 def build_highcharts_series(
-        request_id: int,
-        grouping: Literal["day", "month", "year"],
-        backend_source: Literal["gallica", "pyllica"],
-        average_window: int,
-        conn,
+    request_id: int,
+    grouping: Literal["day", "month", "year"],
+    backend_source: Literal["gallica", "pyllica"],
+    average_window: int,
+    conn,
 ) -> Series:
     # TODO: why on earth does the order matter?
     if backend_source == "gallica":
@@ -46,14 +46,12 @@ def build_highcharts_series(
         )
         for point in data_with_proper_date_format
     ]
-    return Series(
-        name=f"{search_terms}", data=data_as_points, request_id=request_id
-    )
+    return Series(name=f"{search_terms}", data=data_as_points, request_id=request_id)
 
 
 def get_sql_for_grouping(
-        grouping: Literal["day", "month", "year"],
-        backend_source: Literal["gallica", "pyllica"],
+    grouping: Literal["day", "month", "year"],
+    backend_source: Literal["gallica", "pyllica"],
 ):
     match (grouping, backend_source):
         case ("day", "gallica"):
@@ -153,13 +151,11 @@ def get_sql_for_grouping(
 
 
 def get_search_terms_by_grouping(
-        backend_source: Literal["gallica", "pyllica"],
-        request_id: int,
-        conn,
+    backend_source: Literal["gallica", "pyllica"],
+    request_id: int,
+    conn,
 ):
-    table = (
-        "FROM results" if backend_source == 'gallica' else "FROM groupcounts"
-    )
+    table = "FROM results" if backend_source == "gallica" else "FROM groupcounts"
 
     get_terms = f"""
         SELECT array_agg(DISTINCT searchterm) 

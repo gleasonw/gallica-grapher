@@ -157,10 +157,10 @@ def get_num_papers_over_range(start: int, end: int):
 
 @app.get("/api/graphData")
 def graph_data(
-        request_id: int,
-        grouping: Literal["day", "month", "year"] = "year",
-        backend_source: Literal["gallica", "pyllica"] = "pyllica",
-        average_window: Optional[int] = 0,
+    request_id: int,
+    grouping: Literal["month", "year"] = "year",
+    backend_source: Literal["gallica", "pyllica"] = "pyllica",
+    average_window: Optional[int] = 0,
 ):
     with build_db_conn() as conn:
         return build_highcharts_series(
@@ -174,7 +174,7 @@ def graph_data(
 
 @app.get("/api/topPapers")
 def get_top_papers(
-        request_id: int, ticket_ids: List[int] = Query(), num_results: int = 10
+    request_id: int, ticket_ids: List[int] = Query(), num_results: int = 10
 ):
     with build_db_conn() as conn:
         top_papers = select_top_papers_for_tickets(
@@ -197,15 +197,15 @@ def get_csv(tickets: int | List[int], request_id: int):
 
 @app.get("/api/getDisplayRecords")
 def records(
-        request_id: int,
-        ticket_ids: List[int] = Query(),
-        term: str = None,
-        periodical: str = None,
-        year: int = None,
-        month: int = None,
-        day: int = None,
-        limit: int = 10,
-        offset: int = 0,
+    request_id: int,
+    ticket_ids: List[int] = Query(),
+    term: str = None,
+    periodical: str = None,
+    year: int = None,
+    month: int = None,
+    day: int = None,
+    limit: int = 10,
+    offset: int = 0,
 ):
     with build_db_conn() as conn:
         db_records, count = select_display_records(
@@ -225,15 +225,15 @@ def records(
 
 @app.get("/api/getGallicaRecords")
 def fetch_records_from_gallica(
-        year: int = None,
-        month: int = None,
-        day: int = None,
-        terms: List[str] = Query(),
-        codes: Optional[List[str]] = Query(None),
-        start_index: int = 0,
-        num_results: int = 10,
-        link_term: str = None,
-        link_distance: int = None,
+    year: int = None,
+    month: int = None,
+    day: int = None,
+    terms: List[str] = Query(),
+    codes: Optional[List[str]] = Query(None),
+    start_index: int = 0,
+    num_results: int = 10,
+    link_term: str = None,
+    link_distance: int = None,
 ):
     gallica_records = get_gallica_records_for_display(
         terms=terms,
@@ -303,20 +303,20 @@ class Request(threading.Thread):
 
         # estimate number of seconds to completion
         num_remaining_cycles = (
-                                       self.total_requests - self.num_requests_sent
-                               ) / stats.num_workers
+            self.total_requests - self.num_requests_sent
+        ) / stats.num_workers
 
         if self.average_response_time:
             self.average_response_time = (
-                                                 self.average_response_time + stats.elapsed_time
-                                         ) / 2
+                self.average_response_time + stats.elapsed_time
+            ) / 2
         else:
             self.average_response_time = stats.elapsed_time
 
         # a bit of reader fluff to make the wait enjoyable
         self.random_paper_for_progress = get_one_paper_from_record_batch(stats.xml)
         self.estimate_seconds_to_completion = (
-                self.average_response_time * num_remaining_cycles
+            self.average_response_time * num_remaining_cycles
         )
 
     def post_progress_to_redis(self, redis_conn):
@@ -338,7 +338,7 @@ class Request(threading.Thread):
         with connContext.build_redis_conn() as redis_conn:
             with self.conn or connContext.build_db_conn() as db_conn:
                 db_space_remaining = (
-                        MAX_DB_SIZE - get_number_rows_in_db(conn=db_conn) - 10000
+                    MAX_DB_SIZE - get_number_rows_in_db(conn=db_conn) - 10000
                 )
 
                 self.num_records, self.ticket = get_num_records_for_args(
@@ -351,7 +351,10 @@ class Request(threading.Thread):
 
                 if self.num_records == 0:
                     self.state = "no_records"
-                elif self.num_records > min(db_space_remaining, RECORD_LIMIT):
+                elif (
+                    self.num_records > min(db_space_remaining, RECORD_LIMIT)
+                    and self.ticket.backend_source == "gallica"
+                ):
                     self.state = "too_many_records"
                 else:
                     get_and_insert_records_for_ticket(
@@ -406,8 +409,8 @@ def get_number_rows_in_db(conn):
 
 
 def get_num_records_for_args(
-        ticket: Ticket,
-        on_num_records_found: Optional[Callable[[int], None]] = None,
+    ticket: Ticket,
+    on_num_records_found: Optional[Callable[[int], None]] = None,
 ) -> Tuple[int, Ticket]:
     total_records = 0
     cached_queries = []
@@ -498,11 +501,11 @@ def get_num_records_all_volume_occurrence(ticket: Ticket) -> List[OccurrenceQuer
 
 
 def get_and_insert_records_for_ticket(
-        ticket: Ticket,
-        on_progress_update: callable,
-        conn,
-        api=None,
-        on_adding_missing_papers: callable = None,
+    ticket: Ticket,
+    on_progress_update: callable,
+    conn,
+    api=None,
+    on_adding_missing_papers: callable = None,
 ):
     match [ticket.grouping, bool(ticket.codes)]:
         case ["all", True] | ["all", False]:
@@ -530,11 +533,11 @@ def get_and_insert_records_for_ticket(
 
 
 def all_volume_occurrence_search_ticket(
-        ticket: Ticket,
-        conn,
-        on_progress_update: callable,
-        on_adding_missing_papers: callable,
-        api=None,
+    ticket: Ticket,
+    conn,
+    on_progress_update: callable,
+    on_adding_missing_papers: callable,
+    api=None,
 ):
     api: VolumeOccurrenceWrapper = gallicaGetter.connect("volume", api=api)
     records = api.get(
@@ -566,10 +569,10 @@ def pyllica_search_ticket(ticket: Ticket, conn):
 
 
 def period_occurrence_search_ticket(
-        ticket: Ticket,
-        conn,
-        on_progress_update: callable,
-        api=None,
+    ticket: Ticket,
+    conn,
+    on_progress_update: callable,
+    api=None,
 ):
     api: PeriodOccurrenceWrapper = gallicaGetter.connect("period", api=api)
     period_records = api.get(
@@ -589,11 +592,11 @@ def period_occurrence_search_ticket(
 
 
 def insert_records_into_db(
-        records_for_db: List,
-        conn,
-        request_id: int,
-        insert_into_results: bool = False,
-        on_adding_missing_papers: callable = None,
+    records_for_db: List,
+    conn,
+    request_id: int,
+    insert_into_results: bool = False,
+    on_adding_missing_papers: callable = None,
 ):
     if insert_into_results:
         insert_records_into_results(
