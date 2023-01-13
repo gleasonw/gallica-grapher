@@ -4,7 +4,6 @@ import random
 import threading
 from dataclasses import dataclass
 from typing import List, Optional, Literal, Callable, Tuple
-from database.series import Series
 
 import uvicorn
 from fastapi import FastAPI, Query
@@ -73,6 +72,7 @@ class Ticket(BaseModel):
     link_term: Optional[str] = None
     link_distance: Optional[int] = None
     id: Optional[int] = None
+    backend_source: Literal["gallica", "pyllica"] = "pyllica"
 
 
 @app.post("/api/init")
@@ -102,7 +102,7 @@ class Progress(BaseModel):
         "running",
         "adding_missing_papers",
     ]
-    grouping: Literal["month", "year", "gallicaMonth", "gallicaYear", "all"]
+    backend_source: Literal["gallica", "pyllica"]
 
 
 @app.get("/poll/progress/{request_id}")
@@ -120,7 +120,7 @@ def poll_request_state(request_id: str):
                 random_paper="",
                 random_text="",
                 state="running",
-                grouping="year",
+                backend_source="gallica",
             )
     return progress
 
@@ -158,13 +158,15 @@ def get_num_papers_over_range(start: int, end: int):
 @app.get("/api/graphData")
 def graph_data(
     request_id: int,
-    grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"] = "year",
+    grouping: Literal["day", "month", "year"] = "year",
+    backend_source: Literal["gallica", "pyllica"] = "pyllica",
     average_window: Optional[int] = 0,
 ):
     with build_db_conn() as conn:
         return build_highcharts_series(
             request_id=request_id,
             grouping=grouping,
+            backend_source=backend_source,
             average_window=average_window,
             conn=conn,
         )
@@ -321,7 +323,7 @@ class Request(threading.Thread):
         progress = Progress(
             num_results_discovered=self.num_records,
             num_results_retrieved=self.num_requests_sent,
-            grouping=self.ticket.grouping,
+            backend_source=self.ticket.backend_source,
             estimate_seconds_to_completion=self.estimate_seconds_to_completion,
             random_paper=self.random_paper_for_progress,
             state=self.state,
@@ -405,7 +407,7 @@ def get_number_rows_in_db(conn):
 
 def get_num_records_for_args(
     ticket: Ticket,
-    on_num_records_found: Optional[Callable[[int, int], None]] = None,
+    on_num_records_found: Optional[Callable[[int], None]] = None,
 ) -> Tuple[int, Ticket]:
     total_records = 0
     cached_queries = []
@@ -504,16 +506,19 @@ def get_and_insert_records_for_ticket(
 ):
     match [ticket.grouping, bool(ticket.codes)]:
         case ["all", True] | ["all", False]:
+            ticket.backend_source = "gallica"
             all_volume_occurrence_search_ticket(
                 ticket=ticket,
                 conn=conn,
-                onProgressUpdate=on_progress_update,
-                onAddingMissingPapers=on_adding_missing_papers,
+                on_progress_update=on_progress_update,
+                on_adding_missing_papers=on_adding_missing_papers,
                 api=api,
             )
         case ["year", False] | ["month", False]:
+            ticket.backend_source = "pyllica"
             pyllica_search_ticket(ticket=ticket, conn=conn)
         case ["year", True] | ["month", True]:
+            ticket.backend_source = "gallica"
             period_occurrence_search_ticket(
                 ticket=ticket,
                 conn=conn,
@@ -544,8 +549,8 @@ class TicketWithCachedResponse:
 def all_volume_occurrence_search_ticket(
     ticket: Ticket | TicketWithCachedResponse,
     conn,
-    onProgressUpdate: callable,
-    onAddingMissingPapers: callable,
+    on_progress_update: callable,
+    on_adding_missing_papers: callable,
     api=None,
 ):
     api: VolumeOccurrenceWrapper = gallicaGetter.connect("volume", api=api)
@@ -556,7 +561,7 @@ def all_volume_occurrence_search_ticket(
         codes=ticket.codes,
         link_term=ticket.link_term,
         link_distance=ticket.link_distance,
-        onProgressUpdate=onProgressUpdate,
+        onProgressUpdate=on_progress_update,
         query_cache=type(ticket) == TicketWithCachedResponse and ticket.cached_response,
         generate=True,
         num_workers=50,
@@ -566,7 +571,7 @@ def all_volume_occurrence_search_ticket(
         insert_into_results=True,
         conn=conn,
         request_id=requestID,
-        on_adding_missing_papers=onAddingMissingPapers,
+        on_adding_missing_papers=on_adding_missing_papers,
     )
 
 

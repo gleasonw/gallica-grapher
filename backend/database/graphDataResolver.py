@@ -3,41 +3,60 @@ from typing import Literal, Tuple
 
 import ciso8601
 
-from database.series import Series
+from database.series import (
+    Series,
+    SeriesDataPoint,
+)
 
 
 def build_highcharts_series(
         request_id: int,
-        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
+        grouping: Literal["day", "month", "year"],
+        backend_source: Literal["gallica", "pyllica"],
         average_window: int,
         conn,
 ) -> Series:
-    if grouping == "gallicaYear" or grouping == "gallicaMonth":
+    # TODO: why on earth does the order matter?
+    if backend_source == "gallica":
+        psycop_params = (request_id, average_window)
+    elif backend_source == "pyllica":
         psycop_params = (average_window, request_id)
     else:
-        psycop_params = (request_id, average_window)
+        raise ValueError(f"Invalid backend_source: {backend_source}")
     data = get_from_db(
-        params=psycop_params, sql=get_sql_for_grouping(grouping), conn=conn
+        params=psycop_params,
+        sql=get_sql_for_grouping(grouping, backend_source),
+        conn=conn,
     )
     if grouping == "day":
         data_with_proper_date_format = list(map(get_rows_ymd_timestamp, data))
-    elif grouping == "month" or grouping == "gallicaMonth":
+    elif grouping == "month":
         data_with_proper_date_format = list(map(get_rows_ym_timestamp, data))
-    else:
+    elif grouping == "year":
         data_with_proper_date_format = data
+    else:
+        raise ValueError(f"Invalid grouping: {grouping}")
     search_terms = get_search_terms_by_grouping(
-        grouping=grouping, request_id=request_id, conn=conn
+        backend_source=backend_source, request_id=request_id, conn=conn
     )
+    data_as_points = [
+        SeriesDataPoint(
+            date=point[0],
+            count=point[1],
+        )
+        for point in data_with_proper_date_format
+    ]
     return Series(
-        name=f"{search_terms}", data=data_with_proper_date_format, request_id=request_id
+        name=f"{search_terms}", data=data_as_points, request_id=request_id
     )
 
 
 def get_sql_for_grouping(
-        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"]
+        grouping: Literal["day", "month", "year"],
+        backend_source: Literal["gallica", "pyllica"],
 ):
-    match grouping:
-        case "day":
+    match (grouping, backend_source):
+        case ("day", "gallica"):
             return """
 
             WITH binned_frequencies AS (
@@ -58,7 +77,7 @@ def get_sql_for_grouping(
             FROM averaged_frequencies;
 
             """
-        case "month":
+        case ("month", "gallica"):
             return """
 
             WITH binned_frequencies AS
@@ -78,7 +97,7 @@ def get_sql_for_grouping(
             FROM averaged_frequencies;
             
             """
-        case "year":
+        case ("year", "gallica"):
             return """
 
             WITH binned_frequencies AS
@@ -97,7 +116,7 @@ def get_sql_for_grouping(
             FROM averaged_frequencies;
             
             """
-        case "gallicaYear":
+        case ("year", "pyllica"):
             return """
             
             SELECT year, avgFrequency::float8 
@@ -114,7 +133,7 @@ def get_sql_for_grouping(
             ) AS avgedCounts;
             
             """
-        case "gallicaMonth":
+        case ("month", "pyllica"):
             return """
             
             SELECT year, month, avgFrequency::float8
@@ -134,12 +153,12 @@ def get_sql_for_grouping(
 
 
 def get_search_terms_by_grouping(
-        grouping: Literal["day", "month", "year", "gallicaMonth", "gallicaYear"],
+        backend_source: Literal["gallica", "pyllica"],
         request_id: int,
         conn,
 ):
     table = (
-        "FROM results" if grouping in ["day", "month", "year"] else "FROM groupcounts"
+        "FROM results" if backend_source == 'gallica' else "FROM groupcounts"
     )
 
     get_terms = f"""
