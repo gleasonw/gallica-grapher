@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List
 
 from pydantic import BaseModel
 
@@ -10,10 +10,19 @@ def parse_responses_to_records(responses: List[Response]):
     for response in responses:
         num_results_and_pages = get_num_results_and_pages_for_context(response.xml)
         yield ContentRecord(
-            num_results=num_results_and_pages[0], pages=num_results_and_pages[1]
+            num_results=num_results_and_pages[0],
+            pages=[
+                ContentPage(page=occurrence[0], context=occurrence[1])
+                for occurrence in num_results_and_pages[1]
+            ],
         )
+
+
+class ContentPage(BaseModel):
+    page: str
+    context: str
 
 
 class ContentRecord(BaseModel):
     num_results: int
-    pages: List[Tuple[str, str]]
+    pages: List[ContentPage]
