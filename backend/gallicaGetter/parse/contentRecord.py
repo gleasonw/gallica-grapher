@@ -1,7 +1,9 @@
-from dataclasses import dataclass
 from typing import List, Tuple
-from gallicaGetter.parse.parseXML import get_num_results_and_pages_for_context
+
+from pydantic import BaseModel
+
 from gallicaGetter.fetch.gallicasession import Response
+from gallicaGetter.parse.parseXML import get_num_results_and_pages_for_context
 
 
 def parse_responses_to_records(responses: List[Response]):
@@ -12,7 +14,6 @@ def parse_responses_to_records(responses: List[Response]):
         )
 
 
-@dataclass
-class ContentRecord:
+class ContentRecord(BaseModel):
     num_results: int
     pages: List[Tuple[str, str]]

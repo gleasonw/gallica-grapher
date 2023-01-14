@@ -33,6 +33,7 @@ from database.recordInsertResolvers import (
 from gallicaGetter import VolumeOccurrenceWrapper, PeriodOccurrenceWrapper
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.progressUpdate import ProgressUpdate
+from gallicaGetter.parse.contentRecord import ContentRecord
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 
 RECORD_LIMIT = 1000000
@@ -269,8 +270,8 @@ def fetch_records_from_gallica(
 
 @app.get("/api/ocrtext/{ark_code}/{term}")
 def ocr_text(ark_code: str, term: str):
-    record = get_ocr_text_for_record(ark_code=ark_code, term=term)
-    return {"numResults": record.num_results, "text": record.pages}
+    record: ContentRecord = get_ocr_text_for_record(ark_code=ark_code, term=term)
+    return record
 
 
 class Request(threading.Thread):
