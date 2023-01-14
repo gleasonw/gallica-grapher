@@ -34,8 +34,6 @@ from gallicaGetter import VolumeOccurrenceWrapper, PeriodOccurrenceWrapper
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.progressUpdate import ProgressUpdate
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
-from gallicaGetter.parse.periodRecords import PeriodRecord
-from gallicaGetter.parse.volumeRecords import VolumeRecord
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -246,35 +244,9 @@ def fetch_records_from_gallica(
         link_term=link_term,
         link_distance=link_distance,
     )
-    if gallica_records:
-        if isinstance(gallica_records[0], VolumeRecord):
-            display_records = [
-                (
-                    volume_occurrence.term,
-                    volume_occurrence.paper_title,
-                    volume_occurrence.date.getYear(),
-                    volume_occurrence.date.getMonth(),
-                    volume_occurrence.date.getDay(),
-                    volume_occurrence.url,
-                )
-                for volume_occurrence in gallica_records
-            ]
-        elif isinstance(gallica_records[0], PeriodRecord):
-            display_records = [
-                (
-                    period_record.term,
-                    period_record.date.getYear(),
-                    period_record.date.getMonth(),
-                    period_record.date.getDay(),
-                    period_record.count,
-                )
-                for period_record in gallica_records
-            ]
-        else:
-            raise ValueError(f"Unknown record type: {type(gallica_records[0])}")
-    else:
-        display_records = []
-    return {"displayRecords": display_records}
+    if gallica_records is None:
+        return []
+    return gallica_records
 
 
 @app.get("/api/ocrtext/{ark_code}/{term}")

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 from gallicaGetter.parse.date import Date
 from gallicaGetter.parse.parseXML import (
     get_records_from_xml,
@@ -24,8 +24,7 @@ def parse_responses_to_records(responses):
             )
 
 
-@dataclass(slots=True)
-class VolumeRecord:
+class VolumeRecord(BaseModel):
     paper_title: str
     paper_code: str
     url: str
