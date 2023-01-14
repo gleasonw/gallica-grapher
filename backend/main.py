@@ -221,11 +221,19 @@ def records(
     return {"displayRecords": db_records, "count": count}
 
 
-@app.get("/api/getGallicaRecords")
+class GallicaRecord(BaseModel):
+    paper_title: str
+    paper_code: str
+    term: str
+    date: str
+    url: str
+
+
+@app.get("/api/gallicaRecords")
 def fetch_records_from_gallica(
-    year: int = None,
-    month: int = None,
-    day: int = None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    day: Optional[int] = None,
     terms: List[str] = Query(),
     codes: Optional[List[str]] = Query(None),
     start_index: int = 0,
@@ -246,7 +254,17 @@ def fetch_records_from_gallica(
     )
     if gallica_records is None:
         return []
-    return gallica_records
+    return [
+        # TODO: a hack to get around my strange date class in VolumeRecord... potentially expensive?
+        GallicaRecord(
+            paper_title=record.paper_title,
+            paper_code=record.paper_code,
+            term=record.term,
+            date=str(record.date),
+            url=record.url,
+        )
+        for record in gallica_records
+    ]
 
 
 @app.get("/api/ocrtext/{ark_code}/{term}")

@@ -11,6 +11,9 @@ class Date:
         re.compile(r"^\d{4}$"),
     ]
 
+    def __str__(self):
+        return self.dateText
+
     @staticmethod
     def __new__(cls, dateText):
         dateText = str(dateText)

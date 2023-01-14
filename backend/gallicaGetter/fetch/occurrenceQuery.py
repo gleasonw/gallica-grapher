@@ -5,8 +5,8 @@ from pydantic import BaseModel
 
 class OccurrenceQuery(BaseModel):
     term: str
-    start_date: Optional[int]
-    end_date: Optional[int]
+    start_date: Optional[str]
+    end_date: Optional[str]
     endpoint_url: str
     start_index: int
     num_records: int
