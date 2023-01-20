@@ -175,7 +175,7 @@ const TicketRow: React.FC<{
   onGraphedTicketCardClick: (ticket?: Ticket) => void;
 }> = ({ tickets, children, onGraphedTicketCardClick }) => {
   return (
-    <div className={"flex border-t"}>
+    <div className={"flex border-t z-0"}>
       <div className={"flex overflow-x-scroll overflow-y-hidden"}>
         {tickets?.map((ticket, index) => (
           <TicketCard

@@ -23,12 +23,12 @@ export const PaperDropdown: React.FC<{
           setPeriodical(e.target.value)
         }
       />
-      <div className={"bg-white absolute max-w-full"}>
+      <div className={"bg-white absolute max-w-full z-40"}>
         <ul>
           {papersSimilarTo?.data?.map((paper: Paper) => (
             <li
               key={paper.title}
-              className="max-w-full bg-white z-40 border p-5 whitespace-wrap hover:bg-zinc-800 hover:text-white flex-1 hover:cursor-pointer"
+              className="max-w-full border p-5 whitespace-wrap hover:bg-zinc-800 hover:text-white flex-1 hover:cursor-pointer"
               onClick={() => {
                 setPeriodical("");
                 onClick(paper);
