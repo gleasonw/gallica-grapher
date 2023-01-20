@@ -30,7 +30,7 @@ export const PaperSelector: React.FC<{
             ? `In ${papers.length} ${
                 papers.length === 1 ? "periodical" : "periodicals"
               }`
-            : `In ${numPapers?.data} periodicals`
+            : `In ${numPapers?.data || "..."} periodicals`
         }
         onClick={() => setDisplayed(!displayed)}
       />

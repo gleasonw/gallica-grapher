@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc";
 
-const apiURL = process.env.PUBLIC_API_URL || "http://localhost:8000";
+const apiURL = "https://gallica-grapher-production-16e8.up.railway.app";
 
 //snake case cuz that's what the API returns
 export interface Paper {
@@ -85,7 +85,9 @@ export const appRouter = router({
       if (!input.title) {
         return [];
       }
-      const response = await fetch(`${apiURL}/api/papers/${input.title}`);
+      const response = await fetch(
+        `${apiURL}/api/papers/${input.title}`
+      );
       const data = (await response.json()) as { papers: Paper[] };
       return data.papers;
     }),
@@ -139,7 +141,9 @@ export const appRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const response = await fetch(`${apiURL}/poll/progress/${input.id}`);
+      const response = await fetch(
+        `${apiURL}/poll/progress/${input.id}`
+      );
       const data = (await response.json()) as ProgressType;
       return data;
     }),
