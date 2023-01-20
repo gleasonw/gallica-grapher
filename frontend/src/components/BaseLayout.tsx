@@ -11,13 +11,13 @@ export const BaseLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
         </Link>
         <div className={"flex flex-row gap-5 align-center justify-center"}>
           <Link href="/info">
-            <Image src={"/info.svg"} className="w-10 h-10" alt={"Info page"} />
+            <Image src={"/info.svg"} width={30} height={30} alt={"Info page"} />
           </Link>
           <Link
             href={"https://github.com/gleasonw/gallica-grapher"}
             target={"_blank"}
           >
-            <Image src={"/github.svg"} className="w-10 h-10" alt={"Github"} />
+            <Image src={"/github.svg"} width={30} height={30} alt={"Github"} />
           </Link>
           <Link
             target={"_blank"}
