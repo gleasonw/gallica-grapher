@@ -89,7 +89,8 @@ def init(ticket: Ticket):
 
 class Progress(BaseModel):
     num_results_discovered: int
-    num_results_retrieved: int
+    num_requests_to_send: int
+    num_requests_sent: int
     estimate_seconds_to_completion: int
     random_paper: str
     random_text: str
@@ -114,7 +115,8 @@ def poll_request_state(request_id: str):
         else:
             progress = Progress(
                 num_results_discovered=0,
-                num_results_retrieved=0,
+                num_requests_to_send=0,
+                num_requests_sent=0,
                 estimate_seconds_to_completion=0,
                 random_paper="",
                 random_text="",
@@ -313,7 +315,8 @@ class Request(threading.Thread):
     def post_progress_to_redis(self, redis_conn):
         progress = Progress(
             num_results_discovered=self.num_records,
-            num_results_retrieved=self.num_requests_sent,
+            num_requests_to_send=self.total_requests,
+            num_requests_sent=self.num_requests_sent,
             backend_source=self.ticket.backend_source,
             estimate_seconds_to_completion=self.estimate_seconds_to_completion,
             random_paper=self.random_paper_for_progress,
