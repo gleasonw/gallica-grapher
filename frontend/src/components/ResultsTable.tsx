@@ -164,7 +164,16 @@ export const LargeTable: React.FC<{ data: GallicaRecord[] }> = ({ data }) => {
             <Cell>{record.term}</Cell>
             <Cell>{record.date}</Cell>
             <Cell>{record.paper_title}</Cell>
-            <Cell>{record.url}</Cell>
+            <Cell>
+              <a
+                href={record.url}
+                className={"underline"}
+                target={"_blank"}
+                rel={"noreferrer"}
+              >
+                Full text image
+              </a>
+            </Cell>
             <ContextCell record={record} />
           </tr>
         ))}
