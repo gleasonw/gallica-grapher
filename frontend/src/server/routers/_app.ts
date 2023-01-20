@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc";
 
-//snake case cuz that's what the API returns
+const apiURL = process.env.PUBLIC_API_URL || "http://localhost:8000";
 
+//snake case cuz that's what the API returns
 export interface Paper {
   title: string;
   code: string;
@@ -58,7 +59,7 @@ export const appRouter = router({
     )
     .query(async ({ input }) => {
       const response = await fetch(
-        `http://localhost:8000/api/ocrtext/${input.ark_code}/${input.term}`
+        `${apiURL}/api/ocrtext/${input.ark_code}/${input.term}`
       );
       const data = (await response.json()) as GallicaContext;
       return data;
@@ -84,9 +85,7 @@ export const appRouter = router({
       if (!input.title) {
         return [];
       }
-      const response = await fetch(
-        `http://localhost:8000/api/papers/${input.title}`
-      );
+      const response = await fetch(`${apiURL}/api/papers/${input.title}`);
       const data = (await response.json()) as { papers: Paper[] };
       return data.papers;
     }),
@@ -99,7 +98,7 @@ export const appRouter = router({
     )
     .query(async ({ input }) => {
       const response = await fetch(
-        `http://localhost:8000/api/numPapersOverRange/${input.from}/${input.to}`
+        `${apiURL}/api/numPapersOverRange/${input.from}/${input.to}`
       );
       const data = await response.json();
       return data;
@@ -123,7 +122,7 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const response = await fetch(`http://localhost:8000/api/init`, {
+      const response = await fetch(`${apiURL}/api/init`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,9 +139,7 @@ export const appRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const response = await fetch(
-        `http://localhost:8000/poll/progress/${input.id}`
-      );
+      const response = await fetch(`${apiURL}/poll/progress/${input.id}`);
       const data = (await response.json()) as ProgressType;
       return data;
     }),
@@ -157,7 +154,7 @@ export const appRouter = router({
     )
     .query(async ({ input }) => {
       const response = await fetch(
-        `http://localhost:8000/api/graphData?request_id=${input.id}&backend_source=${input.backend_source}&grouping=${input.grouping}&average_window=${input.smoothing}`
+        `${apiURL}/api/graphData?request_id=${input.id}&backend_source=${input.backend_source}&grouping=${input.grouping}&average_window=${input.smoothing}`
       );
       const data = (await response.json()) as GraphData;
       return data;
@@ -180,7 +177,7 @@ export const appRouter = router({
       if (input.terms.length === 0) {
         return [];
       }
-      let url = "http://localhost:8000/api/gallicaRecords?";
+      let url = `${apiURL}/api/gallicaRecords?`;
       if (input.year) {
         url += `year=${input.year}`;
       }
