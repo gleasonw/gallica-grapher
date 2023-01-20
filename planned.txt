@@ -1,4 +1,0 @@
-* sessions to store prior requests key
-* French translation
-* weight newspapers by influence, run a script to track how often they mention one another
-* a graph network?
