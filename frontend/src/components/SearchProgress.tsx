@@ -21,11 +21,12 @@ export const SearchProgress: React.FC<{
     }
   );
 
+  const { onFetchComplete } = props;
   useEffect(() => {
     if (data && data.state === "completed") {
-      props.onFetchComplete(data.backend_source);
+      onFetchComplete(data.backend_source);
     }
-  }, [data]);
+  }, [data, onFetchComplete]);
 
   const progress = data;
 

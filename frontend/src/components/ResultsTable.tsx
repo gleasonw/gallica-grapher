@@ -100,7 +100,9 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
               className={"border  bg-white p-5"}
             >
               {props.tickets?.map((ticket) => (
-                <option value={ticket.id}>{ticket.terms}</option>
+                <option key={ticket.id} value={ticket.id}>
+                  {ticket.terms}
+                </option>
               ))}
             </select>
           </InputLabel>
@@ -126,6 +128,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                   );
                 }
               }}
+              key={paper.code}
               className={"p-5 border hover:bg-zinc-100"}
             >
               {paper.title}

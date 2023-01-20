@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export const BaseLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
@@ -10,13 +11,13 @@ export const BaseLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
         </Link>
         <div className={"flex flex-row gap-5 align-center justify-center"}>
           <Link href="/info">
-            <img src={"/info.svg"} className="w-10 h-10" />
+            <Image src={"/info.svg"} className="w-10 h-10" alt={"Info page"} />
           </Link>
           <Link
             href={"https://github.com/gleasonw/gallica-grapher"}
             target={"_blank"}
           >
-            <img src={"/github.svg"} className="w-10 h-10" />
+            <Image src={"/github.svg"} className="w-10 h-10" alt={"Github"} />
           </Link>
           <Link
             target={"_blank"}
