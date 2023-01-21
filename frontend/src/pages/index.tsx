@@ -4,6 +4,10 @@ import { Paper } from "../server/routers/_app";
 import { BaseLayout } from "../components/BaseLayout";
 import { InputForm } from "../components/InputForm";
 import { ResultViewer } from "../components/ResultViewer";
+import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import { appRouter } from "../server/routers/_app";
+import { trpc } from "../utils/trpc";
+import { tickStep } from "d3";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,6 +46,33 @@ const initTickets = [
   },
 ] as Ticket[];
 
+export async function getStaticProps() {
+  const ssg = createProxySSGHelpers({
+    router: appRouter,
+    ctx: {},
+  });
+
+  initTickets.map(async (ticket) => {
+    console.log("fetch server side")
+    await ssg.graphData.fetch({
+      id: ticket.id,
+      grouping: "month",
+      smoothing: 0,
+      backend_source: "pyllica",
+    });
+  });
+
+  await ssg.gallicaRecords.fetch({
+    terms: initTickets[0].terms,
+  });
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+    },
+  };
+}
+
 export default function Home() {
   const [tickets, setTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1865, 1950]);
@@ -67,10 +98,7 @@ export default function Home() {
           }
         }}
       />
-      <ResultViewer
-        tickets={tickets}
-        outerRange={outerRange}
-      />
+      <ResultViewer tickets={tickets} outerRange={outerRange} />
     </BaseLayout>
   );
 }
