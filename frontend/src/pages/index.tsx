@@ -8,6 +8,8 @@ import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { appRouter } from "../server/routers/_app";
 import { trpc } from "../utils/trpc";
 import { tickStep } from "d3";
+import { DehydratedState } from "@tanstack/react-query";
+import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,7 +38,9 @@ const initTickets = [
   },
 ] as Ticket[];
 
-export async function getStaticProps() {
+export const getStaticProps: GetStaticProps<{
+  trpcState: DehydratedState;
+}> = async () => {
   const ssg = createProxySSGHelpers({
     router: appRouter,
     ctx: {},
@@ -59,9 +63,11 @@ export async function getStaticProps() {
       trpcState: ssg.dehydrate(),
     },
   };
-}
+};
 
-export default function Home({ trpcState }) {
+export default function Home({
+  trpcState,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   console.log(trpcState);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
