@@ -34,16 +34,6 @@ const initTickets = [
     terms: ["brazza"],
     grouping: "month",
   },
-  {
-    id: 1,
-    terms: ["congo"],
-    grouping: "month",
-  },
-  {
-    id: 2,
-    terms: ["stanley"],
-    grouping: "month",
-  },
 ] as Ticket[];
 
 export async function getStaticProps() {
@@ -52,16 +42,12 @@ export async function getStaticProps() {
     ctx: {},
   });
 
-  initTickets.map(async (ticket) => {
-    console.log("fetch server side")
-    await ssg.graphData.fetch({
-      id: ticket.id,
-      grouping: "month",
-      smoothing: 0,
-      backend_source: "pyllica",
-    });
+  await ssg.graphData.fetch({
+    id: initTickets[0].id,
+    grouping: "month",
+    smoothing: 0,
+    backend_source: "pyllica",
   });
-
   await ssg.gallicaRecords.fetch({
     terms: initTickets[0].terms,
   });
@@ -73,7 +59,8 @@ export async function getStaticProps() {
   };
 }
 
-export default function Home() {
+export default function Home({ trpcState }) {
+  console.log(trpcState);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [outerRange, setOuterRange] = useState<[number, number]>([1865, 1950]);
 
