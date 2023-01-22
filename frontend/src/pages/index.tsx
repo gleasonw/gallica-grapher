@@ -74,7 +74,7 @@ export async function getStaticProps() {
 }
 
 export default function Home() {
-  const [tickets, setTickets] = useState<Ticket[]>(initTickets);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [outerRange, setOuterRange] = useState<[number, number]>([1865, 1950]);
 
   return (
