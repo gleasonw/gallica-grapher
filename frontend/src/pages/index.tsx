@@ -42,15 +42,17 @@ export async function getStaticProps() {
     ctx: {},
   });
 
-  await ssg.graphData.fetch({
-    id: initTickets[0].id,
-    grouping: "month",
-    smoothing: 0,
-    backend_source: "pyllica",
-  });
-  await ssg.gallicaRecords.fetch({
-    terms: initTickets[0].terms,
-  });
+  await Promise.allSettled([
+    ssg.graphData.fetch({
+      id: initTickets[0].id,
+      grouping: "month",
+      smoothing: 0,
+      backend_source: "pyllica",
+    }),
+    ssg.gallicaRecords.fetch({
+      terms: initTickets[0].terms,
+    }),
+  ]);
 
   return {
     props: {
