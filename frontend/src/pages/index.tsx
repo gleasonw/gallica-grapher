@@ -62,7 +62,7 @@ export async function getStaticProps() {
 export default function Home({ trpcState }) {
   console.log(trpcState);
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [outerRange, setOuterRange] = useState<[number, number]>([1865, 1950]);
+  const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
 
   return (
     <BaseLayout>
