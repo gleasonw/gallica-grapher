@@ -15,6 +15,7 @@ import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
 import { debugPort } from "process";
 import { generateXAxisOptionsForNumericScale } from "./utils";
+import { DehydratedState } from "@tanstack/react-query";
 
 export const seriesColors = [
   "#7cb5ec",
@@ -32,6 +33,7 @@ export const seriesColors = [
 interface ResultViewerProps {
   tickets: Ticket[];
   outerRange: [number, number];
+  initialData: DehydratedState
 }
 
 export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
