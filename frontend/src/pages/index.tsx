@@ -66,8 +66,7 @@ export const getStaticProps: GetStaticProps<{
 export default function Home({
   trpcState,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.log(trpcState);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
 
   return (
@@ -91,7 +90,11 @@ export default function Home({
           }
         }}
       />
-      <ResultViewer tickets={tickets} outerRange={outerRange} />
+      <ResultViewer
+        tickets={tickets}
+        outerRange={outerRange}
+        initialData={trpcState}
+      />
     </BaseLayout>
   );
 }
