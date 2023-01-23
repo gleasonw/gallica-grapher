@@ -68,7 +68,6 @@ export const getStaticProps: GetStaticProps<{
 export default function Home({
   trpcState,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.log(trpcState);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
 
