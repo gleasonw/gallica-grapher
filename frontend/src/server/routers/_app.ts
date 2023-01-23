@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc";
 
-const apiURL = "https://gallica-grapher-production-16e8.up.railway.app";
+let apiURL: string; 
+if (process.env.NODE_ENV === "development") {
+  apiURL = "http://localhost:8000";
+} else {
+  apiURL = "https://gallica-grapher-production-16e8.up.railway.app";
+}
 
 //snake case cuz that's what the API returns
 export interface Paper {

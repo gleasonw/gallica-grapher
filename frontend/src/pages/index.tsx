@@ -6,8 +6,6 @@ import { InputForm } from "../components/InputForm";
 import { ResultViewer } from "../components/ResultViewer";
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { appRouter } from "../server/routers/_app";
-import { trpc } from "../utils/trpc";
-import { tickStep } from "d3";
 import { DehydratedState } from "@tanstack/react-query";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 
@@ -47,13 +45,13 @@ export const getStaticProps: GetStaticProps<{
   });
 
   await Promise.allSettled([
-    ssg.graphData.fetch({
+    ssg.graphData.prefetch({
       id: initTickets[0].id,
       grouping: "month",
       smoothing: 0,
       backend_source: "pyllica",
     }),
-    ssg.gallicaRecords.fetch({
+    ssg.gallicaRecords.prefetch({
       terms: initTickets[0].terms,
     }),
   ]);
