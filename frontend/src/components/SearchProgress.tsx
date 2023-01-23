@@ -39,7 +39,7 @@ export const SearchProgress: React.FC<{
   );
 
   return (
-    <div className="flex flex-col justify-center m-5">
+    <div className="flex flex-col justify-center m-10 mb-20">
       <div>
         <div>{props.ticket.terms.join(", ")}</div>
         <div>{props.ticket.papers?.map((paper) => paper.title + ", ")}</div>

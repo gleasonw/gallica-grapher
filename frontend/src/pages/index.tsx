@@ -8,6 +8,7 @@ import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { appRouter } from "../server/routers/_app";
 import { DehydratedState } from "@tanstack/react-query";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
+import { trpc } from "../utils/trpc";
 
 const inter = Inter({ subsets: ["latin"] });
 

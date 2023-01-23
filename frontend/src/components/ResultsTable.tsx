@@ -136,11 +136,13 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
           ))}
         </div>
       </div>
-      <div className={"hidden md:block lg:block"}>
-        <LargeTable data={data} />
-      </div>
-      <div className={"md:hidden lg:hidden"}>
-        <MobileTable data={data} />
+      <div className="bg-zinc-100">
+        <div className={"hidden md:block lg:block"}>
+          <LargeTable data={data} />
+        </div>
+        <div className={"md:hidden lg:hidden"}>
+          <MobileTable data={data} />
+        </div>
       </div>
     </div>
   );
@@ -160,7 +162,7 @@ export const LargeTable: React.FC<{ data: GallicaRecord[] }> = ({ data }) => {
       </thead>
       <tbody>
         {data?.map((record, index) => (
-          <tr key={index} className={"odd:bg-zinc-100"}>
+          <tr key={index} className={"odd:bg-white"}>
             <Cell>{record.term}</Cell>
             <Cell>{record.date}</Cell>
             <Cell>{record.paper_title}</Cell>
@@ -194,7 +196,7 @@ export const MobileTable: React.FC<{ data: GallicaRecord[] }> = ({ data }) => {
       </thead>
       <tbody>
         {data?.map((record, index) => (
-          <tr key={index} className={"odd:bg-zinc-100"}>
+          <tr key={index} className={"odd:bg-white"}>
             <td>{record.term}</td>
             <td>{record.date}</td>
             <ContextCell record={record} />

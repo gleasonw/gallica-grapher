@@ -9,7 +9,7 @@ interface RangeInputProps {
 }
 export const RangeInput: React.FC<RangeInputProps> = (props) => {
   return (
-    <div className={"flex flex-row p-5 border gap-10 flex-wrap"}>
+    <div className={"flex shadow-xl flex-row p-5 bg-white gap-10 flex-wrap"}>
       Between
       <input
         className="w-20"

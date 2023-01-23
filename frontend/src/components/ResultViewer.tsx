@@ -9,11 +9,9 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
-import { Paper } from "../server/routers/_app";
 import { ResultsTable } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
-import { debugPort } from "process";
 import { generateXAxisOptionsForNumericScale } from "./utils";
 import { DehydratedState } from "@tanstack/react-query";
 
@@ -158,6 +156,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
               type="monotone"
               dataKey="count"
               stroke={seriesColors[index % seriesColors.length]}
+              strokeWidth={2}
               data={ticket.data?.data}
               name={ticket.data?.name}
               dot={false}

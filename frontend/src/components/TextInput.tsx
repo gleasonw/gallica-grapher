@@ -17,7 +17,7 @@ export const TextInput: React.FC<TextInputProps> = ({
 }) => {
   return (
     <input
-      className="border-2 text-2xl p-5 bg-inherit"
+      className="text-2xl border-rounded shadow-xl bg-white p-5"
       placeholder={placeholder}
       value={value || ""}
       onChange={onChange}
