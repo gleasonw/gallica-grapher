@@ -72,6 +72,11 @@ export const InputForm: React.FC<InputFormProps> = ({
             setSubmitted(false);
             setWord("");
           }}
+          onNoRecordsFound={() => {
+            alert("No records found for this search")
+            setSubmitted(false);
+            setWord("");
+          }}
         />
         <TicketRow
           tickets={tickets}

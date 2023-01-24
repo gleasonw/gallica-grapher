@@ -2,7 +2,7 @@ import json
 import os
 import random
 import threading
-from typing import List, Optional, Literal, Callable, Tuple
+from typing import Generator, List, Optional, Literal, Callable, Tuple
 
 import uvicorn
 from fastapi import FastAPI, Query
@@ -329,6 +329,7 @@ class Request(threading.Thread):
         )
 
     def run(self):
+        """Fetch records for user from Gallica or Pyllica and insert to DB for graphing"""
         with connContext.build_redis_conn() as redis_conn:
             with self.conn or connContext.build_db_conn() as db_conn:
                 if self.ticket.codes:
@@ -358,17 +359,15 @@ class Request(threading.Thread):
                             redis_conn=redis_conn,
                             progress=stats,
                         ),
-                        on_pyllica_no_records_found=lambda: self.set_no_records(
-                            redis_conn
-                        ),
+                        on_pyllica_no_records_found=self.set_no_records,
                         conn=db_conn,
                     )
-                    self.state = "completed"
+                    if self.state not in ["too_many_records", "no_records"]:
+                        self.state = "completed"
                     self.post_progress_to_redis(redis_conn)
 
-    def set_no_records(self, redis_conn):
+    def set_no_records(self):
         self.state = "no_records"
-        self.post_progress_to_redis(redis_conn)
 
     def set_total_records_for_ticket_progress(self, num_records):
         self.num_records = num_records
@@ -485,7 +484,9 @@ def get_and_insert_records_for_ticket(
 ):
     if ticket.backend_source == "gallica":
         if ticket.grouping == "all":
-            volume_api: VolumeOccurrenceWrapper = gallicaGetter.connect("volume", api=api)
+            volume_api: VolumeOccurrenceWrapper = gallicaGetter.connect(
+                "volume", api=api
+            )
             records = volume_api.get(
                 terms=ticket.terms,
                 start_date=ticket.start_date,
@@ -505,7 +506,9 @@ def get_and_insert_records_for_ticket(
                 request_id=requestID,
             )
         elif ticket.grouping in ["year", "month"]:
-            period_api: PeriodOccurrenceWrapper = gallicaGetter.connect("period", api=api)
+            period_api: PeriodOccurrenceWrapper = gallicaGetter.connect(
+                "period", api=api
+            )
             period_records = period_api.get(
                 terms=ticket.terms,
                 codes=ticket.codes,
@@ -535,7 +538,7 @@ def get_and_insert_records_for_ticket(
 
 
 def insert_records_into_db(
-    records_for_db: List,
+    records_for_db: Generator,
     conn,
     request_id: int,
     insert_into_results: bool = False,

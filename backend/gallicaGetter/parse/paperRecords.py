@@ -15,6 +15,7 @@ def parse_responses_to_records(responses):
                 code=get_paper_code_from_record_xml(record),
                 title=get_paper_title_from_record_xml(record),
                 url=get_url_from_record(record),
+                publishing_years=[],
             )
 
 
@@ -23,7 +24,7 @@ class PaperRecord:
     code: str
     title: str
     url: str
-    publishing_years: List[int] = []
+    publishing_years: List[int]
 
     @property
     def continuous(self):

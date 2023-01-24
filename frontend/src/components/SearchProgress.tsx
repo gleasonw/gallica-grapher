@@ -5,6 +5,7 @@ import { Ticket } from "../pages/index";
 export const SearchProgress: React.FC<{
   ticket: Ticket;
   onFetchComplete: (backend_source: "gallica" | "pyllica") => void;
+  onNoRecordsFound: () => void;
 }> = (props) => {
   const { data } = trpc.progress.useQuery(
     {
@@ -21,12 +22,15 @@ export const SearchProgress: React.FC<{
     }
   );
 
-  const { onFetchComplete } = props;
+  const { onFetchComplete, onNoRecordsFound } = props;
   useEffect(() => {
+    if (data && data.state === "no_records") {
+      onNoRecordsFound();
+    }
     if (data && data.state === "completed") {
       onFetchComplete(data.backend_source);
     }
-  }, [data, onFetchComplete]);
+  }, [data, onFetchComplete, onNoRecordsFound]);
 
   const progress = data;
 
@@ -55,9 +59,12 @@ export const SearchProgress: React.FC<{
               {progress.estimate_seconds_to_completion > 0 && (
                 <div>{progress.estimate_seconds_to_completion}</div>
               )}
-              <div>
-                {progress.num_results_discovered} results in the French archive
-              </div>
+              {progress.backend_source === "gallica" && (
+                <div>
+                  {progress.num_results_discovered} results in the French
+                  archive
+                </div>
+              )}
             </div>
           )}
         </div>
