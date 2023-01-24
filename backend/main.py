@@ -331,24 +331,25 @@ class Request(threading.Thread):
     def run(self):
         with connContext.build_redis_conn() as redis_conn:
             with self.conn or connContext.build_db_conn() as db_conn:
-                db_space_remaining = (
-                    MAX_DB_SIZE - get_number_rows_in_db(conn=db_conn) - 10000
-                )
+                if self.ticket.codes:
+                    self.ticket.backend_source = "gallica"
+                    self.num_records, self.ticket = get_num_records_on_gallica_for_args(
+                        ticket=self.ticket,
+                        on_num_records_found=self.set_total_records_for_ticket_progress,
+                    )
+                else:
+                    # Too slow to check for a null request by asking Gallica,
+                    # so just assume there are records for now, pass a callback
+                    # to Pyllica wrapper that will update frontend if null request
+                    self.ticket.backend_source = "pyllica"
+                    self.num_records = 1
 
-                self.num_records, self.ticket = get_num_records_for_args(
-                    ticket=self.ticket,
-                    on_num_records_found=self.set_total_records_for_ticket_progress,
-                )
-
-                # Inform frontend of any state changes
+                # Inform frontend of total number of records
                 self.post_progress_to_redis(redis_conn=redis_conn)
 
                 if self.num_records == 0:
                     self.state = "no_records"
-                elif (
-                    self.num_records > min(db_space_remaining, RECORD_LIMIT)
-                    and self.ticket.backend_source == "gallica"
-                ):
+                elif self.num_records > RECORD_LIMIT:
                     self.state = "too_many_records"
                 else:
                     get_and_insert_records_for_ticket(
@@ -357,15 +358,17 @@ class Request(threading.Thread):
                             redis_conn=redis_conn,
                             progress=stats,
                         ),
-                        on_adding_missing_papers=self.set_adding_missing_papers,
+                        on_pyllica_no_records_found=lambda: self.set_no_records(
+                            redis_conn
+                        ),
                         conn=db_conn,
                     )
-                    self.post_progress_to_redis(redis_conn)
                     self.state = "completed"
-        self.post_progress_to_redis(redis_conn)
+                    self.post_progress_to_redis(redis_conn)
 
-    def set_adding_missing_papers(self):
-        self.state = "adding_missing_papers"
+    def set_no_records(self, redis_conn):
+        self.state = "no_records"
+        self.post_progress_to_redis(redis_conn)
 
     def set_total_records_for_ticket_progress(self, num_records):
         self.num_records = num_records
@@ -390,69 +393,48 @@ class Request(threading.Thread):
             raise KeyboardInterrupt
 
 
-def get_number_rows_in_db(conn):
-    with conn.cursor() as curs:
-        curs.execute(
-            """
-            SELECT sum(reltuples)::bigint AS estimate
-            FROM pg_class
-            WHERE relname IN ('results', 'papers');
-            """
-        )
-        return curs.fetchone()[0]
-
-
-def get_num_records_for_args(
+def get_num_records_on_gallica_for_args(
     ticket: Ticket,
     on_num_records_found: Optional[Callable[[int], None]] = None,
 ) -> Tuple[int, Ticket]:
     total_records = 0
     cached_queries = []
 
-    # get total record so we can tell the user if there are no records, regardless of search type
-    # TODO: only do this if not pyllica. if pyllica, pass a callback during the get, trigger if no records = no waiting for API
     base_queries_with_num_results = get_num_records_all_volume_occurrence(ticket)
     num_records = sum(query.num_results for query in base_queries_with_num_results)
 
-    if ticket.grouping == "all" or ticket.codes:
-
-        # Don't make more requests than there are records, only applies to code-filtered requests,
-        # which cannot use Pyllica, which is only one request (I think, it's been a while)
-
-        if ticket.codes and ticket.grouping in ["year", "month"]:
-            num_periods_to_fetch = get_num_periods_in_range_for_grouping(
-                grouping=ticket.grouping,
-                start=ticket.start_date,
-                end=ticket.end_date,
-            )
-            if num_periods_to_fetch > (num_records // 50) + 1:
-
-                # update ticket so we don't make more requests than there are record batches
-
-                ticket = Ticket(
-                    id=ticket.id,
-                    terms=ticket.terms,
-                    start_date=ticket.start_date,
-                    end_date=ticket.end_date,
-                    codes=ticket.codes,
-                    grouping="all",
-                    link_term=ticket.link_term,
-                    link_distance=ticket.link_distance,
-                )
-            else:
-                num_records = num_periods_to_fetch
-
-        total_records += num_records
-        cached_queries = base_queries_with_num_results
-    else:
-        if num_records and ticket.grouping in ["gallicaMonth", "gallicaYear"]:
-            total_records += get_num_periods_in_range_for_grouping(
-                grouping=ticket.grouping,
-                start=ticket.start_date,
-                end=ticket.end_date,
+    # Ensure we don't make more requests than there are tickets. Switch to fetching all
+    # records if so, faster to group ourselves on DB
+    if ticket.grouping != "all":
+        num_periods_to_fetch = get_num_periods_in_range_for_grouping(
+            grouping=ticket.grouping,
+            start=ticket.start_date,
+            end=ticket.end_date,
+        )
+        # more requests to be sent than if we just fetched all the records ?
+        if num_periods_to_fetch > (num_records // 50) + 1:
+            ticket = Ticket(
+                id=ticket.id,
+                terms=ticket.terms,
+                start_date=ticket.start_date,
+                end_date=ticket.end_date,
+                codes=ticket.codes,
+                grouping="all",
+                link_term=ticket.link_term,
+                link_distance=ticket.link_distance,
             )
         else:
-            total_records += num_records
+            num_records = num_periods_to_fetch
+        total_records += num_records
+        cached_queries = base_queries_with_num_results
+    if num_records and ticket.grouping != "all":
+        total_records += get_num_periods_in_range_for_grouping(
+            grouping=ticket.grouping,
+            start=ticket.start_date,
+            end=ticket.end_date,
+        )
+    else:
+        total_records += num_records
 
     on_num_records_found and on_num_records_found(total_records)
 
@@ -496,93 +478,60 @@ def get_num_records_all_volume_occurrence(ticket: Ticket) -> List[OccurrenceQuer
 
 def get_and_insert_records_for_ticket(
     ticket: Ticket,
-    on_progress_update: callable,
+    on_progress_update: Callable,
     conn,
+    on_pyllica_no_records_found: Callable,
     api=None,
-    on_adding_missing_papers: callable = None,
 ):
-    match [ticket.grouping, bool(ticket.codes)]:
-        case ["all", True] | ["all", False]:
-            ticket.backend_source = "gallica"
-            all_volume_occurrence_search_ticket(
-                ticket=ticket,
-                conn=conn,
-                on_progress_update=on_progress_update,
-                on_adding_missing_papers=on_adding_missing_papers,
-                api=api,
+    if ticket.backend_source == "gallica":
+        if ticket.grouping == "all":
+            volume_api: VolumeOccurrenceWrapper = gallicaGetter.connect("volume", api=api)
+            records = volume_api.get(
+                terms=ticket.terms,
+                start_date=ticket.start_date,
+                end_date=ticket.end_date,
+                codes=ticket.codes,
+                link_term=ticket.link_term,
+                link_distance=ticket.link_distance,
+                onProgressUpdate=on_progress_update,
+                query_cache=ticket.cached_response,
+                generate=True,
+                num_workers=50,
             )
-        case ["year", False] | ["month", False]:
-            ticket.backend_source = "pyllica"
-            pyllica_search_ticket(ticket=ticket, conn=conn)
-        case ["year", True] | ["month", True]:
-            ticket.backend_source = "gallica"
-            period_occurrence_search_ticket(
-                ticket=ticket,
+            insert_records_into_db(
+                records_for_db=records,
+                insert_into_results=True,
                 conn=conn,
-                on_progress_update=on_progress_update,
-                api=api,
+                request_id=requestID,
             )
-        case _:
-            raise ValueError(f"Invalid search type: {ticket.grouping}, {ticket.codes}")
-
-
-def all_volume_occurrence_search_ticket(
-    ticket: Ticket,
-    conn,
-    on_progress_update: callable,
-    on_adding_missing_papers: callable,
-    api=None,
-):
-    api: VolumeOccurrenceWrapper = gallicaGetter.connect("volume", api=api)
-    records = api.get(
-        terms=ticket.terms,
-        start_date=ticket.start_date,
-        end_date=ticket.end_date,
-        codes=ticket.codes,
-        link_term=ticket.link_term,
-        link_distance=ticket.link_distance,
-        onProgressUpdate=on_progress_update,
-        query_cache=ticket.cached_response,
-        generate=True,
-        num_workers=50,
-    )
-    insert_records_into_db(
-        records_for_db=records,
-        insert_into_results=True,
-        conn=conn,
-        request_id=requestID,
-        on_adding_missing_papers=on_adding_missing_papers,
-    )
-
-
-def pyllica_search_ticket(ticket: Ticket, conn):
-    pyllica_records = pyllicaWrapper.get(ticket)
-    insert_records_into_db(
-        records_for_db=pyllica_records, conn=conn, request_id=ticket.id
-    )
-
-
-def period_occurrence_search_ticket(
-    ticket: Ticket,
-    conn,
-    on_progress_update: callable,
-    api=None,
-):
-    api: PeriodOccurrenceWrapper = gallicaGetter.connect("period", api=api)
-    period_records = api.get(
-        terms=ticket.terms,
-        codes=ticket.codes,
-        start_date=ticket.start_date,
-        end_date=ticket.end_date,
-        onProgressUpdate=on_progress_update,
-        num_workers=50,
-        grouping=ticket.grouping,
-    )
-    insert_records_into_db(
-        records_for_db=period_records,
-        conn=conn,
-        request_id=ticket.id,
-    )
+        elif ticket.grouping in ["year", "month"]:
+            period_api: PeriodOccurrenceWrapper = gallicaGetter.connect("period", api=api)
+            period_records = period_api.get(
+                terms=ticket.terms,
+                codes=ticket.codes,
+                start_date=ticket.start_date,
+                end_date=ticket.end_date,
+                onProgressUpdate=on_progress_update,
+                num_workers=50,
+                grouping=ticket.grouping,
+            )
+            insert_records_into_db(
+                records_for_db=period_records,
+                conn=conn,
+                request_id=ticket.id,
+            )
+        else:
+            raise ValueError(f"Invalid grouping: {ticket.grouping}")
+    elif ticket.backend_source == "pyllica":
+        pyllica_records = pyllicaWrapper.get(
+            ticket, on_no_records_found=on_pyllica_no_records_found
+        )
+        if pyllica_records:
+            insert_records_into_db(
+                records_for_db=pyllica_records, conn=conn, request_id=ticket.id
+            )
+    else:
+        raise ValueError(f"Invalid backend_source: {ticket.backend_source}")
 
 
 def insert_records_into_db(
@@ -590,14 +539,12 @@ def insert_records_into_db(
     conn,
     request_id: int,
     insert_into_results: bool = False,
-    on_adding_missing_papers: callable = None,
 ):
     if insert_into_results:
         insert_records_into_results(
             records=records_for_db,
             conn=conn,
             request_id=request_id,
-            on_adding_missing_papers=on_adding_missing_papers,
         )
     else:
         insert_records_into_groupcounts(

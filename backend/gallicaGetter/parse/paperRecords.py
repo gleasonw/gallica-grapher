@@ -23,7 +23,7 @@ class PaperRecord:
     code: str
     title: str
     url: str
-    publishing_years: Optional[List[int]] = None
+    publishing_years: List[int] = []
 
     @property
     def continuous(self):

@@ -1,10 +1,10 @@
 from pyllicagram import pyllicagram as pyllica
 from gallicaGetter.parse.date import Date
 from gallicaGetter.parse.periodRecords import PeriodRecord
-from main import Ticket
+from typing import Callable
 
 
-def get(args: Ticket):
+def get(args, on_no_records_found: Callable):
     converted_args = {"recherche": args.terms, "somme": True, "corpus": "presse"}
     if start := args.start_date:
         converted_args["debut"] = Date(start).getYear()
@@ -12,7 +12,11 @@ def get(args: Ticket):
         converted_args["fin"] = Date(end).getYear()
     if args.grouping == "year":
         converted_args["resolution"] = "annee"
-    return convert_data_frame_to_grouped_record(pyllica(**converted_args))
+    periods = pyllica(**converted_args)
+    if all(periods.ratio == 0):
+        on_no_records_found()
+        return 
+    return convert_data_frame_to_grouped_record(periods)
 
 
 def convert_data_frame_to_grouped_record(frame):

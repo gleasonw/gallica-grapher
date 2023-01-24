@@ -122,11 +122,6 @@ export const InputForm: React.FC<InputFormProps> = ({
   }
 };
 
-interface InputEntryProps {
-  label: string;
-  children: JSX.Element;
-}
-
 interface TicketProps {
   ticket?: Ticket;
   onClick: (ticket?: Ticket) => void;
@@ -150,7 +145,7 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
             viewBox="0 0 800 800"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <rect x="0" y="0" width="80" height="80" fill={color}/>
+            <rect x="0" y="0" width="80" height="80" fill={color} />
           </svg>
           <div className={"absolute top-0 right-3 text-3xl"}>-</div>
           <div>{ticket.terms.join(", ")}</div>

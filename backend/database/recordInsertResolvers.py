@@ -13,7 +13,7 @@ def insert_records_into_papers(records, conn):
         curs.copy_from(csvStream, "papers", sep="|")
 
 
-def insert_records_into_results(records, request_id, on_adding_missing_papers, conn):
+def insert_records_into_results(records, request_id, conn):
     stream, codes = build_csv_stream_ensure_no_issue_duplicates(
         records=records,
         request_id=request_id,
@@ -25,7 +25,6 @@ def insert_records_into_results(records, request_id, on_adding_missing_papers, c
     )
     missing_codes = codes - codes_in_db
     if missing_codes:
-        on_adding_missing_papers and on_adding_missing_papers()
         insert_missing_codes_into_db(missing_codes, conn=conn)
     with conn.cursor() as curs:
         curs.copy_from(
