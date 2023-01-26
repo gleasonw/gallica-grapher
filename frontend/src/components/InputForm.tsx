@@ -3,7 +3,7 @@ import { Paper } from "../server/routers/_app";
 import { trpc } from "../utils/trpc";
 import { Ticket } from "../pages/index";
 import { TextInput } from "./TextInput";
-import { PaperSelector as PaperInput } from "./PaperSelector";
+import { PaperSelector } from "./PaperSelector";
 import { RangeInput } from "./RangeInput";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./ResultViewer";
@@ -99,18 +99,6 @@ export const InputForm: React.FC<InputFormProps> = ({
                 handleSubmit();
               }
             }}
-          />
-          <PaperInput
-            papers={papers}
-            onPaperClick={(paper) => {
-              setPapers(papers.filter((p) => p !== paper));
-            }}
-            onPaperAdd={(paper) => {
-              setPapers([...papers, paper]);
-            }}
-            from={yearRange[0]}
-            to={yearRange[1]}
-            smallText={true}
           />
           <RangeInput
             min={1800}
