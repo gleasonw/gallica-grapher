@@ -33,25 +33,19 @@ export const Context: React.FC<{
         }
         dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }}
       />
-      <div className={"grid justify-items-stretch pt-10"}>
-        {pageIndex > 0 && (
-          <button
-            className={"justify-self-start"}
-            onClick={() => setPageIndex(pageIndex - 1)}
-          >
-            Previous
-          </button>
+      <div className={"flex flex-row justify-between pt-10"}>
+        {pageIndex > 0 ? (
+          <button className={"text-3xl"} onClick={() => setPageIndex(pageIndex - 1)}>{"<"}</button>
+        ) : (
+          <div></div>
         )}
-        <div className={"justify-self-center"}>
+        <div className={"justify-center"}>
           Page {pageIndex + 1} of {data.num_results}
         </div>
-        {pageIndex < data.num_results - 1 && (
-          <button
-            className={"justify-self-end"}
-            onClick={() => setPageIndex(pageIndex + 1)}
-          >
-            Next
-          </button>
+        {pageIndex < data.num_results - 1 ? (
+          <button className={"text-3xl"} onClick={() => setPageIndex(pageIndex + 1)}>{">"}</button>
+        ) : (
+          <div></div>
         )}
       </div>
     </div>
