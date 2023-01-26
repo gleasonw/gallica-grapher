@@ -35,15 +35,25 @@ export const Context: React.FC<{
       />
       <div className={"flex flex-row justify-between pt-10"}>
         {pageIndex > 0 ? (
-          <button className={"text-3xl"} onClick={() => setPageIndex(pageIndex - 1)}>{"<"}</button>
+          <button
+            className={"text-3xl"}
+            onClick={() => setPageIndex(pageIndex - 1)}
+          >
+            {"<"}
+          </button>
         ) : (
           <div></div>
         )}
         <div className={"justify-center"}>
-          Page {pageIndex + 1} of {data.num_results}
+          {pageIndex + 1} of {data.num_results}
         </div>
         {pageIndex < data.num_results - 1 ? (
-          <button className={"text-3xl"} onClick={() => setPageIndex(pageIndex + 1)}>{">"}</button>
+          <button
+            className={"text-3xl"}
+            onClick={() => setPageIndex(pageIndex + 1)}
+          >
+            {">"}
+          </button>
         ) : (
           <div></div>
         )}
