@@ -1,9 +1,7 @@
 import React from "react";
 import { trpc } from "../utils/trpc";
-import { Ticket } from "../pages/index";
 import { GallicaRecord, Paper } from "../server/routers/_app";
 import { InputLabel } from "./InputLabel";
-import { SelectInput } from "./SelectInput";
 import { ContextCell } from "./ContextCell";
 import { PaperDropdown } from "./PaperDropdown";
 
@@ -39,6 +37,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   if (isError) {
     return <div>Error</div>;
   }
+
   return (
     <div className={"flex flex-col"}>
       <div className={"m-auto ml-5 "}>

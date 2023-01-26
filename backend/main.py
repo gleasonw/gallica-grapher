@@ -2,39 +2,32 @@ import json
 import os
 import random
 import threading
-from typing import Generator, List, Optional, Literal, Callable, Tuple
-
-import uvicorn
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from typing import Callable, Generator, List, Literal, Optional, Tuple
 
 import gallicaGetter
 import pyllicaWrapper as pyllicaWrapper
+import uvicorn
 from database import connContext
 from database.connContext import build_db_conn, build_redis_conn
-from database.displayDataResolvers import (
-    select_display_records,
-    get_gallica_records_for_display,
-    clear_records_for_requestid,
-    get_ocr_text_for_record,
-    select_csv_data_for_tickets,
-    select_top_papers_for_tickets,
-)
+from database.displayDataResolvers import (clear_records_for_requestid,
+                                           get_gallica_records_for_display,
+                                           get_ocr_text_for_record,
+                                           select_csv_data_for_tickets,
+                                           select_display_records,
+                                           select_top_papers_for_tickets)
 from database.graphDataResolver import build_highcharts_series
-from database.paperSearchResolver import (
-    select_papers_similar_to_keyword,
-    get_num_papers_in_range,
-)
-from database.recordInsertResolvers import (
-    insert_records_into_results,
-    insert_records_into_groupcounts,
-)
-from gallicaGetter import VolumeOccurrenceWrapper, PeriodOccurrenceWrapper
+from database.paperSearchResolver import (get_num_papers_in_range,
+                                          select_papers_similar_to_keyword)
+from database.recordInsertResolvers import (insert_records_into_groupcounts,
+                                            insert_records_into_results)
+from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
+from gallicaGetter import PeriodOccurrenceWrapper, VolumeOccurrenceWrapper
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.progressUpdate import ProgressUpdate
 from gallicaGetter.parse.contentRecord import ContentRecord
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
+from pydantic import BaseModel
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000

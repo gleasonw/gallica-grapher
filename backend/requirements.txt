@@ -6,7 +6,6 @@ Flask==2.2.2
 Flask_Cors==3.0.10
 lxml==4.9.1
 pandas==1.5.2
-psycopg2==2.9.5
 psycopg2_binary==2.9.5
 pydantic==1.10.2
 redis==4.4.0
