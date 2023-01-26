@@ -85,7 +85,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                 key={record.url}
                 className={"flex flex-col gap-5 bg-white p-5 shadow-md"}
               >
-                <div className={"flex flex-row gap-5"}>
+                <div className={"flex flex-row gap-10 text-lg pb-5"}>
                   <p>{record.term}</p>
                   <p>{record.date}</p>
                   <p>{record.paper_title}</p>
