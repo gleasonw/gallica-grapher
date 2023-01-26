@@ -43,7 +43,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       <div className={"m-auto ml-5 "}>
         <div
           className={
-            "flex flex-row flex-wrap gap-5 pt-10 pb-10 md:gap-10 lg:gap-10"
+            "flex flex-row flex-wrap gap-5 pt-10 md:gap-10 lg:gap-10"
           }
         >
           {props.children || <></>}
