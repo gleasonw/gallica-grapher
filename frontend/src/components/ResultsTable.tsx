@@ -44,7 +44,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       <div className={"m-auto ml-5 "}>
         <div
           className={
-            "gap-5 flex flex-row flex-wrap pt-10 pb-10 md:gap-10 lg:gap-10"
+            "flex flex-row flex-wrap gap-5 pt-10 pb-10 md:gap-10 lg:gap-10"
           }
         >
           {props.children || <></>}
@@ -60,7 +60,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
             />
           </InputLabel>
         </div>
-        <div className={"flex flex-row mb-10 flex-wrap gap-10"}>
+        <div className={"mb-10 flex flex-row flex-wrap gap-10"}>
           {selectedPapers?.map((paper) => (
             <button
               onClick={() => {
@@ -71,7 +71,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                 }
               }}
               key={paper.code}
-              className={"p-5 border hover:bg-zinc-100"}
+              className={"border p-5 hover:bg-zinc-100"}
             >
               {paper.title}
             </button>
@@ -92,7 +92,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
 
 export const LargeTable: React.FC<{ data: GallicaRecord[] }> = ({ data }) => {
   return (
-    <table className={"table-auto w-full h-full"}>
+    <table className={"h-full w-full table-auto"}>
       <thead>
         <tr>
           <th>Term</th>
@@ -128,7 +128,7 @@ export const LargeTable: React.FC<{ data: GallicaRecord[] }> = ({ data }) => {
 
 export const MobileTable: React.FC<{ data: GallicaRecord[] }> = ({ data }) => {
   return (
-    <table className={"table-auto w-full h-full"}>
+    <table className={"h-full w-full table-auto"}>
       <thead>
         <tr className={"table-row"}>
           <th>Term</th>

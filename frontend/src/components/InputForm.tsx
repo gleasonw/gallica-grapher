@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Paper, ProgressType } from "../server/routers/_app";
+import { Paper } from "../server/routers/_app";
 import { trpc } from "../utils/trpc";
 import { Ticket } from "../pages/index";
 import { TextInput } from "./TextInput";
