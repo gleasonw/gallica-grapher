@@ -18,7 +18,12 @@ export default function Context() {
 
   if (!result.success) {
     console.log(result);
-    return <div>Invalid query parameters; check console for detailed error</div>;
+    return (
+      <div>
+        <p>Invalid query parameters</p>
+        <div>{JSON.stringify(result.error)}</div>
+      </div>
+    );
   } else {
     const { terms, year, month, day } = result.data;
     return (
