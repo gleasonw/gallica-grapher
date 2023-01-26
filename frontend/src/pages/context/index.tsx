@@ -22,14 +22,12 @@ export default function Context() {
   } else {
     const { terms, year, month, day } = result.data;
     return (
-      <div>
-        <ResultsTable
-          terms={[terms]}
-          year={year || 0}
-          month={month || 0}
-          day={day || 0}
-        />
-      </div>
+      <ResultsTable
+        terms={[terms]}
+        year={year || 0}
+        month={month || 0}
+        day={day || 0}
+      />
     );
   }
 }
