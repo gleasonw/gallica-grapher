@@ -1,10 +1,10 @@
 # The Gallica Grapher
 
-## Pull requests and new contributors welcome! 
+### Pull requests and new contributors welcome! 
 
 If you have an idea, suggestion, or question about the code, don't hesitate to make a pull request or new issue.
 
-## Analyzing the Press
+### Analyzing the Press
 
 > "... a new way of linking fraternity, power and time meaningfully together ... [print-capitalism] made it possible for
 > rapidly growing numbers of people to think about themselves, and to
