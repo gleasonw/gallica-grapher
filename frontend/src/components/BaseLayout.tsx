@@ -28,10 +28,6 @@ export const BaseLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
           </Link>
         </div>
       </div>
-      <div className="text-3xl m-20 text-center">
-        {" "}
-        View word occurrences in archived French periodicals.
-      </div>
       {children}
     </div>
   );

@@ -72,6 +72,10 @@ export default function Home({
 
   return (
     <BaseLayout>
+      <div className="m-20 text-center text-3xl">
+        {" "}
+        View word occurrences in archived French periodicals.
+      </div>
       <InputForm
         onCreateTicket={(ticket: Ticket) => {
           if (tickets) {
