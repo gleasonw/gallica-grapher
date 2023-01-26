@@ -7,43 +7,27 @@ import { SelectInput } from "./SelectInput";
 import { ContextCell } from "./ContextCell";
 import { PaperDropdown } from "./PaperDropdown";
 
-interface TableProps {
-  tickets?: Ticket[];
+export interface TableProps {
+  terms?: string[];
+  codes?: string[];
   day?: number;
   month?: number;
   year?: number;
-  onSelectMonth: (month: number) => void;
-  onSelectYear: (year: number) => void;
-  onSelectDay: (day: number) => void;
+  children?: React.ReactNode;
 }
 
 export const ResultsTable: React.FC<TableProps> = (props) => {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
-  const [selectedTicket, setSelectedTicket] = React.useState<Ticket>();
-
-  let tableTerms: string[] = [];
-  let tableCodes: string[] = [];
-  if (selectedTicket) {
-    tableTerms = selectedTicket.terms;
-    if (selectedTicket.papers) {
-      tableCodes = selectedTicket.papers.map((p) => p.code);
-    }
-  } else if (props.tickets && props.tickets.length > 0) {
-    tableTerms = props.tickets[0].terms;
-    if (props.tickets[0].papers) {
-      tableCodes = props.tickets[0].papers.map((p) => p.code);
-    }
-  }
 
   const { data, isError, isLoading } = trpc.gallicaRecords.useQuery(
     {
       year: props.year,
       month: props.month,
       day: props.day,
-      codes: selectedPapers?.map((p) => p.code) || tableCodes,
-      terms: tableTerms,
+      codes: selectedPapers?.map((p) => p.code) || props.codes || [],
+      terms: props.terms || [],
     },
     { staleTime: Infinity, keepPreviousData: true }
   );
@@ -63,49 +47,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
             "gap-5 flex flex-row flex-wrap pt-10 pb-10 md:gap-10 lg:gap-10"
           }
         >
-          <InputLabel label={"Year"}>
-            <input
-              type={"number"}
-              className={"border  bg-white p-5"}
-              value={props.year}
-              onChange={(e) => props.onSelectYear(parseInt(e.target.value))}
-            />
-          </InputLabel>
-          <InputLabel label={"Month"}>
-            <SelectInput
-              options={Array.from(Array(12).keys()).map((i) => String(i))}
-              onChange={(value) => props.onSelectMonth(parseInt(value))}
-              value={props.month ? String(props.month) : undefined}
-            />
-          </InputLabel>
-          <InputLabel label={"Day"}>
-            <SelectInput
-              options={Array.from(Array(31).keys()).map((i) => String(i))}
-              onChange={(value) => props.onSelectDay(parseInt(value))}
-              value={props.day ? String(props.day) : undefined}
-            />
-          </InputLabel>
-          <InputLabel label={"Ticket"}>
-            <select
-              onChange={(e) => {
-                if (!props.tickets) {
-                  return;
-                }
-                setSelectedTicket(
-                  props.tickets.find(
-                    (t) => t.id === parseInt(e.target.value)
-                  ) as Ticket
-                );
-              }}
-              className={"border  bg-white p-5"}
-            >
-              {props.tickets?.map((ticket) => (
-                <option key={ticket.id} value={ticket.id}>
-                  {ticket.terms}
-                </option>
-              ))}
-            </select>
-          </InputLabel>
+          {props.children || <></>}
           <InputLabel label={"Periodical"}>
             <PaperDropdown
               onClick={(paper) => {
