@@ -5,3 +5,7 @@
 body {
     @apply text-zinc-800 bg-zinc-100;
 }
+
+.highlight {
+    @apply bg-yellow-300
+}

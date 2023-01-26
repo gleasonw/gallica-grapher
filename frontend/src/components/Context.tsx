@@ -1,12 +1,10 @@
 import React from "react";
 import { trpc } from "../utils/trpc";
 
-
 export const Context: React.FC<{
   url: string;
   term: string;
-  onHideContextClick: () => void;
-}> = ({ url, term, onHideContextClick }) => {
+}> = ({ url, term }) => {
   const [pageIndex, setPageIndex] = React.useState(0);
 
   const arkCode = url.split("/").pop();
@@ -28,16 +26,13 @@ export const Context: React.FC<{
   }
 
   return (
-    <td className={"w-full flex flex-col"}>
-      <button
-        onClick={onHideContextClick}
-        className={"p-5 text-3xl flex flex-row-reverse"}
-      >
-        X
-      </button>
-      <div
-        className={"prose m-auto overflow-scroll"}
-        dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }} />
+    <div className={"flex w-full flex-col"}>
+      <article
+        className={
+          "prose prose-lg m-auto p-5 text-justify lg:prose-lg xl:prose-2xl"
+        }
+        dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }}
+      />
       <div className={"grid justify-items-stretch pt-10"}>
         {pageIndex > 0 && (
           <button
@@ -47,7 +42,7 @@ export const Context: React.FC<{
             Previous
           </button>
         )}
-        <div className={'justify-self-center'}>
+        <div className={"justify-self-center"}>
           Page {pageIndex + 1} of {data.num_results}
         </div>
         {pageIndex < data.num_results - 1 && (
@@ -59,6 +54,6 @@ export const Context: React.FC<{
           </button>
         )}
       </div>
-    </td>
+    </div>
   );
 };

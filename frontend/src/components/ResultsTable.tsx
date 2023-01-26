@@ -1,9 +1,9 @@
 import React from "react";
 import { trpc } from "../utils/trpc";
-import { GallicaRecord, Paper } from "../server/routers/_app";
+import { Paper } from "../server/routers/_app";
 import { InputLabel } from "./InputLabel";
-import { ContextCell } from "./ContextCell";
 import { PaperDropdown } from "./PaperDropdown";
+import { Context } from "./Context";
 
 export interface TableProps {
   terms?: string[];
@@ -78,76 +78,32 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
         </div>
       </div>
       <div className="bg-zinc-100">
-        <div className={"hidden md:block lg:block"}>
-          <LargeTable data={data} />
-        </div>
-        <div className={"md:hidden lg:hidden"}>
-          <MobileTable data={data} />
+        <div>
+          <div className={"m-4 flex flex-col gap-5"}>
+            {data?.map((record, index) => (
+              <div
+                key={record.url}
+                className={"flex flex-col gap-5 bg-white p-5 shadow-md"}
+              >
+                <div className={"flex flex-row gap-5"}>
+                  <p>{record.term}</p>
+                  <p>{record.date}</p>
+                  <p>{record.paper_title}</p>
+                  <a
+                    className={"underline"}
+                    href={record.url}
+                    target={"_blank"}
+                    rel={"noreferrer"}
+                  >
+                    {record.url}
+                  </a>
+                </div>
+                <Context url={record.url} term={record.term} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export const LargeTable: React.FC<{ data: GallicaRecord[] }> = ({ data }) => {
-  return (
-    <table className={"h-full w-full table-auto"}>
-      <thead>
-        <tr>
-          <th>Term</th>
-          <th>Date</th>
-          <th>Periodical</th>
-          <th>Text Image on Gallica</th>
-          <th>Context</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data?.map((record, index) => (
-          <tr key={index} className={"odd:bg-white"}>
-            <Cell>{record.term}</Cell>
-            <Cell>{record.date}</Cell>
-            <Cell>{record.paper_title}</Cell>
-            <Cell>
-              <a
-                href={record.url}
-                className={"underline"}
-                target={"_blank"}
-                rel={"noreferrer"}
-              >
-                Full text image
-              </a>
-            </Cell>
-            <ContextCell record={record} />
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
-
-export const MobileTable: React.FC<{ data: GallicaRecord[] }> = ({ data }) => {
-  return (
-    <table className={"h-full w-full table-auto"}>
-      <thead>
-        <tr className={"table-row"}>
-          <th>Term</th>
-          <th>Date</th>
-          <th>Context</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data?.map((record, index) => (
-          <tr key={index} className={"odd:bg-white"}>
-            <td>{record.term}</td>
-            <td>{record.date}</td>
-            <ContextCell record={record} />
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
-
-export const Cell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <td className={"p-5"}>{children}</td>;
 };
