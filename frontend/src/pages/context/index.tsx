@@ -21,7 +21,7 @@ export default function Context() {
     return (
       <div>
         <p>Invalid query parameters</p>
-        <div>{JSON.stringify(result.error)}</div>
+        <div>{JSON.stringify(result.error, null, 4)}</div>
       </div>
     );
   } else {
