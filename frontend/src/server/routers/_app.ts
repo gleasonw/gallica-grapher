@@ -42,11 +42,13 @@ export interface GallicaRecord {
   url: string;
   date: string;
   term: string;
+  context: GallicaContext;
 }
 
 export interface GallicaContext {
   num_results: number;
   pages: GallicaPage[];
+  ark: string;
 }
 
 export interface GallicaPage {
@@ -55,20 +57,6 @@ export interface GallicaPage {
 }
 
 export const appRouter = router({
-  context: procedure
-    .input(
-      z.object({
-        ark_code: z.string(),
-        term: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      const response = await fetch(
-        `${apiURL}/api/ocrtext/${input.ark_code}/${input.term}`
-      );
-      const data = (await response.json()) as GallicaContext;
-      return data;
-    }),
   hello: procedure
     .input(
       z.object({

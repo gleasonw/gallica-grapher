@@ -98,7 +98,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                     {record.url}
                   </a>
                 </div>
-                <Context url={record.url} term={record.term} />
+                <Context record={record}/>
               </div>
             ))}
           </div>
