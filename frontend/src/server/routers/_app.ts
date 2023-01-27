@@ -166,7 +166,6 @@ export const appRouter = router({
       })
     )
     .query(async ({ input }) => {
-      console.log(apiURL)
       if (input.terms.length === 0) {
         return [];
       }

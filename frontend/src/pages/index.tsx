@@ -6,9 +6,8 @@ import { InputForm } from "../components/InputForm";
 import { ResultViewer } from "../components/ResultViewer";
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { appRouter } from "../server/routers/_app";
-import { DehydratedState } from "@tanstack/react-query";
+import { DehydratedState, hydrate, useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
-import { trpc } from "../utils/trpc";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -69,6 +68,8 @@ export default function Home({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [tickets, setTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
+  const client = useQueryClient();
+  hydrate(client, trpcState);
 
   return (
     <BaseLayout>
@@ -98,7 +99,6 @@ export default function Home({
       <ResultViewer
         tickets={tickets}
         outerRange={outerRange}
-        initialData={trpcState}
       />
     </BaseLayout>
   )

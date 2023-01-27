@@ -31,7 +31,6 @@ export const seriesColors = [
 interface ResultViewerProps {
   tickets: Ticket[];
   outerRange: [number, number];
-  initialData: DehydratedState;
 }
 
 export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
@@ -42,6 +41,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
     "year" | "month"
   >("year");
   const [selectedSmoothing, setSelectedSmoothing] = React.useState<number>(0);
+  
 
   const ticketData = trpc.useQueries((query) =>
     props.tickets.map((ticket) =>
