@@ -3,7 +3,7 @@ import { procedure, router } from "../trpc";
 
 let apiURL: string; 
 if (process.env.NODE_ENV === "development") {
-  apiURL = "https://gallica-grapher-production.up.railway.app";
+  apiURL = "http://localhost:8000";
 } else {
   apiURL = "https://gallica-grapher-production.up.railway.app";
 }

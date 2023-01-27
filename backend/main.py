@@ -9,17 +9,23 @@ import pyllicaWrapper as pyllicaWrapper
 import uvicorn
 from database import connContext
 from database.connContext import build_db_conn, build_redis_conn
-from database.displayDataResolvers import (clear_records_for_requestid,
-                                           get_gallica_records_for_display,
-                                           get_ocr_text_for_record,
-                                           select_csv_data_for_tickets,
-                                           select_display_records,
-                                           select_top_papers_for_tickets)
+from database.displayDataResolvers import (
+    clear_records_for_requestid,
+    get_gallica_records_for_display,
+    get_ocr_text_for_record,
+    select_csv_data_for_tickets,
+    select_display_records,
+    select_top_papers_for_tickets,
+)
 from database.graphDataResolver import build_highcharts_series
-from database.paperSearchResolver import (get_num_papers_in_range,
-                                          select_papers_similar_to_keyword)
-from database.recordInsertResolvers import (insert_records_into_groupcounts,
-                                            insert_records_into_results)
+from database.paperSearchResolver import (
+    get_num_papers_in_range,
+    select_papers_similar_to_keyword,
+)
+from database.recordInsertResolvers import (
+    insert_records_into_groupcounts,
+    insert_records_into_results,
+)
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from gallicaGetter import PeriodOccurrenceWrapper, VolumeOccurrenceWrapper
@@ -414,6 +420,7 @@ def get_num_records_on_gallica_for_args(
                 grouping="all",
                 link_term=ticket.link_term,
                 link_distance=ticket.link_distance,
+                backend_source=ticket.backend_source,
             )
         else:
             num_records = num_periods_to_fetch
@@ -441,6 +448,7 @@ def get_num_records_on_gallica_for_args(
             link_distance=ticket.link_distance,
             grouping=ticket.grouping,
             cached_response=cached_queries,
+            backend_source=ticket.backend_source,
         )
     return total_records, ticket
 
