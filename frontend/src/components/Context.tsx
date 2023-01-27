@@ -29,11 +29,11 @@ export const Context: React.FC<{
     <div className={"flex w-full flex-col"}>
       <article
         className={
-          "prose prose-lg m-auto p-5 text-justify lg:prose-lg xl:prose-2xl"
+          "prose prose-lg m-auto p-5 text-justify lg:prose-lg"
         }
         dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }}
       />
-      <div className={"flex flex-row justify-between pt-10"}>
+      <div className={"flex flex-row justify-between gap-10 m-10"}>
         {pageIndex > 0 ? (
           <button
             className={"text-3xl"}
