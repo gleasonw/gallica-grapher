@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple
 
-import gallicaGetter
+from gallicaGetter import WrapperFactory
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
 
 ticketResultsWithPaperName = """
@@ -98,7 +98,7 @@ def select_display_records(
 
 
 def get_ocr_text_for_record(ark_code: str, term: str):
-    wrapper = gallicaGetter.connect("content")
+    wrapper = WrapperFactory.connect_content()
     if " " in term:
         term = '"' + term + '"'
     return wrapper.get(ark_code, term)[0]
@@ -115,7 +115,7 @@ def get_gallica_records_for_display(
     limit: int = None,
     offset: int = None,
 ):
-    wrapper: VolumeOccurrenceWrapper = gallicaGetter.connect("volume")
+    wrapper = WrapperFactory.connect_volume()
     records = []
     if year and month and day:
         start_date = f"{year}-{month}-{day}"

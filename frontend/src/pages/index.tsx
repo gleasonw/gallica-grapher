@@ -37,32 +37,32 @@ const initTickets = [
   },
 ] as Ticket[];
 
-export const getStaticProps: GetStaticProps<{
-  trpcState: DehydratedState;
-}> = async () => {
-  const ssg = createProxySSGHelpers({
-    router: appRouter,
-    ctx: {},
-  });
+// export const getStaticProps: GetStaticProps<{
+//   trpcState: DehydratedState;
+// }> = async () => {
+//   const ssg = createProxySSGHelpers({
+//     router: appRouter,
+//     ctx: {},
+//   });
 
-  await Promise.allSettled([
-    ssg.graphData.prefetch({
-      id: initTickets[0].id,
-      grouping: "month",
-      smoothing: 0,
-      backend_source: "pyllica",
-    }),
-    ssg.gallicaRecords.prefetch({
-      terms: initTickets[0].terms,
-    }),
-  ]);
+//   await Promise.allSettled([
+//     ssg.graphData.prefetch({
+//       id: initTickets[0].id,
+//       grouping: "month",
+//       smoothing: 0,
+//       backend_source: "pyllica",
+//     }),
+//     ssg.gallicaRecords.prefetch({
+//       terms: initTickets[0].terms,
+//     }),
+//   ]);
 
-  return {
-    props: {
-      trpcState: ssg.dehydrate(),
-    },
-  };
-};
+//   return {
+//     props: {
+//       trpcState: ssg.dehydrate(),
+//     },
+//   };
+// };
 
 export default function Home({
   trpcState,

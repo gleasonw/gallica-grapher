@@ -3,7 +3,7 @@ import { procedure, router } from "../trpc";
 
 let apiURL: string; 
 if (process.env.NODE_ENV === "development") {
-  apiURL = "http://localhost:8000";
+  apiURL = "http://127.0.0.1:8000";
 } else {
   apiURL = "https://gallica-grapher-production.up.railway.app";
 }
@@ -183,6 +183,7 @@ export const appRouter = router({
       })
     )
     .query(async ({ input }) => {
+      console.log(apiURL)
       if (input.terms.length === 0) {
         return [];
       }
