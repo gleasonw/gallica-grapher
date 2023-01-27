@@ -2,6 +2,7 @@ from typing import List, Optional, Tuple
 
 import gallicaGetter
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
+from gallicaGetter.parse.volumeRecords import VolumeRecord
 
 ticketResultsWithPaperName = """
 SELECT searchterm, papertitle, year, month, day, identifier
@@ -97,26 +98,19 @@ def select_display_records(
     return records, total
 
 
-def get_ocr_text_for_record(ark_code: str, term: str):
-    wrapper = gallicaGetter.connect("content")
-    if " " in term:
-        term = '"' + term + '"'
-    return wrapper.get(ark_code, term)[0]
-
-
 def get_gallica_records_for_display(
     terms: List[str],
     link_term: Optional[str],
     link_distance: Optional[int],
-    year: int,
-    month: int = None,
-    day: int = None,
-    codes: List[str] = None,
-    limit: int = None,
-    offset: int = None,
+    year: Optional[int],
+    month: Optional[int],
+    day: Optional[int],
+    codes: Optional[List[str]],
+    limit: int,
+    offset: int,
 ):
     wrapper: VolumeOccurrenceWrapper = gallicaGetter.connect("volume")
-    records = []
+    records : List[VolumeRecord] = []
     if year and month and day:
         start_date = f"{year}-{month}-{day}"
     elif year and month:

@@ -23,5 +23,5 @@ export const TextInput: React.FC<TextInputProps> = ({
       onChange={onChange}
       onKeyPress={onKeyPress}
     />
-  );
+  )
 };

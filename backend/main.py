@@ -3,8 +3,10 @@ import os
 import random
 import threading
 from typing import Callable, Generator, List, Literal, Optional, Tuple
+from database.contextPair import ContextPair
 
 import gallicaGetter
+from gallicaGetter.gallicaWrapper import ContentWrapper
 import pyllicaWrapper as pyllicaWrapper
 import uvicorn
 from database import connContext
@@ -12,7 +14,6 @@ from database.connContext import build_db_conn, build_redis_conn
 from database.displayDataResolvers import (
     clear_records_for_requestid,
     get_gallica_records_for_display,
-    get_ocr_text_for_record,
     select_csv_data_for_tickets,
     select_display_records,
     select_top_papers_for_tickets,
@@ -31,7 +32,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from gallicaGetter import PeriodOccurrenceWrapper, VolumeOccurrenceWrapper
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.progressUpdate import ProgressUpdate
-from gallicaGetter.parse.contentRecord import ContentRecord
+from gallicaGetter.parse.contentRecord import ContentPage, ContentRecord
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from pydantic import BaseModel
 
@@ -59,8 +60,8 @@ def index():
 
 class Ticket(BaseModel):
     terms: List[str] | str
-    start_date: Optional[int]
-    end_date: Optional[int]
+    start_date: int
+    end_date: int
     codes: Optional[List[str] | str] = None
     grouping: Literal["all", "month", "year", "gallicaMonth", "gallicaYear"] = "year"
     num_results: Optional[int] = None
@@ -160,7 +161,7 @@ def graph_data(
     request_id: int,
     grouping: Literal["month", "year"] = "year",
     backend_source: Literal["gallica", "pyllica"] = "pyllica",
-    average_window: Optional[int] = 0,
+    average_window: int = 0,
 ):
     with build_db_conn() as conn:
         return build_highcharts_series(
@@ -199,11 +200,11 @@ def get_csv(tickets: int | List[int], request_id: int):
 def records(
     request_id: int,
     ticket_ids: List[int] = Query(),
-    term: str = None,
-    periodical: str = None,
-    year: int = None,
-    month: int = None,
-    day: int = None,
+    term: str = "",
+    periodical: str = "",
+    year: int = 0,
+    month: int = 0,
+    day: int = 0,
     limit: int = 10,
     offset: int = 0,
 ):
@@ -229,19 +230,20 @@ class GallicaRecord(BaseModel):
     term: str
     date: str
     url: str
+    context: ContentRecord
 
 
 @app.get("/api/gallicaRecords")
 def fetch_records_from_gallica(
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    day: Optional[int] = None,
+    year: Optional[int] = 0,
+    month: Optional[int] = 0,
+    day: Optional[int] = 0,
     terms: List[str] = Query(),
     codes: Optional[List[str]] = Query(None),
     start_index: int = 0,
     num_results: int = 10,
-    link_term: str = None,
-    link_distance: int = None,
+    link_term: str = "",
+    link_distance: int = 0,
 ):
     gallica_records = get_gallica_records_for_display(
         terms=terms,
@@ -256,23 +258,33 @@ def fetch_records_from_gallica(
     )
     if gallica_records is None:
         return []
+    wrapper : ContentWrapper = gallicaGetter.connect("content")
+    keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
+    context = wrapper.get(
+        [
+            ContextPair(ark_code=record.url.split("/")[-1], term=record.term)
+            for record in gallica_records
+        ]
+    )
+    records_with_context = []
+    for con in context:
+        corresponding_record = keyed_records[con.code]
+        records_with_context.append(
+        GallicaRecord(
+            paper_title=corresponding_record.paper_title,
+            paper_code=corresponding_record.paper_code,
+            term=corresponding_record.term,
+            date=str(corresponding_record.date),
+            url=corresponding_record.url,
+            context=con
+        )
+        )
+    
+
     return [
         # TODO: a hack to get around my strange date class in VolumeRecord... potentially expensive?
-        GallicaRecord(
-            paper_title=record.paper_title,
-            paper_code=record.paper_code,
-            term=record.term,
-            date=str(record.date),
-            url=record.url,
-        )
         for record in gallica_records
     ]
-
-
-@app.get("/api/ocrtext/{ark_code}/{term}")
-def ocr_text(ark_code: str, term: str):
-    record: ContentRecord = get_ocr_text_for_record(ark_code=ark_code, term=term)
-    return record
 
 
 class Request(threading.Thread):
