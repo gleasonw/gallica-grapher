@@ -123,7 +123,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           <TicketCard onClick={() => handleSubmit()} />
         </TicketRow>
       </div>
-    );
+    )
   }
 };
 

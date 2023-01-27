@@ -1,5 +1,8 @@
 from typing import List, Optional
 
+from pydantic import BaseModel
+from database.contextPair import ContextPair
+
 from gallicaGetter.buildqueries.argToQueryTransformations import (
     build_indexed_queries,
     get_num_results_for_queries,
@@ -183,11 +186,16 @@ class ContentWrapper(GallicaWrapper):
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/services/ContentSearch"
 
-    def get(self, ark, term, generate=False) -> List[ContentRecord]:
-        query = build_query_for_ark_and_term(
-            ark=ark, term=term, endpoint_url=self.endpoint_url
-        )
-        record_generator = self.fetch_from_queries(queries=query)
+    def get(
+        self, context_pairs: List[ContextPair], generate=False
+    ) -> List[ContentRecord]:
+        queries = [
+            build_query_for_ark_and_term(
+                ark=pair.ark_code, term=pair.term, endpoint_url=self.endpoint_url
+            )
+            for pair in context_pairs
+        ]
+        record_generator = self.fetch_from_queries(queries=queries)
         return record_generator if generate else list(record_generator)
 
 

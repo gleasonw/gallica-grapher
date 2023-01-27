@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
+from typing import Generator, List
 
 from gallicaGetter.fetch.gallicasession import GallicaSession
 from gallicaGetter.fetch.gallicasession import Response
@@ -13,7 +13,7 @@ class ConcurrentFetch:
         self.num_workers = numWorkers
         self.api = GallicaSession(numWorkers)
 
-    def get(self, queries, onProgressUpdate=None) -> List[Response]:
+    def get(self, queries, onProgressUpdate=None):
         if type(queries) is not list:
             queries = [queries]
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
