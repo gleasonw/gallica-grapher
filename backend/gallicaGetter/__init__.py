@@ -1,3 +1,4 @@
+from typing import Optional
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
 from gallicaGetter.gallicaWrapper import (
     VolumeOccurrenceWrapper,
@@ -9,31 +10,26 @@ from gallicaGetter.gallicaWrapper import (
 )
 
 
-def connect(gallicaAPIselect, api=None, num_workers=15):
-    api_wrappers = {
-        "volume": VolumeOccurrenceWrapper,
-        "period": PeriodOccurrenceWrapper,
-        "issues": IssuesWrapper,
-        "content": ContentWrapper,
-        "papers": PapersWrapper,
-        "text": FullTextWrapper,
-    }
-    select_api = gallicaAPIselect.lower()
-    getter = api or ConcurrentFetch(numWorkers=num_workers)
-    if select_api not in api_wrappers:
-        raise ValueError(
-            f'API "{select_api}" not supported. Options are {api_wrappers.keys()}'
-        )
-    return api_wrappers[select_api](api=getter)
+class Gettable:
+    def get(self):
+        return
 
 
-if __name__ == "__main__":
-    test = connect("sru")
-    records = test.get(
-        "brazza",
-        startDate=1886,
-        endDate=1890,
-        startIndex=[0, 50, 214, 1008],
-        grouping="index_selection",
-    )
-    print(records)
+class WrapperFactory:
+    def connect_content(self, api: Optional[Gettable] = None):
+        return ContentWrapper(api=api or ConcurrentFetch(numWorkers=20))
+
+    def connect_volume(self, api: Optional[Gettable] = None):
+        return VolumeOccurrenceWrapper(api=api or ConcurrentFetch(numWorkers=20))
+
+    def connect_period(self, api: Optional[Gettable] = None):
+        return PeriodOccurrenceWrapper(api=api or ConcurrentFetch(numWorkers=20))
+
+    def connect_issues(self, api: Optional[Gettable] = None):
+        return IssuesWrapper(api=api or ConcurrentFetch(numWorkers=20))
+
+    def connect_papers(self, api: Optional[Gettable] = None):
+        return PapersWrapper(api=api or ConcurrentFetch(numWorkers=20))
+
+    def connect_full_text(self, api: Optional[Gettable] = None):
+        return FullTextWrapper(api=api or ConcurrentFetch(numWorkers=20))

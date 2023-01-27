@@ -1,9 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 from io import StringIO
 import gallicaGetter
 import random
 from collections import Counter
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
+from gallicaGetter import WrapperFactory
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -19,8 +20,8 @@ def get_gallica_core(
     distance: int,
     start_date: str,
     end_date: str,
+    api_wrapper: WrapperFactory,
     sample_size: int = 20,
-    api_wrapper=gallicaGetter,
     onUpdateProgress=None,
 ) -> Dict:
 
@@ -38,11 +39,11 @@ def get_sample_text(
     sample_size: int,
     start_date: str,
     end_date: str,
-    api_wrapper,
+    api_wrapper: WrapperFactory,
     onUpdateProgress=None,
 ) -> StringIO:
     def get_text_for_codes(codes: List[str]) -> str:
-        text_wrapper = api_wrapper.connect("text")
+        text_wrapper = api_wrapper.connect_full_text()
         text = ""
         text_records = text_wrapper.get(
             codes, onProgressUpdate=lambda x: print(x["elapsedTime"])
