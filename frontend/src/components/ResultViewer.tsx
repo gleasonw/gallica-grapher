@@ -13,7 +13,7 @@ import { ResultsTable, TableProps } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
 import { generateXAxisOptionsForNumericScale } from "./utils";
-import { DehydratedState } from "@tanstack/react-query";
+import { DehydratedState, useQueryClient } from "@tanstack/react-query";
 
 export const seriesColors = [
   "#7cb5ec",
@@ -41,6 +41,8 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
     "year" | "month"
   >("year");
   const [selectedSmoothing, setSelectedSmoothing] = React.useState<number>(0);
+  const client = useQueryClient();
+  console.log("client", client)
   
 
   const ticketData = trpc.useQueries((query) =>

@@ -6,7 +6,7 @@ import { InputForm } from "../components/InputForm";
 import { ResultViewer } from "../components/ResultViewer";
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { appRouter } from "../server/routers/_app";
-import { DehydratedState, hydrate, useQueryClient } from "@tanstack/react-query";
+import { DehydratedState, hydrate, useHydrate, useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -47,12 +47,13 @@ export const getStaticProps: GetStaticProps<{
   await Promise.allSettled([
     ssg.graphData.prefetch({
       id: initTickets[0].id,
-      grouping: "month",
+      grouping: "year",
       smoothing: 0,
       backend_source: "pyllica",
     }),
     ssg.gallicaRecords.prefetch({
       terms: initTickets[0].terms,
+      codes: [],
     }),
   ]);
 
@@ -68,8 +69,7 @@ export default function Home({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [tickets, setTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
-  const client = useQueryClient();
-  hydrate(client, trpcState);
+  useHydrate(trpcState);
 
   return (
     <BaseLayout>
