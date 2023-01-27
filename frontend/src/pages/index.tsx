@@ -72,7 +72,7 @@ export default function Home({
 
   return (
     <BaseLayout>
-      <div className="m-10 text-center text-4xl leading-loose">
+      <div className="m-10 text-center text-4xl">
         {" "}
         View word occurrences in archived French periodicals.
       </div>

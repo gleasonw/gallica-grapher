@@ -90,7 +90,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                   <p>{record.date}</p>
                   <p>{record.paper_title}</p>
                   <a
-                    className={"underline"}
+                    className={"underline truncate"}
                     href={record.url}
                     target={"_blank"}
                     rel={"noreferrer"}

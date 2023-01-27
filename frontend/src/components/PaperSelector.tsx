@@ -11,7 +11,7 @@ export const PaperSelector: React.FC<{
   onPaperAdd: (paper: Paper) => void;
   onPaperClick: (paper: Paper) => void;
   smallText?: boolean;
-}> = ({ papers, from, to, onPaperAdd, onPaperClick, smallText }) => {
+}> = ({ papers, from, to, onPaperAdd, onPaperClick }) => {
   const [displayed, setDisplayed] = useState(false);
 
   const numPapers = trpc.numPapers.useQuery(
