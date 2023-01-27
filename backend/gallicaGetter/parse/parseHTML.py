@@ -11,6 +11,7 @@ class ParsedGallicaHTML:
     html: str
     text: str = None
     ocr_quality: int = None
+    soup: str = None
 
     def __post_init__(self):
         self.soup = BeautifulSoup(self.html, "html.parser")
@@ -21,7 +22,7 @@ class ParsedGallicaHTML:
             if hr_break_before_paras:
                 item_paras = hr_break_before_paras.find_next_siblings("p")
                 self.text = "\n".join([para.text for para in item_paras])
-        return self.text
+        return self.text or ''
 
     def get_ocr_quality(self) -> int:
         if self.ocr_quality is None:

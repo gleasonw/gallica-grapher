@@ -45,7 +45,7 @@ def get_sample_text(
         text_wrapper = api_wrapper.connect("text")
         text = ""
         text_records = text_wrapper.get(
-            codes, onProgressUpdate=lambda x: print(x["elapsedTime"])
+            codes, onUpdateProgress=lambda x: print(x.elapsed_time)
         )
         for record in text_records:
             text += record.get_text()
@@ -58,7 +58,7 @@ def get_sample_text(
         end_date=end_date,
         grouping="all",
     )
-    num_volumes = num_volumes_with_root_gram[0][1]
+    num_volumes = sum(query.num_results for query in num_volumes_with_root_gram)
     indices_to_sample = random.sample(range(num_volumes), sample_size)
     volumes_with_root_gram = sru_wrapper.get(
         terms=root_gram,
@@ -68,7 +68,7 @@ def get_sample_text(
         onProgressUpdate=onUpdateProgress,
     )
     volume_codes = [
-        volume_record.get_volume_code() for volume_record in volumes_with_root_gram
+        volume_record.paper_code for volume_record in volumes_with_root_gram
     ]
     return StringIO(get_text_for_codes(volume_codes))
 

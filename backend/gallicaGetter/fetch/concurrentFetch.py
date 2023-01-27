@@ -13,7 +13,7 @@ class ConcurrentFetch:
         self.num_workers = numWorkers
         self.api = GallicaSession(numWorkers)
 
-    def get(self, queries, onProgressUpdate=None) -> Generator[Response]:
+    def get(self, queries, onProgressUpdate=None):
         if type(queries) is not list:
             queries = [queries]
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
