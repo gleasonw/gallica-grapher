@@ -69,7 +69,7 @@ class OccurrenceQuery(BaseModel):
             formatted_codes = [f"{code}_date" for code in self.codes]
             return 'arkPress adj "' + '" or arkPress adj "'.join(formatted_codes) + '"'
         else:
-            return 'dc.type all "fascicule" and ocr.quality all "Texte disponible"'
+            return 'dc.type all "fascicule" or dc.type all "monographie" and ocr.quality all "Texte disponible"'
 
     def __repr__(self):
-        return f"Occurrence Query ({self.cql})"
+        return f"Occurrence Query ({self.term})"

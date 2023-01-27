@@ -16,20 +16,26 @@ class Gettable:
 
 
 class WrapperFactory:
-    def connect_content(self, api: Optional[Gettable] = None):
+    @staticmethod
+    def connect_content(api: Optional[Gettable] = None):
         return ContentWrapper(api=api or ConcurrentFetch(numWorkers=20))
 
-    def connect_volume(self, api: Optional[Gettable] = None):
+    @staticmethod
+    def connect_volume(api: Optional[Gettable] = None):
         return VolumeOccurrenceWrapper(api=api or ConcurrentFetch(numWorkers=20))
 
-    def connect_period(self, api: Optional[Gettable] = None):
+    @staticmethod
+    def connect_period(api: Optional[Gettable] = None):
         return PeriodOccurrenceWrapper(api=api or ConcurrentFetch(numWorkers=20))
 
-    def connect_issues(self, api: Optional[Gettable] = None):
+    @staticmethod
+    def connect_issues(api: Optional[Gettable] = None):
         return IssuesWrapper(api=api or ConcurrentFetch(numWorkers=20))
 
-    def connect_papers(self, api: Optional[Gettable] = None):
+    @staticmethod
+    def connect_papers(api: Optional[Gettable] = None):
         return PapersWrapper(api=api or ConcurrentFetch(numWorkers=20))
 
-    def connect_full_text(self, api: Optional[Gettable] = None):
+    @staticmethod
+    def connect_full_text(api: Optional[Gettable] = None):
         return FullTextWrapper(api=api or ConcurrentFetch(numWorkers=20))

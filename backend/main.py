@@ -4,7 +4,7 @@ import random
 import threading
 from typing import Callable, Generator, List, Literal, Optional, Tuple
 
-import gallicaGetter
+from gallicaGetter import WrapperFactory
 import pyllicaWrapper as pyllicaWrapper
 import uvicorn
 from database import connContext
@@ -464,7 +464,7 @@ def get_num_periods_in_range_for_grouping(grouping: str, start: int, end: int) -
 
 
 def get_num_records_all_volume_occurrence(ticket: Ticket) -> List[OccurrenceQuery]:
-    api = gallicaGetter.connect_volume()
+    api = WrapperFactory.connect_volume()
     base_queries_with_num_results = api.get_num_results_for_args(
         terms=ticket.terms,
         start_date=ticket.start_date,
@@ -485,7 +485,7 @@ def get_and_insert_records_for_ticket(
 ):
     if ticket.backend_source == "gallica":
         if ticket.grouping == "all":
-            volume_api: VolumeOccurrenceWrapper = gallicaGetter.connect_volume(api=api)
+            volume_api = WrapperFactory.connect_volume(api=api)
             records = volume_api.get(
                 terms=ticket.terms,
                 start_date=ticket.start_date,
@@ -505,7 +505,7 @@ def get_and_insert_records_for_ticket(
                 request_id=requestID,
             )
         elif ticket.grouping in ["year", "month"]:
-            period_api = gallicaGetter.connect_period(api=api)
+            period_api = WrapperFactory.connect_period(api=api)
             period_records = period_api.get(
                 terms=ticket.terms,
                 codes=ticket.codes,
