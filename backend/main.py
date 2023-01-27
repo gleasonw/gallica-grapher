@@ -243,7 +243,7 @@ def fetch_records_from_gallica(
     num_results: int = 10,
     link_term: str = "",
     link_distance: int = 0,
-):
+) -> List[GallicaRecord]:
     gallica_records = get_gallica_records_for_display(
         terms=terms,
         codes=codes,
@@ -265,25 +265,20 @@ def fetch_records_from_gallica(
             for record in gallica_records
         ]
     )
-    records_with_context = []
-    for con in context:
-        corresponding_record = keyed_records[con.code]
+    records_with_context: List[GallicaRecord] = []
+    for record in context:
+        corresponding_record = keyed_records[record.ark]
         records_with_context.append(
-        GallicaRecord(
-            paper_title=corresponding_record.paper_title,
-            paper_code=corresponding_record.paper_code,
-            term=corresponding_record.term,
-            date=str(corresponding_record.date),
-            url=corresponding_record.url,
-            context=con
+            GallicaRecord(
+                paper_title=corresponding_record.paper_title,
+                paper_code=corresponding_record.paper_code,
+                term=corresponding_record.term,
+                date=str(corresponding_record.date),
+                url=corresponding_record.url,
+                context=record,
+            )
         )
-        )
-    
-
-    return [
-        # TODO: a hack to get around my strange date class in VolumeRecord... potentially expensive?
-        for record in gallica_records
-    ]
+    return records_with_context
 
 
 class Request(threading.Thread):

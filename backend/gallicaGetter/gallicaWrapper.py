@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Generator, List, Optional
 
 from pydantic import BaseModel
 from database.contextPair import ContextPair
@@ -188,7 +188,7 @@ class ContentWrapper(GallicaWrapper):
 
     def get(
         self, context_pairs: List[ContextPair], generate=False
-    ) -> List[ContentRecord]:
+    ) -> Generator[ContentRecord, None, None]:
         queries = [
             build_query_for_ark_and_term(
                 ark=pair.ark_code, term=pair.term, endpoint_url=self.endpoint_url
@@ -196,7 +196,7 @@ class ContentWrapper(GallicaWrapper):
             for pair in context_pairs
         ]
         record_generator = self.fetch_from_queries(queries=queries)
-        return record_generator if generate else list(record_generator)
+        return record_generator
 
 
 class PapersWrapper(GallicaWrapper):

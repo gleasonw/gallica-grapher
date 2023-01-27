@@ -98,16 +98,6 @@ def select_display_records(
     return records, total
 
 
-<<<<<<< HEAD
-def get_ocr_text_for_record(ark_code: str, term: str):
-    wrapper = WrapperFactory.connect_content()
-    if " " in term:
-        term = '"' + term + '"'
-    return wrapper.get(ark_code, term)[0]
-
-
-=======
->>>>>>> batch_gallica
 def get_gallica_records_for_display(
     terms: List[str],
     link_term: Optional[str],

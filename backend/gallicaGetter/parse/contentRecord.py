@@ -15,6 +15,7 @@ def parse_responses_to_records(responses: List[Response]):
                 ContentPage(page=occurrence[0], context=occurrence[1])
                 for occurrence in num_results_and_pages[1]
             ],
+            ark=response.query.ark
         )
 
 
@@ -26,3 +27,4 @@ class ContentPage(BaseModel):
 class ContentRecord(BaseModel):
     num_results: int
     pages: List[ContentPage]
+    ark: str
