@@ -1,12 +1,7 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc";
 
-let apiURL: string; 
-if (process.env.NODE_ENV === "development") {
-  apiURL = "http://127.0.0.1:8000";
-} else {
-  apiURL = "https://gallica-grapher-production.up.railway.app";
-}
+let apiURL = "https://gallica-grapher-production.up.railway.app";
 
 //snake case cuz that's what the API returns
 export interface Paper {
