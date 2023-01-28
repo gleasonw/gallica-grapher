@@ -106,8 +106,8 @@ def get_gallica_records_for_display(
     month: Optional[int],
     day: Optional[int],
     codes: Optional[List[str]],
-    limit: int,
-    offset: int,
+    limit: Optional[int],
+    offset: Optional[int],
 ) -> Tuple[List[VolumeRecord], int]:
     wrapper = WrapperFactory.connect_volume()
     records = []
@@ -119,6 +119,9 @@ def get_gallica_records_for_display(
         start_date = f"{year}"
     else:
         start_date = None
+
+    # TODO: make a separate call so we don't recall this with every new page
+
     num_records_query = wrapper.get_num_results_for_args(
         terms=terms,
         start_date=start_date,
@@ -130,6 +133,7 @@ def get_gallica_records_for_display(
         num_records_on_gallica = num_records_query[0].num_results
     else:
         return records, 0
+
     records.extend(
         wrapper.get(
             terms=terms,

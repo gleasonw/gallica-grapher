@@ -219,8 +219,8 @@ def fetch_records_from_gallica(
     day: Optional[int] = 0,
     terms: List[str] = Query(),
     codes: Optional[List[str]] = Query(None),
-    start_index: int = 0,
-    num_results: int = 10,
+    cursor: Optional[int] = 0,
+    limit: Optional[int] = 10,
     link_term: str = "",
     link_distance: int = 0,
 ) -> GallicaResponse:
@@ -230,8 +230,8 @@ def fetch_records_from_gallica(
         year=year,
         month=month,
         day=day,
-        offset=start_index,
-        limit=num_results,
+        offset=cursor,
+        limit=limit,
         link_term=link_term,
         link_distance=link_distance,
     )

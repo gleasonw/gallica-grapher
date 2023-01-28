@@ -13,9 +13,12 @@ def build_base_queries(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     codes: Optional[List[str]] = None,
+    limit: Optional[int] = None,
+    cursor: Optional[int] = None,
     link_term: Optional[str] = None,
     link_distance: Optional[int] = None,
 ) -> List[OccurrenceQuery | PaperQuery]:
+    """Builds a list of queries to be used to fetch records from Gallica."""
     if not isinstance(terms, list):
         terms = [terms]
     if codes and not isinstance(codes, list):
@@ -31,8 +34,8 @@ def build_base_queries(
                         start_date=start,
                         end_date=end,
                         endpoint_url=endpoint_url,
-                        start_index=0,
-                        num_records=1,
+                        start_index=cursor or 0,
+                        num_records=limit or 1,
                         link_term=link_term,
                         link_distance=link_distance,
                     )

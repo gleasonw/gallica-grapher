@@ -87,19 +87,25 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 link_distance=link_distance,
                 endpoint_url=self.endpoint_url,
                 grouping="all",
+                limit=num_results,
+                cursor=start_index,
             )
             if isinstance(start_index, list):
                 queries = build_base_queries_at_indices(
                     base_queries,
                     start_index,
                 )
-            else:
+            elif num_results is None or num_results > 50:
+                # assume we want all results, or index for more than 50
                 queries = build_indexed_queries(
                     base_queries,
                     api=self.api,
                     limit=num_results,
                     offset=start_index,
                 )
+            else:
+                # num results less than 50, the base query is fine
+                queries = base_queries
         record_generator = self.fetch_from_queries(
             queries=queries, onUpdateProgress=onProgressUpdate
         )

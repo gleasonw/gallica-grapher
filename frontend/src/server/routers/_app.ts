@@ -165,18 +165,23 @@ export const appRouter = router({
         day: z.number().optional(),
         terms: z.array(z.string()),
         codes: z.array(z.string()).optional(),
-        num_results: z.number().optional(),
-        start_index: z.number().optional(),
+        limit: z.number().nullish(),
+        cursor: z.number().nullish(),
         link_term: z.string().optional(),
         link_distance: z.number().optional(),
       })
     )
     .query(async ({ input }) => {
+      const limit = input.limit ?? 30;
+      const { cursor } = input;
       if (input.terms.length === 0) {
         return {
-          records: [],
-          num_records_in_gallica: 0,
-        } as GallicaResponse;
+          data: {
+            records: [],
+            num_records_in_gallica: 0,
+          } as GallicaResponse,
+          nextCursor: null,
+        };
       }
       let url = `${apiURL}/api/gallicaRecords?`;
       if (input.year) {
@@ -194,11 +199,11 @@ export const appRouter = router({
       if (input.codes) {
         url += input.codes.map((code) => `&codes=${code}`).join("");
       }
-      if (input.num_results) {
-        url += `&num_results=${input.num_results}`;
+      if (input.limit) {
+        url += `&limit=${input.limit}`;
       }
-      if (input.start_index) {
-        url += `&start_index=${input.start_index}`;
+      if (cursor !== undefined) {
+        url += `&cursor=${cursor}`;
       }
       if (input.link_term) {
         url += `&link_term=${input.link_term}`;
@@ -208,7 +213,22 @@ export const appRouter = router({
       }
       const response = await fetch(url);
       const data = (await response.json()) as GallicaResponse;
-      return data;
+      let nextCursor = null;
+      if (data.records && data.records.length > 0) {
+        if (cursor) {
+          if (data.num_records_in_gallica > limit + cursor) {
+            nextCursor = cursor + limit;
+          }
+        }else{
+          if (data.num_records_in_gallica > limit) {
+            nextCursor = limit;
+          }
+        }
+      }
+      return {
+        data,
+        nextCursor,
+      };
     }),
 });
 
