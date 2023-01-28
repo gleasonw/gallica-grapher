@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
       <Analytics />
     </>
   );

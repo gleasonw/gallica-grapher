@@ -33,6 +33,6 @@ export default function Context() {
         month={month || 0}
         day={day || 0}
       />
-    );
+    )
   }
 }

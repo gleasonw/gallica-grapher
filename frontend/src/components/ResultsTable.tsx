@@ -42,9 +42,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     <div className={"flex flex-col"}>
       <div className={"m-auto ml-5 "}>
         <div
-          className={
-            "flex flex-row flex-wrap gap-5 pt-10 md:gap-10 lg:gap-10"
-          }
+          className={"flex flex-row flex-wrap gap-5 pt-10 md:gap-10 lg:gap-10"}
         >
           {props.children || <></>}
           <InputLabel label={"Periodical"}>
@@ -85,12 +83,12 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                 key={record.url}
                 className={"flex flex-col gap-5 bg-white p-5 shadow-md"}
               >
-                <div className={"flex flex-row gap-10 text-lg pb-5 flex-wrap"}>
+                <div className={"flex flex-row flex-wrap gap-10 pb-5 text-lg"}>
                   <p>{record.term}</p>
                   <p>{record.date}</p>
                   <p>{record.paper_title}</p>
                   <a
-                    className={"underline truncate"}
+                    className={"truncate underline"}
                     href={record.url}
                     target={"_blank"}
                     rel={"noreferrer"}
@@ -98,7 +96,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                     {record.url}
                   </a>
                 </div>
-                <Context record={record}/>
+                <Context record={record} />
               </div>
             ))}
           </div>
