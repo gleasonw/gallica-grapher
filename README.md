@@ -4,15 +4,13 @@
 
 If you have an idea, suggestion, or question about the code, don't hesitate to make a pull request or new issue. The core parsing code is written in Python, the frontend in Typescript and React. There are many items that could be improved. Readability, architecture, frontend design, something for everyone!
 
-Here is a quick tour:
-
-Important server-side files:
+#### Important server-side files:
 
 [main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
 * api routes for the frontend marked by the @app FastAPI decorator
 * The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
 
-Important front end files:
+#### Important front end files:
 
 [Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/components)
 * Contains the React code for the graph, table, paper dropdown, and every other UI component. 
