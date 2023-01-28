@@ -19,7 +19,7 @@ Important front end files:
 * The long className strings in the html elements are [Tailwind](https://tailwindcss.com/) CSS utility classes.
 
 [_app.ts](https://github.com/gleasonw/gallica-grapher/blob/main/frontend/src/server/routers/_app.ts)
-* Components call a Next.js API through this router, which calls the Python API in main.py
+* Components call a [Next.js](https://nextjs.org/) API through this router, which calls the Python API in main.py
 
 Railway hosts the Python code, a Postgres database for storage and a Redis database for tracking user requests. Vercel hosts the Next.js frontend. It is all free! 
 
