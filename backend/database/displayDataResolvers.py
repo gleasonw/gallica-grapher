@@ -108,7 +108,7 @@ def get_gallica_records_for_display(
     codes: Optional[List[str]],
     limit: int,
     offset: int,
-):
+) -> Tuple[List[VolumeRecord], int]:
     wrapper = WrapperFactory.connect_volume()
     records = []
     if year and month and day:
@@ -119,6 +119,17 @@ def get_gallica_records_for_display(
         start_date = f"{year}"
     else:
         start_date = None
+    num_records_query = wrapper.get_num_results_for_args(
+        terms=terms,
+        start_date=start_date,
+        codes=codes,
+        link_term=link_term,
+        link_distance=link_distance,
+    )
+    if num_records_query and len(num_records_query) > 0:
+        num_records_on_gallica = num_records_query[0].num_results
+    else:
+        return records, 0
     records.extend(
         wrapper.get(
             terms=terms,
@@ -130,8 +141,8 @@ def get_gallica_records_for_display(
             start_index=offset,
         )
     )
-    records.sort(key=lambda record: record.date.getDate())
-    return records
+    records.sort(key=lambda record: str(record.date))
+    return records, num_records_on_gallica
 
 
 def clear_records_for_requestid(requestID, conn):
@@ -143,37 +154,3 @@ def clear_records_for_requestid(requestID, conn):
         """,
             (requestID,),
         )
-
-
-def select_top_papers_for_tickets(
-    tickets: int | List[int],
-    request_id: int,
-    conn,
-    num_results: int = 10,
-):
-    if type(tickets) is int:
-        tickets = (tickets,)
-    if type(tickets) is list:
-        tickets = tuple(tickets)
-    with conn.cursor() as cursor:
-        cursor.execute(
-            """
-        WITH resultCounts AS (
-            SELECT papercode, count(*) as papercount
-            FROM results 
-            WHERE requestid = %s
-            AND ticketid in %s
-            GROUP BY papercode
-            ORDER BY papercount DESC
-            LIMIT %s
-        )
-        SELECT title, papercount
-            FROM resultCounts
-            JOIN
-            papers
-            ON resultCounts.papercode = papers.code
-            ORDER BY papercount DESC;
-        """,
-            (request_id, tickets, num_results),
-        )
-        return cursor.fetchall()

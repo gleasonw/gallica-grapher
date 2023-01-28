@@ -14,7 +14,7 @@ class TestPaperQuery(TestCase):
         test = self.paperQuery.make_copy(start_index=1, num_records=1)
         self.assertIsInstance(test, PaperQuery)
         self.assertEqual(test.start_index, 1)
-        self.assertEqual(test.num_records, 1)
+        self.assertEqual(test.num_results, 1)
         self.assertEqual(test.endpoint_url, self.paperQuery.endpoint_url)
         self.assertEqual(test.codes, self.paperQuery.codes)
 

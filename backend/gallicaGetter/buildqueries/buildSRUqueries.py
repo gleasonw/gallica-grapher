@@ -10,9 +10,9 @@ def build_base_queries(
     terms: List[str] | str,
     endpoint_url: str,
     grouping: str,
-    start_date: Optional[int] = None,
-    end_date: Optional[int] = None,
-    codes: Optional[List[str] | str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    codes: Optional[List[str]] = None,
     link_term: Optional[str] = None,
     link_distance: Optional[int] = None,
 ) -> List[OccurrenceQuery | PaperQuery]:

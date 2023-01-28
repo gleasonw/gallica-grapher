@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc";
 
-let apiURL = "https://gallica-grapher-production.up.railway.app";
+let apiURL: string;
+if (process.env.NODE_ENV === "development") {
+  apiURL = "http://0.0.0.0:8000";
+} else {
+  apiURL = "https://gallica-grapher-production.up.railway.app";
+}
 
 //snake case cuz that's what the API returns
 export interface Paper {
@@ -29,6 +34,11 @@ export interface GraphData {
     count: number;
   }[];
   name: string;
+}
+
+export interface GallicaResponse {
+  records: GallicaRecord[];
+  num_records_in_gallica: number;
 }
 
 export interface GallicaRecord {
@@ -73,9 +83,7 @@ export const appRouter = router({
       if (!input.title) {
         return [];
       }
-      const response = await fetch(
-        `${apiURL}/api/papers/${input.title}`
-      );
+      const response = await fetch(`${apiURL}/api/papers/${input.title}`);
       const data = (await response.json()) as { papers: Paper[] };
       return data.papers;
     }),
@@ -129,9 +137,7 @@ export const appRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const response = await fetch(
-        `${apiURL}/poll/progress/${input.id}`
-      );
+      const response = await fetch(`${apiURL}/poll/progress/${input.id}`);
       const data = (await response.json()) as ProgressType;
       return data;
     }),
@@ -167,7 +173,10 @@ export const appRouter = router({
     )
     .query(async ({ input }) => {
       if (input.terms.length === 0) {
-        return [];
+        return {
+          records: [],
+          num_records_in_gallica: 0,
+        } as GallicaResponse;
       }
       let url = `${apiURL}/api/gallicaRecords?`;
       if (input.year) {
@@ -198,7 +207,7 @@ export const appRouter = router({
         url += `&link_distance=${input.link_distance}`;
       }
       const response = await fetch(url);
-      const data = (await response.json()) as GallicaRecord[];
+      const data = (await response.json()) as GallicaResponse;
       return data;
     }),
 });

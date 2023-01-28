@@ -17,7 +17,7 @@ from gallicaGetter.buildqueries.buildSRUqueries import (
 )
 from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
 from gallicaGetter.parse import build_parser
-from gallicaGetter.parse.contentRecord import ContentRecord
+from gallicaGetter.parse.contentRecord import GallicaContext
 from gallicaGetter.parse.issueYearRecord import IssueYearRecord
 from gallicaGetter.parse.paperRecords import PaperRecord
 from gallicaGetter.parse.periodRecords import PeriodRecord
@@ -64,8 +64,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get(
         self,
         terms: List[str] | str,
-        start_date: Optional[int] = None,
-        end_date: Optional[int] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
         codes: Optional[List[str] | str] = None,
         generate: bool = False,
         num_results: Optional[int] = None,
@@ -108,9 +108,9 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get_num_results_for_args(
         self,
         terms: List[str] | str,
-        start_date: Optional[int] = None,
-        end_date: Optional[int] = None,
-        codes: Optional[List[str] | str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        codes: Optional[List[str]] = None,
         link_term: Optional[str] = None,
         link_distance: Optional[int] = None,
         grouping: str = "all",
@@ -188,7 +188,7 @@ class ContentWrapper(GallicaWrapper):
 
     def get(
         self, context_pairs: List[ContextPair], generate=False
-    ) -> Generator[ContentRecord, None, None]:
+    ) -> Generator[GallicaContext, None, None]:
         queries = [
             build_query_for_ark_and_term(
                 ark=pair.ark_code, term=pair.term, endpoint_url=self.endpoint_url
@@ -232,7 +232,7 @@ class FullTextWrapper(GallicaWrapper):
 
     def get(
         self, ark_codes, onUpdateProgress=None, generate=False
-    ) -> List[ContentRecord]:
+    ) -> List[GallicaContext]:
         queries = build_text_queries_for_codes(
             endpoint=self.endpoint_url, ark_codes=ark_codes
         )
