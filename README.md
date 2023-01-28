@@ -2,7 +2,37 @@
 
 ### Pull requests and new contributors welcome! 
 
-If you have an idea, suggestion, or question about the code, don't hesitate to make a pull request or new issue. The core parsing code is written in Python, the frontend in Typescript and React.
+If you have an idea, suggestion, or question about the code, don't hesitate to make a pull request or new issue. The core parsing code is written in Python, the frontend in Typescript and React. There are many items that could be improved. Readability, architecture, frontend design, something for everyone!
+
+Here is a quick tour:
+
+Important server-side files:
+
+[main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
+* api routes for the frontend marked by the @app FastAPI decorator
+* The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
+
+[CoreSampler.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/coreSampler/CoreSampler.py)
+
+* A prototype "sampling" function that pulls random periodicals from a period and counts words that surround a target word within a window size. The goal is to provide a researcher with more context.
+* Still needs to be integrated into the React frontend.
+
+Important front end files:
+
+[Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/components)
+* Contains the React code for the graph, table, paper dropdown, and every other UI component. 
+* The long className strings in the html elements are [Tailwind](https://tailwindcss.com/) CSS utility classes.
+
+[_app.ts](https://github.com/gleasonw/gallica-grapher/blob/main/frontend/src/server/routers/_app.ts)
+* Technically a server-side file, but [Next.js](https://nextjs.org/) blurs the boundary enough that I'm putting it here. Manages type safe calls to the Next API routes.
+
+Please, fork away! Railway hosts the Python code, a Postgres database for storage and a Redis database for tracking user requests. Vercel hosts the Next.js frontend. It is all free! 
+
+
+
+
+
+
 
 ### Analyzing the Press
 
