@@ -14,6 +14,7 @@ from database.displayDataResolvers import (
     clear_records_for_requestid,
     get_gallica_records_for_display,
     select_display_records,
+    make_date_from_year_mon_day,
 )
 from database.graphDataResolver import build_highcharts_series
 from database.paperSearchResolver import (
@@ -252,6 +253,29 @@ def fetch_records_from_gallica(
             )
         )
     return records_with_context
+
+
+@app.get("/api/numRecordsInGallica")
+def num_records_in_gallica(
+    year: Optional[int] = 0,
+    month: Optional[int] = 0,
+    day: Optional[int] = 0,
+    terms: List[str] = Query(),
+    codes: Optional[List[str]] = Query(None),
+    link_term: str = "",
+    link_distance: int = 0,
+) -> int:
+    wrapper = WrapperFactory.connect_volume()
+    num_records_query = wrapper.get_num_results_for_args(
+        terms=terms,
+        codes=codes,
+        start_date=make_date_from_year_mon_day(year, month, day),
+        link_term=link_term,
+        link_distance=link_distance,
+    )
+    if num_records_query is None or len(num_records_query) == 0:
+        return 0
+    return num_records_query[0].num_results
 
 
 class Request(threading.Thread):

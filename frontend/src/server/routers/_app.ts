@@ -96,6 +96,26 @@ export const appRouter = router({
       const data = await response.json();
       return data;
     }),
+  numRecordsInGallica: procedure
+    .input(
+      z.object({
+        year: z.number().optional(),
+        month: z.number().optional(),
+        day: z.number().optional(),
+        terms: z.array(z.string()),
+        codes: z.array(z.string()).optional(),
+        link_term: z.string().optional(),
+        link_distance: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const baseUrl = `${apiURL}/api/numRecordsInGallica`;
+      const url = addQueryParamsIfExist(baseUrl, input);
+      const response = await fetch(url);
+      const data = await response.json() as string;
+      console.log(data);
+      return data;
+    }),
   search: procedure
     .input(
       z.object({
@@ -176,34 +196,9 @@ export const appRouter = router({
           previousCursor: null,
         };
       }
-      let url = `${apiURL}/api/gallicaRecords?`;
-      if (input.year) {
-        url += `year=${input.year}`;
-      }
-      if (input.month) {
-        url += `&month=${input.month}`;
-      }
-      if (input.day) {
-        url += `&day=${input.day}`;
-      }
-      if (input.terms) {
-        url += input.terms.map((term) => `&terms=${term}`).join("");
-      }
-      if (input.codes) {
-        url += input.codes.map((code) => `&codes=${code}`).join("");
-      }
-      if (input.limit) {
-        url += `&limit=${input.limit}`;
-      }
-      if (cursor !== undefined) {
-        url += `&cursor=${cursor}`;
-      }
-      if (input.link_term) {
-        url += `&link_term=${input.link_term}`;
-      }
-      if (input.link_distance) {
-        url += `&link_distance=${input.link_distance}`;
-      }
+      let baseUrl = `${apiURL}/api/gallicaRecords`;
+      let url = addQueryParamsIfExist(baseUrl, input);
+      console.log(url);
       const response = await fetch(url);
       const data = (await response.json()) as GallicaRecord[];
       let nextCursor = null;
@@ -223,6 +218,20 @@ export const appRouter = router({
       };
     }),
 });
+
+function addQueryParamsIfExist(url: string, params: Record<string, any>) {
+  const urlParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && !Array.isArray(value)) {
+      urlParams.append(key, value);
+    } else if (Array.isArray(value)) {
+      value.forEach((v) => {
+        urlParams.append(key, v);
+      });
+    }
+  });
+  return `${url}?${urlParams.toString()}`;
+}
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

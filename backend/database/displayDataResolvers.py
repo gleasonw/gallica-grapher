@@ -98,6 +98,19 @@ def select_display_records(
     return records, total
 
 
+def make_date_from_year_mon_day(
+    year: Optional[int], month: Optional[int], day: Optional[int]
+) -> str:
+    if year and month and day:
+        return f"{year}-{month}-{day}"
+    elif month:
+        return f"{year}-{month}"
+    elif year:
+        return f"{year}"
+    else:
+        return ""
+
+
 def get_gallica_records_for_display(
     terms: List[str],
     link_term: Optional[str],
@@ -111,19 +124,10 @@ def get_gallica_records_for_display(
 ) -> List[VolumeRecord]:
     wrapper = WrapperFactory.connect_volume()
     records = []
-    if year and month and day:
-        start_date = f"{year}-{month}-{day}"
-    elif year and month:
-        start_date = f"{year}-{month}"
-    elif year:
-        start_date = f"{year}"
-    else:
-        start_date = None
-
     records.extend(
         wrapper.get(
             terms=terms,
-            start_date=start_date,
+            start_date=make_date_from_year_mon_day(year, month, day),
             codes=codes,
             link_term=link_term,
             link_distance=link_distance,
