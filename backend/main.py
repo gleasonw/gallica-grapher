@@ -207,11 +207,6 @@ class GallicaRecord(BaseModel):
     context: GallicaContext
 
 
-class GallicaResponse(BaseModel):
-    num_records_in_gallica: int
-    records: List[GallicaRecord]
-
-
 @app.get("/api/gallicaRecords")
 def fetch_records_from_gallica(
     year: Optional[int] = 0,
@@ -223,8 +218,8 @@ def fetch_records_from_gallica(
     limit: Optional[int] = 10,
     link_term: str = "",
     link_distance: int = 0,
-) -> GallicaResponse:
-    gallica_records, total_records = get_gallica_records_for_display(
+) -> List[GallicaRecord]:
+    gallica_records = get_gallica_records_for_display(
         terms=terms,
         codes=codes,
         year=year,
@@ -256,9 +251,7 @@ def fetch_records_from_gallica(
                 context=record,
             )
         )
-    return GallicaResponse(
-        num_records_in_gallica=total_records, records=records_with_context
-    )
+    return records_with_context
 
 
 class Request(threading.Thread):
@@ -482,7 +475,6 @@ def get_and_insert_records_for_ticket(
                 onProgressUpdate=on_progress_update,
                 query_cache=ticket.cached_response,
                 generate=True,
-                num_workers=50,
             )
             insert_records_into_db(
                 records_for_db=records,

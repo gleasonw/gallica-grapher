@@ -20,6 +20,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     fetchPreviousPage,
     hasNextPage,
     hasPreviousPage,
+    isFetchingNextPage,
     ...data
   } = trpc.gallicaRecords.useInfiniteQuery(
     {
@@ -28,23 +29,25 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       day: props.day,
       codes: props.codes || [],
       terms: props.terms || [],
-      limit: 10,
+      limit: 20,
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
+      getPreviousPageParam: (firstPage) => firstPage.previousCursor,
+      staleTime: Infinity,
     }
   );
 
-  if (isLoading || !data || !data.data || !data.data.pages[page]) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
   if (isError) {
     return <div>Error</div>;
   }
-
-  const currentPage = data.data?.pages[page].data;
-  console.log(currentPage);
+  const currentPage = data.data?.pages[page];
+  console.log(data.data?.pages);
+  console.log({ hasNextPage, hasPreviousPage });
 
   return (
     <div className={"flex flex-col"}>
@@ -55,15 +58,11 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
             <h1 className={"text-2xl"}>
               {currentPage && (
                 <div>
-                  {currentPage?.num_records_in_gallica.toLocaleString()} records
                   <div className={"flex flex-row gap-10"}>
-                    {hasPreviousPage && (
+                    {hasPreviousPage && page != 0 && (
                       <button
                         className={"rounded-md bg-zinc-200 p-2"}
-                        onClick={() => {
-                          fetchPreviousPage();
-                          setPage(page - 1);
-                        }}
+                        onClick={() => setPage(page - 1)}
                       >
                         Previous
                       </button>
@@ -72,7 +71,12 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                       <button
                         className={"rounded-md bg-zinc-200 p-2"}
                         onClick={() => {
-                          fetchNextPage();
+                          if (
+                            data.data?.pages &&
+                            page + 1 === data.data.pages.length
+                          ) {
+                            fetchNextPage();
+                          }
                           setPage(page + 1);
                         }}
                       >
@@ -83,7 +87,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                 </div>
               )}
             </h1>
-            {currentPage?.records.map((record, index) => (
+            {currentPage?.data.map((record, index) => (
               <div
                 key={record.url}
                 className={"flex flex-col gap-5 bg-white p-5 shadow-md"}

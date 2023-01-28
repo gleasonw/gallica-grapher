@@ -36,11 +36,6 @@ export interface GraphData {
   name: string;
 }
 
-export interface GallicaResponse {
-  records: GallicaRecord[];
-  num_records_in_gallica: number;
-}
-
 export interface GallicaRecord {
   paper_title: string;
   paper_code: string;
@@ -176,11 +171,9 @@ export const appRouter = router({
       const { cursor } = input;
       if (input.terms.length === 0) {
         return {
-          data: {
-            records: [],
-            num_records_in_gallica: 0,
-          } as GallicaResponse,
+          data: [],
           nextCursor: null,
+          previousCursor: null,
         };
       }
       let url = `${apiURL}/api/gallicaRecords?`;
@@ -212,22 +205,21 @@ export const appRouter = router({
         url += `&link_distance=${input.link_distance}`;
       }
       const response = await fetch(url);
-      const data = (await response.json()) as GallicaResponse;
+      const data = (await response.json()) as GallicaRecord[];
       let nextCursor = null;
-      if (data.records && data.records.length > 0) {
+      let previousCursor = cursor ?? 0;
+      console.log({ cursor });
+      if (data && data.length > 0) {
         if (cursor) {
-          if (data.num_records_in_gallica > limit + cursor) {
-            nextCursor = cursor + limit;
-          }
-        }else{
-          if (data.num_records_in_gallica > limit) {
-            nextCursor = limit;
-          }
+          nextCursor = cursor + limit;
+        } else {
+          nextCursor = limit;
         }
       }
       return {
         data,
         nextCursor,
+        previousCursor,
       };
     }),
 });

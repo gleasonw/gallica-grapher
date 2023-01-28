@@ -31,10 +31,15 @@ class OccurrenceQuery(BaseModel):
 
     def generate_cql(self):
         cql_components = []
-        (termCQL := self.build_gram_cql()) and cql_components.append(termCQL)
-        (dateCQL := self.build_date_cql()) and cql_components.append(dateCQL)
-        (paperCQL := self.build_periodical_cql()) and cql_components.append(paperCQL)
-        return " and ".join(cql_components)
+        if termCQL := self.build_gram_cql():
+            cql_components.append(termCQL)
+        if dateCQL := self.build_date_cql():
+            cql_components.append(dateCQL)
+        if paperCQL := self.build_periodical_cql():
+            cql_components.append(paperCQL)
+        cql = " and ".join(cql_components)
+        cql += " sortby dc.date/sort.ascending"
+        return cql
 
     def build_date_cql(self):
         if self.start_date and self.end_date:
