@@ -9,11 +9,11 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
-import { ResultsTable, TableProps } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
 import { generateXAxisOptionsForNumericScale } from "./utils";
 import { DehydratedState, useQueryClient } from "@tanstack/react-query";
+import { TicketResultTable } from "./TicketResultTable";
 
 export const seriesColors = [
   "#7cb5ec",
@@ -181,80 +181,4 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
   );
 };
 
-export interface TicketTableProps extends TableProps {
-  onSelectMonth: (month: number) => void;
-  onSelectYear: (year: number) => void;
-  onSelectDay: (day: number) => void;
-  tickets: Ticket[];
-}
 
-export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
-  const [selectedTicket, setSelectedTicket] = React.useState<Ticket>();
-  let tableTerms: string[] = [];
-  let tableCodes: string[] = [];
-  if (selectedTicket) {
-    tableTerms = selectedTicket.terms;
-    if (selectedTicket.papers) {
-      tableCodes = selectedTicket.papers.map((p) => p.code);
-    }
-  } else if (props.tickets && props.tickets.length > 0) {
-    tableTerms = props.tickets[0].terms;
-    if (props.tickets[0].papers) {
-      tableCodes = props.tickets[0].papers.map((p) => p.code);
-    }
-  }
-
-  return (
-    <ResultsTable
-      terms={tableTerms}
-      codes={tableCodes}
-      month={props.month}
-      day={props.day}
-      year={props.year}
-    >
-      <InputLabel label={"Year"}>
-        <input
-          type={"number"}
-          className={"border  bg-white p-5"}
-          value={props.year}
-          onChange={(e) => props.onSelectYear(parseInt(e.target.value))}
-        />
-      </InputLabel>
-      <InputLabel label={"Month"}>
-        <SelectInput
-          options={Array.from(Array(12).keys()).map((i) => String(i))}
-          onChange={(value) => props.onSelectMonth(parseInt(value))}
-          value={props.month ? String(props.month) : undefined}
-        />
-      </InputLabel>
-      <InputLabel label={"Day"}>
-        <SelectInput
-          options={Array.from(Array(31).keys()).map((i) => String(i))}
-          onChange={(value) => props.onSelectDay(parseInt(value))}
-          value={props.day ? String(props.day) : undefined}
-        />
-      </InputLabel>
-      <InputLabel label={"Ticket"}>
-        <select
-          onChange={(e) => {
-            if (!props.tickets) {
-              return;
-            }
-            setSelectedTicket(
-              props.tickets.find(
-                (t) => t.id === parseInt(e.target.value)
-              ) as Ticket
-            );
-          }}
-          className={"border  bg-white p-5"}
-        >
-          {props.tickets?.map((ticket) => (
-            <option key={ticket.id} value={ticket.id}>
-              {ticket.terms}
-            </option>
-          ))}
-        </select>
-      </InputLabel>
-    </ResultsTable>
-  );
-};

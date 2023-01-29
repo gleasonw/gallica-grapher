@@ -13,9 +13,8 @@ from database.connContext import build_db_conn, build_redis_conn
 from database.displayDataResolvers import (
     clear_records_for_requestid,
     get_gallica_records_for_display,
-    select_csv_data_for_tickets,
     select_display_records,
-    select_top_papers_for_tickets,
+    make_date_from_year_mon_day,
 )
 from database.graphDataResolver import build_highcharts_series
 from database.paperSearchResolver import (
@@ -31,7 +30,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from gallicaGetter import PeriodOccurrenceWrapper, VolumeOccurrenceWrapper
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 from gallicaGetter.fetch.progressUpdate import ProgressUpdate
-from gallicaGetter.parse.contentRecord import ContentPage, ContentRecord
+from gallicaGetter.parse.contentRecord import GallicaPage, GallicaContext
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from pydantic import BaseModel
 
@@ -58,11 +57,11 @@ def index():
 
 
 class Ticket(BaseModel):
-    terms: List[str] | str
+    terms: List[str]
     start_date: int
     end_date: int
-    codes: Optional[List[str] | str] = None
-    grouping: Literal["all", "month", "year", "gallicaMonth", "gallicaYear"] = "year"
+    codes: Optional[List[str]] = None
+    grouping: Literal["month", "year"] = "year"
     num_results: Optional[int] = None
     start_index: Optional[int] = 0
     num_workers: Optional[int] = 15
@@ -172,29 +171,6 @@ def graph_data(
         )
 
 
-@app.get("/api/topPapers")
-def get_top_papers(
-    request_id: int, ticket_ids: List[int] = Query(), num_results: int = 10
-):
-    with build_db_conn() as conn:
-        top_papers = select_top_papers_for_tickets(
-            tickets=ticket_ids,
-            request_id=request_id,
-            num_results=num_results,
-            conn=conn,
-        )
-    return {"topPapers": top_papers}
-
-
-@app.get("/api/getcsv")
-def get_csv(tickets: int | List[int], request_id: int):
-    with build_db_conn() as conn:
-        csv_data = select_csv_data_for_tickets(
-            ticket_ids=tickets, request_id=request_id, conn=conn
-        )
-    return {"csvData": csv_data}
-
-
 @app.get("/api/getDisplayRecords")
 def records(
     request_id: int,
@@ -229,7 +205,12 @@ class GallicaRecord(BaseModel):
     term: str
     date: str
     url: str
-    context: ContentRecord
+    context: GallicaContext
+
+
+class GallicaResponse(BaseModel):
+    records: List[GallicaRecord]
+    num_results: int
 
 
 @app.get("/api/gallicaRecords")
@@ -239,24 +220,31 @@ def fetch_records_from_gallica(
     day: Optional[int] = 0,
     terms: List[str] = Query(),
     codes: Optional[List[str]] = Query(None),
-    start_index: int = 0,
-    num_results: int = 10,
+    cursor: Optional[int] = 0,
+    limit: Optional[int] = 10,
     link_term: str = "",
     link_distance: int = 0,
-) -> List[GallicaRecord]:
+) -> GallicaResponse:
+
+    total_records = 0
+
+    def set_total_records(num_records: int):
+        nonlocal total_records
+        total_records = num_records
+
     gallica_records = get_gallica_records_for_display(
         terms=terms,
         codes=codes,
         year=year,
         month=month,
         day=day,
-        offset=start_index,
-        limit=num_results,
+        offset=cursor,
+        limit=limit,
         link_term=link_term,
         link_distance=link_distance,
+        on_get_total_records=set_total_records,
     )
-    if gallica_records is None:
-        return []
+
     wrapper = WrapperFactory.connect_content()
     keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
     context = wrapper.get(
@@ -278,7 +266,7 @@ def fetch_records_from_gallica(
                 context=record,
             )
         )
-    return records_with_context
+    return GallicaResponse(records=records_with_context, num_results=total_records)
 
 
 class Request(threading.Thread):
@@ -473,8 +461,8 @@ def get_num_records_all_volume_occurrence(ticket: Ticket) -> List[OccurrenceQuer
     api = WrapperFactory.connect_volume()
     base_queries_with_num_results = api.get_num_results_for_args(
         terms=ticket.terms,
-        start_date=ticket.start_date,
-        end_date=ticket.end_date,
+        start_date=str(ticket.start_date),
+        end_date=str(ticket.end_date),
         codes=ticket.codes,
         link_term=ticket.link_term,
         link_distance=ticket.link_distance,

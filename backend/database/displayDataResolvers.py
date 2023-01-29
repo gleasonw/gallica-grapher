@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 from gallicaGetter import WrapperFactory
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
@@ -98,6 +98,19 @@ def select_display_records(
     return records, total
 
 
+def make_date_from_year_mon_day(
+    year: Optional[int], month: Optional[int], day: Optional[int]
+) -> str:
+    if year and month and day:
+        return f"{year}-{month}-{day}"
+    elif month:
+        return f"{year}-{month}"
+    elif year:
+        return f"{year}"
+    else:
+        return ""
+
+
 def get_gallica_records_for_display(
     terms: List[str],
     link_term: Optional[str],
@@ -106,31 +119,24 @@ def get_gallica_records_for_display(
     month: Optional[int],
     day: Optional[int],
     codes: Optional[List[str]],
-    limit: int,
-    offset: int,
-):
+    limit: Optional[int],
+    offset: Optional[int],
+    on_get_total_records: Optional[Callable[[int], None]] = None,
+) -> List[VolumeRecord]:
     wrapper = WrapperFactory.connect_volume()
     records = []
-    if year and month and day:
-        start_date = f"{year}-{month}-{day}"
-    elif year and month:
-        start_date = f"{year}-{month}"
-    elif year:
-        start_date = f"{year}"
-    else:
-        start_date = None
     records.extend(
         wrapper.get(
             terms=terms,
-            start_date=start_date,
+            start_date=make_date_from_year_mon_day(year, month, day),
             codes=codes,
             link_term=link_term,
             link_distance=link_distance,
             num_results=limit,
             start_index=offset,
+            on_get_total_records=on_get_total_records,
         )
     )
-    records.sort(key=lambda record: record.date.getDate())
     return records
 
 
@@ -143,37 +149,3 @@ def clear_records_for_requestid(requestID, conn):
         """,
             (requestID,),
         )
-
-
-def select_top_papers_for_tickets(
-    tickets: int | List[int],
-    request_id: int,
-    conn,
-    num_results: int = 10,
-):
-    if type(tickets) is int:
-        tickets = (tickets,)
-    if type(tickets) is list:
-        tickets = tuple(tickets)
-    with conn.cursor() as cursor:
-        cursor.execute(
-            """
-        WITH resultCounts AS (
-            SELECT papercode, count(*) as papercount
-            FROM results 
-            WHERE requestid = %s
-            AND ticketid in %s
-            GROUP BY papercode
-            ORDER BY papercount DESC
-            LIMIT %s
-        )
-        SELECT title, papercount
-            FROM resultCounts
-            JOIN
-            papers
-            ON resultCounts.papercode = papers.code
-            ORDER BY papercount DESC;
-        """,
-            (request_id, tickets, num_results),
-        )
-        return cursor.fetchall()
