@@ -502,7 +502,6 @@ def get_and_insert_records_for_ticket(
                 onProgressUpdate=on_progress_update,
                 query_cache=ticket.cached_response,
                 generate=True,
-                num_workers=50,
             )
             insert_records_into_db(
                 records_for_db=records,
