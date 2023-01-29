@@ -13,6 +13,7 @@ export interface TableProps {
 
 export const ResultsTable: React.FC<TableProps> = (props) => {
   const [page, setPage] = React.useState(0);
+  const [selectedCursor, setSelectedCursor] = React.useState(0);
   const {
     isError,
     isLoading,
@@ -45,16 +46,19 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   if (isError) {
     return <div>Error</div>;
   }
-  const currentPage = data.data?.pages[page];
+  const currentPage = data.data?.pages.filter(
+    (page) => page.previousCursor == selectedCursor
+  )[0];
   const total_results = Number(data.data?.pages[0].data.num_results) ?? 0;
+  console.log(data.data?.pages);
+  const fetchedCursors = data.data?.pages.map((page) => page.previousCursor);
 
-  async function handlePageIncrement(value: number) {
-    if (data.data && hasNextPage && page + 1 === data.data.pages.length) {
+  async function handleCursorChange() {
+    //figure out if we need to fetch the next page
+    if (fetchedCursors && hasNextPage && !fetchedCursors.includes(selectedCursor + 20)) {
       await fetchNextPage();
-      setPage((old) => old + value);
-    } else if (data.data && page + 1 < data.data.pages.length) {
-      setPage((old) => old + value);
     }
+    setSelectedCursor(selectedCursor + 20);
   }
 
   return (
@@ -68,22 +72,35 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
               {currentPage && (
                 <div>
                   <div className={"flex flex-row gap-10"}>
-                    {hasPreviousPage && page != 0 && (
-                      <button onClick={() => setPage(page - 1)}>{"<"}</button>
+                    {hasPreviousPage && selectedCursor != 0 && (
+                      <button
+                        onClick={() => setSelectedCursor(selectedCursor - 20)}
+                      >
+                        {"<"}
+                      </button>
                     )}
                     <input
                       type={"number"}
-                      value={page + 1}
-                      onChange={(e) => {
+                      value={selectedCursor / 20 + 1}
+                      onChange={async (e) => {
                         const value = Number(e.target.value);
                         if (value !== undefined && value > 0) {
-                          handlePageIncrement(value - 1);
+                          if (value > page + 1) {
+                            if (value == page + 2) {
+                              handleCursorChange();
+                            } else {
+                              await fetchNextPage({ pageParam: value * 20 });
+                              setSelectedCursor((value - 1) * 20);
+                            }
+                          } else {
+                            setSelectedCursor((value-1) * 20);
+                          }
                         }
                       }}
                     />
                     <p>of {Math.floor(total_results / 20).toLocaleString()}</p>
                     {hasNextPage && (
-                      <button onClick={() => handlePageIncrement(1)}>
+                      <button onClick={() => handleCursorChange()}>
                         {">"}
                       </button>
                     )}
