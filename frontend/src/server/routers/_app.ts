@@ -172,6 +172,7 @@ export const appRouter = router({
       })
     )
     .query(async ({ input }) => {
+      console.log(input);
       const limit = input.limit ?? 30;
       const { cursor } = input;
       if (input.terms.length === 0) {
@@ -186,12 +187,10 @@ export const appRouter = router({
       }
       let baseUrl = `${apiURL}/api/gallicaRecords`;
       let url = addQueryParamsIfExist(baseUrl, input);
-      console.log(url);
       const response = await fetch(url);
       const data = (await response.json()) as GallicaResponse;
       let nextCursor = null;
       let previousCursor = cursor ?? 0;
-      console.log({ cursor });
       if (data.records && data.records.length > 0) {
         if (cursor) {
           nextCursor = cursor + limit;

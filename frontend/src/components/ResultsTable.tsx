@@ -12,8 +12,7 @@ export interface TableProps {
 }
 
 export const ResultsTable: React.FC<TableProps> = (props) => {
-  const [page, setPage] = React.useState(0);
-  const [selectedCursor, setSelectedCursor] = React.useState(0);
+  const [selectedPage, setSelectedPage] = React.useState(1);
   const {
     isError,
     isLoading,
@@ -22,6 +21,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     hasNextPage,
     hasPreviousPage,
     isFetchingNextPage,
+    isFetchingPreviousPage,
     ...data
   } = trpc.gallicaRecords.useInfiniteQuery(
     {
@@ -33,6 +33,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       limit: 20,
     },
     {
+      //TODO: fix this logic, it's never really used since the cursor is not continuous
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       getPreviousPageParam: (firstPage) => firstPage.previousCursor,
       staleTime: Infinity,
@@ -46,20 +47,46 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   if (isError) {
     return <div>Error</div>;
   }
+
   const currentPage = data.data?.pages.filter(
-    (page) => page.previousCursor == selectedCursor
+    (page) => page.nextCursor == pageToCursor(selectedPage)
   )[0];
   const total_results = Number(data.data?.pages[0].data.num_results) ?? 0;
-  console.log(data.data?.pages);
-  const fetchedCursors = data.data?.pages.map((page) => page.previousCursor);
 
-  async function handleCursorChange() {
-    //figure out if we need to fetch the next page
-    if (fetchedCursors && hasNextPage && !fetchedCursors.includes(selectedCursor + 20)) {
-      await fetchNextPage();
+  // TODO: Make this a set... I don't think the perf will matter much, but a nice touch
+  const fetchedCursors = data.data?.pages.map((page) => page.nextCursor);
+
+  async function handleCursorIncrement(amount: number = 1) {
+    if (
+      fetchedCursors &&
+      hasNextPage &&
+      !fetchedCursors.includes(pageToCursor(selectedPage + amount))
+    ) {
+      await fetchNextPage({
+        pageParam: pageToCursor(selectedPage + amount - 1),
+      });
     }
-    setSelectedCursor(selectedCursor + 20);
+    setSelectedPage(selectedPage + amount);
   }
+
+  async function handleCursorDecrement(amount: number = 1) {
+    if (
+      fetchedCursors &&
+      hasPreviousPage &&
+      !fetchedCursors.includes(pageToCursor(selectedPage - amount))
+    ) {
+      await fetchPreviousPage({
+        pageParam: pageToCursor(selectedPage - (amount + 1)),
+      });
+    }
+    setSelectedPage(selectedPage - amount);
+  }
+
+  function pageToCursor(page: number) {
+    return page * 20;
+  }
+
+  console.log(data.data.pages);
 
   return (
     <div className={"flex flex-col"}>
@@ -69,38 +96,32 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
           <div className={"m-4 flex flex-col gap-5"}>
             <h1 className={"text-2xl"}>
               {isFetchingNextPage && <p>Fetching next page...</p>}
+              {isFetchingPreviousPage && <p>Fetching previous page...</p>}
               {currentPage && (
                 <div>
-                  <div className={"flex flex-row gap-10"}>
-                    {hasPreviousPage && selectedCursor != 0 && (
-                      <button
-                        onClick={() => setSelectedCursor(selectedCursor - 20)}
-                      >
+                  <div className={"flex flex-row justify-center gap-10"}>
+                    {hasPreviousPage && selectedPage != 1 && (
+                      <button onClick={() => handleCursorDecrement()}>
                         {"<"}
                       </button>
                     )}
                     <input
                       type={"number"}
-                      value={selectedCursor / 20 + 1}
+                      value={selectedPage}
                       onChange={async (e) => {
                         const value = Number(e.target.value);
                         if (value !== undefined && value > 0) {
-                          if (value > page + 1) {
-                            if (value == page + 2) {
-                              handleCursorChange();
-                            } else {
-                              await fetchNextPage({ pageParam: value * 20 });
-                              setSelectedCursor((value - 1) * 20);
-                            }
-                          } else {
-                            setSelectedCursor((value-1) * 20);
+                          if (value > selectedPage) {
+                            handleCursorIncrement(value - selectedPage);
+                          } else if (value < selectedPage) {
+                            handleCursorDecrement(selectedPage - value);
                           }
                         }
                       }}
                     />
                     <p>of {Math.floor(total_results / 20).toLocaleString()}</p>
                     {hasNextPage && (
-                      <button onClick={() => handleCursorChange()}>
+                      <button onClick={() => handleCursorIncrement()}>
                         {">"}
                       </button>
                     )}
