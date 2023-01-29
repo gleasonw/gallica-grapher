@@ -51,7 +51,14 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   const currentPage = data.data?.pages.filter(
     (page) => page.nextCursor == pageToCursor(selectedPage)
   )[0];
+
   const total_results = Number(data.data?.pages[0].data.num_results) ?? 0;
+
+  const cursorMax = Math.floor(total_results / 20) + 1;
+
+  function pageToCursor(page: number) {
+    return page * 20;
+  }
 
   // TODO: Make this a set... I don't think the perf will matter much, but a nice touch
   const fetchedCursors = data.data?.pages.map((page) => page.nextCursor);
@@ -82,12 +89,6 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     setSelectedPage(selectedPage - amount);
   }
 
-  function pageToCursor(page: number) {
-    return page * 20;
-  }
-
-  console.log(data.data.pages);
-
   return (
     <div className={"flex flex-col"}>
       <div className={"m-auto ml-5 "}>{props.children}</div>
@@ -105,22 +106,14 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                         {"<"}
                       </button>
                     )}
-                    <input
-                      type={"number"}
-                      value={selectedPage}
-                      onChange={async (e) => {
-                        const value = Number(e.target.value);
-                        if (value !== undefined && value > 0) {
-                          if (value > selectedPage) {
-                            handleCursorIncrement(value - selectedPage);
-                          } else if (value < selectedPage) {
-                            handleCursorDecrement(selectedPage - value);
-                          }
-                        }
-                      }}
+                    <CursorInput
+                      cursor={selectedPage}
+                      cursorMax={cursorMax}
+                      onCursorIncrement={handleCursorIncrement}
+                      onCursorDecrement={handleCursorDecrement}
                     />
-                    <p>of {Math.floor(total_results / 20).toLocaleString()}</p>
-                    {hasNextPage && (
+                    <p>of {cursorMax.toLocaleString()}</p>
+                    {hasNextPage && selectedPage !== cursorMax && (
                       <button onClick={() => handleCursorIncrement()}>
                         {">"}
                       </button>
@@ -154,5 +147,57 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
         </div>
       </div>
     </div>
+  );
+};
+
+interface CursorInputProps {
+  cursor: number;
+  cursorMax: number;
+  onCursorIncrement: (amount?: number) => void;
+  onCursorDecrement: (amount?: number) => void;
+}
+
+const CursorInput: React.FC<CursorInputProps> = (props) => {
+  const [localCursor, setLocalCursor] = React.useState(props.cursor);
+
+  React.useEffect(() => {
+    setLocalCursor(props.cursor);
+  }, [props.cursor]);
+
+  const handleLocalCursorChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = Number(e.target.value);
+
+    let valueToPropagate = value;
+
+    if (value > props.cursorMax) {
+      valueToPropagate = props.cursorMax;
+    }
+
+    if (value <= 0) {
+      valueToPropagate = 1;
+    }
+
+    if (valueToPropagate > props.cursor) {
+      props.onCursorIncrement(valueToPropagate - props.cursor);
+    } else if (valueToPropagate < props.cursor) {
+      props.onCursorDecrement(props.cursor - valueToPropagate);
+    }
+    setLocalCursor(valueToPropagate);
+  };
+
+  return (
+    <input
+      type={"number"}
+      value={localCursor}
+      onChange={(e) => setLocalCursor(e.target.valueAsNumber)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleLocalCursorChange(e as any);
+        }
+      }}
+    />
   );
 };

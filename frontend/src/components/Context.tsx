@@ -4,6 +4,10 @@ import { GallicaRecord } from "../server/routers/_app";
 export const Context: React.FC<{ record: GallicaRecord }> = (props) => {
   const [pageIndex, setPageIndex] = React.useState(0);
 
+  React.useEffect(() => {
+    setPageIndex(0);
+  }, [props.record]);
+
   const data = props.record.context;
 
   return (
