@@ -8,7 +8,7 @@ from gallicaGetter.parse.parseXML import (
 )
 
 
-def parse_responses_to_records(responses):
+def parse_responses_to_records(responses, on_get_total_records):
     for response in responses:
         for record in get_records_from_xml(response.xml):
             yield PaperRecord(

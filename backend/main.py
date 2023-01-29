@@ -208,6 +208,11 @@ class GallicaRecord(BaseModel):
     context: GallicaContext
 
 
+class GallicaResponse(BaseModel):
+    records: List[GallicaRecord]
+    num_results: int
+
+
 @app.get("/api/gallicaRecords")
 def fetch_records_from_gallica(
     year: Optional[int] = 0,
@@ -219,7 +224,14 @@ def fetch_records_from_gallica(
     limit: Optional[int] = 10,
     link_term: str = "",
     link_distance: int = 0,
-) -> List[GallicaRecord]:
+) -> GallicaResponse:
+
+    total_records = 0
+
+    def set_total_records(num_records: int):
+        nonlocal total_records
+        total_records = num_records
+
     gallica_records = get_gallica_records_for_display(
         terms=terms,
         codes=codes,
@@ -230,7 +242,9 @@ def fetch_records_from_gallica(
         limit=limit,
         link_term=link_term,
         link_distance=link_distance,
+        on_get_total_records=set_total_records,
     )
+
     wrapper = WrapperFactory.connect_content()
     keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
     context = wrapper.get(
@@ -252,30 +266,7 @@ def fetch_records_from_gallica(
                 context=record,
             )
         )
-    return records_with_context
-
-
-@app.get("/api/numRecordsInGallica")
-def num_records_in_gallica(
-    year: Optional[int] = 0,
-    month: Optional[int] = 0,
-    day: Optional[int] = 0,
-    terms: List[str] = Query(),
-    codes: Optional[List[str]] = Query(None),
-    link_term: str = "",
-    link_distance: int = 0,
-) -> int:
-    wrapper = WrapperFactory.connect_volume()
-    num_records_query = wrapper.get_num_results_for_args(
-        terms=terms,
-        codes=codes,
-        start_date=make_date_from_year_mon_day(year, month, day),
-        link_term=link_term,
-        link_distance=link_distance,
-    )
-    if num_records_query is None or len(num_records_query) == 0:
-        return 0
-    return num_records_query[0].num_results
+    return GallicaResponse(records=records_with_context, num_results=total_records)
 
 
 class Request(threading.Thread):

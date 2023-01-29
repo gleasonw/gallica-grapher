@@ -1,4 +1,4 @@
-from typing import Generator, List, Optional
+from typing import Callable, Generator, List, Optional
 
 from pydantic import BaseModel
 from database.contextPair import ContextPair
@@ -16,12 +16,17 @@ from gallicaGetter.buildqueries.buildSRUqueries import (
     build_base_queries_at_indices,
 )
 from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
-from gallicaGetter.parse import build_parser
 from gallicaGetter.parse.contentRecord import GallicaContext
 from gallicaGetter.parse.issueYearRecord import IssueYearRecord
 from gallicaGetter.parse.paperRecords import PaperRecord
 from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.parse.volumeRecords import VolumeRecord
+import gallicaGetter.parse.issueYearRecord as issueRecords
+import gallicaGetter.parse.contentRecord as contentRecords
+import gallicaGetter.parse.fullText as fullText
+import gallicaGetter.parse.paperRecords as paperRecords
+import gallicaGetter.parse.periodRecords as periodRecords
+import gallicaGetter.parse.volumeRecords as volumeRecords
 
 
 class GallicaWrapper:
@@ -41,9 +46,17 @@ class GallicaWrapper:
             f"get_endpoint_url() not implemented for {self.__class__.__name__}"
         )
 
-    def fetch_from_queries(self, queries, onUpdateProgress=None):
-        raw_response = self.api.get(queries, onProgressUpdate=onUpdateProgress)
-        return self.parser(raw_response)
+    def fetch_from_queries(
+        self,
+        queries,
+        onUpdateProgress=None,
+        on_get_total_records: Optional[Callable[[int], None]] = None,
+    ):
+        raw_response = self.api.get(
+            queries,
+            onProgressUpdate=onUpdateProgress,
+        )
+        return self.parser(raw_response, on_get_total_records=on_get_total_records)
 
     def get_parser(self):
         raise NotImplementedError(
@@ -56,7 +69,7 @@ class GallicaWrapper:
 
 class VolumeOccurrenceWrapper(GallicaWrapper):
     def get_parser(self):
-        return build_parser("occurrence")
+        return volumeRecords.parse_responses_to_records
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/SRU"
@@ -74,6 +87,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         link_distance: Optional[int] = None,
         onProgressUpdate=None,
         query_cache=None,
+        on_get_total_records: Optional[Callable[[int], None]] = None,
     ) -> List[VolumeRecord]:
         if query_cache:
             queries = index_queries_by_num_results(query_cache)
@@ -97,6 +111,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 )
             elif num_results is None or num_results > 50:
                 # assume we want all results, or index for more than 50
+                # we will have to fetch # total records from Gallica
                 queries = build_indexed_queries(
                     base_queries,
                     api=self.api,
@@ -107,7 +122,9 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 # num results less than 50, the base query is fine
                 queries = base_queries
         record_generator = self.fetch_from_queries(
-            queries=queries, onUpdateProgress=onProgressUpdate
+            queries=queries,
+            onUpdateProgress=onProgressUpdate,
+            on_get_total_records=on_get_total_records,
         )
         return record_generator if generate else list(record_generator)
 
@@ -169,12 +186,12 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
         return "https://gallica.bnf.fr/SRU"
 
     def get_parser(self):
-        return build_parser("groupedCount")
+        return periodRecords.parse_responses_to_records
 
 
 class IssuesWrapper(GallicaWrapper):
     def get_parser(self):
-        return build_parser("issues")
+        return issueRecords.parse_responses_to_records
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/services/Issues"
@@ -187,7 +204,7 @@ class IssuesWrapper(GallicaWrapper):
 
 class ContentWrapper(GallicaWrapper):
     def get_parser(self):
-        return build_parser("content")
+        return contentRecords.parse_responses_to_records
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/services/ContentSearch"
@@ -226,7 +243,7 @@ class PapersWrapper(GallicaWrapper):
         return sru_paper_records
 
     def get_parser(self):
-        return build_parser("paper")
+        return paperRecords.parse_responses_to_records
 
 
 class FullTextWrapper(GallicaWrapper):
@@ -234,7 +251,7 @@ class FullTextWrapper(GallicaWrapper):
         return "https://gallica.bnf.fr"
 
     def get_parser(self):
-        return build_parser("fullText")
+        return fullText.parse_responses_to_records
 
     def get(
         self, ark_codes, onUpdateProgress=None, generate=False

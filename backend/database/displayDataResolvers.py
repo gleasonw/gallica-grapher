@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 from gallicaGetter import WrapperFactory
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
@@ -121,6 +121,7 @@ def get_gallica_records_for_display(
     codes: Optional[List[str]],
     limit: Optional[int],
     offset: Optional[int],
+    on_get_total_records: Optional[Callable[[int], None]] = None,
 ) -> List[VolumeRecord]:
     wrapper = WrapperFactory.connect_volume()
     records = []
@@ -133,6 +134,7 @@ def get_gallica_records_for_display(
             link_distance=link_distance,
             num_results=limit,
             start_index=offset,
+            on_get_total_records=on_get_total_records,
         )
     )
     return records

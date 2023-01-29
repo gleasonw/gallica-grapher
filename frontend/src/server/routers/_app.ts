@@ -36,6 +36,11 @@ export interface GraphData {
   name: string;
 }
 
+export interface GallicaResponse {
+  records: GallicaRecord[];
+  num_results: string;
+}
+
 export interface GallicaRecord {
   paper_title: string;
   paper_code: string;
@@ -94,26 +99,6 @@ export const appRouter = router({
         `${apiURL}/api/numPapersOverRange/${input.from}/${input.to}`
       );
       const data = await response.json();
-      return data;
-    }),
-  numRecordsInGallica: procedure
-    .input(
-      z.object({
-        year: z.number().optional(),
-        month: z.number().optional(),
-        day: z.number().optional(),
-        terms: z.array(z.string()),
-        codes: z.array(z.string()).optional(),
-        link_term: z.string().optional(),
-        link_distance: z.number().optional(),
-      })
-    )
-    .query(async ({ input }) => {
-      const baseUrl = `${apiURL}/api/numRecordsInGallica`;
-      const url = addQueryParamsIfExist(baseUrl, input);
-      const response = await fetch(url);
-      const data = await response.json() as string;
-      console.log(data);
       return data;
     }),
   search: procedure
@@ -191,7 +176,10 @@ export const appRouter = router({
       const { cursor } = input;
       if (input.terms.length === 0) {
         return {
-          data: [],
+          data: {
+            records: [],
+            num_results: 0,
+          },
           nextCursor: null,
           previousCursor: null,
         };
@@ -200,11 +188,11 @@ export const appRouter = router({
       let url = addQueryParamsIfExist(baseUrl, input);
       console.log(url);
       const response = await fetch(url);
-      const data = (await response.json()) as GallicaRecord[];
+      const data = (await response.json()) as GallicaResponse;
       let nextCursor = null;
       let previousCursor = cursor ?? 0;
       console.log({ cursor });
-      if (data && data.length > 0) {
+      if (data.records && data.records.length > 0) {
         if (cursor) {
           nextCursor = cursor + limit;
         } else {

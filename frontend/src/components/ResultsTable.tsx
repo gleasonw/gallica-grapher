@@ -46,8 +46,17 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     return <div>Error</div>;
   }
   const currentPage = data.data?.pages[page];
-  console.log(data.data?.pages);
-  console.log({ hasNextPage, hasPreviousPage });
+  const total_results = Number(data.data?.pages[0].data.num_results) ?? 0;
+
+  async function handlePageIncrement(value: number) {
+    if (data.data && hasNextPage && page + 1 === data.data.pages.length) {
+      await fetchNextPage();
+      setPage((old) => old + value);
+    } else if (data.data && page + 1 < data.data.pages.length) {
+      setPage((old) => old + value);
+    }
+  }
+
   return (
     <div className={"flex flex-col"}>
       <div className={"m-auto ml-5 "}>{props.children}</div>
@@ -55,44 +64,36 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
         <div>
           <div className={"m-4 flex flex-col gap-5"}>
             <h1 className={"text-2xl"}>
-              <TotalResults
-                terms={props.terms}
-                codes={props.codes}
-                year={props.year}
-                month={props.month}
-                day={props.day}
-              />
               {isFetchingNextPage && <p>Fetching next page...</p>}
               {currentPage && (
                 <div>
                   <div className={"flex flex-row gap-10"}>
                     {hasPreviousPage && page != 0 && (
-                      <button onClick={() => setPage(page - 1)}>
-                        Previous
-                      </button>
+                      <button onClick={() => setPage(page - 1)}>{"<"}</button>
                     )}
+                    <input
+                      type={"number"}
+                      value={page + 1}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        if (value !== undefined && value > 0) {
+                          handlePageIncrement(value - 1);
+                        }
+                      }}
+                    />
+                    <p>of {Math.floor(total_results / 20).toLocaleString()}</p>
                     {hasNextPage && (
-                      <button
-                        onClick={() => {
-                          if (
-                            data.data?.pages &&
-                            page + 1 === data.data.pages.length
-                          ) {
-                            fetchNextPage();
-                          }
-                          setPage(page + 1);
-                        }}
-                      >
-                        Next
+                      <button onClick={() => handlePageIncrement(1)}>
+                        {">"}
                       </button>
                     )}
                   </div>
                 </div>
               )}
             </h1>
-            {currentPage?.data.map((record) => (
+            {currentPage?.data.records.map((record, index) => (
               <div
-                key={record.url}
+                key={index}
                 className={"flex flex-col gap-5 bg-white p-5 shadow-md"}
               >
                 <div className={"flex flex-row flex-wrap gap-10 pb-5 text-lg"}>
@@ -116,15 +117,4 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       </div>
     </div>
   );
-};
-
-export const TotalResults: React.FC<TableProps> = (props) => {
-  const { data } = trpc.numRecordsInGallica.useQuery({
-    year: props.year,
-    month: props.month,
-    day: props.day,
-    codes: props.codes || [],
-    terms: props.terms || [],
-  });
-  return <div>{data?.toLocaleString()} total</div>;
 };

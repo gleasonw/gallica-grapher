@@ -6,7 +6,7 @@ from gallicaGetter.fetch.gallicasession import Response
 from gallicaGetter.parse.parseXML import get_num_results_and_pages_for_context
 
 
-def parse_responses_to_records(responses: List[Response]):
+def parse_responses_to_records(responses: List[Response], on_get_total_records):
     for response in responses:
         num_results_and_pages = get_num_results_and_pages_for_context(response.xml)
         yield GallicaContext(
