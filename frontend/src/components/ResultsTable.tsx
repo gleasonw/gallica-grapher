@@ -98,29 +98,49 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
             <h1 className={"text-2xl"}>
               {isFetchingNextPage && <p>Fetching next page...</p>}
               {isFetchingPreviousPage && <p>Fetching previous page...</p>}
-              {currentPage && (
-                <div>
-                  <div className={"flex flex-row justify-center gap-10"}>
-                    {hasPreviousPage && selectedPage != 1 && (
-                      <button onClick={() => handleCursorDecrement()}>
-                        {"<"}
-                      </button>
-                    )}
-                    <CursorInput
-                      cursor={selectedPage}
-                      cursorMax={cursorMax}
-                      onCursorIncrement={handleCursorIncrement}
-                      onCursorDecrement={handleCursorDecrement}
-                    />
-                    <p>of {cursorMax.toLocaleString()}</p>
-                    {hasNextPage && selectedPage !== cursorMax && (
-                      <button onClick={() => handleCursorIncrement()}>
-                        {">"}
-                      </button>
-                    )}
+              {currentPage &&
+                !isFetchingNextPage &&
+                !isFetchingPreviousPage && (
+                  <div>
+                    <div className={"flex flex-row justify-center gap-10 text-3xl"}>
+                      {hasPreviousPage && selectedPage != 1 && (
+                        <div className={"flex flex-row gap-10"}>
+                          <button
+                            onClick={() =>
+                              handleCursorDecrement(selectedPage - 1)
+                            }
+                          >
+                            {"<<"}
+                          </button>
+                          <button onClick={() => handleCursorDecrement()}>
+                            {"<"}
+                          </button>
+                        </div>
+                      )}
+                      <CursorInput
+                        cursor={selectedPage}
+                        cursorMax={cursorMax}
+                        onCursorIncrement={handleCursorIncrement}
+                        onCursorDecrement={handleCursorDecrement}
+                      />
+                      <p>of {cursorMax.toLocaleString()}</p>
+                      {hasNextPage && selectedPage !== cursorMax && (
+                        <div className={"flex flex-row gap-10"}>
+                          <button onClick={() => handleCursorIncrement()}>
+                            {">"}
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleCursorIncrement(cursorMax - selectedPage)
+                            }
+                          >
+                            {">>"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </h1>
             {currentPage?.data.records.map((record, index) => (
               <div
@@ -192,6 +212,7 @@ const CursorInput: React.FC<CursorInputProps> = (props) => {
       type={"number"}
       value={localCursor}
       onChange={(e) => setLocalCursor(e.target.valueAsNumber)}
+      className={"w-20"}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
