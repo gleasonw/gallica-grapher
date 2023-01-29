@@ -102,7 +102,11 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                 !isFetchingNextPage &&
                 !isFetchingPreviousPage && (
                   <div>
-                    <div className={"flex flex-row justify-center gap-10 text-3xl"}>
+                    <div
+                      className={
+                        "flex flex-row justify-center gap-10 text-xl md:text-3xl lg:text-3xl"
+                      }
+                    >
                       {hasPreviousPage && selectedPage != 1 && (
                         <div className={"flex flex-row gap-10"}>
                           <button
