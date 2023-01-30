@@ -6,7 +6,12 @@ import { InputForm } from "../components/InputForm";
 import { ResultViewer } from "../components/ResultViewer";
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { appRouter } from "../server/routers/_app";
-import { DehydratedState, hydrate, useHydrate, useQueryClient } from "@tanstack/react-query";
+import {
+  DehydratedState,
+  hydrate,
+  useHydrate,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -52,9 +57,9 @@ export const getStaticProps: GetStaticProps<{
       backend_source: "pyllica",
     }),
     ssg.gallicaRecords.prefetch({
-      terms: initTickets[0].terms,
+      terms: initTickets[0].terms[0],
       codes: [],
-      limit: 20
+      limit: 20,
     }),
   ]);
 
@@ -97,10 +102,7 @@ export default function Home({
           }
         }}
       />
-      <ResultViewer
-        tickets={tickets}
-        outerRange={outerRange}
-      />
+      <ResultViewer tickets={tickets} outerRange={outerRange} />
     </BaseLayout>
-  )
+  );
 }
