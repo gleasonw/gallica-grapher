@@ -1,64 +1,14 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc";
+import { addQueryParamsIfExist } from "../../utils/addQueryParamsIfExist";
+import { GallicaResponse, GraphData, Paper, ProgressType } from "../../models/dbStructs";
+import { tableParamSchema } from "../../models/tableParamSchema";
 
 let apiURL: string;
 if (process.env.NODE_ENV === "development") {
   apiURL = "http://0.0.0.0:8000";
 } else {
   apiURL = "https://gallica-grapher-production.up.railway.app";
-}
-
-//snake case cuz that's what the API returns
-export interface Paper {
-  title: string;
-  code: string;
-  start_date: string;
-  end_date: string;
-}
-
-export interface ProgressType {
-  num_results_discovered: number;
-  num_requests_to_send: number;
-  num_requests_sent: number;
-  estimate_seconds_to_completion: number;
-  random_paper: string;
-  random_text: string;
-  state: "too_many_records" | "completed" | "error" | "no_records" | "running";
-  backend_source: "gallica" | "pyllica";
-}
-
-export interface GraphData {
-  request_id: number;
-  data: {
-    date: number; //year or unix seconds
-    count: number;
-  }[];
-  name: string;
-}
-
-export interface GallicaResponse {
-  records: GallicaRecord[];
-  num_results: string;
-}
-
-export interface GallicaRecord {
-  paper_title: string;
-  paper_code: string;
-  url: string;
-  date: string;
-  term: string;
-  context: GallicaContext;
-}
-
-export interface GallicaContext {
-  num_results: number;
-  pages: GallicaPage[];
-  ark: string;
-}
-
-export interface GallicaPage {
-  page: string;
-  context: string;
 }
 
 export const appRouter = router({
@@ -157,74 +107,40 @@ export const appRouter = router({
       const data = (await response.json()) as GraphData;
       return data;
     }),
-  gallicaRecords: procedure
-    .input(
-      z.object({
-        year: z.number().nullish(),
-        month: z.number().nullish(),
-        day: z.number().nullish(),
-        terms: z.array(z.string()),
-        codes: z.array(z.string()).nullish(),
-        limit: z.number().nullish(),
-        cursor: z.number().nullish(),
-        link_term: z.string().nullish(),
-        link_distance: z.number().nullish(),
-        source: z
-          .literal("book")
-          .or(z.literal("periodical"))
-          .or(z.literal("all"))
-          .nullish(),
-        sort: z.literal("date").or(z.literal("relevance")).nullish(),
-      })
-    )
-    .query(async ({ input }) => {
-      console.log(input);
-      const limit = input.limit ?? 30;
-      const { cursor } = input;
-      if (input.terms.length === 0) {
-        return {
-          data: {
-            records: [],
-            num_results: 0,
-          },
-          nextCursor: null,
-          previousCursor: null,
-        };
-      }
-      let baseUrl = `${apiURL}/api/gallicaRecords`;
-      let url = addQueryParamsIfExist(baseUrl, input);
-      const response = await fetch(url);
-      const data = (await response.json()) as GallicaResponse;
-      let nextCursor = null;
-      let previousCursor = cursor ?? 0;
-      if (data.records && data.records.length > 0) {
-        if (cursor) {
-          nextCursor = cursor + limit;
-        } else {
-          nextCursor = limit;
-        }
-      }
+  gallicaRecords: procedure.input(tableParamSchema).query(async ({ input }) => {
+    console.log(input);
+    const limit = input.limit ?? 30;
+    const { cursor } = input;
+    if (input.terms.length === 0) {
       return {
-        data,
-        nextCursor,
-        previousCursor,
+        data: {
+          records: [],
+          num_results: 0,
+        },
+        nextCursor: null,
+        previousCursor: null,
       };
-    }),
-});
-
-function addQueryParamsIfExist(url: string, params: Record<string, any>) {
-  const urlParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && !Array.isArray(value)) {
-      urlParams.append(key, value);
-    } else if (Array.isArray(value)) {
-      value.forEach((v) => {
-        urlParams.append(key, v);
-      });
     }
-  });
-  return `${url}?${urlParams.toString()}`;
-}
+    let baseUrl = `${apiURL}/api/gallicaRecords`;
+    let url = addQueryParamsIfExist(baseUrl, input);
+    const response = await fetch(url);
+    const data = (await response.json()) as GallicaResponse;
+    let nextCursor = null;
+    let previousCursor = cursor ?? 0;
+    if (data.records && data.records.length > 0) {
+      if (cursor) {
+        nextCursor = cursor + limit;
+      } else {
+        nextCursor = limit;
+      }
+    }
+    return {
+      data,
+      nextCursor,
+      previousCursor,
+    };
+  }),
+});
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
