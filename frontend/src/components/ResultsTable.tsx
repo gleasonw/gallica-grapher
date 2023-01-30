@@ -13,6 +13,7 @@ export interface TableProps {
   link_distance?: number | null;
   children?: React.ReactNode;
   limit?: number;
+  sort?: "date" | "relevance" | null;
 }
 
 export const ResultsTable: React.FC<TableProps> = (props) => {
@@ -37,6 +38,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       link_term: props.link_term,
       link_distance: props.link_distance,
       limit: limit,
+      sort: props.sort,
     },
     {
       staleTime: Infinity,

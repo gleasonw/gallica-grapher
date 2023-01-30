@@ -121,6 +121,7 @@ def get_gallica_records_for_display(
     codes: Optional[List[str]],
     limit: Optional[int],
     offset: Optional[int],
+    sort: Optional[Literal["date", "relevance"]],
     on_get_total_records: Optional[Callable[[int], None]] = None,
 ) -> List[VolumeRecord]:
     wrapper = WrapperFactory.connect_volume()
@@ -134,6 +135,7 @@ def get_gallica_records_for_display(
             link=link,
             num_results=limit,
             start_index=offset,
+            sort=sort,
             on_get_total_records=on_get_total_records,
         )
     )

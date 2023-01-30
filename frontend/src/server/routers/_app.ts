@@ -172,7 +172,9 @@ export const appRouter = router({
         source: z
           .literal("book")
           .or(z.literal("periodical"))
-          .or(z.literal("all")).nullish(),
+          .or(z.literal("all"))
+          .nullish(),
+        sort: z.literal("date").or(z.literal("relevance")).nullish(),
       })
     )
     .query(async ({ input }) => {

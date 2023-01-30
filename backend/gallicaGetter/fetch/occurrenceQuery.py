@@ -13,6 +13,7 @@ class OccurrenceQuery(BaseModel):
     link: Optional[Tuple[str, int]]
     source: Optional[Literal["book", "periodical", "all"]]
     codes: Optional[List[str]] = None
+    sort: Optional[Literal["date", "relevance"]] = None
     num_results: int = 0
     collapsing = False
 
@@ -27,6 +28,7 @@ class OccurrenceQuery(BaseModel):
             num_records=num_records,
             link=self.link,
             source=self.source,
+            sort=self.sort,
         )
 
     def generate_cql(self):
@@ -38,7 +40,8 @@ class OccurrenceQuery(BaseModel):
         if paperCQL := self.build_source_sql():
             cql_components.append(paperCQL)
         cql = " and ".join(cql_components)
-        cql += " sortby dc.date/sort.ascending"
+        if self.sort == "date":
+            cql += " sortby dc.date/sort.ascending"
         return cql
 
     def build_date_cql(self):

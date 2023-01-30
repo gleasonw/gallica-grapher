@@ -12,6 +12,7 @@ def build_base_queries(
     grouping: str,
     link: Optional[Tuple[str, int]] = None,
     source: Optional[Literal["book", "periodical", "all"]] = None,
+    sort: Optional[Literal["date", "relevance"]] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     codes: Optional[List[str]] = None,
@@ -38,6 +39,7 @@ def build_base_queries(
                         num_records=limit or 1,
                         link=link,
                         source=source,
+                        sort=sort,
                     )
                 )
     return base_queries

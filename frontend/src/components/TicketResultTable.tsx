@@ -47,7 +47,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
           <input
             type={"number"}
             className={"border  bg-white p-5"}
-            value={props.year}
+            value={props.year || ""}
             onChange={(e) => props.onSelectYear(parseInt(e.target.value))}
           />
         </InputLabel>

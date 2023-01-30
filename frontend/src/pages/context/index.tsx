@@ -17,6 +17,7 @@ const tableParamSchema = z.object({
   link_distance: z.coerce.number().nullish(),
   codes: z.string().array().nullish(),
   limit: z.coerce.number().nullish(),
+  sort: z.literal("date").or(z.literal("relevance")).nullish(),
 });
 
 export default function Context() {
@@ -44,12 +45,24 @@ export default function Context() {
       link_distance,
       link_term,
       limit,
+      sort,
     } = result.data;
     if (limit && limit > 50) {
       return (
         <p>
           Limit must be less than or equal to 50, the maximum number of records
           Gallica returns in one request
+        </p>
+      );
+    }
+    if (
+      (link_distance && link_term === undefined) ||
+      (link_term && link_distance === undefined)
+    ) {
+      return (
+        <p>
+          If you specify a link_term, you must also specify a link_distance, and
+          vice versa
         </p>
       );
     }
@@ -64,6 +77,7 @@ export default function Context() {
         limit={20}
         link_term={link_term}
         link_distance={link_distance}
+        sort={sort}
       />
     );
   }
