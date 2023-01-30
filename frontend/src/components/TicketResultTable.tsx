@@ -34,7 +34,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
 
   return (
     <ResultsTable
-      terms={tableTerms}
+      terms={tableTerms[0]}
       codes={tableCodes || selectedPapers?.map((p) => p.code) || []}
       month={props.month}
       day={props.day}
