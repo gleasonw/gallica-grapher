@@ -20,7 +20,7 @@ export interface TableProps {
 
 export const ResultsTable: React.FC<TableProps> = (props) => {
   const fetchContext = async ({ pageParam = 0 }) => {
-    let apiURL = "http://localhost:8000";
+    let apiURL = "https://gallica-grapher-production.up.railway.app";
     let baseUrl = `${apiURL}/api/gallicaRecords`;
     let url = addQueryParamsIfExist(baseUrl, props);
     const response = await fetch(url);
