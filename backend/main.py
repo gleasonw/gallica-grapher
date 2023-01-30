@@ -225,7 +225,7 @@ def fetch_records_from_gallica(
     link_term: Optional[str] = None,
     link_distance: Optional[int] = 0,
     source: Literal["book", "periodical", "all"] = "all",
-    sort: Literal["date", "relevance"] = "date",
+    sort: Literal["date", "relevance"] = "relevance",
 ) -> GallicaResponse:
 
     link = None
