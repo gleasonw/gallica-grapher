@@ -54,6 +54,7 @@ export const getStaticProps: GetStaticProps<{
     ssg.gallicaRecords.prefetch({
       terms: initTickets[0].terms,
       codes: [],
+      limit: 20
     }),
   ]);
 
