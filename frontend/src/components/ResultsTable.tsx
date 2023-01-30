@@ -2,12 +2,18 @@ import React from "react";
 import { trpc } from "../utils/trpc";
 import { Context } from "./Context";
 
+// TODO
+// source filter
+// api routes
+
 export interface TableProps {
   terms?: string[];
   codes?: string[];
   day?: number;
   month?: number;
   year?: number;
+  source?: "book" | "periodical" | "all";
+  link?: [string, number] | null;
   children?: React.ReactNode;
 }
 
