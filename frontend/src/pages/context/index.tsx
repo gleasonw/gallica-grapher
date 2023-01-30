@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { z } from "zod";
 import { tableParamSchema } from "../../models/tableParamSchema";
 
-
 export default function Context() {
   const router = useRouter();
   const params = router.query;
@@ -52,7 +51,7 @@ export default function Context() {
     }
     return (
       <ResultsTable
-        terms={terms}
+        terms={[terms]}
         year={year}
         month={month}
         day={day}
