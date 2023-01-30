@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional, Tuple
 
 from pydantic import BaseModel
 
@@ -10,10 +10,10 @@ class OccurrenceQuery(BaseModel):
     endpoint_url: str
     start_index: int
     num_records: int
+    link: Optional[Tuple[str, int]]
+    source: Optional[Literal["book", "periodical", "all"]]
     codes: Optional[List[str]] = None
     num_results: int = 0
-    link_term: Optional[str] = ""
-    link_distance: Optional[int] = 0
     collapsing = False
 
     def make_copy(self, start_index: int, num_records: int = 1):
@@ -25,8 +25,8 @@ class OccurrenceQuery(BaseModel):
             endpoint_url=self.endpoint_url,
             start_index=start_index,
             num_records=num_records,
-            link_term=self.link_term,
-            link_distance=self.link_distance,
+            link=self.link,
+            source=self.source,
         )
 
     def generate_cql(self):
@@ -35,7 +35,7 @@ class OccurrenceQuery(BaseModel):
             cql_components.append(termCQL)
         if dateCQL := self.build_date_cql():
             cql_components.append(dateCQL)
-        if paperCQL := self.build_periodical_cql():
+        if paperCQL := self.build_source_sql():
             cql_components.append(paperCQL)
         cql = " and ".join(cql_components)
         cql += " sortby dc.date/sort.ascending"
@@ -50,8 +50,8 @@ class OccurrenceQuery(BaseModel):
             return ""
 
     def build_gram_cql(self) -> str:
-        if self.link_term:
-            return f'text adj "{self.term}" prox/unit=word/distance={self.link_distance} "{self.link_term}"'
+        if self.link:
+            return f'text adj "{self.term}" prox/unit=word/distance={self.link[1]} "{self.link[0]}"'
         elif self.term:
             return f'text adj "{self.term}"'
         else:
@@ -69,12 +69,17 @@ class OccurrenceQuery(BaseModel):
         }
         return base
 
-    def build_periodical_cql(self):
+    def build_source_sql(self):
         if self.codes and self.codes[0]:
             formatted_codes = [f"{code}_date" for code in self.codes]
             return 'arkPress adj "' + '" or arkPress adj "'.join(formatted_codes) + '"'
+        elif self.source == "periodical":
+            base = 'dc.type all "fascicule"'
+        elif self.source == "book":
+            base = 'dc.type all "monographie"'
         else:
-            return 'dc.type all "fascicule" or dc.type all "monographie" and ocr.quality all "Texte disponible"'
+            base = 'dc.type all "fascicule" or dc.type all "monographie"'
+        return base + ' and ocr.quality all "Texte disponible"'
 
     def __repr__(self):
         return f"Occurrence Query ({self.term})"

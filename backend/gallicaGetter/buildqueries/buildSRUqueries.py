@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional, Tuple
 
 from gallicaGetter.buildqueries.argToQueryTransformations import bundle_codes
 from gallicaGetter.buildqueries.buildDateGrouping import build_date_grouping
@@ -7,22 +7,22 @@ from gallicaGetter.fetch.paperQuery import PaperQuery
 
 
 def build_base_queries(
-    terms: List[str] | str,
+    terms: List[str],
     endpoint_url: str,
     grouping: str,
+    link: Optional[Tuple[str, int]] = None,
+    source: Optional[Literal["book", "periodical", "all"]] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     codes: Optional[List[str]] = None,
     limit: Optional[int] = None,
     cursor: Optional[int] = None,
-    link_term: Optional[str] = None,
-    link_distance: Optional[int] = None,
 ) -> List[OccurrenceQuery | PaperQuery]:
-    """Builds a list of queries to be used to fetch records from Gallica."""
-    if not isinstance(terms, list):
-        terms = [terms]
-    if codes and not isinstance(codes, list):
-        codes = [codes]
+    """
+    Builds a list of queries to be used to fetch records from Gallica.
+    If pulling all records for the query, this query will be used to get the number of records and then
+    spawn additional indexed queries to fetch all records in batches of 50.
+    """
     base_queries = []
     for term in terms:
         for start, end in build_date_grouping(start_date, end_date, grouping):
@@ -36,8 +36,8 @@ def build_base_queries(
                         endpoint_url=endpoint_url,
                         start_index=cursor or 0,
                         num_records=limit or 1,
-                        link_term=link_term,
-                        link_distance=link_distance,
+                        link=link,
+                        source=source,
                     )
                 )
     return base_queries

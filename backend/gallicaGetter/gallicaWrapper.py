@@ -1,4 +1,4 @@
-from typing import Callable, Generator, List, Optional
+from typing import Callable, Generator, List, Literal, Optional, Tuple
 
 from pydantic import BaseModel
 from database.contextPair import ContextPair
@@ -76,15 +76,15 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
 
     def get(
         self,
-        terms: List[str] | str,
+        terms: List[str],
+        link: Optional[Tuple[str, int]],
+        source: Optional[Literal["book", "periodical", "all"]],
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
-        codes: Optional[List[str] | str] = None,
+        codes: Optional[List[str]] = None,
         generate: bool = False,
         num_results: Optional[int] = None,
         start_index: Optional[int] = 0,
-        link_term: Optional[str] = None,
-        link_distance: Optional[int] = None,
         onProgressUpdate=None,
         query_cache=None,
         on_get_total_records: Optional[Callable[[int], None]] = None,
@@ -97,8 +97,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 start_date=start_date,
                 end_date=end_date,
                 codes=codes,
-                link_term=link_term,
-                link_distance=link_distance,
+                link=link,
+                source=source,
                 endpoint_url=self.endpoint_url,
                 grouping="all",
                 limit=num_results,
@@ -130,12 +130,12 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
 
     def get_num_results_for_args(
         self,
-        terms: List[str] | str,
+        terms: List[str],
+        link: Optional[Tuple[str, int]],
+        source: Optional[Literal["book", "periodical", "all"]],
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         codes: Optional[List[str]] = None,
-        link_term: Optional[str] = None,
-        link_distance: Optional[int] = None,
         grouping: str = "all",
     ):
         base_queries = build_base_queries(
@@ -143,8 +143,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             start_date=start_date,
             end_date=end_date,
             codes=codes,
-            link_term=link_term,
-            link_distance=link_distance,
+            link=link,
+            source=source,
             endpoint_url=self.endpoint_url,
             grouping=grouping,
         )
@@ -154,15 +154,12 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
 class PeriodOccurrenceWrapper(GallicaWrapper):
     def get(
         self,
-        terms: List[str] | str,
-        start_date: Optional[int] = None,
-        end_date: Optional[int] = None,
-        codes: Optional[List[str] | str] = None,
+        terms: List[str],
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        codes: Optional[List[str]] = None,
         generate: bool = False,
-        num_results: Optional[int] = None,
         grouping: str = "year",
-        start_index: Optional[int] = 0,
-        num_workers: Optional[int] = 15,
         onProgressUpdate=None,
     ) -> List[PeriodRecord]:
         if grouping not in ["year", "month"]:

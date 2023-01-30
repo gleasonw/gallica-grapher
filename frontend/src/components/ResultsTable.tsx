@@ -2,30 +2,27 @@ import React from "react";
 import { trpc } from "../utils/trpc";
 import { Context } from "./Context";
 
-// TODO
-// source filter
-// api routes
-
 export interface TableProps {
   terms?: string[];
   codes?: string[];
-  day?: number;
-  month?: number;
-  year?: number;
-  source?: "book" | "periodical" | "all";
-  link?: [string, number] | null;
+  day?: number | null;
+  month?: number | null;
+  year?: number | null;
+  source?: "book" | "periodical" | "all" | null;
+  link_term?: string | null;
+  link_distance?: number | null;
   children?: React.ReactNode;
+  limit?: number;
 }
 
 export const ResultsTable: React.FC<TableProps> = (props) => {
   const [selectedPage, setSelectedPage] = React.useState(1);
+  const limit = props.limit || 20;
   const {
     isError,
     isLoading,
     fetchNextPage,
     fetchPreviousPage,
-    hasNextPage,
-    hasPreviousPage,
     isFetchingNextPage,
     isFetchingPreviousPage,
     ...data
@@ -34,14 +31,14 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       year: props.year,
       month: props.month,
       day: props.day,
-      codes: props.codes || [],
+      codes: props.codes,
       terms: props.terms || [],
-      limit: 20,
+      source: props.source,
+      link_term: props.link_term,
+      link_distance: props.link_distance,
+      limit: limit,
     },
     {
-      //TODO: fix this logic, it's never really used since the cursor is not continuous
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-      getPreviousPageParam: (firstPage) => firstPage.previousCursor,
       staleTime: Infinity,
     }
   );
@@ -60,21 +57,17 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
 
   const total_results = Number(data.data?.pages[0].data.num_results) ?? 0;
 
-  const cursorMax = Math.floor(total_results / 20) + 1;
+  const cursorMax = Math.floor(total_results / limit) + 1;
 
   function pageToCursor(page: number) {
-    return page * 20;
+    return page * limit;
   }
 
-  // TODO: Make this a set... I don't think the perf will matter much, but a nice touch
   const fetchedCursors = data.data?.pages.map((page) => page.nextCursor);
+  const fetchedSet = new Set(fetchedCursors);
 
   async function handleCursorIncrement(amount: number = 1) {
-    if (
-      fetchedCursors &&
-      hasNextPage &&
-      !fetchedCursors.includes(pageToCursor(selectedPage + amount))
-    ) {
+    if (fetchedSet && !fetchedSet.has(pageToCursor(selectedPage + amount))) {
       await fetchNextPage({
         pageParam: pageToCursor(selectedPage + amount - 1),
       });
@@ -83,11 +76,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   }
 
   async function handleCursorDecrement(amount: number = 1) {
-    if (
-      fetchedCursors &&
-      hasPreviousPage &&
-      !fetchedCursors.includes(pageToCursor(selectedPage - amount))
-    ) {
+    if (fetchedSet && !fetchedSet.has(pageToCursor(selectedPage - amount))) {
       await fetchPreviousPage({
         pageParam: pageToCursor(selectedPage - (amount + 1)),
       });
@@ -113,7 +102,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                         "flex flex-row justify-center gap-10 text-xl md:text-3xl lg:text-3xl"
                       }
                     >
-                      {hasPreviousPage && selectedPage != 1 && (
+                      {selectedPage != 1 && (
                         <div className={"flex flex-row gap-10"}>
                           <button
                             onClick={() =>
@@ -134,7 +123,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                         onCursorDecrement={handleCursorDecrement}
                       />
                       <p>of {cursorMax.toLocaleString()}</p>
-                      {hasNextPage && selectedPage !== cursorMax && (
+                      {selectedPage !== cursorMax && (
                         <div className={"flex flex-row gap-10"}>
                           <button onClick={() => handleCursorIncrement()}>
                             {">"}

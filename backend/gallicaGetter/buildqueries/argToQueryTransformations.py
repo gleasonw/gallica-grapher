@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import gallicaGetter.parse.parseXML as parseXML
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
@@ -41,7 +41,7 @@ def index_queries_by_num_results(
     return indexed_queries
 
 
-def bundle_codes(codes: List[str]) -> List[List[str]]:
+def bundle_codes(codes: Optional[List[str]]) -> List[List[str]]:
     if codes is None or len(codes) == 0:
         return [[]]
     return [

@@ -25,7 +25,7 @@ from database.recordInsertResolvers import (
     insert_records_into_groupcounts,
     insert_records_into_results,
 )
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from gallicaGetter import PeriodOccurrenceWrapper, VolumeOccurrenceWrapper
 from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
@@ -61,15 +61,15 @@ class Ticket(BaseModel):
     start_date: int
     end_date: int
     codes: Optional[List[str]] = None
-    grouping: Literal["month", "year"] = "year"
+    grouping: Literal["month", "year", "all"] = "year"
     num_results: Optional[int] = None
     start_index: Optional[int] = 0
     num_workers: Optional[int] = 15
-    link_term: Optional[str] = None
-    link_distance: Optional[int] = None
     id: Optional[int] = None
     backend_source: Literal["gallica", "pyllica"] = "pyllica"
     cached_response: Optional[List[OccurrenceQuery]] = None
+    link: Optional[Tuple[str, int]] = None
+    source: Optional[Literal["book", "periodical", "all"]] = "all"
 
 
 @app.post("/api/init")
@@ -222,9 +222,20 @@ def fetch_records_from_gallica(
     codes: Optional[List[str]] = Query(None),
     cursor: Optional[int] = 0,
     limit: Optional[int] = 10,
-    link_term: str = "",
-    link_distance: int = 0,
+    link_term: Optional[str] = None,
+    link_distance: Optional[int] = 0,
+    source: Literal["book", "periodical", "all"] = "all",
 ) -> GallicaResponse:
+
+    link = None
+    if link_term and not link_distance or link_distance and not link_term:
+        raise HTTPException(
+            status_code=400,
+            detail="link_distance and link_term must both be specified if either is specified",
+        )
+    if link_distance and link_term:
+        link_distance = int(link_distance)
+        link = (link_term, link_distance)
 
     total_records = 0
 
@@ -240,8 +251,8 @@ def fetch_records_from_gallica(
         day=day,
         offset=cursor,
         limit=limit,
-        link_term=link_term,
-        link_distance=link_distance,
+        link=link,
+        source=source,
         on_get_total_records=set_total_records,
     )
 
@@ -412,8 +423,7 @@ def get_num_records_on_gallica_for_args(
                 end_date=ticket.end_date,
                 codes=ticket.codes,
                 grouping="all",
-                link_term=ticket.link_term,
-                link_distance=ticket.link_distance,
+                link=ticket.link,
                 backend_source=ticket.backend_source,
             )
         else:
@@ -429,7 +439,8 @@ def get_num_records_on_gallica_for_args(
     else:
         total_records += num_records
 
-    on_num_records_found and on_num_records_found(total_records)
+    if on_num_records_found:
+        on_num_records_found(total_records)
 
     if cached_queries:
         ticket = Ticket(
@@ -438,8 +449,8 @@ def get_num_records_on_gallica_for_args(
             start_date=ticket.start_date,
             end_date=ticket.end_date,
             codes=ticket.codes,
-            link_term=ticket.link_term,
-            link_distance=ticket.link_distance,
+            link=ticket.link,
+            source=ticket.source,
             grouping=ticket.grouping,
             cached_response=cached_queries,
             backend_source=ticket.backend_source,
@@ -464,8 +475,8 @@ def get_num_records_all_volume_occurrence(ticket: Ticket) -> List[OccurrenceQuer
         start_date=str(ticket.start_date),
         end_date=str(ticket.end_date),
         codes=ticket.codes,
-        link_term=ticket.link_term,
-        link_distance=ticket.link_distance,
+        link=ticket.link,
+        source=ticket.source,
     )
     return base_queries_with_num_results
 
@@ -482,11 +493,11 @@ def get_and_insert_records_for_ticket(
             volume_api = WrapperFactory.connect_volume(api=api)
             records = volume_api.get(
                 terms=ticket.terms,
-                start_date=ticket.start_date,
-                end_date=ticket.end_date,
+                start_date=str(ticket.start_date),
+                end_date=str(ticket.end_date),
                 codes=ticket.codes,
-                link_term=ticket.link_term,
-                link_distance=ticket.link_distance,
+                link=ticket.link,
+                source=ticket.source,
                 onProgressUpdate=on_progress_update,
                 query_cache=ticket.cached_response,
                 generate=True,
@@ -502,10 +513,9 @@ def get_and_insert_records_for_ticket(
             period_records = period_api.get(
                 terms=ticket.terms,
                 codes=ticket.codes,
-                start_date=ticket.start_date,
-                end_date=ticket.end_date,
+                start_date=str(ticket.start_date),
+                end_date=str(ticket.end_date),
                 onProgressUpdate=on_progress_update,
-                num_workers=50,
                 grouping=ticket.grouping,
             )
             insert_records_into_db(

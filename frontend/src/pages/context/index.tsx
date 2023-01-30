@@ -13,8 +13,10 @@ const tableParamSchema = z.object({
     .or(z.literal("periodical"))
     .or(z.literal("all"))
     .nullish(),
-  link: z.tuple([z.string(), z.number()]).nullish(),
+  link_term: z.string().nullish(),
+  link_distance: z.coerce.number().nullish(),
   codes: z.string().array().nullish(),
+  limit: z.coerce.number().nullish(),
 });
 
 export default function Context() {
@@ -32,16 +34,36 @@ export default function Context() {
       </p>
     );
   } else {
-    const { terms, year, month, day, source, codes, link } = result.data;
+    const {
+      terms,
+      year,
+      month,
+      day,
+      source,
+      codes,
+      link_distance,
+      link_term,
+      limit,
+    } = result.data;
+    if (limit && limit > 50) {
+      return (
+        <p>
+          Limit must be less than or equal to 50, the maximum number of records
+          Gallica returns in one request
+        </p>
+      );
+    }
     return (
       <ResultsTable
         terms={[terms]}
-        year={year || 0}
-        month={month || 0}
-        day={day || 0}
-        source={source || "all"}
+        year={year}
+        month={month}
+        day={day}
+        source={source}
         codes={codes || []}
-        link={link}
+        limit={20}
+        link_term={link_term}
+        link_distance={link_distance}
       />
     );
   }

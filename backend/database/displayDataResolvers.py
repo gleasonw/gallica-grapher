@@ -1,4 +1,4 @@
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Literal, Optional, Tuple
 
 from gallicaGetter import WrapperFactory
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
@@ -113,8 +113,8 @@ def make_date_from_year_mon_day(
 
 def get_gallica_records_for_display(
     terms: List[str],
-    link_term: Optional[str],
-    link_distance: Optional[int],
+    link: Optional[Tuple[str, int]],
+    source: Literal["book", "periodical", "all"],
     year: Optional[int],
     month: Optional[int],
     day: Optional[int],
@@ -130,8 +130,8 @@ def get_gallica_records_for_display(
             terms=terms,
             start_date=make_date_from_year_mon_day(year, month, day),
             codes=codes,
-            link_term=link_term,
-            link_distance=link_distance,
+            source=source,
+            link=link,
             num_results=limit,
             start_index=offset,
             on_get_total_records=on_get_total_records,

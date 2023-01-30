@@ -160,15 +160,19 @@ export const appRouter = router({
   gallicaRecords: procedure
     .input(
       z.object({
-        year: z.number().optional(),
-        month: z.number().optional(),
-        day: z.number().optional(),
+        year: z.number().nullish(),
+        month: z.number().nullish(),
+        day: z.number().nullish(),
         terms: z.array(z.string()),
-        codes: z.array(z.string()).optional(),
+        codes: z.array(z.string()).nullish(),
         limit: z.number().nullish(),
         cursor: z.number().nullish(),
-        link_term: z.string().optional(),
-        link_distance: z.number().optional(),
+        link_term: z.string().nullish(),
+        link_distance: z.number().nullish(),
+        source: z
+          .literal("book")
+          .or(z.literal("periodical"))
+          .or(z.literal("all")).nullish(),
       })
     )
     .query(async ({ input }) => {
