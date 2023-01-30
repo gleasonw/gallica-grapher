@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc";
+import { tableParamSchema } from "../../pages/context";
 
 let apiURL: string;
 if (process.env.NODE_ENV === "development") {
@@ -157,59 +158,39 @@ export const appRouter = router({
       const data = (await response.json()) as GraphData;
       return data;
     }),
-  gallicaRecords: procedure
-    .input(
-      z.object({
-        year: z.number().nullish(),
-        month: z.number().nullish(),
-        day: z.number().nullish(),
-        terms: z.array(z.string()),
-        codes: z.array(z.string()).nullish(),
-        limit: z.number().nullish(),
-        cursor: z.number().nullish(),
-        link_term: z.string().nullish(),
-        link_distance: z.number().nullish(),
-        source: z
-          .literal("book")
-          .or(z.literal("periodical"))
-          .or(z.literal("all"))
-          .nullish(),
-        sort: z.literal("date").or(z.literal("relevance")).nullish(),
-      })
-    )
-    .query(async ({ input }) => {
-      console.log(input);
-      const limit = input.limit ?? 30;
-      const { cursor } = input;
-      if (input.terms.length === 0) {
-        return {
-          data: {
-            records: [],
-            num_results: 0,
-          },
-          nextCursor: null,
-          previousCursor: null,
-        };
-      }
-      let baseUrl = `${apiURL}/api/gallicaRecords`;
-      let url = addQueryParamsIfExist(baseUrl, input);
-      const response = await fetch(url);
-      const data = (await response.json()) as GallicaResponse;
-      let nextCursor = null;
-      let previousCursor = cursor ?? 0;
-      if (data.records && data.records.length > 0) {
-        if (cursor) {
-          nextCursor = cursor + limit;
-        } else {
-          nextCursor = limit;
-        }
-      }
+  gallicaRecords: procedure.input(tableParamSchema).query(async ({ input }) => {
+    console.log(input);
+    const limit = input.limit ?? 30;
+    const { cursor } = input;
+    if (input.terms.length === 0) {
       return {
-        data,
-        nextCursor,
-        previousCursor,
+        data: {
+          records: [],
+          num_results: 0,
+        },
+        nextCursor: null,
+        previousCursor: null,
       };
-    }),
+    }
+    let baseUrl = `${apiURL}/api/gallicaRecords`;
+    let url = addQueryParamsIfExist(baseUrl, input);
+    const response = await fetch(url);
+    const data = (await response.json()) as GallicaResponse;
+    let nextCursor = null;
+    let previousCursor = cursor ?? 0;
+    if (data.records && data.records.length > 0) {
+      if (cursor) {
+        nextCursor = cursor + limit;
+      } else {
+        nextCursor = limit;
+      }
+    }
+    return {
+      data,
+      nextCursor,
+      previousCursor,
+    };
+  }),
 });
 
 function addQueryParamsIfExist(url: string, params: Record<string, any>) {

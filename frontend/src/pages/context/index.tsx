@@ -3,20 +3,21 @@ import { useRouter } from "next/router";
 
 import { z } from "zod";
 
-const tableParamSchema = z.object({
+export const tableParamSchema = z.object({
+  year: z.number().nullish(),
+  month: z.number().nullish(),
+  day: z.number().nullish(),
   terms: z.string(),
-  year: z.coerce.number().nullish(),
-  month: z.coerce.number().nullish(),
-  day: z.coerce.number().nullish(),
+  codes: z.array(z.string()).nullish(),
+  limit: z.number().nullish(),
+  cursor: z.number().nullish(),
+  link_term: z.string().nullish(),
+  link_distance: z.number().nullish(),
   source: z
     .literal("book")
     .or(z.literal("periodical"))
     .or(z.literal("all"))
     .nullish(),
-  link_term: z.string().nullish(),
-  link_distance: z.coerce.number().nullish(),
-  codes: z.string().array().nullish(),
-  limit: z.coerce.number().nullish(),
   sort: z.literal("date").or(z.literal("relevance")).nullish(),
 });
 
@@ -68,7 +69,7 @@ export default function Context() {
     }
     return (
       <ResultsTable
-        terms={[terms]}
+        terms={terms}
         year={year}
         month={month}
         day={day}

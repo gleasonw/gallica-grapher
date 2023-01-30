@@ -3,7 +3,7 @@ import { trpc } from "../utils/trpc";
 import { Context } from "./Context";
 
 export interface TableProps {
-  terms?: string[];
+  terms?: string;
   codes?: string[];
   day?: number | null;
   month?: number | null;
@@ -33,7 +33,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       month: props.month,
       day: props.day,
       codes: props.codes,
-      terms: props.terms || [],
+      terms: props.terms || "",
       source: props.source,
       link_term: props.link_term,
       link_distance: props.link_distance,
