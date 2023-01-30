@@ -4,15 +4,15 @@ import { useRouter } from "next/router";
 import { z } from "zod";
 
 export const tableParamSchema = z.object({
-  year: z.number().nullish(),
-  month: z.number().nullish(),
-  day: z.number().nullish(),
+  year: z.coerce.number().nullish(),
+  month: z.coerce.number().nullish(),
+  day: z.coerce.number().nullish(),
   terms: z.string(),
   codes: z.array(z.string()).nullish(),
-  limit: z.number().nullish(),
+  limit: z.coerce.number().nullish(),
   cursor: z.number().nullish(),
   link_term: z.string().nullish(),
-  link_distance: z.number().nullish(),
+  link_distance: z.coerce.number().nullish(),
   source: z
     .literal("book")
     .or(z.literal("periodical"))
