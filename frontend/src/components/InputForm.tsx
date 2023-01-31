@@ -57,6 +57,8 @@ export const InputForm: React.FC<InputFormProps> = ({
         onSuccess: (data) => {
           setTicketID(data.requestid);
           setSubmitted(true);
+          //remove example ticket
+          onDeleteTicket(tickets?.find((ticket) => ticket.example));
         },
       }
     );
