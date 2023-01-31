@@ -13,7 +13,7 @@ export const Context: React.FC<{ record: GallicaRecord }> = (props) => {
   return (
     <div className={"flex w-full flex-col"}>
       <article
-        className={"prose prose-lg m-auto p-5 text-justify lg:prose-lg"}
+        className={"prose h-60 prose-lg m-auto text-justify lg:prose-lg"}
         dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }}
       />
       <div className={"m-10 flex flex-row justify-between gap-10"}>
@@ -27,9 +27,11 @@ export const Context: React.FC<{ record: GallicaRecord }> = (props) => {
         ) : (
           <div></div>
         )}
-        <div className={"justify-center"}>
-          {pageIndex + 1} of {data.num_results}
-        </div>
+        {data.num_results > 0 && (
+          <div className={"justify-center"}>
+            {pageIndex + 1} of {data.num_results}
+          </div>
+        )}
         {pageIndex < data.num_results - 1 ? (
           <button
             className={"text-3xl"}

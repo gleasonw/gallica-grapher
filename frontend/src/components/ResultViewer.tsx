@@ -34,6 +34,11 @@ interface ResultViewerProps {
   outerRange: [number, number];
 }
 
+// TODO: qol
+// pagination context arrow stays at same position
+// keep previous data on table load
+// fix paper selector
+
 export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
   const [selectedYear, setSelectedYear] = React.useState<number>();
   const [selectedMonth, setSelectedMonth] = React.useState<number>();

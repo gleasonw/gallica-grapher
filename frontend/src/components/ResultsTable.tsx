@@ -49,6 +49,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   const [selectedPage, setSelectedPage] = React.useState(1);
   const limit = props.limit || 20;
   const {
+    isFetching,
     isError,
     isLoading,
     fetchNextPage,
@@ -72,11 +73,8 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     ],
     queryFn: fetchContext,
     staleTime: Infinity,
+    keepPreviousData: true,
   });
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   if (isError) {
     return <div>Error</div>;
@@ -120,10 +118,13 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       <div className={"m-auto ml-5 "}>{props.children}</div>
       <div className="bg-zinc-100">
         <div>
-          <div className={"m-4 flex flex-col gap-5"}>
+          <div className={"mt-5 flex flex-col gap-5"}>
             <h1 className={"text-2xl"}>
               {isFetchingNextPage && <p>Fetching next page...</p>}
               {isFetchingPreviousPage && <p>Fetching previous page...</p>}
+              {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
+                <p>Fetching updated context...</p>
+              )}
               {currentPage &&
                 !isFetchingNextPage &&
                 !isFetchingPreviousPage && (
@@ -242,7 +243,7 @@ const CursorInput: React.FC<CursorInputProps> = (props) => {
       type={"number"}
       value={localCursor}
       onChange={(e) => setLocalCursor(e.target.valueAsNumber)}
-      className={"w-20"}
+      className={"w-10"}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();

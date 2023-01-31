@@ -29,8 +29,8 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     }
   }, [props.tickets, selectedTicket]);
 
-  let tableTerms: string[] = [];
-  let tableCodes: string[] = [];
+  let tableTerms: string[] | null = null;
+  let tableCodes: string[] | null = null;
   if (selectedTicket) {
     tableTerms = selectedTicket.terms;
     if (selectedTicket.papers) {
@@ -43,11 +43,12 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     }
   }
 
-  console.log(tableTerms);
+  console.log(tableCodes);
+  console.log(selectedPapers);
 
   return (
     <ResultsTable
-      terms={tableTerms[0]}
+      terms={tableTerms ? tableTerms[0] : undefined}
       codes={tableCodes || selectedPapers?.map((p) => p.code) || []}
       month={props.month}
       day={props.day}
