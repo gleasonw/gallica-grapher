@@ -134,7 +134,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
           />
         </InputLabel>
       </div>
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={400} className={"mb-10"}>
         <LineChart
           width={500}
           height={300}
@@ -194,6 +194,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
         onSelectYear={(year) => setSelectedYear(year)}
         onSelectMonth={(month) => setSelectedMonth(month)}
         onSelectDay={(day) => setSelectedDay(day)}
+        limit={10}
       />
     </div>
   );
