@@ -7,44 +7,52 @@ export const Context: React.FC<{ record?: GallicaRecord }> = (props) => {
   React.useEffect(() => {
     setPageIndex(0);
   }, [props.record]);
-  
+
   const data = props.record?.context;
 
   if (!data || !data.pages || pageIndex >= data.pages.length) {
-    return <div>Something broke :(</div>;
+    return <div>Something broke </div>;
   }
 
+  const handleLeftPageTurn = () => {
+    if (pageIndex > 0) {
+      setPageIndex(pageIndex - 1);
+    }
+  };
+
+  const handleRightPageTurn = () => {
+    if (pageIndex < data.pages.length - 1) {
+      setPageIndex(pageIndex + 1);
+    }
+  };
+
   return (
-    <div className={"flex w-full flex-col"}>
+    <div className={"relative flex w-full flex-col"}>
+      {data.pages && data.pages.length > 1 && (
+        <div className={" absolute flex h-full w-full flex-row"}>
+          <button
+            onClick={() => handleLeftPageTurn()}
+            className={"h-full w-full"}
+          />
+          <button
+            onClick={() => handleRightPageTurn()}
+            className={"h-full w-full"}
+          />
+        </div>
+      )}
       <article
-        className={"prose prose-lg m-auto min-h-60 text-justify lg:prose-lg"}
+        className={"min-h-60 prose prose-lg m-auto text-justify lg:prose-lg"}
         dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }}
       />
-      <div className={"m-10 flex flex-row justify-between gap-10"}>
-        {pageIndex > 0 ? (
-          <button
-            className={"text-3xl"}
-            onClick={() => setPageIndex(pageIndex - 1)}
-          >
-            {"<"}
-          </button>
-        ) : (
-          <div></div>
-        )}
+      <div className={"m-10 flex flex-row justify-center text-xl"}>
         {data.num_results > 0 && (
-          <div className={"justify-center"}>
-            {pageIndex + 1} of {data.num_results}
+          <div className={"flex flex-row gap-20"}>
+            {pageIndex > 0 ? <p>{"<"}</p> : <p></p>}
+            <div className={"justify-center"}>
+              {pageIndex + 1} of {data.num_results}
+            </div>
+            {pageIndex < data.pages.length - 1 ? <p>{">"}</p> : <p></p>}
           </div>
-        )}
-        {pageIndex < data.num_results - 1 ? (
-          <button
-            className={"text-3xl"}
-            onClick={() => setPageIndex(pageIndex + 1)}
-          >
-            {">"}
-          </button>
-        ) : (
-          <div></div>
         )}
       </div>
     </div>
