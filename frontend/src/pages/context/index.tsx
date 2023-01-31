@@ -1,25 +1,7 @@
 import { ResultsTable } from "../../components/ResultsTable";
 import { useRouter } from "next/router";
-
 import { z } from "zod";
-
-export const tableParamSchema = z.object({
-  year: z.coerce.number().nullish(),
-  month: z.coerce.number().nullish(),
-  day: z.coerce.number().nullish(),
-  terms: z.string(),
-  codes: z.array(z.string()).nullish(),
-  limit: z.coerce.number().nullish(),
-  cursor: z.number().nullish(),
-  link_term: z.string().nullish(),
-  link_distance: z.coerce.number().nullish(),
-  source: z
-    .literal("book")
-    .or(z.literal("periodical"))
-    .or(z.literal("all"))
-    .nullish(),
-  sort: z.literal("date").or(z.literal("relevance")).nullish(),
-});
+import { tableParamSchema } from "../../models/tableParamSchema";
 
 export default function Context() {
   const router = useRouter();

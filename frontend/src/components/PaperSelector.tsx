@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Paper } from "../server/routers/_app";
-import { trpc } from "../utils/trpc";
 import { RevealButton } from "./RevealButton";
 import { PaperDropdown } from "./PaperDropdown";
+import { Paper } from "../models/dbStructs";
+import { apiURL } from "./apiURL";
+import { useQuery } from "@tanstack/react-query";
 
 export const PaperSelector: React.FC<{
   papers: Paper[];
@@ -12,15 +13,21 @@ export const PaperSelector: React.FC<{
   onPaperClick: (paper: Paper) => void;
   smallText?: boolean;
 }> = ({ papers, from, to, onPaperAdd, onPaperClick }) => {
+  async function fetchNumPapers(from: number, to: number) {
+    const response = await fetch(
+      `${apiURL}/api/numPapersOverRange/${from}/${to}`
+    );
+    const data = await response.json();
+    return data as number;
+  }
+
   const [displayed, setDisplayed] = useState(false);
 
-  const numPapers = trpc.numPapers.useQuery(
-    {
-      from: from,
-      to: to,
-    },
-    { staleTime: Infinity }
-  );
+  const numPapers = useQuery({
+    queryKey: ["numPapers", from, to],
+    queryFn: () => fetchNumPapers(from, to),
+    staleTime: Infinity,
+  });
 
   return (
     <div>
@@ -36,7 +43,7 @@ export const PaperSelector: React.FC<{
       />
       {displayed && (
         <>
-          <div className="flex flex-wrap mt-5 gap-10">
+          <div className="mt-5 flex flex-wrap gap-10">
             {papers.map((paper) => (
               <button
                 className={"p-5"}

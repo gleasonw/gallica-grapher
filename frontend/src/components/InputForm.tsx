@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Paper } from "../server/routers/_app";
-import { trpc } from "../utils/trpc";
 import { Ticket } from "../pages/index";
 import { TextInput } from "./TextInput";
 import { PaperSelector } from "./PaperSelector";
 import { RangeInput } from "./RangeInput";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./ResultViewer";
+import { useMutation } from "@tanstack/react-query";
+import { Paper } from "../models/dbStructs";
+import { apiURL } from "./apiURL";
 
 export interface InputFormProps {
   onCreateTicket: (ticket: Ticket) => void;
@@ -27,16 +28,30 @@ export const InputForm: React.FC<InputFormProps> = ({
   const [papers, setPapers] = useState<Paper[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [ticketID, setTicketID] = useState<number>(0);
-  const mutation = trpc.search.useMutation();
+
+  async function postTicket(ticket: Ticket): Promise<{ requestid: number }> {
+    const response = await fetch(`${apiURL}/api/init`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ticket),
+    });
+    const data = await response.json();
+    return data as { requestid: number };
+  }
+
+  const mutation = useMutation(postTicket);
 
   const handleSubmit = () => {
     mutation.mutateAsync(
       {
         terms: [word],
-        codes: papers.map((p) => p.code),
+        papers: papers,
         start_date: yearRange[0],
         end_date: yearRange[1],
         grouping: "month",
+        id: ticketID,
       },
       {
         onSuccess: (data) => {
@@ -87,7 +102,7 @@ export const InputForm: React.FC<InputFormProps> = ({
   } else {
     return (
       <div>
-        <div className="flex flex-col gap-10 text-left m-10 mb-20">
+        <div className="m-10 mb-20 flex flex-col gap-10 text-left">
           <TextInput
             placeholder={"Search term"}
             value={word}
@@ -123,7 +138,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           <TicketCard onClick={() => handleSubmit()} />
         </TicketRow>
       </div>
-    )
+    );
   }
 };
 
@@ -138,12 +153,12 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
     <button
       onClick={() => onClick(ticket)}
       className={
-        "text-xl hover:bg-zinc-500 transition duration-150 hover:ease-in"
+        "text-xl transition duration-150 hover:bg-zinc-500 hover:ease-in"
       }
     >
       {ticket ? (
         <div
-          className={"border border-t-0 border-r-0 p-10 w-full h-full relative"}
+          className={"relative h-full w-full border border-t-0 border-r-0 p-10"}
         >
           <svg
             className={"absolute top-0 left-0"}
@@ -159,7 +174,7 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
       ) : (
         <div
           className={
-            "border-b border-l border-r h-full p-20 pt-10 pb-10 m-w-full m-h-full text-3xl justify-center flex flex-col"
+            "m-w-full m-h-full flex h-full flex-col justify-center border-b border-l border-r p-20 pt-10 pb-10 text-3xl"
           }
         >
           +
@@ -175,8 +190,8 @@ const TicketRow: React.FC<{
   onGraphedTicketCardClick: (ticket?: Ticket) => void;
 }> = ({ tickets, children, onGraphedTicketCardClick }) => {
   return (
-    <div className={"flex border-t z-0 bg-white"}>
-      <div className={"flex overflow-x-scroll overflow-y-hidden"}>
+    <div className={"z-0 flex border-t bg-white"}>
+      <div className={"flex overflow-y-hidden overflow-x-scroll"}>
         {tickets?.map((ticket, index) => (
           <TicketCard
             key={ticket.id}

@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from "react";
-import { trpc } from "../utils/trpc";
+import React from "react";
 import { Ticket } from "../pages/index";
 import {
   LineChart,
@@ -12,8 +11,10 @@ import {
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
 import { generateXAxisOptionsForNumericScale } from "./utils";
-import { DehydratedState, useQueryClient } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
+import { apiURL } from "./apiURL";
+import { GraphData } from "../models/dbStructs";
 
 export const seriesColors = [
   "#7cb5ec",
@@ -41,23 +42,35 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
     "year" | "month"
   >("year");
   const [selectedSmoothing, setSelectedSmoothing] = React.useState<number>(0);
-  const client = useQueryClient();
-  console.log("client", client)
-  
 
-  const ticketData = trpc.useQueries((query) =>
-    props.tickets.map((ticket) =>
-      query.graphData(
-        {
-          id: ticket.id,
-          backend_source: ticket.backend_source || "pyllica",
-          grouping: selectedGrouping,
-          smoothing: selectedSmoothing,
-        },
-        { keepPreviousData: true }
-      )
-    )
-  );
+  async function getTicketData(
+    id: number,
+    backend_source: "gallica" | "pyllica" = "pyllica",
+    grouping: string,
+    smoothing: number
+  ) {
+    const response = await fetch(
+      `${apiURL}/api/graphData?request_id=${id}&backend_source=${backend_source}&grouping=${grouping}&average_window=${smoothing}`
+    );
+    const data = (await response.json()) as GraphData;
+    return data;
+  }
+
+  const ticketData = useQueries({
+    queries: props.tickets.map((ticket) => {
+      return {
+        queryKey: ["ticket", ticket.id, selectedGrouping, selectedSmoothing],
+        queryFn: () =>
+          getTicketData(
+            ticket.id,
+            ticket.backend_source,
+            selectedGrouping,
+            selectedSmoothing
+          ),
+        staleTime: Infinity,
+      };
+    }),
+  });
 
   const allDateMarksInTicketData = ticketData?.map((ticket) =>
     ticket.data?.data.map((data) => data.date)
@@ -99,8 +112,8 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
   }
 
   return (
-    <div className={"w-full h-full bg-white"}>
-      <div className={"flex flex-row gap-10 m-5"}>
+    <div className={"h-full w-full bg-white"}>
+      <div className={"m-5 flex flex-row gap-10"}>
         <InputLabel label={"Grouping"}>
           <SelectInput
             options={["year", "month"]}
@@ -159,6 +172,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
               dataKey="count"
               stroke={seriesColors[index % seriesColors.length]}
               strokeWidth={2}
+              animateNewValues={false}
               data={ticket.data?.data}
               name={ticket.data?.name}
               dot={false}
@@ -180,5 +194,3 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
     </div>
   );
 };
-
-

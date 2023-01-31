@@ -1,34 +1,42 @@
 import React, { useState } from "react";
-import { Paper } from "../server/routers/_app";
-import { trpc } from "../utils/trpc";
-import { TextInput } from "./TextInput";
+import { apiURL } from "./apiURL";
+import { useQuery } from "@tanstack/react-query";
+import { Paper } from "../models/dbStructs";
 
 export const PaperDropdown: React.FC<{
   onClick: (paper: Paper) => void;
 }> = ({ onClick }) => {
+  async function fetchPapers(title: string) {
+    if (!title) {
+      return [];
+    }
+    const response = await fetch(`${apiURL}/api/papers/${title}`);
+    const data = (await response.json()) as { papers: Paper[] };
+    return data.papers;
+  }
   const [periodical, setPeriodical] = useState<string | undefined>();
-  const papersSimilarTo = trpc.papersSimilarTo.useQuery(
-    {
-      title: periodical || "",
-    },
-    { keepPreviousData: true }
-  );
+  const papersSimilarTo = useQuery({
+    queryKey: ["papers", periodical],
+    queryFn: () => fetchPapers(periodical || ""),
+    staleTime: Infinity,
+    keepPreviousData: true,
+  });
   return (
     <div>
       <input
         placeholder={"search for a periodical"}
         value={periodical}
-        className={"border bg-white p-5 relative max-w-full"}
+        className={"relative max-w-full border bg-white p-5"}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setPeriodical(e.target.value)
         }
       />
-      <div className={"bg-white absolute max-w-full z-40"}>
+      <div className={"absolute z-40 max-w-full bg-white"}>
         <ul>
           {papersSimilarTo?.data?.map((paper: Paper) => (
             <li
               key={paper.title}
-              className="max-w-full border p-5 whitespace-wrap hover:bg-zinc-800 hover:text-white flex-1 hover:cursor-pointer"
+              className="whitespace-wrap max-w-full flex-1 border p-5 hover:cursor-pointer hover:bg-zinc-800 hover:text-white"
               onClick={() => {
                 setPeriodical("");
                 onClick(paper);

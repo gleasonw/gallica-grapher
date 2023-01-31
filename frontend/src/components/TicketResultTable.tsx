@@ -3,8 +3,9 @@ import { Ticket } from "../pages/index";
 import { ResultsTable, TableProps } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
-import { Paper } from "../server/routers/_app";
 import { PaperDropdown } from "./PaperDropdown";
+import { Paper } from "../models/dbStructs";
+import { some } from "d3";
 
 export interface TicketTableProps extends TableProps {
   onSelectMonth: (month: number) => void;
@@ -18,6 +19,16 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
+
+  React.useEffect(() => {
+    if (
+      props.tickets.length > 0 &&
+      !props.tickets.some((t) => t.id === selectedTicket?.id)
+    ) {
+      setSelectedTicket(props.tickets[0]);
+    }
+  }, [props.tickets, selectedTicket]);
+
   let tableTerms: string[] = [];
   let tableCodes: string[] = [];
   if (selectedTicket) {
@@ -31,6 +42,8 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       tableCodes = props.tickets[0].papers.map((p) => p.code);
     }
   }
+
+  console.log(tableTerms);
 
   return (
     <ResultsTable

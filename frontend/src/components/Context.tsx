@@ -1,5 +1,5 @@
 import React from "react";
-import { GallicaRecord } from "../server/routers/_app";
+import { GallicaRecord } from "../models/dbStructs";
 
 export const Context: React.FC<{ record: GallicaRecord }> = (props) => {
   const [pageIndex, setPageIndex] = React.useState(0);
