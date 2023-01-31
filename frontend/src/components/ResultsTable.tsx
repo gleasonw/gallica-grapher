@@ -135,14 +135,12 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
         <div>
           <div className={"mt-5 flex flex-col gap-5"}>
             <h1 className={"text-2xl"}>
-              <h2 className="">
-                {isFetchingNextPage && <p>Fetching next page...</p>}
-                {isFetchingPreviousPage && <p>Fetching previous page...</p>}
-                {!isFetchingNextPage &&
-                  !isFetchingPreviousPage &&
-                  isFetching && <p>Fetching updated context...</p>}
-                {!currentPage && !isFetching && <p>No results found</p>}
-              </h2>
+              {isFetchingNextPage && <p>Fetching next page...</p>}
+              {isFetchingPreviousPage && <p>Fetching previous page...</p>}
+              {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
+                <p>Fetching updated context...</p>
+              )}
+              {!currentPage && !isFetching && <p>No results found</p>}
               {currentPage &&
                 !isFetchingNextPage &&
                 !isFetchingPreviousPage && (

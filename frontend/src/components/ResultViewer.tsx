@@ -50,9 +50,9 @@ export async function getTicketData(
 }
 
 export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
-  const [selectedYear, setSelectedYear] = React.useState<number | null>();
-  const [selectedMonth, setSelectedMonth] = React.useState<number | null>();
-  const [selectedDay, setSelectedDay] = React.useState<number | null>();
+  const [selectedYear, setSelectedYear] = React.useState<number | null>(null);
+  const [selectedMonth, setSelectedMonth] = React.useState<number | null>(null);
+  const [selectedDay, setSelectedDay] = React.useState<number | null>(null);
   const [selectedGrouping, setSelectedGrouping] = React.useState<
     "year" | "month"
   >("year");
