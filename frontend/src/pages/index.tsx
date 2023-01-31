@@ -28,37 +28,21 @@ export interface Ticket {
   papers?: Paper[];
   link_term?: string;
   link_distance?: number;
+  example?: boolean;
 }
 
-const initTickets = [
+export const initTickets = [
   {
     id: 0,
     terms: ["brazza"],
     grouping: "month",
+    example: true,
   },
 ] as Ticket[];
 
-export const getStaticProps: GetStaticProps<{
-  trpcState: DehydratedState;
-}> = async () => {
-  const ssg = createProxySSGHelpers({
-    router: appRouter,
-    ctx: {},
-  });
-
-  return {
-    props: {
-      trpcState: ssg.dehydrate(),
-    },
-  };
-};
-
-export default function Home({
-  trpcState,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Home() {
   const [tickets, setTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
-  useHydrate(trpcState);
 
   return (
     <BaseLayout>

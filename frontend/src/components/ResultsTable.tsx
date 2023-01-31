@@ -19,33 +19,34 @@ export interface TableProps {
   sort?: "date" | "relevance" | null;
 }
 
-export const ResultsTable: React.FC<TableProps> = (props) => {
-  const fetchContext = async ({ pageParam = 0 }) => {
-    let baseUrl = `${apiURL}/api/gallicaRecords`;
-    let url = addQueryParamsIfExist(baseUrl, {
-      ...props,
-      children: undefined,
-      cursor: pageParam,
-      limit: limit,
-    });
-    const response = await fetch(url);
-    const data = (await response.json()) as GallicaResponse;
-    let nextCursor = null;
-    let previousCursor = pageParam ?? 0;
-    if (data.records && data.records.length > 0) {
-      if (pageParam) {
-        nextCursor = pageParam + limit;
-      } else {
-        nextCursor = limit;
-      }
+export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
+  let baseUrl = `${apiURL}/api/gallicaRecords`;
+  let url = addQueryParamsIfExist(baseUrl, {
+    ...props,
+    children: undefined,
+    cursor: pageParam,
+    limit: props.limit,
+  });
+  const response = await fetch(url);
+  const data = (await response.json()) as GallicaResponse;
+  const limit = props.limit || 10;
+  let nextCursor = null;
+  let previousCursor = pageParam ?? 0;
+  if (data.records && data.records.length > 0) {
+    if (pageParam) {
+      nextCursor = pageParam + limit;
+    } else {
+      nextCursor = limit;
     }
-    return {
-      data,
-      nextCursor,
-      previousCursor,
-    };
+  }
+  return {
+    data,
+    nextCursor,
+    previousCursor,
   };
+};
 
+export const ResultsTable: React.FC<TableProps> = (props) => {
   const [selectedPage, setSelectedPage] = React.useState(1);
   const limit = props.limit || 20;
   const {
@@ -71,7 +72,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       limit,
       props.sort,
     ],
-    queryFn: fetchContext,
+    queryFn: (pageParams) => fetchContext(pageParams, props),
     staleTime: Infinity,
     keepPreviousData: true,
   });

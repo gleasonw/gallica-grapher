@@ -34,10 +34,18 @@ interface ResultViewerProps {
   outerRange: [number, number];
 }
 
-// TODO: qol
-// pagination context arrow stays at same position
-// keep previous data on table load
-// fix paper selector
+export async function getTicketData(
+  id: number,
+  backend_source: "gallica" | "pyllica" = "pyllica",
+  grouping: string,
+  smoothing: number
+) {
+  const response = await fetch(
+    `${apiURL}/api/graphData?request_id=${id}&backend_source=${backend_source}&grouping=${grouping}&average_window=${smoothing}`
+  );
+  const data = (await response.json()) as GraphData;
+  return data;
+}
 
 export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
   const [selectedYear, setSelectedYear] = React.useState<number>();
@@ -47,19 +55,6 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
     "year" | "month"
   >("year");
   const [selectedSmoothing, setSelectedSmoothing] = React.useState<number>(0);
-
-  async function getTicketData(
-    id: number,
-    backend_source: "gallica" | "pyllica" = "pyllica",
-    grouping: string,
-    smoothing: number
-  ) {
-    const response = await fetch(
-      `${apiURL}/api/graphData?request_id=${id}&backend_source=${backend_source}&grouping=${grouping}&average_window=${smoothing}`
-    );
-    const data = (await response.json()) as GraphData;
-    return data;
-  }
 
   const ticketData = useQueries({
     queries: props.tickets.map((ticket) => {

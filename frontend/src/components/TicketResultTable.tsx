@@ -29,30 +29,14 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     }
   }, [props.tickets, selectedTicket]);
 
-  let tableTerms: string[] | null = null;
-  let tableCodes: string[] | null = null;
-  if (selectedTicket) {
-    tableTerms = selectedTicket.terms;
-    if (selectedTicket.papers) {
-      tableCodes = selectedTicket.papers.map((p) => p.code);
-    }
-  } else if (props.tickets && props.tickets.length > 0) {
-    tableTerms = props.tickets[0].terms;
-    if (props.tickets[0].papers) {
-      tableCodes = props.tickets[0].papers.map((p) => p.code);
-    }
-  }
-
-  console.log(tableCodes);
-  console.log(selectedPapers);
-
   return (
     <ResultsTable
-      terms={tableTerms ? tableTerms[0] : undefined}
-      codes={tableCodes || selectedPapers?.map((p) => p.code) || []}
+      terms={selectedTicket?.terms[0]}
+      codes={selectedPapers?.map((p) => p.code) || []}
       month={props.month}
       day={props.day}
       year={props.year}
+      limit={10}
     >
       <div
         className={"flex flex-row flex-wrap gap-5 pt-10 md:gap-10 lg:gap-10"}
