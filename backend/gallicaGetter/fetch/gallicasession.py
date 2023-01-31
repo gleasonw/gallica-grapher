@@ -18,7 +18,7 @@ class GallicaSession:
     def __init__(self, maxSize):
         self.maxSize = maxSize
         self.session = self.build_session()
-
+    # don't retry on 503, need to catch
     def build_session(self):
         retry_strategy = Retry(
             total=10,
