@@ -19,7 +19,7 @@ export const Context: React.FC<{ record?: GallicaRecord }> = (props) => {
   return (
     <div className={"flex w-full flex-col"}>
       <article
-        className={"prose prose-lg m-auto h-60 text-justify lg:prose-lg"}
+        className={"prose prose-lg m-auto min-h-60 text-justify lg:prose-lg"}
         dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }}
       />
       <div className={"m-10 flex flex-row justify-between gap-10"}>
