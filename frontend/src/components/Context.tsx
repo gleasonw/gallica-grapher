@@ -1,19 +1,23 @@
 import React from "react";
 import { GallicaRecord } from "../models/dbStructs";
 
-export const Context: React.FC<{ record: GallicaRecord }> = (props) => {
+export const Context: React.FC<{ record?: GallicaRecord }> = (props) => {
   const [pageIndex, setPageIndex] = React.useState(0);
 
   React.useEffect(() => {
     setPageIndex(0);
   }, [props.record]);
 
-  const data = props.record.context;
+  const data = props.record?.context;
+
+  if (!data) {
+    return <div></div>;
+  }
 
   return (
     <div className={"flex w-full flex-col"}>
       <article
-        className={"prose h-60 prose-lg m-auto text-justify lg:prose-lg"}
+        className={"prose prose-lg m-auto h-60 text-justify lg:prose-lg"}
         dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }}
       />
       <div className={"m-10 flex flex-row justify-between gap-10"}>
