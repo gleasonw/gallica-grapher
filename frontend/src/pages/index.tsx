@@ -52,7 +52,7 @@ export const getStaticProps: GetStaticProps<{
   const series = getTicketData(
     initTicket.id,
     "pyllica",
-    initTicket.grouping,
+    "year",
     0
   );
   const data = await Promise.allSettled([records, series]);

@@ -70,6 +70,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
             selectedSmoothing
           ),
         staleTime: Infinity,
+        placeholderData: props.initVals.initSeries
       };
     }),
   });
