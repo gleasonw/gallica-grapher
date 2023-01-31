@@ -115,18 +115,6 @@ export const InputForm: React.FC<InputFormProps> = ({
               }
             }}
           />
-          <PaperSelector
-            papers={papers}
-            onPaperClick={(paper) => {
-              setPapers(papers.filter((p) => p !== paper));
-            }}
-            onPaperAdd={(paper) => {
-              setPapers([...papers, paper]);
-            }}
-            from={yearRange[0]}
-            to={yearRange[1]}
-            smallText={true}
-          />
           <RangeInput
             min={1800}
             max={2020}
