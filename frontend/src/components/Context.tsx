@@ -12,8 +12,8 @@ export const Context: React.FC<{ record?: GallicaRecord }> = (props) => {
 
   const data = props.record?.context;
 
-  if (!data) {
-    return <div></div>;
+  if (!data || !data.pages || pageIndex >= data.pages.length) {
+    return <div>Something broke :(</div>;
   }
 
   return (
