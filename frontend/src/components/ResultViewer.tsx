@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Ticket, getStaticProps } from "../pages/index";
 import {
   LineChart,
@@ -50,9 +50,9 @@ export async function getTicketData(
 }
 
 export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
-  const [selectedYear, setSelectedYear] = React.useState<number>();
-  const [selectedMonth, setSelectedMonth] = React.useState<number>();
-  const [selectedDay, setSelectedDay] = React.useState<number>();
+  const [selectedYear, setSelectedYear] = React.useState<number | null>();
+  const [selectedMonth, setSelectedMonth] = React.useState<number | null>();
+  const [selectedDay, setSelectedDay] = React.useState<number | null>();
   const [selectedGrouping, setSelectedGrouping] = React.useState<
     "year" | "month"
   >("year");
@@ -70,7 +70,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
             selectedSmoothing
           ),
         staleTime: Infinity,
-        placeholderData: props.initVals.initSeries
+        placeholderData: props.initVals.initSeries,
       };
     }),
   });

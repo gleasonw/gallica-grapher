@@ -7,9 +7,9 @@ import { PaperDropdown } from "./PaperDropdown";
 import { Paper } from "../models/dbStructs";
 
 export interface TicketTableProps extends TableProps {
-  onSelectMonth: (month: number) => void;
-  onSelectYear: (year: number) => void;
-  onSelectDay: (day: number) => void;
+  onSelectMonth: (month: number | null) => void;
+  onSelectYear: (year: number | null) => void;
+  onSelectDay: (day: number | null) => void;
   tickets: Ticket[];
   initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
@@ -20,14 +20,19 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     Paper[] | undefined
   >();
 
+  const { onSelectMonth, onSelectYear, onSelectDay } = props;
+
   React.useEffect(() => {
     if (
       props.tickets.length > 0 &&
       !props.tickets.some((t) => t.id === selectedTicket?.id)
     ) {
       setSelectedTicket(props.tickets[0]);
+      onSelectDay(null);
+      onSelectMonth(null);
+      onSelectYear(null);
     }
-  }, [props.tickets, selectedTicket]);
+  }, [props.tickets, selectedTicket, onSelectDay, onSelectMonth, onSelectYear]);
 
   return (
     <ResultsTable

@@ -61,7 +61,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   } else {
     ssrData = undefined;
   }
-
+  console.log(props.year)
   const {
     isFetching,
     isError,
