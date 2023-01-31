@@ -7,6 +7,8 @@ export const Context: React.FC<{ record?: GallicaRecord }> = (props) => {
   React.useEffect(() => {
     setPageIndex(0);
   }, [props.record]);
+  
+  console.log(pageIndex);
 
   const data = props.record?.context;
 
