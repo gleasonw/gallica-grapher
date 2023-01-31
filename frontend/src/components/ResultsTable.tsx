@@ -89,7 +89,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     queryFn: (pageParams) => fetchContext(pageParams, props),
     staleTime: Infinity,
     keepPreviousData: true,
-    initialData: ssrData,
+    placeholderData: ssrData,
   });
 
   if (isError) {
