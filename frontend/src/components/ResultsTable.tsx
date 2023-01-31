@@ -3,6 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Context } from "./Context";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
+import { apiURL } from "./apiURL";
 
 export interface TableProps {
   terms?: string[];
@@ -20,9 +21,13 @@ export interface TableProps {
 
 export const ResultsTable: React.FC<TableProps> = (props) => {
   const fetchContext = async ({ pageParam = 0 }) => {
-    let apiURL = "https://gallica-grapher-production.up.railway.app";
     let baseUrl = `${apiURL}/api/gallicaRecords`;
-    let url = addQueryParamsIfExist(baseUrl, props);
+    let url = addQueryParamsIfExist(baseUrl, {
+      ...props,
+      children: undefined,
+      cursor: pageParam,
+      limit: limit,
+    });
     const response = await fetch(url);
     const data = (await response.json()) as GallicaResponse;
     let nextCursor = null;
@@ -66,6 +71,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       props.sort,
     ],
     queryFn: fetchContext,
+    staleTime: Infinity,
   });
 
   if (isLoading) {

@@ -1,6 +1,5 @@
 import { Inter } from "@next/font/google";
 import React, { useState } from "react";
-import { Paper } from "../server/routers/_app";
 import { BaseLayout } from "../components/BaseLayout";
 import { InputForm } from "../components/InputForm";
 import { ResultViewer } from "../components/ResultViewer";
@@ -8,6 +7,7 @@ import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { appRouter } from "../server/routers/_app";
 import { DehydratedState, hydrate, useHydrate, useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
+import { Paper } from "../models/dbStructs";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,9 +21,6 @@ export interface Ticket {
   start_date?: number;
   end_date?: number;
   papers?: Paper[];
-  num_results?: number;
-  start_index?: number;
-  num_workers?: number;
   link_term?: string;
   link_distance?: number;
 }
@@ -43,20 +40,6 @@ export const getStaticProps: GetStaticProps<{
     router: appRouter,
     ctx: {},
   });
-
-  await Promise.allSettled([
-    ssg.graphData.prefetch({
-      id: initTickets[0].id,
-      grouping: "year",
-      smoothing: 0,
-      backend_source: "pyllica",
-    }),
-    ssg.gallicaRecords.prefetch({
-      terms: initTickets[0].terms,
-      codes: [],
-      limit: 20
-    }),
-  ]);
 
   return {
     props: {
