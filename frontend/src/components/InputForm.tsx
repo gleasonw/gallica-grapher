@@ -104,7 +104,7 @@ export const InputForm: React.FC<InputFormProps> = ({
   } else {
     return (
       <div>
-        <div className="m-10 mb-20 flex flex-col gap-10 text-left">
+        <div className="m-10 flex flex-col gap-10 text-left">
           <TextInput
             placeholder={"Search term"}
             value={word}
@@ -123,17 +123,18 @@ export const InputForm: React.FC<InputFormProps> = ({
             value={yearRange}
             onChange={onSliderChange}
           />
+          <TicketRow
+            tickets={tickets}
+            onGraphedTicketCardClick={onDeleteTicket}
+          />
         </div>
-        <TicketRow tickets={tickets} onGraphedTicketCardClick={onDeleteTicket}>
-          <TicketCard onClick={() => handleSubmit()} />
-        </TicketRow>
       </div>
     );
   }
 };
 
 interface TicketProps {
-  ticket?: Ticket;
+  ticket: Ticket;
   onClick: (ticket?: Ticket) => void;
   color?: string;
 }
@@ -143,33 +144,16 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
     <button
       onClick={() => onClick(ticket)}
       className={
-        "text-xl transition duration-150 hover:bg-zinc-500 hover:ease-in"
+        "bg-white text-xl transition duration-150 hover:bg-zinc-500 hover:ease-in"
       }
     >
-      {ticket ? (
-        <div
-          className={"relative h-full w-full border border-t-0 border-r-0 p-10"}
-        >
-          <svg
-            className={"absolute top-0 left-0"}
-            viewBox="0 0 800 800"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect x="0" y="0" width="80" height="80" fill={color} />
-          </svg>
-          <div className={"absolute top-0 right-3 text-3xl"}>-</div>
-          <div>{ticket.terms.join(", ")}</div>
-          <div>{ticket.papers?.map((paper) => paper.title).join(", ")}</div>
-        </div>
-      ) : (
-        <div
-          className={
-            "m-w-full m-h-full flex h-full flex-col justify-center border-b border-l border-r p-20 pt-10 pb-10 text-3xl"
-          }
-        >
-          +
-        </div>
-      )}
+      <div
+        className={"border-rounded relative h-full w-full border p-5 shadow-md"}
+      >
+        <div className={"absolute top-0 right-3 text-3xl"}>-</div>
+        <div>{ticket.terms.join(", ")}</div>
+        <div>{ticket.papers?.map((paper) => paper.title).join(", ")}</div>
+      </div>
     </button>
   );
 };
@@ -180,8 +164,8 @@ const TicketRow: React.FC<{
   onGraphedTicketCardClick: (ticket?: Ticket) => void;
 }> = ({ tickets, children, onGraphedTicketCardClick }) => {
   return (
-    <div className={"z-0 flex border-t bg-white"}>
-      <div className={"flex overflow-y-hidden overflow-x-scroll"}>
+    <div className={"z-0 flex"}>
+      <div className={"flex flex-wrap gap-10"}>
         {tickets?.map((ticket, index) => (
           <TicketCard
             key={ticket.id}

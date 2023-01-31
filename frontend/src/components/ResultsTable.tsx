@@ -15,7 +15,7 @@ export interface TableProps {
   link_term?: string | null;
   link_distance?: number | null;
   children?: React.ReactNode;
-  limit?: number;
+  limit: number;
   sort?: "date" | "relevance" | null;
   initialRecords?: Awaited<ReturnType<typeof fetchContext>>;
 }
@@ -30,14 +30,13 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
   });
   const response = await fetch(url);
   const data = (await response.json()) as GallicaResponse;
-  const limit = props.limit || 10;
   let nextCursor = null;
   let previousCursor = pageParam ?? 0;
   if (data.records && data.records.length > 0) {
     if (pageParam) {
-      nextCursor = pageParam + limit;
+      nextCursor = pageParam + props.limit;
     } else {
-      nextCursor = limit;
+      nextCursor = props.limit;
     }
   }
   return {
@@ -49,9 +48,8 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
 
 export const ResultsTable: React.FC<TableProps> = (props) => {
   const [selectedPage, setSelectedPage] = React.useState(1);
-  const limit = props.limit || 20;
-
   let ssrData;
+  const limit = props.limit || 10;
 
   if (props.initialRecords) {
     ssrData = {
@@ -82,10 +80,11 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       props.source,
       props.link_term,
       props.link_distance,
-      limit,
+      props.limit,
       props.sort,
     ],
-    queryFn: (pageParams) => fetchContext(pageParams, props),
+    queryFn: (pageParams) =>
+      fetchContext(pageParams, { ...props, children: undefined }),
     staleTime: Infinity,
     keepPreviousData: true,
     placeholderData: ssrData,
@@ -104,7 +103,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   const cursorMax = Math.floor(total_results / limit) + 1;
 
   function pageToCursor(page: number) {
-    return page * limit;
+    return page * props.limit;
   }
 
   const fetchedCursors = data.data?.pages.map((page) => page?.nextCursor);
@@ -127,11 +126,11 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     }
     setSelectedPage(selectedPage - amount);
   }
+  console.log(props.terms);
 
   return (
     <div className={"flex flex-col"}>
-      <div className={"m-auto ml-5 "}>{props.children}</div>
-      <div className="bg-zinc-100">
+      <div className="">
         <div>
           <div className={"mt-5 flex flex-col gap-5"}>
             <h1 className={"text-2xl"}>
@@ -189,6 +188,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
                   </div>
                 )}
             </h1>
+            <div className={"m-auto ml-5 "}>{props.children}</div>
             {currentPage?.data.records.map((record, index) => (
               <div
                 key={index}
