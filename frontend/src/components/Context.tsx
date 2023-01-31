@@ -8,8 +8,6 @@ export const Context: React.FC<{ record?: GallicaRecord }> = (props) => {
     setPageIndex(0);
   }, [props.record]);
   
-  console.log(pageIndex);
-
   const data = props.record?.context;
 
   if (!data || !data.pages || pageIndex >= data.pages.length) {

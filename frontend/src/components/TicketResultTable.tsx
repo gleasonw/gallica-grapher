@@ -1,17 +1,21 @@
 import React from "react";
 import { Ticket } from "../pages/index";
-import { ResultsTable, TableProps } from "./ResultsTable";
+import { ResultsTable, TableProps, fetchContext } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
 import { PaperDropdown } from "./PaperDropdown";
-import { Paper } from "../models/dbStructs";
-import { some } from "d3";
+import { GallicaResponse, Paper } from "../models/dbStructs";
+import { initTickets } from "../pages/index";
+
+import { GetStaticProps, InferGetStaticPropsType } from "next";
+
 
 export interface TicketTableProps extends TableProps {
   onSelectMonth: (month: number) => void;
   onSelectYear: (year: number) => void;
   onSelectDay: (day: number) => void;
   tickets: Ticket[];
+  initRecords?: InferGetStaticPropsType<typeof getStaticProps>;
 }
 
 export const TicketResultTable: React.FC<TicketTableProps> = (props) => {

@@ -2,17 +2,10 @@ import { Inter } from "@next/font/google";
 import React, { useState } from "react";
 import { BaseLayout } from "../components/BaseLayout";
 import { InputForm } from "../components/InputForm";
-import { ResultViewer } from "../components/ResultViewer";
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
-import { appRouter } from "../server/routers/_app";
-import {
-  DehydratedState,
-  hydrate,
-  useHydrate,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { ResultViewer, getTicketData } from "../components/ResultViewer";
+import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
-import { Paper } from "../models/dbStructs";
+import { fetchContext } from "../components/ResultsTable";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,9 +33,47 @@ export const initTickets = [
   },
 ] as Ticket[];
 
-export default function Home() {
+export const getStaticProps: GetStaticProps<{
+  initRecords: {
+    data: GallicaResponse;
+    nextCursor: number | null;
+    previousCursor: number;
+  };
+  initSeries: GraphData;
+}> = async () => {
+  const initTicket = initTickets[0];
+  const records = fetchContext(
+    { pageParam: 0 },
+    {
+      terms: initTicket.terms[0],
+      limit: 10,
+    }
+  );
+  const series = getTicketData(
+    initTicket.id,
+    "pyllica",
+    initTicket.grouping,
+    0
+  );
+  const data = await Promise.allSettled([records, series]);
+  console.log(data);
+  return {
+    props: {
+      // @ts-ignore
+      initRecords: data[0].value,
+      // @ts-ignore
+      initSeries: data[1].value,
+    },
+  };
+};
+
+export default function Home({
+  initRecords,
+  initSeries,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const [tickets, setTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
+  console.log(initRecords, initSeries);
 
   return (
     <BaseLayout>
