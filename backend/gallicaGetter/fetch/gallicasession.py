@@ -22,7 +22,7 @@ class GallicaSession:
     def build_session(self):
         retry_strategy = Retry(
             total=10,
-            status_forcelist=[429, 500, 502, 503, 504],
+            status_forcelist=[429, 500, 502, 504],
             backoff_factor=1,
             connect=20,
             read=20,
