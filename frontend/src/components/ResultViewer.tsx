@@ -1,5 +1,5 @@
 import React from "react";
-import { Ticket } from "../pages/index";
+import { Ticket, getStaticProps } from "../pages/index";
 import {
   LineChart,
   Line,
@@ -14,7 +14,8 @@ import { generateXAxisOptionsForNumericScale } from "./utils";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
-import { GraphData } from "../models/dbStructs";
+import { GallicaResponse, GraphData } from "../models/dbStructs";
+import { InferGetStaticPropsType } from "next";
 
 export const seriesColors = [
   "#7cb5ec",
@@ -32,6 +33,7 @@ export const seriesColors = [
 interface ResultViewerProps {
   tickets: Ticket[];
   outerRange: [number, number];
+  initVals: InferGetStaticPropsType<typeof getStaticProps>;
 }
 
 export async function getTicketData(
@@ -183,6 +185,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
         </LineChart>
       </ResponsiveContainer>
       <TicketResultTable
+        initialRecords={props.initVals.initRecords}
         tickets={props.tickets}
         month={selectedMonth}
         day={selectedDay}

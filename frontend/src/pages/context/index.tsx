@@ -57,8 +57,8 @@ export default function Context() {
         day={day}
         source={source}
         codes={codes || []}
-        limit={20}
         link_term={link_term}
+        limit={10}
         link_distance={link_distance}
         sort={sort}
       />

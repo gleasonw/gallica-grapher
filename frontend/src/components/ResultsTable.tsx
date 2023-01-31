@@ -17,6 +17,7 @@ export interface TableProps {
   children?: React.ReactNode;
   limit?: number;
   sort?: "date" | "relevance" | null;
+  initialRecords?: Awaited<ReturnType<typeof fetchContext>>;
 }
 
 export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
@@ -49,6 +50,19 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
 export const ResultsTable: React.FC<TableProps> = (props) => {
   const [selectedPage, setSelectedPage] = React.useState(1);
   const limit = props.limit || 20;
+
+  let ssrData;
+
+  if (props.initialRecords) {
+    ssrData = {
+      pages: [props.initialRecords],
+      pageParams: [0],
+    };
+  } else {
+    ssrData = undefined;
+  }
+  console.log(ssrData);
+
   const {
     isFetching,
     isError,
@@ -75,6 +89,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     queryFn: (pageParams) => fetchContext(pageParams, props),
     staleTime: Infinity,
     keepPreviousData: true,
+    initialData: ssrData,
   });
 
   if (isError) {
@@ -82,10 +97,10 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   }
 
   const currentPage = data.data?.pages.filter(
-    (page) => page.nextCursor == pageToCursor(selectedPage)
+    (page) => page?.nextCursor == pageToCursor(selectedPage)
   )[0];
 
-  const total_results = Number(data.data?.pages[0].data.num_results) ?? 0;
+  const total_results = Number(data.data?.pages[0]?.data.num_results) ?? 0;
 
   const cursorMax = Math.floor(total_results / limit) + 1;
 
@@ -93,7 +108,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     return page * limit;
   }
 
-  const fetchedCursors = data.data?.pages.map((page) => page.nextCursor);
+  const fetchedCursors = data.data?.pages.map((page) => page?.nextCursor);
   const fetchedSet = new Set(fetchedCursors);
 
   async function handleCursorIncrement(amount: number = 1) {

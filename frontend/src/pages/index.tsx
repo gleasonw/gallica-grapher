@@ -100,7 +100,11 @@ export default function Home({
           }
         }}
       />
-      <ResultViewer tickets={tickets} outerRange={outerRange} />
+      <ResultViewer
+        tickets={tickets}
+        outerRange={outerRange}
+        initVals={{ initRecords, initSeries }}
+      />
     </BaseLayout>
   );
 }

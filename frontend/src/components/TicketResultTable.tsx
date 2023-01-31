@@ -4,18 +4,14 @@ import { ResultsTable, TableProps, fetchContext } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
 import { PaperDropdown } from "./PaperDropdown";
-import { GallicaResponse, Paper } from "../models/dbStructs";
-import { initTickets } from "../pages/index";
-
-import { GetStaticProps, InferGetStaticPropsType } from "next";
-
+import { Paper } from "../models/dbStructs";
 
 export interface TicketTableProps extends TableProps {
   onSelectMonth: (month: number) => void;
   onSelectYear: (year: number) => void;
   onSelectDay: (day: number) => void;
   tickets: Ticket[];
-  initRecords?: InferGetStaticPropsType<typeof getStaticProps>;
+  initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
 
 export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
@@ -41,6 +37,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       day={props.day}
       year={props.year}
       limit={10}
+      initialRecords={props.initialRecords}
     >
       <div
         className={"flex flex-row flex-wrap gap-5 pt-10 md:gap-10 lg:gap-10"}
