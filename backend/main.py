@@ -3,7 +3,7 @@ import os
 import random
 from typing import List, Literal, Optional
 from progress import Progress
-from request import Request
+from backend.request import Request
 from ticket import Ticket
 from gallicaGetter.contextPair import ContextPair
 
