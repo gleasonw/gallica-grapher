@@ -3,7 +3,7 @@ from typing import Literal, Tuple
 
 import ciso8601
 
-from database.series import (
+from www.models import (
     Series,
     SeriesDataPoint,
 )

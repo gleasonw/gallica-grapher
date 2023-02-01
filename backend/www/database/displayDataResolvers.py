@@ -1,9 +1,5 @@
 from typing import List, Optional, Tuple
 
-from gallicaGetter.wrapperFactory import WrapperFactory
-from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
-from gallicaGetter.parse.volumeRecords import VolumeRecord
-
 ticketResultsWithPaperName = """
 SELECT searchterm, papertitle, year, month, day, identifier
 FROM results

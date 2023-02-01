@@ -5,8 +5,6 @@ from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 
 from gallicaGetter.parse.parseHTML import ParsedGallicaHTML
 
-from gallicaGetter.www.contextPair import ContextPair
-
 from gallicaGetter.buildqueries.argToQueryTransformations import (
     build_indexed_queries,
     bundle_codes,
@@ -90,6 +88,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         onProgressUpdate=None,
         query_cache=None,
         on_get_total_records: Optional[Callable[[int], None]] = None,
+        get_all_results: bool = False,
     ) -> Generator[VolumeRecord, None, None]:
         if query_cache:
             queries = index_queries_by_num_results(query_cache)
@@ -107,7 +106,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 limit=num_results,
                 cursor=start_index,
             )
-            if num_results and num_results > 50:
+            if num_results and num_results > 50 or get_all_results:
                 # assume we want all results, or index for more than 50
                 # we will have to fetch # total records from Gallica
                 queries = build_indexed_queries(
@@ -204,11 +203,11 @@ class ContentWrapper(GallicaWrapper):
         return "https://gallica.bnf.fr/services/ContentSearch"
 
     def get(
-        self, context_pairs: List[ContextPair], generate=False
+        self, context_pairs: List[Tuple[str, str]], generate=False
     ) -> Generator[GallicaContext, None, None]:
         queries = [
             build_query_for_ark_and_term(
-                ark=pair.ark_code, term=pair.term, endpoint_url=self.endpoint_url
+                ark=pair[0], term=pair[1], endpoint_url=self.endpoint_url
             )
             for pair in context_pairs
         ]
