@@ -105,7 +105,7 @@ def papers(keyword: str):
                 )
                 for paper in similar_papers
             ]
-    return papers
+    return {"papers": papers}
 
 
 @app.get("/api/numPapersOverRange/{start}/{end}")
