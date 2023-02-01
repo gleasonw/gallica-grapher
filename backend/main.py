@@ -23,10 +23,7 @@ from database.paperSearchResolver import (
 )
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
-from gallicaGetter.fetch.progressUpdate import ProgressUpdate
-from gallicaGetter.parse.contentRecord import GallicaPage, GallicaContext
-from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
+from gallicaGetter.parse.contentRecord import GallicaContext
 from pydantic import BaseModel
 
 RECORD_LIMIT = 1000000
@@ -224,7 +221,7 @@ def fetch_records_from_gallica(
     )
 
     # fetch the context for those terms
-    content_wrapper = WrapperFactory.connect_context()()
+    content_wrapper = WrapperFactory.connect_context()
     keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
     context = content_wrapper.get(
         [
