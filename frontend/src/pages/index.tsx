@@ -56,7 +56,6 @@ export const getStaticProps: GetStaticProps<{
     0
   );
   const data = await Promise.allSettled([records, series]);
-  console.log(data);
   return {
     props: {
       // @ts-ignore
@@ -73,7 +72,6 @@ export default function Home({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [tickets, setTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
-  console.log(initRecords, initSeries);
 
   return (
     <BaseLayout>

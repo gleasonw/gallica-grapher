@@ -90,6 +90,11 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     placeholderData: ssrData,
   });
 
+  //if props change, reset page to 1
+  React.useEffect(() => {
+    setSelectedPage(1);
+  }, [props]);
+
   if (isError) {
     return <div>Error</div>;
   }
@@ -126,7 +131,10 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     }
     setSelectedPage(selectedPage - amount);
   }
-  console.log(props.terms);
+
+  console.log("data", data.data?.pages);
+  console.log("fetchedSet", fetchedSet);
+  console.log("selectedPage", selectedPage);
 
   return (
     <div className={"flex flex-col"}>
