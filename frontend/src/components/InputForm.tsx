@@ -143,15 +143,14 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
   return (
     <button
       onClick={() => onClick(ticket)}
-      className={
-        "bg-white text-xl transition duration-150 hover:bg-zinc-500 hover:ease-in"
-      }
+      className={`rounded-lg border bg-white p-5 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
+      style={{ borderColor: color }}
     >
-      <div
-        className={"border-rounded relative h-full w-full border p-5 shadow-md"}
-      >
-        <div className={"absolute top-0 right-3 text-3xl"}>-</div>
-        <div>{ticket.terms.join(", ")}</div>
+      <div className={`relative h-full w-full`}>
+        <div className={"flex flex-row gap-10"}>
+          <p>{ticket.terms.join(", ")}</p>
+          <p className={"text-zinc-600"}>x</p>
+        </div>
         <div>{ticket.papers?.map((paper) => paper.title).join(", ")}</div>
       </div>
     </button>

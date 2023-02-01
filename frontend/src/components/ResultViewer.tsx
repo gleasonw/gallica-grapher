@@ -117,7 +117,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
 
   return (
     <div className={"h-full w-full bg-white"}>
-      <div className={"m-5 flex flex-row gap-10"}>
+      <div className={"ml-10 mb-5 flex flex-row gap-10"}>
         <InputLabel label={"Grouping"}>
           <SelectInput
             options={["year", "month"]}
