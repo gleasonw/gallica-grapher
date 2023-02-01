@@ -25,7 +25,7 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 * Contains the React code for the graph, table, paper dropdown, and every other UI component. 
 * The long className strings in the html elements are [Tailwind](https://tailwindcss.com/) CSS utility classes.
 
-Railway hosts the Python code, a Postgres database for storage and a Redis database for tracking user requests. Vercel hosts the Next.js frontend. It is all free! 
+Railway hosts the Python code, a Postgres database for storage and a Redis database for tracking request progress. Vercel hosts the Next.js frontend. It is all free! 
 
 
 
