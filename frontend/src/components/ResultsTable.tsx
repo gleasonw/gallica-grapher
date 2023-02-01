@@ -132,10 +132,6 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
     setSelectedPage(selectedPage - amount);
   }
 
-  console.log("data", data.data?.pages);
-  console.log("fetchedSet", fetchedSet);
-  console.log("selectedPage", selectedPage);
-
   return (
     <div className={"flex flex-col"}>
       <div className="">
