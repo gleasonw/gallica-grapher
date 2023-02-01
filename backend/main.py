@@ -2,7 +2,7 @@ import json
 import os
 import random
 from progress import Progress
-from gallicaGetter.contextPair import ContextPair
+from contextPair import ContextPair
 import io
 import threading
 from typing import Any, Callable, Generator, List, Literal, Optional, Tuple
