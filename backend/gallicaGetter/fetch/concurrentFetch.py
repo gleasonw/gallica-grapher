@@ -1,9 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import Generator, List
 
-from gallicaGetter.fetch.gallicasession import GallicaSession
-from gallicaGetter.fetch.gallicasession import Response
-from gallicaGetter.fetch.progressUpdate import ProgressUpdate
+from .gallicasession import GallicaSession
+from .progressUpdate import ProgressUpdate
 
 NUM_WORKERS = 20
 

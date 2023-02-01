@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from typing import Optional, List
-from gallicaGetter.parse.parseXML import (
+from typing import List
+from ..parse.parseXML import (
     get_records_from_xml,
     get_paper_code_from_record_xml,
     get_paper_title_from_record_xml,

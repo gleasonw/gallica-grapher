@@ -1,32 +1,33 @@
 from typing import Callable, Generator, List, Literal, Optional, Tuple
 
-from pydantic import BaseModel
 from database.contextPair import ContextPair
 
-from gallicaGetter.buildqueries.argToQueryTransformations import (
+from .buildqueries.argToQueryTransformations import (
     build_indexed_queries,
     get_num_results_for_queries,
     index_queries_by_num_results,
 )
-from gallicaGetter.buildqueries.buildContentQuery import build_query_for_ark_and_term
-from gallicaGetter.buildqueries.buildIssueQueries import build_issue_queries_for_codes
-from gallicaGetter.buildqueries.buildPaperQueries import build_paper_queries_for_codes
-from gallicaGetter.buildqueries.buildSRUqueries import (
+from .buildqueries.buildContentQuery import build_query_for_ark_and_term
+from .buildqueries.buildIssueQueries import build_issue_queries_for_codes
+from .buildqueries.buildPaperQueries import build_paper_queries_for_codes
+from .buildqueries.buildSRUqueries import (
     build_base_queries,
     build_base_queries_at_indices,
 )
-from gallicaGetter.buildqueries.buildTextQueries import build_text_queries_for_codes
-from gallicaGetter.parse.contentRecord import GallicaContext
-from gallicaGetter.parse.issueYearRecord import IssueYearRecord
-from gallicaGetter.parse.paperRecords import PaperRecord
-from gallicaGetter.parse.periodRecords import PeriodRecord
-from gallicaGetter.parse.volumeRecords import VolumeRecord
-import gallicaGetter.parse.issueYearRecord as issueRecords
-import gallicaGetter.parse.contentRecord as contentRecords
-import gallicaGetter.parse.fullText as fullText
-import gallicaGetter.parse.paperRecords as paperRecords
-import gallicaGetter.parse.periodRecords as periodRecords
-import gallicaGetter.parse.volumeRecords as volumeRecords
+from .buildqueries.buildTextQueries import build_text_queries_for_codes
+from .parse.contentRecord import GallicaContext
+from .parse.issueYearRecord import IssueYearRecord
+from .parse.paperRecords import PaperRecord
+from .parse.periodRecords import PeriodRecord
+from .parse.volumeRecords import VolumeRecord
+from .parse import (
+    fullText,
+    paperRecords,
+    periodRecords,
+    volumeRecords,
+    issueYearRecord,
+    contentRecord,
+)
 
 
 class GallicaWrapper:
@@ -77,19 +78,18 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get(
         self,
         terms: List[str],
-        link: Optional[Tuple[str, int]],
-        source: Optional[Literal["book", "periodical", "all"]],
+        source: Optional[Literal["book", "periodical", "all"]] = "all",
+        link: Optional[Tuple[str, int]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         codes: Optional[List[str]] = None,
-        generate: bool = False,
         num_results: Optional[int] = None,
         start_index: Optional[int] = 0,
         sort: Optional[Literal["date", "relevance"]] = None,
         onProgressUpdate=None,
         query_cache=None,
         on_get_total_records: Optional[Callable[[int], None]] = None,
-    ) -> List[VolumeRecord]:
+    ) -> Generator[VolumeRecord, None, None]:
         if query_cache:
             queries = index_queries_by_num_results(query_cache)
         else:
@@ -128,7 +128,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             onUpdateProgress=onProgressUpdate,
             on_get_total_records=on_get_total_records,
         )
-        return record_generator if generate else list(record_generator)
+        return record_generator
 
     def get_num_results_for_args(
         self,
@@ -160,10 +160,9 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         codes: Optional[List[str]] = None,
-        generate: bool = False,
         grouping: str = "year",
         onProgressUpdate=None,
-    ) -> List[PeriodRecord]:
+    ) -> Generator[PeriodRecord, None, None]:
         if grouping not in ["year", "month"]:
             raise ValueError(
                 f'grouping must be either "year" or "month", not {grouping}'
@@ -179,7 +178,7 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
         record_generator = self.fetch_from_queries(
             queries=queries, onUpdateProgress=onProgressUpdate
         )
-        return record_generator if generate else list(record_generator)
+        return record_generator
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/SRU"
@@ -190,7 +189,7 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
 
 class IssuesWrapper(GallicaWrapper):
     def get_parser(self):
-        return issueRecords.parse_responses_to_records
+        return issueYearRecord.parse_responses_to_records
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/services/Issues"
@@ -203,7 +202,7 @@ class IssuesWrapper(GallicaWrapper):
 
 class ContentWrapper(GallicaWrapper):
     def get_parser(self):
-        return contentRecords.parse_responses_to_records
+        return contentRecord.parse_responses_to_records
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/services/ContentSearch"

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from gallicaGetter.parse.date import Date
-from gallicaGetter.parse.parseXML import get_num_records
+from ..parse.date import Date
+from ..parse.parseXML import get_num_records
 from typing import List
-from gallicaGetter.fetch.gallicasession import Response
+from ..fetch.gallicasession import Response
 
 
 def parse_responses_to_records(responses: List[Response], on_get_total_records):

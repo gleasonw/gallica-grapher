@@ -2,8 +2,8 @@ from typing import List
 
 from pydantic import BaseModel
 
-from gallicaGetter.fetch.gallicasession import Response
-from gallicaGetter.parse.parseXML import get_num_results_and_pages_for_context
+from ..fetch.gallicasession import Response
+from ..parse.parseXML import get_num_results_and_pages_for_context
 
 
 def parse_responses_to_records(responses: List[Response], on_get_total_records):
@@ -15,7 +15,7 @@ def parse_responses_to_records(responses: List[Response], on_get_total_records):
                 GallicaPage(page=occurrence[0], context=occurrence[1])
                 for occurrence in num_results_and_pages[1]
             ],
-            ark=response.query.ark
+            ark=response.query.ark,
         )
 
 

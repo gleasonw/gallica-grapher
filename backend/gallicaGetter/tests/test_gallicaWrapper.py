@@ -1,105 +1,83 @@
-from unittest import TestCase
-from unittest.mock import MagicMock
-from gallicaGetter import connect
-from gallicaGetter.gallicaWrapper import (
-    VolumeOccurrenceWrapper,
-    IssuesWrapper,
-    ContentWrapper,
-    PapersWrapper,
-    FullTextWrapper,
-    PeriodOccurrenceWrapper,
+import pytest
+
+from backend.database.contextPair import ContextPair
+from ..wrapperFactory import WrapperFactory
+
+# could speed up by running the fetches in parallel. But hey, sometimes it's good to relax
+@pytest.mark.parametrize(
+    ("input", "expected_length"),
+    [
+        ({"terms": ["seattle"], "codes": ["cb32895690j"]}, 268),
+        (
+            {
+                "terms": ["bon pain"],
+                "start_date": "1890-01-02",
+                "end_date": "1890-01-03",
+            },
+            1,
+        ),
+    ],
 )
+def test_get_volume_occurrences(input, expected_length):
+    getter = WrapperFactory.connect_volume()
+    records = getter.get(**input)
+    list_records = list(records)
+    assert len(list_records) == expected_length
 
 
-class TestGallicaWrapper(TestCase):
-    def setUp(self) -> None:
-        self.gallicaAPIs = [
-            VolumeOccurrenceWrapper(api=MagicMock()),
-            IssuesWrapper(api=MagicMock()),
-            ContentWrapper(api=MagicMock()),
-            PapersWrapper(api=MagicMock()),
-        ]
-
-    # Liskov tests
-    def test_connect(self):
-        self.assertIsInstance(connect("period"), PeriodOccurrenceWrapper)
-        self.assertIsInstance(connect("volume"), VolumeOccurrenceWrapper)
-        self.assertIsInstance(connect("issues"), IssuesWrapper)
-        self.assertIsInstance(connect("content"), ContentWrapper)
-        self.assertIsInstance(connect("papers"), PapersWrapper)
-        self.assertIsInstance(connect("text"), FullTextWrapper)
-        with self.assertRaises(ValueError):
-            connect("not an api")
-
-
-class TestVolumeOccurrenceWrapper(TestCase):
-    def setUp(self) -> None:
-        self.api = VolumeOccurrenceWrapper(api=MagicMock())
-
-    def test_get(self):
-        getter = VolumeOccurrenceWrapper(api=MagicMock())
-        getter.api = MagicMock()
-        getter.fetch_from_queries = MagicMock()
-
-        self.assertIsInstance(getter.get(terms="a term"), list)
+@pytest.mark.parametrize(
+    ("input", "expected_length"),
+    [
+        (
+            {
+                "terms": ["bon pain"],
+                "start_date": "1890",
+                "end_date": "1895",
+                "grouping": "year",
+            },
+            6,
+        ),
+        (
+            {
+                "terms": ["bon pain"],
+                "start_date": "1890",
+                "end_date": "1890",
+                "grouping": "month",
+            },
+            12,
+        ),
+    ],
+)
+def test_get_period_occurrences(input, expected_length):
+    getter = WrapperFactory.connect_period()
+    records = getter.get(**input)
+    list_records = list(records)
+    assert len(list_records) == expected_length
 
 
-class TestPeriodOccurrenceWrapper(TestCase):
-    def setUp(self) -> None:
-        self.api = PeriodOccurrenceWrapper(api=MagicMock())
-
-    def test_get(self):
-        getter = PeriodOccurrenceWrapper(api=MagicMock())
-        getter.api = MagicMock()
-        getter.fetch_from_queries = MagicMock()
-
-        self.assertIsInstance(getter.get(terms="a term"), list)
+def test_get_issues():
+    getter = WrapperFactory.connect_issues()
+    records = getter.get("cb344484501")
+    list_records = list(records)
+    assert len(list_records) == 1
+    issue = list_records[0]
+    assert issue.code == "cb344484501"
 
 
-class TestIssuesWrapper(TestCase):
-    def setUp(self) -> None:
-        self.api = IssuesWrapper(api=MagicMock())
-
-    def test_get(self):
-        getter = IssuesWrapper(api=MagicMock())
-        getter.queryBuilder = MagicMock()
-        getter.fetch_from_queries = MagicMock()
-
-        self.assertIsInstance(getter.get("a paper code"), list)
+def test_get_content():
+    getter = WrapperFactory.connect_content()
+    records = getter.get([ContextPair(ark_code="bpt6k267221f", term="erratum")])
+    list_records = list(records)
+    context = list_records[0]
+    assert context.ark == "bpt6k267221f"
 
 
-class TestContentWrapper(TestCase):
-    def setUp(self) -> None:
-        self.api = ContentWrapper(api=MagicMock())
-
-    def test_get(self):
-        getter = ContentWrapper(api=MagicMock())
-        getter.queryBuilder = MagicMock()
-        getter.fetch_from_queries = MagicMock()
-
-        self.assertIsInstance(
-            getter.get(ark="a periodical issue code", term="a term"), list
-        )
+def test_get_papers_wrapper():
+    getter = WrapperFactory.connect_papers()
+    papers = getter.get("cb32895690j")
+    paper = papers[0]
+    assert paper.code == "cb32895690j"
 
 
-class TestPapersWrapper(TestCase):
-    def setUp(self) -> None:
-        self.paperWrapper = PapersWrapper(api=MagicMock())
-
-    def test_get(self):
-        getter = PapersWrapper(api=MagicMock())
-        getter.queryBuilder = MagicMock()
-        getter.fetch_from_queries = MagicMock()
-        getter.issues_wrapper = MagicMock()
-
-        self.assertIsInstance(getter.get("a paper code"), list)
-
-
-class TestFullTextWrapper(TestCase):
-    def setUp(self) -> None:
-        self.fullTextWrapper = FullTextWrapper(api=MagicMock())
-        self.fullTextWrapper.fetch_from_queries = MagicMock()
-
-    def test_get(self):
-        records = self.fullTextWrapper.get("test")
-        self.assertIsInstance(records, list)
+if __name__ == "__main__":
+    raise SystemExit(pytest.main([__file__]))

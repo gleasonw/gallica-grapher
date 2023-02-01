@@ -1,9 +1,9 @@
 from typing import List, Literal, Optional, Tuple
 
-from gallicaGetter.buildqueries.argToQueryTransformations import bundle_codes
-from gallicaGetter.buildqueries.buildDateGrouping import build_date_grouping
-from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
-from gallicaGetter.fetch.paperQuery import PaperQuery
+from ..buildqueries.argToQueryTransformations import bundle_codes
+from ..buildqueries.buildDateGrouping import build_date_grouping
+from ..fetch.occurrenceQuery import OccurrenceQuery
+from ..fetch.paperQuery import PaperQuery
 
 
 def build_base_queries(

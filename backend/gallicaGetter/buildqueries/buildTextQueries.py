@@ -1,4 +1,4 @@
-from gallicaGetter.fetch.fullTextQuery import FullTextQuery
+from ..fetch.fullTextQuery import FullTextQuery
 
 
 def build_text_queries_for_codes(endpoint, ark_codes):

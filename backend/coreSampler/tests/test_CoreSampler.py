@@ -19,6 +19,7 @@ class TestCoreSampler(TestCase):
                 10,
                 "1900",
                 "1901",
+                api_wrapper=MagicMock(),
             ),
             {},
         )

@@ -1,5 +1,5 @@
 from lxml import etree
-from gallicaGetter.parse.date import Date
+from ..parse.date import Date
 from typing import List, Tuple
 
 
@@ -48,7 +48,7 @@ def get_years_published(xml) -> List[str]:
     return list(filter(None, years))
 
 
-def get_year_from_element(year_element) -> str:
+def get_year_from_element(year_element) -> str | None:
     if year_element is not None:
         year = year_element.text
         return year if year.isdigit() else None

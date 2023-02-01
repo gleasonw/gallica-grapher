@@ -1,6 +1,6 @@
-from typing import Callable, List, Literal, Optional, Tuple
+from typing import List, Optional, Tuple
 
-from gallicaGetter import WrapperFactory
+from gallicaGetter.wrapperFactory import WrapperFactory
 from gallicaGetter.gallicaWrapper import VolumeOccurrenceWrapper
 from gallicaGetter.parse.volumeRecords import VolumeRecord
 
@@ -17,21 +17,6 @@ FROM results
 WHERE ticketid in %(tickets)s
 AND requestid = %(requestID)s
 """
-
-
-def select_csv_data_for_tickets(ticket_ids: int | List[int], request_id: int, conn):
-    tupled_ids = tuple(ticket_ids) if isinstance(ticket_ids, list) else (ticket_ids,)
-    with conn.cursor() as cur:
-        cur.execute(
-            f"""
-        {ticketResultsWithPaperName}
-        """,
-            {"tickets": tupled_ids, "requestID": request_id},
-        )
-        data = cur.fetchall()
-    row_labels = ["ngram", "identifier", "periodical", "year", "month", "day"]
-    data.insert(0, row_labels)
-    return data
 
 
 def select_display_records(
@@ -109,37 +94,6 @@ def make_date_from_year_mon_day(
         return f"{year}"
     else:
         return ""
-
-
-def get_gallica_records_for_display(
-    terms: List[str],
-    link: Optional[Tuple[str, int]],
-    source: Literal["book", "periodical", "all"],
-    year: Optional[int],
-    month: Optional[int],
-    day: Optional[int],
-    codes: Optional[List[str]],
-    limit: Optional[int],
-    offset: Optional[int],
-    sort: Optional[Literal["date", "relevance"]],
-    on_get_total_records: Optional[Callable[[int], None]] = None,
-) -> List[VolumeRecord]:
-    wrapper = WrapperFactory.connect_volume()
-    records = []
-    records.extend(
-        wrapper.get(
-            terms=terms,
-            start_date=make_date_from_year_mon_day(year, month, day),
-            codes=codes,
-            source=source,
-            link=link,
-            num_results=limit,
-            start_index=offset,
-            sort=sort,
-            on_get_total_records=on_get_total_records,
-        )
-    )
-    return records
 
 
 def clear_records_for_requestid(requestID, conn):
