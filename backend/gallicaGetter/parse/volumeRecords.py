@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from ..parse.date import Date
-from ..parse.parseXML import (
+from parse.date import Date
+from parse.parseXML import (
     get_records_from_xml,
     get_paper_title_from_record_xml,
     get_paper_code_from_record_xml,

@@ -2,8 +2,8 @@ from typing import List
 
 from pydantic import BaseModel
 
-from ..fetch.gallicasession import Response
-from ..parse.parseXML import get_num_results_and_pages_for_context
+from  fetch.gallicasession import Response
+from parse.parseXML import get_num_results_and_pages_for_context
 
 
 def parse_responses_to_records(responses: List[Response], on_get_total_records):

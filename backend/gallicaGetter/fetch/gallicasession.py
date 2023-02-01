@@ -18,11 +18,11 @@ class GallicaSession:
     def __init__(self, maxSize):
         self.maxSize = maxSize
         self.session = self.build_session()
-    # don't retry on 503, need to catch
+
     def build_session(self):
         retry_strategy = Retry(
             total=10,
-            status_forcelist=[429, 500, 502, 504],
+            status_forcelist=[403, 429],
             backoff_factor=1,
             connect=20,
             read=20,

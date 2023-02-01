@@ -1,6 +1,6 @@
 import pytest
 
-from backend.database.contextPair import ContextPair
+from backend.gallicaGetter.buildqueries.contextPair import ContextPair
 from ..wrapperFactory import WrapperFactory
 
 # could speed up by running the fetches in parallel. But hey, sometimes it's good to relax
@@ -65,7 +65,7 @@ def test_get_issues():
 
 
 def test_get_content():
-    getter = WrapperFactory.connect_content()
+    getter = WrapperFactory.connect_context()()
     records = getter.get([ContextPair(ark_code="bpt6k267221f", term="erratum")])
     list_records = list(records)
     context = list_records[0]

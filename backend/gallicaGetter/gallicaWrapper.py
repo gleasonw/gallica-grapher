@@ -1,26 +1,27 @@
 from typing import Callable, Generator, List, Literal, Optional, Tuple
+from fetch.fullTextQuery import FullTextQuery
+from buildqueries.buildDateGrouping import build_date_grouping
+from fetch.occurrenceQuery import OccurrenceQuery
 
-from database.contextPair import ContextPair
+from parse.parseHTML import ParsedGallicaHTML
 
-from .buildqueries.argToQueryTransformations import (
+from buildqueries.contextPair import ContextPair
+
+from buildqueries.argToQueryTransformations import (
     build_indexed_queries,
+    bundle_codes,
     get_num_results_for_queries,
     index_queries_by_num_results,
 )
-from .buildqueries.buildContentQuery import build_query_for_ark_and_term
-from .buildqueries.buildIssueQueries import build_issue_queries_for_codes
-from .buildqueries.buildPaperQueries import build_paper_queries_for_codes
-from .buildqueries.buildSRUqueries import (
-    build_base_queries,
-    build_base_queries_at_indices,
-)
-from .buildqueries.buildTextQueries import build_text_queries_for_codes
-from .parse.contentRecord import GallicaContext
-from .parse.issueYearRecord import IssueYearRecord
-from .parse.paperRecords import PaperRecord
-from .parse.periodRecords import PeriodRecord
-from .parse.volumeRecords import VolumeRecord
-from .parse import (
+from buildqueries.buildContentQuery import build_query_for_ark_and_term
+from buildqueries.buildIssueQueries import build_issue_queries_for_codes
+from buildqueries.buildPaperQueries import build_paper_queries_for_codes
+from parse.contentRecord import GallicaContext
+from parse.issueYearRecord import IssueYearRecord
+from parse.paperRecords import PaperRecord
+from parse.periodRecords import PeriodRecord
+from parse.volumeRecords import VolumeRecord
+from parse import (
     fullText,
     paperRecords,
     periodRecords,
@@ -84,7 +85,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         end_date: Optional[str] = None,
         codes: Optional[List[str]] = None,
         num_results: Optional[int] = None,
-        start_index: Optional[int] = 0,
+        start_index: int | List[int] = 0,
         sort: Optional[Literal["date", "relevance"]] = None,
         onProgressUpdate=None,
         query_cache=None,
@@ -106,12 +107,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 limit=num_results,
                 cursor=start_index,
             )
-            if isinstance(start_index, list):
-                queries = build_base_queries_at_indices(
-                    base_queries,
-                    start_index,
-                )
-            elif num_results is None or num_results > 50:
+            if num_results and num_results > 50:
                 # assume we want all results, or index for more than 50
                 # we will have to fetch # total records from Gallica
                 queries = build_indexed_queries(
@@ -133,8 +129,8 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get_num_results_for_args(
         self,
         terms: List[str],
-        link: Optional[Tuple[str, int]],
-        source: Optional[Literal["book", "periodical", "all"]],
+        link: Optional[Tuple[str, int]] = None,
+        source: Optional[Literal["book", "periodical", "all"]] = "all",
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         codes: Optional[List[str]] = None,
@@ -253,11 +249,53 @@ class FullTextWrapper(GallicaWrapper):
 
     def get(
         self, ark_codes, onUpdateProgress=None, generate=False
-    ) -> List[GallicaContext]:
-        queries = build_text_queries_for_codes(
-            endpoint=self.endpoint_url, ark_codes=ark_codes
-        )
+    ) -> List[ParsedGallicaHTML]:
+        if type(ark_codes) is not list:
+            ark_codes = [ark_codes]
+        queries = [FullTextQuery(ark=code) for code in ark_codes]
         record_generator = self.fetch_from_queries(
             queries=queries, onUpdateProgress=onUpdateProgress
         )
         return record_generator if generate else list(record_generator)
+
+
+def build_base_queries(
+    terms: List[str],
+    endpoint_url: str,
+    grouping: str,
+    link: Optional[Tuple[str, int]] = None,
+    source: Optional[Literal["book", "periodical", "all"]] = None,
+    sort: Optional[Literal["date", "relevance"]] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    codes: Optional[List[str]] = None,
+    limit: Optional[int] = None,
+    cursor: int | List[int] = 0,
+) -> List[OccurrenceQuery]:
+    """
+    Builds a list of queries to be used to fetch records from Gallica.
+    If pulling all records for the query, this query will be used to get the number of records and then
+    spawn additional indexed queries to fetch all records in batches of 50.
+    """
+    base_queries = []
+    for term in terms:
+        for start, end in build_date_grouping(start_date, end_date, grouping):
+            for code_bundle in bundle_codes(codes):
+                if type(cursor) is int:
+                    cursor = [cursor]
+                for c in cursor:  # type: ignore
+                    base_queries.append(
+                        OccurrenceQuery(
+                            term=term,
+                            codes=code_bundle,
+                            start_date=start,
+                            end_date=end,
+                            endpoint_url=endpoint_url,
+                            start_index=c,
+                            num_records=limit or 1,
+                            link=link,
+                            source=source,
+                            sort=sort,
+                        )
+                    )
+    return base_queries

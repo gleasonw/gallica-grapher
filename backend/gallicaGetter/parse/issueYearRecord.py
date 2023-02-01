@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
-from ..parse.parseXML import get_years_published
-from ..fetch.gallicasession import Response
+from parse.parseXML import get_years_published
+from  fetch.gallicasession import Response
 
 
 def parse_responses_to_records(responses: List[Response], on_get_total_records):

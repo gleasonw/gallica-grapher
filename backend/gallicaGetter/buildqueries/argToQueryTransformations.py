@@ -1,24 +1,23 @@
 from typing import List, Optional
 
-from ..parse import parseXML as parseXML
-from ..fetch.concurrentFetch import ConcurrentFetch
-from ..fetch.occurrenceQuery import OccurrenceQuery
-from ..fetch.paperQuery import PaperQuery
+from parse import parseXML as parseXML
+from fetch.concurrentFetch import ConcurrentFetch
+from fetch.occurrenceQuery import OccurrenceQuery
+from fetch.paperQuery import PaperQuery
 
 NUM_CODES_PER_BUNDLE = 10
 
 
 def build_indexed_queries(
-    queries: [List[OccurrenceQuery | PaperQuery]],
+    queries: List[OccurrenceQuery] | List[PaperQuery],
     api: ConcurrentFetch,
-    limit=None,
-    offset=None,
-) -> [List[OccurrenceQuery | PaperQuery]]:
+    limit,
+    offset,
+) -> List[OccurrenceQuery] | List[PaperQuery]:
     if limit:
         queries_with_num_results = []
         for query in queries:
-            new_query = query.make_copy(start_index=offset)
-            new_query.num_results = limit
+            new_query = query.make_copy(start_index=offset, num_records=limit)
             queries_with_num_results.append(new_query)
     else:
         queries_with_num_results = get_num_results_for_queries(queries, api)
@@ -28,8 +27,9 @@ def build_indexed_queries(
 
 
 def index_queries_by_num_results(
-    queries_num_results: List[PaperQuery | OccurrenceQuery], records_per_query: int = 50
-) -> List[PaperQuery | OccurrenceQuery]:
+    queries_num_results: List[PaperQuery] | List[OccurrenceQuery],
+    records_per_query: int = 50,
+) -> List[PaperQuery] | List[OccurrenceQuery]:
     if not queries_num_results:
         return []
     indexed_queries = []
@@ -51,8 +51,8 @@ def bundle_codes(codes: Optional[List[str]]) -> List[List[str]]:
 
 
 def get_num_results_for_queries(
-    queries: List[PaperQuery | OccurrenceQuery], api: ConcurrentFetch
-) -> List[PaperQuery | OccurrenceQuery]:
+    queries: List[OccurrenceQuery] | List[PaperQuery], api: ConcurrentFetch
+) -> List[PaperQuery] | List[OccurrenceQuery]:
     responses = api.get(queries)
     queries_with_num_results_state = []
     for response in responses:

@@ -5,7 +5,7 @@ from typing import List, Literal, Optional
 from progress import Progress
 from request import Request
 from ticket import Ticket
-from database.contextPair import ContextPair
+from backend.gallicaGetter.buildqueries.contextPair import ContextPair
 
 from gallicaGetter.wrapperFactory import WrapperFactory
 import pyllicaWrapper as pyllicaWrapper
@@ -224,7 +224,7 @@ def fetch_records_from_gallica(
     )
 
     # fetch the context for those terms
-    content_wrapper = WrapperFactory.connect_content()
+    content_wrapper = WrapperFactory.connect_context()()
     keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
     context = content_wrapper.get(
         [

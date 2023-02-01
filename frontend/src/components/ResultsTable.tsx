@@ -25,6 +25,7 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
   let url = addQueryParamsIfExist(baseUrl, {
     ...props,
     children: undefined,
+    initialRecords: undefined,
     cursor: pageParam,
     limit: props.limit,
   });
@@ -59,7 +60,6 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   } else {
     ssrData = undefined;
   }
-  console.log(props.year);
   const {
     isFetching,
     isError,

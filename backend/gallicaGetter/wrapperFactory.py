@@ -1,6 +1,6 @@
 from typing import Optional
-from .fetch.concurrentFetch import ConcurrentFetch
-from .gallicaWrapper import (
+from fetch.concurrentFetch import ConcurrentFetch
+from gallicaWrapper import (
     VolumeOccurrenceWrapper,
     PeriodOccurrenceWrapper,
     IssuesWrapper,
@@ -17,7 +17,7 @@ class Gettable:
 
 class WrapperFactory:
     @staticmethod
-    def connect_content(api: Optional[Gettable] = None):
+    def connect_context(api: Optional[Gettable] = None):
         return ContentWrapper(api=api or ConcurrentFetch(numWorkers=20))
 
     @staticmethod
