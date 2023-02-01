@@ -8,6 +8,8 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 
 [main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
 * api routes for the frontend marked by the @app FastAPI decorator
+
+[request.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
 * The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
 
 [gallicaGetter directory](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter)
