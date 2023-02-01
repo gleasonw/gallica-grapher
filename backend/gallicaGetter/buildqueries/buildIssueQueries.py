@@ -1,5 +1,5 @@
 from typing import List
-from  fetch.issueQuery import IssueQueryForNewspaperYears
+from gallicaGetter.fetch.issueQuery import IssueQueryForNewspaperYears
 
 
 def build_issue_queries_for_codes(

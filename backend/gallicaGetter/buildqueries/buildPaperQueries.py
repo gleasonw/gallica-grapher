@@ -1,12 +1,12 @@
 import logging
 from typing import List
-from buildqueries.argToQueryTransformations import (
+from gallicaGetter.buildqueries.argToQueryTransformations import (
     NUM_CODES_PER_BUNDLE,
     build_indexed_queries,
     bundle_codes,
 )
-from fetch.concurrentFetch import ConcurrentFetch
-from fetch.paperQuery import PaperQuery
+from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
+from gallicaGetter.fetch.paperQuery import PaperQuery
 
 
 def build_paper_queries_for_codes(

@@ -1,27 +1,27 @@
 from typing import Callable, Generator, List, Literal, Optional, Tuple
-from fetch.fullTextQuery import FullTextQuery
-from buildqueries.buildDateGrouping import build_date_grouping
-from fetch.occurrenceQuery import OccurrenceQuery
+from gallicaGetter.fetch.fullTextQuery import FullTextQuery
+from gallicaGetter.buildqueries.buildDateGrouping import build_date_grouping
+from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 
-from parse.parseHTML import ParsedGallicaHTML
+from gallicaGetter.parse.parseHTML import ParsedGallicaHTML
 
-from buildqueries.contextPair import ContextPair
+from gallicaGetter.buildqueries.contextPair import ContextPair
 
-from buildqueries.argToQueryTransformations import (
+from gallicaGetter.buildqueries.argToQueryTransformations import (
     build_indexed_queries,
     bundle_codes,
     get_num_results_for_queries,
     index_queries_by_num_results,
 )
-from buildqueries.buildContentQuery import build_query_for_ark_and_term
-from buildqueries.buildIssueQueries import build_issue_queries_for_codes
-from buildqueries.buildPaperQueries import build_paper_queries_for_codes
-from parse.contentRecord import GallicaContext
-from parse.issueYearRecord import IssueYearRecord
-from parse.paperRecords import PaperRecord
-from parse.periodRecords import PeriodRecord
-from parse.volumeRecords import VolumeRecord
-from parse import (
+from gallicaGetter.buildqueries.buildContentQuery import build_query_for_ark_and_term
+from gallicaGetter.buildqueries.buildIssueQueries import build_issue_queries_for_codes
+from gallicaGetter.buildqueries.buildPaperQueries import build_paper_queries_for_codes
+from gallicaGetter.parse.contentRecord import GallicaContext
+from gallicaGetter.parse.issueYearRecord import IssueYearRecord
+from gallicaGetter.parse.paperRecords import PaperRecord
+from gallicaGetter.parse.periodRecords import PeriodRecord
+from gallicaGetter.parse.volumeRecords import VolumeRecord
+from gallicaGetter.parse import (
     fullText,
     paperRecords,
     periodRecords,

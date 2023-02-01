@@ -1,9 +1,9 @@
 from typing import List, Optional
 
-from parse import parseXML as parseXML
-from fetch.concurrentFetch import ConcurrentFetch
-from fetch.occurrenceQuery import OccurrenceQuery
-from fetch.paperQuery import PaperQuery
+from gallicaGetter.parse import parseXML as parseXML
+from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
+from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
+from gallicaGetter.fetch.paperQuery import PaperQuery
 
 NUM_CODES_PER_BUNDLE = 10
 

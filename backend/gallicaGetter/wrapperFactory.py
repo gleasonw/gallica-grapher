@@ -1,6 +1,6 @@
 from typing import Optional
-from fetch.concurrentFetch import ConcurrentFetch
-from gallicaWrapper import (
+from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
+from gallicaGetter.gallicaWrapper import (
     VolumeOccurrenceWrapper,
     PeriodOccurrenceWrapper,
     IssuesWrapper,
