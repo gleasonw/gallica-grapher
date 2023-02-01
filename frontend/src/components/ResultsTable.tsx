@@ -47,7 +47,7 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
   };
 };
 
-export const ResultsTable: React.FC<TableProps> = (props) => {
+export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
   let ssrData;
   const limit = props.limit || 10;
@@ -102,15 +102,8 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
   const currentPage = data.data?.pages.filter(
     (page) => page?.nextCursor == pageToCursor(selectedPage)
   )[0];
-
   const total_results = Number(data.data?.pages[0]?.data.num_results) ?? 0;
-
   const cursorMax = Math.floor(total_results / limit) + 1;
-
-  function pageToCursor(page: number) {
-    return page * props.limit;
-  }
-
   const fetchedCursors = data.data?.pages.map((page) => page?.nextCursor);
   const fetchedSet = new Set(fetchedCursors);
 
@@ -130,6 +123,10 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       });
     }
     setSelectedPage(selectedPage - amount);
+  }
+
+  function pageToCursor(page: number) {
+    return page * props.limit;
   }
 
   return (
@@ -219,7 +216,7 @@ export const ResultsTable: React.FC<TableProps> = (props) => {
       </div>
     </div>
   );
-};
+}
 
 interface CursorInputProps {
   cursor: number;
@@ -228,7 +225,7 @@ interface CursorInputProps {
   onCursorDecrement: (amount?: number) => void;
 }
 
-const CursorInput: React.FC<CursorInputProps> = (props) => {
+function CursorInput(props: CursorInputProps) {
   const [localCursor, setLocalCursor] = React.useState(props.cursor);
 
   React.useEffect(() => {
@@ -272,4 +269,4 @@ const CursorInput: React.FC<CursorInputProps> = (props) => {
       }}
     />
   );
-};
+}

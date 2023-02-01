@@ -49,7 +49,7 @@ export async function getTicketData(
   return data;
 }
 
-export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
+export function ResultViewer(props: ResultViewerProps) {
   const [selectedYear, setSelectedYear] = React.useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = React.useState<number | null>(null);
   const [selectedDay, setSelectedDay] = React.useState<number | null>(null);
@@ -199,4 +199,4 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
       />
     </div>
   );
-};
+}
