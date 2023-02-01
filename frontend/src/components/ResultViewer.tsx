@@ -14,7 +14,7 @@ import { generateXAxisOptionsForNumericScale } from "./utils";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
-import { GallicaResponse, GraphData } from "../models/dbStructs";
+import { GraphData } from "../models/dbStructs";
 import { InferGetStaticPropsType } from "next";
 
 export const seriesColors = [
@@ -71,6 +71,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = (props) => {
           ),
         staleTime: Infinity,
         placeholderData: props.initVals.initSeries,
+        keepPreviousData: true,
       };
     }),
   });
