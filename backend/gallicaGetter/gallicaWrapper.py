@@ -5,7 +5,7 @@ from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
 
 from gallicaGetter.parse.parseHTML import ParsedGallicaHTML
 
-from gallicaGetter.buildqueries.contextPair import ContextPair
+from gallicaGetter.contextPair import ContextPair
 
 from gallicaGetter.buildqueries.argToQueryTransformations import (
     build_indexed_queries,

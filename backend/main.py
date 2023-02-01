@@ -5,7 +5,7 @@ from typing import List, Literal, Optional
 from progress import Progress
 from request import Request
 from ticket import Ticket
-from gallicaGetter.buildqueries.contextPair import ContextPair
+from gallicaGetter.contextPair import ContextPair
 
 from gallicaGetter.wrapperFactory import WrapperFactory
 import pyllicaWrapper as pyllicaWrapper

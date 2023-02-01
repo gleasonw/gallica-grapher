@@ -1,6 +1,6 @@
 import pytest
 
-from backend.gallicaGetter.buildqueries.contextPair import ContextPair
+from backend.gallicaGetter.contextPair import ContextPair
 from ..wrapperFactory import WrapperFactory
 
 # could speed up by running the fetches in parallel. But hey, sometimes it's good to relax
