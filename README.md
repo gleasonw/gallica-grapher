@@ -14,7 +14,6 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 
 [gallicaGetter directory](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter)
 * contains gallicaWrapper.py, the class containing Python wrappers for most Gallica API endpoints
-* CQL query building is in [buildqueries](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/buildqueries)
 * XML response parsing is in [parse](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/parse)
 * concurrent fetching / Gallica session management is in [fetch](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/fetch)
 
