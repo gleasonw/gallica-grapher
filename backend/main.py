@@ -1,8 +1,8 @@
 import json
 import os
 import random
-from www.progress import Progress
-from www.contextPair import ContextPair
+from gallicaGetter.www.progress import Progress
+from gallicaGetter.www.contextPair import ContextPair
 import io
 import threading
 from typing import Any, Callable, Generator, List, Literal, Optional, Tuple
@@ -12,9 +12,9 @@ from gallicaGetter.parse.paperRecords import PaperRecord
 from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
 from gallicaGetter.parse.periodRecords import PeriodRecord
 from gallicaGetter.parse.volumeRecords import VolumeRecord
-from www.progress import Progress
-from www.ticket import Ticket
-import www.pyllicaWrapper as pyllicaWrapper
+from gallicaGetter.www.progress import Progress
+from gallicaGetter.www.ticket import Ticket
+import gallicaGetter.www.pyllicaWrapper as pyllicaWrapper
 import uvicorn
 from database.connContext import build_db_conn, build_redis_conn
 from database.displayDataResolvers import (
