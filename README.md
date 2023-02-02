@@ -13,9 +13,9 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 * The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
 
 [gallicaGetter directory](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter)
-* contains gallicaWrapper.py, the class containing Python wrappers for most Gallica API endpoints
-* XML response parsing is in [parse](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/parse)
-* concurrent fetching / Gallica session management / CQL building is in [fetch](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/fetch)
+* contains gallicaWrapper.py, the base abstraction for getting XML from Gallica and converting it to Python objects.
+* each endpoint wrapper is kept in its own file (e.g. volumeOccurrenceWrapper.py)
+* concurrent fetching / Gallica session management is in [fetch](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/fetch)
 
 
 #### Important front end files:
