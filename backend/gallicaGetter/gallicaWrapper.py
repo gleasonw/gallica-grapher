@@ -1,4 +1,4 @@
-from typing import Any, Callable, Generator, Optional
+from typing import Any, Generator
 
 
 class GallicaWrapper:
@@ -21,8 +21,7 @@ class GallicaWrapper:
 
     def parse(
         self,
-        gallica_response,
-        on_get_total_records: Optional[Callable[[int], None]] = None,
+        gallica_responses,
     ) -> Generator[Any, None, None]:
         raise NotImplementedError(
             f"get_parser() not implemented for {self.__class__.__name__}"
@@ -34,11 +33,11 @@ class GallicaWrapper:
     def get_records_for_queries(
         self,
         queries,
-        onUpdateProgress=None,
-        on_get_total_records: Optional[Callable[[int], None]] = None,
+        on_update_progress=None,
     ):
+        """The core abstraction for fetching record xml from gallica and parsing it to Python objects. Called by all subclasses."""
         raw_response = self.api.get(
             queries,
-            onProgressUpdate=onUpdateProgress,
+            on_update_progress=on_update_progress,
         )
-        return self.parse(raw_response, on_get_total_records=on_get_total_records)
+        return self.parse(raw_response)

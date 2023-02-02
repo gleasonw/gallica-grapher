@@ -14,6 +14,8 @@ class PeriodRecord:
 
 
 class PeriodOccurrenceWrapper(GallicaWrapper):
+    """Fetches # occurrences of terms in a given period of time. Useful for making graphs."""
+
     def get(
         self,
         terms: List[str],
@@ -36,14 +38,14 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
             grouping=grouping,
         )
         record_generator = self.get_records_for_queries(
-            queries=queries, onUpdateProgress=onProgressUpdate
+            queries=queries, on_update_progress=onProgressUpdate
         )
         return record_generator
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/SRU"
 
-    def parse(self, gallica_responses, on_get_total_records=None):
+    def parse(self, gallica_responses):
         for response in gallica_responses:
             count = get_num_records_from_gallica_xml(response.xml)
             query = response.query

@@ -1,6 +1,6 @@
 from typing import Optional
-from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from gallicaGetter.contentWrapper import ContentWrapper
+from gallicaGetter.concurrentFetch import ConcurrentFetch
+from gallicaGetter.contentWrapper import ContextWrapper
 from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper
 from gallicaGetter.periodOccurrenceWrapper import PeriodOccurrenceWrapper
 from gallicaGetter.issuesWrapper import IssuesWrapper
@@ -19,7 +19,7 @@ NUM_WORKERS = 30
 class WrapperFactory:
     @staticmethod
     def context(api: Optional[Gettable] = None):
-        return ContentWrapper(api=api or ConcurrentFetch(numWorkers=NUM_WORKERS))
+        return ContextWrapper(api=api or ConcurrentFetch(numWorkers=NUM_WORKERS))
 
     @staticmethod
     def volume(api: Optional[Gettable] = None):

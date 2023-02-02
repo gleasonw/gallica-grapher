@@ -39,7 +39,7 @@ def build_base_queries(
                             end_date=end,
                             endpoint_url=endpoint_url,
                             start_index=c,
-                            num_records=limit or 1,
+                            limit=limit or 1,
                             link=link,
                             source=source,
                             sort=sort,

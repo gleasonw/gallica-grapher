@@ -3,6 +3,7 @@ import weakref
 
 
 class Date:
+    """Caches dates for memory efficiency."""
 
     _cache = {}
     dateFormats = [

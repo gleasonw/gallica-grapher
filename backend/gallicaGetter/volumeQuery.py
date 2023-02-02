@@ -3,17 +3,18 @@ from pydantic import BaseModel
 
 
 class VolumeQuery(BaseModel):
+    """Struct for a query to Gallica's SRU API."""
     term: str
     start_date: Optional[str]
     end_date: Optional[str]
     endpoint_url: str
     start_index: int
-    num_records: int
+    limit: int
     link: Optional[Tuple[str, int]] = None
     source: Optional[Literal["book", "periodical", "all"]] = "all"
     codes: Optional[List[str]] = None
     sort: Optional[Literal["date", "relevance"]] = None
-    num_results: int = 0
+    gallica_results_for_params: int = 0
     collapsing = False
 
     def make_copy(self, start_index: int, num_records: int = 1):
@@ -24,7 +25,7 @@ class VolumeQuery(BaseModel):
             end_date=self.end_date,
             endpoint_url=self.endpoint_url,
             start_index=start_index,
-            num_records=num_records,
+            limit=num_records,
             link=self.link,
             source=self.source,
             sort=self.sort,
@@ -65,7 +66,7 @@ class VolumeQuery(BaseModel):
             "exactSearch": "True",
             "version": 1.2,
             "startRecord": self.start_index,
-            "maximumRecords": self.num_records,
+            "maximumRecords": self.limit,
             "query": self.build_cql_string(),
             "collapsing": self.collapsing and "true" or "false",
         }
@@ -84,4 +85,4 @@ class VolumeQuery(BaseModel):
         return base + ' and ocr.quality all "Texte disponible"'
 
     def __repr__(self):
-        return f"Occurrence Query ({self.term})"
+        return f"Volume Query ({self.term})"

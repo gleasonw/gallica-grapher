@@ -17,18 +17,18 @@ class TestArgQueryTransformations(TestCase):
             end_date="1901",
             term="test",
             start_index=0,
-            num_records=1,
+            limit=1,
             endpoint_url="test",
-            num_results=1205,
+            gallica_results_for_params=1205,
         )
         self.test_2 = VolumeQuery(
             start_date="1900",
             end_date="1905",
             term="test",
             start_index=0,
-            num_records=1,
+            limit=1,
             endpoint_url="test",
-            num_results=1895,
+            gallica_results_for_params=1895,
         )
 
     def test_index_queries_by_num_results(self):

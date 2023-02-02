@@ -3,7 +3,7 @@ from gallicaGetter.date import Date
 from typing import List, Tuple
 
 
-def get_one_paper_from_record_batch(xml) -> str:
+def get_one_paper_from_record_batch(xml: bytes) -> str:
     records = get_records_from_xml(xml)
     if records:
         return get_paper_title_from_record_xml(records[0])
@@ -11,7 +11,9 @@ def get_one_paper_from_record_batch(xml) -> str:
         return ""
 
 
-def get_num_results_and_pages_for_context(xml) -> Tuple[int, List[Tuple[str, str]]]:
+def get_num_results_and_pages_for_context(
+    xml: bytes,
+) -> Tuple[int, List[Tuple[str, str]]]:
     elements = etree.fromstring(xml)
     top_level = elements.find(".")
     num_results = top_level.attrib.get("countResults")
@@ -28,12 +30,12 @@ def get_records_from_xml(xml: bytes) -> List[etree.Element]:
     return records_root.findall("{http://www.loc.gov/zing/srw/}record")
 
 
-def get_html(xml: str) -> str:
+def get_html(xml: bytes) -> str:
     elements = etree.fromstring(xml)
     return elements.find("html").text
 
 
-def get_num_records_from_gallica_xml(xml) -> int:
+def get_num_records_from_gallica_xml(xml: bytes) -> int:
     xml_root = etree.fromstring(xml)
     num_results = xml_root.find("{http://www.loc.gov/zing/srw/}numberOfRecords")
     if num_results is not None:
@@ -42,7 +44,7 @@ def get_num_records_from_gallica_xml(xml) -> int:
         return 0
 
 
-def get_years_published(xml) -> List[str]:
+def get_years_published(xml: bytes) -> List[str]:
     root = etree.fromstring(xml)
     years = [get_year_from_element(yearElement) for yearElement in root.iter("year")]
     return list(filter(None, years))

@@ -5,7 +5,7 @@ import json
 from www.database.connContext import build_db_conn, build_redis_conn
 from typing import Any, Callable, Generator, List, Literal, Optional, Tuple
 import gallicaGetter.wrapperFactory as wF
-from gallicaGetter.fetch.progressUpdate import ProgressUpdate
+from gallicaGetter.concurrentFetch import ProgressUpdate
 from gallicaGetter.parse_xml import get_one_paper_from_record_batch
 from gallicaGetter.volumeOccurrenceWrapper import VolumeRecord
 from gallicaGetter.papersWrapper import PaperRecord
@@ -147,7 +147,7 @@ def get_num_records_on_gallica_for_args(
         link=ticket.link,
         source=ticket.source,
     )
-    num_records = sum(query.num_results for query in base_queries_with_num_results)
+    num_records = sum(query.gallica_results_for_params for query in base_queries_with_num_results)
 
     # Ensure we don't make more requests than there are tickets. Switch to fetching all
     # records if so, faster to group ourselves on DB

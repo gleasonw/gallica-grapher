@@ -2,6 +2,7 @@ from typing import Generator, List, Tuple
 from pydantic import BaseModel
 from gallicaGetter.parse_xml import get_num_results_and_pages_for_context
 from gallicaGetter.gallicaWrapper import GallicaWrapper
+from dataclasses import dataclass
 
 
 class GallicaPage(BaseModel):
@@ -15,8 +16,10 @@ class GallicaContext(BaseModel):
     ark: str
 
 
-class ContentWrapper(GallicaWrapper):
-    def parse(self, gallica_responses, on_get_total_records=None):
+class ContextWrapper(GallicaWrapper):
+    """Wrapper for Gallica's ContentSearch API."""
+
+    def parse(self, gallica_responses):
         for response in gallica_responses:
             num_results_and_pages = get_num_results_and_pages_for_context(response.xml)
             yield GallicaContext(
@@ -42,14 +45,13 @@ class ContentWrapper(GallicaWrapper):
         return record_generator
 
 
+@dataclass(frozen=True, slots=True)
 class ContentQuery:
-    def __init__(self, ark: str, term: str, endpoint_url: str):
-        self.ark = ark
-        self.term = term
-        self.endpoint_url = endpoint_url
+    """Struct for query to Gallica's ContentSearch API."""
+
+    ark: str
+    term: str
+    endpoint_url: str
 
     def get_params_for_fetch(self):
         return {"ark": self.ark, "query": self.term}
-
-    def __repr__(self):
-        return f"OCRQuery({self.ark}, {self.term})"

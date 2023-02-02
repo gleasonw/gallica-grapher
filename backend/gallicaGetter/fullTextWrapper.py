@@ -25,27 +25,27 @@ class ParsedGallicaHTML:
 
 
 class FullTextWrapper(GallicaWrapper):
+    """Wraps Gallica's full text API. Can be an expensive fetch, and is rate-limited."""
+
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr"
 
-    def parse(self, gallica_responses, on_get_total_records):
+    def parse(self, gallica_responses):
         return (ParsedGallicaHTML(response.xml) for response in gallica_responses)
 
-    def get(
-        self, ark_codes, onUpdateProgress=None
-    ) -> Generator[ParsedGallicaHTML, None, None]:
+    def get(self, ark_codes) -> Generator[ParsedGallicaHTML, None, None]:
         if type(ark_codes) is not list:
             ark_codes = [ark_codes]
         queries = [FullTextQuery(ark=code) for code in ark_codes]
-        record_generator = self.get_records_for_queries(
-            queries=queries, onUpdateProgress=onUpdateProgress
-        )
+        record_generator = self.get_records_for_queries(queries=queries)
         return record_generator
 
 
+@dataclass(frozen=True, slots=True)
 class FullTextQuery:
-    def __init__(self, ark: str):
-        self.ark = ark
+    """Struct for a query to Gallica's full text API. The endpoint does not use query parameters, so the endpoint URL changes for each query."""
+
+    ark: str
 
     def get_params_for_fetch(self):
         return {}

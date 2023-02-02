@@ -58,7 +58,7 @@ def get_sample_text(
         end_date=end_date,
         grouping="all",
     )
-    num_volumes = sum(query.num_results for query in num_volumes_with_root_gram)
+    num_volumes = sum(query.gallica_results_for_params for query in num_volumes_with_root_gram)
     indices_to_sample = random.sample(range(num_volumes), sample_size)
     volumes_with_root_gram = volume_wrapper.get(
         terms=[root_gram],

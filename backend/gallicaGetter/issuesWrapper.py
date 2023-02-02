@@ -11,7 +11,9 @@ class IssueYearRecord:
 
 
 class IssuesWrapper(GallicaWrapper):
-    def parse(self, gallica_responses, on_get_total_records):
+    """Fetches periodical periodical publishing years from Gallica's Issues API. Used in PapersWrapper."""
+
+    def parse(self, gallica_responses):
         for response in gallica_responses:
             years = get_years_published(response.xml)
             code = response.query.get_code()
@@ -30,16 +32,15 @@ class IssuesWrapper(GallicaWrapper):
         return record_generator
 
 
+@dataclass(frozen=True, slots=True)
 class IssuesQuery:
-    def __init__(self, code: str, endpoint_url: str):
-        self.code = code
-        self.endpoint_url = endpoint_url
+    """Struct for query to Gallica's Issues API."""
+
+    code: str
+    endpoint_url: str
 
     def get_code(self):
         return self.code
 
     def get_params_for_fetch(self):
         return {"ark": f"ark:/12148/{self.code}/date"}
-
-    def __repr__(self):
-        return f"ArkQuery({self.code})"
