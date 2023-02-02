@@ -17,6 +17,11 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 * each endpoint wrapper is kept in its own file (e.g. volumeOccurrenceWrapper.py)
 * concurrent fetching / Gallica session management is in [fetch](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/fetch)
 
+gallicaGetter is available on PyPi:
+```sh
+pip install gallicaGetter
+```
+
 
 #### Important front end files:
 
