@@ -9,8 +9,8 @@ class VolumeQuery(BaseModel):
     endpoint_url: str
     start_index: int
     num_records: int
-    link: Optional[Tuple[str, int]]
-    source: Optional[Literal["book", "periodical", "all"]]
+    link: Optional[Tuple[str, int]] = None
+    source: Optional[Literal["book", "periodical", "all"]] = "all"
     codes: Optional[List[str]] = None
     sort: Optional[Literal["date", "relevance"]] = None
     num_results: int = 0

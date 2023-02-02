@@ -1,6 +1,6 @@
 from unittest import TestCase
-from gallicaGetter.parse.parseXML import *
-from gallicaGetter.parse.date import Date
+from gallicaGetter.parse_xml import *
+from gallicaGetter.date import Date
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))

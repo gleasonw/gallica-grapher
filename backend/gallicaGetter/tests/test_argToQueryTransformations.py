@@ -2,18 +2,17 @@ import math
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from gallicaGetter.buildqueries.argToQueryTransformations import (
+from gallicaGetter.index_query_builds import (
     index_queries_by_num_results,
     build_indexed_queries,
-    bundle_codes,
-    NUM_CODES_PER_BUNDLE,
 )
-from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
+from gallicaGetter.base_query_builds import bundle_codes, NUM_CODES_PER_BUNDLE
+from gallicaGetter.volumeQuery import VolumeQuery
 
 
 class TestArgQueryTransformations(TestCase):
     def setUp(self):
-        self.test_1 = OccurrenceQuery(
+        self.test_1 = VolumeQuery(
             start_date="1900",
             end_date="1901",
             term="test",
@@ -22,7 +21,7 @@ class TestArgQueryTransformations(TestCase):
             endpoint_url="test",
             num_results=1205,
         )
-        self.test_2 = OccurrenceQuery(
+        self.test_2 = VolumeQuery(
             start_date="1900",
             end_date="1905",
             term="test",
@@ -39,7 +38,7 @@ class TestArgQueryTransformations(TestCase):
         ]
         results = index_queries_by_num_results(test_queries)
         self.assertEqual(len(results), 63)
-        self.assertIsInstance(results[0], OccurrenceQuery)
+        self.assertIsInstance(results[0], VolumeQuery)
 
     def test_build_indexed_queries(self):
         results = build_indexed_queries(
