@@ -2,7 +2,6 @@ from typing import Dict, List
 from io import StringIO
 import random
 from collections import Counter
-from backend.contextPair import ContextPair
 from wrapperFactory import WrapperFactory
 from collections import Counter
 from bs4 import BeautifulSoup
@@ -24,7 +23,7 @@ def get_gallica_core(
     onUpdateProgress=None,
     api_wrapper: WrapperFactory | None = None,
 ) -> Dict[str, int]:
-    """An experimental tool that returns the most frequent words in a sample of surrounding context to a target word. An exploration aid."""
+    """An experimental tool that returns the most frequent words in the surrounding context of a target word occurrence."""
     if api_wrapper is None:
         api_wrapper = WrapperFactory()
     text_to_analyze = get_sample_text(
@@ -43,25 +42,16 @@ def get_sample_text(
     onUpdateProgress=None,
 ) -> StringIO:
     def get_text_for_codes(codes: List[str], target_word: str) -> str:
-        text_wrapper = api_wrapper.connect_context()
+        text_wrapper = api_wrapper.context()
         text = ""
-        text_records = text_wrapper.get(
-            [
-                ContextPair(
-                    term=target_word,
-                    ark_code=code,
-                )
-                for code in codes
-            ]
-        )
+        text_records = text_wrapper.get([(code, target_word) for code in codes])
         for record in text_records:
             for page in record.pages:
-                # extract text from html page
                 soup = BeautifulSoup(page.context, "html.parser")
                 text += soup.get_text()
         return text
 
-    volume_wrapper = api_wrapper.connect_volume()
+    volume_wrapper = api_wrapper.volume()
     num_volumes_with_root_gram = volume_wrapper.get_num_results_for_args(
         terms=[root_gram],
         start_date=start_date,

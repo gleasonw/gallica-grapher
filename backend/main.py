@@ -4,7 +4,7 @@ import random
 from typing import List, Literal, Optional
 import uvicorn
 from pydantic import BaseModel
-from gallicaGetter.parse.contentRecord import GallicaContext
+from gallicaGetter.contentWrapper import GallicaContext
 import gallicaGetter.wrapperFactory as wF
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
@@ -221,7 +221,7 @@ def fetch_records_from_gallica(
         total_records = num_records
 
     # fetch the volumes in which terms appear
-    volume_Gallica_wrapper = wF.WrapperFactory.connect_volume()
+    volume_Gallica_wrapper = wF.WrapperFactory.volume()
     gallica_records = volume_Gallica_wrapper.get(
         terms=terms,
         start_date=make_date_from_year_mon_day(year, month, day),
@@ -235,7 +235,7 @@ def fetch_records_from_gallica(
     )
 
     # fetch the context for those terms
-    content_wrapper = wF.WrapperFactory.connect_context()
+    content_wrapper = wF.WrapperFactory.context()
     keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
     context = content_wrapper.get(
         [

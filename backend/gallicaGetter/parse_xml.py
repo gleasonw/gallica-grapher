@@ -1,5 +1,5 @@
 from lxml import etree
-from gallicaGetter.parse.date import Date
+from gallicaGetter.date import Date
 from typing import List, Tuple
 
 
@@ -33,7 +33,7 @@ def get_html(xml: str) -> str:
     return elements.find("html").text
 
 
-def get_num_records(xml) -> int:
+def get_num_records_from_gallica_xml(xml) -> int:
     xml_root = etree.fromstring(xml)
     num_results = xml_root.find("{http://www.loc.gov/zing/srw/}numberOfRecords")
     if num_results is not None:
@@ -79,6 +79,7 @@ def get_url_from_record(record) -> str:
     if url_element is not None:
         url = url_element.text
         return url
+    return ""
 
 
 def get_paper_title_from_record_xml(record) -> str:
@@ -92,6 +93,7 @@ def get_date_from_record_xml(record) -> Date:
     date_element = xml.find("{http://purl.org/dc/elements/1.1/}date")
     if date_element is not None:
         return Date(date_element.text)
+    return Date("")
 
 
 def get_page_and_context_for_occurrence(xml_items) -> List[Tuple[str, str]]:

@@ -1,13 +1,11 @@
 from typing import Optional
 from gallicaGetter.fetch.concurrentFetch import ConcurrentFetch
-from gallicaGetter.gallicaWrapper import (
-    VolumeOccurrenceWrapper,
-    PeriodOccurrenceWrapper,
-    IssuesWrapper,
-    ContentWrapper,
-    PapersWrapper,
-    FullTextWrapper,
-)
+from gallicaGetter.contentWrapper import ContentWrapper
+from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper
+from gallicaGetter.periodOccurrenceWrapper import PeriodOccurrenceWrapper
+from gallicaGetter.issuesWrapper import IssuesWrapper
+from gallicaGetter.papersWrapper import PapersWrapper
+from gallicaGetter.fullTextWrapper import FullTextWrapper
 
 
 class Gettable:
@@ -15,27 +13,34 @@ class Gettable:
         return
 
 
+NUM_WORKERS = 30
+
+
 class WrapperFactory:
     @staticmethod
-    def connect_context(api: Optional[Gettable] = None):
-        return ContentWrapper(api=api or ConcurrentFetch(numWorkers=20))
+    def context(api: Optional[Gettable] = None):
+        return ContentWrapper(api=api or ConcurrentFetch(numWorkers=NUM_WORKERS))
 
     @staticmethod
-    def connect_volume(api: Optional[Gettable] = None):
-        return VolumeOccurrenceWrapper(api=api or ConcurrentFetch(numWorkers=20))
+    def volume(api: Optional[Gettable] = None):
+        return VolumeOccurrenceWrapper(
+            api=api or ConcurrentFetch(numWorkers=NUM_WORKERS)
+        )
 
     @staticmethod
-    def connect_period(api: Optional[Gettable] = None):
-        return PeriodOccurrenceWrapper(api=api or ConcurrentFetch(numWorkers=20))
+    def period(api: Optional[Gettable] = None):
+        return PeriodOccurrenceWrapper(
+            api=api or ConcurrentFetch(numWorkers=NUM_WORKERS)
+        )
 
     @staticmethod
-    def connect_issues(api: Optional[Gettable] = None):
-        return IssuesWrapper(api=api or ConcurrentFetch(numWorkers=20))
+    def issues(api: Optional[Gettable] = None):
+        return IssuesWrapper(api=api or ConcurrentFetch(numWorkers=NUM_WORKERS))
 
     @staticmethod
-    def connect_papers(api: Optional[Gettable] = None):
-        return PapersWrapper(api=api or ConcurrentFetch(numWorkers=20))
+    def papers(api: Optional[Gettable] = None):
+        return PapersWrapper(api=api or ConcurrentFetch(numWorkers=NUM_WORKERS))
 
     @staticmethod
-    def connect_full_text(api: Optional[Gettable] = None):
-        return FullTextWrapper(api=api or ConcurrentFetch(numWorkers=20))
+    def full_text(api: Optional[Gettable] = None):
+        return FullTextWrapper(api=api or ConcurrentFetch(numWorkers=NUM_WORKERS))

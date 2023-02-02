@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Literal, Optional, Tuple
-from gallicaGetter.fetch.occurrenceQuery import OccurrenceQuery
+from gallicaGetter.volumeQuery import VolumeQuery
 
 
 class Progress(BaseModel):
@@ -40,6 +40,6 @@ class Ticket(BaseModel):
     grouping: Literal["month", "year", "all"] = "year"
     id: Optional[int] = None
     backend_source: Literal["gallica", "pyllica"] = "pyllica"
-    cached_response: Optional[List[OccurrenceQuery]] = None
+    cached_response: Optional[List[VolumeQuery]] = None
     link: Optional[Tuple[str, int]] = None
     source: Optional[Literal["book", "periodical", "all"]] = "all"

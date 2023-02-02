@@ -43,6 +43,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       year={props.year}
       limit={10}
       initialRecords={props.initialRecords}
+      source={"periodical"}
     >
       <div
         className={"flex flex-row flex-wrap gap-5 pt-10 md:gap-10 lg:gap-10"}

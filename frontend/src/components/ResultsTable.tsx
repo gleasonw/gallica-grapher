@@ -49,9 +49,9 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
-  let ssrData;
   const limit = props.limit || 10;
 
+  let ssrData;
   if (props.initialRecords) {
     ssrData = {
       pages: [props.initialRecords],
@@ -90,7 +90,6 @@ export function ResultsTable(props: TableProps) {
     placeholderData: ssrData,
   });
 
-  //if props change, reset page to 1
   React.useEffect(() => {
     setSelectedPage(1);
   }, [props]);

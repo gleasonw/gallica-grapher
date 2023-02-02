@@ -6,10 +6,10 @@ from www.database.connContext import build_db_conn, build_redis_conn
 from typing import Any, Callable, Generator, List, Literal, Optional, Tuple
 import gallicaGetter.wrapperFactory as wF
 from gallicaGetter.fetch.progressUpdate import ProgressUpdate
-from gallicaGetter.parse.parseXML import get_one_paper_from_record_batch
-from gallicaGetter.parse.volumeRecords import VolumeRecord
-from gallicaGetter.parse.paperRecords import PaperRecord
-from gallicaGetter.parse.periodRecords import PeriodRecord
+from gallicaGetter.parse_xml import get_one_paper_from_record_batch
+from gallicaGetter.volumeOccurrenceWrapper import VolumeRecord
+from gallicaGetter.papersWrapper import PaperRecord
+from gallicaGetter.periodOccurrenceWrapper import PeriodRecord
 import www.pyllicaWrapper as pW
 
 
@@ -138,7 +138,7 @@ def get_num_records_on_gallica_for_args(
     total_records = 0
     cached_queries = []
 
-    api = wF.WrapperFactory.connect_volume()
+    api = wF.WrapperFactory.volume()
     base_queries_with_num_results = api.get_num_results_for_args(
         terms=ticket.terms,
         start_date=str(ticket.start_date),
@@ -220,7 +220,7 @@ def get_and_insert_records_for_ticket(
 ):
     if ticket.backend_source == "gallica":
         if ticket.grouping == "all":
-            volume_api = wF.WrapperFactory.connect_volume(api=api)
+            volume_api = wF.WrapperFactory.volume(api=api)
             records = volume_api.get(
                 terms=ticket.terms,
                 start_date=str(ticket.start_date),
@@ -238,7 +238,7 @@ def get_and_insert_records_for_ticket(
                 request_id=ticket.id or 0,
             )
         elif ticket.grouping in ["year", "month"]:
-            period_api = wF.WrapperFactory.connect_period(api=api)
+            period_api = wF.WrapperFactory.period(api=api)
             period_records = period_api.get(
                 terms=ticket.terms,
                 codes=ticket.codes,
@@ -340,7 +340,7 @@ def insert_records_into_groupcounts(records, request_id, conn):
 
 
 def insert_missing_codes_into_db(codes, conn):
-    paper_api = wF.WrapperFactory.connect_papers()
+    paper_api = wF.WrapperFactory.papers()
     paper_records = paper_api.get(list(codes))
     insert_records_into_papers(paper_records, conn)
 

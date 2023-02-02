@@ -18,7 +18,7 @@ from .. import wrapperFactory as wF
     ],
 )
 def test_get_volume_occurrences(input, expected_length):
-    getter = wF.WrapperFactory.connect_volume()
+    getter = wF.WrapperFactory.volume()
     records = getter.get(**input, get_all_results=True)
     list_records = list(records)
     assert len(list_records) == expected_length
@@ -48,14 +48,14 @@ def test_get_volume_occurrences(input, expected_length):
     ],
 )
 def test_get_period_occurrences(input, expected_length):
-    getter = wF.WrapperFactory.connect_period()
+    getter = wF.WrapperFactory.period()
     records = getter.get(**input)
     list_records = list(records)
     assert len(list_records) == expected_length
 
 
 def test_get_issues():
-    getter = wF.WrapperFactory.connect_issues()
+    getter = wF.WrapperFactory.issues()
     records = getter.get("cb344484501")
     list_records = list(records)
     assert len(list_records) == 1
@@ -64,7 +64,7 @@ def test_get_issues():
 
 
 def test_get_content():
-    getter = wF.WrapperFactory.connect_context()
+    getter = wF.WrapperFactory.context()
     records = getter.get([("bpt6k267221f", "erratum")])
     list_records = list(records)
     context = list_records[0]
@@ -72,8 +72,8 @@ def test_get_content():
 
 
 def test_get_papers_wrapper():
-    getter = wF.WrapperFactory.connect_papers()
-    papers = getter.get("cb32895690j")
+    getter = wF.WrapperFactory.papers()
+    papers = getter.get(["cb32895690j"])
     paper = papers[0]
     assert paper.code == "cb32895690j"
 

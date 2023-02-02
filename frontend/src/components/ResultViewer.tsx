@@ -80,7 +80,6 @@ export function ResultViewer(props: ResultViewerProps) {
     ticket.data?.data.map((data) => data.date)
   );
 
-  //collapse array of arrays into one array
   const allDateMarks = allDateMarksInTicketData?.reduce((acc, val) => {
     if (val && acc) {
       return acc.concat(val);

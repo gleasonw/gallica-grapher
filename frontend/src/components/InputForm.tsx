@@ -143,7 +143,7 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
   return (
     <button
       onClick={() => onClick(ticket)}
-      className={`rounded-lg border bg-white p-5 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
+      className={`rounded-lg border-2 bg-white p-5 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
       style={{ borderColor: color }}
     >
       <div className={`relative h-full w-full`}>

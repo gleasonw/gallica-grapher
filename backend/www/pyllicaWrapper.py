@@ -1,5 +1,5 @@
-from gallicaGetter.parse.date import Date
-from gallicaGetter.parse.periodRecords import PeriodRecord
+from gallicaGetter.date import Date
+from gallicaGetter.periodOccurrenceWrapper import PeriodRecord
 from typing import Callable
 from urllib.error import HTTPError
 import pandas as pd

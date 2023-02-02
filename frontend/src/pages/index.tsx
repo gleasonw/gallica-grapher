@@ -31,40 +31,47 @@ export const initTickets = [
     grouping: "month",
     example: true,
   },
+  {
+    id: 1,
+    terms: ["congo"],
+    grouping: "month",
+    example: true,
+  },
 ] as Ticket[];
 
-export const getStaticProps: GetStaticProps<{
-  initRecords: {
-    data: GallicaResponse;
-    nextCursor: number | null;
-    previousCursor: number;
-  };
-  initSeries: GraphData;
-}> = async () => {
-  const initTicket = initTickets[0];
-  const records = fetchContext(
-    { pageParam: 0 },
-    {
-      terms: initTicket.terms[0],
-      limit: 10,
-    }
-  );
-  const series = getTicketData(
-    initTicket.id,
-    "pyllica",
-    "year",
-    0
-  );
-  const data = await Promise.allSettled([records, series]);
-  return {
-    props: {
-      // @ts-ignore
-      initRecords: data[0].value,
-      // @ts-ignore
-      initSeries: data[1].value,
-    },
-  };
-};
+// export const getStaticProps: GetStaticProps<{
+//   initRecords: {
+//     data: GallicaResponse;
+//     nextCursor: number | null;
+//     previousCursor: number;
+//   };
+//   initSeries: GraphData;
+// }> = async () => {
+//   const initTicket = initTickets[0];
+//   const records = fetchContext(
+//     { pageParam: 0 },
+//     {
+//       terms: initTicket.terms[0],
+//       limit: 10,
+//       source: "periodical",
+//     }
+//   );
+//   const series = getTicketData(
+//     initTicket.id,
+//     "pyllica",
+//     "year",
+//     0
+//   );
+//   const data = await Promise.allSettled([records, series]);
+//   return {
+//     props: {
+//       // @ts-ignore
+//       initRecords: data[0].value,
+//       // @ts-ignore
+//       initSeries: data[1].value,
+//     },
+//   };
+// };
 
 export default function Home({
   initRecords,

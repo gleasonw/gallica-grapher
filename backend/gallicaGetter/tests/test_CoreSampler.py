@@ -1,7 +1,7 @@
 from io import StringIO
 from unittest import TestCase
 from unittest.mock import MagicMock
-from backend.gallicaGetter.coreSampler import get_associated_words, get_sample_text, get_gallica_core
+from gallicaGetter.coreSampler import get_associated_words, get_sample_text, get_gallica_core
 
 
 class TestCoreSampler(TestCase):
