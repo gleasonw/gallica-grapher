@@ -151,6 +151,7 @@ def get_num_records_on_gallica_for_args(
 
     # Ensure we don't make more requests than there are tickets. Switch to fetching all
     # records if so, faster to group ourselves on DB
+    # TODO: needlessly complicated, move this logic outside the function
     if ticket.grouping != "all":
         num_periods_to_fetch = get_num_periods_in_range_for_grouping(
             grouping=ticket.grouping,
