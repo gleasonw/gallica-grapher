@@ -105,6 +105,9 @@ export default function Home({
             setTickets(tickets.filter((t) => t.id !== ticket.id));
           }
         }}
+        onDeleteExampleTickets={() => {
+          setTickets(tickets.filter((t) => !t.example));
+        }}
       />
       <ResultViewer
         tickets={tickets}

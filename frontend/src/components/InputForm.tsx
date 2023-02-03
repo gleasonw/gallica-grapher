@@ -12,6 +12,7 @@ import { apiURL } from "./apiURL";
 export interface InputFormProps {
   onCreateTicket: (ticket: Ticket) => void;
   onDeleteTicket: (ticket?: Ticket) => void;
+  onDeleteExampleTickets: () => void;
   tickets?: Ticket[];
   onSliderChange: (value: [number, number]) => void;
   yearRange: [number, number];
@@ -20,6 +21,7 @@ export interface InputFormProps {
 export const InputForm: React.FC<InputFormProps> = ({
   onCreateTicket,
   onDeleteTicket,
+  onDeleteExampleTickets,
   onSliderChange,
   yearRange,
   tickets,
@@ -58,7 +60,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           setTicketID(data.requestid);
           setSubmitted(true);
           //remove example ticket
-          onDeleteTicket(tickets?.find((ticket) => ticket.example));
+          onDeleteExampleTickets();
         },
       }
     );

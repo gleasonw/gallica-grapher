@@ -177,7 +177,6 @@ export function ResultViewer(props: ResultViewerProps) {
               dataKey="count"
               stroke={seriesColors[index % seriesColors.length]}
               strokeWidth={2}
-              animateNewValues={false}
               data={ticket.data?.data}
               name={ticket.data?.name}
               dot={false}
