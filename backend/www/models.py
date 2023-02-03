@@ -22,7 +22,7 @@ class Progress(BaseModel):
 
 
 class SeriesDataPoint(BaseModel):
-    date: str
+    date: float
     count: float
 
 

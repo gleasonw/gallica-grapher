@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { scaleLinear } from "d3-scale";
 import { Ticket, getStaticProps } from "../pages/index";
 import {
   LineChart,
@@ -189,7 +188,7 @@ export function ResultViewer(props: ResultViewerProps) {
         {zoomed && (
           <button onClick={zoomOut} className={"p-5 "}>
             {" "}
-            <div className={"p-5 border hover:bg-zinc-100"}>Zoom out</div>
+            <div className={"border p-5 hover:bg-zinc-100"}>Zoom out</div>
           </button>
         )}
       </div>

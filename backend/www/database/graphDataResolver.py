@@ -28,14 +28,7 @@ def build_highcharts_series(
         sql=get_sql_for_grouping(grouping, backend_source),
         conn=conn,
     )
-    if grouping == "day":
-        data_with_proper_date_format = list(map(get_rows_ymd_timestamp, data))
-    elif grouping == "month":
-        data_with_proper_date_format = list(map(get_rows_ym_timestamp, data))
-    elif grouping == "year":
-        data_with_proper_date_format = data
-    else:
-        raise ValueError(f"Invalid grouping: {grouping}")
+    data_with_proper_date_format = list(map(get_row_timestamp, data))
     search_terms = get_search_terms_by_grouping(
         backend_source=backend_source, request_id=request_id, conn=conn
     )
@@ -47,6 +40,36 @@ def build_highcharts_series(
         for point in data_with_proper_date_format
     ]
     return Series(name=f"{search_terms}", data=data_as_points, request_id=request_id)
+
+
+def get_row_timestamp(row: Tuple) -> Tuple[float, float]:
+    if len(row) == 4:
+        year = row[0]
+        month = row[1]
+        day = row[2]
+        frequency = row[3]
+        date = f"{year}-{month:02d}-{day:02d}"
+        unix_seconds = get_timestamp(date)
+    elif len(row) == 3:
+        year = row[0]
+        month = row[1]
+        frequency = row[2]
+        date = f"{year}-{month:02d}-01"
+        unix_seconds = get_timestamp(date)
+    elif len(row) == 2:
+        year = row[0]
+        frequency = row[1]
+        date = f"{year}-01-01"
+        unix_seconds = get_timestamp(date)
+    else:
+        raise ValueError(f"Invalid row: {row}")
+    return (unix_seconds, frequency)
+
+
+def get_timestamp(date: str):
+    date_object = ciso8601.parse_datetime(date)
+    date_object = date_object.replace(tzinfo=datetime.timezone.utc)
+    return datetime.datetime.timestamp(date_object) * 1000
 
 
 def get_sql_for_grouping(
@@ -148,6 +171,10 @@ def get_sql_for_grouping(
             ) AS avgedCounts;
             
             """
+        case _:
+            raise ValueError(
+                f"Invalid grouping/backend_source: {grouping}/{backend_source}"
+            )
 
 
 def get_search_terms_by_grouping(
@@ -172,34 +199,6 @@ def get_from_db(conn, params: Tuple, sql: str):
     with conn.cursor() as curs:
         curs.execute(sql, params)
         return curs.fetchall()
-
-
-def get_rows_ymd_timestamp(row):
-    year = row[0]
-    month = row[1]
-    day = row[2]
-    frequency = row[3]
-    date = f"{year}-{month:02d}-{day:02d}"
-    return get_timestamp(date), frequency
-
-
-def get_rows_ym_timestamp(row):
-    year = row[0]
-    month = row[1]
-    frequency = row[2]
-    date = f"{year}-{month:02d}-01"
-    return get_timestamp(date), frequency
-
-
-def get_timestamp(date):
-    try:
-        date_object = ciso8601.parse_datetime(date)
-        date_object = date_object.replace(tzinfo=datetime.timezone.utc)
-        timestamp = datetime.datetime.timestamp(date_object) * 1000
-    except ValueError:
-        print(f"erred with date: {date}")
-        return None
-    return timestamp
 
 
 def get_params_for_ticket_and_settings(settings):
