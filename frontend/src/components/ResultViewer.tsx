@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Ticket, getStaticProps } from "../pages/index";
 import {
   LineChart,
@@ -135,8 +135,9 @@ export function ResultViewer(props: ResultViewerProps) {
   );
 
   function formatTicks(tick: string): string {
+    const date = new Date(parseInt(tick));
     if (selectedGrouping === "year") {
-      return tick;
+      return `${date.getFullYear()}`;
     } else {
       const date = new Date(parseInt(tick));
       return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
@@ -215,12 +216,10 @@ export function ResultViewer(props: ResultViewerProps) {
               const payload = e.activePayload[0];
               console.log(payload.name);
               if (payload.payload && payload.payload.date) {
-                if (selectedGrouping === "year") {
-                  setSelectedYear(parseInt(payload.payload.date));
-                } else {
-                  const date = new Date(parseInt(payload.payload.date));
+                const date = new Date(parseInt(payload.payload.date));
+                setSelectedYear(date.getFullYear());
+                if (selectedGrouping === "month") {
                   setSelectedMonth(date.getMonth() + 1);
-                  setSelectedYear(date.getFullYear());
                 }
               }
             }
