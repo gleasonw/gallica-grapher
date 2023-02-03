@@ -45,30 +45,31 @@ export const getStaticProps: GetStaticProps<{
     nextCursor: number | null;
     previousCursor: number;
   };
-  initSeries: GraphData;
+  initSeries: GraphData[];
 }> = async () => {
-  const initTicket = initTickets[0];
-  const records = fetchContext(
+  const records = await fetchContext(
     { pageParam: 0 },
     {
-      terms: initTicket.terms[0],
+      terms: initTickets[0].terms[0],
       limit: 10,
       source: "periodical",
     }
   );
-  const series = getTicketData(
-    initTicket.id,
-    "pyllica",
-    "year",
-    0
+  const initSeries = await Promise.all(
+    initTickets.map((ticket) => {
+      return getTicketData(
+        ticket.id,
+        ticket.backend_source,
+        ticket.grouping,
+        0
+      );
+    })
   );
-  const data = await Promise.allSettled([records, series]);
   return {
     props: {
       // @ts-ignore
-      initRecords: data[0].value,
-      // @ts-ignore
-      initSeries: data[1].value,
+      initRecords: records,
+      initSeries: initSeries,
     },
   };
 };

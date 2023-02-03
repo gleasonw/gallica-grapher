@@ -70,7 +70,9 @@ export function ResultViewer(props: ResultViewerProps) {
             selectedSmoothing
           ),
         staleTime: Infinity,
-        placeholderData: props.initVals.initSeries,
+        placeholderData: props.initVals.initSeries.filter(
+          (series) => series.request_id === ticket.id
+        )[0],
         keepPreviousData: true,
       };
     }),
