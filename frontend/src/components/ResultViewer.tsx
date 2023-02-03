@@ -229,7 +229,7 @@ export function ResultViewer(props: ResultViewerProps) {
         >
           <XAxis
             dataKey={"date"}
-            domain={() => xAxisOptions.domain}
+            domain={() => xAxisOptions.domain as any}
             scale={xAxisOptions.scale}
             type={xAxisOptions.type}
             ticks={xAxisOptions.ticks}
