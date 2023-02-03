@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { scaleLinear } from "d3-scale";
 import { Ticket, getStaticProps } from "../pages/index";
 import {
   LineChart,
@@ -128,7 +129,11 @@ export function ResultViewer(props: ResultViewerProps) {
     "December",
   ];
 
-  const xAxisOptions = generateXAxisOptionsForNumericScale(allDateMarks || []);
+  const xAxisOptions = generateXAxisOptionsForNumericScale(
+    allDateMarks || [],
+    dataMin,
+    dataMax
+  );
 
   function formatTicks(tick: string): string {
     if (selectedGrouping === "year") {
@@ -163,15 +168,8 @@ export function ResultViewer(props: ResultViewerProps) {
     setDataMin(null);
   }
 
-  function determineXDomain() {
-    if (dataMin && dataMax) {
-      return [dataMin, dataMax];
-    } else {
-      return [xAxisOptions.domain[0], xAxisOptions.domain[1]];
-    }
-  }
+  console.log(xAxisOptions.domain);
 
-  console.log(refAreaLeft, refAreaRight);
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"ml-10 mb-5 flex flex-row gap-10"}>
@@ -238,8 +236,12 @@ export function ResultViewer(props: ResultViewerProps) {
         >
           <XAxis
             dataKey={"date"}
-            domain={determineXDomain}
-            scale={xAxisOptions.scale}
+            domain={() => generateXAxisOptionsForNumericScale(
+              allDateMarks || [],
+              dataMin,
+              dataMax
+            ).domain}
+            scale={"time"}
             type={xAxisOptions.type}
             ticks={xAxisOptions.ticks}
             allowDuplicatedCategory={false}
