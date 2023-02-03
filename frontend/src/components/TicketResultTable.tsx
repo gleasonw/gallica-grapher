@@ -10,33 +10,22 @@ export interface TicketTableProps extends TableProps {
   onSelectMonth: (month: number | null) => void;
   onSelectYear: (year: number | null) => void;
   onSelectDay: (day: number | null) => void;
+  onSelectTicket: (ticket: Ticket) => void;
+  selectedTicket: Ticket | null;
   tickets: Ticket[];
   initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
 
 export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
-  const [selectedTicket, setSelectedTicket] = React.useState<Ticket>();
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
 
-  const { onSelectMonth, onSelectYear, onSelectDay } = props;
 
-  React.useEffect(() => {
-    if (
-      props.tickets.length > 0 &&
-      !props.tickets.some((t) => t.id === selectedTicket?.id)
-    ) {
-      setSelectedTicket(props.tickets[0]);
-      onSelectDay(null);
-      onSelectMonth(null);
-      onSelectYear(null);
-    }
-  }, [props.tickets, selectedTicket, onSelectDay, onSelectMonth, onSelectYear]);
 
   return (
     <ResultsTable
-      terms={selectedTicket?.terms[0]}
+      terms={props.selectedTicket?.terms[0]}
       codes={selectedPapers?.map((p) => p.code) || []}
       month={props.month}
       day={props.day}
@@ -76,7 +65,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
               if (!props.tickets) {
                 return;
               }
-              setSelectedTicket(
+              props.onSelectTicket(
                 props.tickets.find(
                   (t) => t.id === parseInt(e.target.value)
                 ) as Ticket

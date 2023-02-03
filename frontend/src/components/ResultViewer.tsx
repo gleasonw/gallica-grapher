@@ -7,6 +7,7 @@ import {
   XAxis,
   Legend,
   Tooltip,
+  ReferenceArea,
 } from "recharts";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
@@ -50,6 +51,9 @@ export async function getTicketData(
 }
 
 export function ResultViewer(props: ResultViewerProps) {
+  const [selectedTicket, setSelectedTicket] = React.useState<Ticket | null>(
+    props.tickets && props.tickets.length > 0 ? props.tickets[0] : null
+  );
   const [selectedYear, setSelectedYear] = React.useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = React.useState<number | null>(null);
   const [selectedDay, setSelectedDay] = React.useState<number | null>(null);
@@ -57,6 +61,25 @@ export function ResultViewer(props: ResultViewerProps) {
     "year" | "month"
   >("year");
   const [selectedSmoothing, setSelectedSmoothing] = React.useState<number>(0);
+
+  //zoom state
+  const [zoomed, setZoomed] = React.useState<boolean>(false);
+  const [refAreaLeft, setRefAreaLeft] = React.useState<number | null>(null);
+  const [refAreaRight, setRefAreaRight] = React.useState<number | null>(null);
+  const [dataMin, setDataMin] = React.useState<number | null>(null);
+  const [dataMax, setDataMax] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (
+      props.tickets.length > 0 &&
+      !props.tickets.some((t) => t.id === selectedTicket?.id)
+    ) {
+      setSelectedTicket(props.tickets[0]);
+      setSelectedDay(null);
+      setSelectedMonth(null);
+      setSelectedYear(null);
+    }
+  }, [props.tickets, selectedTicket]);
 
   const ticketData = useQueries({
     queries: props.tickets.map((ticket) => {
@@ -116,6 +139,39 @@ export function ResultViewer(props: ResultViewerProps) {
     }
   }
 
+  function zoom() {
+    if (refAreaLeft === refAreaRight || refAreaRight === null) {
+      setZoomed(false);
+    } else {
+      setZoomed(true);
+      //ensure that dataMin is always less than dataMax
+      if (refAreaLeft && refAreaLeft < refAreaRight) {
+        setDataMin(refAreaLeft);
+        setDataMax(refAreaRight);
+      } else {
+        setDataMin(refAreaRight);
+        setDataMax(refAreaLeft);
+      }
+    }
+    setRefAreaLeft(null);
+    setRefAreaRight(null);
+  }
+
+  function zoomOut() {
+    setZoomed(false);
+    setDataMax(null);
+    setDataMin(null);
+  }
+
+  function determineXDomain() {
+    if (dataMin && dataMax) {
+      return [dataMin, dataMax];
+    } else {
+      return [xAxisOptions.domain[0], xAxisOptions.domain[1]];
+    }
+  }
+
+  console.log(refAreaLeft, refAreaRight);
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"ml-10 mb-5 flex flex-row gap-10"}>
@@ -136,16 +192,36 @@ export function ResultViewer(props: ResultViewerProps) {
           />
         </InputLabel>
       </div>
+      {zoomed && (
+        <button
+          onClick={zoomOut}
+          className={" rounded-sm border p-5 hover:bg-zinc-100"}
+        >
+          Zoom out
+        </button>
+      )}
       <ResponsiveContainer width="100%" height={400} className={"mb-10"}>
         <LineChart
           width={500}
           height={300}
+          onMouseDown={(e: any) => {
+            if (e && e.activeLabel) {
+              setRefAreaLeft(e.activeLabel);
+            }
+          }}
+          onMouseMove={(e: any) => {
+            if (refAreaLeft && e.activeLabel) {
+              setRefAreaRight(e.activeLabel);
+            }
+          }}
+          onMouseUp={zoom}
           onClick={(e) => {
             if (!e) {
               return;
             }
             if (e.activePayload && e.activePayload.length > 0) {
               const payload = e.activePayload[0];
+              console.log(payload.name);
               if (payload.payload && payload.payload.date) {
                 if (selectedGrouping === "year") {
                   setSelectedYear(parseInt(payload.payload.date));
@@ -162,7 +238,7 @@ export function ResultViewer(props: ResultViewerProps) {
         >
           <XAxis
             dataKey={"date"}
-            domain={xAxisOptions.domain}
+            domain={determineXDomain}
             scale={xAxisOptions.scale}
             type={xAxisOptions.type}
             ticks={xAxisOptions.ticks}
@@ -184,6 +260,13 @@ export function ResultViewer(props: ResultViewerProps) {
               style={{ cursor: "pointer" }}
             />
           ))}
+          {refAreaLeft && refAreaRight ? (
+            <ReferenceArea
+              x1={refAreaLeft}
+              x2={refAreaRight}
+              strokeOpacity={0.3}
+            />
+          ) : null}
         </LineChart>
       </ResponsiveContainer>
       <TicketResultTable
@@ -195,6 +278,8 @@ export function ResultViewer(props: ResultViewerProps) {
         onSelectYear={(year) => setSelectedYear(year)}
         onSelectMonth={(month) => setSelectedMonth(month)}
         onSelectDay={(day) => setSelectedDay(day)}
+        onSelectTicket={(ticket) => setSelectedTicket(ticket)}
+        selectedTicket={selectedTicket}
         limit={10}
       />
     </div>
