@@ -186,15 +186,13 @@ export function ResultViewer(props: ResultViewerProps) {
             value={selectedSmoothing.toString()}
           />
         </InputLabel>
+        {zoomed && (
+          <button onClick={zoomOut} className={"p-5 "}>
+            {" "}
+            <div className={"p-5 border hover:bg-zinc-100"}>Zoom out</div>
+          </button>
+        )}
       </div>
-      {zoomed && (
-        <button
-          onClick={zoomOut}
-          className={" rounded-sm border p-5 hover:bg-zinc-100"}
-        >
-          Zoom out
-        </button>
-      )}
       <ResponsiveContainer width="100%" height={400} className={"mb-10"}>
         <LineChart
           width={500}
