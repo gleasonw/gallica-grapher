@@ -145,18 +145,15 @@ export function ResultViewer(props: ResultViewerProps) {
   }
 
   function zoom() {
+    let [left, right] = [refAreaLeft, refAreaRight];
     if (refAreaLeft === refAreaRight || refAreaRight === null) {
-      setZoomed(false);
     } else {
-      setZoomed(true);
-      //ensure that dataMin is always less than dataMax
-      if (refAreaLeft && refAreaLeft < refAreaRight) {
-        setDataMin(refAreaLeft);
-        setDataMax(refAreaRight);
-      } else {
-        setDataMin(refAreaRight);
-        setDataMax(refAreaLeft);
+      if (refAreaLeft && refAreaLeft > refAreaRight) {
+        [left, right] = [refAreaRight, refAreaLeft];
       }
+      setDataMin(left);
+      setDataMax(right);
+      setZoomed(true);
     }
     setRefAreaLeft(null);
     setRefAreaRight(null);
@@ -236,12 +233,8 @@ export function ResultViewer(props: ResultViewerProps) {
         >
           <XAxis
             dataKey={"date"}
-            domain={() => generateXAxisOptionsForNumericScale(
-              allDateMarks || [],
-              dataMin,
-              dataMax
-            ).domain}
-            scale={"time"}
+            domain={() => xAxisOptions.domain}
+            scale={xAxisOptions.scale}
             type={xAxisOptions.type}
             ticks={xAxisOptions.ticks}
             allowDuplicatedCategory={false}
