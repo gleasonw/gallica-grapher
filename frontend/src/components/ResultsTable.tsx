@@ -134,12 +134,12 @@ export function ResultsTable(props: TableProps) {
       <div className="">
         <div>
           <div className={"mt-5 flex flex-col gap-5"}>
+            <div className={"m-auto ml-5 "}>{props.children}</div>
             <h1 className={"ml-10 text-2xl"}>
               {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
                 <p>Fetching updated context...</p>
               )}
               {!currentPage && !isFetching && <p>No results found</p>}
-              <div className={"m-auto ml-5 "}>{props.children}</div>
               {currentPage && (
                 <div className={"flex flex-row gap-10"}>
                   {total_results.toLocaleString()} results
