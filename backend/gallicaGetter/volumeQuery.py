@@ -4,7 +4,8 @@ from pydantic import BaseModel
 
 class VolumeQuery(BaseModel):
     """Struct for a query to Gallica's SRU API."""
-    term: str
+
+    terms: List[str]
     start_date: Optional[str]
     end_date: Optional[str]
     endpoint_url: str
@@ -19,7 +20,7 @@ class VolumeQuery(BaseModel):
 
     def make_copy(self, start_index: int, num_records: int = 1):
         return VolumeQuery(
-            term=self.term,
+            terms=self.terms,
             codes=self.codes,
             start_date=self.start_date,
             end_date=self.end_date,
@@ -53,10 +54,10 @@ class VolumeQuery(BaseModel):
             return ""
 
     def build_gram_cql(self) -> str:
-        if self.link:
-            return f'text adj "{self.term}" prox/unit=word/distance={self.link[1]} "{self.link[0]}"'
-        elif self.term:
-            return f'text adj "{self.term}"'
+        if self.link and len(self.terms) == 1:
+            return f'text adj "{self.terms[0]}" prox/unit=word/distance={self.link[1]} "{self.link[0]}"'
+        elif self.terms:
+            return 'text adj "' + '" or text adj "'.join(self.terms) + '"'
         else:
             return ""
 
@@ -85,4 +86,4 @@ class VolumeQuery(BaseModel):
         return base + ' and ocr.quality all "Texte disponible"'
 
     def __repr__(self):
-        return f"Volume Query ({self.term})"
+        return f"Volume Query ({self.terms})"

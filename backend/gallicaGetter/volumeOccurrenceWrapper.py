@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from gallicaGetter.concurrentFetch import Response
+import urllib.parse
 
 from gallicaGetter.base_query_builds import build_base_queries
 from gallicaGetter.index_query_builds import (
@@ -26,7 +28,7 @@ class VolumeRecord:
     paper_code: str
     url: str
     date: Date
-    term: str
+    terms: List[str]
 
 
 class VolumeOccurrenceWrapper(GallicaWrapper):
@@ -34,7 +36,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
 
     def parse(
         self,
-        gallica_responses,
+        gallica_responses: List[Response],
     ):
         for response in gallica_responses:
             for i, record in enumerate(get_records_from_xml(response.xml)):
@@ -50,7 +52,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                     paper_code=paper_code,
                     date=date,
                     url=get_url_from_record(record),
-                    term=response.query.term,
+                    terms=response.query.terms,
                 )
 
     def post_init(self):
@@ -73,6 +75,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         onProgressUpdate=None,
         query_cache=None,
         on_get_total_records: Optional[Callable[[int], None]] = None,
+        on_get_origin_urls: Optional[Callable[[List[str]], None]] = None,
         get_all_results: bool = False,
     ) -> Generator[VolumeRecord, None, None]:
         if query_cache:
@@ -105,6 +108,14 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         if on_get_total_records:
             # If we want to know the total number of records, we need to assign the callback
             self.on_get_total_records = on_get_total_records
+        if on_get_origin_urls:
+            url = "https://gallica.bnf.fr/services/engine/search/sru?"
+            on_get_origin_urls(
+                [
+                    url + urllib.parse.urlencode(query.get_params_for_fetch())
+                    for query in queries
+                ]
+            )
         record_generator = self.get_records_for_queries(
             queries=queries,
             on_update_progress=onProgressUpdate,

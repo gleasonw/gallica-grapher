@@ -18,6 +18,11 @@ import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
 import { InferGetStaticPropsType } from "next";
 
+// TODO: remove day
+// page nav on bottom
+// link term input
+// source input
+
 export const seriesColors = [
   "#7cb5ec",
   "#434348",

@@ -35,10 +35,10 @@ class ContextWrapper(GallicaWrapper):
         return "https://gallica.bnf.fr/services/ContentSearch"
 
     def get(
-        self, context_pairs: List[Tuple[str, str]], generate=False
+        self, context_pairs: List[Tuple[str, List[str]]], generate=False
     ) -> Generator[GallicaContext, None, None]:
         queries = [
-            ContentQuery(ark=pair[0], term=pair[1], endpoint_url=self.endpoint_url)
+            ContentQuery(ark=pair[0], terms=pair[1], endpoint_url=self.endpoint_url)
             for pair in context_pairs
         ]
         record_generator = self.get_records_for_queries(queries=queries)
@@ -50,8 +50,8 @@ class ContentQuery:
     """Struct for query to Gallica's ContentSearch API."""
 
     ark: str
-    term: str
+    terms: List[str]
     endpoint_url: str
 
     def get_params_for_fetch(self):
-        return {"ark": self.ark, "query": self.term}
+        return {"ark": self.ark, "query": self.terms}

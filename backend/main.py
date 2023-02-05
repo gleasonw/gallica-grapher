@@ -177,7 +177,7 @@ def records(
 class GallicaRecord(BaseModel):
     paper_title: str
     paper_code: str
-    term: str
+    terms: List[str]
     date: str
     url: str
     context: GallicaContext
@@ -186,6 +186,7 @@ class GallicaRecord(BaseModel):
 class GallicaResponse(BaseModel):
     records: List[GallicaRecord]
     num_results: int
+    origin_urls: List[str]
 
 
 @app.get("/api/gallicaRecords")
@@ -214,11 +215,17 @@ def fetch_records_from_gallica(
         link = (link_term, link_distance)
 
     total_records = 0
+    origin_urls = []
 
     def set_total_records(num_records: int):
         """Callback passed to the volume wrapper"""
         nonlocal total_records
         total_records = num_records
+
+    def set_origin_urls(urls: List[str]):
+        """Callback passed to the volume wrapper"""
+        nonlocal origin_urls
+        origin_urls = urls
 
     # fetch the volumes in which terms appear
     volume_Gallica_wrapper = wF.WrapperFactory.volume()
@@ -232,6 +239,7 @@ def fetch_records_from_gallica(
         start_index=cursor,
         sort=sort,
         on_get_total_records=set_total_records,
+        on_get_origin_urls=set_origin_urls,
     )
 
     # fetch the context for those terms
@@ -239,7 +247,7 @@ def fetch_records_from_gallica(
     keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
     context = content_wrapper.get(
         [
-            (record.url.split("/")[-1], record.term)
+            (record.url.split("/")[-1], record.terms)
             for _, record in keyed_records.items()
         ]
     )
@@ -252,14 +260,14 @@ def fetch_records_from_gallica(
             GallicaRecord(
                 paper_title=corresponding_record.paper_title,
                 paper_code=corresponding_record.paper_code,
-                term=corresponding_record.term,
+                terms=corresponding_record.terms,
                 date=str(corresponding_record.date),
                 url=corresponding_record.url,
-                context=record,
+                context=record
             )
         )
 
-    return GallicaResponse(records=records_with_context, num_results=total_records)
+    return GallicaResponse(records=records_with_context, num_results=total_records, origin_urls=origin_urls)
 
 
 if __name__ == "__main__":

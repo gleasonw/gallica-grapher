@@ -6,7 +6,7 @@ import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 
 export interface TableProps {
-  terms?: string;
+  terms?: string[];
   codes?: string[];
   day?: number | null;
   month?: number | null;
@@ -102,6 +102,7 @@ export function ResultsTable(props: TableProps) {
     (page) => page?.nextCursor == pageToCursor(selectedPage)
   )[0];
   const total_results = Number(data.data?.pages[0]?.data.num_results) ?? 0;
+  const origin_urls = data.data?.pages[0]?.data.origin_urls ?? [];
   const cursorMax = Math.floor(total_results / limit) + 1;
   const fetchedCursors = data.data?.pages.map((page) => page?.nextCursor);
   const fetchedSet = new Set(fetchedCursors);
@@ -129,64 +130,30 @@ export function ResultsTable(props: TableProps) {
   }
 
   return (
-    <div className={"flex flex-col"}>
+    <div className={"flex flex-col mb-20"}>
       <div className="">
         <div>
           <div className={"mt-5 flex flex-col gap-5"}>
-            <h1 className={"text-2xl"}>
-              {isFetchingNextPage && <p>Fetching next page...</p>}
-              {isFetchingPreviousPage && <p>Fetching previous page...</p>}
+            <h1 className={"ml-10 text-2xl"}>
               {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
                 <p>Fetching updated context...</p>
               )}
               {!currentPage && !isFetching && <p>No results found</p>}
-              {currentPage &&
-                !isFetchingNextPage &&
-                !isFetchingPreviousPage && (
-                  <div>
-                    <div
-                      className={
-                        "flex flex-row justify-center gap-10 text-xl md:text-3xl lg:text-3xl"
-                      }
+              {currentPage && (
+                <div className={"flex flex-row gap-10"}>
+                  {total_results.toLocaleString()} results
+                  {origin_urls.length > 0 && (
+                    <a
+                      href={origin_urls[0]}
+                      target={"_blank"}
+                      rel={"noreferrer"}
+                      className={"underline"}
                     >
-                      {selectedPage != 1 && (
-                        <div className={"flex flex-row gap-10"}>
-                          <button
-                            onClick={() =>
-                              handleCursorDecrement(selectedPage - 1)
-                            }
-                          >
-                            {"<<"}
-                          </button>
-                          <button onClick={() => handleCursorDecrement()}>
-                            {"<"}
-                          </button>
-                        </div>
-                      )}
-                      <CursorInput
-                        cursor={selectedPage}
-                        cursorMax={cursorMax}
-                        onCursorIncrement={handleCursorIncrement}
-                        onCursorDecrement={handleCursorDecrement}
-                      />
-                      <p>of {cursorMax.toLocaleString()}</p>
-                      {selectedPage !== cursorMax && (
-                        <div className={"flex flex-row gap-10"}>
-                          <button onClick={() => handleCursorIncrement()}>
-                            {">"}
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleCursorIncrement(cursorMax - selectedPage)
-                            }
-                          >
-                            {">>"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+                      Gallica
+                    </a>
+                  )}
+                </div>
+              )}
             </h1>
             <div className={"m-auto ml-5 "}>{props.children}</div>
             {currentPage?.data.records.map((record, index) => (
@@ -195,7 +162,7 @@ export function ResultsTable(props: TableProps) {
                 className={"flex flex-col gap-5 bg-white p-5 shadow-md"}
               >
                 <div className={"flex flex-row flex-wrap gap-10 pb-5 text-lg"}>
-                  <p>{record.term}</p>
+                  <p>{record.terms}</p>
                   <p>{record.date}</p>
                   <p>{record.paper_title}</p>
                   <a
@@ -210,6 +177,51 @@ export function ResultsTable(props: TableProps) {
                 <Context record={record} />
               </div>
             ))}
+            {isFetchingNextPage && <p>Fetching next page...</p>}
+            {isFetchingPreviousPage && <p>Fetching previous page...</p>}
+            {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
+              <div>
+                <div
+                  className={
+                    "flex flex-row justify-center gap-10 text-xl md:text-3xl lg:text-3xl"
+                  }
+                >
+                  {selectedPage != 1 && (
+                    <div className={"flex flex-row gap-10"}>
+                      <button
+                        onClick={() => handleCursorDecrement(selectedPage - 1)}
+                      >
+                        {"<<"}
+                      </button>
+                      <button onClick={() => handleCursorDecrement()}>
+                        {"<"}
+                      </button>
+                    </div>
+                  )}
+                  <CursorInput
+                    cursor={selectedPage}
+                    cursorMax={cursorMax}
+                    onCursorIncrement={handleCursorIncrement}
+                    onCursorDecrement={handleCursorDecrement}
+                  />
+                  <p>of {cursorMax.toLocaleString()}</p>
+                  {selectedPage !== cursorMax && (
+                    <div className={"flex flex-row gap-10"}>
+                      <button onClick={() => handleCursorIncrement()}>
+                        {">"}
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleCursorIncrement(cursorMax - selectedPage)
+                        }
+                      >
+                        {">>"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

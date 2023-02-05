@@ -1,6 +1,7 @@
 export interface GallicaResponse {
   records: GallicaRecord[];
   num_results: string;
+  origin_urls: string[];
 }
 
 export interface GallicaRecord {
@@ -8,7 +9,7 @@ export interface GallicaRecord {
   paper_code: string;
   url: string;
   date: string;
-  term: string;
+  terms: string[];
   context: GallicaContext;
 }
 

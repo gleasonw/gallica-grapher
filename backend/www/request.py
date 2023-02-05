@@ -399,7 +399,7 @@ def write_to_csv_stream(stream, record, request_id):
             record.date.getYear(),
             record.date.getMonth(),
             record.date.getDay(),
-            record.term,
+            record.terms,
             request_id,
             record.paper_code,
             record.paper_title,

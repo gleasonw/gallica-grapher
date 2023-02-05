@@ -15,7 +15,7 @@ class TestArgQueryTransformations(TestCase):
         self.test_1 = VolumeQuery(
             start_date="1900",
             end_date="1901",
-            term="test",
+            terms="test",
             start_index=0,
             limit=1,
             endpoint_url="test",
@@ -24,7 +24,7 @@ class TestArgQueryTransformations(TestCase):
         self.test_2 = VolumeQuery(
             start_date="1900",
             end_date="1905",
-            term="test",
+            terms="test",
             start_index=0,
             limit=1,
             endpoint_url="test",

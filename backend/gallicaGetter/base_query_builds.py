@@ -25,25 +25,24 @@ def build_base_queries(
     spawn additional indexed queries to fetch all records in batches of 50.
     """
     base_queries = []
-    for term in terms:
-        for start, end in build_date_grouping(start_date, end_date, grouping):
-            for code_bundle in bundle_codes(codes):
-                if type(cursor) is int:
-                    cursor = [cursor]
-                for c in cursor:  # type: ignore
-                    base_queries.append(
-                        VolumeQuery(
-                            term=term,
-                            codes=code_bundle,
-                            start_date=start,
-                            end_date=end,
-                            endpoint_url=endpoint_url,
-                            start_index=c,
-                            limit=limit or 1,
-                            link=link,
-                            source=source,
-                            sort=sort,
-                        )
+    for start, end in build_date_grouping(start_date, end_date, grouping):
+        for code_bundle in bundle_codes(codes):
+            if type(cursor) is int:
+                cursor = [cursor]
+            for c in cursor:  # type: ignore
+                base_queries.append(
+                    VolumeQuery(
+                        terms=terms,
+                        codes=code_bundle,
+                        start_date=start,
+                        end_date=end,
+                        endpoint_url=endpoint_url,
+                        start_index=c,
+                        limit=limit or 1,
+                        link=link,
+                        source=source,
+                        sort=sort,
+                    )
                     )
     return base_queries
 
