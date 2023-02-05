@@ -50,7 +50,7 @@ export const getStaticProps: GetStaticProps<{
   const records = await fetchContext(
     { pageParam: 0 },
     {
-      terms: initTickets[0].terms[0],
+      terms: initTickets[0].terms,
       limit: 10,
       source: "periodical",
     }
