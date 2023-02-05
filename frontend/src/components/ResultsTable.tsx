@@ -143,16 +143,6 @@ export function ResultsTable(props: TableProps) {
               {currentPage && (
                 <div className={"flex flex-row gap-10"}>
                   {total_results.toLocaleString()} results
-                  {origin_urls.length > 0 && (
-                    <a
-                      href={origin_urls[0]}
-                      target={"_blank"}
-                      rel={"noreferrer"}
-                      className={"underline"}
-                    >
-                      Gallica
-                    </a>
-                  )}
                 </div>
               )}
             </h1>
