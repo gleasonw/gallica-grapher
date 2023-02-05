@@ -130,7 +130,7 @@ export function ResultsTable(props: TableProps) {
   }
 
   return (
-    <div className={"flex flex-col mb-20"}>
+    <div className={"mb-20 flex flex-col"}>
       <div className="">
         <div>
           <div className={"mt-5 flex flex-col gap-5"}>
@@ -139,6 +139,7 @@ export function ResultsTable(props: TableProps) {
                 <p>Fetching updated context...</p>
               )}
               {!currentPage && !isFetching && <p>No results found</p>}
+              <div className={"m-auto ml-5 "}>{props.children}</div>
               {currentPage && (
                 <div className={"flex flex-row gap-10"}>
                   {total_results.toLocaleString()} results
@@ -155,14 +156,13 @@ export function ResultsTable(props: TableProps) {
                 </div>
               )}
             </h1>
-            <div className={"m-auto ml-5 "}>{props.children}</div>
             {currentPage?.data.records.map((record, index) => (
               <div
                 key={index}
                 className={"flex flex-col gap-5 bg-white p-5 shadow-md"}
               >
                 <div className={"flex flex-row flex-wrap gap-10 pb-5 text-lg"}>
-                  <p>{record.terms}</p>
+                  <p>{record.terms.join(", ")}</p>
                   <p>{record.date}</p>
                   <p>{record.paper_title}</p>
                   <a
