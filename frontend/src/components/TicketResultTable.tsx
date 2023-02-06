@@ -9,7 +9,6 @@ import { Paper } from "../models/dbStructs";
 export interface TicketTableProps extends TableProps {
   onSelectMonth: (month: number | null) => void;
   onSelectYear: (year: number | null) => void;
-  onSelectDay: (day: number | null) => void;
   onSelectTicket: (ticket: Ticket) => void;
   selectedTicket: Ticket | null;
   tickets: Ticket[];
@@ -50,13 +49,6 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
             options={Array.from(Array(12).keys()).map((i) => String(i))}
             onChange={(value) => props.onSelectMonth(parseInt(value))}
             value={props.month ? String(props.month) : undefined}
-          />
-        </InputLabel>
-        <InputLabel label={"Day"}>
-          <SelectInput
-            options={Array.from(Array(31).keys()).map((i) => String(i))}
-            onChange={(value) => props.onSelectDay(parseInt(value))}
-            value={props.day ? String(props.day) : undefined}
           />
         </InputLabel>
         <InputLabel label={"Ticket"}>

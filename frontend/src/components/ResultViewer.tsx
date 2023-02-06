@@ -61,7 +61,6 @@ export function ResultViewer(props: ResultViewerProps) {
   );
   const [selectedYear, setSelectedYear] = React.useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = React.useState<number | null>(null);
-  const [selectedDay, setSelectedDay] = React.useState<number | null>(null);
   const [selectedGrouping, setSelectedGrouping] = React.useState<
     "year" | "month"
   >("year");
@@ -80,7 +79,6 @@ export function ResultViewer(props: ResultViewerProps) {
       !props.tickets.some((t) => t.id === selectedTicket?.id)
     ) {
       setSelectedTicket(props.tickets[0]);
-      setSelectedDay(null);
       setSelectedMonth(null);
       setSelectedYear(null);
     }
@@ -269,11 +267,9 @@ export function ResultViewer(props: ResultViewerProps) {
         initialRecords={props.initVals.initRecords}
         tickets={props.tickets}
         month={selectedMonth}
-        day={selectedDay}
         year={selectedYear}
         onSelectYear={(year) => setSelectedYear(year)}
         onSelectMonth={(month) => setSelectedMonth(month)}
-        onSelectDay={(day) => setSelectedDay(day)}
         onSelectTicket={(ticket) => setSelectedTicket(ticket)}
         selectedTicket={selectedTicket}
         limit={10}
