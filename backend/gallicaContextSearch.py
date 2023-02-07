@@ -22,7 +22,7 @@ class GallicaRecord(BaseModel):
     context: HTMLContext | List[ContextRow]
 
 
-class GallicaResponse(BaseModel):
+class UserResponse(BaseModel):
     records: List[GallicaRecord]
     num_results: int
     origin_urls: List[str]
@@ -43,6 +43,8 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
     rows: List[ContextRow] = []
 
     def parse_context_rows(con: HTMLContext) -> List[ContextRow]:
+        """Split the Gallica HTML context on the highlighted spans, creating rows of pivot (span), left context, and right context."""
+
         nonlocal rows
         for page in con.pages:
             soup = BeautifulSoup(page.context, "html.parser")
@@ -91,7 +93,9 @@ def get_context(
     source: Literal["book", "periodical", "all"] = "all",
     sort: Literal["date", "relevance"] = "relevance",
     parser: Callable[[VolumeRecord, HTMLContext], GallicaRecord] = build_html_record,
-) -> GallicaResponse:
+) -> UserResponse:
+    """Queries Gallica's SRU and ContentSearch API's to get context for a given term in the archive."""
+
     link = None
     if link_distance and link_term:
         link_distance = int(link_distance)
@@ -139,7 +143,7 @@ def get_context(
         corresponding_record = keyed_records[record.ark]
         records_with_context.append(parser(corresponding_record, record))
 
-    return GallicaResponse(
+    return UserResponse(
         records=records_with_context, num_results=total_records, origin_urls=origin_urls
     )
 

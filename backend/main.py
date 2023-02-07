@@ -4,7 +4,7 @@ import random
 from typing import List, Literal, Optional
 import uvicorn
 from pydantic import BaseModel
-from gallicaContextSearch import GallicaResponse, get_row_context, get_html_context
+from gallicaContextSearch import UserResponse, get_row_context, get_html_context
 import gallicaGetter.wrapperFactory as wF
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
@@ -185,7 +185,7 @@ def fetch_records_from_gallica(
     source: Literal["book", "periodical", "all"] = "all",
     sort: Literal["date", "relevance"] = "relevance",
     row_split: Optional[bool] = False,
-) -> GallicaResponse:
+) -> UserResponse:
     """API endpoint for the context table."""
 
     if limit and limit > 50:
