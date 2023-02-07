@@ -108,6 +108,7 @@ def get_context(
         nonlocal origin_urls
         origin_urls = urls
 
+    # get the volumes in which the term appears
     volume_Gallica_wrapper = wF.WrapperFactory.volume()
     gallica_records = volume_Gallica_wrapper.get(
         terms=terms,
@@ -122,6 +123,7 @@ def get_context(
         on_get_origin_urls=set_origin_urls,
     )
 
+    # get the context for those volumes
     content_wrapper = wF.WrapperFactory.context()
     keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
     context = content_wrapper.get(
@@ -131,6 +133,7 @@ def get_context(
         ]
     )
 
+    # combine the two
     records_with_context: List[GallicaRecord] = []
     for record in context:
         corresponding_record = keyed_records[record.ark]
