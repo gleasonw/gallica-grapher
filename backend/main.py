@@ -4,7 +4,7 @@ import random
 from typing import List, Literal, Optional
 import uvicorn
 from pydantic import BaseModel
-from gallicaGetter.contentWrapper import GallicaContext
+from gallicaContextSearch import GallicaRecord, GallicaResponse, get_context
 import gallicaGetter.wrapperFactory as wF
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
@@ -174,21 +174,6 @@ def records(
     return {"displayRecords": db_records, "count": count}
 
 
-class GallicaRecord(BaseModel):
-    paper_title: str
-    paper_code: str
-    terms: List[str]
-    date: str
-    url: str
-    context: GallicaContext
-
-
-class GallicaResponse(BaseModel):
-    records: List[GallicaRecord]
-    num_results: int
-    origin_urls: List[str]
-
-
 @app.get("/api/gallicaRecords")
 def fetch_records_from_gallica(
     year: Optional[int] = 0,
@@ -204,70 +189,20 @@ def fetch_records_from_gallica(
     sort: Literal["date", "relevance"] = "relevance",
 ) -> GallicaResponse:
     """API endpoint for the context table."""
-    link = None
-    if link_term and not link_distance or link_distance and not link_term:
-        raise HTTPException(
-            status_code=400,
-            detail="link_distance and link_term must both be specified if either is specified",
-        )
-    if link_distance and link_term:
-        link_distance = int(link_distance)
-        link = (link_term, link_distance)
 
-    total_records = 0
-    origin_urls = []
-
-    def set_total_records(num_records: int):
-        """Callback passed to the volume wrapper"""
-        nonlocal total_records
-        total_records = num_records
-
-    def set_origin_urls(urls: List[str]):
-        """Callback passed to the volume wrapper"""
-        nonlocal origin_urls
-        origin_urls = urls
-
-    # fetch the volumes in which terms appear
-    volume_Gallica_wrapper = wF.WrapperFactory.volume()
-    gallica_records = volume_Gallica_wrapper.get(
+    return get_context(
+        year=year,
+        month=month,
+        day=day,
         terms=terms,
-        start_date=make_date_from_year_mon_day(year, month, day),
         codes=codes,
+        cursor=cursor,
+        limit=limit,
+        link_term=link_term,
+        link_distance=link_distance,
         source=source,
-        link=link,
-        num_results=limit,
-        start_index=cursor,
         sort=sort,
-        on_get_total_records=set_total_records,
-        on_get_origin_urls=set_origin_urls,
     )
-
-    # fetch the context for those terms
-    content_wrapper = wF.WrapperFactory.context()
-    keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
-    context = content_wrapper.get(
-        [
-            (record.url.split("/")[-1], record.terms)
-            for _, record in keyed_records.items()
-        ]
-    )
-
-    # combine the two
-    records_with_context: List[GallicaRecord] = []
-    for record in context:
-        corresponding_record = keyed_records[record.ark]
-        records_with_context.append(
-            GallicaRecord(
-                paper_title=corresponding_record.paper_title,
-                paper_code=corresponding_record.paper_code,
-                terms=corresponding_record.terms,
-                date=str(corresponding_record.date),
-                url=corresponding_record.url,
-                context=record
-            )
-        )
-
-    return GallicaResponse(records=records_with_context, num_results=total_records, origin_urls=origin_urls)
 
 
 if __name__ == "__main__":

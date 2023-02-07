@@ -10,7 +10,7 @@ class GallicaPage(BaseModel):
     context: str
 
 
-class GallicaContext(BaseModel):
+class HTMLContext(BaseModel):
     num_results: int
     pages: List[GallicaPage]
     ark: str
@@ -22,7 +22,7 @@ class ContextWrapper(GallicaWrapper):
     def parse(self, gallica_responses):
         for response in gallica_responses:
             num_results_and_pages = get_num_results_and_pages_for_context(response.xml)
-            yield GallicaContext(
+            yield HTMLContext(
                 num_results=num_results_and_pages[0],
                 pages=[
                     GallicaPage(page=occurrence[0], context=occurrence[1])
@@ -36,7 +36,7 @@ class ContextWrapper(GallicaWrapper):
 
     def get(
         self, context_pairs: List[Tuple[str, List[str]]], generate=False
-    ) -> Generator[GallicaContext, None, None]:
+    ) -> Generator[HTMLContext, None, None]:
         queries = [
             ContentQuery(ark=pair[0], terms=pair[1], endpoint_url=self.endpoint_url)
             for pair in context_pairs
