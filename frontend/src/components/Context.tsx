@@ -41,7 +41,7 @@ export const Context: React.FC<{ record?: GallicaRecord }> = (props) => {
         </div>
       )}
       <article
-        className={"min-h-60 prose prose-lg m-auto text-justify lg:prose-lg"}
+        className={"min-h-60 prose prose-lg m-auto text-justify lg:prose-lg z-50"}
         dangerouslySetInnerHTML={{ __html: data.pages[pageIndex].context }}
       />
       <div className={"m-10 flex flex-row justify-center text-xl"}>
