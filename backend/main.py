@@ -11,9 +11,8 @@ from www.database.graphDataResolver import build_highcharts_series
 from www.database.displayDataResolvers import select_display_records
 from www.request import Request
 from www.models import Ticket, Progress
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from functools import partial
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -188,6 +187,9 @@ def fetch_records_from_gallica(
     row_split: Optional[bool] = False,
 ) -> GallicaResponse:
     """API endpoint for the context table."""
+
+    if limit and limit > 50:
+        raise HTTPException(status_code=400, detail="Limit must be less than or equal to 50, the maximum number of records for one request to Gallica.")
 
     if row_split:
         return get_row_context(

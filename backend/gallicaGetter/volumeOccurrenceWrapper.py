@@ -109,7 +109,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             # If we want to know the total number of records, we need to assign the callback
             self.on_get_total_records = on_get_total_records
         if on_get_origin_urls:
-            url = "https://gallica.bnf.fr/services/engine/search/sru?"
+            url = "https://gallica.bnf.fr/SRU?"
             on_get_origin_urls(
                 [
                     url + urllib.parse.urlencode(query.get_params_for_fetch())
