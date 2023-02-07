@@ -19,8 +19,32 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
+  const [selectedLinkTerm, setSelectedLinkTerm] = React.useState<
+    string | null
+  >();
+  const [passedLinkTerm, setPassedLinkTerm] = React.useState<string | null>();
+  const [selectedDistance, setSelectedDistance] = React.useState<number | null>(
+    10
+  );
+  const [typingTimeout, setTypingTimeout] =
+    React.useState<NodeJS.Timeout | null>(null);
 
+  function handleLinkChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setSelectedLinkTerm(e.target.value);
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    setTypingTimeout(
+      setTimeout(() => {
+        setPassedLinkTerm(e.target.value);
+      }, 500)
+    );
+  }
 
+  React.useEffect(() => {
+    setSelectedLinkTerm(null);
+    setPassedLinkTerm(null);
+  }, [props.month, props.day, props.year, props.selectedTicket]);
 
   return (
     <ResultsTable
@@ -30,6 +54,8 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       day={props.day}
       year={props.year}
       limit={10}
+      link_term={passedLinkTerm}
+      link_distance={selectedDistance}
       initialRecords={props.initialRecords}
       source={"periodical"}
     >
@@ -82,6 +108,22 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
               }
             }}
           />
+        </InputLabel>
+        <InputLabel label={"Link search"}>
+          <div className={"align-center flex flex-row justify-center"}>
+            <input
+              className={"relative max-w-full border p-5"}
+              value={selectedLinkTerm || ""}
+              onChange={handleLinkChange}
+            />
+            <p className={"p-5"}>within</p>
+            <input
+              className={"relative w-20 border p-5"}
+              value={selectedDistance || ""}
+              onChange={(e) => setSelectedDistance(parseInt(e.target.value))}
+            />
+            <p className={"p-5"}>words</p>
+          </div>
         </InputLabel>
       </div>
       <div className={"mb-10 flex flex-row flex-wrap gap-10"}>

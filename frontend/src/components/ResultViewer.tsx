@@ -12,7 +12,7 @@ import {
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
 import { generateXAxisOptionsForNumericScale } from "./utils";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
