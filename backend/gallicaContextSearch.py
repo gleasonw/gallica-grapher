@@ -40,35 +40,31 @@ def build_html_record(record: VolumeRecord, context: HTMLContext):
 
 
 def build_row_record(record: VolumeRecord, context: HTMLContext):
+    """Split the Gallica HTML context on the highlighted spans, creating rows of pivot (span), left context, and right context."""
     rows: List[ContextRow] = []
 
-    def parse_context_rows(con: HTMLContext) -> List[ContextRow]:
-        """Split the Gallica HTML context on the highlighted spans, creating rows of pivot (span), left context, and right context."""
-
-        nonlocal rows
-        for page in con.pages:
-            soup = BeautifulSoup(page.context, "html.parser")
-            spans = soup.find_all("span", {"class": "highlight"})
-            for span in spans:
-                pivot = span.text
-                left_context = span.previous_sibling
-                if left_context:
-                    left_context = str(left_context).strip()
-                else:
-                    left_context = ""
-                right_context = span.next_sibling
-                if right_context:
-                    right_context = str(right_context).strip()
-                else:
-                    right_context = ""
-                rows.append(
-                    ContextRow(
-                        pivot=pivot,
-                        left_context=left_context,
-                        right_context=right_context,
-                    )
+    for page in context.pages:
+        soup = BeautifulSoup(page.context, "html.parser")
+        spans = soup.find_all("span", {"class": "highlight"})
+        for span in spans:
+            pivot = span.text
+            left_context = span.previous_sibling
+            if left_context:
+                left_context = str(left_context).strip()
+            else:
+                left_context = ""
+            right_context = span.next_sibling
+            if right_context:
+                right_context = str(right_context).strip()
+            else:
+                right_context = ""
+            rows.append(
+                ContextRow(
+                    pivot=pivot,
+                    left_context=left_context,
+                    right_context=right_context,
                 )
-        return rows
+            )
 
     return GallicaRecord(
         paper_title=record.paper_title,
@@ -76,7 +72,7 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
         terms=record.terms,
         date=str(record.date),
         url=record.url,
-        context=parse_context_rows(context),
+        context=rows,
     )
 
 
