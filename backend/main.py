@@ -4,17 +4,14 @@ import random
 from typing import List, Literal, Optional
 import uvicorn
 from pydantic import BaseModel
-from gallicaContextSearch import GallicaRecord, GallicaResponse, get_row_context
+from gallicaContextSearch import GallicaResponse, get_row_context, get_html_context
 import gallicaGetter.wrapperFactory as wF
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
-from www.database.displayDataResolvers import (
-    make_date_from_year_mon_day,
-    select_display_records,
-)
+from www.database.displayDataResolvers import select_display_records
 from www.request import Request
 from www.models import Ticket, Progress
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from functools import partial
 
@@ -188,24 +185,37 @@ def fetch_records_from_gallica(
     link_distance: Optional[int] = 0,
     source: Literal["book", "periodical", "all"] = "all",
     sort: Literal["date", "relevance"] = "relevance",
+    row_split: Optional[bool] = False,
 ) -> GallicaResponse:
     """API endpoint for the context table."""
 
-    return get_row_context(
-        year=year,
-        month=month,
-        day=day,
-        terms=terms,
-        codes=codes,
-        cursor=cursor,
-        limit=limit,
-        link_term=link_term,
-        link_distance=link_distance,
-        source=source,
-        sort=sort,
+    if row_split:
+        return get_row_context(
+            year=year,
+            month=month,
+            day=day,
+            terms=terms,
+            codes=codes,
+            cursor=cursor,
+            limit=limit,
+            link_term=link_term,
+            link_distance=link_distance,
+            source=source,
+            sort=sort,
+        )
+    return get_html_context(
+            year=year,
+            month=month,
+            day=day,
+            terms=terms,
+            codes=codes,
+            cursor=cursor,
+            limit=limit,
+            link_term=link_term,
+            link_distance=link_distance,
+            source=source,
+            sort=sort,
     )
-
-
 
 
 
