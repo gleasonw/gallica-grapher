@@ -135,9 +135,9 @@ def get_context(
 
     # combine the two
     records_with_context: List[GallicaRecord] = []
-    for record in context:
-        corresponding_record = keyed_records[record.ark]
-        records_with_context.append(parser(corresponding_record, record))
+    for context_response in context:
+        corresponding_record = keyed_records[context_response.ark]
+        records_with_context.append(parser(corresponding_record, context_response))
 
     return UserResponse(
         records=records_with_context, num_results=total_records, origin_urls=origin_urls
