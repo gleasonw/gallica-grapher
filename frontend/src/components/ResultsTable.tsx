@@ -135,7 +135,7 @@ export function ResultsTable(props: TableProps) {
         <div>
           <div className={"mt-5 flex flex-col gap-5"}>
             <div className={"m-auto ml-5 "}>{props.children}</div>
-            <h1 className={"ml-10 text-2xl"}>
+            <h1 className={"ml-5 text-2xl"}>
               {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
                 <p>Fetching updated context...</p>
               )}
