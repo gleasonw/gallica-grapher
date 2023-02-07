@@ -4,7 +4,7 @@ import random
 from typing import List, Literal, Optional
 import uvicorn
 from pydantic import BaseModel
-from gallicaContextSearch import GallicaRecord, GallicaResponse, get_context
+from gallicaContextSearch import GallicaRecord, GallicaResponse, get_row_context
 import gallicaGetter.wrapperFactory as wF
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
@@ -16,6 +16,7 @@ from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from functools import partial
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -190,7 +191,7 @@ def fetch_records_from_gallica(
 ) -> GallicaResponse:
     """API endpoint for the context table."""
 
-    return get_context(
+    return get_row_context(
         year=year,
         month=month,
         day=day,
@@ -203,6 +204,9 @@ def fetch_records_from_gallica(
         source=source,
         sort=sort,
     )
+
+
+
 
 
 if __name__ == "__main__":
