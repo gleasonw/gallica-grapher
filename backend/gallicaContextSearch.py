@@ -50,19 +50,23 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
             pivot = span.text
             left_context = span.previous_sibling
             if left_context:
-                left_context = str(left_context).strip()
+                left_text = str(left_context).strip()
+                ellipsis_split = left_text.split("(...)")
+                closest_left_text = ellipsis_split[-1]
             else:
-                left_context = ""
+                closest_left_text = ""
             right_context = span.next_sibling
             if right_context:
                 right_context = str(right_context).strip()
+                ellipsis_split = right_context.split("(...)")
+                closest_right_text = ellipsis_split[0]
             else:
-                right_context = ""
+                closest_right_text = ""
             rows.append(
                 ContextRow(
                     pivot=pivot,
-                    left_context=left_context,
-                    right_context=right_context,
+                    left_context=closest_left_text,
+                    right_context=closest_right_text,
                 )
             )
 
