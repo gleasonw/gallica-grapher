@@ -10,7 +10,13 @@ export interface GallicaRecord {
   url: string;
   date: string;
   terms: string[];
-  context: GallicaContext;
+  context: ContextRow[];
+}
+
+export interface ContextRow {
+  pivot: string;
+  left_context: string;
+  right_context: string;
 }
 
 export interface Paper {

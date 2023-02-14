@@ -63,7 +63,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       month={props.month}
       day={props.day}
       year={props.year}
-      limit={10}
+      limit={5}
       link_term={passedLinkTerm}
       link_distance={selectedDistance}
       initialRecords={props.initialRecords}

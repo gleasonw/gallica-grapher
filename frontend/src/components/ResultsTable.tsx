@@ -1,6 +1,6 @@
 import React from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Context } from "./Context";
+import { Column, useTable } from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
@@ -28,6 +28,7 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
     initialRecords: undefined,
     cursor: pageParam,
     limit: props.limit,
+    row_split: true,
   });
   const response = await fetch(url);
   const data = (await response.json()) as GallicaResponse;
@@ -90,15 +91,61 @@ export function ResultsTable(props: TableProps) {
     placeholderData: ssrData,
   });
 
-  if (isError) {
-    return <div>Error</div>;
-  }
+  const columns: Column<{
+    col1: string;
+    col2: string;
+    col3: string;
+    col4: string;
+    col5: string;
+  }>[] = React.useMemo(
+    () => [
+      {
+        Header: "Document",
+        accessor: "col1",
+      },
+      {
+        Header: "Date",
+        accessor: "col2",
+      },
+      {
+        Header: "Left context",
+        accessor: "col3",
+      },
+      {
+        Header: "Pivot",
+        accessor: "col4",
+      },
+      {
+        Header: "Right context",
+        accessor: "col5",
+      },
+    ],
+    []
+  );
 
   const currentPage = data.data?.pages.filter(
     (page) => page?.nextCursor == pageToCursor(selectedPage)
   )[0];
+
+  const tableData = React.useMemo(
+    () =>
+      currentPage?.data.records
+        .map((record) =>
+          record.context.map((contextRow) => ({
+            col1: record.paper_title,
+            col2: record.date,
+            col3: contextRow.left_context,
+            col4: contextRow.pivot,
+            col5: contextRow.right_context,
+          }))
+        )
+        .flat() ?? [],
+    [currentPage]
+  );
+
+  const tableInstance = useTable({ columns, data: tableData });
+
   const total_results = Number(data.data?.pages[0]?.data.num_results) ?? 0;
-  const origin_urls = data.data?.pages[0]?.data.origin_urls ?? [];
   const cursorMax = Math.floor(total_results / limit) + 1;
   const fetchedCursors = data.data?.pages.map((page) => page?.nextCursor);
   const fetchedSet = new Set(fetchedCursors);
@@ -138,31 +185,39 @@ export function ResultsTable(props: TableProps) {
               {!currentPage && !isFetching && <p>No results found</p>}
               {currentPage && (
                 <div className={"flex flex-row gap-10"}>
-                  {total_results.toLocaleString()} results
+                  {total_results.toLocaleString()} documents
                 </div>
               )}
             </h1>
-            {currentPage?.data.records.map((record, index) => (
-              <div
-                key={index}
-                className={"flex flex-col gap-5 bg-white p-5 shadow-md"}
-              >
-                <div className={"flex flex-row flex-wrap gap-10 pb-5 text-lg"}>
-                  <p>{record.terms.join(", ")}</p>
-                  <p>{record.date}</p>
-                  <p>{record.paper_title}</p>
-                  <a
-                    className={"truncate underline"}
-                    href={record.url}
-                    target={"_blank"}
-                    rel={"noreferrer"}
-                  >
-                    {record.url}
-                  </a>
-                </div>
-                <Context record={record} key={record.url + record.terms} />
-              </div>
-            ))}
+            <table>
+              <thead>
+                {tableInstance.headerGroups.map((headerGroup, index) => (
+                  <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                    {headerGroup.headers.map((column, index) => (
+                      <th {...column.getHeaderProps()} key={index}>
+                        {column.render("Header")}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody {...tableInstance.getTableBodyProps()}>
+                {tableInstance.rows.map((row, index) => {
+                  tableInstance.prepareRow(row);
+                  return (
+                    <tr {...row.getRowProps()} key={index}>
+                      {row.cells.map((cell, index) => {
+                        return (
+                          <td {...cell.getCellProps()} key={index}>
+                            {cell.render("Cell")}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
             {isFetchingNextPage && <p>Fetching next page...</p>}
             {isFetchingPreviousPage && <p>Fetching previous page...</p>}
             {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
