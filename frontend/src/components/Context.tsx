@@ -4,10 +4,6 @@ import { GallicaRecord } from "../models/dbStructs";
 export const Context: React.FC<{ record?: GallicaRecord }> = (props) => {
   const [pageIndex, setPageIndex] = React.useState(0);
 
-  React.useEffect(() => {
-    setPageIndex(0);
-  }, [props.record]);
-
   const data = props.record?.context;
 
   if (!data || !data.pages || pageIndex >= data.pages.length) {

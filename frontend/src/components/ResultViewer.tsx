@@ -170,6 +170,7 @@ export function ResultViewer(props: ResultViewerProps) {
 
   console.log(xAxisOptions.domain);
 
+
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"ml-10 mb-5 flex flex-row gap-10"}>

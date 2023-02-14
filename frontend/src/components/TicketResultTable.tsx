@@ -46,6 +46,16 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     setPassedLinkTerm(null);
   }, [props.month, props.day, props.year, props.selectedTicket]);
 
+  const tableKey = [
+    props.month,
+    props.day,
+    props.year,
+    props.selectedTicket?.id,
+    selectedLinkTerm,
+    selectedDistance,
+    selectedPapers
+  ]
+
   return (
     <ResultsTable
       terms={props.selectedTicket?.terms}
@@ -58,6 +68,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       link_distance={selectedDistance}
       initialRecords={props.initialRecords}
       source={"periodical"}
+      key={tableKey.join("-")}
     >
       <div
         className={"flex flex-row flex-wrap gap-5 pt-10 md:gap-10 lg:gap-10"}

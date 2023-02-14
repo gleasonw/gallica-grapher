@@ -90,10 +90,6 @@ export function ResultsTable(props: TableProps) {
     placeholderData: ssrData,
   });
 
-  React.useEffect(() => {
-    setSelectedPage(1);
-  }, [props]);
-
   if (isError) {
     return <div>Error</div>;
   }
@@ -164,7 +160,7 @@ export function ResultsTable(props: TableProps) {
                     {record.url}
                   </a>
                 </div>
-                <Context record={record} />
+                <Context record={record} key={record.url + record.terms} />
               </div>
             ))}
             {isFetchingNextPage && <p>Fetching next page...</p>}

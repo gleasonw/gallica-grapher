@@ -46,22 +46,28 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
     for page in context.pages:
         soup = BeautifulSoup(page.context, "html.parser")
         spans = soup.find_all("span", {"class": "highlight"})
+
+        def stringify_and_split(span: BeautifulSoup):
+            text = str(span).strip()
+            return text.split("(...)")
+
         for span in spans:
             pivot = span.text
+
             left_context = span.previous_sibling
             if left_context:
-                left_text = str(left_context).strip()
-                ellipsis_split = left_text.split("(...)")
+                ellipsis_split = stringify_and_split(left_context)
                 closest_left_text = ellipsis_split[-1]
             else:
                 closest_left_text = ""
+
             right_context = span.next_sibling
             if right_context:
-                right_context = str(right_context).strip()
-                ellipsis_split = right_context.split("(...)")
+                ellipsis_split = stringify_and_split(right_context)
                 closest_right_text = ellipsis_split[0]
             else:
                 closest_right_text = ""
+
             rows.append(
                 ContextRow(
                     pivot=pivot,
