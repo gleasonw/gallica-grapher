@@ -51,7 +51,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     props.day,
     props.year,
     props.selectedTicket?.id,
-    selectedLinkTerm,
+    passedLinkTerm,
     selectedDistance,
     selectedPapers
   ]
