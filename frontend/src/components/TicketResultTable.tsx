@@ -19,32 +19,10 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
-  const [formDisplayLinkTerm, setFormDisplayLinkTerm] = React.useState<
-    string | null
-  >();
   const [passedLinkTerm, setPassedLinkTerm] = React.useState<string | null>();
   const [selectedDistance, setSelectedDistance] = React.useState<number | null>(
     10
   );
-  const [typingTimeout, setTypingTimeout] =
-    React.useState<NodeJS.Timeout | null>(null);
-
-  function handleLinkChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFormDisplayLinkTerm(e.target.value);
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-    }
-    setTypingTimeout(
-      setTimeout(() => {
-        setPassedLinkTerm(e.target.value);
-      }, 500)
-    );
-  }
-
-  React.useEffect(() => {
-    setFormDisplayLinkTerm(null);
-    setPassedLinkTerm(null);
-  }, [props.month, props.day, props.year, props.selectedTicket]);
 
   const tableKey = [
     props.month,
@@ -53,8 +31,8 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     props.selectedTicket?.id,
     passedLinkTerm,
     selectedDistance,
-    selectedPapers
-  ]
+    selectedPapers,
+  ];
 
   return (
     <ResultsTable
@@ -119,22 +97,6 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
               }
             }}
           />
-        </InputLabel>
-        <InputLabel label={"Link search"}>
-          <div className={"align-center flex flex-row justify-center"}>
-            <input
-              className={"relative max-w-full border p-5"}
-              value={formDisplayLinkTerm || ""}
-              onChange={handleLinkChange}
-            />
-            <p className={"p-5"}>within</p>
-            <input
-              className={"relative w-20 border p-5"}
-              value={selectedDistance || ""}
-              onChange={(e) => setSelectedDistance(parseInt(e.target.value))}
-            />
-            <p className={"p-5"}>words</p>
-          </div>
         </InputLabel>
       </div>
       <div className={"mb-10 flex flex-row flex-wrap gap-10"}>
