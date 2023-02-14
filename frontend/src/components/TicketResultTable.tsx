@@ -19,7 +19,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
-  const [selectedLinkTerm, setSelectedLinkTerm] = React.useState<
+  const [formDisplayLinkTerm, setFormDisplayLinkTerm] = React.useState<
     string | null
   >();
   const [passedLinkTerm, setPassedLinkTerm] = React.useState<string | null>();
@@ -30,7 +30,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     React.useState<NodeJS.Timeout | null>(null);
 
   function handleLinkChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setSelectedLinkTerm(e.target.value);
+    setFormDisplayLinkTerm(e.target.value);
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
@@ -42,7 +42,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
   }
 
   React.useEffect(() => {
-    setSelectedLinkTerm(null);
+    setFormDisplayLinkTerm(null);
     setPassedLinkTerm(null);
   }, [props.month, props.day, props.year, props.selectedTicket]);
 
@@ -124,7 +124,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
           <div className={"align-center flex flex-row justify-center"}>
             <input
               className={"relative max-w-full border p-5"}
-              value={selectedLinkTerm || ""}
+              value={formDisplayLinkTerm || ""}
               onChange={handleLinkChange}
             />
             <p className={"p-5"}>within</p>

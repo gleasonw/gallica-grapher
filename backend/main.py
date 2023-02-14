@@ -189,36 +189,31 @@ def fetch_records_from_gallica(
     """API endpoint for the context table."""
 
     if limit and limit > 50:
-        raise HTTPException(status_code=400, detail="Limit must be less than or equal to 50, the maximum number of records for one request to Gallica.")
+        raise HTTPException(
+            status_code=400,
+            detail="Limit must be less than or equal to 50, the maximum number of records for one request to Gallica.",
+        )
+
+    # quotations ensure an exact phrase search in Gallica, mostly for multi-word terms
+    wrapped_terms = [f'"{term}"' for term in terms]
 
     if row_split:
-        return get_row_context(
-            year=year,
-            month=month,
-            day=day,
-            terms=terms,
-            codes=codes,
-            cursor=cursor,
-            limit=limit,
-            link_term=link_term,
-            link_distance=link_distance,
-            source=source,
-            sort=sort,
-        )
-    return get_html_context(
-            year=year,
-            month=month,
-            day=day,
-            terms=terms,
-            codes=codes,
-            cursor=cursor,
-            limit=limit,
-            link_term=link_term,
-            link_distance=link_distance,
-            source=source,
-            sort=sort,
+        context_getter = get_row_context
+    else:
+        context_getter = get_html_context
+    return context_getter(
+        year=year,
+        month=month,
+        day=day,
+        terms=wrapped_terms,
+        codes=codes,
+        cursor=cursor,
+        limit=limit,
+        link_term=link_term,
+        link_distance=link_distance,
+        source=source,
+        sort=sort,
     )
-
 
 
 if __name__ == "__main__":
