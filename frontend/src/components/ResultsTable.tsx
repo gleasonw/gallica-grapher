@@ -181,114 +181,132 @@ export function ResultsTable(props: TableProps) {
     return page * props.limit;
   }
 
-  //TODO: copy Frantext presentation
-
   return (
     <div className={"mb-20 flex flex-col"}>
-      <div className="">
-        <div>
-          <div className={"mt-5 flex flex-col gap-5"}>
-            <div className={"m-auto ml-5 "}>{props.children}</div>
-            <h1 className={"ml-5 text-2xl flex flex-col gap-2"}>
-              {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
-                <p>Fetching updated context...</p>
-              )}
-              {!currentPage && !isFetching && <p>No results found</p>}
-              {currentPage && (
+      <div className={"mt-5 flex flex-col gap-5"}>
+        <div className={"m-auto ml-5 "}>{props.children}</div>
+        <h1 className={"ml-5 text-2xl flex flex-col gap-2"}>
+          {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
+            <p>Fetching updated context...</p>
+          )}
+          {!currentPage && !isFetching && <p>No results found</p>}
+          {currentPage && (
+            <div className={"flex flex-row gap-10"}>
+              {total_results.toLocaleString()} total documents
+            </div>
+          )}
+          <p className={"text-xl"}>5 documents per page</p>
+          {isFetchingNextPage && <p>Fetching next page...</p>}
+          {isFetchingPreviousPage && <p>Fetching previous page...</p>}
+        </h1>
+        {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
+          <div>
+            <div
+              className={
+                "ml-5 flex flex-row gap-10 text-xl md:text-2xl lg:text-2xl"
+              }
+            >
+              {selectedPage != 1 && (
                 <div className={"flex flex-row gap-10"}>
-                  {total_results.toLocaleString()} total documents
+                  <button
+                    onClick={() => handleCursorDecrement(selectedPage - 1)}
+                  >
+                    {"<<"}
+                  </button>
+                  <button onClick={() => handleCursorDecrement()}>{"<"}</button>
                 </div>
               )}
-              <p className={"text-xl"}>5 documents per page</p>
-              {isFetchingNextPage && <p>Fetching next page...</p>}
-              {isFetchingPreviousPage && <p>Fetching previous page...</p>}
-            </h1>
-            {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
-              <div>
-                <div
-                  className={
-                    "ml-5 flex flex-row gap-10 text-xl md:text-2xl lg:text-2xl"
-                  }
-                >
-                  {selectedPage != 1 && (
-                    <div className={"flex flex-row gap-10"}>
-                      <button
-                        onClick={() => handleCursorDecrement(selectedPage - 1)}
-                      >
-                        {"<<"}
-                      </button>
-                      <button onClick={() => handleCursorDecrement()}>
-                        {"<"}
-                      </button>
-                    </div>
-                  )}
-                  <p>Page</p>
-                  <CursorInput
-                    cursor={selectedPage}
-                    cursorMax={cursorMax}
-                    onCursorIncrement={handleCursorIncrement}
-                    onCursorDecrement={handleCursorDecrement}
-                  />
-                  <p>of {cursorMax.toLocaleString()}</p>
-                  {selectedPage !== cursorMax && (
-                    <div className={"flex flex-row gap-10"}>
-                      <button onClick={() => handleCursorIncrement()}>
-                        {">"}
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleCursorIncrement(cursorMax - selectedPage)
-                        }
-                      >
-                        {">>"}
-                      </button>
-                    </div>
-                  )}
+              <p>Page</p>
+              <CursorInput
+                cursor={selectedPage}
+                cursorMax={cursorMax}
+                onCursorIncrement={handleCursorIncrement}
+                onCursorDecrement={handleCursorDecrement}
+              />
+              <p>of {cursorMax.toLocaleString()}</p>
+              {selectedPage !== cursorMax && (
+                <div className={"flex flex-row gap-10"}>
+                  <button onClick={() => handleCursorIncrement()}>{">"}</button>
+                  <button
+                    onClick={() =>
+                      handleCursorIncrement(cursorMax - selectedPage)
+                    }
+                  >
+                    {">>"}
+                  </button>
                 </div>
-              </div>
-            )}
-            <table className={"shadow-md"}>
-              <thead>
-                {tableInstance.headerGroups.map((headerGroup, index) => (
-                  <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-                    {headerGroup.headers.map((column, index) => (
-                      <th {...column.getHeaderProps()} key={index}>
-                        {column.render("Header")}
-                      </th>
-                    ))}
-                  </tr>
+              )}
+            </div>
+          </div>
+        )}
+        <table className={"shadow-md hidden md:block lg:block"}>
+          <thead>
+            {tableInstance.headerGroups.map((headerGroup, index) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                {headerGroup.headers.map((column, index) => (
+                  <th {...column.getHeaderProps()} key={index}>
+                    {column.render("Header")}
+                  </th>
                 ))}
-              </thead>
-              <tbody {...tableInstance.getTableBodyProps()}>
-                {tableInstance.rows.map((row, index) => {
-                  tableInstance.prepareRow(row);
+              </tr>
+            ))}
+          </thead>
+          <tbody {...tableInstance.getTableBodyProps()}>
+            {tableInstance.rows.map((row, index) => {
+              tableInstance.prepareRow(row);
+              return (
+                <tr
+                  {...row.getRowProps()}
+                  key={index}
+                  className={"odd:bg-zinc-100"}
+                >
+                  {row.cells.map((cell, index) => {
+                    let twStyle = "";
+                    if (cell.column.Header === "Left context") {
+                      twStyle = "text-right";
+                    }
+                    return (
+                      <td
+                        {...cell.getCellProps()}
+                        key={index}
+                        className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div className={"flex flex-col gap-10"}>
+          {tableInstance.rows.map((row, index) => {
+            tableInstance.prepareRow(row);
+            return (
+              <div
+                {...row.getRowProps()}
+                key={index}
+                className={"odd:bg-zinc-100"}
+              >
+                {row.cells.map((cell, index) => {
+                  let twStyle = "";
+                  if (cell.column.Header === "Pivot") {
+                    twStyle = "font-medium";
+                  }
                   return (
-                    <tr
-                      {...row.getRowProps()}
+                    <div
+                      {...cell.getCellProps()}
                       key={index}
-                      className={"odd:bg-zinc-100"}
+                      className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
                     >
-                      {row.cells.map((cell, index) => {
-                        let twStyle = "";
-                        if (cell.column.Header === "Left context") {
-                          twStyle = "text-right";
-                        }
-                        return (
-                          <td
-                            {...cell.getCellProps()}
-                            key={index}
-                            className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
-                          >
-                            {cell.render("Cell")}
-                          </td>
-                        );
-                      })}
-                    </tr>
+                      {cell.render("Cell")}
+                    </div>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
