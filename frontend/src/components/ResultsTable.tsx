@@ -260,11 +260,15 @@ export function ResultsTable(props: TableProps) {
                       className={"odd:bg-zinc-100"}
                     >
                       {row.cells.map((cell, index) => {
+                        let twStyle = "";
+                        if (cell.column.Header === "Left context") {
+                          twStyle = "text-right";
+                        }
                         return (
                           <td
                             {...cell.getCellProps()}
                             key={index}
-                            className={"pl-5 pr-5 pt-2 pb-2"}
+                            className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
                           >
                             {cell.render("Cell")}
                           </td>
