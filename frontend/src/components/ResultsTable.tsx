@@ -172,6 +172,8 @@ export function ResultsTable(props: TableProps) {
     return page * props.limit;
   }
 
+  //TODO: copy Frantext presentation
+
   return (
     <div className={"mb-20 flex flex-col"}>
       <div className="">
@@ -262,7 +264,7 @@ export function ResultsTable(props: TableProps) {
                           <td
                             {...cell.getCellProps()}
                             key={index}
-                            className={"pl-5 pr-5"}
+                            className={"pl-5 pr-5 pt-2 pb-2"}
                           >
                             {cell.render("Cell")}
                           </td>
