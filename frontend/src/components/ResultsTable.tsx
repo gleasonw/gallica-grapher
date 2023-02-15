@@ -178,53 +178,25 @@ export function ResultsTable(props: TableProps) {
         <div>
           <div className={"mt-5 flex flex-col gap-5"}>
             <div className={"m-auto ml-5 "}>{props.children}</div>
-            <h1 className={"ml-5 text-2xl"}>
+            <h1 className={"ml-5 text-2xl flex flex-col gap-2"}>
               {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
                 <p>Fetching updated context...</p>
               )}
               {!currentPage && !isFetching && <p>No results found</p>}
               {currentPage && (
                 <div className={"flex flex-row gap-10"}>
-                  {total_results.toLocaleString()} documents
+                  {total_results.toLocaleString()} total documents
                 </div>
               )}
+              <p className={"text-xl"}>5 documents per page</p>
+              {isFetchingNextPage && <p>Fetching next page...</p>}
+              {isFetchingPreviousPage && <p>Fetching previous page...</p>}
             </h1>
-            <table>
-              <thead>
-                {tableInstance.headerGroups.map((headerGroup, index) => (
-                  <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-                    {headerGroup.headers.map((column, index) => (
-                      <th {...column.getHeaderProps()} key={index}>
-                        {column.render("Header")}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody {...tableInstance.getTableBodyProps()}>
-                {tableInstance.rows.map((row, index) => {
-                  tableInstance.prepareRow(row);
-                  return (
-                    <tr {...row.getRowProps()} key={index}>
-                      {row.cells.map((cell, index) => {
-                        return (
-                          <td {...cell.getCellProps()} key={index}>
-                            {cell.render("Cell")}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            {isFetchingNextPage && <p>Fetching next page...</p>}
-            {isFetchingPreviousPage && <p>Fetching previous page...</p>}
             {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
               <div>
                 <div
                   className={
-                    "flex flex-row justify-center gap-10 text-xl md:text-3xl lg:text-3xl"
+                    "ml-5 flex flex-row gap-10 text-xl md:text-2xl lg:text-2xl"
                   }
                 >
                   {selectedPage != 1 && (
@@ -239,6 +211,7 @@ export function ResultsTable(props: TableProps) {
                       </button>
                     </div>
                   )}
+                  <p>Page</p>
                   <CursorInput
                     cursor={selectedPage}
                     cursorMax={cursorMax}
@@ -263,6 +236,43 @@ export function ResultsTable(props: TableProps) {
                 </div>
               </div>
             )}
+            <table className={"shadow-md"}>
+              <thead>
+                {tableInstance.headerGroups.map((headerGroup, index) => (
+                  <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                    {headerGroup.headers.map((column, index) => (
+                      <th {...column.getHeaderProps()} key={index}>
+                        {column.render("Header")}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody {...tableInstance.getTableBodyProps()}>
+                {tableInstance.rows.map((row, index) => {
+                  tableInstance.prepareRow(row);
+                  return (
+                    <tr
+                      {...row.getRowProps()}
+                      key={index}
+                      className={"odd:bg-zinc-100"}
+                    >
+                      {row.cells.map((cell, index) => {
+                        return (
+                          <td
+                            {...cell.getCellProps()}
+                            key={index}
+                            className={"pl-5 pr-5"}
+                          >
+                            {cell.render("Cell")}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -312,7 +322,7 @@ function CursorInput(props: CursorInputProps) {
       type={"number"}
       value={localCursor}
       onChange={(e) => setLocalCursor(e.target.valueAsNumber)}
-      className={"w-10"}
+      className={"w-20 border rounded-md"}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
