@@ -259,7 +259,7 @@ export function ResultViewer(props: ResultViewerProps) {
           ) : null}
         </LineChart>
       </ResponsiveContainer>
-      <div className={"border ml-5 mr-5 p-5"}>
+      <div className={"ml-5 mr-5 border p-3"}>
         Word count data courtesy Benjamin Azoulay and Benoît de Courson of the{" "}
         <a
           className={"underline"}
