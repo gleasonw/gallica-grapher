@@ -60,7 +60,7 @@ class GallicaSession:
         self.maxSize = maxSize
         retry_strategy = Retry(
             total=10,
-            status_forcelist=[403, 429],
+            status_forcelist=[403, 429, 500],
             backoff_factor=1,
             connect=20,
             read=20,
@@ -85,6 +85,7 @@ class GallicaSession:
             return Response(b"", query, 0)
         end = time.perf_counter()
         if response.status_code != 200:
+            print(response.url)
             print(f"Gallica HTTP response Error: {response.status_code}")
             return Response(b"", query, 0)
         return Response(xml=response.content, query=query, elapsed=end - start)

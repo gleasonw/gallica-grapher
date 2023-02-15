@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from gallicaGetter import wrapperFactory as wF
 from functools import partial
 from bs4 import BeautifulSoup
+from gallicaGetter.concurrentFetch import NUM_WORKERS
 
 
 class ContextRow(BaseModel):
@@ -170,3 +171,77 @@ def make_date_from_year_mon_day(
         return f"{year}"
     else:
         return ""
+
+
+def stream_all_records_with_context(
+    terms: List[str],
+    codes: Optional[List[str]] = None,
+    year: Optional[int] = 0,
+    month: Optional[int] = 0,
+    day: Optional[int] = 0,
+    link_term: Optional[str] = None,
+    link_distance: Optional[int] = 0,
+    source: Literal["book", "periodical", "all"] = "all",
+    sort: Literal["date", "relevance"] = "relevance",
+):
+    """Queries Gallica's SRU and ContentSearch API's to get all context for a given term in the archive; begins a CSV download."""
+
+    link = None
+    if link_distance and link_term:
+        link_distance = int(link_distance)
+        link = (link_term, link_distance)
+
+    total_records = 0
+    origin_urls = []
+
+    def set_total_records(num_records: int):
+        nonlocal total_records
+        total_records = num_records
+
+    def set_origin_urls(urls: List[str]):
+        nonlocal origin_urls
+        origin_urls = urls
+
+    # get the volumes in which the term appears
+    volume_Gallica_wrapper = wF.WrapperFactory.volume()
+    gallica_records = volume_Gallica_wrapper.get(
+        terms=terms,
+        start_date=make_date_from_year_mon_day(year, month, day),
+        codes=codes,
+        source=source,
+        link=link,
+        sort=sort,
+        on_get_total_records=set_total_records,
+        on_get_origin_urls=set_origin_urls,
+        get_all_results=True,
+    )
+
+    # get the context for those volumes
+    content_wrapper = wF.WrapperFactory.context()
+
+    batch_of_num_workers = []
+    continue_loop = True
+
+    yield "paper_title\tpaper_code\tdate\turl\tleft_context\tpivot\tright_context\n"
+
+    while continue_loop:
+        for _ in range(NUM_WORKERS):
+            try:
+                batch_of_num_workers.append(next(gallica_records))
+            except StopIteration:
+                continue_loop = False
+                break
+        code_dict = {
+            record.url.split("/")[-1]: record for record in batch_of_num_workers
+        }
+        context = content_wrapper.get(
+            [
+                (record.url.split("/")[-1], record.terms)
+                for record in batch_of_num_workers
+            ]
+        )
+        for context_response in context:
+            record = code_dict[context_response.ark]
+            row = build_row_record(record, context_response)
+            for context_row in row.context:
+                yield f"{row.paper_title}\t{row.paper_code}\t{row.date}\t{row.url}\t{context_row.left_context}\t{context_row.pivot}\t{context_row.right_context}\n"

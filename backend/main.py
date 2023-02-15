@@ -1,10 +1,14 @@
 import json
 import os
+import uvicorn
 import random
 from typing import List, Literal, Optional
-import uvicorn
 from pydantic import BaseModel
-from gallicaContextSearch import UserResponse, get_row_context, get_html_context
+from gallicaContextSearch import (
+    get_row_context,
+    get_html_context,
+    stream_all_records_with_context,
+)
 import gallicaGetter.wrapperFactory as wF
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
@@ -13,6 +17,8 @@ from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+import asyncio
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -185,7 +191,8 @@ def fetch_records_from_gallica(
     source: Literal["book", "periodical", "all"] = "all",
     sort: Literal["date", "relevance"] = "relevance",
     row_split: Optional[bool] = False,
-) -> UserResponse:
+    download_csv: Optional[bool] = False,
+):
     """API endpoint for the context table."""
 
     if limit and limit > 50:
@@ -196,6 +203,26 @@ def fetch_records_from_gallica(
 
     # quotations ensure an exact phrase search in Gallica, mostly for multi-word terms
     wrapped_terms = [f'"{term}"' for term in terms]
+
+    if download_csv:
+        record_gen = stream_all_records_with_context(
+            year=year,
+            month=month,
+            day=day,
+            terms=wrapped_terms,
+            codes=codes,
+            link_term=link_term,
+            link_distance=link_distance,
+            source=source,
+            sort=sort,
+        )
+        return StreamingResponse(
+            record_gen,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f'attachment; filename="context_table.csv"',
+            },
+        )
 
     if row_split:
         context_getter = get_row_context
