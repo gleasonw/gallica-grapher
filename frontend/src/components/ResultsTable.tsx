@@ -280,7 +280,7 @@ export function ResultsTable(props: TableProps) {
             })}
           </tbody>
         </table>
-        <div className={"flex flex-col gap-10"}>
+        <div className={"flex flex-col gap-10 md:hidden lg:hidden"}>
           {tableInstance.rows.map((row, index) => {
             tableInstance.prepareRow(row);
             return (
