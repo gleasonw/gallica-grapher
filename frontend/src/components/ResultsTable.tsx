@@ -95,7 +95,7 @@ export function ResultsTable(props: TableProps) {
     col1: JSX.Element;
     col2: string;
     col3: string;
-    col4: string;
+    col4: JSX.Element;
     col5: string;
   }>[] = React.useMemo(
     () => [
@@ -144,7 +144,7 @@ export function ResultsTable(props: TableProps) {
             ),
             col2: record.date,
             col3: contextRow.left_context,
-            col4: contextRow.pivot,
+            col4: <span className={"font-medium"}>{contextRow.pivot}</span>,
             col5: contextRow.right_context,
           }))
         )
@@ -290,15 +290,11 @@ export function ResultsTable(props: TableProps) {
                 className={"odd:bg-zinc-100"}
               >
                 {row.cells.map((cell, index) => {
-                  let twStyle = "";
-                  if (cell.column.Header === "Pivot") {
-                    twStyle = "font-medium";
-                  }
                   return (
                     <div
                       {...cell.getCellProps()}
                       key={index}
-                      className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
+                      className={"pl-5 pr-5 pt-2 pb-2 "}
                     >
                       {cell.render("Cell")}
                     </div>
