@@ -92,7 +92,7 @@ export function ResultsTable(props: TableProps) {
   });
 
   const columns: Column<{
-    col1: string;
+    col1: JSX.Element;
     col2: string;
     col3: string;
     col4: string;
@@ -132,7 +132,16 @@ export function ResultsTable(props: TableProps) {
       currentPage?.data.records
         .map((record) =>
           record.context.map((contextRow) => ({
-            col1: record.paper_title,
+            col1: (
+              <a
+                href={record.url}
+                className={"underline"}
+                target={"_blank"}
+                rel="noreferrer"
+              >
+                {record.paper_title}
+              </a>
+            ),
             col2: record.date,
             col3: contextRow.left_context,
             col4: contextRow.pivot,
