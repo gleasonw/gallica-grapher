@@ -260,7 +260,7 @@ export function ResultViewer(props: ResultViewerProps) {
         </LineChart>
       </ResponsiveContainer>
       <div className={"border ml-5 mr-5 p-5"}>
-        Word count data courtesy Benjamin Azoulay and Benoit de Courson of the{" "}
+        Word count data courtesy Benjamin Azoulay and Benoît de Courson of the{" "}
         <a
           className={"underline"}
           href={"https://shiny.ens-paris-saclay.fr/app/gallicagram"}
