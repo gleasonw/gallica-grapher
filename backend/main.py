@@ -220,7 +220,7 @@ def fetch_records_from_gallica(
             record_gen,
             media_type="text/csv",
             headers={
-                "Content-Disposition": f'attachment; filename="context_table.csv"',
+                "Content-Disposition": f'attachment; filename="{terms[0]}_context.csv"',
             },
         )
 
