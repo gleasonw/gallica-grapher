@@ -18,11 +18,6 @@ import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
 import { InferGetStaticPropsType } from "next";
 
-// TODO: remove day
-// page nav on bottom
-// link term input
-// source input
-
 export const seriesColors = [
   "#7cb5ec",
   "#434348",
@@ -73,6 +68,7 @@ export function ResultViewer(props: ResultViewerProps) {
   const [dataMin, setDataMin] = React.useState<number | null>(null);
   const [dataMax, setDataMax] = React.useState<number | null>(null);
 
+  // TODO: remove this effect, make selectedTicketID a number
   React.useEffect(() => {
     if (
       props.tickets.length > 0 &&
@@ -170,7 +166,6 @@ export function ResultViewer(props: ResultViewerProps) {
 
   console.log(xAxisOptions.domain);
 
-
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"ml-10 mb-5 flex flex-row gap-10"}>
@@ -264,6 +259,18 @@ export function ResultViewer(props: ResultViewerProps) {
           ) : null}
         </LineChart>
       </ResponsiveContainer>
+      <div className={"border ml-5 mr-5 p-5"}>
+        Word count data courtesy Benjamin Azoulay and Benoit de Courson of the{" "}
+        <a
+          className={"underline"}
+          href={"https://shiny.ens-paris-saclay.fr/app/gallicagram"}
+          target={"_blank"}
+          rel={"noreferrer"}
+        >
+          Gallicagram
+        </a>{" "}
+        project.
+      </div>
       <TicketResultTable
         initialRecords={props.initVals.initRecords}
         tickets={props.tickets}
