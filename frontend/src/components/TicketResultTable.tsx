@@ -33,7 +33,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
   return (
     <ResultsTable
       terms={
-        props.tickets.filter((t) => t.id === props.selectedTicket)[0].terms
+        props.tickets?.filter((t) => t.id === props.selectedTicket)[0].terms
       }
       codes={selectedPapers?.map((p) => p.code) || []}
       month={props.month}
