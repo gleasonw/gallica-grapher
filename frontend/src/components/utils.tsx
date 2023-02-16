@@ -19,7 +19,6 @@ export function generateXAxisOptionsForNumericScale(
     linearDomainMin || 0,
     linearDomainMax || 0,
   ]);
-  console.log(linearScale.domain());
 
   return {
     domain: linearScale.domain(),

@@ -123,9 +123,10 @@ export function ResultsTable(props: TableProps) {
     []
   );
 
-  const currentPage = data.data?.pages.filter(
-    (page) => page?.nextCursor == pageToCursor(selectedPage)
-  )[0];
+  const currentPage =
+    data.data?.pages.filter(
+      (page) => page?.nextCursor == pageToCursor(selectedPage)
+    )[0] ?? ssrData?.pages[0];
 
   const tableData = React.useMemo(
     () =>
@@ -180,20 +181,26 @@ export function ResultsTable(props: TableProps) {
   function pageToCursor(page: number) {
     return page * props.limit;
   }
-//TODO: extract to components for readability, eliminate funky ?
+
   return (
     <div className={"mb-20 flex flex-col"}>
-      <div className={"mt-5 flex flex-col gap-5 justify-center"}>
+      <div className={"mt-5 flex flex-col justify-center"}>
         <h1 className={"text-2xl flex flex-col gap-2 ml-5"}>
           {!currentPage && !isFetching && <p>No results found</p>}
           {currentPage && (
             <div className={"flex flex-row gap-10"}>
-              {total_results.toLocaleString()} total documents
+              {total_results.toLocaleString()} total documents on Gallica
             </div>
           )}
-          <p className={"text-xl"}>5 documents per page</p>
+          <p className={"text-xl"}>
+            Showing occurrences in 5 documents per page
+          </p>
         </h1>
-        <h1 className={"flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"}>
+        <h1
+          className={
+            "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
+          }
+        >
           {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
             <p>Fetching updated context...</p>
           )}
@@ -203,7 +210,7 @@ export function ResultsTable(props: TableProps) {
         {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
           <div
             className={
-              "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
+              "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl mt-5 mb-5"
             }
           >
             {selectedPage != 1 && (
@@ -222,14 +229,16 @@ export function ResultsTable(props: TableProps) {
                 </button>
               </div>
             )}
-            <p className={"md:mr-5 lg:mr-5"}>Page</p>
+            <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
             <CursorInput
               cursor={selectedPage}
               cursorMax={cursorMax}
               onCursorIncrement={handleCursorIncrement}
               onCursorDecrement={handleCursorDecrement}
             />
-            <p className={"md:ml-5 lg:ml-5"}>of {cursorMax.toLocaleString()}</p>
+            <p className={"ml-3 md:ml-5 lg:ml-5"}>
+              of {cursorMax.toLocaleString()}
+            </p>
             {selectedPage !== cursorMax && (
               <div className={"flex flex-row justify-between"}>
                 <button

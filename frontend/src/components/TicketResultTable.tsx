@@ -9,8 +9,8 @@ import { Paper } from "../models/dbStructs";
 export interface TicketTableProps extends TableProps {
   onSelectMonth: (month: number | null) => void;
   onSelectYear: (year: number | null) => void;
-  onSelectTicket: (ticket: Ticket) => void;
-  selectedTicket: Ticket | null;
+  onSelectTicket: (ticketID: number) => void;
+  selectedTicket: number | null;
   tickets: Ticket[];
   initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
@@ -19,38 +19,30 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
-  const [passedLinkTerm, setPassedLinkTerm] = React.useState<string | null>();
-  const [selectedDistance, setSelectedDistance] = React.useState<number | null>(
-    10
-  );
 
   const tableKey = [
     props.month,
     props.day,
     props.year,
-    props.selectedTicket?.id,
-    passedLinkTerm,
-    selectedDistance,
+    props.selectedTicket,
     selectedPapers,
   ];
 
   return (
     <ResultsTable
-      terms={props.selectedTicket?.terms}
+      terms={
+        props.tickets.filter((t) => t.id === props.selectedTicket)[0].terms
+      }
       codes={selectedPapers?.map((p) => p.code) || []}
       month={props.month}
       day={props.day}
       year={props.year}
       limit={5}
-      link_term={passedLinkTerm}
-      link_distance={selectedDistance}
       initialRecords={props.initialRecords}
       source={"periodical"}
       key={tableKey.join("-")}
     >
-      <div
-        className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}
-      >
+      <div className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}>
         <InputLabel label={"Year"}>
           <input
             type={"number"}
@@ -69,18 +61,12 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
         <InputLabel label={"Ticket"}>
           <select
             onChange={(e) => {
-              if (!props.tickets) {
-                return;
-              }
-              props.onSelectTicket(
-                props.tickets.find(
-                  (t) => t.id === parseInt(e.target.value)
-                ) as Ticket
-              );
+              props.onSelectTicket(parseInt(e.target.value));
             }}
             className={"border  bg-white p-5"}
+            value={props.selectedTicket || ""}
           >
-            {props.tickets?.map((ticket) => (
+            {props.tickets.map((ticket) => (
               <option key={ticket.id} value={ticket.id}>
                 {ticket.terms}
               </option>
@@ -99,7 +85,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
           />
         </InputLabel>
       </div>
-      <div className={"mb-10 flex flex-row flex-wrap gap-10"}>
+      <div className={"mb-10 mt-5 flex flex-row flex-wrap gap-10"}>
         {selectedPapers?.map((paper) => (
           <button
             onClick={() => {

@@ -51,9 +51,7 @@ export async function getTicketData(
 }
 
 export function ResultViewer(props: ResultViewerProps) {
-  const [selectedTicket, setSelectedTicket] = React.useState<Ticket | null>(
-    props.tickets && props.tickets.length > 0 ? props.tickets[0] : null
-  );
+  const [selectedTicket, setSelectedTicket] = React.useState<number | null>(null);
   const [selectedYear, setSelectedYear] = React.useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = React.useState<number | null>(null);
   const [selectedGrouping, setSelectedGrouping] = React.useState<
@@ -68,17 +66,14 @@ export function ResultViewer(props: ResultViewerProps) {
   const [dataMin, setDataMin] = React.useState<number | null>(null);
   const [dataMax, setDataMax] = React.useState<number | null>(null);
 
-  // TODO: remove this effect, make selectedTicketID a number
-  React.useEffect(() => {
-    if (
-      props.tickets.length > 0 &&
-      !props.tickets.some((t) => t.id === selectedTicket?.id)
-    ) {
-      setSelectedTicket(props.tickets[0]);
-      setSelectedMonth(null);
-      setSelectedYear(null);
-    }
-  }, [props.tickets, selectedTicket]);
+  if (
+    props.tickets.length > 0 &&
+    !props.tickets.some((t) => t.id === selectedTicket)
+  ) {
+    setSelectedTicket(props.tickets[0].id);
+    setSelectedMonth(null);
+    setSelectedYear(null);
+  }
 
   const ticketData = useQueries({
     queries: props.tickets.map((ticket) => {
@@ -213,7 +208,6 @@ export function ResultViewer(props: ResultViewerProps) {
             }
             if (e.activePayload && e.activePayload.length > 0) {
               const payload = e.activePayload[0];
-              console.log(payload.name);
               if (payload.payload && payload.payload.date) {
                 const date = new Date(parseInt(payload.payload.date));
                 setSelectedYear(date.getFullYear());
