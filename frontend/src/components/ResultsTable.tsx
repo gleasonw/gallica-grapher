@@ -183,8 +183,8 @@ export function ResultsTable(props: TableProps) {
 
   return (
     <div className={"mb-20 flex flex-col"}>
-      <div className={"mt-5 flex flex-col gap-5"}>
-        <h1 className={"ml-5 text-2xl flex flex-col gap-2"}>
+      <div className={"mt-5 flex flex-col gap-5 justify-center"}>
+        <h1 className={"text-2xl flex flex-col gap-2"}>
           {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
             <p>Fetching updated context...</p>
           )}
@@ -201,7 +201,7 @@ export function ResultsTable(props: TableProps) {
         {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
           <div
             className={
-              "flex flex-row items-center text-xl md:text-2xl lg:text-2xl md:ml-5 lg:ml-5"
+              "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl md:ml-5 lg:ml-5"
             }
           >
             {selectedPage != 1 && (
