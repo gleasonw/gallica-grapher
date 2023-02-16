@@ -184,7 +184,6 @@ export function ResultsTable(props: TableProps) {
   return (
     <div className={"mb-20 flex flex-col"}>
       <div className={"mt-5 flex flex-col gap-5"}>
-        <div className={"m-auto ml-5 "}>{props.children}</div>
         <h1 className={"ml-5 text-2xl flex flex-col gap-2"}>
           {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
             <p>Fetching updated context...</p>
@@ -249,6 +248,7 @@ export function ResultsTable(props: TableProps) {
             )}
           </div>
         )}
+        <div className={"m-auto ml-5 "}>{props.children}</div>
         <table className={"shadow-md hidden md:block lg:block"}>
           <thead>
             {tableInstance.headerGroups.map((headerGroup, index) => (
