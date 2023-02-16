@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { LangContext } from "../pages";
 import { Ticket } from "../pages/index";
 import { ResultsTable, TableProps, fetchContext } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
@@ -27,6 +28,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     props.selectedTicket,
     selectedPapers,
   ];
+  const { lang } = useContext(LangContext);
 
   return (
     <ResultsTable
@@ -43,7 +45,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       key={tableKey.join("-")}
     >
       <div className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}>
-        <InputLabel label={"Year"}>
+        <InputLabel label={lang === "fr" ? "Année" : "Year"}>
           <input
             type={"number"}
             className={"border  bg-white p-5"}
@@ -51,7 +53,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
             onChange={(e) => props.onSelectYear(parseInt(e.target.value))}
           />
         </InputLabel>
-        <InputLabel label={"Month"}>
+        <InputLabel label={lang === "fr" ? "Mois" : "Month"}>
           <SelectInput
             options={Array.from(Array(12).keys()).map((i) => String(i))}
             onChange={(value) => props.onSelectMonth(parseInt(value))}
@@ -73,7 +75,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
             ))}
           </select>
         </InputLabel>
-        <InputLabel label={"Periodical"}>
+        <InputLabel label={lang === "fr" ? "Périodique" : "Periodical"}>
           <PaperDropdown
             onClick={(paper) => {
               if (selectedPapers) {

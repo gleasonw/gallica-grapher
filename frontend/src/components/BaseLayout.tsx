@@ -6,7 +6,7 @@ import { LangContext } from "../pages";
 
 interface BaseLayoutProps {
   children: ReactNode;
-  onToggleLang: () => void;
+  onToggleLang?: () => void;
 }
 
 export const BaseLayout: React.FC<BaseLayoutProps> = (props) => {

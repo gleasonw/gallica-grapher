@@ -4,6 +4,8 @@ import { Column, useTable } from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
+import { useContext } from "react";
+import { LangContext } from "../pages";
 
 export interface TableProps {
   terms?: string[];
@@ -48,9 +50,30 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
   };
 };
 
+const strings = {
+  fr: {
+    noResults: "Aucun résultat",
+    loading_next: "Chargement de la prochaine page...",
+    loading_previous: "Chargement de la page précédente...",
+    error: "Erreur",
+    total_docs: "documents sur Gallica",
+    num_docs_page: "Les occurrences dans 5 documents sont affichées",
+  },
+  en: {
+    noResults: "No results",
+    loading_next: "Loading next page...",
+    loading_previous: "Loading previous page...",
+    error: "Error",
+    total_docs: "documents on Gallica",
+    num_docs_page: "Occurrences in 5 documents are displayed",
+  },
+};
+
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
   const limit = props.limit || 10;
+  const { lang } = useContext(LangContext);
+  const translation = strings[lang];
 
   let ssrData;
   if (props.initialRecords) {
@@ -108,7 +131,7 @@ export function ResultsTable(props: TableProps) {
         accessor: "col2",
       },
       {
-        Header: "Left context",
+        Header: lang === "fr" ? "Contexte gauche" : "Left context",
         accessor: "col3",
       },
       {
@@ -116,11 +139,11 @@ export function ResultsTable(props: TableProps) {
         accessor: "col4",
       },
       {
-        Header: "Right context",
+        Header: lang === "fr" ? "Contexte droit" : "Right context",
         accessor: "col5",
       },
     ],
-    []
+    [lang]
   );
 
   const currentPage =
@@ -189,12 +212,10 @@ export function ResultsTable(props: TableProps) {
           {!currentPage && !isFetching && <p>No results found</p>}
           {currentPage && (
             <div className={"flex flex-row gap-10"}>
-              {total_results.toLocaleString()} total documents on Gallica
+              {total_results.toLocaleString()} {translation.total_docs}
             </div>
           )}
-          <p className={"text-xl"}>
-            Showing occurrences in 5 documents per page
-          </p>
+          <p className={"text-xl"}>{translation.num_docs_page}</p>
         </h1>
         <h1
           className={
@@ -202,10 +223,10 @@ export function ResultsTable(props: TableProps) {
           }
         >
           {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
-            <p>Fetching updated context...</p>
+            <p>{translation.loading_next}</p>
           )}
-          {isFetchingNextPage && <p>Fetching next page...</p>}
-          {isFetchingPreviousPage && <p>Fetching previous page...</p>}
+          {isFetchingNextPage && <p>{translation.loading_next}</p>}
+          {isFetchingPreviousPage && <p>{translation.loading_previous}</p>}
         </h1>
         {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
           <div
@@ -237,7 +258,7 @@ export function ResultsTable(props: TableProps) {
               onCursorDecrement={handleCursorDecrement}
             />
             <p className={"ml-3 md:ml-5 lg:ml-5"}>
-              of {cursorMax.toLocaleString()}
+              {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
             </p>
             {selectedPage !== cursorMax && (
               <div className={"flex flex-row justify-between"}>
@@ -283,7 +304,10 @@ export function ResultsTable(props: TableProps) {
                 >
                   {row.cells.map((cell, index) => {
                     let twStyle = "";
-                    if (cell.column.Header === "Left context") {
+                    if (
+                      cell.column.Header === "Left context" ||
+                      cell.column.Header === "Contexte gauche"
+                    ) {
                       twStyle = "text-right";
                     }
                     return (

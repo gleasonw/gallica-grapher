@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { LangContext } from "../pages";
 import { apiURL } from "./apiURL";
 import { useQuery } from "@tanstack/react-query";
 import { Paper } from "../models/dbStructs";
@@ -21,10 +22,11 @@ export const PaperDropdown: React.FC<{
     staleTime: Infinity,
     keepPreviousData: true,
   });
+  const { lang } = useContext(LangContext);
   return (
     <div>
       <input
-        placeholder={"search for a periodical"}
+        placeholder={lang === "fr" ? "rechercher un périodique" : "search for a paper"}
         value={periodical}
         className={"relative max-w-full border bg-white p-5"}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
