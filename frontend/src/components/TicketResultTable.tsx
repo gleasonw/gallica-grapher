@@ -49,7 +49,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       key={tableKey.join("-")}
     >
       <div
-        className={"flex flex-row flex-wrap gap-5 pt-10 md:gap-10 lg:gap-10"}
+        className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}
       >
         <InputLabel label={"Year"}>
           <input
