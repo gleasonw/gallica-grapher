@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { LangContext } from "../pages";
 import { Ticket, getStaticProps } from "../pages/index";
 import {
   LineChart,
@@ -50,8 +51,45 @@ export async function getTicketData(
   return data;
 }
 
+const gallica_plug = (
+  <a
+    href="https://shiny.ens-paris-saclay.fr/app/gallicagram"
+    target="_blank"
+    rel="noreferrer"
+    className="text-blue-500 underline"
+  >
+    Gallicagram
+  </a>
+);
+const strings = {
+  fr: {
+    zoom_out: "Zoomer à l'échelle originale",
+    gallicagram_plug: (
+      <p>
+        Données de charte fournies par {gallica_plug}, un projet de Benjamin
+        Azoulay et Benoît de Courson
+      </p>
+    ),
+    grouping: "Résolution",
+    smoothing: "Lissage",
+  },
+  en: {
+    zoom_out: "Zoom out",
+    gallicagram_plug: (
+      <p>
+        Chart data provided by {gallica_plug}, a project by Benjamin Azoulay and
+        Benoît de Courson
+      </p>
+    ),
+    grouping: "Grouping",
+    smoothing: "Smoothing",
+  },
+};
+
 export function ResultViewer(props: ResultViewerProps) {
-  const [selectedTicket, setSelectedTicket] = React.useState<number | null>(null);
+  const [selectedTicket, setSelectedTicket] = React.useState<number | null>(
+    null
+  );
   const [selectedYear, setSelectedYear] = React.useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = React.useState<number | null>(null);
   const [selectedGrouping, setSelectedGrouping] = React.useState<
@@ -65,6 +103,9 @@ export function ResultViewer(props: ResultViewerProps) {
   const [refAreaRight, setRefAreaRight] = React.useState<number | null>(null);
   const [dataMin, setDataMin] = React.useState<number | null>(null);
   const [dataMax, setDataMax] = React.useState<number | null>(null);
+
+  const { lang } = useContext(LangContext);
+  const translation = strings[lang];
 
   if (
     props.tickets.length > 0 &&
@@ -164,7 +205,7 @@ export function ResultViewer(props: ResultViewerProps) {
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"ml-10 mb-5 flex flex-row gap-10"}>
-        <InputLabel label={"Grouping"}>
+        <InputLabel label={translation.grouping}>
           <SelectInput
             options={["year", "month"]}
             onChange={(value: string) =>
@@ -173,7 +214,7 @@ export function ResultViewer(props: ResultViewerProps) {
             value={selectedGrouping}
           />
         </InputLabel>
-        <InputLabel label={"Smoothing"}>
+        <InputLabel label={translation.smoothing}>
           <SelectInput
             options={["0", "1", "2", "3", "4", "5", "10", "20", "50"]}
             onChange={(value: string) => setSelectedSmoothing(parseInt(value))}
@@ -183,7 +224,9 @@ export function ResultViewer(props: ResultViewerProps) {
         {zoomed && (
           <button onClick={zoomOut} className={"p-5 "}>
             {" "}
-            <div className={"border p-5 hover:bg-zinc-100"}>Zoom out</div>
+            <div className={"border p-5 hover:bg-zinc-100"}>
+              {translation.zoom_out}
+            </div>
           </button>
         )}
       </div>
@@ -254,16 +297,7 @@ export function ResultViewer(props: ResultViewerProps) {
         </LineChart>
       </ResponsiveContainer>
       <div className={"ml-5 mr-5 border p-3"}>
-        Word count data courtesy Benjamin Azoulay and Benoît de Courson of the{" "}
-        <a
-          className={"underline"}
-          href={"https://shiny.ens-paris-saclay.fr/app/gallicagram"}
-          target={"_blank"}
-          rel={"noreferrer"}
-        >
-          Gallicagram
-        </a>{" "}
-        project.
+        {translation.gallicagram_plug}
       </div>
       <TicketResultTable
         initialRecords={props.initVals.initRecords}

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Ticket } from "../pages/index";
 import { TextInput } from "./TextInput";
-import { PaperSelector } from "./PaperSelector";
 import { RangeInput } from "./RangeInput";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./ResultViewer";
 import { useMutation } from "@tanstack/react-query";
 import { Paper } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
+import { useContext } from "react";
+import { LangContext } from "../pages/index";
 
 export interface InputFormProps {
   onCreateTicket: (ticket: Ticket) => void;
@@ -17,6 +18,17 @@ export interface InputFormProps {
   onSliderChange: (value: [number, number]) => void;
   yearRange: [number, number];
 }
+
+const strings = {
+  fr: {
+    no_records_found: "Aucun résultat trouvé",
+    search_for_word: "Rechercher un mot",
+  },
+  en: {
+    no_records_found: "No records found",
+    search_for_word: "Search for a word",
+  },
+};
 
 export const InputForm: React.FC<InputFormProps> = ({
   onCreateTicket,
@@ -30,6 +42,8 @@ export const InputForm: React.FC<InputFormProps> = ({
   const [papers, setPapers] = useState<Paper[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [ticketID, setTicketID] = useState<number>(0);
+  const { lang } = useContext(LangContext);
+  const translation = strings[lang];
 
   async function postTicket(ticket: Ticket): Promise<{ requestid: number }> {
     const response = await fetch(`${apiURL}/api/init`, {
@@ -92,7 +106,7 @@ export const InputForm: React.FC<InputFormProps> = ({
             setWord("");
           }}
           onNoRecordsFound={() => {
-            alert("No records found for this search");
+            alert(translation.no_records_found);
             setSubmitted(false);
             setWord("");
           }}
@@ -108,7 +122,7 @@ export const InputForm: React.FC<InputFormProps> = ({
       <div>
         <div className="m-10 flex flex-col gap-10 text-left">
           <TextInput
-            placeholder={"Search term"}
+            placeholder={translation.search_for_word}
             value={word}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setWord(e.target.value)

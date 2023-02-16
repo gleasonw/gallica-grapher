@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { RevealButton } from "./RevealButton";
+import React, { useContext } from "react";
+import { LangContext } from "../pages";
 
 interface RangeInputProps {
   min: number;
@@ -8,9 +8,10 @@ interface RangeInputProps {
   onChange: (value: [number, number]) => void;
 }
 export const RangeInput: React.FC<RangeInputProps> = (props) => {
+  const { lang } = useContext(LangContext);
   return (
     <div className={"flex flex-row flex-wrap gap-10 rounded-md border-4 shadow-sm p-5"}>
-      Between
+      {lang === "fr" ? "De" : "From"}
       <input
         className="w-20"
         type="number"
@@ -20,7 +21,7 @@ export const RangeInput: React.FC<RangeInputProps> = (props) => {
           props.onChange(newValue as [number, number]);
         }}
       />
-      and
+      {lang === "fr" ? "à" : "to"}
       <input
         className="w-20"
         type="number"

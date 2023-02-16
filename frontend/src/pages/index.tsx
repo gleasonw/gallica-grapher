@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, createContext } from "react";
 import { BaseLayout } from "../components/BaseLayout";
 import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
@@ -69,49 +69,67 @@ export const getStaticProps: GetStaticProps<{
   };
 };
 
+export const LangContext = createContext<{
+  lang: "fr" | "en";
+  setLang: React.Dispatch<React.SetStateAction<"fr" | "en">>;
+}>({ lang: "fr", setLang: () => {} });
+
+const strings = {
+  fr: {
+    title: "The Gallica Grapher",
+    description:
+      "Explorez les occurrences de mots dans des périodiques Gallica archivés.",
+  },
+  en: {
+    title: "The Gallica Grapher",
+    description: "Explore word occurrences in archived Gallica periodicals.",
+  },
+};
+
 export default function Home({
   initRecords,
   initSeries,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [tickets, setTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
-
+  const [lang, setLang] = useState<"fr" | "en">("fr");
+  const translation = strings[lang];
   return (
-    <BaseLayout>
-      <title>
-        The Gallica Grapher
-      </title>
-      <div className="m-10 text-center text-4xl">
-        {" "}
-        View word occurrences in archived French periodicals.
-      </div>
-      <InputForm
-        onCreateTicket={(ticket: Ticket) => {
-          if (tickets) {
-            setTickets([...tickets, ticket]);
-          } else {
-            setTickets([ticket]);
-          }
-        }}
-        onSliderChange={(range: [number, number]) => {
-          setOuterRange(range);
-        }}
-        tickets={tickets}
-        yearRange={outerRange}
-        onDeleteTicket={(ticket?: Ticket) => {
-          if (tickets && ticket) {
-            setTickets(tickets.filter((t) => t.id !== ticket.id));
-          }
-        }}
-        onDeleteExampleTickets={() => {
-          setTickets(tickets.filter((t) => !t.example));
-        }}
-      />
-      <ResultViewer
-        tickets={tickets}
-        outerRange={outerRange}
-        initVals={{ initRecords, initSeries }}
-      />
-    </BaseLayout>
+    <LangContext.Provider value={{ lang, setLang }}>
+      <BaseLayout onToggleLang={() => setLang(lang === "en" ? "fr" : "en")}>
+        <title>{translation.title}</title>
+        <div className="m-10 text-center text-4xl">
+          {" "}
+          {translation.description}{" "}
+        </div>
+        <InputForm
+          onCreateTicket={(ticket: Ticket) => {
+            if (tickets) {
+              setTickets([...tickets, ticket]);
+            } else {
+              setTickets([ticket]);
+            }
+          }}
+          onSliderChange={(range: [number, number]) => {
+            setOuterRange(range);
+          }}
+          tickets={tickets}
+          yearRange={outerRange}
+          onDeleteTicket={(ticket?: Ticket) => {
+            if (tickets && ticket) {
+              setTickets(tickets.filter((t) => t.id !== ticket.id));
+            }
+          }}
+          onDeleteExampleTickets={() => {
+            setTickets(tickets.filter((t) => !t.example));
+          }}
+        />
+        <ResultViewer
+          tickets={tickets}
+          outerRange={outerRange}
+          initVals={{ initRecords, initSeries }}
+        />
+      </BaseLayout>
+    </LangContext.Provider>
   );
 }
