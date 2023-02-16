@@ -184,7 +184,7 @@ export function ResultsTable(props: TableProps) {
   return (
     <div className={"mb-20 flex flex-col"}>
       <div className={"mt-5 flex flex-col gap-5 justify-center"}>
-        <h1 className={"text-2xl flex flex-col gap-2"}>
+        <h1 className={"text-2xl flex flex-col gap-2 ml-5"}>
           {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
             <p>Fetching updated context...</p>
           )}
