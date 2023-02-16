@@ -78,7 +78,7 @@ const strings = {
   fr: {
     title: "The Gallica Grapher",
     description:
-      "Explorez les occurrences de mots dans des périodiques Gallica archivés.",
+      "Explorez les occurrences de mots dans des périodiques Gallica.",
   },
   en: {
     title: "The Gallica Grapher",
