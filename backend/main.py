@@ -204,6 +204,9 @@ def fetch_records_from_gallica(
     # quotations ensure an exact phrase search in Gallica, mostly for multi-word terms
     wrapped_terms = [f'"{term}"' for term in terms]
 
+    # implementation is currently problematic, Gallica throws 500 errors both for random reasons and for malformed queries...
+    # Can't retry on 500, because the request may or may not be flawed. Need to spend some more time on this.
+    # The csv download might miss some records. TODO: fix this.
     if download_csv:
         record_gen = stream_all_records_with_context(
             year=year,
