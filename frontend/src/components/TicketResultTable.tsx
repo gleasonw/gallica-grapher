@@ -12,7 +12,7 @@ export interface TicketTableProps extends TableProps {
   onSelectYear: (year: number | null) => void;
   onSelectTicket: (ticketID: number) => void;
   selectedTicket: number | null;
-  tickets: Ticket[];
+  tickets?: Ticket[];
   initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
 
@@ -68,7 +68,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
             className={"border  bg-white p-5"}
             value={props.selectedTicket || ""}
           >
-            {props.tickets.map((ticket) => (
+            {props.tickets?.map((ticket) => (
               <option key={ticket.id} value={ticket.id}>
                 {ticket.terms}
               </option>
