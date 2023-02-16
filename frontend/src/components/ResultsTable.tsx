@@ -200,43 +200,53 @@ export function ResultsTable(props: TableProps) {
           {isFetchingPreviousPage && <p>Fetching previous page...</p>}
         </h1>
         {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
-          <div>
-            <div
-              className={
-                "ml-5 flex flex-row gap-10 text-xl md:text-2xl lg:text-2xl"
-              }
-            >
-              {selectedPage != 1 && (
-                <div className={"flex flex-row gap-10"}>
-                  <button
-                    onClick={() => handleCursorDecrement(selectedPage - 1)}
-                  >
-                    {"<<"}
-                  </button>
-                  <button onClick={() => handleCursorDecrement()}>{"<"}</button>
-                </div>
-              )}
-              <p>Page</p>
-              <CursorInput
-                cursor={selectedPage}
-                cursorMax={cursorMax}
-                onCursorIncrement={handleCursorIncrement}
-                onCursorDecrement={handleCursorDecrement}
-              />
-              <p>of {cursorMax.toLocaleString()}</p>
-              {selectedPage !== cursorMax && (
-                <div className={"flex flex-row gap-10"}>
-                  <button onClick={() => handleCursorIncrement()}>{">"}</button>
-                  <button
-                    onClick={() =>
-                      handleCursorIncrement(cursorMax - selectedPage)
-                    }
-                  >
-                    {">>"}
-                  </button>
-                </div>
-              )}
-            </div>
+          <div
+            className={
+              "flex flex-row items-center text-xl md:text-2xl lg:text-2xl md:ml-5 lg:ml-5"
+            }
+          >
+            {selectedPage != 1 && (
+              <div className={"flex flex-row justify-between"}>
+                <button
+                  onClick={() => handleCursorDecrement(selectedPage - 1)}
+                  className={"p-3"}
+                >
+                  {"<<"}
+                </button>
+                <button
+                  className={"p-4"}
+                  onClick={() => handleCursorDecrement()}
+                >
+                  {"<"}
+                </button>
+              </div>
+            )}
+            <p className={"md:mr-5 lg:mr-5"}>Page</p>
+            <CursorInput
+              cursor={selectedPage}
+              cursorMax={cursorMax}
+              onCursorIncrement={handleCursorIncrement}
+              onCursorDecrement={handleCursorDecrement}
+            />
+            <p className={"md:ml-5 lg:ml-5"}>of {cursorMax.toLocaleString()}</p>
+            {selectedPage !== cursorMax && (
+              <div className={"flex flex-row justify-between"}>
+                <button
+                  className={"p-4"}
+                  onClick={() => handleCursorIncrement()}
+                >
+                  {">"}
+                </button>
+                <button
+                  onClick={() =>
+                    handleCursorIncrement(cursorMax - selectedPage)
+                  }
+                  className={"p-3"}
+                >
+                  {">>"}
+                </button>
+              </div>
+            )}
           </div>
         )}
         <table className={"shadow-md hidden md:block lg:block"}>
@@ -351,7 +361,7 @@ function CursorInput(props: CursorInputProps) {
       type={"number"}
       value={localCursor}
       onChange={(e) => setLocalCursor(e.target.valueAsNumber)}
-      className={"w-20 border rounded-md"}
+      className={"w-full max-w-max border rounded-md"}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
