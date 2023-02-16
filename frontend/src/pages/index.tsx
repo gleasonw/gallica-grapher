@@ -1,4 +1,3 @@
-import { Inter } from "@next/font/google";
 import React, { useState } from "react";
 import { BaseLayout } from "../components/BaseLayout";
 import { InputForm } from "../components/InputForm";
@@ -6,10 +5,6 @@ import { ResultViewer, getTicketData } from "../components/ResultViewer";
 import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 import { fetchContext } from "../components/ResultsTable";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export type changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => void;
 
 export interface Ticket {
   id: number;

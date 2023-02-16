@@ -22,8 +22,11 @@ def get_num_results_and_pages_for_context(
     return num_results, pages
 
 
-def get_records_from_xml(xml: bytes) -> List[etree.Element]:
-    elements = etree.fromstring(xml)
+def get_records_from_xml(xml: bytes):
+    try:
+        elements = etree.fromstring(xml)
+    except etree.XMLSyntaxError:
+        return []
     records_root = elements.find("{http://www.loc.gov/zing/srw/}records")
     if records_root is None:
         return []

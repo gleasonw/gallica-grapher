@@ -60,7 +60,7 @@ class GallicaSession:
         self.maxSize = maxSize
         retry_strategy = Retry(
             total=10,
-            status_forcelist=[403, 429, 500],
+            status_forcelist=[403, 429],
             backoff_factor=1,
             connect=20,
             read=20,
