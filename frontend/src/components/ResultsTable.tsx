@@ -180,14 +180,11 @@ export function ResultsTable(props: TableProps) {
   function pageToCursor(page: number) {
     return page * props.limit;
   }
-
+//TODO: extract to components for readability, eliminate funky ?
   return (
     <div className={"mb-20 flex flex-col"}>
       <div className={"mt-5 flex flex-col gap-5 justify-center"}>
         <h1 className={"text-2xl flex flex-col gap-2 ml-5"}>
-          {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
-            <p>Fetching updated context...</p>
-          )}
           {!currentPage && !isFetching && <p>No results found</p>}
           {currentPage && (
             <div className={"flex flex-row gap-10"}>
@@ -195,13 +192,18 @@ export function ResultsTable(props: TableProps) {
             </div>
           )}
           <p className={"text-xl"}>5 documents per page</p>
+        </h1>
+        <h1 className={"flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"}>
+          {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
+            <p>Fetching updated context...</p>
+          )}
           {isFetchingNextPage && <p>Fetching next page...</p>}
           {isFetchingPreviousPage && <p>Fetching previous page...</p>}
         </h1>
         {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
           <div
             className={
-              "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl md:ml-5 lg:ml-5"
+              "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
             }
           >
             {selectedPage != 1 && (
