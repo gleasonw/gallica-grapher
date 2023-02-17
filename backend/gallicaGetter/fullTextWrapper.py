@@ -47,7 +47,8 @@ class FullTextQuery:
 
     ark: str
 
-    def get_params_for_fetch(self):
+    @property
+    def params(self):
         return {}
 
     @property

@@ -25,7 +25,8 @@ class PaperQuery:
     def make_copy(self, start_index: int, num_records: int):
         return PaperQuery(start_index, num_records, self.endpoint_url, self.codes)
 
-    def get_params_for_fetch(self):
+    @property
+    def params(self):
         base = {
             "operation": "searchRetrieve",
             "exactSearch": "True",

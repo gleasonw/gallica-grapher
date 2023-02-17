@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from gallicaGetter.concurrentFetch import Response
 import urllib.parse
 
 from gallicaGetter.base_query_builds import build_base_queries
@@ -9,7 +8,7 @@ from gallicaGetter.index_query_builds import (
     index_queries_by_num_results,
 )
 from gallicaGetter.date import Date
-from gallicaGetter.gallicaWrapper import GallicaWrapper
+from gallicaGetter.gallicaWrapper import GallicaWrapper, Response
 from gallicaGetter.parse_xml import (
     get_records_from_xml,
     get_paper_title_from_record_xml,
@@ -61,7 +60,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/SRU"
 
-    def get(
+    async def get(
         self,
         terms: List[str],
         source: Optional[Literal["book", "periodical", "all"]] = "all",
@@ -112,15 +111,14 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             url = "https://gallica.bnf.fr/SRU?"
             on_get_origin_urls(
                 [
-                    url + urllib.parse.urlencode(query.get_params_for_fetch())
+                    url + urllib.parse.urlencode(query.params)
                     for query in queries
                 ]
             )
-        record_generator = self.get_records_for_queries(
+        return await self.get_records_for_queries(
             queries=queries,
             on_update_progress=onProgressUpdate,
         )
-        return record_generator
 
     def get_num_results_for_args(
         self,

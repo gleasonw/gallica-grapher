@@ -53,5 +53,6 @@ class ContentQuery:
     terms: List[str]
     endpoint_url: str
 
-    def get_params_for_fetch(self):
+    @property
+    def params(self):
         return {"ark": self.ark, "query": self.terms}

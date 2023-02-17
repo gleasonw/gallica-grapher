@@ -3,7 +3,7 @@ from gallicaGetter.date import Date
 from typing import List, Tuple
 
 
-def get_one_paper_from_record_batch(xml: bytes) -> str:
+def get_one_paper_from_record_batch(xml: str) -> str:
     records = get_records_from_xml(xml)
     if records:
         return get_paper_title_from_record_xml(records[0])
@@ -15,7 +15,7 @@ def get_num_results_and_pages_for_context(
     xml: bytes,
 ) -> Tuple[int, List[Tuple[str, str]]]:
     try:
-        elements = etree.fromstring(xml)
+        elements = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
     except etree.XMLSyntaxError:
         return 0, []
     top_level = elements.find(".")
@@ -25,9 +25,9 @@ def get_num_results_and_pages_for_context(
     return num_results, pages
 
 
-def get_records_from_xml(xml: bytes):
+def get_records_from_xml(xml: str):
     try:
-        elements = etree.fromstring(xml)
+        elements = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
     except etree.XMLSyntaxError:
         return []
     records_root = elements.find("{http://www.loc.gov/zing/srw/}records")
@@ -36,13 +36,13 @@ def get_records_from_xml(xml: bytes):
     return records_root.findall("{http://www.loc.gov/zing/srw/}record")
 
 
-def get_html(xml: bytes) -> str:
-    elements = etree.fromstring(xml)
+def get_html(xml: str) -> str:
+    elements = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
     return elements.find("html").text
 
 
-def get_num_records_from_gallica_xml(xml: bytes) -> int:
-    xml_root = etree.fromstring(xml)
+def get_num_records_from_gallica_xml(xml: str) -> int:
+    xml_root = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
     num_results = xml_root.find("{http://www.loc.gov/zing/srw/}numberOfRecords")
     if num_results is not None:
         return int(num_results.text)
@@ -50,8 +50,8 @@ def get_num_records_from_gallica_xml(xml: bytes) -> int:
         return 0
 
 
-def get_years_published(xml: bytes) -> List[str]:
-    root = etree.fromstring(xml)
+def get_years_published(xml: str) -> List[str]:
+    root = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
     years = [get_year_from_element(yearElement) for yearElement in root.iter("year")]
     return list(filter(None, years))
 
@@ -64,7 +64,7 @@ def get_year_from_element(year_element) -> str | None:
         return None
 
 
-def get_data_from_record_root(root) -> etree.Element:
+def get_data_from_record_root(root):
     root = root[2]
     data = root[0]
     return data

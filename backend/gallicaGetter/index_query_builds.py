@@ -1,5 +1,4 @@
 from typing import List, Optional
-from gallicaGetter.concurrentFetch import ConcurrentFetch
 from gallicaGetter.parse_xml import get_num_records_from_gallica_xml
 from gallicaGetter.volumeQuery import VolumeQuery
 from gallicaGetter.paperQuery import PaperQuery
@@ -7,7 +6,7 @@ from gallicaGetter.paperQuery import PaperQuery
 
 def build_indexed_queries(
     queries: List[VolumeQuery] | List[PaperQuery],
-    api: ConcurrentFetch,
+    api: Callable[[List[VolumeQuery] | List[PaperQuery]], List[Response]],
     limit: Optional[int] = None,
     offset: Optional[int] = None,
 ) -> List[VolumeQuery] | List[PaperQuery]:

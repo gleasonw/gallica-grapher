@@ -18,6 +18,19 @@ class VolumeQuery(BaseModel):
     gallica_results_for_params: int = 0
     collapsing = False
 
+    @property
+    def params(self):
+        base = {
+            "operation": "searchRetrieve",
+            "exactSearch": "True",
+            "version": 1.2,
+            "startRecord": self.start_index,
+            "maximumRecords": self.limit,
+            "query": self.build_cql_string(),
+            "collapsing": self.collapsing and "true" or "false",
+        }
+        return base
+
     def make_copy(self, start_index: int, num_records: int = 1):
         return VolumeQuery(
             terms=self.terms,
@@ -60,18 +73,6 @@ class VolumeQuery(BaseModel):
             return 'text adj "' + '" or text adj "'.join(self.terms) + '"'
         else:
             return ""
-
-    def get_params_for_fetch(self):
-        base = {
-            "operation": "searchRetrieve",
-            "exactSearch": "True",
-            "version": 1.2,
-            "startRecord": self.start_index,
-            "maximumRecords": self.limit,
-            "query": self.build_cql_string(),
-            "collapsing": self.collapsing and "true" or "false",
-        }
-        return base
 
     def build_source_sql(self):
         if self.codes and self.codes[0]:

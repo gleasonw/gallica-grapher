@@ -42,5 +42,6 @@ class IssuesQuery:
     def get_code(self):
         return self.code
 
-    def get_params_for_fetch(self):
+    @property
+    def params(self):
         return {"ark": f"ark:/12148/{self.code}/date"}
