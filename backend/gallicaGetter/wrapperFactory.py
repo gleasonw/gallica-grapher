@@ -13,7 +13,7 @@ class Gettable:
         return
 
 
-NUM_WORKERS = 20 
+NUM_WORKERS = 30 
 
 
 class WrapperFactory:

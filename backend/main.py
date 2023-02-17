@@ -180,7 +180,8 @@ def records(
 def fetch_records_from_gallica(
     year: Optional[int] = 0,
     month: Optional[int] = 0,
-    day: Optional[int] = 0,
+    end_year: Optional[int] = 0,
+    end_month: Optional[int] = 0,
     terms: List[str] = Query(),
     codes: Optional[List[str]] = Query(None),
     cursor: Optional[int] = 0,
@@ -193,7 +194,7 @@ def fetch_records_from_gallica(
     download_csv: Optional[bool] = False,
 ):
     """API endpoint for the context table. To fetch multiple terms linked with OR in the Gallica CQL, pass multiple terms parameters: /api/gallicaRecords?terms=term1&terms=term2&terms=term3"""
-
+    print(year, end_year)
     if limit and limit > 50:
         raise HTTPException(
             status_code=400,
@@ -213,9 +214,10 @@ def fetch_records_from_gallica(
 
     if download_csv:
         record_gen = stream_all_records_with_context(
-            year=year,
-            month=month,
-            day=day,
+            start_year=year,
+            start_month=month,
+            end_year=end_year,
+            end_month=end_month,
             terms=wrapped_terms,
             codes=codes,
             link_term=link_term,
@@ -238,7 +240,8 @@ def fetch_records_from_gallica(
     return context_getter(
         year=year,
         month=month,
-        day=day,
+        end_year=end_year,
+        end_month=end_month,
         terms=wrapped_terms,
         codes=codes,
         cursor=cursor,
