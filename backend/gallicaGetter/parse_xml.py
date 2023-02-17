@@ -14,7 +14,10 @@ def get_one_paper_from_record_batch(xml: bytes) -> str:
 def get_num_results_and_pages_for_context(
     xml: bytes,
 ) -> Tuple[int, List[Tuple[str, str]]]:
-    elements = etree.fromstring(xml)
+    try:
+        elements = etree.fromstring(xml)
+    except etree.XMLSyntaxError:
+        return 0, []
     top_level = elements.find(".")
     num_results = top_level.attrib.get("countResults")
     items = top_level[1].findall("item")

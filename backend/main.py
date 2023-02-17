@@ -18,7 +18,6 @@ from www.models import Ticket, Progress
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-import asyncio
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -201,12 +200,17 @@ def fetch_records_from_gallica(
             detail="Limit must be less than or equal to 50, the maximum number of records for one request to Gallica.",
         )
 
-    # quotations ensure an exact phrase search in Gallica, mostly for multi-word terms
-    wrapped_terms = [f'"{term}"' for term in terms]
+    # ensure multi-word terms are wrapped in quotes for an exact search in Gallica; don't double wrap though
+    wrapped_terms = []
+    for term in terms:
+        if term.startswith('"') and term.endswith('"'):
+            wrapped_terms.append(term)
+        else:
+            if " " in term:
+                wrapped_terms.append(f'"{term}"')
+            else:
+                wrapped_terms.append(term)
 
-    # implementation is currently problematic, Gallica throws 500 errors both for random reasons and for malformed queries...
-    # Can't retry on 500, because the request may or may not be flawed. Need to spend some more time on this.
-    # The csv download might miss some records. TODO: fix this.
     if download_csv:
         record_gen = stream_all_records_with_context(
             year=year,
