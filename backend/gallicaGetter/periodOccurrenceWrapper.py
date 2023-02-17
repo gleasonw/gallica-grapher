@@ -52,5 +52,5 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
             yield PeriodRecord(
                 date=Date(query.start_date),
                 count=count,
-                term=query.term,
+                term=query.terms,
             )

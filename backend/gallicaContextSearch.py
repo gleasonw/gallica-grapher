@@ -92,6 +92,8 @@ def get_context(
     codes: Optional[List[str]] = None,
     year: Optional[int] = 0,
     month: Optional[int] = 0,
+    end_year: Optional[int] = 0,
+    end_month: Optional[int] = 0,
     day: Optional[int] = 0,
     cursor: Optional[int] = 0,
     limit: Optional[int] = 10,
@@ -102,7 +104,6 @@ def get_context(
     parser: Callable[[VolumeRecord, HTMLContext], GallicaRecord] = build_html_record,
 ) -> UserResponse:
     """Queries Gallica's SRU and ContentSearch API's to get context for a given term in the archive."""
-
     link = None
     if link_distance and link_term:
         link_distance = int(link_distance)
@@ -124,6 +125,7 @@ def get_context(
     gallica_records = volume_Gallica_wrapper.get(
         terms=terms,
         start_date=make_date_from_year_mon_day(year, month, day),
+        end_date=make_date_from_year_mon_day(end_year, end_month, day),
         codes=codes,
         source=source,
         link=link,
@@ -176,8 +178,10 @@ def make_date_from_year_mon_day(
 def stream_all_records_with_context(
     terms: List[str],
     codes: Optional[List[str]] = None,
-    year: Optional[int] = 0,
-    month: Optional[int] = 0,
+    start_year: Optional[int] = 0,
+    start_month: Optional[int] = 0,
+    end_year: Optional[int] = 0,
+    end_month: Optional[int] = 0,
     day: Optional[int] = 0,
     link_term: Optional[str] = None,
     link_distance: Optional[int] = 0,
@@ -206,7 +210,8 @@ def stream_all_records_with_context(
     volume_Gallica_wrapper = wF.WrapperFactory.volume()
     gallica_records = volume_Gallica_wrapper.get(
         terms=terms,
-        start_date=make_date_from_year_mon_day(year, month, day),
+        start_date=make_date_from_year_mon_day(start_year, start_month, day),
+        end_date=make_date_from_year_mon_day(end_year, end_month, day),
         codes=codes,
         source=source,
         link=link,
