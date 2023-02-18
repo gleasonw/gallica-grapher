@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-from backend.gallicaGetter.utils.date import Date
-from backend.gallicaGetter.utils.parse_xml import get_num_records_from_gallica_xml
+
+import aiohttp
+from gallicaGetter.utils.date import Date
+from gallicaGetter.utils.parse_xml import get_num_records_from_gallica_xml
 from gallicaGetter.gallicaWrapper import GallicaWrapper
-from backend.gallicaGetter.utils.base_query_builds import build_base_queries
+from gallicaGetter.utils.base_query_builds import build_base_queries
 from typing import Generator, List, Optional
 
 
@@ -16,7 +18,7 @@ class PeriodRecord:
 class PeriodOccurrenceWrapper(GallicaWrapper):
     """Fetches # occurrences of terms in a given period of time. Useful for making graphs."""
 
-    def get(
+    async def get(
         self,
         terms: List[str],
         start_date: Optional[str] = None,
@@ -24,7 +26,19 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
         codes: Optional[List[str]] = None,
         grouping: str = "year",
         onProgressUpdate=None,
+        session: aiohttp.ClientSession | None = None,
     ) -> Generator[PeriodRecord, None, None]:
+        if session is None:
+            async with aiohttp.ClientSession() as session:
+                return await self.get(
+                    terms=terms,
+                    start_date=start_date,
+                    end_date=end_date,
+                    codes=codes,
+                    grouping=grouping,
+                    onProgressUpdate=onProgressUpdate,
+                    session=session,
+                )
         if grouping not in ["year", "month"]:
             raise ValueError(
                 f'grouping must be either "year" or "month", not {grouping}'
@@ -37,10 +51,9 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
             endpoint_url=self.endpoint_url,
             grouping=grouping,
         )
-        record_generator = self.get_records_for_queries(
-            queries=queries, on_update_progress=onProgressUpdate
+        return await self.get_records_for_queries(
+            queries=queries, on_update_progress=onProgressUpdate, session=session
         )
-        return record_generator
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/SRU"

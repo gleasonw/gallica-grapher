@@ -4,6 +4,7 @@ from gallicaGetter.queries import ContentQuery
 from gallicaGetter.utils.parse_xml import get_num_results_and_pages_for_context
 from gallicaGetter.gallicaWrapper import GallicaWrapper
 from dataclasses import dataclass
+import aiohttp
 
 
 class GallicaPage(BaseModel):
@@ -35,13 +36,17 @@ class ContextWrapper(GallicaWrapper):
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/services/ContentSearch"
 
-    def get(
-        self, context_pairs: List[Tuple[str, List[str]]], generate=False
+    async def get(
+        self,
+        context_pairs: List[Tuple[str, List[str]]],
+        generate=False,
+        session: aiohttp.ClientSession | None = None,
     ) -> Generator[HTMLContext, None, None]:
+        if session is None:
+            async with aiohttp.ClientSession() as session:
+                return await self.get(context_pairs, generate, session)
         queries = [
             ContentQuery(ark=pair[0], terms=pair[1], endpoint_url=self.endpoint_url)
             for pair in context_pairs
         ]
-        record_generator = self.get_records_for_queries(queries=queries)
-        return record_generator
-
+        return await self.get_records_for_queries(queries=queries, session=session)

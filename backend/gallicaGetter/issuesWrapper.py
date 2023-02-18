@@ -1,4 +1,6 @@
 from typing import Generator, List
+
+import aiohttp
 from gallicaGetter.queries import IssuesQuery
 from gallicaGetter.utils.parse_xml import get_years_published
 from gallicaGetter.gallicaWrapper import GallicaWrapper
@@ -17,17 +19,21 @@ class IssuesWrapper(GallicaWrapper):
     def parse(self, gallica_responses):
         for response in gallica_responses:
             years = get_years_published(response.xml)
-            code = response.query.get_code()
+            code = response.query.code
             yield IssueYearRecord(code=code, years=years)
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/services/Issues"
 
-    async def get(self, codes) -> Generator[IssueYearRecord, None, None]:
+    async def get(
+        self, codes, session: aiohttp.ClientSession | None = None
+    ) -> Generator[IssueYearRecord, None, None]:
+        if session is None:
+            async with aiohttp.ClientSession() as session:
+                return await self.get(codes, session)
         if type(codes) == str:
             codes = [codes]
         queries = [
             IssuesQuery(code=code, endpoint_url=self.endpoint_url) for code in codes
         ]
-        return await self.get_records_for_queries(queries)
-
+        return await self.get_records_for_queries(queries, session=session)

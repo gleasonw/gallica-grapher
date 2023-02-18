@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
+
+import aiohttp
 from gallicaGetter.issuesWrapper import IssuesWrapper
 from gallicaGetter.utils.parse_xml import (
     get_paper_code_from_record_xml,
@@ -8,9 +10,12 @@ from gallicaGetter.utils.parse_xml import (
     get_url_from_record,
 )
 from gallicaGetter.gallicaWrapper import GallicaWrapper
-from gallicaGetter.paperQuery import PaperQuery
-from backend.gallicaGetter.utils.base_query_builds import bundle_codes, NUM_CODES_PER_BUNDLE
-from backend.gallicaGetter.utils.index_query_builds import build_indexed_queries
+from gallicaGetter.queries import PaperQuery
+from gallicaGetter.utils.base_query_builds import (
+    bundle_codes,
+    NUM_CODES_PER_BUNDLE,
+)
+from gallicaGetter.utils.index_query_builds import build_indexed_queries
 
 
 @dataclass(slots=True)
@@ -39,45 +44,31 @@ class PapersWrapper(GallicaWrapper):
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/SRU"
 
-    def get(
+    async def get(
         self,
         arg_codes: Optional[List[str]] = None,
         get_all_results: bool = False,
+        session: aiohttp.ClientSession | None = None,
     ) -> List[PaperRecord]:
-        if type(arg_codes) == str:
-            arg_codes = [arg_codes]
-
-        def build_sru_queries_for_codes() -> List[PaperQuery]:
-            """Builds a Gallica query to fetch paper metadata for bundles of code strings"""
-            sru_queries = []
-            for code_bundle in bundle_codes(arg_codes):
-                sru_query = PaperQuery(
-                    start_index=0,
-                    limit=NUM_CODES_PER_BUNDLE,
-                    codes=code_bundle,
-                    endpoint_url=self.endpoint_url,
-                )
-                sru_queries.append(sru_query)
-            return sru_queries
-
+        if session is None:
+            async with aiohttp.ClientSession() as session:
+                return await self.get(arg_codes, get_all_results, session)
         if not arg_codes and get_all_results:
             # Fetch all results, indexing by the number of papers on Gallica. Lengthy fetch.
             queries = build_indexed_queries(
                 [PaperQuery(start_index=0, limit=1, endpoint_url=self.endpoint_url)],
-                api=self.api,
+                session=session,
             )
         elif not arg_codes and not get_all_results:
             raise ValueError(
                 "Must provide arg_codes to get specific papers, or set get_all_results=True"
             )
         else:
-            if type(arg_codes) == str:
-                codes = [arg_codes]
-            queries = build_sru_queries_for_codes()
-        record_generator = self.get_records_for_queries(queries)
+            queries = self.build_sru_queries_for_codes(arg_codes)
+        record_generator = await self.get_records_for_queries(queries, session=session)
         sru_paper_records = list(record_generator)
-        codes = [record.code for record in sru_paper_records]
-        year_records = self.issues_API.get(codes)
+        paper_codes = [record.code for record in sru_paper_records]
+        year_records = await self.issues_API.get(paper_codes, session=session)
         years_as_dict = {record.code: record.years for record in year_records}
         for record in sru_paper_records:
             record.publishing_years = years_as_dict[record.code]
@@ -92,3 +83,16 @@ class PapersWrapper(GallicaWrapper):
                     url=get_url_from_record(record),
                     publishing_years=[],
                 )
+
+    def build_sru_queries_for_codes(self, codes: List[str] | None) -> List[PaperQuery]:
+        """Builds a Gallica query to fetch paper metadata for bundles of code strings"""
+        sru_queries = []
+        for code_bundle in bundle_codes(codes):
+            sru_query = PaperQuery(
+                start_index=0,
+                limit=NUM_CODES_PER_BUNDLE,
+                codes=code_bundle,
+                endpoint_url=self.endpoint_url,
+            )
+            sru_queries.append(sru_query)
+        return sru_queries
