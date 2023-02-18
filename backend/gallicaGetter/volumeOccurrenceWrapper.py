@@ -126,26 +126,3 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             on_update_progress=onProgressUpdate,
             session=session,
         )
-
-    def get_num_results_for_args(
-        self,
-        terms: List[str],
-        link: Optional[Tuple[str, int]] = None,
-        source: Optional[Literal["book", "periodical", "all"]] = "all",
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        codes: Optional[List[str]] = None,
-        grouping: str = "all",
-    ):
-        """Returns Gallica's knowledge of the number of records in the database that match the given arguments."""
-        base_queries = build_base_queries(
-            terms=terms,
-            start_date=start_date,
-            end_date=end_date,
-            codes=codes,
-            link=link,
-            source=source,
-            endpoint_url=self.endpoint_url,
-            grouping=grouping,
-        )
-        return get_num_results_for_queries(base_queries, session=self.session)

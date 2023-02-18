@@ -49,7 +49,7 @@ class GallicaWrapper:
     ):
         """The core abstraction for fetching record xml from gallica and parsing it to Python objects. Called by all subclasses."""
 
-        raw_response = await get(
+        raw_response = await fetch_from_gallica(
             queries,
             session=session,
             on_update_progress=on_update_progress,
@@ -64,13 +64,13 @@ class Response:
     elapsed_time: float
 
 
-async def get(queries, session: aiohttp.ClientSession, on_update_progress=None):
+async def fetch_from_gallica(queries, session: aiohttp.ClientSession, on_update_progress=None):
     if type(queries) is not list:
         queries = [queries]
     tasks = []
     for query in queries:
         tasks.append(
-            fetch_from_gallica(
+            get(
                 query=query,
                 session=session,
                 on_update_progress=on_update_progress,
@@ -80,7 +80,7 @@ async def get(queries, session: aiohttp.ClientSession, on_update_progress=None):
     return await asyncio.gather(*tasks)
 
 
-async def fetch_from_gallica(
+async def get(
     query: VolumeQuery | PaperQuery | IssuesQuery | ContentQuery | FullTextQuery,
     session: aiohttp.ClientSession,
     on_update_progress=None,

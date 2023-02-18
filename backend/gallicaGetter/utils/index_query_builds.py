@@ -4,7 +4,7 @@ import aiohttp
 from gallicaGetter.utils.parse_xml import get_num_records_from_gallica_xml
 from gallicaGetter.queries import VolumeQuery
 from gallicaGetter.queries import PaperQuery
-import gallicaGetter.gallicaWrapper as gallicaG
+import gallicaGetter.gallicaWrapper as gallicaWrapper
 
 
 async def build_indexed_queries(
@@ -28,7 +28,7 @@ async def build_indexed_queries(
 async def get_num_results_for_queries(
     queries: List[VolumeQuery] | List[PaperQuery], session: aiohttp.ClientSession
 ) -> List[PaperQuery] | List[VolumeQuery]:
-    responses = await gallicaG.get(queries, session)
+    responses = await gallicaWrapper.fetch_from_gallica(queries, session)
     queries_with_num_results_state = []
     for response in responses:
         assert response.query is type(VolumeQuery) or type(PaperQuery)
