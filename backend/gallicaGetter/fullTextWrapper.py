@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Generator, List
 
 from bs4 import BeautifulSoup
+from gallicaGetter.queries import FullTextQuery
 from gallicaGetter.gallicaWrapper import GallicaWrapper
 
 
@@ -40,20 +41,3 @@ class FullTextWrapper(GallicaWrapper):
         record_generator = self.get_records_for_queries(queries=queries)
         return record_generator
 
-
-@dataclass(frozen=True, slots=True)
-class FullTextQuery:
-    """Struct for a query to Gallica's full text API. The endpoint does not use query parameters, so the endpoint URL changes for each query."""
-
-    ark: str
-
-    @property
-    def params(self):
-        return {}
-
-    @property
-    def endpoint_url(self):
-        return f"https://gallica.bnf.fr/ark:/12148/{self.ark}.texteBrut"
-
-    def __repr__(self) -> str:
-        return f"RawTextQuery({self.ark})"

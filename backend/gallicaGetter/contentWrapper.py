@@ -1,6 +1,7 @@
 from typing import Generator, List, Tuple
 from pydantic import BaseModel
-from backend.gallicaGetter.utils.parse_xml import get_num_results_and_pages_for_context
+from gallicaGetter.queries import ContentQuery
+from gallicaGetter.utils.parse_xml import get_num_results_and_pages_for_context
 from gallicaGetter.gallicaWrapper import GallicaWrapper
 from dataclasses import dataclass
 
@@ -44,15 +45,3 @@ class ContextWrapper(GallicaWrapper):
         record_generator = self.get_records_for_queries(queries=queries)
         return record_generator
 
-
-@dataclass(frozen=True, slots=True)
-class ContentQuery:
-    """Struct for query to Gallica's ContentSearch API."""
-
-    ark: str
-    terms: List[str]
-    endpoint_url: str
-
-    @property
-    def params(self):
-        return {"ark": self.ark, "query": self.terms}

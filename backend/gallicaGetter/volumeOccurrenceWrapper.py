@@ -1,15 +1,17 @@
 from dataclasses import dataclass
 import urllib.parse
 
-from backend.gallicaGetter.utils.base_query_builds import build_base_queries
-from backend.gallicaGetter.utils.index_query_builds import (
+import aiohttp
+
+from gallicaGetter.utils.base_query_builds import build_base_queries
+from gallicaGetter.utils.index_query_builds import (
     build_indexed_queries,
     get_num_results_for_queries,
     index_queries_by_num_results,
 )
-from backend.gallicaGetter.utils.date import Date
+from gallicaGetter.utils.date import Date
 from gallicaGetter.gallicaWrapper import GallicaWrapper, Response
-from backend.gallicaGetter.utils.parse_xml import (
+from gallicaGetter.utils.parse_xml import (
     get_records_from_xml,
     get_paper_title_from_record_xml,
     get_paper_code_from_record_xml,
@@ -76,7 +78,14 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         on_get_total_records: Optional[Callable[[int], None]] = None,
         on_get_origin_urls: Optional[Callable[[List[str]], None]] = None,
         get_all_results: bool = False,
+        session: aiohttp.ClientSession | None = None,
     ) -> Generator[VolumeRecord, None, None]:
+        if session is None:
+            async with aiohttp.ClientSession() as session:
+                local_args = locals()
+                del local_args["self"]
+                del local_args["session"]
+                return await self.get(**local_args, session=session)
         if query_cache:
             queries = index_queries_by_num_results(query_cache)
         else:
@@ -96,9 +105,9 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             if (num_results and num_results > 50) or get_all_results:
                 # assume we want all results, or index for more than 50
                 # we will have to fetch # total records from Gallica
-                queries = build_indexed_queries(
+                queries = await build_indexed_queries(
                     base_queries,
-                    api=self.api,
+                    session=session,
                     limit=num_results,
                 )
             else:
@@ -110,14 +119,12 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         if on_get_origin_urls:
             url = "https://gallica.bnf.fr/SRU?"
             on_get_origin_urls(
-                [
-                    url + urllib.parse.urlencode(query.params)
-                    for query in queries
-                ]
+                [url + urllib.parse.urlencode(query.params) for query in queries]
             )
         return await self.get_records_for_queries(
             queries=queries,
             on_update_progress=onProgressUpdate,
+            session=session,
         )
 
     def get_num_results_for_args(
@@ -141,4 +148,4 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             endpoint_url=self.endpoint_url,
             grouping=grouping,
         )
-        return get_num_results_for_queries(base_queries, api=self.api)
+        return get_num_results_for_queries(base_queries, session=self.session)

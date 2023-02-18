@@ -4,6 +4,7 @@ from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper
 
 
 # could speed up by running the fetches in parallel. But hey, sometimes it's good to relax
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("input", "expected_length"),
     [

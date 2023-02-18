@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional, Tuple
-from backend.gallicaGetter.utils.date import Date
-from gallicaGetter.volumeQuery import VolumeQuery
+from gallicaGetter.utils.date import Date
+from gallicaGetter.queries import VolumeQuery
 
 NUM_CODES_PER_BUNDLE = 10
 
@@ -43,7 +43,7 @@ def build_base_queries(
                         source=source,
                         sort=sort,
                     )
-                    )
+                )
     return base_queries
 
 

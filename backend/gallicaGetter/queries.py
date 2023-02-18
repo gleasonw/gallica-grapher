@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List, Literal, Optional, Tuple
 from pydantic import BaseModel
 
@@ -88,3 +89,83 @@ class VolumeQuery(BaseModel):
 
     def __repr__(self):
         return f"Volume Query ({self.terms})"
+
+
+@dataclass(slots=True)
+class PaperQuery:
+    """Struct for a paper metadata query to Gallica's SRU API. Similar to VolumeQuery, but with fewer params and a different CQL build."""
+
+    start_index: int
+    limit: int
+    endpoint_url: str
+    codes: Optional[List[str]] = None
+    cql: Optional[str] = None
+    gallica_results_for_params: int = 0
+
+    def __post_init__(self):
+        if self.codes and self.codes[0]:
+            formatted_codes = [f"{code}_date" for code in self.codes]
+            self.cql = (
+                'arkPress adj "' + '" or arkPress adj "'.join(formatted_codes) + '"'
+            )
+        else:
+            self.cql = 'dc.type all "fascicule" and ocr.quality all "Texte disponible"'
+
+    def make_copy(self, start_index: int, num_records: int):
+        return PaperQuery(start_index, num_records, self.endpoint_url, self.codes)
+
+    @property
+    def params(self):
+        base = {
+            "operation": "searchRetrieve",
+            "exactSearch": "True",
+            "version": 1.2,
+            "startRecord": self.start_index,
+            "maximumRecords": self.limit,
+            "query": self.cql,
+            "collapsing": "true",
+        }
+        return base
+
+
+@dataclass(frozen=True, slots=True)
+class IssuesQuery:
+    """Struct for query to Gallica's Issues API."""
+
+    code: str
+    endpoint_url: str
+
+    @property
+    def params(self):
+        return {"ark": f"ark:/12148/{self.code}/date"}
+
+
+@dataclass(frozen=True, slots=True)
+class FullTextQuery:
+    """Struct for a query to Gallica's full text API. The endpoint does not use query parameters, so the endpoint URL changes for each query."""
+
+    ark: str
+
+    @property
+    def params(self):
+        return {}
+
+    @property
+    def endpoint_url(self):
+        return f"https://gallica.bnf.fr/ark:/12148/{self.ark}.texteBrut"
+
+    def __repr__(self) -> str:
+        return f"RawTextQuery({self.ark})"
+
+
+@dataclass(frozen=True, slots=True)
+class ContentQuery:
+    """Struct for query to Gallica's ContentSearch API."""
+
+    ark: str
+    terms: List[str]
+    endpoint_url: str
+
+    @property
+    def params(self):
+        return {"ark": self.ark, "query": self.terms}

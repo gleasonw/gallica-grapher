@@ -1,9 +1,9 @@
 from typing import List, Optional
 
 import aiohttp
-from backend.gallicaGetter.utils.parse_xml import get_num_records_from_gallica_xml
-from gallicaGetter.volumeQuery import VolumeQuery
-from gallicaGetter.paperQuery import PaperQuery
+from gallicaGetter.utils.parse_xml import get_num_records_from_gallica_xml
+from gallicaGetter.queries import VolumeQuery
+from gallicaGetter.queries import PaperQuery
 import gallicaGetter.gallicaWrapper as gallicaG
 
 

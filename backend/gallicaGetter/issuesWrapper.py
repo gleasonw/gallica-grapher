@@ -1,5 +1,6 @@
 from typing import Generator, List
-from backend.gallicaGetter.utils.parse_xml import get_years_published
+from gallicaGetter.queries import IssuesQuery
+from gallicaGetter.utils.parse_xml import get_years_published
 from gallicaGetter.gallicaWrapper import GallicaWrapper
 from dataclasses import dataclass
 
@@ -30,14 +31,3 @@ class IssuesWrapper(GallicaWrapper):
         ]
         return await self.get_records_for_queries(queries)
 
-
-@dataclass(frozen=True, slots=True)
-class IssuesQuery:
-    """Struct for query to Gallica's Issues API."""
-
-    code: str
-    endpoint_url: str
-
-    @property
-    def params(self):
-        return {"ark": f"ark:/12148/{self.code}/date"}

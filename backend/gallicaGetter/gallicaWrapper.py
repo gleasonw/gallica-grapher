@@ -3,6 +3,14 @@ from typing import Any, Generator
 import asyncio
 import aiohttp
 
+from gallicaGetter.queries import (
+    ContentQuery,
+    FullTextQuery,
+    IssuesQuery,
+    PaperQuery,
+    VolumeQuery,
+)
+
 
 class GallicaWrapper:
     """Base class for Gallica API wrappers."""
@@ -36,25 +44,53 @@ class GallicaWrapper:
     async def get_records_for_queries(
         self,
         queries,
+        session: aiohttp.ClientSession,
         on_update_progress=None,
     ):
         """The core abstraction for fetching record xml from gallica and parsing it to Python objects. Called by all subclasses."""
 
-        if not self.session:
-            async with aiohttp.ClientSession() as session:
-                async with asyncio.Semaphore(20):
-                    raw_response = await get(
-                        queries,
-                        session=session,
-                        on_update_progress=on_update_progress,
-                    )
-                    return self.parse(raw_response)
-        else:
-            async with asyncio.Semaphore(20):
-                raw_response = await get(
-                    queries,
-                    session=self.session,
-                    on_update_progress=on_update_progress,
-                )
-                return self.parse(raw_response)
+        raw_response = await get(
+            queries,
+            session=session,
+            on_update_progress=on_update_progress,
+        )
+        return self.parse(raw_response)
 
+
+@dataclass
+class Response:
+    xml: bytes
+    query: VolumeQuery | PaperQuery | IssuesQuery | ContentQuery | FullTextQuery
+    elapsed_time: float
+
+
+async def get(queries, session: aiohttp.ClientSession, on_update_progress=None):
+    if type(queries) is not list:
+        queries = [queries]
+    tasks = []
+    for query in queries:
+        tasks.append(
+            fetch_from_gallica(
+                query=query,
+                session=session,
+                on_update_progress=on_update_progress,
+            )
+        )
+
+    return await asyncio.gather(*tasks)
+
+
+async def fetch_from_gallica(
+    query: VolumeQuery | PaperQuery | IssuesQuery | ContentQuery | FullTextQuery,
+    session: aiohttp.ClientSession,
+    on_update_progress=None,
+):
+    async with session.get(query.endpoint_url, params=query.params) as response:
+        if on_update_progress:
+            on_update_progress("FETCHING")
+        xml = await response.content.read()
+        return Response(
+            xml=xml,
+            query=query,
+            elapsed_time=0,
+        )

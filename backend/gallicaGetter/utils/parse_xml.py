@@ -1,9 +1,9 @@
 from lxml import etree
-from backend.gallicaGetter.utils.date import Date
+from gallicaGetter.utils.date import Date
 from typing import List, Tuple
 
 
-def get_one_paper_from_record_batch(xml: str) -> str:
+def get_one_paper_from_record_batch(xml: bytes) -> str:
     records = get_records_from_xml(xml)
     if records:
         return get_paper_title_from_record_xml(records[0])
@@ -25,7 +25,7 @@ def get_num_results_and_pages_for_context(
     return num_results, pages
 
 
-def get_records_from_xml(xml: str):
+def get_records_from_xml(xml: bytes):
     try:
         elements = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
     except etree.XMLSyntaxError:
@@ -36,12 +36,12 @@ def get_records_from_xml(xml: str):
     return records_root.findall("{http://www.loc.gov/zing/srw/}record")
 
 
-def get_html(xml: str) -> str:
+def get_html(xml: bytes) -> str:
     elements = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
     return elements.find("html").text
 
 
-def get_num_records_from_gallica_xml(xml: str) -> int:
+def get_num_records_from_gallica_xml(xml: bytes) -> int:
     xml_root = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
     num_results = xml_root.find("{http://www.loc.gov/zing/srw/}numberOfRecords")
     if num_results is not None:
