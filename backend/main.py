@@ -9,7 +9,6 @@ from gallicaContextSearch import (
     get_html_context,
     stream_all_records_with_context,
 )
-import gallicaGetter.wrapperFactory as wF
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
 from www.database.displayDataResolvers import select_display_records

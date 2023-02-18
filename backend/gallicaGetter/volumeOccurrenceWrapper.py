@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 import urllib.parse
 
-from gallicaGetter.base_query_builds import build_base_queries
-from gallicaGetter.index_query_builds import (
+from backend.gallicaGetter.utils.base_query_builds import build_base_queries
+from backend.gallicaGetter.utils.index_query_builds import (
     build_indexed_queries,
     get_num_results_for_queries,
     index_queries_by_num_results,
 )
-from gallicaGetter.date import Date
+from backend.gallicaGetter.utils.date import Date
 from gallicaGetter.gallicaWrapper import GallicaWrapper, Response
-from gallicaGetter.parse_xml import (
+from backend.gallicaGetter.utils.parse_xml import (
     get_records_from_xml,
     get_paper_title_from_record_xml,
     get_paper_code_from_record_xml,

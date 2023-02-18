@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
-from gallicaGetter.parse_xml import (
+from gallicaGetter.issuesWrapper import IssuesWrapper
+from gallicaGetter.utils.parse_xml import (
     get_paper_code_from_record_xml,
     get_paper_title_from_record_xml,
     get_records_from_xml,
@@ -8,9 +9,8 @@ from gallicaGetter.parse_xml import (
 )
 from gallicaGetter.gallicaWrapper import GallicaWrapper
 from gallicaGetter.paperQuery import PaperQuery
-from gallicaGetter.base_query_builds import bundle_codes, NUM_CODES_PER_BUNDLE
-from gallicaGetter.index_query_builds import build_indexed_queries
-import gallicaGetter.wrapperFactory as wF
+from backend.gallicaGetter.utils.base_query_builds import bundle_codes, NUM_CODES_PER_BUNDLE
+from backend.gallicaGetter.utils.index_query_builds import build_indexed_queries
 
 
 @dataclass(slots=True)
@@ -34,7 +34,7 @@ class PapersWrapper(GallicaWrapper):
     """There is no official Gallica endpoint for fetching paper metadata. This class fetches from two Gallica endpoints, SRU (titles, codes) and Issues (publishing years), to get all metadata."""
 
     def post_init(self):
-        self.issues_API = wF.WrapperFactory.issues()
+        self.issues_API = IssuesWrapper()
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/SRU"
@@ -42,7 +42,6 @@ class PapersWrapper(GallicaWrapper):
     def get(
         self,
         arg_codes: Optional[List[str]] = None,
-        stateHooks=None,
         get_all_results: bool = False,
     ) -> List[PaperRecord]:
         if type(arg_codes) == str:

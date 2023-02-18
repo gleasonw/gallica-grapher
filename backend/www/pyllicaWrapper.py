@@ -1,4 +1,4 @@
-from gallicaGetter.date import Date
+from backend.gallicaGetter.utils.date import Date
 from gallicaGetter.periodOccurrenceWrapper import PeriodRecord
 from typing import Callable
 from urllib.error import HTTPError

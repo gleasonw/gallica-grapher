@@ -1,5 +1,5 @@
 from lxml import etree
-from gallicaGetter.date import Date
+from backend.gallicaGetter.utils.date import Date
 from typing import List, Tuple
 
 

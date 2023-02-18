@@ -6,7 +6,7 @@ from www.database.connContext import build_db_conn, build_redis_conn
 from typing import Any, Callable, Generator, List, Literal, Optional, Tuple
 import gallicaGetter.wrapperFactory as wF
 from gallicaGetter.concurrentFetch import ProgressUpdate
-from gallicaGetter.parse_xml import get_one_paper_from_record_batch
+from backend.gallicaGetter.utils.parse_xml import get_one_paper_from_record_batch
 from gallicaGetter.volumeOccurrenceWrapper import VolumeRecord
 from gallicaGetter.papersWrapper import PaperRecord
 from gallicaGetter.periodOccurrenceWrapper import PeriodRecord

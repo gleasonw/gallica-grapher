@@ -1,6 +1,6 @@
 from typing import Generator, List, Tuple
 from pydantic import BaseModel
-from gallicaGetter.parse_xml import get_num_results_and_pages_for_context
+from backend.gallicaGetter.utils.parse_xml import get_num_results_and_pages_for_context
 from gallicaGetter.gallicaWrapper import GallicaWrapper
 from dataclasses import dataclass
 

@@ -2,11 +2,11 @@ import math
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from gallicaGetter.index_query_builds import (
+from backend.gallicaGetter.utils.index_query_builds import (
     index_queries_by_num_results,
     build_indexed_queries,
 )
-from gallicaGetter.base_query_builds import bundle_codes, NUM_CODES_PER_BUNDLE
+from backend.gallicaGetter.utils.base_query_builds import bundle_codes, NUM_CODES_PER_BUNDLE
 from gallicaGetter.volumeQuery import VolumeQuery
 
 

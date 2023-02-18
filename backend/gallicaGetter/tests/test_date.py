@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gallicaGetter.date import Date
+from backend.gallicaGetter.utils.date import Date
 
 
 class TestDate(TestCase):

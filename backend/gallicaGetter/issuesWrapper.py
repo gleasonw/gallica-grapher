@@ -1,5 +1,5 @@
 from typing import Generator, List
-from gallicaGetter.parse_xml import get_years_published
+from backend.gallicaGetter.utils.parse_xml import get_years_published
 from gallicaGetter.gallicaWrapper import GallicaWrapper
 from dataclasses import dataclass
 
@@ -22,14 +22,13 @@ class IssuesWrapper(GallicaWrapper):
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/services/Issues"
 
-    def get(self, codes) -> Generator[IssueYearRecord, None, None]:
+    async def get(self, codes) -> Generator[IssueYearRecord, None, None]:
         if type(codes) == str:
             codes = [codes]
         queries = [
             IssuesQuery(code=code, endpoint_url=self.endpoint_url) for code in codes
         ]
-        record_generator = self.get_records_for_queries(queries)
-        return record_generator
+        return await self.get_records_for_queries(queries)
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,9 +37,6 @@ class IssuesQuery:
 
     code: str
     endpoint_url: str
-
-    def get_code(self):
-        return self.code
 
     @property
     def params(self):

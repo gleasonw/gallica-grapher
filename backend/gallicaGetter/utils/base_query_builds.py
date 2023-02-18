@@ -1,5 +1,5 @@
 from typing import List, Literal, Optional, Tuple
-from gallicaGetter.date import Date
+from backend.gallicaGetter.utils.date import Date
 from gallicaGetter.volumeQuery import VolumeQuery
 
 NUM_CODES_PER_BUNDLE = 10

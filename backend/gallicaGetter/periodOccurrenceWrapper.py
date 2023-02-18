@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from gallicaGetter.date import Date
-from gallicaGetter.parse_xml import get_num_records_from_gallica_xml
+from backend.gallicaGetter.utils.date import Date
+from backend.gallicaGetter.utils.parse_xml import get_num_records_from_gallica_xml
 from gallicaGetter.gallicaWrapper import GallicaWrapper
-from gallicaGetter.base_query_builds import build_base_queries
+from backend.gallicaGetter.utils.base_query_builds import build_base_queries
 from typing import Generator, List, Optional
 
 
