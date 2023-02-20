@@ -1,11 +1,11 @@
-from gallicaGetter.volumeOccurrenceWrapper import VolumeRecord
-from gallicaGetter.contentWrapper import HTMLContext
+import asyncio
+from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper, VolumeRecord
+from gallicaGetter.contentWrapper import ContextWrapper, HTMLContext
 from typing import Callable, List, Literal, Optional
 from pydantic import BaseModel
-from gallicaGetter import wrapperFactory as wF
 from functools import partial
 from bs4 import BeautifulSoup
-from gallicaGetter.concurrentFetch import NUM_WORKERS
+import aiohttp
 
 
 class ContextRow(BaseModel):
@@ -87,7 +87,7 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
     )
 
 
-def get_context(
+async def get_context(
     terms: List[str],
     codes: Optional[List[str]] = None,
     year: Optional[int] = 0,
@@ -121,40 +121,47 @@ def get_context(
         origin_urls = urls
 
     # get the volumes in which the term appears
-    volume_Gallica_wrapper = wF.WrapperFactory.volume()
-    gallica_records = volume_Gallica_wrapper.get(
-        terms=terms,
-        start_date=make_date_from_year_mon_day(year, month, day),
-        end_date=make_date_from_year_mon_day(end_year, end_month, day),
-        codes=codes,
-        source=source,
-        link=link,
-        num_results=limit,
-        start_index=cursor or 0,
-        sort=sort,
-        on_get_total_records=set_total_records,
-        on_get_origin_urls=set_origin_urls,
-    )
+    async with aiohttp.ClientSession() as session:
+        volume_Gallica_wrapper = VolumeOccurrenceWrapper()
+        gallica_records = await volume_Gallica_wrapper.get(
+            terms=terms,
+            start_date=make_date_from_year_mon_day(year, month, day),
+            end_date=make_date_from_year_mon_day(end_year, end_month, day),
+            codes=codes,
+            source=source,
+            link=link,
+            limit=limit,
+            start_index=cursor or 0,
+            sort=sort,
+            on_get_total_records=set_total_records,
+            on_get_origin_urls=set_origin_urls,
+            session=session,
+        )
 
-    # get the context for those volumes
-    content_wrapper = wF.WrapperFactory.context()
-    keyed_records = {record.url.split("/")[-1]: record for record in gallica_records}
-    context = content_wrapper.get(
-        [
-            (record.url.split("/")[-1], record.terms)
-            for _, record in keyed_records.items()
-        ]
-    )
+        # get the context for those volumes
+        content_wrapper = ContextWrapper()
+        keyed_records = {
+            record.url.split("/")[-1]: record for record in gallica_records
+        }
+        context = await content_wrapper.get(
+            [
+                (record.url.split("/")[-1], record.terms)
+                for _, record in keyed_records.items()
+            ],
+            session=session,
+        )
 
-    # combine the two
-    records_with_context: List[GallicaRecord] = []
-    for context_response in context:
-        corresponding_record = keyed_records[context_response.ark]
-        records_with_context.append(parser(corresponding_record, context_response))
+        # combine the two
+        records_with_context: List[GallicaRecord] = []
+        for context_response in context:
+            corresponding_record = keyed_records[context_response.ark]
+            records_with_context.append(parser(corresponding_record, context_response))
 
-    return UserResponse(
-        records=records_with_context, num_results=total_records, origin_urls=origin_urls
-    )
+        return UserResponse(
+            records=records_with_context,
+            num_results=total_records,
+            origin_urls=origin_urls,
+        )
 
 
 get_html_context = partial(get_context, parser=build_html_record)
@@ -175,7 +182,7 @@ def make_date_from_year_mon_day(
         return ""
 
 
-def stream_all_records_with_context(
+async def stream_all_records_with_context(
     terms: List[str],
     codes: Optional[List[str]] = None,
     start_year: Optional[int] = 0,
@@ -206,47 +213,52 @@ def stream_all_records_with_context(
         nonlocal origin_urls
         origin_urls = urls
 
-    # get the volumes in which the term appears
-    volume_Gallica_wrapper = wF.WrapperFactory.volume()
-    gallica_records = volume_Gallica_wrapper.get(
-        terms=terms,
-        start_date=make_date_from_year_mon_day(start_year, start_month, day),
-        end_date=make_date_from_year_mon_day(end_year, end_month, day),
-        codes=codes,
-        source=source,
-        link=link,
-        sort=sort,
-        on_get_total_records=set_total_records,
-        on_get_origin_urls=set_origin_urls,
-        get_all_results=True,
-    )
-
-    # get the context for those volumes
-    content_wrapper = wF.WrapperFactory.context()
-
-    batch_of_num_workers = []
-    continue_loop = True
-
-    yield "paper_title\tpaper_code\tdate\turl\tleft_context\tpivot\tright_context\n"
-
-    while continue_loop:
-        for _ in range(NUM_WORKERS):
-            try:
-                batch_of_num_workers.append(next(gallica_records))
-            except StopIteration:
-                continue_loop = False
-                break
-        code_dict = {
-            record.url.split("/")[-1]: record for record in batch_of_num_workers
-        }
-        context = content_wrapper.get(
-            [
-                (record.url.split("/")[-1], record.terms)
-                for record in batch_of_num_workers
-            ]
+    async with aiohttp.ClientSession() as session:
+        semaphore = asyncio.Semaphore(40)
+        volume_Gallica_wrapper = VolumeOccurrenceWrapper()
+        gallica_records = await volume_Gallica_wrapper.get(
+            terms=terms,
+            start_date=make_date_from_year_mon_day(start_year, start_month, day),
+            end_date=make_date_from_year_mon_day(end_year, end_month, day),
+            codes=codes,
+            source=source,
+            link=link,
+            sort=sort,
+            on_get_total_records=set_total_records,
+            on_get_origin_urls=set_origin_urls,
+            get_all_results=True,
+            session=session,
+            semaphore=semaphore,
         )
-        for context_response in context:
-            record = code_dict[context_response.ark]
-            row = build_row_record(record, context_response)
-            for context_row in row.context:
-                yield f"{row.paper_title}\t{row.paper_code}\t{row.date}\t{row.url}\t{context_row.left_context}\t{context_row.pivot}\t{context_row.right_context}\n"
+
+        # get the context for those volumes
+        content_wrapper = ContextWrapper()
+
+        batch_of_num_workers = []
+        continue_loop = True
+
+        yield "paper_title\tpaper_code\tdate\turl\tleft_context\tpivot\tright_context\n"
+
+        while continue_loop:
+            for _ in range(5):
+                try:
+                    batch_of_num_workers.append(next(gallica_records))
+                except StopIteration:
+                    continue_loop = False
+                    break
+            code_dict = {
+                record.url.split("/")[-1]: record for record in batch_of_num_workers
+            }
+            context = await content_wrapper.get(
+                [
+                    (record.url.split("/")[-1], record.terms)
+                    for record in batch_of_num_workers
+                ],
+                session=session,
+                semaphore=semaphore,
+            )
+            for context_response in context:
+                record = code_dict[context_response.ark]
+                row = build_row_record(record, context_response)
+                for context_row in row.context:
+                    yield f"{row.paper_title}\t{row.paper_code}\t{row.date}\t{row.url}\t{context_row.left_context}\t{context_row.pivot}\t{context_row.right_context}\n"

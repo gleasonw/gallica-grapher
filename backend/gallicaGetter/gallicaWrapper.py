@@ -44,6 +44,7 @@ class GallicaWrapper:
         self,
         queries,
         session: aiohttp.ClientSession,
+        semaphore: asyncio.Semaphore | None = None,
         on_update_progress=None,
     ):
         """The core abstraction for fetching record xml from gallica and parsing it to Python objects. Called by all subclasses."""
@@ -51,6 +52,7 @@ class GallicaWrapper:
         raw_response = await fetch_from_gallica(
             queries,
             session=session,
+            semaphore=semaphore,
             on_update_progress=on_update_progress,
         )
         return self.parse(raw_response)
@@ -64,10 +66,11 @@ class Response:
 
 
 async def fetch_from_gallica(
-    queries, session: aiohttp.ClientSession, on_update_progress=None
+    queries, session: aiohttp.ClientSession, on_update_progress=None, semaphore=None
 ):
     if type(queries) is not list:
         queries = [queries]
+
     tasks = []
     for query in queries:
         tasks.append(
@@ -75,6 +78,7 @@ async def fetch_from_gallica(
                 query=query,
                 session=session,
                 on_update_progress=on_update_progress,
+                semaphore=semaphore,
             )
         )
 
@@ -84,11 +88,33 @@ async def fetch_from_gallica(
 async def get(
     query: VolumeQuery | PaperQuery | IssuesQuery | ContentQuery | FullTextQuery,
     session: aiohttp.ClientSession,
+    semaphore: asyncio.Semaphore | None = None,
     on_update_progress=None,
+    num_retries=0,
 ):
+    if semaphore:
+        async with semaphore:
+            return await get(
+                query=query,
+                session=session,
+                on_update_progress=on_update_progress,
+                semaphore=None,
+            )
     async with session.get(query.endpoint_url, params=query.params) as response:
         if on_update_progress:
             on_update_progress("FETCHING")
+
+        # check if we need to retry
+        if response.status != 200 and num_retries < 3:
+            print(f'retrying {num_retries}')
+            await asyncio.sleep(2**num_retries)
+            return await get(
+                query=query,
+                session=session,
+                on_update_progress=on_update_progress,
+                semaphore=semaphore,
+                num_retries=num_retries + 1,
+            )
         xml = await response.content.read()
         return Response(
             xml=xml,

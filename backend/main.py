@@ -176,7 +176,7 @@ def records(
 
 
 @app.get("/api/gallicaRecords")
-def fetch_records_from_gallica(
+async def fetch_records_from_gallica(
     year: Optional[int] = 0,
     month: Optional[int] = 0,
     end_year: Optional[int] = 0,
@@ -236,7 +236,7 @@ def fetch_records_from_gallica(
         context_getter = get_row_context
     else:
         context_getter = get_html_context
-    return context_getter(
+    return await context_getter(
         year=year,
         month=month,
         end_year=end_year,

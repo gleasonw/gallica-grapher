@@ -34,40 +34,40 @@ export const initTickets = [
   },
 ] as Ticket[];
 
-export const getStaticProps: GetStaticProps<{
-  initRecords: {
-    data: GallicaResponse;
-    nextCursor: number | null;
-    previousCursor: number;
-  };
-  initSeries: GraphData[];
-}> = async () => {
-  const records = await fetchContext(
-    { pageParam: 0 },
-    {
-      terms: initTickets[0].terms,
-      limit: 10,
-      source: "periodical",
-    }
-  );
-  const initSeries = await Promise.all(
-    initTickets.map((ticket) => {
-      return getTicketData(
-        ticket.id,
-        ticket.backend_source,
-        ticket.grouping,
-        0
-      );
-    })
-  );
-  return {
-    props: {
-      // @ts-ignore
-      initRecords: records,
-      initSeries: initSeries,
-    },
-  };
-};
+// export const getStaticProps: GetStaticProps<{
+//   initRecords: {
+//     data: GallicaResponse;
+//     nextCursor: number | null;
+//     previousCursor: number;
+//   };
+//   initSeries: GraphData[];
+// }> = async () => {
+//   const records = await fetchContext(
+//     { pageParam: 0 },
+//     {
+//       terms: initTickets[0].terms,
+//       limit: 10,
+//       source: "periodical",
+//     }
+//   );
+//   const initSeries = await Promise.all(
+//     initTickets.map((ticket) => {
+//       return getTicketData(
+//         ticket.id,
+//         ticket.backend_source,
+//         ticket.grouping,
+//         0
+//       );
+//     })
+//   );
+//   return {
+//     props: {
+//       // @ts-ignore
+//       initRecords: records,
+//       initSeries: initSeries,
+//     },
+//   };
+// };
 
 export const LangContext = createContext<{
   lang: "fr" | "en";

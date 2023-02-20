@@ -44,19 +44,16 @@ class Date:
     def __repr__(self):
         return f"Date({self.date})"
 
-    def getDateAsList(self) -> list:
-        return self.date
-
-    def getDate(self) -> str:
-        return self.dateText
-
-    def getYear(self) -> str:
+    @property
+    def year(self) -> str:
         return self.date[0]
 
-    def getMonth(self) -> str:
+    @property
+    def month(self) -> str:
         return self.date[1]
 
-    def getDay(self) -> str:
+    @property
+    def day(self) -> str:
         return self.date[2]
 
     def __del__(self):

@@ -10,9 +10,21 @@ from typing import Generator, List, Optional
 
 @dataclass(slots=True)
 class PeriodRecord:
-    date: Date
+    _date: Date
     count: int
     term: str
+
+    @property
+    def year(self):
+        return self._date.year
+
+    @property
+    def month(self):
+        return self._date.month
+
+    @property
+    def day(self):
+        return self._date.day
 
 
 class PeriodOccurrenceWrapper(GallicaWrapper):
@@ -63,7 +75,7 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
             count = get_num_records_from_gallica_xml(response.xml)
             query = response.query
             yield PeriodRecord(
-                date=Date(query.start_date),
+                _date=Date(query.start_date),
                 count=count,
                 term=query.terms,
             )

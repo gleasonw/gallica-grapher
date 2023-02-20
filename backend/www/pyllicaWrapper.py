@@ -1,4 +1,4 @@
-from backend.gallicaGetter.utils.date import Date
+from gallicaGetter.utils.date import Date
 from gallicaGetter.periodOccurrenceWrapper import PeriodRecord
 from typing import Callable
 from urllib.error import HTTPError
@@ -10,9 +10,9 @@ def get(args, on_no_records_found: Callable):
     """Get records from Pyllica. Interpret 500 error as no records found."""
     converted_args = {"recherche": args.terms, "somme": True, "corpus": "presse"}
     if start := args.start_date:
-        converted_args["debut"] = Date(start).getYear()
+        converted_args["debut"] = Date(start).year
     if end := args.end_date:
-        converted_args["fin"] = Date(end).getYear()
+        converted_args["fin"] = Date(end).year
     if args.grouping == "year":
         converted_args["resolution"] = "annee"
     try:
@@ -33,7 +33,7 @@ def convert_data_frame_to_grouped_record(frame):
         dates = frame.apply(lambda row: f"{row.annee}-{row.mois:02}", axis=1)
     return (
         PeriodRecord(
-            date=Date(date),
+            _date=Date(date),
             count=count,
             term=term,
         )
@@ -44,7 +44,6 @@ def convert_data_frame_to_grouped_record(frame):
 def pyllicagram(
     recherche, corpus="presse", debut=1789, fin=1950, resolution="default", somme=False
 ):
-
     # forked from https://github.com/regicid/pyllicagram
     # credits Benjamin Azoulay and Benoît de Courson
 

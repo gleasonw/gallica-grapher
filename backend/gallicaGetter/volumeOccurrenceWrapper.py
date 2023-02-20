@@ -1,7 +1,9 @@
+import asyncio
 from dataclasses import dataclass
 import urllib.parse
 
 import aiohttp
+from gallicaGetter.queries import VolumeQuery
 
 from gallicaGetter.utils.base_query_builds import build_base_queries
 from gallicaGetter.utils.index_query_builds import (
@@ -44,6 +46,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                     self.on_get_total_records(
                         get_num_records_from_gallica_xml(response.xml)
                     )
+                assert isinstance(response.query, VolumeQuery)
                 yield VolumeRecord(
                     paper_title=get_paper_title_from_record_xml(record),
                     paper_code=get_paper_code_from_record_xml(record),
@@ -66,7 +69,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         codes: Optional[List[str]] = None,
-        num_results: Optional[int] = None,
+        limit: Optional[int] = None,
         start_index: int | List[int] = 0,
         sort: Optional[Literal["date", "relevance"]] = None,
         onProgressUpdate=None,
@@ -75,6 +78,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         on_get_origin_urls: Optional[Callable[[List[str]], None]] = None,
         get_all_results: bool = False,
         session: aiohttp.ClientSession | None = None,
+        semaphore: asyncio.Semaphore | None = None,
     ) -> Generator[VolumeRecord, None, None]:
         if session is None:
             async with aiohttp.ClientSession() as session:
@@ -95,16 +99,16 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 sort=sort,
                 endpoint_url=self.endpoint_url,
                 grouping="all",
-                limit=num_results,
+                limit=limit,
                 cursor=start_index,
             )
-            if (num_results and num_results > 50) or get_all_results:
+            if (limit and limit > 50) or get_all_results:
                 # assume we want all results, or index for more than 50
                 # we will have to fetch # total records from Gallica
                 queries = await build_indexed_queries(
                     base_queries,
                     session=session,
-                    limit=num_results,
+                    limit=limit,
                 )
             else:
                 # num results less than 50, the base query is fine
@@ -121,4 +125,5 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             queries=queries,
             on_update_progress=onProgressUpdate,
             session=session,
+            semaphore=semaphore,
         )

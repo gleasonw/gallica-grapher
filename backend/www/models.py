@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Literal, Optional, Tuple
-from gallicaGetter.volumeQuery import VolumeQuery
+from gallicaGetter.queries import VolumeQuery
 
 
 class Progress(BaseModel):
