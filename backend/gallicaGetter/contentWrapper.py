@@ -9,8 +9,12 @@ import aiohttp
 
 
 class GallicaPage(BaseModel):
-    page: str
+    page_label: str
     context: str
+
+    @property
+    def page_num(self):
+        return self.page_label.split("_")[-1]
 
 
 class HTMLContext(BaseModel):
@@ -28,7 +32,7 @@ class ContextWrapper(GallicaWrapper):
             yield HTMLContext(
                 num_results=num_results_and_pages[0],
                 pages=[
-                    GallicaPage(page=occurrence[0], context=occurrence[1])
+                    GallicaPage(page_label=occurrence[0], context=occurrence[1])
                     for occurrence in num_results_and_pages[1]
                 ],
                 ark=response.query.ark,
