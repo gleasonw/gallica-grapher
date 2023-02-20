@@ -75,7 +75,7 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
                     pivot=pivot,
                     left_context=closest_left_text,
                     right_context=closest_right_text,
-                    page_url=f'{record.url}/f{page.page_num}.image.r="{pivot}"',
+                    page_url=f'{record.url}/f{page.page_num}.image.r={pivot}',
                 )
             )
 
