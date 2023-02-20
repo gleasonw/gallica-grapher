@@ -158,7 +158,7 @@ export function ResultsTable(props: TableProps) {
           record.context.map((contextRow) => ({
             col1: (
               <a
-                href={record.url}
+                href={contextRow.page_url}
                 className={"underline"}
                 target={"_blank"}
                 rel="noreferrer"

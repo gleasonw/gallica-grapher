@@ -17,6 +17,7 @@ export interface ContextRow {
   pivot: string;
   left_context: string;
   right_context: string;
+  page_url: string;
 }
 
 export interface Paper {
