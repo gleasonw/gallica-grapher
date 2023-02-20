@@ -194,7 +194,6 @@ def fetch_records_from_gallica(
     download_csv: Optional[bool] = False,
 ):
     """API endpoint for the context table. To fetch multiple terms linked with OR in the Gallica CQL, pass multiple terms parameters: /api/gallicaRecords?terms=term1&terms=term2&terms=term3"""
-    print(year, end_year)
     if limit and limit > 50:
         raise HTTPException(
             status_code=400,

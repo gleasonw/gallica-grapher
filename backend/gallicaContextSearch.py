@@ -12,6 +12,7 @@ class ContextRow(BaseModel):
     pivot: str
     left_context: str
     right_context: str
+    page_url: str
 
 
 class GallicaRecord(BaseModel):
@@ -74,6 +75,7 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
                     pivot=pivot,
                     left_context=closest_left_text,
                     right_context=closest_right_text,
+                    page_url=f'{record.url}/f{page.page_num}.image.r="{pivot}"',
                 )
             )
 
@@ -249,4 +251,4 @@ def stream_all_records_with_context(
             record = code_dict[context_response.ark]
             row = build_row_record(record, context_response)
             for context_row in row.context:
-                yield f"{row.paper_title}\t{row.paper_code}\t{row.date}\t{row.url}\t{context_row.left_context}\t{context_row.pivot}\t{context_row.right_context}\n"
+                yield f"{row.paper_title}\t{row.paper_code}\t{row.date}\t{context_row.page_url}\t{context_row.left_context}\t{context_row.pivot}\t{context_row.right_context}\n"
