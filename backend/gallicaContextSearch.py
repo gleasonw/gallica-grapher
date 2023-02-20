@@ -216,7 +216,7 @@ async def stream_all_records_with_context(
         origin_urls = urls
 
     async with aiohttp.ClientSession() as session:
-        semaphore = asyncio.Semaphore(40)
+        semaphore = asyncio.Semaphore(20)
         volume_Gallica_wrapper = VolumeOccurrenceWrapper()
         gallica_records = await volume_Gallica_wrapper.get(
             terms=terms,
