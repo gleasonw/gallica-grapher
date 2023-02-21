@@ -91,10 +91,10 @@ def papers(keyword: str):
                 """
                 SELECT title, code, startdate, enddate
                     FROM papers 
-                    WHERE LOWER(title) LIKE %(paperNameSearchString)s
+                    WHERE LOWER(title) LIKE %(paper_name)s
                     ORDER BY title DESC LIMIT 20;
             """,
-                {"paperNameSearchString": "%" + keyword + "%"},
+                {"paper_name": "%" + keyword + "%"},
             )
             similar_papers = curs.fetchall()
             papers = [
@@ -144,35 +144,6 @@ def graph_data(
             average_window=average_window,
             conn=conn,
         )
-
-
-@app.get("/api/getDisplayRecords")
-def records(
-    request_id: int,
-    ticket_ids: List[int] = Query(),
-    term: str = "",
-    periodical: str = "",
-    year: int = 0,
-    month: int = 0,
-    day: int = 0,
-    limit: int = 10,
-    offset: int = 0,
-):
-    """Gets records stored in the database, as opposed to fetching them from Gallica."""
-    with build_db_conn() as conn:
-        db_records, count = select_display_records(
-            ticket_ids=ticket_ids,
-            request_id=request_id,
-            term=term,
-            periodical=periodical,
-            limit=limit,
-            offset=offset,
-            year=year,
-            month=month,
-            day=day,
-            conn=conn,
-        )
-    return {"displayRecords": db_records, "count": count}
 
 
 @app.get("/api/gallicaRecords")
