@@ -38,13 +38,14 @@ export const PaperDropdown: React.FC<{
           {papersSimilarTo?.data?.map((paper: Paper) => (
             <li
               key={paper.title}
-              className="whitespace-wrap max-w-full flex-1 border p-5 hover:cursor-pointer hover:bg-zinc-800 hover:text-white"
+              className="whitespace-wrap max-w-full flex flex-col flex-1 border p-5 hover:cursor-pointer hover:bg-zinc-800 hover:text-white"
               onClick={() => {
                 setPeriodical("");
                 onClick(paper);
               }}
             >
               {paper.title}
+              <span className={"text-zinc-500"}>{paper.start_date} - {paper.end_date}</span>
             </li>
           ))}
         </ul>
