@@ -18,8 +18,7 @@ class ParsedGallicaHTML:
     @property
     def parsed_text(self) -> str:
         if self.soup:
-            hr_break_before_paras = self.soup.find("hr")
-            if hr_break_before_paras:
+            if hr_break_before_paras := self.soup.find("hr"):
                 item_paras = hr_break_before_paras.find_next_siblings("p")
                 self.text = "\n".join([para.text for para in item_paras])
         return self.text
