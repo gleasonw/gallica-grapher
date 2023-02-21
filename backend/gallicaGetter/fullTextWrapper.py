@@ -38,6 +38,5 @@ class FullTextWrapper(GallicaWrapper):
         if type(ark_codes) is not list:
             ark_codes = [ark_codes]
         queries = [FullTextQuery(ark=code) for code in ark_codes]
-        record_generator = self.get_records_for_queries(queries=queries)
-        return record_generator
+        return self.get_records_for_queries(queries=queries)
 
