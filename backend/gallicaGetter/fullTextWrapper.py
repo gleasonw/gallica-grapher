@@ -18,8 +18,7 @@ class ParsedGallicaHTML:
     @property
     def parsed_text(self) -> str:
         if self.soup:
-            hr_break_before_paras = self.soup.find("hr")
-            if hr_break_before_paras:
+            if hr_break_before_paras := self.soup.find("hr"):
                 item_paras = hr_break_before_paras.find_next_siblings("p")
                 self.text = "\n".join([para.text for para in item_paras])
         return self.text
@@ -38,6 +37,5 @@ class FullTextWrapper(GallicaWrapper):
         if type(ark_codes) is not list:
             ark_codes = [ark_codes]
         queries = [FullTextQuery(ark=code) for code in ark_codes]
-        record_generator = self.get_records_for_queries(queries=queries)
-        return record_generator
+        return self.get_records_for_queries(queries=queries)
 
