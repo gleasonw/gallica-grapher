@@ -89,8 +89,6 @@ export function ResultsTable(props: TableProps) {
     >,
   });
 
-  console.log(data);
-
   const columns: Column<{
     col1: JSX.Element;
     col2: string;
