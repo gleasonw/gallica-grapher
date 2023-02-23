@@ -6,7 +6,6 @@ import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "../pages";
-import { select } from "d3";
 
 export interface TableProps {
   terms?: string[];
@@ -62,7 +61,7 @@ export function ResultsTable(props: TableProps) {
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
-  const { isFetching, isError, isLoading, data } = useQuery({
+  const { isFetching, data } = useQuery({
     queryKey: [
       "context",
       props.year,
@@ -78,16 +77,41 @@ export function ResultsTable(props: TableProps) {
       selectedPage,
     ],
     queryFn: () =>
-      fetchContext(pageToCursor(selectedPage), {
+      fetchContext(selectedPage * props.limit, {
         ...props,
         children: undefined,
       }),
     staleTime: Infinity,
     keepPreviousData: true,
-    placeholderData: props.initialRecords as Awaited<
-      ReturnType<typeof fetchContext>
-    >,
+    placeholderData: props.initialRecords,
   });
+
+  const currentPage = data;
+
+  const tableData = React.useMemo(
+    () =>
+      currentPage?.records
+        ?.map((record) =>
+          record.context.map((contextRow) => ({
+            col1: (
+              <a
+                href={contextRow.page_url}
+                className={"underline"}
+                target={"_blank"}
+                rel="noreferrer"
+              >
+                {record.paper_title}
+              </a>
+            ),
+            col2: record.date,
+            col3: contextRow.left_context,
+            col4: <span className={"font-medium"}>{contextRow.pivot}</span>,
+            col5: contextRow.right_context,
+          }))
+        )
+        .flat() ?? [],
+    [currentPage]
+  );
 
   const columns: Column<{
     col1: JSX.Element;
@@ -121,43 +145,12 @@ export function ResultsTable(props: TableProps) {
     [lang]
   );
 
-  const currentPage = data;
-  const tableData = React.useMemo(
-    () =>
-      currentPage?.records
-        ?.map((record) =>
-          record.context.map((contextRow) => ({
-            col1: (
-              <a
-                href={contextRow.page_url}
-                className={"underline"}
-                target={"_blank"}
-                rel="noreferrer"
-              >
-                {record.paper_title}
-              </a>
-            ),
-            col2: record.date,
-            col3: contextRow.left_context,
-            col4: <span className={"font-medium"}>{contextRow.pivot}</span>,
-            col5: contextRow.right_context,
-          }))
-        )
-        .flat() ?? [],
-    [currentPage]
-  );
-
   const tableInstance = useTable({ columns, data: tableData });
   const total_results = Number(data?.num_results) ?? 0;
   const cursorMax = Math.floor(total_results / limit);
 
-  function pageToCursor(page: number) {
-    return page * props.limit;
-  }
-
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-
       <h1 className={"text-2xl flex flex-col gap-2 ml-5"}>
         {!currentPage && !isFetching && <p>No results found</p>}
         {currentPage && (
@@ -174,7 +167,6 @@ export function ResultsTable(props: TableProps) {
       >
         {isFetching && <p>{translation.loading_next}</p>}
       </h1>
-
       {currentPage && !isFetching && (
         <QueryPagination
           onPageIncrement={() => setSelectedPage(selectedPage + 1)}
@@ -196,53 +188,8 @@ export function ResultsTable(props: TableProps) {
           </p>
         </QueryPagination>
       )}
-
-      <div className={"m-auto ml-5 "}>{props.children}</div>
-
-      <table className={"shadow-md hidden md:block lg:block"}>
-        <thead>
-          {tableInstance.headerGroups.map((headerGroup, index) => (
-            <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-              {headerGroup.headers.map((column, index) => (
-                <th {...column.getHeaderProps()} key={index}>
-                  {column.render("Header")}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...tableInstance.getTableBodyProps()}>
-          {tableInstance.rows.map((row, index) => {
-            tableInstance.prepareRow(row);
-            return (
-              <tr
-                {...row.getRowProps()}
-                key={index}
-                className={"odd:bg-zinc-100"}
-              >
-                {row.cells.map((cell, index) => {
-                  let twStyle = "";
-                  if (
-                    cell.column.Header === "Left context" ||
-                    cell.column.Header === "Contexte gauche"
-                  ) {
-                    twStyle = "text-right";
-                  }
-                  return (
-                    <td
-                      {...cell.getCellProps()}
-                      key={index}
-                      className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
-                    >
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      {props.children}
+      <DesktopTable tableInstance={tableInstance} />
       <MobileTable tableInstance={tableInstance} />
     </div>
   );
@@ -363,5 +310,54 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
         );
       })}
     </div>
+  );
+}
+
+function DesktopTable(props: { tableInstance: TableInstance<any> }) {
+  return (
+    <table className={"shadow-md hidden md:block lg:block"}>
+      <thead>
+        {props.tableInstance.headerGroups.map((headerGroup, index) => (
+          <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+            {headerGroup.headers.map((column, index) => (
+              <th {...column.getHeaderProps()} key={index}>
+                {column.render("Header")}
+              </th>
+            ))}
+          </tr>
+        ))}
+      </thead>
+      <tbody {...props.tableInstance.getTableBodyProps()}>
+        {props.tableInstance.rows.map((row, index) => {
+          props.tableInstance.prepareRow(row);
+          return (
+            <tr
+              {...row.getRowProps()}
+              key={index}
+              className={"odd:bg-zinc-100"}
+            >
+              {row.cells.map((cell, index) => {
+                let twStyle = "";
+                if (
+                  cell.column.Header === "Left context" ||
+                  cell.column.Header === "Contexte gauche"
+                ) {
+                  twStyle = "text-right";
+                }
+                return (
+                  <td
+                    {...cell.getCellProps()}
+                    key={index}
+                    className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
+                  >
+                    {cell.render("Cell")}
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
