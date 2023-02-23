@@ -14,7 +14,7 @@ export const SearchProgress: React.FC<{
     const data = (await response.json()) as ProgressType;
     return data;
   }
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["progress", props.ticket.id],
     queryFn: fetchProgress,
     refetchInterval: (data) => {
@@ -36,10 +36,19 @@ export const SearchProgress: React.FC<{
     }
   }, [data, onFetchComplete, onNoRecordsFound]);
 
-  const progress = data;
-
-  if (!progress) {
-    return <div>loading...</div>;
+  if (isLoading || data?.state !== "completed") {
+    return (
+      <div className="flex items-center justify-center">
+        <div
+          className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status"
+        >
+          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+            Loading...
+          </span>
+        </div>
+      </div>
+    );
   }
 
   return (
