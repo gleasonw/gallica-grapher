@@ -35,21 +35,14 @@ export const initTickets = [
 ] as Ticket[];
 
 export const getStaticProps: GetStaticProps<{
-  initRecords: {
-    data: GallicaResponse;
-    nextCursor: number | null;
-    previousCursor: number;
-  };
+  initRecords: GallicaResponse;
   initSeries: GraphData[];
 }> = async () => {
-  const records = await fetchContext(
-    { pageParam: 0 },
-    {
-      terms: initTickets[0].terms,
-      limit: 10,
-      source: "periodical",
-    }
-  );
+  const records = await fetchContext(0, {
+    terms: initTickets[0].terms,
+    limit: 10,
+    source: "periodical",
+  });
   const initSeries = await Promise.all(
     initTickets.map((ticket) => {
       return getTicketData(
