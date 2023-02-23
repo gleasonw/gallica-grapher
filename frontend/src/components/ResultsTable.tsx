@@ -1,11 +1,12 @@
 import React from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { Column, useTable } from "react-table";
+import { useQuery } from "@tanstack/react-query";
+import { Column, TableInstance, useTable } from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "../pages";
+import { select } from "d3";
 
 export interface TableProps {
   terms?: string[];
@@ -22,7 +23,7 @@ export interface TableProps {
   initialRecords?: Awaited<ReturnType<typeof fetchContext>>;
 }
 
-export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
+export const fetchContext = async (pageParam = 0, props: TableProps) => {
   let baseUrl = `${apiURL}/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...props,
@@ -33,21 +34,7 @@ export const fetchContext = async ({ pageParam = 0 }, props: TableProps) => {
     row_split: true,
   });
   const response = await fetch(url);
-  const data = (await response.json()) as GallicaResponse;
-  let nextCursor = null;
-  let previousCursor = pageParam ?? 0;
-  if (data.records && data.records.length > 0) {
-    if (pageParam) {
-      nextCursor = pageParam + props.limit;
-    } else {
-      nextCursor = props.limit;
-    }
-  }
-  return {
-    data,
-    nextCursor,
-    previousCursor,
-  };
+  return (await response.json()) as GallicaResponse;
 };
 
 const strings = {
@@ -75,25 +62,7 @@ export function ResultsTable(props: TableProps) {
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
-  let ssrData;
-  if (props.initialRecords) {
-    ssrData = {
-      pages: [props.initialRecords],
-      pageParams: [0],
-    };
-  } else {
-    ssrData = undefined;
-  }
-  const {
-    isFetching,
-    isError,
-    isLoading,
-    fetchNextPage,
-    fetchPreviousPage,
-    isFetchingNextPage,
-    isFetchingPreviousPage,
-    ...data
-  } = useInfiniteQuery({
+  const { isFetching, isError, isLoading, data } = useQuery({
     queryKey: [
       "context",
       props.year,
@@ -106,13 +75,21 @@ export function ResultsTable(props: TableProps) {
       props.link_distance,
       props.limit,
       props.sort,
+      selectedPage,
     ],
-    queryFn: (pageParams) =>
-      fetchContext(pageParams, { ...props, children: undefined }),
+    queryFn: () =>
+      fetchContext(pageToCursor(selectedPage), {
+        ...props,
+        children: undefined,
+      }),
     staleTime: Infinity,
     keepPreviousData: true,
-    placeholderData: ssrData,
+    placeholderData: props.initialRecords as Awaited<
+      ReturnType<typeof fetchContext>
+    >,
   });
+
+  console.log(data);
 
   const columns: Column<{
     col1: JSX.Element;
@@ -146,15 +123,11 @@ export function ResultsTable(props: TableProps) {
     [lang]
   );
 
-  const currentPage =
-    data.data?.pages.filter(
-      (page) => page?.nextCursor == pageToCursor(selectedPage)
-    )[0] ?? ssrData?.pages[0];
-
+  const currentPage = data;
   const tableData = React.useMemo(
     () =>
-      currentPage?.data.records
-        .map((record) =>
+      currentPage?.records
+        ?.map((record) =>
           record.context.map((contextRow) => ({
             col1: (
               <a
@@ -177,179 +150,142 @@ export function ResultsTable(props: TableProps) {
   );
 
   const tableInstance = useTable({ columns, data: tableData });
-
-  const total_results = Number(data.data?.pages[0]?.data.num_results) ?? 0;
-  const cursorMax = Math.floor(total_results / limit) + 1;
-  const fetchedCursors = data.data?.pages.map((page) => page?.nextCursor);
-  const fetchedSet = new Set(fetchedCursors);
-
-  async function handleCursorIncrement(amount: number = 1) {
-    if (fetchedSet && !fetchedSet.has(pageToCursor(selectedPage + amount))) {
-      await fetchNextPage({
-        pageParam: pageToCursor(selectedPage + amount - 1),
-      });
-    }
-    setSelectedPage(selectedPage + amount);
-  }
-
-  async function handleCursorDecrement(amount: number = 1) {
-    if (fetchedSet && !fetchedSet.has(pageToCursor(selectedPage - amount))) {
-      await fetchPreviousPage({
-        pageParam: pageToCursor(selectedPage - (amount + 1)),
-      });
-    }
-    setSelectedPage(selectedPage - amount);
-  }
+  const total_results = Number(data?.num_results) ?? 0;
+  const cursorMax = Math.floor(total_results / limit);
 
   function pageToCursor(page: number) {
     return page * props.limit;
   }
 
   return (
-    <div className={"mb-20 flex flex-col"}>
-      <div className={"mt-5 flex flex-col justify-center"}>
-        <h1 className={"text-2xl flex flex-col gap-2 ml-5"}>
-          {!currentPage && !isFetching && <p>No results found</p>}
-          {currentPage && (
-            <div className={"flex flex-row gap-10"}>
-              {total_results.toLocaleString()} {translation.total_docs}
-            </div>
-          )}
-          <p className={"text-xl"}>{translation.num_docs_page}</p>
-        </h1>
-        <h1
-          className={
-            "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
-          }
-        >
-          {!isFetchingNextPage && !isFetchingPreviousPage && isFetching && (
-            <p>{translation.loading_next}</p>
-          )}
-          {isFetchingNextPage && <p>{translation.loading_next}</p>}
-          {isFetchingPreviousPage && <p>{translation.loading_previous}</p>}
-        </h1>
-        {currentPage && !isFetchingNextPage && !isFetchingPreviousPage && (
-          <div
-            className={
-              "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl mt-5 mb-5"
-            }
-          >
-            {selectedPage != 1 && (
-              <div className={"flex flex-row justify-between"}>
-                <button
-                  onClick={() => handleCursorDecrement(selectedPage - 1)}
-                  className={"p-3"}
-                >
-                  {"<<"}
-                </button>
-                <button
-                  className={"p-4"}
-                  onClick={() => handleCursorDecrement()}
-                >
-                  {"<"}
-                </button>
-              </div>
-            )}
-            <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
-            <CursorInput
-              cursor={selectedPage}
-              cursorMax={cursorMax}
-              onCursorIncrement={handleCursorIncrement}
-              onCursorDecrement={handleCursorDecrement}
-            />
-            <p className={"ml-3 md:ml-5 lg:ml-5"}>
-              {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
-            </p>
-            {selectedPage !== cursorMax && (
-              <div className={"flex flex-row justify-between"}>
-                <button
-                  className={"p-4"}
-                  onClick={() => handleCursorIncrement()}
-                >
-                  {">"}
-                </button>
-                <button
-                  onClick={() =>
-                    handleCursorIncrement(cursorMax - selectedPage)
-                  }
-                  className={"p-3"}
-                >
-                  {">>"}
-                </button>
-              </div>
-            )}
+    <div className={"mt-5 flex flex-col justify-center mb-20"}>
+
+      <h1 className={"text-2xl flex flex-col gap-2 ml-5"}>
+        {!currentPage && !isFetching && <p>No results found</p>}
+        {currentPage && (
+          <div className={"flex flex-row gap-10"}>
+            {total_results.toLocaleString()} {translation.total_docs}
           </div>
         )}
-        <div className={"m-auto ml-5 "}>{props.children}</div>
-        <table className={"shadow-md hidden md:block lg:block"}>
-          <thead>
-            {tableInstance.headerGroups.map((headerGroup, index) => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-                {headerGroup.headers.map((column, index) => (
-                  <th {...column.getHeaderProps()} key={index}>
-                    {column.render("Header")}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...tableInstance.getTableBodyProps()}>
-            {tableInstance.rows.map((row, index) => {
-              tableInstance.prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  key={index}
-                  className={"odd:bg-zinc-100"}
-                >
-                  {row.cells.map((cell, index) => {
-                    let twStyle = "";
-                    if (
-                      cell.column.Header === "Left context" ||
-                      cell.column.Header === "Contexte gauche"
-                    ) {
-                      twStyle = "text-right";
-                    }
-                    return (
-                      <td
-                        {...cell.getCellProps()}
-                        key={index}
-                        className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
-                      >
-                        {cell.render("Cell")}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <div className={"flex flex-col gap-10 md:hidden lg:hidden"}>
+        <p className={"text-xl"}>{translation.num_docs_page}</p>
+      </h1>
+      <h1
+        className={
+          "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
+        }
+      >
+        {isFetching && <p>{translation.loading_next}</p>}
+      </h1>
+
+      {currentPage && !isFetching && (
+        <QueryPagination
+          onPageIncrement={() => setSelectedPage(selectedPage + 1)}
+          onPageDecrement={() => setSelectedPage(selectedPage - 1)}
+          selectedPage={selectedPage}
+          cursorMax={cursorMax}
+          onLastPage={() => setSelectedPage(cursorMax)}
+          onFirstPage={() => setSelectedPage(1)}
+        >
+          <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
+          <CursorInput
+            cursor={selectedPage}
+            cursorMax={cursorMax}
+            onCursorIncrement={setSelectedPage}
+            onCursorDecrement={setSelectedPage}
+          />
+          <p className={"ml-3 md:ml-5 lg:ml-5"}>
+            {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
+          </p>
+        </QueryPagination>
+      )}
+
+      <div className={"m-auto ml-5 "}>{props.children}</div>
+
+      <table className={"shadow-md hidden md:block lg:block"}>
+        <thead>
+          {tableInstance.headerGroups.map((headerGroup, index) => (
+            <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+              {headerGroup.headers.map((column, index) => (
+                <th {...column.getHeaderProps()} key={index}>
+                  {column.render("Header")}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody {...tableInstance.getTableBodyProps()}>
           {tableInstance.rows.map((row, index) => {
             tableInstance.prepareRow(row);
             return (
-              <div
+              <tr
                 {...row.getRowProps()}
                 key={index}
                 className={"odd:bg-zinc-100"}
               >
                 {row.cells.map((cell, index) => {
+                  let twStyle = "";
+                  if (
+                    cell.column.Header === "Left context" ||
+                    cell.column.Header === "Contexte gauche"
+                  ) {
+                    twStyle = "text-right";
+                  }
                   return (
-                    <div
+                    <td
                       {...cell.getCellProps()}
                       key={index}
-                      className={"pl-5 pr-5 pt-2 pb-2 "}
+                      className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
                     >
                       {cell.render("Cell")}
-                    </div>
+                    </td>
                   );
                 })}
-              </div>
+              </tr>
             );
           })}
+        </tbody>
+      </table>
+      <MobileTable tableInstance={tableInstance} />
+    </div>
+  );
+}
+
+function QueryPagination(props: {
+  children: React.ReactNode;
+  selectedPage: number;
+  cursorMax: number;
+  onFirstPage: () => void;
+  onPageIncrement: () => void;
+  onPageDecrement: () => void;
+  onLastPage: () => void;
+}) {
+  return (
+    <div
+      className={
+        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl mt-5 mb-5"
+      }
+    >
+      {props.selectedPage !== 1 && (
+        <div className={"flex flex-row justify-between"}>
+          <button onClick={props.onFirstPage} className={"p-3"}>
+            {"<<"}
+          </button>
+          <button className={"p-4"} onClick={props.onPageDecrement}>
+            {"<"}
+          </button>
         </div>
-      </div>
+      )}
+      {props.children}
+      {props.selectedPage !== props.cursorMax && (
+        <div className={"flex flex-row justify-between"}>
+          <button className={"p-4"} onClick={props.onPageIncrement}>
+            {">"}
+          </button>
+          <button onClick={props.onLastPage} className={"p-3"}>
+            {">>"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -357,8 +293,8 @@ export function ResultsTable(props: TableProps) {
 interface CursorInputProps {
   cursor: number;
   cursorMax: number;
-  onCursorIncrement: (amount?: number) => void;
-  onCursorDecrement: (amount?: number) => void;
+  onCursorIncrement: (amount: number) => void;
+  onCursorDecrement: (amount: number) => void;
 }
 
 function CursorInput(props: CursorInputProps) {
@@ -404,5 +340,30 @@ function CursorInput(props: CursorInputProps) {
         }
       }}
     />
+  );
+}
+
+function MobileTable(props: { tableInstance: TableInstance<any> }) {
+  return (
+    <div className={"flex flex-col gap-10 md:hidden lg:hidden"}>
+      {props.tableInstance.rows.map((row, index) => {
+        props.tableInstance.prepareRow(row);
+        return (
+          <div {...row.getRowProps()} key={index} className={"odd:bg-zinc-100"}>
+            {row.cells.map((cell, index) => {
+              return (
+                <div
+                  {...cell.getCellProps()}
+                  key={index}
+                  className={"pl-5 pr-5 pt-2 pb-2 "}
+                >
+                  {cell.render("Cell")}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
   );
 }
