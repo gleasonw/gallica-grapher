@@ -105,6 +105,7 @@ export function ResultsTable(props: TableProps) {
           record.context.map((contextRow) => ({
             document: `${record.paper_title}||${record.date}`,
             date: record.date,
+            page: contextRow.page_url,
             left_context: contextRow.left_context,
             pivot: <span className={"font-medium"}>{contextRow.pivot}</span>,
             right_context: contextRow.right_context,
@@ -112,6 +113,13 @@ export function ResultsTable(props: TableProps) {
         )
         .flat() ?? [],
     [currentPage]
+  );
+
+  const urlElement = (url: string) => (
+    <a className="underline" href={url} target="_blank" rel="noreferrer">
+      {" "}
+      Page Gallica
+    </a>
   );
 
   const columns = React.useMemo(
@@ -126,7 +134,13 @@ export function ResultsTable(props: TableProps) {
         Header: "Date",
         accessor: "date",
         aggregate: "unique",
-        Aggregated: ({ value }: { value: string }) => value,
+      } as const,
+      {
+        Header: "Page",
+        accessor: "page",
+        aggregate: "unique",
+        Aggregated: ({ value }: { value: string[] }) => urlElement(value[0]),
+        Cell: ({ value }: { value: string }) => urlElement(value),
       } as const,
       {
         Header: lang === "fr" ? "Contexte gauche" : "Left context",
