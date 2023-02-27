@@ -77,7 +77,7 @@ export function ResultsTable(props: TableProps) {
       selectedPage,
     ],
     queryFn: () =>
-      fetchContext(selectedPage * props.limit, {
+      fetchContext((selectedPage - 1) * props.limit, {
         ...props,
         children: undefined,
       }),
