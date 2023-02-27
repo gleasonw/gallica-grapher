@@ -1,7 +1,6 @@
 import React, { ReactElement } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Column,
   TableInstance,
   useExpanded,
   useGroupBy,
@@ -168,6 +167,7 @@ export function ResultsTable(props: TableProps) {
     {
       columns,
       data: tableData,
+      // @ts-ignore
       initialState: { groupBy: ["document"] },
     },
     useGroupBy,
@@ -221,12 +221,16 @@ export function ResultsTable(props: TableProps) {
         )}
         {props.children}
         <button
+          // @ts-ignore
           {...documentHeader.getGroupByToggleProps()}
           className={"border p-5 hover:bg-zinc-100"}
         >
-          {documentHeader.isGrouped
-            ? translation.ungroup_by_doc
-            : translation.group_by_doc}
+          {
+            // @ts-ignore
+            documentHeader.isGrouped
+              ? translation.ungroup_by_doc
+              : translation.group_by_doc
+          }
         </button>
       </div>
       <DesktopTable tableInstance={tableInstance} />
@@ -374,7 +378,10 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
             <tr
               {...row.getRowProps()}
               className={"odd:bg-zinc-100"}
-              {...row.getToggleRowExpandedProps()}
+              {
+                // @ts-ignore
+                ...row.getToggleRowExpandedProps()
+              }
               key={index}
             >
               {row.cells.map((cell, index) => {
@@ -391,24 +398,34 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                     key={index}
                     className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
                   >
-                    {cell.isGrouped ? (
-                      // If it's a grouped cell, add an expander and row count
-                      <>
-                        <span className={"text-xl"}>
-                          {row.isExpanded ? "⌄" : "›"}
-                        </span>{" "}
-                        {cell.render("Cell")} ({row.subRows.length})
-                      </>
-                    ) : cell.isAggregated ? (
-                      // If the cell is aggregated, use the Aggregated
-                      // renderer for cell
-                      row.isExpanded ? null : (
-                        cell.render("Aggregated")
+                    {
+                      // @ts-ignore
+                      cell.isGrouped ? (
+                        // If it's a grouped cell, add an expander and row count
+                        <>
+                          <span className={"text-xl"}>
+                            {
+                              // @ts-ignore
+                              row.isExpanded ? "⌄" : "›"
+                            }
+                          </span>{" "}
+                          {cell.render("Cell")} ({row.subRows.length})
+                        </>
+                      ) : // @ts-ignore
+                      cell.isAggregated ? (
+                        // If the cell is aggregated, use the Aggregated
+                        // renderer for cell
+                        // @ts-ignore
+                        row.isExpanded ? null : (
+                          cell.render("Aggregated")
+                        )
+                      ) : 
+                      // @ts-ignore
+                      cell.isPlaceholder ? null : ( // For cells with repeated values, render null
+                        // Otherwise, just render the regular cell
+                        cell.render("Cell")
                       )
-                    ) : cell.isPlaceholder ? null : ( // For cells with repeated values, render null
-                      // Otherwise, just render the regular cell
-                      cell.render("Cell")
-                    )}
+                    }
                   </td>
                 );
               })}
