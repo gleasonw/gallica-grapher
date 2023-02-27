@@ -1,6 +1,12 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Column, TableInstance, useTable } from "react-table";
+import {
+  Column,
+  TableInstance,
+  useExpanded,
+  useGroupBy,
+  useTable,
+} from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
@@ -44,6 +50,8 @@ const strings = {
     error: "Erreur",
     total_docs: "documents sur Gallica",
     num_docs_page: "Les occurrences dans 5 documents sont affichées",
+    group_by_doc: "Regrouper par document",
+    ungroup_by_doc: "Dégrouper par document",
   },
   en: {
     noResults: "No results",
@@ -52,6 +60,8 @@ const strings = {
     error: "Error",
     total_docs: "documents on Gallica",
     num_docs_page: "Occurrences in 5 documents are displayed",
+    group_by_doc: "Group by document",
+    ungroup_by_doc: "Ungroup by document",
   },
 };
 
@@ -93,102 +103,118 @@ export function ResultsTable(props: TableProps) {
       currentPage?.records
         ?.map((record) =>
           record.context.map((contextRow) => ({
-            col1: (
-              <a
-                href={contextRow.page_url}
-                className={"underline"}
-                target={"_blank"}
-                rel="noreferrer"
-              >
-                {record.paper_title}
-              </a>
-            ),
-            col2: record.date,
-            col3: contextRow.left_context,
-            col4: <span className={"font-medium"}>{contextRow.pivot}</span>,
-            col5: contextRow.right_context,
+            document: `${record.paper_title}||${record.date}`,
+            date: record.date,
+            left_context: contextRow.left_context,
+            pivot: <span className={"font-medium"}>{contextRow.pivot}</span>,
+            right_context: contextRow.right_context,
           }))
         )
         .flat() ?? [],
     [currentPage]
   );
 
-  const columns: Column<{
-    col1: JSX.Element;
-    col2: string;
-    col3: string;
-    col4: JSX.Element;
-    col5: string;
-  }>[] = React.useMemo(
+  const columns = React.useMemo(
     () => [
       {
         Header: "Document",
-        accessor: "col1",
-      },
+        accessor: "document",
+        Cell: ({ value }: { value: string }) =>
+          value.split("||")[0] as unknown as JSX.Element,
+      } as const,
       {
         Header: "Date",
-        accessor: "col2",
-      },
+        accessor: "date",
+        aggregate: "unique",
+        Aggregated: ({ value }: { value: string }) => value,
+      } as const,
       {
         Header: lang === "fr" ? "Contexte gauche" : "Left context",
-        accessor: "col3",
-      },
+        accessor: "left_context" as const,
+        aggregate: "unique",
+        Aggregated: ({ value }: { value: string[] }) => value[0],
+      } as const,
       {
         Header: "Pivot",
-        accessor: "col4",
-      },
+        accessor: "pivot",
+        aggregate: "unique",
+        Aggregated: ({ value }: { value: string[] }) => value[0],
+      } as const,
       {
         Header: lang === "fr" ? "Contexte droit" : "Right context",
-        accessor: "col5",
-      },
+        accessor: "right_context",
+        aggregate: "unique",
+        Aggregated: ({ value }: { value: string[] }) => value[0],
+      } as const,
     ],
     [lang]
   );
 
-  const tableInstance = useTable({ columns, data: tableData });
+  const tableInstance = useTable(
+    {
+      columns,
+      data: tableData,
+      initialState: { groupBy: ["document"] },
+    },
+    useGroupBy,
+    useExpanded
+  );
   const total_results = Number(data?.num_results) ?? 0;
   const cursorMax = Math.floor(total_results / limit);
+  const documentHeader = tableInstance.headerGroups[0].headers.filter(
+    (h) => h.id === "document"
+  )[0];
 
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-      <h1 className={"text-2xl flex flex-col gap-2 ml-5"}>
-        {!currentPage && !isFetching && <p>No results found</p>}
-        {currentPage && (
-          <div className={"flex flex-row gap-10"}>
-            {total_results.toLocaleString()} {translation.total_docs}
-          </div>
-        )}
-        <p className={"text-xl"}>{translation.num_docs_page}</p>
-      </h1>
-      <h1
-        className={
-          "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
-        }
-      >
-        {isFetching && <p>{translation.loading_next}</p>}
-      </h1>
-      {currentPage && !isFetching && (
-        <QueryPagination
-          onPageIncrement={() => setSelectedPage(selectedPage + 1)}
-          onPageDecrement={() => setSelectedPage(selectedPage - 1)}
-          selectedPage={selectedPage}
-          cursorMax={cursorMax}
-          onLastPage={() => setSelectedPage(cursorMax)}
-          onFirstPage={() => setSelectedPage(1)}
+      <div className={"ml-5"}>
+        <h1 className={"text-2xl flex flex-col gap-2"}>
+          {!currentPage && !isFetching && <p>No results found</p>}
+          {currentPage && (
+            <div className={"flex flex-row gap-10"}>
+              {total_results.toLocaleString()} {translation.total_docs}
+            </div>
+          )}
+          <p className={"text-xl"}>{translation.num_docs_page}</p>
+        </h1>
+        <h1
+          className={
+            "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
+          }
         >
-          <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
-          <CursorInput
-            cursor={selectedPage}
+          {isFetching && <p>{translation.loading_next}</p>}
+        </h1>
+        {currentPage && !isFetching && (
+          <QueryPagination
+            onPageIncrement={() => setSelectedPage(selectedPage + 1)}
+            onPageDecrement={() => setSelectedPage(selectedPage - 1)}
+            selectedPage={selectedPage}
             cursorMax={cursorMax}
-            onCursorIncrement={setSelectedPage}
-            onCursorDecrement={setSelectedPage}
-          />
-          <p className={"ml-3 md:ml-5 lg:ml-5"}>
-            {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
-          </p>
-        </QueryPagination>
-      )}
-      {props.children}
+            onLastPage={() => setSelectedPage(cursorMax)}
+            onFirstPage={() => setSelectedPage(1)}
+          >
+            <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
+            <CursorInput
+              cursor={selectedPage}
+              cursorMax={cursorMax}
+              onCursorIncrement={setSelectedPage}
+              onCursorDecrement={setSelectedPage}
+            />
+            <p className={"ml-3 md:ml-5 lg:ml-5"}>
+              {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
+            </p>
+          </QueryPagination>
+        )}
+        {props.children}
+        <button
+          {...documentHeader.getGroupByToggleProps()}
+          className={"border p-5 hover:bg-zinc-100"}
+        >
+          {documentHeader.isGrouped
+            ? translation.ungroup_by_doc
+            : translation.group_by_doc}
+        </button>
+      </div>
       <DesktopTable tableInstance={tableInstance} />
       <MobileTable tableInstance={tableInstance} />
     </div>
@@ -333,8 +359,9 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
           return (
             <tr
               {...row.getRowProps()}
-              key={index}
               className={"odd:bg-zinc-100"}
+              {...row.getToggleRowExpandedProps()}
+              key={index}
             >
               {row.cells.map((cell, index) => {
                 let twStyle = "";
@@ -350,7 +377,24 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                     key={index}
                     className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
                   >
-                    {cell.render("Cell")}
+                    {cell.isGrouped ? (
+                      // If it's a grouped cell, add an expander and row count
+                      <>
+                        <span className={"text-xl"}>
+                          {row.isExpanded ? "⌄" : "›"}
+                        </span>{" "}
+                        {cell.render("Cell")} ({row.subRows.length})
+                      </>
+                    ) : cell.isAggregated ? (
+                      // If the cell is aggregated, use the Aggregated
+                      // renderer for cell
+                      row.isExpanded ? null : (
+                        cell.render("Aggregated")
+                      )
+                    ) : cell.isPlaceholder ? null : ( // For cells with repeated values, render null
+                      // Otherwise, just render the regular cell
+                      cell.render("Cell")
+                    )}
                   </td>
                 );
               })}
