@@ -15,6 +15,7 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 [gallicaGetter directory](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter)
 * contains gallicaWrapper.py, the base abstraction for fetching XML from Gallica and converting it to Python objects.
 * each endpoint wrapper is kept in its own file (e.g. volumeOccurrenceWrapper.py)
+* contains a [tests directory](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/tests) containing unit tests for important logic and each endpoint wrapper. Calls to Gallica are not mocked, so the entire suite takes ~10 seconds to run. 
 
 #### Important client-side files:
 
