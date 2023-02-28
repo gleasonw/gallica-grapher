@@ -91,7 +91,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
           />
         </InputLabel>
       </div>
-      <div className={"mb-10 mt-5 flex flex-row flex-wrap gap-10"}>
+      <div className={"mt-5 flex flex-row flex-wrap gap-10"}>
         {selectedPapers?.map((paper) => (
           <button
             onClick={() => {

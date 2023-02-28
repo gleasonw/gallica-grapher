@@ -40,7 +40,7 @@ export const getStaticProps: GetStaticProps<{
 }> = async () => {
   const records = await fetchContext(0, {
     terms: initTickets[0].terms,
-    limit: 5,
+    limit: 10,
     source: "periodical",
   });
   const initSeries = await Promise.all(

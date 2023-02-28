@@ -1,11 +1,6 @@
 import React, { ReactElement } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  TableInstance,
-  useExpanded,
-  useGroupBy,
-  useTable,
-} from "react-table";
+import { TableInstance, useExpanded, useGroupBy, useTable } from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
@@ -37,37 +32,37 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
     limit: props.limit,
     row_split: true,
   });
+  console.log(url);
   const response = await fetch(url);
   return (await response.json()) as GallicaResponse;
-};
-
-const strings = {
-  fr: {
-    noResults: "Aucun résultat",
-    loading_next: "Chargement de la prochaine page...",
-    loading_previous: "Chargement de la page précédente...",
-    error: "Erreur",
-    total_docs: "documents sur Gallica",
-    num_docs_page: "Les occurrences dans 5 documents sont affichées",
-    group_by_doc: "Regrouper par document",
-    ungroup_by_doc: "Dégrouper par document",
-  },
-  en: {
-    noResults: "No results",
-    loading_next: "Loading next page...",
-    loading_previous: "Loading previous page...",
-    error: "Error",
-    total_docs: "documents on Gallica",
-    num_docs_page: "Occurrences in 5 documents are displayed",
-    group_by_doc: "Group by document",
-    ungroup_by_doc: "Ungroup by document",
-  },
 };
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
   const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
+  const strings = {
+    fr: {
+      noResults: "Aucun résultat",
+      loading_next: "Chargement de la prochaine page...",
+      loading_previous: "Chargement de la page précédente...",
+      error: "Erreur",
+      total_docs: "documents sur Gallica",
+      num_docs_page: `Les occurrences dans ${limit} documents sont affichées`,
+      group_by_doc: "Regrouper par document",
+      ungroup_by_doc: "Dégrouper par document",
+    },
+    en: {
+      noResults: "No results",
+      loading_next: "Loading next page...",
+      loading_previous: "Loading previous page...",
+      error: "Error",
+      total_docs: "documents on Gallica",
+      num_docs_page: `Occurrences in ${limit} documents are displayed`,
+      group_by_doc: "Group by document",
+      ungroup_by_doc: "Ungroup by document",
+    },
+  };
   const translation = strings[lang];
 
   const { isFetching, data } = useQuery({
@@ -179,6 +174,35 @@ export function ResultsTable(props: TableProps) {
     (h) => h.id === "document"
   )[0];
 
+  const pagination = currentPage && !isFetching && (
+    <QueryPagination
+      onPageIncrement={() => setSelectedPage(selectedPage + 1)}
+      onPageDecrement={() => setSelectedPage(selectedPage - 1)}
+      selectedPage={selectedPage}
+      cursorMax={cursorMax}
+      onLastPage={() => setSelectedPage(cursorMax)}
+      onFirstPage={() => setSelectedPage(1)}
+    >
+      <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
+      <CursorInput
+        cursor={selectedPage}
+        cursorMax={cursorMax}
+        onCursorIncrement={setSelectedPage}
+        onCursorDecrement={setSelectedPage}
+      />
+      <p className={"ml-3 md:ml-5 lg:ml-5"}>
+        {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
+      </p>
+    </QueryPagination>
+  );
+
+  const spinner = isFetching && (
+    <div
+      className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+      role="status"
+    />
+  );
+
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
       <div className={"ml-5"}>
@@ -191,34 +215,8 @@ export function ResultsTable(props: TableProps) {
           )}
           <p className={"text-xl"}>{translation.num_docs_page}</p>
         </h1>
-        <h1
-          className={
-            "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
-          }
-        >
-          {isFetching && <p>{translation.loading_next}</p>}
-        </h1>
-        {currentPage && !isFetching && (
-          <QueryPagination
-            onPageIncrement={() => setSelectedPage(selectedPage + 1)}
-            onPageDecrement={() => setSelectedPage(selectedPage - 1)}
-            selectedPage={selectedPage}
-            cursorMax={cursorMax}
-            onLastPage={() => setSelectedPage(cursorMax)}
-            onFirstPage={() => setSelectedPage(1)}
-          >
-            <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
-            <CursorInput
-              cursor={selectedPage}
-              cursorMax={cursorMax}
-              onCursorIncrement={setSelectedPage}
-              onCursorDecrement={setSelectedPage}
-            />
-            <p className={"ml-3 md:ml-5 lg:ml-5"}>
-              {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
-            </p>
-          </QueryPagination>
-        )}
+        <h1 className={"flex justify-center"}>{spinner}</h1>
+        {pagination}
         {props.children}
         <button
           // @ts-ignore
@@ -235,6 +233,8 @@ export function ResultsTable(props: TableProps) {
       </div>
       <DesktopTable tableInstance={tableInstance} />
       <MobileTable tableInstance={tableInstance} />
+      <h1 className={"pt-5 flex justify-center"}>{spinner}</h1>
+      {pagination}
     </div>
   );
 }
@@ -416,15 +416,17 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                         // If the cell is aggregated, use the Aggregated
                         // renderer for cell
                         // @ts-ignore
-                        row.isExpanded ? null : (
+                        row.isExpanded ? (
+                          cell.column.id === "date" ? (
+                            cell.render("Cell")
+                          ) : null
+                        ) : (
                           cell.render("Aggregated")
                         )
-                      ) : 
-                      // @ts-ignore
-                      cell.isPlaceholder ? null : ( // For cells with repeated values, render null
-                        // Otherwise, just render the regular cell
+                      ) : // @ts-ignore
+                      cell.isPlaceholder ? null : cell.column.id !== "date" ? ( // Otherwise, just render the regular cell // For cells with repeated values, render null
                         cell.render("Cell")
-                      )
+                      ) : null
                     }
                   </td>
                 );
