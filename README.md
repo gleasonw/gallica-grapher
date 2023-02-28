@@ -13,17 +13,10 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 * The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
 
 [gallicaGetter directory](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter)
-* contains gallicaWrapper.py, the base abstraction for getting XML from Gallica and converting it to Python objects.
+* contains gallicaWrapper.py, the base abstraction for fetching XML from Gallica and converting it to Python objects.
 * each endpoint wrapper is kept in its own file (e.g. volumeOccurrenceWrapper.py)
-* concurrent fetching / Gallica session management is in [fetch](https://github.com/gleasonw/gallica-grapher/tree/main/backend/gallicaGetter/fetch)
 
-gallicaGetter is available on PyPi:
-```sh
-pip install gallicaGetter
-```
-
-
-#### Important front end files:
+#### Important client-side files:
 
 [Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/components)
 * Contains the React code for the graph, table, paper dropdown, and every other UI component. 
