@@ -107,6 +107,7 @@ async def get(
         # check if we need to retry
         if response.status != 200 and num_retries < 3:
             print(f'retrying {num_retries}')
+            print(response.status)
             await asyncio.sleep(2**num_retries)
             return await get(
                 query=query,
