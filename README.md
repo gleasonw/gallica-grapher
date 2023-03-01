@@ -8,7 +8,7 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 
 [main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
 * api routes for the frontend marked by the @app FastAPI decorator
-* The root is at https://gallica-grapher-production.up.railway.app/ 
+* Hosted at https://gallica-grapher-production.up.railway.app/ 
 
 [request.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/www/request.py)
 * The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
