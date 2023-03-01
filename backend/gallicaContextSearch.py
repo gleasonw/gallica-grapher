@@ -1,4 +1,5 @@
 import asyncio
+from gallicaGetter.gallicaWrapper import Response
 from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper, VolumeRecord
 from gallicaGetter.contentWrapper import ContextWrapper, HTMLContext
 from typing import Callable, List, Literal, Optional
@@ -7,12 +8,15 @@ from functools import partial
 from bs4 import BeautifulSoup
 import aiohttp
 
+MAX_CONCURRENT_REQUESTS_FOR_CSV = 20
+
 
 class ContextRow(BaseModel):
     pivot: str
     left_context: str
     right_context: str
     page_url: str
+    page: str
 
 
 class GallicaRecord(BaseModel):
@@ -28,6 +32,7 @@ class UserResponse(BaseModel):
     records: List[GallicaRecord]
     num_results: int
     origin_urls: List[str]
+    est_seconds_to_download: int
 
 
 def build_html_record(record: VolumeRecord, context: HTMLContext):
@@ -75,7 +80,8 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
                     pivot=pivot,
                     left_context=closest_left_text,
                     right_context=closest_right_text,
-                    page_url=f'{record.url}/f{page.page_num}.image.r={pivot}',
+                    page_url=f"{record.url}/f{page.page_num}.image.r={pivot}",
+                    page=page.page_num,
                 )
             )
 
@@ -113,6 +119,8 @@ async def get_context(
 
     total_records = 0
     origin_urls = []
+    sru_average_response = 0
+    content_average_response = 0
 
     def set_total_records(num_records: int):
         nonlocal total_records
@@ -121,6 +129,24 @@ async def get_context(
     def set_origin_urls(urls: List[str]):
         nonlocal origin_urls
         origin_urls = urls
+
+    def update_response_time(current_average: float, new: float):
+        if current_average == 0:
+            return new
+        else:
+            return (current_average + new) / 2
+
+    def update_sru_average_response_time(response: Response):
+        nonlocal sru_average_response
+        sru_average_response = update_response_time(
+            sru_average_response, response.elapsed_time
+        )
+
+    def update_content_average_response_time(response: Response):
+        nonlocal content_average_response
+        content_average_response = update_response_time(
+            content_average_response, response.elapsed_time
+        )
 
     # get the volumes in which the term appears
     async with aiohttp.ClientSession() as session:
@@ -137,6 +163,7 @@ async def get_context(
             sort=sort,
             on_get_total_records=set_total_records,
             on_get_origin_urls=set_origin_urls,
+            on_receive_response=update_sru_average_response_time,
             session=session,
         )
 
@@ -151,6 +178,7 @@ async def get_context(
                 for _, record in keyed_records.items()
             ],
             session=session,
+            on_receive_response=update_content_average_response_time,
         )
 
         # combine the two
@@ -163,6 +191,13 @@ async def get_context(
             records=records_with_context,
             num_results=total_records,
             origin_urls=origin_urls,
+            est_seconds_to_download=int(
+                (
+                    (total_records / 50) * sru_average_response
+                    + total_records * content_average_response
+                )
+                / MAX_CONCURRENT_REQUESTS_FOR_CSV
+            ),
         )
 
 
@@ -216,7 +251,7 @@ async def stream_all_records_with_context(
         origin_urls = urls
 
     async with aiohttp.ClientSession() as session:
-        semaphore = asyncio.Semaphore(20)
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS_FOR_CSV)
         volume_Gallica_wrapper = VolumeOccurrenceWrapper()
         gallica_records = await volume_Gallica_wrapper.get(
             terms=terms,

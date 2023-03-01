@@ -64,7 +64,7 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
             grouping=grouping,
         )
         return await self.get_records_for_queries(
-            queries=queries, on_update_progress=onProgressUpdate, session=session
+            queries=queries, on_receive_response=onProgressUpdate, session=session
         )
 
     def get_endpoint_url(self):

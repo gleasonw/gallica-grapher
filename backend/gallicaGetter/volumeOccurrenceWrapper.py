@@ -72,11 +72,11 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
         limit: Optional[int] = None,
         start_index: int | List[int] = 0,
         sort: Optional[Literal["date", "relevance"]] = None,
-        onProgressUpdate=None,
         query_cache=None,
         on_get_total_records: Optional[Callable[[int], None]] = None,
         on_get_origin_urls: Optional[Callable[[List[str]], None]] = None,
         get_all_results: bool = False,
+        on_receive_response: Optional[Callable[[Response], None]] = None,
         session: aiohttp.ClientSession | None = None,
         semaphore: asyncio.Semaphore | None = None,
     ) -> Generator[VolumeRecord, None, None]:
@@ -123,7 +123,7 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             )
         return await self.get_records_for_queries(
             queries=queries,
-            on_update_progress=onProgressUpdate,
+            on_receive_response=on_receive_response,
             session=session,
             semaphore=semaphore,
         )
