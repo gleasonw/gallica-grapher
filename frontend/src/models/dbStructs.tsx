@@ -18,6 +18,7 @@ export interface ContextRow {
   left_context: string;
   right_context: string;
   page_url: string;
+  page: number;
 }
 
 export interface Paper {
@@ -46,7 +47,6 @@ export interface GraphData {
   }[];
   name: string;
 }
-
 
 export interface GallicaContext {
   num_results: number;
