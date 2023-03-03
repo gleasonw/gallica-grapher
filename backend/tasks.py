@@ -1,6 +1,6 @@
 from celery import Celery
 
-app = Celery("tasks", broker="redis://localhost:6379/0")
+app = Celery("tasks", broker="redis://default:j6prqWNEhhw1kUa3uUHW@containers-us-west-68.railway.app:7270")
 
 
 @app.task
