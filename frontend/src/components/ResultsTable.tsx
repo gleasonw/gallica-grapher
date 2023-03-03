@@ -6,7 +6,7 @@ import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "../pages";
-import { CSVLink, CSVDownload } from "react-csv";
+import { CSVDownload } from "react-csv";
 
 export interface TableProps {
   terms?: string[];
