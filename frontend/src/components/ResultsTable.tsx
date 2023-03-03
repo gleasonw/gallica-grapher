@@ -6,6 +6,7 @@ import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "../pages";
+import { CSVLink, CSVDownload } from "react-csv";
 
 export interface TableProps {
   terms?: string[];
@@ -39,6 +40,7 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
+  const [downloadCSVPage, setDownloadCSVPage] = React.useState(false);
   const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
   const strings = {
@@ -51,6 +53,7 @@ export function ResultsTable(props: TableProps) {
       num_docs_page: `Les occurrences dans ${limit} documents sont affichées`,
       group_by_doc: "Regrouper par document",
       ungroup_by_doc: "Dégrouper par document",
+      download_csv: "Télécharger page CSV",
     },
     en: {
       noResults: "No results",
@@ -61,6 +64,7 @@ export function ResultsTable(props: TableProps) {
       num_docs_page: `Occurrences in ${limit} documents are displayed`,
       group_by_doc: "Group by document",
       ungroup_by_doc: "Ungroup by document",
+      download_csv: "Download CSV page",
     },
   };
   const translation = strings[lang];
@@ -215,21 +219,41 @@ export function ResultsTable(props: TableProps) {
           )}
           <p className={"text-xl"}>{translation.num_docs_page}</p>
         </h1>
+        {props.children}
         <h1 className={"flex justify-center"}>{spinner}</h1>
         {pagination}
-        {props.children}
-        <button
-          // @ts-ignore
-          {...documentHeader.getGroupByToggleProps()}
-          className={"border p-5 hover:bg-zinc-100"}
-        >
-          {
+        <div className={"flex flex-row gap-5 mb-5"}>
+          <button
             // @ts-ignore
-            documentHeader.isGrouped
-              ? translation.ungroup_by_doc
-              : translation.group_by_doc
-          }
-        </button>
+            {...documentHeader.getGroupByToggleProps()}
+            className={"border p-5 hover:bg-zinc-100"}
+          >
+            {
+              // @ts-ignore
+              documentHeader.isGrouped
+                ? translation.ungroup_by_doc
+                : translation.group_by_doc
+            }
+          </button>
+          <button
+            onClick={() => setDownloadCSVPage(true)}
+            className={"border p-5 hover:bg-zinc-100"}
+          >
+            {translation.download_csv}
+            {downloadCSVPage && (
+              <CSVDownload
+                data={tableData.map((row) => {
+                  return {
+                    ...row,
+                    document: row.document.split("||")[0],
+                    pivot: row.pivot.props.children,
+                  };
+                })}
+                target="_blank"
+              />
+            )}
+          </button>
+        </div>
       </div>
       <DesktopTable tableInstance={tableInstance} />
       <MobileTable tableInstance={tableInstance} />
