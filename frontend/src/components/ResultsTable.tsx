@@ -255,6 +255,7 @@ export function ResultsTable(props: TableProps) {
                     ...row,
                     document: row.document.split("||")[0],
                     pivot: row.pivot.props.children,
+                    page: row.page.props.children,
                   };
                 })}
                 target="_blank"
