@@ -1,6 +1,7 @@
 from celery import Celery
+import os
 
-app = Celery("tasks", broker="redis://default:j6prqWNEhhw1kUa3uUHW@containers-us-west-68.railway.app:7270")
+app = Celery("tasks", broker=os.environ.get("REDIS_URL"))
 
 
 @app.task
