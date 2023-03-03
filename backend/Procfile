@@ -1,2 +1,1 @@
-web: python3 -m main
-
+worker: celery -A tasks worker --loglevel=INFO
