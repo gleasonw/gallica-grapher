@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { TableInstance, useExpanded, useGroupBy, useTable } from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
@@ -103,7 +103,16 @@ export function ResultsTable(props: TableProps) {
           record.context.map((contextRow) => ({
             document: `${record.paper_title}||${record.date}`,
             date: record.date,
-            page: contextRow.page_url,
+            page: (
+              <a
+                className="underline p-5"
+                href={contextRow.page_url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {contextRow.page}
+              </a>
+            ),
             left_context: contextRow.left_context,
             pivot: <span className={"font-medium"}>{contextRow.pivot}</span>,
             right_context: contextRow.right_context,
@@ -137,8 +146,7 @@ export function ResultsTable(props: TableProps) {
         Header: "Page",
         accessor: "page",
         aggregate: "unique",
-        Aggregated: ({ value }: { value: string[] }) => urlElement(value[0]),
-        Cell: ({ value }: { value: string }) => urlElement(value),
+        Aggregated: ({ value }: { value: string[] }) => value[0],
       } as const,
       {
         Header: lang === "fr" ? "Contexte gauche" : "Left context",
@@ -433,7 +441,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                               row.isExpanded ? "⌄" : "›"
                             }
                           </span>{" "}
-                          {cell.render("Cell")} ({row.subRows.length})
+                          ({row.subRows.length}) {cell.render("Cell")}
                         </>
                       ) : // @ts-ignore
                       cell.isAggregated ? (

@@ -1,9 +1,9 @@
 import asyncio
-from typing import Generator, List, Tuple
+from typing import Callable, Generator, List, Tuple
 from pydantic import BaseModel
 from gallicaGetter.queries import ContentQuery
 from gallicaGetter.utils.parse_xml import get_num_results_and_pages_for_context
-from gallicaGetter.gallicaWrapper import GallicaWrapper
+from gallicaGetter.gallicaWrapper import GallicaWrapper, Response
 from dataclasses import dataclass
 import aiohttp
 
@@ -44,15 +44,24 @@ class ContextWrapper(GallicaWrapper):
     async def get(
         self,
         context_pairs: List[Tuple[str, List[str]]],
-        generate=False,
+        on_receive_response: Callable[[Response], None] | None = None,
         session: aiohttp.ClientSession | None = None,
         semaphore: asyncio.Semaphore | None = None,
     ) -> Generator[HTMLContext, None, None]:
         if session is None:
             async with aiohttp.ClientSession() as session:
-                return await self.get(context_pairs, generate, session)
+                return await self.get(
+                    context_pairs=context_pairs,
+                    session=session,
+                    on_receive_response=on_receive_response,
+                )
         queries = [
             ContentQuery(ark=pair[0], terms=pair[1], endpoint_url=self.endpoint_url)
             for pair in context_pairs
         ]
-        return await self.get_records_for_queries(queries=queries, session=session, semaphore=semaphore)
+        return await self.get_records_for_queries(
+            queries=queries,
+            session=session,
+            semaphore=semaphore,
+            on_receive_response=on_receive_response,
+        )

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Generator, Dict
 import asyncio
 import aiohttp
+import time
 
 from gallicaGetter.queries import (
     ContentQuery,
@@ -10,6 +11,13 @@ from gallicaGetter.queries import (
     PaperQuery,
     VolumeQuery,
 )
+
+
+@dataclass
+class Response:
+    xml: bytes
+    query: VolumeQuery | PaperQuery | IssuesQuery | ContentQuery | FullTextQuery
+    elapsed_time: float
 
 
 class GallicaWrapper:
@@ -45,7 +53,7 @@ class GallicaWrapper:
         queries,
         session: aiohttp.ClientSession,
         semaphore: asyncio.Semaphore | None = None,
-        on_update_progress=None,
+        on_receive_response: Callable[[Response], None] | None = None,
     ):
         """The core abstraction for fetching record xml from gallica and parsing it to Python objects. Called by all subclasses."""
 
@@ -53,20 +61,16 @@ class GallicaWrapper:
             queries,
             session=session,
             semaphore=semaphore,
-            on_update_progress=on_update_progress,
+            on_receive_response=on_receive_response,
         )
         return self.parse(raw_response)
 
 
-@dataclass
-class Response:
-    xml: bytes
-    query: VolumeQuery | PaperQuery | IssuesQuery | ContentQuery | FullTextQuery
-    elapsed_time: float
-
-
 async def fetch_from_gallica(
-    queries, session: aiohttp.ClientSession, on_update_progress=None, semaphore=None
+    queries,
+    session: aiohttp.ClientSession,
+    on_receive_response: Callable[[Response], None] | None = None,
+    semaphore=None,
 ):
     if type(queries) is not list:
         queries = [queries]
@@ -77,7 +81,7 @@ async def fetch_from_gallica(
             get(
                 query=query,
                 session=session,
-                on_update_progress=on_update_progress,
+                on_receive_response=on_receive_response,
                 semaphore=semaphore,
             )
         )
@@ -89,7 +93,7 @@ async def get(
     query: VolumeQuery | PaperQuery | IssuesQuery | ContentQuery | FullTextQuery,
     session: aiohttp.ClientSession,
     semaphore: asyncio.Semaphore | None = None,
-    on_update_progress=None,
+    on_receive_response: Callable[[Response], None] | None = None,
     num_retries=0,
 ):
     if semaphore:
@@ -97,27 +101,29 @@ async def get(
             return await get(
                 query=query,
                 session=session,
-                on_update_progress=on_update_progress,
+                on_receive_response=on_receive_response,
                 semaphore=None,
             )
+    start_time = time.perf_counter()
     async with session.get(query.endpoint_url, params=query.params) as response:
-        if on_update_progress:
-            on_update_progress("FETCHING")
-
+        elapsed_time = time.perf_counter() - start_time
         # check if we need to retry
         if response.status != 200 and num_retries < 3:
-            print(f'retrying {num_retries}')
+            print(f"retrying {num_retries}")
+            print(response.status)
             await asyncio.sleep(2**num_retries)
             return await get(
                 query=query,
                 session=session,
-                on_update_progress=on_update_progress,
+                on_receive_response=on_receive_response,
                 semaphore=semaphore,
                 num_retries=num_retries + 1,
             )
-        xml = await response.content.read()
-        return Response(
-            xml=xml,
+        response = Response(
+            xml=await response.content.read(),
             query=query,
-            elapsed_time=0,
+            elapsed_time=elapsed_time,
         )
+        if on_receive_response:
+            on_receive_response(response)
+        return response
