@@ -202,4 +202,4 @@ async def fetch_records_from_gallica(
 
 
 if __name__ == "__main__":
-    add.delay(1, 2)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
