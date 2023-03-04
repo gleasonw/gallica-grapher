@@ -161,8 +161,7 @@ async def fetch_records_from_gallica(
     link_distance: Optional[int] = 0,
     source: Literal["book", "periodical", "all"] = "all",
     sort: Literal["date", "relevance"] = "relevance",
-    row_split: Optional[bool] = False,
-    download_csv: Optional[bool] = False,
+    row_split: Optional[bool] = False
 ):
     """API endpoint for the context table. To fetch multiple terms linked with OR in the Gallica CQL, pass multiple terms parameters: /api/gallicaRecords?terms=term1&terms=term2&terms=term3"""
     if limit and limit > 50:
@@ -181,27 +180,6 @@ async def fetch_records_from_gallica(
                 wrapped_terms.append(f'"{term}"')
             else:
                 wrapped_terms.append(term)
-
-    if download_csv:
-        record_gen = stream_all_records_with_context(
-            start_year=year,
-            start_month=month,
-            end_year=end_year,
-            end_month=end_month,
-            terms=wrapped_terms,
-            codes=codes,
-            link_term=link_term,
-            link_distance=link_distance,
-            source=source,
-            sort=sort,
-        )
-        return StreamingResponse(
-            record_gen,
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": f'attachment; filename="{terms[0]}_context.csv"',
-            },
-        )
 
     if row_split:
         context_getter = get_row_context
