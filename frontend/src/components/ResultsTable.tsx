@@ -243,25 +243,6 @@ export function ResultsTable(props: TableProps) {
                 : translation.group_by_doc
             }
           </button>
-          <button
-            onClick={() => setDownloadCSVPage(true)}
-            className={"border p-5 hover:bg-zinc-100"}
-          >
-            {translation.download_csv}
-            {downloadCSVPage && (
-              <CSVDownload
-                data={tableData.map((row) => {
-                  return {
-                    ...row,
-                    document: row.document.split("||")[0],
-                    pivot: row.pivot.props.children,
-                    page: row.page.props.children,
-                  };
-                })}
-                target="_blank"
-              />
-            )}
-          </button>
         </div>
       </div>
       <DesktopTable tableInstance={tableInstance} />
