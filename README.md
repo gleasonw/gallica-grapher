@@ -21,7 +21,7 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 #### Important client-side files:
 
 [Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/components)
-* Contains the React code for the graph, table, paper dropdown, and every other UI component. 
+* Contains the React components for the graph, table, paper dropdown, and every UI component. 
 * The long className strings in the html elements are [Tailwind](https://tailwindcss.com/) CSS utility classes.
 
-Railway hosts the Python code, a Postgres database for storage and a Redis database for tracking request progress. Vercel hosts the Next.js frontend. It is all free! 
+Railway hosts the Python code, a Postgres database for storage and a Redis database for tracking request progress. Vercel hosts the Next.js frontend. 
