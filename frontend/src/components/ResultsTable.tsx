@@ -1,6 +1,13 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { TableInstance, useExpanded, useGroupBy, useTable } from "react-table";
+import {
+  Cell,
+  Row,
+  TableInstance,
+  useExpanded,
+  useGroupBy,
+  useTable,
+} from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
@@ -40,7 +47,6 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
-  const [downloadCSVPage, setDownloadCSVPage] = React.useState(false);
   const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
   const strings = {
@@ -120,13 +126,6 @@ export function ResultsTable(props: TableProps) {
         )
         .flat() ?? [],
     [currentPage]
-  );
-
-  const urlElement = (url: string) => (
-    <a className="underline" href={url} target="_blank" rel="noreferrer">
-      {" "}
-      Page Gallica
-    </a>
   );
 
   const columns = React.useMemo(
@@ -352,7 +351,12 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
       {props.tableInstance.rows.map((row, index) => {
         props.tableInstance.prepareRow(row);
         return (
-          <div {...row.getRowProps()} key={index} className={"odd:bg-zinc-100"}>
+          <div
+            {...row.getRowProps()}
+            {...row.getToggleRowExpandedProps()}
+            key={index}
+            className={"odd:bg-zinc-100"}
+          >
             {row.cells.map((cell, index) => {
               return (
                 <div
@@ -360,7 +364,7 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
                   key={index}
                   className={"pl-5 pr-5 pt-2 pb-2 "}
                 >
-                  {cell.render("Cell")}
+                  {cellRender(row, cell)}
                 </div>
               );
             })}
@@ -412,36 +416,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                     key={index}
                     className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
                   >
-                    {
-                      // @ts-ignore
-                      cell.isGrouped ? (
-                        // If it's a grouped cell, add an expander and row count
-                        <>
-                          <span className={"text-xl"}>
-                            {
-                              // @ts-ignore
-                              row.isExpanded ? "⌄" : "›"
-                            }
-                          </span>{" "}
-                          ({row.subRows.length}) {cell.render("Cell")}
-                        </>
-                      ) : // @ts-ignore
-                      cell.isAggregated ? (
-                        // If the cell is aggregated, use the Aggregated
-                        // renderer for cell
-                        // @ts-ignore
-                        row.isExpanded ? (
-                          cell.column.id === "date" ? (
-                            cell.render("Cell")
-                          ) : null
-                        ) : (
-                          cell.render("Aggregated")
-                        )
-                      ) : // @ts-ignore
-                      cell.isPlaceholder ? null : cell.column.id !== "date" ? ( // Otherwise, just render the regular cell // For cells with repeated values, render null
-                        cell.render("Cell")
-                      ) : null
-                    }
+                    {cellRender(row, cell)}
                   </td>
                 );
               })}
@@ -450,5 +425,39 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
         })}
       </tbody>
     </table>
+  );
+}
+
+//TODO: move type defs to vercel to remove ts-ignore
+function cellRender(row: Row, cell: Cell) {
+  return (
+    // @ts-ignore
+    cell.isGrouped ? (
+      // If it's a grouped cell, add an expander and row count
+      <>
+        <span className={"text-xl"}>
+          {
+            // @ts-ignore
+            row.isExpanded ? "⌄" : "›"
+          }
+        </span>{" "}
+        ({row.subRows.length}) {cell.render("Cell")}
+      </>
+    ) : // @ts-ignore
+    cell.isAggregated ? (
+      // If the cell is aggregated, use the Aggregated
+      // renderer for cell
+      // @ts-ignore
+      row.isExpanded ? (
+        cell.column.id === "date" ? (
+          cell.render("Cell")
+        ) : null
+      ) : (
+        cell.render("Aggregated")
+      )
+    ) : // @ts-ignore
+    cell.isPlaceholder ? null : cell.column.id !== "date" ? ( // Otherwise, just render the regular cell // For cells with repeated values, render null
+      cell.render("Cell")
+    ) : null
   );
 }
