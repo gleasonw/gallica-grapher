@@ -353,6 +353,7 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
         return (
           <div
             {...row.getRowProps()}
+            // @ts-ignore
             {...row.getToggleRowExpandedProps()}
             key={index}
             className={"odd:bg-zinc-100"}
