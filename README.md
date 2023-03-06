@@ -2,7 +2,7 @@
 
 ### Pull requests and new contributors welcome! 
 
-If you have an idea, suggestion, or question about the code, don't hesitate to make a pull request or new issue. The core parsing code is written in Python, the frontend in Typescript and React. There are many items that could be improved. Readability, architecture, frontend design, something for everyone!
+If you have an idea, suggestion, or question about the code, don't hesitate to make a pull request or new issue. I wrote the core Gallica interface in Python, the frontend in Typescript and React. There are many items that could be improved. Readability, architecture, frontend design, something for everyone!
 
 #### Important server-side files:
 
