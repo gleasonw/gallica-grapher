@@ -222,29 +222,26 @@ export function ResultsTable(props: TableProps) {
               {total_results.toLocaleString()} {translation.total_docs}
             </div>
           )}
-          <p className={"text-xl"}>{translation.num_docs_page}</p>
         </h1>
         {props.children}
         {spinner}
         {pagination}
-        <div className={"flex flex-row gap-5 mb-5"}>
-          <button
-            // @ts-ignore
-            {...documentHeader.getGroupByToggleProps()}
-            className={"border p-5 hover:bg-zinc-100"}
-          >
-            {
-              // @ts-ignore
-              documentHeader.isGrouped
-                ? translation.ungroup_by_doc
-                : translation.group_by_doc
-            }
-          </button>
-        </div>
       </div>
       <DesktopTable tableInstance={tableInstance} />
       <MobileTable tableInstance={tableInstance} />
       <h1 className={"pt-5 flex justify-center"}>{spinner}</h1>
+      <button
+        // @ts-ignore
+        {...documentHeader.getGroupByToggleProps()}
+        className={"border p-5 hover:bg-zinc-100"}
+      >
+        {
+          // @ts-ignore
+          documentHeader.isGrouped
+            ? translation.ungroup_by_doc
+            : translation.group_by_doc
+        }
+      </button>
       {pagination}
     </div>
   );

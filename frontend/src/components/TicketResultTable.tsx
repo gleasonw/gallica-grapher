@@ -53,7 +53,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
           <InputLabel label={lang === "fr" ? "Année" : "Year"}>
             <input
               type={"number"}
-              className={"border  bg-white p-5"}
+              className={"border bg-white p-3"}
               value={props.year || ""}
               onChange={(e) => props.onSelectYear(parseInt(e.target.value))}
             />
@@ -70,7 +70,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
               onChange={(e) => {
                 props.onSelectTicket(parseInt(e.target.value));
               }}
-              className={"border  bg-white p-5"}
+              className={"border  bg-white p-3"}
               value={props.selectedTicket || ""}
             >
               {props.tickets?.map((ticket) => (

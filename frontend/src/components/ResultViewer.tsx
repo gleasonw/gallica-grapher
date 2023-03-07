@@ -18,6 +18,7 @@ import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
 import { InferGetStaticPropsType } from "next";
+import { ResponsiveLine } from "@nivo/line";
 
 export const seriesColors = [
   "#7cb5ec",
@@ -65,10 +66,17 @@ const strings = {
   fr: {
     zoom_out: "Zoomer à l'échelle originale",
     gallicagram_plug: (
-      <p>
-        Données de charte fournies par {gallica_plug}, un projet de Benjamin
-        Azoulay et Benoît de Courson.
-      </p>
+      <>
+        <p>
+          Données de charte fournies par {gallica_plug}, un projet de Benjamin
+          Azoulay et Benoît de Courson.
+        </p>
+        <p>
+          Le graphe représente le nombre d{"'"}
+          occurrences dans la période divisé par le nombre total de mots dans la
+          période (année ou mois).
+        </p>
+      </>
     ),
     grouping: "Résolution",
     smoothing: "Lissage",
@@ -76,10 +84,16 @@ const strings = {
   en: {
     zoom_out: "Zoom out",
     gallicagram_plug: (
-      <p>
-        Chart data provided by {gallica_plug}, a project by Benjamin Azoulay and
-        Benoît de Courson.
-      </p>
+      <>
+        <p>
+          Chart data provided by {gallica_plug}, a project by Benjamin Azoulay
+          and Benoît de Courson.
+        </p>
+        <p>
+          The Y axis represents the number of occurrences in the period (year or
+          month) divided by the total number of words in that period.
+        </p>
+      </>
     ),
     grouping: "Grouping",
     smoothing: "Smoothing",
@@ -103,7 +117,6 @@ export function ResultViewer(props: ResultViewerProps) {
   const [refAreaRight, setRefAreaRight] = React.useState<number | null>(null);
   const [dataMin, setDataMin] = React.useState<number | null>(null);
   const [dataMax, setDataMax] = React.useState<number | null>(null);
-  console.log(selectedYear);
 
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
@@ -201,8 +214,6 @@ export function ResultViewer(props: ResultViewerProps) {
     setDataMin(null);
   }
 
-  console.log(xAxisOptions.domain);
-
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"ml-10 mb-5 flex flex-row gap-10"}>
@@ -231,7 +242,7 @@ export function ResultViewer(props: ResultViewerProps) {
           </button>
         )}
       </div>
-      <ResponsiveContainer width="100%" height={400} className={"mb-10"}>
+      <ResponsiveContainer width="100%" height={400}>
         <LineChart
           width={500}
           height={300}
@@ -286,6 +297,7 @@ export function ResultViewer(props: ResultViewerProps) {
               dot={false}
               key={index}
               style={{ cursor: "pointer" }}
+              onClick={(e) => console.log(e)}
             />
           ))}
           {refAreaLeft && refAreaRight ? (
@@ -297,9 +309,8 @@ export function ResultViewer(props: ResultViewerProps) {
           ) : null}
         </LineChart>
       </ResponsiveContainer>
-      <div className={"ml-5 mr-5 border p-3"}>
-        {translation.gallicagram_plug}
-      </div>
+      <div className={"ml-5 mr-5 mt-2"}>{translation.gallicagram_plug}</div>
+      <div className={"p-2"} />
       <TicketResultTable
         initialRecords={props.initVals.initRecords}
         tickets={props.tickets}
