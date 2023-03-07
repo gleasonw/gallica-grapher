@@ -18,7 +18,6 @@ import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
 import { InferGetStaticPropsType } from "next";
-import { ResponsiveLine } from "@nivo/line";
 
 export const seriesColors = [
   "#7cb5ec",
