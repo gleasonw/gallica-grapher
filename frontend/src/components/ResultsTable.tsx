@@ -96,7 +96,6 @@ export function ResultsTable(props: TableProps) {
       }),
     staleTime: Infinity,
     keepPreviousData: true,
-    placeholderData: props.initialRecords,
   });
 
   const currentPage = data;
