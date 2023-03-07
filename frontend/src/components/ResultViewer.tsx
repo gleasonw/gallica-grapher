@@ -103,6 +103,7 @@ export function ResultViewer(props: ResultViewerProps) {
   const [refAreaRight, setRefAreaRight] = React.useState<number | null>(null);
   const [dataMin, setDataMin] = React.useState<number | null>(null);
   const [dataMax, setDataMax] = React.useState<number | null>(null);
+  console.log(selectedYear);
 
   const { lang } = useContext(LangContext);
   const translation = strings[lang];

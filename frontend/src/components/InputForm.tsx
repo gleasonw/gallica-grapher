@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Ticket } from "../pages/index";
-import { TextInput } from "./TextInput";
+import Image from "next/image";
+import glassIcon from "./icons/glass.svg";
 import { RangeInput } from "./RangeInput";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./ResultViewer";
@@ -39,7 +40,6 @@ export const InputForm: React.FC<InputFormProps> = ({
   tickets,
 }) => {
   const [word, setWord] = useState<string>("");
-  const [papers, setPapers] = useState<Paper[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [ticketID, setTicketID] = useState<number>(0);
   const { lang } = useContext(LangContext);
@@ -63,7 +63,6 @@ export const InputForm: React.FC<InputFormProps> = ({
     mutation.mutateAsync(
       {
         terms: [word],
-        papers: papers,
         start_date: yearRange[0],
         end_date: yearRange[1],
         grouping: "month",
@@ -73,7 +72,6 @@ export const InputForm: React.FC<InputFormProps> = ({
         onSuccess: (data) => {
           setTicketID(data.requestid);
           setSubmitted(true);
-          //remove example ticket
           onDeleteExampleTickets();
         },
       }
@@ -87,7 +85,6 @@ export const InputForm: React.FC<InputFormProps> = ({
           ticket={{
             id: ticketID,
             terms: [word],
-            papers: papers,
             start_date: yearRange[0],
             end_date: yearRange[1],
             grouping: "month",
@@ -97,7 +94,6 @@ export const InputForm: React.FC<InputFormProps> = ({
               id: ticketID,
               backend_source: backendSource,
               terms: [word],
-              papers: papers,
               start_date: yearRange[0],
               end_date: yearRange[1],
               grouping: "month",
@@ -119,11 +115,12 @@ export const InputForm: React.FC<InputFormProps> = ({
     );
   } else {
     return (
-      <div>
-        <div className="m-10 flex flex-col gap-10 text-left">
-          <TextInput
+      <div className="ml-10 mr-10 mb-10 flex flex-col gap-10">
+        <div className="text-2xl relative border-4 shadow-sm rounded-md m-auto mt-10 mb-10">
+          <input
+            className={"p-5 w-full"}
             placeholder={translation.search_for_word}
-            value={word}
+            value={word || ""}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setWord(e.target.value)
             }
@@ -133,17 +130,17 @@ export const InputForm: React.FC<InputFormProps> = ({
               }
             }}
           />
-          <RangeInput
-            min={1800}
-            max={2020}
-            value={yearRange}
-            onChange={onSliderChange}
-          />
-          <TicketRow
-            tickets={tickets}
-            onGraphedTicketCardClick={onDeleteTicket}
+          <Image
+            src={glassIcon}
+            className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
+            alt="Search icon"
+            onClick={() => handleSubmit()}
           />
         </div>
+        <TicketRow
+          tickets={tickets}
+          onGraphedTicketCardClick={onDeleteTicket}
+        />
       </div>
     );
   }

@@ -84,6 +84,8 @@ def make_wide_groupings_for_all_search(startDate: Date, endDate: Date):
             return [(str(markerDate), None)]
         if month := markerDate.month:
             return getOneMonthInterval(month, markerDate.year)
+        if not markerDate.year:
+            return [(None, None)]
         return [(f"{markerDate.year}-01-01", f"{int(markerDate.year) + 1}-01-01")]
     else:
         start = min(str(startDate), str(endDate))

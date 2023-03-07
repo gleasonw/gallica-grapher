@@ -13,7 +13,6 @@ import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "../pages";
-import { CSVDownload } from "react-csv";
 
 export interface TableProps {
   terms?: string[];
@@ -216,7 +215,7 @@ export function ResultsTable(props: TableProps) {
 
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-      <div className={"ml-5"}>
+      <div className={"ml-5 flex flex-col gap-5"}>
         <h1 className={"text-2xl flex flex-col gap-2"}>
           {!currentPage && !isFetching && <p>No results found</p>}
           {currentPage && (
@@ -227,7 +226,7 @@ export function ResultsTable(props: TableProps) {
           <p className={"text-xl"}>{translation.num_docs_page}</p>
         </h1>
         {props.children}
-        <h1 className={"flex justify-center"}>{spinner}</h1>
+        {spinner}
         {pagination}
         <div className={"flex flex-row gap-5 mb-5"}>
           <button
@@ -264,7 +263,7 @@ function QueryPagination(props: {
   return (
     <div
       className={
-        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl mt-5 mb-5"
+        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
       }
     >
       {props.selectedPage !== 1 && (
