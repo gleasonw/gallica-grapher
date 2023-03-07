@@ -67,7 +67,7 @@ const strings = {
     gallicagram_plug: (
       <p>
         Données de charte fournies par {gallica_plug}, un projet de Benjamin
-        Azoulay et Benoît de Courson
+        Azoulay et Benoît de Courson.
       </p>
     ),
     grouping: "Résolution",
@@ -78,7 +78,7 @@ const strings = {
     gallicagram_plug: (
       <p>
         Chart data provided by {gallica_plug}, a project by Benjamin Azoulay and
-        Benoît de Courson
+        Benoît de Courson.
       </p>
     ),
     grouping: "Grouping",
