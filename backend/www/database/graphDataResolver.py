@@ -5,7 +5,6 @@ import ciso8601
 
 from www.models import (
     Series,
-    SeriesDataPoint,
 )
 
 
@@ -32,14 +31,11 @@ def build_highcharts_series(
     search_terms = get_search_terms_by_grouping(
         backend_source=backend_source, request_id=request_id, conn=conn
     )
-    data_as_points = [
-        SeriesDataPoint(
-            date=point[0],
-            count=point[1],
-        )
-        for point in data_with_proper_date_format
-    ]
-    return Series(name=f"{search_terms}", data=data_as_points, request_id=request_id)
+    if search_terms and len(search_terms) == 1:
+        search_terms = search_terms[0]
+    return Series(
+        name=f"{search_terms}", data=data_with_proper_date_format, request_id=request_id
+    )
 
 
 def get_row_timestamp(row: Tuple) -> Tuple[float, float]:

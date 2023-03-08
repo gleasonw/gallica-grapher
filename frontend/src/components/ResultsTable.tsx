@@ -214,7 +214,7 @@ export function ResultsTable(props: TableProps) {
 
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-      <div className={"ml-5 flex flex-col gap-5"}>
+      <div className={"ml-5 flex flex-col gap-5 mb-10"}>
         <h1 className={"text-2xl flex flex-col gap-2"}>
           {!currentPage && !isFetching && <p>No results found</p>}
           {currentPage && (
@@ -223,13 +223,11 @@ export function ResultsTable(props: TableProps) {
             </div>
           )}
         </h1>
-        {props.children}
         {spinner}
         {pagination}
       </div>
       <DesktopTable tableInstance={tableInstance} />
       <MobileTable tableInstance={tableInstance} />
-      <h1 className={"pt-5 flex justify-center"}>{spinner}</h1>
       <button
         // @ts-ignore
         {...documentHeader.getGroupByToggleProps()}
@@ -242,6 +240,7 @@ export function ResultsTable(props: TableProps) {
             : translation.group_by_doc
         }
       </button>
+      {props.children}
       {pagination}
     </div>
   );

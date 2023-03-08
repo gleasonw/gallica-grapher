@@ -21,14 +21,9 @@ class Progress(BaseModel):
     backend_source: Literal["gallica", "pyllica"]
 
 
-class SeriesDataPoint(BaseModel):
-    date: float
-    count: float
-
-
 class Series(BaseModel):
     request_id: int
-    data: List[SeriesDataPoint]
+    data: List[Tuple[float, float]]
     name: str
 
 

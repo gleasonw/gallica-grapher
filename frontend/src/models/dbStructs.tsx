@@ -41,10 +41,7 @@ export interface ProgressType {
 
 export interface GraphData {
   request_id: number;
-  data: {
-    date: number; //year or unix seconds
-    count: number;
-  }[];
+  data: [number, number][];
   name: string;
 }
 

@@ -35,7 +35,6 @@ export const InputForm: React.FC<InputFormProps> = ({
   onCreateTicket,
   onDeleteTicket,
   onDeleteExampleTickets,
-  onSliderChange,
   yearRange,
   tickets,
 }) => {
@@ -116,26 +115,28 @@ export const InputForm: React.FC<InputFormProps> = ({
   } else {
     return (
       <div className="ml-10 mr-10 mb-10 flex flex-col gap-10">
-        <div className="text-2xl relative border-4 shadow-sm rounded-md m-auto mt-10 mb-10">
-          <input
-            className={"p-5 w-full"}
-            placeholder={translation.search_for_word}
-            value={word || ""}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setWord(e.target.value)
-            }
-            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Enter") {
-                handleSubmit();
+        <div className="justify-center items-center flex">
+          <div className="text-2xl relative border-4 shadow-sm rounded-md mt-10 mb-5 w-full max-w-3xl">
+            <input
+              className={"p-5 w-full"}
+              placeholder={translation.search_for_word}
+              value={word || ""}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setWord(e.target.value)
               }
-            }}
-          />
-          <Image
-            src={glassIcon}
-            className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
-            alt="Search icon"
-            onClick={() => handleSubmit()}
-          />
+              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === "Enter") {
+                  handleSubmit();
+                }
+              }}
+            />
+            <Image
+              src={glassIcon}
+              className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
+              alt="Search icon"
+              onClick={() => handleSubmit()}
+            />
+          </div>
         </div>
         <TicketRow
           tickets={tickets}

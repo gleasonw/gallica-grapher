@@ -1,18 +1,10 @@
 import React, { useContext } from "react";
 import { LangContext } from "../pages";
 import { Ticket, getStaticProps } from "../pages/index";
-import {
-  LineChart,
-  Line,
-  ResponsiveContainer,
-  XAxis,
-  Legend,
-  Tooltip,
-  ReferenceArea,
-} from "recharts";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
-import { generateXAxisOptionsForNumericScale } from "./utils";
 import { useQueries } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
@@ -70,11 +62,6 @@ const strings = {
           Données de charte fournies par {gallica_plug}, un projet de Benjamin
           Azoulay et Benoît de Courson.
         </p>
-        <p>
-          Le graphe représente le nombre d{"'"}
-          occurrences dans la période divisé par le nombre total de mots dans la
-          période (année ou mois).
-        </p>
       </>
     ),
     grouping: "Résolution",
@@ -87,10 +74,6 @@ const strings = {
         <p>
           Chart data provided by {gallica_plug}, a project by Benjamin Azoulay
           and Benoît de Courson.
-        </p>
-        <p>
-          The Y axis represents the number of occurrences in the period (year or
-          month) divided by the total number of words in that period.
         </p>
       </>
     ),
@@ -109,13 +92,6 @@ export function ResultViewer(props: ResultViewerProps) {
     "year" | "month"
   >("year");
   const [selectedSmoothing, setSelectedSmoothing] = React.useState<number>(0);
-
-  //zoom state
-  const [zoomed, setZoomed] = React.useState<boolean>(false);
-  const [refAreaLeft, setRefAreaLeft] = React.useState<number | null>(null);
-  const [refAreaRight, setRefAreaRight] = React.useState<number | null>(null);
-  const [dataMin, setDataMin] = React.useState<number | null>(null);
-  const [dataMax, setDataMax] = React.useState<number | null>(null);
 
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
@@ -149,69 +125,71 @@ export function ResultViewer(props: ResultViewerProps) {
     }),
   });
 
-  const allDateMarksInTicketData = ticketData?.map((ticket) =>
-    ticket.data?.data.map((data) => data.date)
-  );
-
-  const allDateMarks = allDateMarksInTicketData?.reduce((acc, val) => {
-    if (val && acc) {
-      return acc.concat(val);
-    } else {
-      return acc;
-    }
-  }, []);
-
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const xAxisOptions = generateXAxisOptionsForNumericScale(
-    allDateMarks || [],
-    dataMin,
-    dataMax
-  );
-
-  function formatTicks(tick: string): string {
-    const date = new Date(parseInt(tick));
+  function handleSeriesClick(e: Highcharts.Point) {
+    setSelectedTicket(
+      props.tickets.filter((t) => t.terms[0] === e.series.name)[0].id
+    );
+    const date = new Date(e.category);
     if (selectedGrouping === "year") {
-      return `${date.getFullYear()}`;
+      setSelectedYear(date.getUTCFullYear());
+      setSelectedMonth(0);
     } else {
-      const date = new Date(parseInt(tick));
-      return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+      setSelectedYear(date.getUTCFullYear());
+      setSelectedMonth(date.getUTCMonth() + 1);
     }
   }
 
-  function zoom() {
-    let [left, right] = [refAreaLeft, refAreaRight];
-    if (refAreaLeft === refAreaRight || refAreaRight === null) {
-    } else {
-      if (refAreaLeft && refAreaLeft > refAreaRight) {
-        [left, right] = [refAreaRight, refAreaLeft];
-      }
-      setDataMin(left);
-      setDataMax(right);
-      setZoomed(true);
-    }
-    setRefAreaLeft(null);
-    setRefAreaRight(null);
-  }
-
-  function zoomOut() {
-    setZoomed(false);
-    setDataMax(null);
-    setDataMin(null);
-  }
+  const highchartsOpts: Highcharts.Options = {
+    chart: {
+      type: "line",
+      zooming: {
+        type: "x",
+      },
+    },
+    title: {
+      text: "",
+    },
+    xAxis: {
+      type: "datetime",
+    },
+    yAxis: {
+      title: {
+        text: "Frequency",
+      },
+    },
+    tooltip: {
+      shared: true,
+    },
+    plotOptions: {
+      series: {
+        cursor: "pointer",
+        marker: {
+          enabled: false,
+          states: {
+            hover: {
+              enabled: true,
+            },
+            select: {
+              enabled: true,
+            },
+          },
+        },
+      },
+    },
+    // @ts-ignore
+    series: ticketData
+      .filter((ticket) => ticket.data !== undefined)
+      .map((ticket, i) => ({
+        name: ticket.data!.name,
+        data: ticket.data!.data,
+        color: seriesColors[i],
+        point: {
+          events: {
+            click: (e) => handleSeriesClick(e.point),
+          },
+        },
+      })),
+  };
 
   return (
     <div className={"h-full w-full bg-white"}>
@@ -232,84 +210,9 @@ export function ResultViewer(props: ResultViewerProps) {
             value={selectedSmoothing.toString()}
           />
         </InputLabel>
-        {zoomed && (
-          <button onClick={zoomOut} className={"p-5 "}>
-            {" "}
-            <div className={"border p-5 hover:bg-zinc-100"}>
-              {translation.zoom_out}
-            </div>
-          </button>
-        )}
       </div>
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart
-          width={500}
-          height={300}
-          onMouseDown={(e: any) => {
-            if (e && e.activeLabel) {
-              setRefAreaLeft(e.activeLabel);
-            }
-          }}
-          onMouseMove={(e: any) => {
-            if (refAreaLeft && e.activeLabel) {
-              setRefAreaRight(e.activeLabel);
-            }
-          }}
-          onMouseUp={zoom}
-          onClick={(e) => {
-            if (!e) {
-              return;
-            }
-            if (e.activePayload && e.activePayload.length > 0) {
-              const payload = e.activePayload[0];
-              if (payload.payload && payload.payload.date) {
-                const date = new Date(parseInt(payload.payload.date));
-                setSelectedYear(date.getFullYear());
-                if (selectedGrouping === "month") {
-                  setSelectedMonth(date.getMonth() + 1);
-                }
-              }
-            }
-          }}
-          // @ts-ignore
-          cursor={"pointer"}
-        >
-          <XAxis
-            dataKey={"date"}
-            domain={() => xAxisOptions.domain as any}
-            scale={xAxisOptions.scale}
-            type={xAxisOptions.type}
-            ticks={xAxisOptions.ticks}
-            allowDuplicatedCategory={false}
-            tickFormatter={formatTicks}
-          />
-          <Legend />
-          <Tooltip labelFormatter={(label) => formatTicks(label as string)} />
-          {ticketData.map((ticket, index) => (
-            <Line
-              type="monotone"
-              dataKey="count"
-              stroke={seriesColors[index % seriesColors.length]}
-              strokeWidth={2}
-              data={ticket.data?.data}
-              name={ticket.data?.name}
-              dot={false}
-              key={index}
-              style={{ cursor: "pointer" }}
-              onClick={(e) => console.log(e)}
-            />
-          ))}
-          {refAreaLeft && refAreaRight ? (
-            <ReferenceArea
-              x1={refAreaLeft}
-              x2={refAreaRight}
-              strokeOpacity={0.3}
-            />
-          ) : null}
-        </LineChart>
-      </ResponsiveContainer>
+      <HighchartsReact highcharts={Highcharts} options={highchartsOpts} />
       <div className={"ml-5 mr-5 mt-2"}>{translation.gallicagram_plug}</div>
-      <div className={"p-2"} />
       <TicketResultTable
         initialRecords={props.initVals.initRecords}
         tickets={props.tickets}
