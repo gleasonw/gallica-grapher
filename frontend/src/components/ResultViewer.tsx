@@ -139,6 +139,18 @@ export function ResultViewer(props: ResultViewerProps) {
     }
   }
 
+  const getSeries = React.useCallback(
+    () =>
+      ticketData
+        .filter((ticket) => ticket.data !== undefined)
+        .map((ticket, i) => ({
+          name: ticket.data!.name,
+          data: ticket.data!.data,
+          color: seriesColors[i],
+        })),
+    [ticketData]
+  );
+
   const highchartsOpts: Highcharts.Options = {
     chart: {
       type: "line",
@@ -163,6 +175,9 @@ export function ResultViewer(props: ResultViewerProps) {
     plotOptions: {
       series: {
         cursor: "pointer",
+        events: {
+          click: (e) => handleSeriesClick(e.point),
+        },
         marker: {
           enabled: false,
           states: {
@@ -177,18 +192,7 @@ export function ResultViewer(props: ResultViewerProps) {
       },
     },
     // @ts-ignore
-    series: ticketData
-      .filter((ticket) => ticket.data !== undefined)
-      .map((ticket, i) => ({
-        name: ticket.data!.name,
-        data: ticket.data!.data,
-        color: seriesColors[i],
-        point: {
-          events: {
-            click: (e) => handleSeriesClick(e.point),
-          },
-        },
-      })),
+    series: getSeries(),
   };
 
   return (
