@@ -86,7 +86,9 @@ export function ResultViewer(props: ResultViewerProps) {
   const [selectedTicket, setSelectedTicket] = React.useState<number | null>(
     null
   );
-  const [selectedYear, setSelectedYear] = React.useState<number | null>(null);
+  const [yearRange, setYearRange] = React.useState<
+    [number | null, number | null]
+  >([null, null]);
   const [selectedMonth, setSelectedMonth] = React.useState<number | null>(null);
   const [selectedGrouping, setSelectedGrouping] = React.useState<
     "year" | "month"
@@ -102,7 +104,7 @@ export function ResultViewer(props: ResultViewerProps) {
   ) {
     setSelectedTicket(props.tickets[0].id);
     setSelectedMonth(null);
-    setSelectedYear(null);
+    setYearRange([null, null]);
   }
 
   const ticketData = useQueries({
@@ -131,10 +133,10 @@ export function ResultViewer(props: ResultViewerProps) {
     );
     const date = new Date(e.category);
     if (selectedGrouping === "year") {
-      setSelectedYear(date.getUTCFullYear());
+      setYearRange([date.getUTCFullYear(), null]);
       setSelectedMonth(0);
     } else {
-      setSelectedYear(date.getUTCFullYear());
+      setYearRange([date.getUTCFullYear(), null]);
       setSelectedMonth(date.getUTCMonth() + 1);
     }
   }
@@ -161,6 +163,31 @@ export function ResultViewer(props: ResultViewerProps) {
     },
     xAxis: {
       type: "datetime",
+      events: {
+        setExtremes: (e) => {
+          if (e.trigger === "zoom") {
+            const minDate = new Date(e.min);
+            const maxDate = new Date(e.max);
+            if (minDate.toString() === "Invalid Date") {
+              setYearRange([null, null]);
+              setSelectedMonth(null);
+              return;
+            }
+            if (selectedGrouping === "year") {
+              setYearRange([
+                minDate.getUTCFullYear(),
+                maxDate.getUTCFullYear(),
+              ]);
+            } else {
+              setYearRange([
+                minDate.getUTCFullYear(),
+                maxDate.getUTCFullYear(),
+              ]);
+              setSelectedMonth(minDate.getUTCMonth() + 1);
+            }
+          }
+        },
+      },
     },
     yAxis: {
       title: {
@@ -219,8 +246,8 @@ export function ResultViewer(props: ResultViewerProps) {
         initialRecords={props.initVals.initRecords}
         tickets={props.tickets}
         month={selectedMonth}
-        year={selectedYear}
-        onSelectYear={(year) => setSelectedYear(year)}
+        yearRange={yearRange}
+        onSelectYear={(year) => setYearRange([year, null])}
         onSelectMonth={(month) => setSelectedMonth(month)}
         onSelectTicket={(ticket) => setSelectedTicket(ticket)}
         selectedTicket={selectedTicket}

@@ -19,7 +19,7 @@ export interface TableProps {
   codes?: string[];
   day?: number | null;
   month?: number | null;
-  year?: number | null;
+  yearRange?: [number | null, number | null];
   source?: "book" | "periodical" | "all" | null;
   link_term?: string | null;
   link_distance?: number | null;
@@ -38,6 +38,9 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
     cursor: pageParam,
     limit: props.limit,
     row_split: true,
+    year: props.yearRange?.[0],
+    end_year: props.yearRange?.[1],
+    yearRange: undefined,
   });
   console.log(url);
   const response = await fetch(url);
@@ -77,7 +80,7 @@ export function ResultsTable(props: TableProps) {
   const { isFetching, data } = useQuery({
     queryKey: [
       "context",
-      props.year,
+      props.yearRange,
       props.month,
       props.day,
       props.codes,

@@ -24,7 +24,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
   const tableKey = [
     props.month,
     props.day,
-    props.year,
+    props.yearRange,
     props.selectedTicket,
     selectedPapers,
   ];
@@ -42,7 +42,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       codes={selectedPapers?.map((p) => p.code) || []}
       month={props.month}
       day={props.day}
-      year={props.year}
+      yearRange={props.yearRange}
       limit={10}
       initialRecords={props.initialRecords}
       source={"periodical"}
@@ -53,8 +53,8 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
           <InputLabel label={lang === "fr" ? "Année" : "Year"}>
             <input
               type={"number"}
-              className={"border bg-white p-3"}
-              value={props.year || ""}
+              className={"border rounded-lg bg-white p-3"}
+              value={props.yearRange![0] || ""}
               onChange={(e) => props.onSelectYear(parseInt(e.target.value))}
             />
           </InputLabel>
@@ -70,7 +70,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
               onChange={(e) => {
                 props.onSelectTicket(parseInt(e.target.value));
               }}
-              className={"border  bg-white p-3"}
+              className={"border rounded-lg  bg-white p-3"}
               value={props.selectedTicket || ""}
             >
               {props.tickets?.map((ticket) => (

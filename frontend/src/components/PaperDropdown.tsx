@@ -28,7 +28,7 @@ export const PaperDropdown: React.FC<{
       <input
         placeholder={lang === "fr" ? "rechercher un périodique" : "search for a paper"}
         value={periodical}
-        className={"relative max-w-full border bg-white p-3"}
+        className={"relative max-w-full border rounded-lg bg-white p-3"}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setPeriodical(e.target.value)
         }

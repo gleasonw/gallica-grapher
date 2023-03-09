@@ -8,7 +8,7 @@ interface SelectInputProps {
 export const SelectInput: React.FC<SelectInputProps> = (props) => {
   return (
     <select
-      className={"border bg-white p-3 hover:cursor-pointer"}
+      className={"border rounded-lg bg-white p-3 hover:cursor-pointer"}
       onChange={(e) => props.onChange(e.target.value)}
       value={props.value}
     >
