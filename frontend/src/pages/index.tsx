@@ -32,6 +32,12 @@ export const initTickets = [
     grouping: "month",
     example: true,
   },
+  {
+    id: -1,
+    terms: ["coloniale"],
+    grouping: "month",
+    example: true,
+  },
 ] as Ticket[];
 
 export const getStaticProps: GetStaticProps<{
@@ -91,11 +97,8 @@ export default function Home({
         </div>
         <InputForm
           onCreateTicket={(ticket: Ticket) => {
-            if (tickets) {
-              setTickets([...tickets, ticket]);
-            } else {
-              setTickets([ticket]);
-            }
+            const noExamples = tickets.filter((t) => !t.example);
+            setTickets([...noExamples, ticket]);
           }}
           onSliderChange={(range: [number, number]) => {
             setOuterRange(range);

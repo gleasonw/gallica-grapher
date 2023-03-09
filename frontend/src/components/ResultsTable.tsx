@@ -99,6 +99,7 @@ export function ResultsTable(props: TableProps) {
       }),
     staleTime: Infinity,
     keepPreviousData: true,
+    placeholderData: props.initialRecords,
   });
 
   const currentPage = data;
@@ -209,15 +210,17 @@ export function ResultsTable(props: TableProps) {
   );
 
   const spinner = isFetching && (
-    <div
-      className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-      role="status"
-    />
+    <div className={"flex justify-center items-center"}>
+      <div
+        className=" h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+        role="status"
+      />
+    </div>
   );
 
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-      <div className={"ml-5 flex flex-col gap-5 mb-10"}>
+      <div className={"ml-5 flex flex-col mb-10"}>
         <h1 className={"text-2xl flex flex-col gap-2"}>
           {!currentPage && !isFetching && <p>No results found</p>}
           {currentPage && (

@@ -21,13 +21,6 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
     Paper[] | undefined
   >();
 
-  const tableKey = [
-    props.month,
-    props.day,
-    props.yearRange,
-    props.selectedTicket,
-    selectedPapers,
-  ];
   const { lang } = useContext(LangContext);
 
   return (
@@ -46,7 +39,6 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       limit={10}
       initialRecords={props.initialRecords}
       source={"periodical"}
-      key={tableKey.join("-")}
     >
       <div>
         <div className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}>
