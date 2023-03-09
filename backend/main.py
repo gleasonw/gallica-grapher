@@ -16,8 +16,8 @@ from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_utils.tasks import repeat_every
 from tasks import add
-from fastapi.responses import StreamingResponse
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -34,6 +34,21 @@ app.add_middleware(
 )
 
 requestID = random.randint(0, 1000000000)
+
+
+@app.on_event("startup")
+@repeat_every(seconds=60 * 60 * 48)
+def remove_expired_graph_data():
+    with build_db_conn() as conn:
+        with conn.cursor() as curs:
+            curs.execute(
+            """
+            DELETE FROM groupcounts
+            WHERE created < NOW() - INTERVAL '1 hour'
+            AND requestid > 0;
+            """
+            )
+            conn.commit()
 
 
 @app.get("/")
@@ -161,7 +176,7 @@ async def fetch_records_from_gallica(
     link_distance: Optional[int] = 0,
     source: Literal["book", "periodical", "all"] = "all",
     sort: Literal["date", "relevance"] = "relevance",
-    row_split: Optional[bool] = False
+    row_split: Optional[bool] = False,
 ):
     """API endpoint for the context table. To fetch multiple terms linked with OR in the Gallica CQL, pass multiple terms parameters: /api/gallicaRecords?terms=term1&terms=term2&terms=term3"""
     if limit and limit > 50:
