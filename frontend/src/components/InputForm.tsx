@@ -6,7 +6,6 @@ import { RangeInput } from "./RangeInput";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./ResultViewer";
 import { useMutation } from "@tanstack/react-query";
-import { Paper } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "../pages/index";
@@ -116,9 +115,9 @@ export const InputForm: React.FC<InputFormProps> = ({
     return (
       <div className="ml-10 mr-10 mb-10 flex flex-col gap-10">
         <div className="justify-center items-center flex">
-          <div className="text-2xl relative border-4 shadow-sm rounded-md mt-10 mb-5 w-full max-w-3xl">
+          <div className="text-2xl relative mt-10 mb-10 w-full max-w-3xl">
             <input
-              className={"p-5 w-full"}
+              className={"p-5 w-full rounded-3xl border-2 hover:shadow-lg"}
               placeholder={translation.search_for_word}
               value={word || ""}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

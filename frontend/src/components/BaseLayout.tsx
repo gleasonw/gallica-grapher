@@ -13,7 +13,7 @@ export const BaseLayout: React.FC<BaseLayoutProps> = (props) => {
   const lang = useContext(LangContext);
   return (
     <div className="h-screen w-screen flex flex-col">
-      <div className={"flex flex-row items-center justify-between m-5"}>
+      <div className={"flex flex-row items-center justify-between p-5 border-b bg-slate-100"}>
         <Link href="/" className={"text-3xl self-start"}>
           📊
         </Link>
