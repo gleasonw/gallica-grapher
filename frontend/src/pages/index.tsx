@@ -45,12 +45,7 @@ export const getStaticProps: GetStaticProps<{
   });
   const initSeries = await Promise.all(
     initTickets.map((ticket) => {
-      return getTicketData(
-        ticket.id,
-        ticket.backend_source,
-        ticket.grouping,
-        0
-      );
+      return getTicketData(ticket.id, ticket.backend_source, "year", 0);
     })
   );
   return {
