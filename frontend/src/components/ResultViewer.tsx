@@ -5,7 +5,7 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
@@ -116,11 +116,11 @@ export function ResultViewer(props: ResultViewerProps) {
             selectedGrouping,
             selectedSmoothing
           ),
-        staleTime: Infinity,
         placeholderData: props.initVals.initSeries.filter(
           (series) => series.request_id === ticket.id
         )[0],
         keepPreviousData: true,
+        refetchOnWindowFocus: false,
       };
     }),
   });
@@ -139,17 +139,15 @@ export function ResultViewer(props: ResultViewerProps) {
     }
   }
 
-  const getSeries = React.useCallback(
-    () =>
-      ticketData
-        .filter((ticket) => ticket.data !== undefined)
-        .map((ticket, i) => ({
-          name: ticket.data!.name,
-          data: ticket.data!.data,
-          color: seriesColors[i],
-        })),
-    [ticketData]
-  );
+  const getSeries = React.useCallback(() => {
+    return ticketData
+      .filter((ticket) => ticket.data !== undefined)
+      .map((ticket, i) => ({
+        name: ticket.data!.name,
+        data: ticket.data!.data,
+        color: seriesColors[i],
+      }));
+  }, [ticketData]);
 
   const highchartsOpts: Highcharts.Options = {
     chart: {
