@@ -1,5 +1,4 @@
 aiohttp==3.8.4
-backend==0.2.4.1
 beautifulsoup4==4.11.2
 celery==5.2.7
 ciso8601==2.2.0
