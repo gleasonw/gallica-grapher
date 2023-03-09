@@ -36,19 +36,6 @@ app.add_middleware(
 requestID = random.randint(0, 1000000000)
 
 
-@app.on_event("startup")
-@repeat_every(seconds=60 * 60 * 48)
-def remove_expired_graph_data():
-    with build_db_conn() as conn:
-        with conn.cursor() as curs:
-            curs.execute(
-            """
-            DELETE FROM groupcounts
-            WHERE created < NOW() - INTERVAL '1 hour'
-            AND requestid > 0;
-            """
-            )
-            conn.commit()
 
 
 @app.get("/")
