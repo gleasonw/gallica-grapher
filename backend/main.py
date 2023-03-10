@@ -7,7 +7,6 @@ from pydantic import BaseModel
 from gallicaContextSearch import (
     get_row_context,
     get_html_context,
-    stream_all_records_with_context,
 )
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
@@ -34,8 +33,6 @@ app.add_middleware(
 )
 
 requestID = random.randint(0, 1000000000)
-
-
 
 
 @app.get("/")

@@ -19,24 +19,33 @@ class ContextRow(BaseModel):
     page: str
 
 
-class GallicaRecord(BaseModel):
+class GallicaRecordWithRows(BaseModel):
     paper_title: str
     paper_code: str
     terms: List[str]
     date: str
     url: str
-    context: HTMLContext | List[ContextRow]
+    context: List[ContextRow]
+
+
+class GallicaRecordWithHTML(BaseModel):
+    paper_title: str
+    paper_code: str
+    terms: List[str]
+    date: str
+    url: str
+    context: HTMLContext
 
 
 class UserResponse(BaseModel):
-    records: List[GallicaRecord]
+    records: List[GallicaRecordWithRows | GallicaRecordWithHTML]
     num_results: int
     origin_urls: List[str]
     est_seconds_to_download: int
 
 
 def build_html_record(record: VolumeRecord, context: HTMLContext):
-    return GallicaRecord(
+    return GallicaRecordWithHTML(
         paper_title=record.paper_title,
         paper_code=record.paper_code,
         terms=record.terms,
@@ -58,7 +67,9 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
             text = str(span).strip()
             return text.split("(...)")
 
-        for span in spans:
+        i = 0
+        while i < len(spans):
+            span = spans[i]
             pivot = span.text
 
             left_context = span.previous_sibling
@@ -72,9 +83,29 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
             if right_context:
                 ellipsis_split = stringify_and_split(right_context)
                 closest_right_text = ellipsis_split[0]
+
+                # check if gallica has made an erroneous (..) split in the middle of our pivot, only for requests with any multi-word terms
+                if (
+                    any(len(term.split(" ")) > 1 for term in record.terms)
+                    and i < len(spans) - 1
+                ):
+                    next_pivot = spans[i + 1].text
+                    if any(
+                        f'"{pivot} {next_pivot}"'.casefold() == term.casefold()
+                        for term in record.terms
+                    ):
+                        pivot = f"{pivot} {next_pivot}"
+                        new_right_context = spans[i + 1].next_sibling
+                        if new_right_context:
+                            ellipsis_split = stringify_and_split(new_right_context)
+                            closest_right_text = ellipsis_split[0]
+
+                        # ignore the next span
+                        i += 1
+
             else:
                 closest_right_text = ""
-
+            i += 1
             rows.append(
                 ContextRow(
                     pivot=pivot,
@@ -85,7 +116,7 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
                 )
             )
 
-    return GallicaRecord(
+    return GallicaRecordWithRows(
         paper_title=record.paper_title,
         paper_code=record.paper_code,
         terms=record.terms,
@@ -109,7 +140,9 @@ async def get_context(
     link_distance: Optional[int] = 0,
     source: Literal["book", "periodical", "all"] = "all",
     sort: Literal["date", "relevance"] = "relevance",
-    parser: Callable[[VolumeRecord, HTMLContext], GallicaRecord] = build_html_record,
+    parser: Callable[
+        [VolumeRecord, HTMLContext], GallicaRecordWithRows | GallicaRecordWithHTML
+    ] = build_html_record,
 ) -> UserResponse:
     """Queries Gallica's SRU and ContentSearch API's to get context for a given term in the archive."""
     link = None
@@ -182,7 +215,7 @@ async def get_context(
         )
 
         # combine the two
-        records_with_context: List[GallicaRecord] = []
+        records_with_context: List[GallicaRecordWithRows | GallicaRecordWithHTML] = []
         for context_response in context:
             corresponding_record = keyed_records[context_response.ark]
             records_with_context.append(parser(corresponding_record, context_response))
@@ -217,85 +250,3 @@ def make_date_from_year_mon_day(
         return f"{year}"
     else:
         return ""
-
-
-async def stream_all_records_with_context(
-    terms: List[str],
-    codes: Optional[List[str]] = None,
-    start_year: Optional[int] = 0,
-    start_month: Optional[int] = 0,
-    end_year: Optional[int] = 0,
-    end_month: Optional[int] = 0,
-    day: Optional[int] = 0,
-    link_term: Optional[str] = None,
-    link_distance: Optional[int] = 0,
-    source: Literal["book", "periodical", "all"] = "all",
-    sort: Literal["date", "relevance"] = "relevance",
-):
-    """Queries Gallica's SRU and ContentSearch API's to get all context for a given term in the archive; begins a CSV download."""
-
-    link = None
-    if link_distance and link_term:
-        link_distance = int(link_distance)
-        link = (link_term, link_distance)
-
-    total_records = 0
-    origin_urls = []
-
-    def set_total_records(num_records: int):
-        nonlocal total_records
-        total_records = num_records
-
-    def set_origin_urls(urls: List[str]):
-        nonlocal origin_urls
-        origin_urls = urls
-
-    async with aiohttp.ClientSession() as session:
-        semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS_FOR_CSV)
-        volume_Gallica_wrapper = VolumeOccurrenceWrapper()
-        gallica_records = await volume_Gallica_wrapper.get(
-            terms=terms,
-            start_date=make_date_from_year_mon_day(start_year, start_month, day),
-            end_date=make_date_from_year_mon_day(end_year, end_month, day),
-            codes=codes,
-            source=source,
-            link=link,
-            sort=sort,
-            on_get_total_records=set_total_records,
-            on_get_origin_urls=set_origin_urls,
-            get_all_results=True,
-            session=session,
-            semaphore=semaphore,
-        )
-
-        # get the context for those volumes
-        content_wrapper = ContextWrapper()
-
-        batch_of_num_workers = []
-        continue_loop = True
-
-        yield "paper_title\tpaper_code\tdate\turl\tleft_context\tpivot\tright_context\n"
-
-        while continue_loop:
-            for _ in range(5):
-                try:
-                    batch_of_num_workers.append(next(gallica_records))
-                except StopIteration:
-                    continue_loop = False
-                    break
-            code_dict = {
-                record.url.split("/")[-1]: record for record in batch_of_num_workers
-            }
-            context = await content_wrapper.get(
-                [
-                    (record.url.split("/")[-1], record.terms)
-                    for record in batch_of_num_workers
-                ],
-                session=session,
-                semaphore=semaphore,
-            )
-            for context_response in context:
-                record = code_dict[context_response.ark]
-                row = build_row_record(record, context_response)
-                for context_row in row.context:
-                    yield f"{row.paper_title}\t{row.paper_code}\t{row.date}\t{row.url}\t{context_row.left_context}\t{context_row.pivot}\t{context_row.right_context}\n"

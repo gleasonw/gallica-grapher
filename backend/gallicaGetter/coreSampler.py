@@ -2,7 +2,6 @@ from typing import Dict, List
 from io import StringIO
 import random
 from collections import Counter
-from wrapperFactory import WrapperFactory
 from collections import Counter
 from bs4 import BeautifulSoup
 import os

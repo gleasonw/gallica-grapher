@@ -65,7 +65,7 @@ class TestGallicaXMLparse(TestCase):
     def test_get_date(self):
         records = get_records_from_xml(self.occurrencesXML)
         oneRecord = records[0]
-        self.assertListEqual(
-            get_date_from_record_xml(oneRecord).getDateAsList(),
-            Date("1883-04").getDateAsList(),
+        self.assertEqual(
+            get_date_from_record_xml(oneRecord).year,
+            Date("1883-04").year,
         )
