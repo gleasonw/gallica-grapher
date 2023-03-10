@@ -88,6 +88,7 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
                 if (
                     any(len(term.split(" ")) > 1 for term in record.terms)
                     and i < len(spans) - 1
+                    and closest_right_text == ""
                 ):
                     next_pivot = spans[i + 1].text
                     if any(
