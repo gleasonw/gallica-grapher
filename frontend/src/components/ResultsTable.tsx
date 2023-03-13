@@ -246,7 +246,6 @@ export function ResultsTable(props: TableProps) {
             : translation.group_by_doc
         }
       </button>
-      {props.children}
       {pagination}
     </div>
   );

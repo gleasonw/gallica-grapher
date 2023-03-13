@@ -1,10 +1,13 @@
 import React, { useState, createContext } from "react";
-import { BaseLayout } from "../components/BaseLayout";
+import Link from "next/link";
+import Image from "next/image";
 import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
 import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 import { fetchContext } from "../components/ResultsTable";
+import Info from "../components/Info";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface Ticket {
   id: number;
@@ -18,6 +21,10 @@ export interface Ticket {
   link_distance?: number;
   example?: boolean;
 }
+
+export const pages = ["graph", "context", "info"] as const;
+
+type Page = typeof pages[number];
 
 export const initTickets = [
   {
@@ -83,43 +90,189 @@ export default function Home({
   initRecords,
   initSeries,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const [tickets, setTickets] = useState<Ticket[]>(initTickets);
-  const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
   const [lang, setLang] = useState<"fr" | "en">("fr");
-  const translation = strings[lang];
+  const [currentPage, setCurrentPage] = useState<Page>("graph");
+  const [showSidebar, setShowSidebar] = React.useState(false);
+  let homeLinkStyle = "p-5 hover:cursor-pointer";
+  let exploreLinkStyle = "p-5 hover:cursor-pointer";
+  let infoLinkStyle = "p-5 hover:cursor-pointer";
+  const borderBottomFocus = " border-b border-blue-500 border-b-4";
+  if (currentPage === "graph") {
+    homeLinkStyle += borderBottomFocus;
+  } else if (currentPage === "context") {
+    exploreLinkStyle += borderBottomFocus;
+  } else if (currentPage === "info") {
+    infoLinkStyle += borderBottomFocus;
+  }
+
+  function getPage() {
+    switch (currentPage) {
+      case "graph":
+        return (
+          <GraphAndTable initRecords={initRecords} initSeries={initSeries} />
+        );
+      case "context":
+        return <div>Coming soon!</div>;
+      case "info":
+        return <Info />;
+    }
+  }
+
   return (
     <LangContext.Provider value={{ lang, setLang }}>
-      <BaseLayout onToggleLang={() => setLang(lang === "en" ? "fr" : "en")}>
-        <title>{translation.title}</title>
-        <div className="m-10 text-center text-4xl">
-          {" "}
-          {translation.description}{" "}
-        </div>
-        <InputForm
-          onCreateTicket={(ticket: Ticket) => {
-            const noExamples = tickets.filter((t) => !t.example);
-            setTickets([...noExamples, ticket]);
-          }}
-          onSliderChange={(range: [number, number]) => {
-            setOuterRange(range);
-          }}
-          tickets={tickets}
-          yearRange={outerRange}
-          onDeleteTicket={(ticket?: Ticket) => {
-            if (tickets && ticket) {
-              setTickets(tickets.filter((t) => t.id !== ticket.id));
+      <div className="flex flex-col">
+        <div className="flex flex-col sticky top-0 z-50">
+          <div
+            className={
+              "flex flex-row items-center justify-between p-5 border-b-2 bg-white shadow-sm"
             }
-          }}
-          onDeleteExampleTickets={() => {
-            setTickets(tickets.filter((t) => !t.example));
-          }}
-        />
-        <ResultViewer
-          tickets={tickets}
-          outerRange={outerRange}
-          initVals={{ initRecords, initSeries }}
-        />
-      </BaseLayout>
+          >
+            <div className={"flex"}>
+              <svg
+                focusable="false"
+                viewBox="0 0 24 24"
+                className="w-10 hover:cursor-pointer hover:bg-zinc-100 rounded-full"
+                onClick={() => setShowSidebar(!showSidebar)}
+              >
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+              </svg>
+              <div
+                className={"p-5 text-3xl"}
+                onClick={() => setCurrentPage("graph")}
+              >
+                Gallica Grapher
+              </div>
+              <div className="hidden lg:flex xl:flex items-center">
+                <div
+                  className={homeLinkStyle}
+                  onClick={() => setCurrentPage("graph")}
+                >
+                  Graph
+                </div>
+                <div
+                  className={exploreLinkStyle}
+                  onClick={() => setCurrentPage("context")}
+                >
+                  Context
+                </div>
+                <div
+                  onClick={() => setCurrentPage("info")}
+                  className={infoLinkStyle}
+                >
+                  Info
+                </div>
+              </div>
+            </div>
+            <div className={"flex flex-row gap-5 align-center justify-center"}>
+              <select
+                onChange={() => setLang(lang === "fr" ? "en" : "fr")}
+                value={lang}
+                className={""}
+              >
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+              </select>
+              <Link
+                href={"https://github.com/gleasonw/gallica-grapher"}
+                target={"_blank"}
+              >
+                <Image
+                  src={"/github.svg"}
+                  width={40}
+                  height={40}
+                  alt={"Github"}
+                />
+              </Link>
+            </div>
+          </div>
+          <AnimatePresence>
+            {showSidebar && (
+              <motion.div
+                initial={{ x: -1000 }}
+                animate={{ x: 0 }}
+                exit={{ x: -1000 }}
+                transition={{ duration: 0.2 }}
+                className={"sticky top-0"}
+              >
+                <div
+                  className={
+                    "absolute bg-white z-40 flex flex-col gap-1 p-2 h-screen border-r shadow-md"
+                  }
+                >
+                  <div
+                    className={
+                      "p-5 w-96 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
+                    }
+                    onClick={() => setCurrentPage("graph")}
+                  >
+                    Graph
+                  </div>
+                  <div
+                    className={
+                      "p-5 w-96 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
+                    }
+                    onClick={() => setCurrentPage("context")}
+                  >
+                    Context
+                  </div>
+                  <div
+                    onClick={() => setCurrentPage("info")}
+                    className={
+                      "p-5 w-96 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
+                    }
+                  >
+                    Info
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        {getPage()}
+      </div>
     </LangContext.Provider>
+  );
+}
+
+function GraphAndTable({
+  initRecords,
+  initSeries,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
+  const { lang } = React.useContext(LangContext);
+  const translation = strings[lang];
+  const [tickets, setTickets] = useState<Ticket[]>(initTickets);
+  const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
+  return (
+    <>
+      <title>{translation.title}</title>
+      <div className="m-10 text-center text-4xl">
+        {" "}
+        {translation.description}{" "}
+      </div>
+      <InputForm
+        onCreateTicket={(ticket: Ticket) => {
+          const noExamples = tickets.filter((t) => !t.example);
+          setTickets([...noExamples, ticket]);
+        }}
+        onSliderChange={(range: [number, number]) => {
+          setOuterRange(range);
+        }}
+        tickets={tickets}
+        yearRange={outerRange}
+        onDeleteTicket={(ticket?: Ticket) => {
+          if (tickets && ticket) {
+            setTickets(tickets.filter((t) => t.id !== ticket.id));
+          }
+        }}
+        onDeleteExampleTickets={() => {
+          setTickets(tickets.filter((t) => !t.example));
+        }}
+      />
+      <ResultViewer
+        tickets={tickets}
+        outerRange={outerRange}
+        initVals={{ initRecords, initSeries }}
+      />
+    </>
   );
 }
