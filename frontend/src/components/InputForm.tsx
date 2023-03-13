@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Ticket } from "../pages/index";
 import Image from "next/image";
-import glassIcon from "./icons/glass.svg";
+import glassIcon from "./assets/glass.svg";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./ResultViewer";
 import { useMutation } from "@tanstack/react-query";
