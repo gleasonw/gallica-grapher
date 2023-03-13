@@ -5,7 +5,7 @@ import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
 import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
-import { fetchContext } from "../components/ResultsTable";
+import { ResultsTable, fetchContext } from "../components/ResultsTable";
 import Info from "../components/Info";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -112,7 +112,7 @@ export default function Home({
           <GraphAndTable initRecords={initRecords} initSeries={initSeries} />
         );
       case "context":
-        return <div>Coming soon!</div>;
+        return <SearchableContext initRecords={initRecords} />;
       case "info":
         return <Info />;
     }
@@ -201,7 +201,7 @@ export default function Home({
                 >
                   <div
                     className={
-                      "p-5 w-96 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
+                      "p-5 w-60 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
                     }
                     onClick={() => setCurrentPage("graph")}
                   >
@@ -209,7 +209,7 @@ export default function Home({
                   </div>
                   <div
                     className={
-                      "p-5 w-96 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
+                      "p-5 w-60 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
                     }
                     onClick={() => setCurrentPage("context")}
                   >
@@ -218,7 +218,7 @@ export default function Home({
                   <div
                     onClick={() => setCurrentPage("info")}
                     className={
-                      "p-5 w-96 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
+                      "p-5 w-60 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
                     }
                   >
                     Info
@@ -228,7 +228,7 @@ export default function Home({
             )}
           </AnimatePresence>
         </div>
-        {getPage()}
+        <div onClick={() => setShowSidebar(false)}>{getPage()}</div>
       </div>
     </LangContext.Provider>
   );
@@ -273,6 +273,22 @@ function GraphAndTable({
         outerRange={outerRange}
         initVals={{ initRecords, initSeries }}
       />
+    </>
+  );
+}
+
+function SearchableContext(props: { initRecords: GallicaResponse }) {
+  const { lang } = React.useContext(LangContext);
+  const [tickets, setTickets] = useState<Ticket[]>(initTickets);
+  const [selectedPapers, setSelectedPapers] = useState<Paper[]>([]);
+  const [month, setMonth] = useState<number | undefined>(undefined);
+  const [day, setDay] = useState<number | undefined>(undefined);
+  const [yearRange, setYearRange] = useState<[number, number]>([1789, 2000]);
+  const [source, setSource] = useState<"book" | "periodical" | "all">("all");
+
+  return (
+    <>
+    Coming soon!
     </>
   );
 }
