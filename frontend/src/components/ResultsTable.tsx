@@ -113,7 +113,7 @@ export function ResultsTable(props: TableProps) {
             date: record.date,
             page: (
               <a
-                className="underline p-5"
+                className="underline font-medium"
                 href={contextRow.page_url}
                 target="_blank"
                 rel="noreferrer"
@@ -122,7 +122,11 @@ export function ResultsTable(props: TableProps) {
               </a>
             ),
             left_context: contextRow.left_context,
-            pivot: <span className={"font-medium"}>{contextRow.pivot}</span>,
+            pivot: (
+              <span className={"text-blue-500 font-medium"}>
+                {contextRow.pivot}
+              </span>
+            ),
             right_context: contextRow.right_context,
           }))
         )
@@ -130,42 +134,52 @@ export function ResultsTable(props: TableProps) {
     [currentPage]
   );
 
+  function showFirstWhenAggregated({ value }: { value: string[] }) {
+    return value[0];
+  }
+
   const columns = React.useMemo(
     () => [
       {
         Header: "Document",
         accessor: "document",
-        Cell: ({ value }: { value: string }) =>
-          value.split("||")[0] as unknown as JSX.Element,
-      } as const,
-      {
-        Header: "Date",
-        accessor: "date",
-        aggregate: "unique",
+        Cell: ({ value }: { value: string }) => (
+          <div className={"flex flex-col gap-2"}>
+            {value.split("||").map((v, i) =>
+              i === 0 ? (
+                <div className="italic" key={v}>
+                  {v}
+                </div>
+              ) : (
+                <div key={v}>{v}</div>
+              )
+            )}
+          </div>
+        ),
       } as const,
       {
         Header: "Page",
         accessor: "page",
         aggregate: "unique",
-        Aggregated: ({ value }: { value: string[] }) => value[0],
+        Aggregated: showFirstWhenAggregated,
       } as const,
       {
         Header: lang === "fr" ? "Contexte gauche" : "Left context",
         accessor: "left_context" as const,
         aggregate: "unique",
-        Aggregated: ({ value }: { value: string[] }) => value[0],
+        Aggregated: showFirstWhenAggregated,
       } as const,
       {
         Header: "Pivot",
         accessor: "pivot",
         aggregate: "unique",
-        Aggregated: ({ value }: { value: string[] }) => value[0],
+        Aggregated: showFirstWhenAggregated,
       } as const,
       {
         Header: lang === "fr" ? "Contexte droit" : "Right context",
         accessor: "right_context",
         aggregate: "unique",
-        Aggregated: ({ value }: { value: string[] }) => value[0],
+        Aggregated: showFirstWhenAggregated,
       } as const,
     ],
     [lang]
@@ -234,18 +248,6 @@ export function ResultsTable(props: TableProps) {
       </div>
       <DesktopTable tableInstance={tableInstance} />
       <MobileTable tableInstance={tableInstance} />
-      <button
-        // @ts-ignore
-        {...documentHeader.getGroupByToggleProps()}
-        className={"border p-5 hover:bg-zinc-100"}
-      >
-        {
-          // @ts-ignore
-          documentHeader.isGrouped
-            ? translation.ungroup_by_doc
-            : translation.group_by_doc
-        }
-      </button>
       {pagination}
     </div>
   );
@@ -408,13 +410,17 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                   cell.column.Header === "Left context" ||
                   cell.column.Header === "Contexte gauche"
                 ) {
-                  twStyle = "text-right";
+                  twStyle = " text-right";
+                }
+                // @ts-ignore
+                if (cell.column.Header === "Document" && !row.isExpanded) {
+                  twStyle = " max-w-xs truncate";
                 }
                 return (
                   <td
                     {...cell.getCellProps()}
                     key={index}
-                    className={"pl-5 pr-5 pt-2 pb-2 " + twStyle}
+                    className={"pl-3 pr-3 pt-2 pb-2" + twStyle}
                   >
                     {cellRender(row, cell)}
                   </td>

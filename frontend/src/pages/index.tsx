@@ -286,9 +286,5 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
   const [yearRange, setYearRange] = useState<[number, number]>([1789, 2000]);
   const [source, setSource] = useState<"book" | "periodical" | "all">("all");
 
-  return (
-    <>
-    Coming soon!
-    </>
-  );
+  return <>Coming soon!</>;
 }
