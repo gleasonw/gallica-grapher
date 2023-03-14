@@ -268,11 +268,13 @@ function GraphAndTable({
           setGraphTickets(graphTickets.filter((t) => !t.example));
         }}
       />
-      <ResultViewer
-        tickets={graphTickets}
-        outerRange={outerRange}
-        initVals={{ initRecords, initSeries }}
-      />
+      {graphTickets && graphTickets.length > 0 && (
+        <ResultViewer
+          tickets={graphTickets}
+          outerRange={outerRange}
+          initVals={{ initRecords, initSeries }}
+        />
+      )}
     </>
   );
 }

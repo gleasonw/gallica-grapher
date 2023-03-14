@@ -66,8 +66,8 @@ export function makeOptions(
     },
     // @ts-ignore
     series: ticketData.map((ticket, i) => ({
-      name: ticket.data!.name,
-      data: ticket.data!.data,
+      name: ticket?.data?.name,
+      data: ticket?.data?.data,
       color: seriesColors[i],
       point: {
         events: {
