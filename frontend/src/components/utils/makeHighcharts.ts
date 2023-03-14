@@ -72,23 +72,7 @@ export function makeOptions(
       point: {
         events: {
           click: (e) => {
-            if (!!e.point.category) {
-              e.point.select(true, false);
-              e.point.update({
-                marker: {
-                  enabled: true,
-                },
-              });
-              if (selectedPoint && selectedPoint.category !== null) {
-                selectedPoint.update({
-                  marker: {
-                    enabled: false,
-                  },
-                });
-              }
-              selectedPoint = e.point;
-              onSeriesClick(e.point);
-            }
+            onSeriesClick(e.point);
           },
         },
       },
