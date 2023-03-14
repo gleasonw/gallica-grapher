@@ -3,7 +3,7 @@ import { Ticket } from "../pages/index";
 import Image from "next/image";
 import glassIcon from "./assets/glass.svg";
 import { SearchProgress } from "./SearchProgress";
-import { seriesColors } from "./ResultViewer";
+import { seriesColors } from "./utils/makeHighcharts";
 import { useMutation } from "@tanstack/react-query";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";

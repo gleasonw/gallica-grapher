@@ -5,7 +5,7 @@ import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
 import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
-import { ResultsTable, fetchContext } from "../components/ResultsTable";
+import { fetchContext } from "../components/ResultsTable";
 import Info from "../components/Info";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -240,7 +240,7 @@ function GraphAndTable({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
-  const [tickets, setTickets] = useState<Ticket[]>(initTickets);
+  const [graphTickets, setGraphTickets] = useState<Ticket[]>(initTickets);
   const [outerRange, setOuterRange] = useState<[number, number]>([1789, 2000]);
   return (
     <>
@@ -251,25 +251,25 @@ function GraphAndTable({
       </div>
       <InputForm
         onCreateTicket={(ticket: Ticket) => {
-          const noExamples = tickets.filter((t) => !t.example);
-          setTickets([...noExamples, ticket]);
+          const noExamples = graphTickets.filter((t) => !t.example);
+          setGraphTickets([...noExamples, ticket]);
         }}
         onSliderChange={(range: [number, number]) => {
           setOuterRange(range);
         }}
-        tickets={tickets}
+        tickets={graphTickets}
         yearRange={outerRange}
         onDeleteTicket={(ticket?: Ticket) => {
-          if (tickets && ticket) {
-            setTickets(tickets.filter((t) => t.id !== ticket.id));
+          if (graphTickets && ticket) {
+            setGraphTickets(graphTickets.filter((t) => t.id !== ticket.id));
           }
         }}
         onDeleteExampleTickets={() => {
-          setTickets(tickets.filter((t) => !t.example));
+          setGraphTickets(graphTickets.filter((t) => !t.example));
         }}
       />
       <ResultViewer
-        tickets={tickets}
+        tickets={graphTickets}
         outerRange={outerRange}
         initVals={{ initRecords, initSeries }}
       />

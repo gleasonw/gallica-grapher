@@ -10,19 +10,7 @@ import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
 import { InferGetStaticPropsType } from "next";
-
-export const seriesColors = [
-  "#7cb5ec",
-  "#434348",
-  "#90ed7d",
-  "#f7a35c",
-  "#8085e9",
-  "#f15c80",
-  "#e4d354",
-  "#2b908f",
-  "#f45b5b",
-  "#91e8e1",
-];
+import { makeOptions } from "./utils/makeHighcharts";
 
 interface ResultViewerProps {
   tickets: Ticket[];
@@ -127,98 +115,41 @@ export function ResultViewer(props: ResultViewerProps) {
     }),
   });
 
-  function handleSeriesClick(e: Highcharts.Point) {
-    setSelectedTicket(
-      props.tickets.filter((t) => t.terms[0] === e.series.name)[0].id
-    );
-    const date = new Date(e.category);
-    if (selectedGrouping === "year") {
-      setYearRange([date.getUTCFullYear(), null]);
-      setSelectedMonth(0);
-    } else {
-      setYearRange([date.getUTCFullYear(), null]);
-      setSelectedMonth(date.getUTCMonth() + 1);
+  const highchartsOpts = React.useMemo(() => {
+    function handleSeriesClick(e: Highcharts.Point) {
+      setSelectedTicket(
+        props.tickets.filter((t) => t.terms[0] === e.series.name)[0].id
+      );
+      const date = new Date(e.category);
+      if (selectedGrouping === "year") {
+        setYearRange([date.getUTCFullYear(), null]);
+        setSelectedMonth(0);
+      } else {
+        setYearRange([date.getUTCFullYear(), null]);
+        setSelectedMonth(date.getUTCMonth() + 1);
+      }
     }
-  }
 
-  const getSeries = React.useCallback(() => {
-    return ticketData
-      .filter((ticket) => ticket.data !== undefined)
-      .map((ticket, i) => ({
-        name: ticket.data!.name,
-        data: ticket.data!.data,
-        color: seriesColors[i],
-      }));
-  }, [ticketData]);
+    function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
+      if (e.trigger === "zoom") {
+        const minDate = new Date(e.min);
+        const maxDate = new Date(e.max);
+        if (minDate.toString() === "Invalid Date") {
+          setYearRange([null, null]);
+          setSelectedMonth(null);
+          return;
+        }
+        if (selectedGrouping === "year") {
+          setYearRange([minDate.getUTCFullYear(), maxDate.getUTCFullYear()]);
+        } else {
+          setYearRange([minDate.getUTCFullYear(), maxDate.getUTCFullYear()]);
+          setSelectedMonth(minDate.getUTCMonth() + 1);
+        }
+      }
+    }
 
-  const highchartsOpts: Highcharts.Options = {
-    chart: {
-      type: "line",
-      zooming: {
-        type: "x",
-      },
-    },
-    title: {
-      text: "",
-    },
-    xAxis: {
-      type: "datetime",
-      events: {
-        setExtremes: (e) => {
-          if (e.trigger === "zoom") {
-            const minDate = new Date(e.min);
-            const maxDate = new Date(e.max);
-            if (minDate.toString() === "Invalid Date") {
-              setYearRange([null, null]);
-              setSelectedMonth(null);
-              return;
-            }
-            if (selectedGrouping === "year") {
-              setYearRange([
-                minDate.getUTCFullYear(),
-                maxDate.getUTCFullYear(),
-              ]);
-            } else {
-              setYearRange([
-                minDate.getUTCFullYear(),
-                maxDate.getUTCFullYear(),
-              ]);
-              setSelectedMonth(minDate.getUTCMonth() + 1);
-            }
-          }
-        },
-      },
-    },
-    yAxis: {
-      title: {
-        text: "Frequency",
-      },
-    },
-    tooltip: {
-      shared: true,
-    },
-    plotOptions: {
-      series: {
-        cursor: "pointer",
-        events: {
-          click: (e) => handleSeriesClick(e.point),
-        },
-        marker: {
-          enabled: false,
-          states: {
-            hover: {
-              enabled: true,
-            },
-            select: {
-              enabled: true,
-            },
-          },
-        },
-      },
-    },
-    // @ts-ignore
-    series: getSeries(),
-  };
+    return makeOptions(handleSetExtremes, handleSeriesClick, ticketData);
+  }, [props.tickets, selectedGrouping, ticketData]);
 
   return (
     <div className={"h-full w-full bg-white"}>
