@@ -82,6 +82,7 @@ export function ResultViewer(props: ResultViewerProps) {
     "year" | "month"
   >("year");
   const [selectedSmoothing, setSelectedSmoothing] = React.useState<number>(0);
+  const [selectedPoint, setSelectedPoint] = React.useState<Highcharts.Point>();
 
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
@@ -115,41 +116,43 @@ export function ResultViewer(props: ResultViewerProps) {
     }),
   });
 
-  const highchartsOpts = React.useMemo(() => {
-    function handleSeriesClick(e: Highcharts.Point) {
-      setSelectedTicket(
-        props.tickets.filter((t) => t.terms[0] === e.series.name)[0].id
-      );
-      const date = new Date(e.category);
+  function handleSeriesClick(point: Highcharts.Point) {
+    setSelectedTicket(
+      props.tickets.filter((t) => t.terms[0] === point.series.name)[0].id
+    );
+    const date = new Date(point.category);
+    if (selectedGrouping === "year") {
+      setYearRange([date.getUTCFullYear(), null]);
+      setSelectedMonth(0);
+    } else {
+      setYearRange([date.getUTCFullYear(), null]);
+      setSelectedMonth(date.getUTCMonth() + 1);
+    }
+  }
+
+  function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
+    if (e.trigger === "zoom") {
+      const minDate = new Date(e.min);
+      const maxDate = new Date(e.max);
+      if (minDate.toString() === "Invalid Date") {
+        setYearRange([null, null]);
+        setSelectedMonth(null);
+        return;
+      }
       if (selectedGrouping === "year") {
-        setYearRange([date.getUTCFullYear(), null]);
-        setSelectedMonth(0);
+        setYearRange([minDate.getUTCFullYear(), maxDate.getUTCFullYear()]);
       } else {
-        setYearRange([date.getUTCFullYear(), null]);
-        setSelectedMonth(date.getUTCMonth() + 1);
+        setYearRange([minDate.getUTCFullYear(), maxDate.getUTCFullYear()]);
+        setSelectedMonth(minDate.getUTCMonth() + 1);
       }
     }
+  }
 
-    function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
-      if (e.trigger === "zoom") {
-        const minDate = new Date(e.min);
-        const maxDate = new Date(e.max);
-        if (minDate.toString() === "Invalid Date") {
-          setYearRange([null, null]);
-          setSelectedMonth(null);
-          return;
-        }
-        if (selectedGrouping === "year") {
-          setYearRange([minDate.getUTCFullYear(), maxDate.getUTCFullYear()]);
-        } else {
-          setYearRange([minDate.getUTCFullYear(), maxDate.getUTCFullYear()]);
-          setSelectedMonth(minDate.getUTCMonth() + 1);
-        }
-      }
-    }
-
-    return makeOptions(handleSetExtremes, handleSeriesClick, ticketData);
-  }, [props.tickets, selectedGrouping, ticketData]);
+  const highchartsOpts = makeOptions(
+    handleSetExtremes,
+    handleSeriesClick,
+    ticketData
+  );
 
   return (
     <div className={"h-full w-full bg-white"}>
