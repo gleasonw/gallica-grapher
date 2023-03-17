@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { LangContext } from "../pages";
-import { Ticket } from "../pages/index";
+import { LangContext } from "../pages/LangContext";
+import { GraphTicket } from "../pages/GraphTicket";
 import { ResultsTable, TableProps, fetchContext } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
@@ -12,7 +12,7 @@ export interface TicketTableProps extends TableProps {
   onSelectYear: (year: number | null) => void;
   onSelectTicket: (ticketID: number) => void;
   selectedTicket: number | null;
-  tickets?: Ticket[];
+  tickets?: GraphTicket[];
   initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
 

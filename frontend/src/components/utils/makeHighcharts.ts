@@ -14,7 +14,6 @@ export const seriesColors = [
   "#91e8e1",
 ];
 
-let selectedPoint: Highcharts.Point | null = null;
 
 export function makeOptions(
   onSetExtremes: (e: any) => void,

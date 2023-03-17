@@ -6,7 +6,7 @@ export const RevealButton: React.FC<{ label: string; onClick: () => void }> = (
   const [expanded, setExpanded] = useState(false);
   return (
     <button
-      className={"bg-white shadow-xl p-5 hover:bg-zinc-100"}
+      className={"bg-white rounded-md shadow-sm p-3 border hover:bg-zinc-100"}
       onClick={() => {
         props.onClick();
         setExpanded(!expanded);

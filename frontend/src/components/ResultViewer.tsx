@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
-import { LangContext } from "../pages";
-import { Ticket, getStaticProps } from "../pages/index";
+import { LangContext } from "../pages/LangContext";
+import { getStaticProps } from "../pages/index";
+import { GraphTicket } from "../pages/GraphTicket";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
@@ -13,7 +14,7 @@ import { InferGetStaticPropsType } from "next";
 import { makeOptions } from "./utils/makeHighcharts";
 
 interface ResultViewerProps {
-  tickets: Ticket[];
+  tickets: GraphTicket[];
   outerRange: [number, number];
   initVals: InferGetStaticPropsType<typeof getStaticProps>;
 }
@@ -107,9 +108,9 @@ export function ResultViewer(props: ResultViewerProps) {
             selectedGrouping,
             selectedSmoothing
           ),
-        placeholderData: props.initVals.initSeries.filter(
-          (series) => series.request_id === ticket.id
-        )[0],
+        // placeholderData: props.initVals.initSeries.filter(
+        //   (series) => series.request_id === ticket.id
+        // )[0],
         keepPreviousData: true,
         refetchOnWindowFocus: false,
       };
