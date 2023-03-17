@@ -1,10 +1,8 @@
 import { Paper } from "../models/dbStructs";
-import { SearchTicket } from "../pages/index";
 
 export interface SearchPageState {
-  papers: Paper[];
-  tickets: SearchTicket[];
-  selectedTicket?: number;
+  term: string;
+  papers?: Paper[];
   source: "book" | "periodical" | "all";
   limit: number;
   cursor: number;
@@ -38,16 +36,6 @@ export interface SetCursorAction {
   payload: SearchPageState["cursor"];
 }
 
-export interface AddTicketAction {
-  type: "add_ticket";
-  payload: SearchTicket;
-}
-
-export interface RemoveTicketAction {
-  type: "remove_ticket";
-  payload: SearchPageState["selectedTicket"];
-}
-
 export interface SetYearRangeAction {
   type: "set_year_range";
   payload: SearchPageState["yearRange"];
@@ -68,6 +56,11 @@ export interface SetLinkDistanceAction {
   payload: SearchPageState["linkDistance"];
 }
 
+export interface SetTermsAction {
+  type: "set_terms";
+  payload: SearchPageState["term"];
+}
+
 export function searchStateReducer(
   state: SearchPageState,
   action:
@@ -76,23 +69,24 @@ export function searchStateReducer(
     | SetSourceAction
     | SetLimitAction
     | SetCursorAction
-    | AddTicketAction
-    | RemoveTicketAction
     | SetYearRangeAction
     | SetSortAction
     | SetLinkTermAction
     | SetLinkDistanceAction
+    | SetTermsAction
 ): SearchPageState {
   switch (action.type) {
     case "add_paper":
       return {
         ...state,
-        papers: [...state.papers, action.payload],
+        papers: state.papers
+          ? [...state.papers, action.payload]
+          : [action.payload],
       };
     case "remove_paper":
       return {
         ...state,
-        papers: state.papers.filter((p) => p.code !== action.payload),
+        papers: state.papers?.filter((p) => p.code !== action.payload),
       };
     case "set_source":
       return {
@@ -108,16 +102,6 @@ export function searchStateReducer(
       return {
         ...state,
         cursor: action.payload,
-      };
-    case "add_ticket":
-      return {
-        ...state,
-        tickets: [...state.tickets, action.payload],
-      };
-    case "remove_ticket":
-      return {
-        ...state,
-        tickets: state.tickets.filter((ticket) => ticket.id !== action.payload),
       };
     case "set_year_range":
       return {
@@ -139,6 +123,11 @@ export function searchStateReducer(
       return {
         ...state,
         linkDistance: action.payload,
+      };
+    case "set_terms":
+      return {
+        ...state,
+        term: action.payload,
       };
   }
 }

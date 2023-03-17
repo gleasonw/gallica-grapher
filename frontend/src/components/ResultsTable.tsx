@@ -31,6 +31,7 @@ export interface TableProps {
 
 export const fetchContext = async (pageParam = 0, props: TableProps) => {
   let baseUrl = `${apiURL}/api/gallicaRecords`;
+  console.log({ props });
   let url = addQueryParamsIfExist(baseUrl, {
     ...props,
     children: undefined,

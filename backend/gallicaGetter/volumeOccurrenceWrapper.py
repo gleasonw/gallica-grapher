@@ -126,4 +126,5 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
             on_receive_response=on_receive_response,
             session=session,
             semaphore=semaphore,
+            on_connection_error=lambda: print("Connection error"),
         )

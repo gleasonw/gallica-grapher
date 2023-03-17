@@ -28,6 +28,8 @@ import { SelectInput } from "../components/SelectInput";
 
 import { GraphTicket, Page, initTickets } from "./GraphTicket";
 import { LangContext, strings } from "./LangContext";
+import link from "../components/assets/link.svg";
+import refresh from "../components/assets/refresh.svg";
 
 export default function Home({
   initRecords,
@@ -49,9 +51,8 @@ export default function Home({
   const [searchState, searchStateDispatch] = React.useReducer(
     searchStateReducer,
     {
-      papers: [],
-      tickets: [],
-      selectedTicket: undefined,
+      term: "",
+      papers: undefined,
       source: "all",
       limit: 10,
       cursor: 0,
@@ -277,220 +278,187 @@ function GraphAndTable({ initRecords, initSeries }) {
   );
 }
 
-export interface SearchTicket {
-  id: number;
-  terms: string[];
-  yearRange: [number | undefined, number | undefined];
-  source: "periodical" | "book" | "all";
-  papers?: Paper[];
-  limit?: number;
-  cursor?: number;
-  sort?: "date" | "relevance";
-  linkTerm?: string;
-  linkDistance?: number;
-}
-
 function SearchableContext(props: { initRecords: GallicaResponse }) {
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
   const searchState = React.useContext(SearchPageStateContext);
   const searchStateDispatch = React.useContext(SearchPageDispatchContext);
+
   const [inputWord, setInputWord] = React.useState("");
+  const [localLink, setLocalLink] = React.useState("");
+  const [localDistance, setLocalDistance] = React.useState(10);
+
   if (!searchState || !searchStateDispatch) {
     throw new Error("Search state not initialized");
   }
   const {
-    tickets,
     yearRange,
     source,
     papers,
     limit,
     cursor,
-    selectedTicket,
     linkTerm,
     linkDistance,
+    sort,
+    term,
   } = searchState;
 
-  const currentDisplayedTicket = tickets?.[0];
-
-  function getTicketId() {
-    if (tickets.length > 0) {
-      return tickets[tickets.length - 1].id + 1;
-    }
-    return 0;
-  }
-
   return (
-    <DashboardLayout>
-      <div className={"w-full flex flex-col justify-center items-center"}>
-        <InputBubble
-          word={inputWord}
-          onWordChange={setInputWord}
-          onSubmit={() =>
-            searchStateDispatch({
-              type: "add_ticket",
-              payload: {
-                id: getTicketId(),
-                terms: [inputWord],
-                yearRange,
-                source,
-                papers,
-                limit,
-                cursor,
-              },
-            })
+    <>
+      <DashboardLayout>
+        <div
+          className={
+            "w-full flex flex-col justify-center items-center bg-blue-100 rounded-lg pt-5 pb-5"
           }
         >
-          <ProximitySearchInput
-            onSetLinkTerm={(linkTerm) =>
+          <InputBubble
+            word={inputWord}
+            onWordChange={setInputWord}
+            onSubmit={() => {
+              searchStateDispatch({
+                type: "set_terms",
+                payload: inputWord,
+              });
               searchStateDispatch({
                 type: "set_link_term",
-                payload: linkTerm,
-              })
-            }
-            onSetLinkDistance={(linkDistance) =>
+                payload: localLink,
+              });
               searchStateDispatch({
                 type: "set_link_distance",
-                payload: linkDistance,
-              })
-            }
-            linkTerm={linkTerm}
-            linkDistance={linkDistance}
-          />
-        </InputBubble>
-      </div>
-      <SubInputLayout>
-        <YearRangeInput
-          min={1500}
-          max={2023}
-          value={yearRange}
-          onChange={(value) =>
-            searchStateDispatch({ type: "set_year_range", payload: value })
-          }
-        />
-        <SelectInput
-          options={["book", "periodical", "all"]}
-          onChange={(new_source) => {
-            searchStateDispatch({ type: "set_source", payload: new_source });
-          }}
-        />
-        {source === "periodical" && (
-          <PaperSelector
-            papers={papers}
-            from={yearRange[0]}
-            to={yearRange[1]}
-            onPaperAdd={(new_paper) =>
-              searchStateDispatch({
-                type: "add_paper",
-                payload: new_paper,
-              })
-            }
-            onPaperClick={(paperCode) => {
-              searchStateDispatch({
-                type: "remove_paper",
-                payload: paperCode.code,
+                payload: localDistance,
               });
             }}
+          ></InputBubble>
+          <div className={"p-2"}></div>
+          <SubInputLayout>
+            <ProximitySearchInput
+              linkTerm={localLink}
+              linkDistance={localDistance}
+              onSetLinkTerm={setLocalLink}
+              onSetLinkDistance={setLocalDistance}
+              onRefreshLinkDistance={(new_distance) =>
+                searchStateDispatch({
+                  type: "set_link_distance",
+                  payload: new_distance,
+                })
+              }
+              onRefreshLinkTerm={(new_term) =>
+                searchStateDispatch({
+                  type: "set_link_term",
+                  payload: new_term,
+                })
+              }
+            />
+          </SubInputLayout>
+        </div>
+        <SubInputLayout>
+          <YearRangeInput
+            min={1500}
+            max={2023}
+            value={yearRange}
+            onChange={(value) =>
+              searchStateDispatch({ type: "set_year_range", payload: value })
+            }
           />
-        )}
-        <SelectInput
-          options={["date", "relevance"]}
-          onChange={(new_sort) =>
-            searchStateDispatch({ type: "set_sort", payload: new_sort })
-          }
-        />
-        <SelectInput
-          options={[10, 20, 50, 100]}
-          onChange={(new_limit) =>
-            searchStateDispatch({ type: "set_limit", payload: new_limit })
-          }
-        />
-      </SubInputLayout>
-      <SearchTicketRow
-        selectedTicket={selectedTicket}
-        tickets={tickets}
-        onDeleteTicket={(ticketID: number) =>
-          searchStateDispatch({
-            type: "remove_ticket",
-            payload: ticketID,
-          })
-        }
-        onSelectTicket={(ticket: SearchTicket) =>
-          searchStateDispatch({
-            type: "add_ticket",
-            payload: ticket,
-          })
-        }
-      />
-      {currentDisplayedTicket && (
+          <SelectInput
+            label={"corpus"}
+            options={["book", "periodical", "all"]}
+            value={source}
+            onChange={(new_source) => {
+              searchStateDispatch({ type: "set_source", payload: new_source });
+            }}
+          />
+          {source === "periodical" && (
+            <PaperSelector
+              papers={papers}
+              from={yearRange[0]}
+              to={yearRange[1]}
+              onPaperAdd={(new_paper) =>
+                searchStateDispatch({
+                  type: "add_paper",
+                  payload: new_paper,
+                })
+              }
+              onPaperClick={(paperCode) => {
+                searchStateDispatch({
+                  type: "remove_paper",
+                  payload: paperCode.code,
+                });
+              }}
+            />
+          )}
+          <SelectInput
+            label={"sort"}
+            value={sort}
+            options={["date", "relevance"]}
+            onChange={(new_sort) =>
+              searchStateDispatch({ type: "set_sort", payload: new_sort })
+            }
+          />
+          <SelectInput
+            label={"limit"}
+            value={limit}
+            options={[10, 20, 50, 100]}
+            onChange={(new_limit) =>
+              searchStateDispatch({ type: "set_limit", payload: new_limit })
+            }
+          />
+        </SubInputLayout>
+      </DashboardLayout>
+      {!!term && (
         <ResultsTable
-          terms={currentDisplayedTicket.terms}
-          yearRange={currentDisplayedTicket.yearRange}
-          source={currentDisplayedTicket.source}
-          papers={currentDisplayedTicket.papers}
-          limit={currentDisplayedTicket.limit || 10}
-          cursor={currentDisplayedTicket.cursor}
-          sort={currentDisplayedTicket.sort}
-          linkTerm={currentDisplayedTicket.linkTerm}
-          linkDistance={currentDisplayedTicket.linkDistance}
+          terms={[term]}
+          yearRange={yearRange}
+          source={source}
+          papers={papers}
+          limit={limit || 10}
+          cursor={cursor}
+          sort={sort}
+          link_term={linkTerm}
+          link_distance={linkDistance}
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }
 
 function ProximitySearchInput(props: {
+  onRefreshLinkTerm: (linkTerm: string) => void;
+  onRefreshLinkDistance: (linkDistance: number) => void;
   onSetLinkTerm: (linkTerm: string) => void;
   onSetLinkDistance: (linkDistance: number) => void;
-  linkTerm: string;
-  linkDistance: number;
+  linkTerm?: string;
+  linkDistance?: number;
 }) {
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
-  const [isOpen, setIsOpen] = React.useState(false);
-  return isOpen ? (
-    <div className="flex flex-wrap gap-5 mt-5">
+  return (
+    <div className="flex flex-wrap gap-5 bg-white rounded-full p-3 border shadow-sm">
+      <Image src={link} alt={"proximity search icon"} width={30} height={30} />
       <input
         type="text"
         value={props.linkTerm}
         onChange={(e) => props.onSetLinkTerm(e.target.value)}
-        className={"border p-2 rounded-full shadow-sm"}
+        className={"border p-2 rounded-lg shadow-sm"}
         placeholder={translation.linkTerm}
       />
       <input
         type="number"
         value={props.linkDistance}
         onChange={(e) => props.onSetLinkDistance(Number(e.target.value))}
-        className={"border p-2 rounded-full shadow-sm"}
+        className={"border p-2 rounded-lg shadow-sm"}
         placeholder={translation.linkDistance}
       />
-    </div>
-  ) : (
-    <button onClick={() => setIsOpen(true)}>{translation.linkTerm}</button>
-  );
-}
-
-function SearchTicketRow(props: {
-  tickets: SearchTicket[];
-  selectedTicket?: number;
-  onDeleteTicket: (ticketID: number) => void;
-  onSelectTicket: (ticket: SearchTicket) => void;
-}) {
-  const { lang } = React.useContext(LangContext);
-  const translation = strings[lang];
-  return (
-    <div className="flex flex-row flex-wrap gap-10 w-full max-w-3xl">
-      {props.tickets.map((ticket) => (
-        <div
-          key={ticket.id}
-          className={"rounded-lg border-2 bg-white p-5 text-xl shadow-md"}
-          onClick={() => props.onDeleteTicket(ticket.id)}
-        >
-          <div className="flex flex-row flex-wrap gap-5">
-            <div className="text-xl font-bold">{ticket.terms}</div>
-          </div>
-        </div>
-      ))}
+      <Image
+        src={refresh}
+        alt={"refresh icon"}
+        width={20}
+        height={20}
+        onClick={() => {
+          props.onRefreshLinkTerm(props.linkTerm || "");
+          props.onRefreshLinkDistance(props.linkDistance || 10);
+        }}
+      />
     </div>
   );
 }
@@ -498,37 +466,48 @@ function SearchTicketRow(props: {
 interface YearRangeInputProps {
   min: number;
   max: number;
-  value: [number | undefined, number | undefined];
   onChange: (value: [number, number]) => void;
 }
 export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
   const { lang } = useContext(LangContext);
+  const [localRange, setLocalRange] = useState([props.min, props.max]);
   return (
-    <div
-      className={
-        "flex flex-row text-md max-w-md flex-wrap gap-10 p-3 border rounded-lg shadow-sm"
-      }
-    >
-      {lang === "fr" ? "De" : "From"}
-      <input
-        className="w-20 border rounded-lg"
-        type="number"
-        value={props.value[0]}
-        onChange={(e) => {
-          const newValue = [parseInt(e.target.value), props.value[1]];
-          props.onChange(newValue as [number, number]);
-        }}
-      />
-      {lang === "fr" ? "à" : "to"}
-      <input
-        className="w-20 rounded-lg border"
-        type="number"
-        value={props.value[1]}
-        onChange={(e) => {
-          const newValue = [props.value[0], parseInt(e.target.value)];
-          props.onChange(newValue as [number, number]);
-        }}
-      />
+    <div>
+      <label
+        htmlFor={"year-range"}
+        className="block text-gray-700 text-sm font-bold mb-2"
+      >
+        {lang === "fr" ? "Années" : "Years"}
+      </label>
+      <div
+        className={
+          "flex flex-row text-md max-w-md flex-wrap gap-10 p-3 border rounded-lg shadow-sm"
+        }
+        id={"year-range"}
+      >
+        <input
+          className="w-20 border rounded-lg"
+          type="number"
+          value={localRange[0]}
+          onChange={(e) => {
+            const newValue = [parseInt(e.target.value), localRange[1]];
+            setLocalRange(newValue);
+          }}
+        />
+        {lang === "fr" ? "à" : "to"}
+        <input
+          className="w-20 rounded-lg border"
+          type="number"
+          value={localRange[1]}
+          onChange={(e) => {
+            const newValue = [localRange[0], parseInt(e.target.value)];
+            setLocalRange(newValue);
+          }}
+        />
+        <button onClick={() => props.onChange(localRange)}>
+          <Image src={refresh} alt={"reset"} width={20} height={20} />
+        </button>
+      </div>
     </div>
   );
 };
@@ -537,18 +516,6 @@ function SubInputLayout(props: { children: React.ReactNode }) {
   return (
     <div className="w-full max-w-3xl flex gap-5 items-center">
       {props.children}
-    </div>
-  );
-}
-
-function InputOpenClose(props: { children: React.ReactNode; label: string }) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  return (
-    <div className="flex flex-col flex-wrap gap-5 shadow-md rounded-lg w-full p-5">
-      <button onClick={() => setIsOpen(!isOpen)} className="text-xl">
-        {props.label}
-      </button>
-      {isOpen && props.children}
     </div>
   );
 }

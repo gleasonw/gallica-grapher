@@ -15,7 +15,6 @@ from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_utils.tasks import repeat_every
 from tasks import add
 
 RECORD_LIMIT = 1000000
