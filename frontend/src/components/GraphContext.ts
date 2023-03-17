@@ -1,6 +1,5 @@
 import React, { createContext } from "react";
-import { graphStateReducer } from "./GraphStateReducer";
-import { GraphPageState } from "../pages/GraphPageState";
+import { graphStateReducer, GraphPageState } from "./GraphStateReducer";
 
 export const GraphPageStateContext = createContext<GraphPageState | undefined>(
   undefined

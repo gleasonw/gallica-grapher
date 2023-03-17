@@ -34,11 +34,27 @@ import { PaperSelector } from "../components/PaperSelector";
 import { SelectInput } from "../components/SelectInput";
 
 import { GraphTicket, initTickets } from "./GraphTicket";
-import { LangContext, strings } from "./LangContext";
+import { LangContext } from "./LangContext";
 import link from "../components/assets/link.svg";
-import refresh from "../components/assets/refresh.svg";
+import { SubInputLayout } from "../components/SubInputLayout";
 
 type Page = "graph" | "context" | "info";
+
+const strings = {
+  fr: {
+    title: "The Gallica Grapher",
+    description:
+      "Explorez les occurrences de mots dans des périodiques Gallica.",
+    linkTerm: "Terme de proximité",
+    linkDistance: "Distance de proximité",
+  },
+  en: {
+    title: "The Gallica Grapher",
+    description: "Explore word occurrences in archived Gallica periodicals.",
+    linkTerm: "Link term",
+    linkDistance: "Link distance",
+  },
+};
 
 export const getStaticProps: GetStaticProps<{
   initRecords: GallicaResponse;
@@ -76,7 +92,7 @@ export default function Home({
     month: undefined,
     grouping: "year",
     smoothing: 0,
-    selectedTicket: undefined,
+    selectedTicket: initTickets[0].id,
   } as GraphPageState);
 
   const [searchState, searchStateDispatch] = React.useReducer(
@@ -260,55 +276,42 @@ function GraphAndTable({
   }
   const { tickets, yearRange } = graphState;
   const graphStateDispatch = React.useContext(GraphPageDispatchContext);
-
-  function handleCreateTicket(ticket: GraphTicket) {
-    if (graphStateDispatch) {
-      graphStateDispatch({
-        type: "add_ticket",
-        payload: ticket,
-      });
-    }
-  }
-
-  function handleDeleteTicket(ticketID: number) {
-    if (graphStateDispatch) {
-      graphStateDispatch({
-        type: "remove_ticket",
-        payload: ticketID,
-      });
-    }
-  }
-
-  function handleDeleteExampleTickets() {
-    if (graphStateDispatch) {
-      graphStateDispatch({
-        type: "remove_example_tickets",
-      });
-    }
+  if (!graphStateDispatch) {
+    throw new Error("Graph dispatch not initialized");
   }
 
   return (
-    <>
+    <div className={"flex flex-col"}>
       <title>{translation.title}</title>
-      <div className="m-10 text-center text-4xl">
+      <div className="m-10 mt-20 text-center text-4xl">
         {" "}
         {translation.description}{" "}
       </div>
       <InputForm
-        onCreateTicket={handleCreateTicket}
+        onCreateTicket={(ticket) =>
+          graphStateDispatch({
+            type: "add_ticket",
+            payload: ticket,
+          })
+        }
         tickets={tickets}
         yearRange={yearRange}
-        onDeleteTicket={handleDeleteTicket}
-        onDeleteExampleTickets={handleDeleteExampleTickets}
+        onDeleteTicket={(ticketID) =>
+          graphStateDispatch({
+            type: "remove_ticket",
+            payload: ticketID,
+          })
+        }
+        onDeleteExampleTickets={() =>
+          graphStateDispatch({
+            type: "remove_example_tickets",
+          })
+        }
       />
       {tickets && tickets.length > 0 && (
-        <ResultViewer
-          tickets={tickets}
-          outerRange={yearRange}
-          initVals={{ initRecords, initSeries }}
-        />
+        <ResultViewer initVals={{ initRecords, initSeries }} />
       )}
-    </>
+    </div>
   );
 }
 
@@ -317,7 +320,6 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
   const translation = strings[lang];
   const searchState = React.useContext(SearchPageStateContext);
   const searchStateDispatch = React.useContext(SearchPageDispatchContext);
-  const [tableProps, setTableProps] = React.useState<TableProps>();
 
   if (!searchState || !searchStateDispatch) {
     throw new Error("Search state not initialized");
@@ -331,6 +333,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
     linkDistance,
     sort,
     term,
+    tableProps,
   } = searchState;
 
   function makeDisplayCQL() {
@@ -369,15 +372,18 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
   }
 
   function handleSubmit() {
-    setTableProps({
-      limit,
-      codes: papers?.map((paper) => paper.code),
-      link_distance: linkDistance,
-      link_term: linkTerm,
-      sort,
-      source,
-      terms: [term],
-      yearRange,
+    searchStateDispatch!({
+      type: "set_table_props",
+      payload: {
+        limit,
+        codes: papers?.map((paper) => paper.code),
+        link_distance: linkDistance,
+        link_term: linkTerm,
+        sort,
+        source,
+        terms: [term],
+        yearRange,
+      },
     });
   }
 
@@ -389,7 +395,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
             "w-full flex flex-col justify-center gap-10 items-center rounded-lg pt-5 pb-5"
           }
         >
-          Work in progress!
+          Work in progress! Direct CQL query option coming soon.
           <InputBubble
             word={term}
             onWordChange={(word) =>
@@ -592,11 +598,3 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
     </div>
   );
 };
-
-function SubInputLayout(props: { children: React.ReactNode }) {
-  return (
-    <div className="flex flex-wrap gap-5 items-center rounded-lg bg-white p-3 shadow-sm border">
-      {props.children}
-    </div>
-  );
-}

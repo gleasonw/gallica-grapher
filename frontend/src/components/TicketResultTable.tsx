@@ -11,7 +11,7 @@ export interface TicketTableProps extends TableProps {
   onSelectMonth: (month: number | null) => void;
   onSelectYear: (year: number | null) => void;
   onSelectTicket: (ticketID: number) => void;
-  selectedTicket: number | null;
+  selectedTicket?: number;
   tickets?: GraphTicket[];
   initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
@@ -29,7 +29,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
         (props.tickets &&
           props.tickets.length > 0 &&
           props.tickets.filter((t) => t.id === props.selectedTicket)[0]
-            .terms) ||
+            ?.terms) ||
         []
       }
       codes={selectedPapers?.map((p) => p.code) || []}

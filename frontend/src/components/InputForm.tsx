@@ -116,6 +116,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           }}
         />
       )}
+      <div></div>
       <TicketRow tickets={tickets} onGraphedTicketCardClick={onDeleteTicket} />
     </DashboardLayout>
   );

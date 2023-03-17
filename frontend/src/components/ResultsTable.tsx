@@ -31,7 +31,6 @@ export interface TableProps {
 
 export const fetchContext = async (pageParam = 0, props: TableProps) => {
   let baseUrl = `${apiURL}/api/gallicaRecords`;
-  console.log({ props });
   let url = addQueryParamsIfExist(baseUrl, {
     ...props,
     children: undefined,
@@ -380,7 +379,7 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
 
 function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
-    <table className={"shadow-md hidden md:block lg:block"}>
+    <table className={"shadow-md hidden md:block lg:block w-screen"}>
       <thead>
         {props.tableInstance.headerGroups.map((headerGroup, index) => (
           <tr {...headerGroup.getHeaderGroupProps()} key={index}>

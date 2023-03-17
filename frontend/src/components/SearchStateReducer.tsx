@@ -1,4 +1,5 @@
 import { Paper } from "../models/dbStructs";
+import { TableProps } from "./ResultsTable";
 
 export interface SearchPageState {
   term: string;
@@ -10,6 +11,7 @@ export interface SearchPageState {
   sort: "date" | "relevance";
   linkTerm?: string;
   linkDistance?: number;
+  tableProps?: TableProps;
 }
 export interface AddPaperAction {
   type: "add_paper";
@@ -61,6 +63,11 @@ export interface SetTermsAction {
   payload: SearchPageState["term"];
 }
 
+export interface SetTablePropsAction {
+  type: "set_table_props";
+  payload: SearchPageState["tableProps"];
+}
+
 export function searchStateReducer(
   state: SearchPageState,
   action:
@@ -74,6 +81,7 @@ export function searchStateReducer(
     | SetLinkTermAction
     | SetLinkDistanceAction
     | SetTermsAction
+    | SetTablePropsAction
 ): SearchPageState {
   switch (action.type) {
     case "add_paper":
@@ -128,6 +136,11 @@ export function searchStateReducer(
       return {
         ...state,
         term: action.payload,
+      };
+    case "set_table_props":
+      return {
+        ...state,
+        tableProps: action.payload,
       };
   }
 }

@@ -12,10 +12,13 @@ import { apiURL } from "./apiURL";
 import { GraphData } from "../models/dbStructs";
 import { InferGetStaticPropsType } from "next";
 import { makeOptions } from "./utils/makeHighcharts";
+import {
+  GraphPageDispatchContext,
+  GraphPageStateContext,
+} from "./GraphContext";
+import { SubInputLayout } from "./SubInputLayout";
 
 interface ResultViewerProps {
-  tickets: GraphTicket[];
-  outerRange: [number, number];
   initVals: InferGetStaticPropsType<typeof getStaticProps>;
 }
 
@@ -72,45 +75,66 @@ const strings = {
 };
 
 export function ResultViewer(props: ResultViewerProps) {
-  const [selectedTicket, setSelectedTicket] = React.useState<number | null>(
-    null
-  );
-  const [yearRange, setYearRange] = React.useState<
-    [number | null, number | null]
-  >([null, null]);
-  const [selectedMonth, setSelectedMonth] = React.useState<number | null>(null);
-  const [selectedGrouping, setSelectedGrouping] = React.useState<
-    "year" | "month"
-  >("year");
-  const [selectedSmoothing, setSelectedSmoothing] = React.useState<number>(0);
-  const [selectedPoint, setSelectedPoint] = React.useState<Highcharts.Point>();
-
+  const graphState = useContext(GraphPageStateContext);
+  const graphStateDispatch = useContext(GraphPageDispatchContext);
+  if (!graphState || !graphStateDispatch)
+    throw new Error("Graph state not initialized");
+  const selectedPoint = React.useRef<Highcharts.Point>();
+  const { selectedTicket, grouping, smoothing, tickets, month, yearRange } =
+    graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
-  if (
-    props.tickets.length > 0 &&
-    !props.tickets.some((t) => t.id === selectedTicket)
-  ) {
-    setSelectedTicket(props.tickets[0].id);
-    setSelectedMonth(null);
+  function setSelectedTicket(ticket: number) {
+    graphStateDispatch!({
+      type: "set_selected_ticket",
+      payload: ticket,
+    });
+  }
+
+  function setGrouping(grouping: string) {
+    graphStateDispatch!({
+      type: "set_grouping",
+      payload: grouping,
+    });
+  }
+
+  function setSmoothing(smoothing: number) {
+    graphStateDispatch!({
+      type: "set_smoothing",
+      payload: smoothing,
+    });
+  }
+
+  function setMonth(month: number | null) {
+    graphStateDispatch!({
+      type: "set_month",
+      payload: month,
+    });
+  }
+
+  function setYearRange(yearRange: [number | null, number | null]) {
+    graphStateDispatch!({
+      type: "set_year_range",
+      payload: yearRange,
+    });
+  }
+
+  if (tickets.length > 0 && !tickets.some((t) => t.id === selectedTicket)) {
+    setSelectedTicket(tickets[0].id);
+    setMonth(null);
     setYearRange([null, null]);
   }
 
   const ticketData = useQueries({
-    queries: props.tickets.map((ticket) => {
+    queries: tickets.map((ticket) => {
       return {
-        queryKey: ["ticket", ticket.id, selectedGrouping, selectedSmoothing],
+        queryKey: ["ticket", ticket.id, grouping, smoothing],
         queryFn: () =>
-          getTicketData(
-            ticket.id,
-            ticket.backend_source,
-            selectedGrouping,
-            selectedSmoothing
-          ),
-        // placeholderData: props.initVals.initSeries.filter(
-        //   (series) => series.request_id === ticket.id
-        // )[0],
+          getTicketData(ticket.id, ticket.backend_source, grouping, smoothing),
+        placeholderData: props.initVals.initSeries.filter(
+          (series) => series.request_id === ticket.id
+        )[0],
         keepPreviousData: true,
         refetchOnWindowFocus: false,
       };
@@ -118,33 +142,35 @@ export function ResultViewer(props: ResultViewerProps) {
   });
 
   function handleSeriesClick(point: Highcharts.Point) {
+    if (!graphStateDispatch) return;
     setSelectedTicket(
-      props.tickets.filter((t) => t.terms[0] === point.series.name)[0].id
+      tickets.filter((t) => t.terms[0] === point.series.name)[0].id
     );
     const date = new Date(point.category);
-    if (selectedGrouping === "year") {
-      setYearRange([date.getUTCFullYear(), null]);
-      setSelectedMonth(0);
+    if (grouping === "year") {
+      setMonth(null);
+      setYearRange([date.getUTCFullYear(), date.getUTCFullYear() + 1]);
     } else {
-      setYearRange([date.getUTCFullYear(), null]);
-      setSelectedMonth(date.getUTCMonth() + 1);
+      setMonth(date.getUTCMonth() + 1);
+      setYearRange([date.getUTCFullYear(), date.getUTCFullYear() + 1]);
     }
   }
 
   function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
+    if (!graphStateDispatch) return;
     if (e.trigger === "zoom") {
       const minDate = new Date(e.min);
       const maxDate = new Date(e.max);
       if (minDate.toString() === "Invalid Date") {
+        setMonth(null);
         setYearRange([null, null]);
-        setSelectedMonth(null);
         return;
       }
-      if (selectedGrouping === "year") {
+      if (grouping === "year") {
         setYearRange([minDate.getUTCFullYear(), maxDate.getUTCFullYear()]);
       } else {
         setYearRange([minDate.getUTCFullYear(), maxDate.getUTCFullYear()]);
-        setSelectedMonth(minDate.getUTCMonth() + 1);
+        setMonth(minDate.getUTCMonth() + 1);
       }
     }
   }
@@ -161,29 +187,41 @@ export function ResultViewer(props: ResultViewerProps) {
         <InputLabel label={translation.grouping}>
           <SelectInput
             options={["year", "month"]}
-            onChange={(value: string) =>
-              setSelectedGrouping(value as "year" | "month")
-            }
-            value={selectedGrouping}
+            onChange={(value: string) => setGrouping(value as "year" | "month")}
+            value={grouping}
           />
         </InputLabel>
         <InputLabel label={translation.smoothing}>
           <SelectInput
             options={["0", "1", "2", "3", "4", "5", "10", "20", "50"]}
-            onChange={(value: string) => setSelectedSmoothing(parseInt(value))}
-            value={selectedSmoothing.toString()}
+            onChange={(value: string) => setSmoothing(parseInt(value))}
+            value={smoothing.toString()}
           />
         </InputLabel>
       </div>
       <HighchartsReact highcharts={Highcharts} options={highchartsOpts} />
-      <div className={"ml-5 mr-5 mt-2"}>{translation.gallicagram_plug}</div>
+      <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
+        {translation.gallicagram_plug}
+        <div className={"max-w-sm"}>
+          <SelectInput
+            label={"Term"}
+            options={tickets.map((ticket) => ticket.terms[0])}
+            onChange={(value: string) =>
+              setSelectedTicket(
+                tickets.filter((t) => t.terms[0] === value)[0].id
+              )
+            }
+            value={tickets.filter((t) => t.id === selectedTicket)[0].terms[0]}
+          />
+        </div>
+      </div>
       <TicketResultTable
         initialRecords={props.initVals.initRecords}
-        tickets={props.tickets}
-        month={selectedMonth}
+        tickets={tickets}
+        month={month}
         yearRange={yearRange}
         onSelectYear={(year) => setYearRange([year, null])}
-        onSelectMonth={(month) => setSelectedMonth(month)}
+        onSelectMonth={(month) => setMonth(month)}
         onSelectTicket={(ticket) => setSelectedTicket(ticket)}
         selectedTicket={selectedTicket}
         limit={10}
