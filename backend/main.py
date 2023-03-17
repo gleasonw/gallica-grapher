@@ -200,7 +200,7 @@ async def fetch_records_from_gallica(
             sort=sort,
         )
     except aiohttp.client_exceptions.ClientConnectorError:
-        raise HTTPException(status_code=500, detail="Could not connect to Gallica.")
+        raise HTTPException(status_code=503, detail="Could not connect to Gallica.")
 
 
 if __name__ == "__main__":

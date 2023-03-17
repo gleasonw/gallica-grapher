@@ -3,7 +3,7 @@ import { GraphTicket } from "../pages/GraphTicket";
 
 export interface GraphPageState {
   tickets: GraphTicket[];
-  yearRange: [number, number];
+  yearRange: [number | undefined, number | undefined];
   month?: number;
   grouping: "year" | "month";
   smoothing: number;

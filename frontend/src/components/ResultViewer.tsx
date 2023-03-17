@@ -92,7 +92,7 @@ export function ResultViewer(props: ResultViewerProps) {
     });
   }
 
-  function setGrouping(grouping: string) {
+  function setGrouping(grouping: "year" | "month") {
     graphStateDispatch!({
       type: "set_grouping",
       payload: grouping,
@@ -106,14 +106,14 @@ export function ResultViewer(props: ResultViewerProps) {
     });
   }
 
-  function setMonth(month: number | null) {
+  function setMonth(month: number | undefined) {
     graphStateDispatch!({
       type: "set_month",
       payload: month,
     });
   }
 
-  function setYearRange(yearRange: [number | null, number | null]) {
+  function setYearRange(yearRange: [number | undefined, number | undefined]) {
     graphStateDispatch!({
       type: "set_year_range",
       payload: yearRange,
@@ -122,8 +122,8 @@ export function ResultViewer(props: ResultViewerProps) {
 
   if (tickets.length > 0 && !tickets.some((t) => t.id === selectedTicket)) {
     setSelectedTicket(tickets[0].id);
-    setMonth(null);
-    setYearRange([null, null]);
+    setMonth(undefined);
+    setYearRange([undefined, undefined]);
   }
 
   const ticketData = useQueries({
@@ -148,7 +148,7 @@ export function ResultViewer(props: ResultViewerProps) {
     );
     const date = new Date(point.category);
     if (grouping === "year") {
-      setMonth(null);
+      setMonth(undefined);
       setYearRange([date.getUTCFullYear(), date.getUTCFullYear() + 1]);
     } else {
       setMonth(date.getUTCMonth() + 1);
@@ -162,8 +162,8 @@ export function ResultViewer(props: ResultViewerProps) {
       const minDate = new Date(e.min);
       const maxDate = new Date(e.max);
       if (minDate.toString() === "Invalid Date") {
-        setMonth(null);
-        setYearRange([null, null]);
+        setMonth(undefined);
+        setYearRange([undefined, undefined]);
         return;
       }
       if (grouping === "year") {
@@ -220,7 +220,7 @@ export function ResultViewer(props: ResultViewerProps) {
         tickets={tickets}
         month={month}
         yearRange={yearRange}
-        onSelectYear={(year) => setYearRange([year, null])}
+        onSelectYear={(year) => setYearRange([year, undefined])}
         onSelectMonth={(month) => setMonth(month)}
         onSelectTicket={(ticket) => setSelectedTicket(ticket)}
         selectedTicket={selectedTicket}

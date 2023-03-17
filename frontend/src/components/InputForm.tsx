@@ -16,7 +16,7 @@ export interface InputFormProps {
   onDeleteTicket: (ticketID: number) => void;
   onDeleteExampleTickets: () => void;
   tickets?: GraphTicket[];
-  yearRange: [number, number];
+  yearRange: [number?, number?];
 }
 
 const strings = {

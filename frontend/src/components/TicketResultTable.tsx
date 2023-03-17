@@ -8,8 +8,8 @@ import { PaperDropdown } from "./PaperDropdown";
 import { Paper } from "../models/dbStructs";
 
 export interface TicketTableProps extends TableProps {
-  onSelectMonth: (month: number | null) => void;
-  onSelectYear: (year: number | null) => void;
+  onSelectMonth: (month: number) => void;
+  onSelectYear: (year: number) => void;
   onSelectTicket: (ticketID: number) => void;
   selectedTicket?: number;
   tickets?: GraphTicket[];
