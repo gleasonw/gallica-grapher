@@ -1,5 +1,6 @@
 import json
 import os
+import aiohttp.client_exceptions
 import uvicorn
 import random
 from typing import List, Literal, Optional
@@ -183,20 +184,23 @@ async def fetch_records_from_gallica(
         context_getter = get_row_context
     else:
         context_getter = get_html_context
-    return await context_getter(
-        year=year,
-        month=month,
-        end_year=end_year,
-        end_month=end_month,
-        terms=wrapped_terms,
-        codes=codes,
-        cursor=cursor,
-        limit=limit,
-        link_term=link_term,
-        link_distance=link_distance,
-        source=source,
-        sort=sort,
-    )
+    try:
+        return await context_getter(
+            year=year,
+            month=month,
+            end_year=end_year,
+            end_month=end_month,
+            terms=wrapped_terms,
+            codes=codes,
+            cursor=cursor,
+            limit=limit,
+            link_term=link_term,
+            link_distance=link_distance,
+            source=source,
+            sort=sort,
+        )
+    except aiohttp.client_exceptions.ClientConnectorError:
+        raise HTTPException(status_code=500, detail="Could not connect to Gallica.")
 
 
 if __name__ == "__main__":

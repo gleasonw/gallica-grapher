@@ -1,4 +1,5 @@
-import asyncio
+import aiohttp.client_exceptions
+from aiohttp.client_reqrep import ConnectionKey
 from gallicaGetter.gallicaWrapper import Response
 from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper, VolumeRecord
 from gallicaGetter.contentWrapper import ContextWrapper, HTMLContext
@@ -146,6 +147,7 @@ async def get_context(
     ] = build_html_record,
 ) -> UserResponse:
     """Queries Gallica's SRU and ContentSearch API's to get context for a given term in the archive."""
+
     link = None
     if link_distance and link_term:
         link_distance = int(link_distance)

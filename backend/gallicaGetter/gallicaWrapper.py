@@ -53,21 +53,17 @@ class GallicaWrapper:
         self,
         queries,
         session: aiohttp.ClientSession,
-        on_connection_error: Callable,
         semaphore: asyncio.Semaphore | None = None,
         on_receive_response: Callable[[Response], None] | None = None,
     ):
         """The core abstraction for fetching record xml from gallica and parsing it to Python objects. Called by all subclasses."""
-        try:
-            raw_response = await fetch_from_gallica(
-                queries,
-                session=session,
-                semaphore=semaphore,
-                on_receive_response=on_receive_response,
-            )
-        except aiohttp.client_exceptions.ClientConnectorError:
-            on_connection_error()
-            return
+        raw_response = await fetch_from_gallica(
+            queries,
+            session=session,
+            semaphore=semaphore,
+            on_receive_response=on_receive_response,
+        )
+
         return self.parse(raw_response)
 
 

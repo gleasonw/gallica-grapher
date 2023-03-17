@@ -64,5 +64,4 @@ class ContextWrapper(GallicaWrapper):
             session=session,
             semaphore=semaphore,
             on_receive_response=on_receive_response,
-            on_connection_error=lambda: print("Connection error!"),
         )

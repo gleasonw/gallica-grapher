@@ -6,7 +6,7 @@ import { apiURL } from "./apiURL";
 import { useQuery } from "@tanstack/react-query";
 
 export const PaperSelector: React.FC<{
-  papers: Paper[];
+  papers?: Paper[];
   from?: number;
   to?: number;
   onPaperAdd: (paper: Paper) => void;
@@ -46,7 +46,7 @@ export const PaperSelector: React.FC<{
       {displayed && (
         <>
           <div className="mt-5 flex flex-wrap gap-10">
-            {papers.map((paper) => (
+            {papers?.map((paper) => (
               <button
                 className={"p-5"}
                 key={paper.title}

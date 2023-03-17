@@ -10,7 +10,7 @@ import {
   RemoveExampleTicketsAction,
 } from "./reducerActions";
 
-interface GraphPageState {
+export interface GraphPageState {
   tickets: GraphTicket[];
   yearRange: [number, number];
   month?: number;

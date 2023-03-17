@@ -4,7 +4,7 @@ import glassIcon from "./assets/glass.svg";
 export default function InputBubble(props: {
   word: string;
   onWordChange: (word: string) => void;
-  onSubmit: () => void;
+  onSubmit?: () => void;
   children?: React.ReactNode;
 }) {
   return (
@@ -17,16 +17,10 @@ export default function InputBubble(props: {
           props.onWordChange(e.target.value)
         }
         onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-          if (e.key === "Enter") {
+          if (e.key === "Enter" && props.onSubmit) {
             props.onSubmit();
           }
         }}
-      />
-      <Image
-        src={glassIcon}
-        className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
-        alt="Search icon"
-        onClick={() => props.onSubmit()}
       />
       {props.children}
     </div>

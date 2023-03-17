@@ -13,7 +13,6 @@ export interface GraphTicket {
   link_distance?: number;
   example?: boolean;
 }
-export type Page = "graph" | "context" | "info";
 
 export const initTickets = [
   {

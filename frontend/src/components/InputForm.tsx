@@ -79,11 +79,14 @@ export const InputForm: React.FC<InputFormProps> = ({
   return (
     <DashboardLayout>
       {!submitted && (
-        <InputBubble
-          word={word}
-          onWordChange={setWord}
-          onSubmit={handleSubmit}
-        />
+        <InputBubble word={word} onWordChange={setWord} onSubmit={handleSubmit}>
+          <Image
+            src={glassIcon}
+            className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
+            alt="Search icon"
+            onClick={handleSubmit}
+          />
+        </InputBubble>
       )}
       {submitted && (
         <SearchProgress

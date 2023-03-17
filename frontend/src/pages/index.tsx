@@ -1,14 +1,17 @@
 import React, { useState, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { InputForm, TicketRow } from "../components/InputForm";
+import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
 import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 import { ResultsTable, fetchContext } from "../components/ResultsTable";
 import Info from "../components/Info";
 import { AnimatePresence, motion } from "framer-motion";
-import { graphStateReducer } from "../components/GraphStateReducer";
+import {
+  graphStateReducer,
+  GraphPageState,
+} from "../components/GraphStateReducer";
 import {
   GraphPageDispatchContext,
   GraphPageStateContext,
@@ -26,10 +29,34 @@ import DashboardLayout from "../components/DashboardLayout";
 import { PaperSelector } from "../components/PaperSelector";
 import { SelectInput } from "../components/SelectInput";
 
-import { GraphTicket, Page, initTickets } from "./GraphTicket";
+import { GraphTicket, initTickets } from "./GraphTicket";
 import { LangContext, strings } from "./LangContext";
 import link from "../components/assets/link.svg";
 import refresh from "../components/assets/refresh.svg";
+
+type Page = "graph" | "context" | "info";
+
+export const getStaticProps: GetStaticProps<{
+  initRecords: GallicaResponse;
+  initSeries: GraphData[];
+}> = async () => {
+  const records = await fetchContext(0, {
+    terms: initTickets[0].terms,
+    limit: 10,
+    source: "periodical",
+  });
+  const initSeries = await Promise.all(
+    initTickets.map((ticket) => {
+      return getTicketData(ticket.id, ticket.backend_source, "year", 0);
+    })
+  );
+  return {
+    props: {
+      initRecords: records,
+      initSeries: initSeries,
+    },
+  };
+};
 
 export default function Home({
   initRecords,
@@ -217,7 +244,10 @@ export default function Home({
   );
 }
 
-function GraphAndTable({ initRecords, initSeries }) {
+function GraphAndTable({
+  initRecords,
+  initSeries,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
   const graphState = React.useContext(GraphPageStateContext);
@@ -284,10 +314,6 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
   const searchState = React.useContext(SearchPageStateContext);
   const searchStateDispatch = React.useContext(SearchPageDispatchContext);
 
-  const [inputWord, setInputWord] = React.useState("");
-  const [localLink, setLocalLink] = React.useState("");
-  const [localDistance, setLocalDistance] = React.useState(10);
-
   if (!searchState || !searchStateDispatch) {
     throw new Error("Search state not initialized");
   }
@@ -303,46 +329,67 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
     term,
   } = searchState;
 
+  function makeDisplayCQL() {
+    let termCQL = "";
+    let dateCQL = "";
+    let corpusCQL = "";
+    if (term) {
+      if (linkTerm) {
+        termCQL = `text adj "${term}" prox/unit=word/distance=${linkDistance} "${linkTerm}"`;
+      } else {
+        termCQL = `text adj "${term}"`;
+      }
+    }
+    if (yearRange[0] && yearRange[1]) {
+      dateCQL = `gallicapublication_date>="${yearRange[0]}-01-01" and gallicapublication_date<="${yearRange[1]}-12-31"`;
+    }
+    if (papers) {
+      const formattedCodes = papers.map((paper) => `${paper.code}_date`);
+      corpusCQL =
+        'arkPress adj "' + formattedCodes.join('" or arkPress adj "') + '"';
+      if (source === "periodical") {
+        corpusCQL += ' and dc.type all "fascicule"';
+      } else if (source === "book") {
+        corpusCQL += ' and dc.type all "monographie"';
+      }
+    }
+    const cql = [termCQL, dateCQL, corpusCQL]
+      .filter((cql) => cql !== "")
+      .join(" and ");
+    if (sort === "date") {
+      return `${cql} sortby dc.date/sort.ascending`;
+    }
+    return cql;
+  }
+
   return (
     <>
       <DashboardLayout>
         <div
           className={
-            "w-full flex flex-col justify-center items-center bg-blue-100 rounded-lg pt-5 pb-5"
+            "w-full flex flex-col justify-center gap-5 items-center bg-blue-100 rounded-lg pt-5 pb-5"
           }
         >
           <InputBubble
-            word={inputWord}
-            onWordChange={setInputWord}
-            onSubmit={() => {
+            word={term}
+            onWordChange={(word) =>
               searchStateDispatch({
                 type: "set_terms",
-                payload: inputWord,
-              });
-              searchStateDispatch({
-                type: "set_link_term",
-                payload: localLink,
-              });
-              searchStateDispatch({
-                type: "set_link_distance",
-                payload: localDistance,
-              });
-            }}
-          ></InputBubble>
-          <div className={"p-2"}></div>
+                payload: word,
+              })
+            }
+          />
           <SubInputLayout>
             <ProximitySearchInput
-              linkTerm={localLink}
-              linkDistance={localDistance}
-              onSetLinkTerm={setLocalLink}
-              onSetLinkDistance={setLocalDistance}
-              onRefreshLinkDistance={(new_distance) =>
+              linkTerm={linkTerm}
+              linkDistance={linkDistance}
+              onSetLinkDistance={(new_distance) =>
                 searchStateDispatch({
                   type: "set_link_distance",
                   payload: new_distance,
                 })
               }
-              onRefreshLinkTerm={(new_term) =>
+              onSetLinkTerm={(new_term) =>
                 searchStateDispatch({
                   type: "set_link_term",
                   payload: new_term,
@@ -350,81 +397,97 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
               }
             />
           </SubInputLayout>
-        </div>
-        <SubInputLayout>
-          <YearRangeInput
-            min={1500}
-            max={2023}
-            value={yearRange}
-            onChange={(value) =>
-              searchStateDispatch({ type: "set_year_range", payload: value })
-            }
-          />
-          <SelectInput
-            label={"corpus"}
-            options={["book", "periodical", "all"]}
-            value={source}
-            onChange={(new_source) => {
-              searchStateDispatch({ type: "set_source", payload: new_source });
-            }}
-          />
-          {source === "periodical" && (
-            <PaperSelector
-              papers={papers}
-              from={yearRange[0]}
-              to={yearRange[1]}
-              onPaperAdd={(new_paper) =>
-                searchStateDispatch({
-                  type: "add_paper",
-                  payload: new_paper,
-                })
+          <SubInputLayout>
+            <YearRangeInput
+              min={1500}
+              max={2023}
+              value={yearRange}
+              onChange={(value) =>
+                searchStateDispatch({ type: "set_year_range", payload: value })
               }
-              onPaperClick={(paperCode) => {
-                searchStateDispatch({
-                  type: "remove_paper",
-                  payload: paperCode.code,
-                });
+            />
+          </SubInputLayout>
+          <SubInputLayout>
+            <SelectInput
+              label={"corpus"}
+              options={["book", "periodical", "all"]}
+              value={source}
+              onChange={(new_source) => {
+                if (
+                  new_source === "book" ||
+                  new_source === "periodical" ||
+                  new_source === "all"
+                ) {
+                  searchStateDispatch({
+                    type: "set_source",
+                    payload: new_source,
+                  });
+                }
               }}
             />
-          )}
-          <SelectInput
-            label={"sort"}
-            value={sort}
-            options={["date", "relevance"]}
-            onChange={(new_sort) =>
-              searchStateDispatch({ type: "set_sort", payload: new_sort })
-            }
-          />
-          <SelectInput
-            label={"limit"}
-            value={limit}
-            options={[10, 20, 50, 100]}
-            onChange={(new_limit) =>
-              searchStateDispatch({ type: "set_limit", payload: new_limit })
-            }
-          />
-        </SubInputLayout>
+            {source === "periodical" && (
+              <PaperSelector
+                papers={papers}
+                from={yearRange[0]}
+                to={yearRange[1]}
+                onPaperAdd={(new_paper) =>
+                  searchStateDispatch({
+                    type: "add_paper",
+                    payload: new_paper,
+                  })
+                }
+                onPaperClick={(paperCode) => {
+                  searchStateDispatch({
+                    type: "remove_paper",
+                    payload: paperCode.code,
+                  });
+                }}
+              />
+            )}
+          </SubInputLayout>
+          <SubInputLayout>
+            <SelectInput
+              label={"sort"}
+              value={sort}
+              options={["date", "relevance"]}
+              onChange={(new_sort) => {
+                if (new_sort === "date" || new_sort === "relevance") {
+                  searchStateDispatch({ type: "set_sort", payload: new_sort });
+                }
+              }}
+            />
+            <SelectInput
+              label={"limit"}
+              value={limit}
+              options={[10, 20, 50, 100]}
+              onChange={(new_limit) => {
+                if (typeof new_limit === "number") {
+                  searchStateDispatch({
+                    type: "set_limit",
+                    payload: new_limit,
+                  });
+                }
+              }}
+            />
+          </SubInputLayout>
+          <SubInputLayout>
+            <div className="flex justify-between w-full">
+              <span>{makeDisplayCQL()}</span>
+              <button
+                className="bg-blue-500 border w-52 rounded-full p-5 shadow-md"
+                onClick={() => console.log(searchState)}
+              >
+                RUN
+              </button>
+            </div>
+          </SubInputLayout>
+        </div>
       </DashboardLayout>
-      {!!term && (
-        <ResultsTable
-          terms={[term]}
-          yearRange={yearRange}
-          source={source}
-          papers={papers}
-          limit={limit || 10}
-          cursor={cursor}
-          sort={sort}
-          link_term={linkTerm}
-          link_distance={linkDistance}
-        />
-      )}
     </>
   );
 }
 
 function ProximitySearchInput(props: {
-  onRefreshLinkTerm: (linkTerm: string) => void;
-  onRefreshLinkDistance: (linkDistance: number) => void;
   onSetLinkTerm: (linkTerm: string) => void;
   onSetLinkDistance: (linkDistance: number) => void;
   linkTerm?: string;
@@ -433,7 +496,7 @@ function ProximitySearchInput(props: {
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
   return (
-    <div className="flex flex-wrap gap-5 bg-white rounded-full p-3 border shadow-sm">
+    <div className="flex flex-wrap gap-5">
       <Image src={link} alt={"proximity search icon"} width={30} height={30} />
       <input
         type="text"
@@ -449,16 +512,6 @@ function ProximitySearchInput(props: {
         className={"border p-2 rounded-lg shadow-sm"}
         placeholder={translation.linkDistance}
       />
-      <Image
-        src={refresh}
-        alt={"refresh icon"}
-        width={20}
-        height={20}
-        onClick={() => {
-          props.onRefreshLinkTerm(props.linkTerm || "");
-          props.onRefreshLinkDistance(props.linkDistance || 10);
-        }}
-      />
     </div>
   );
 }
@@ -466,11 +519,11 @@ function ProximitySearchInput(props: {
 interface YearRangeInputProps {
   min: number;
   max: number;
-  onChange: (value: [number, number]) => void;
+  value: [number | undefined, number | undefined];
+  onChange: (value: [number | undefined, number | undefined]) => void;
 }
 export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
   const { lang } = useContext(LangContext);
-  const [localRange, setLocalRange] = useState([props.min, props.max]);
   return (
     <div>
       <label
@@ -488,25 +541,28 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
         <input
           className="w-20 border rounded-lg"
           type="number"
-          value={localRange[0]}
+          value={props.value[0]}
           onChange={(e) => {
-            const newValue = [parseInt(e.target.value), localRange[1]];
-            setLocalRange(newValue);
+            const newValue = [parseInt(e.target.value), props.value[1]] as [
+              number,
+              number
+            ];
+            props.onChange(newValue);
           }}
         />
         {lang === "fr" ? "à" : "to"}
         <input
           className="w-20 rounded-lg border"
           type="number"
-          value={localRange[1]}
+          value={props.value[1]}
           onChange={(e) => {
-            const newValue = [localRange[0], parseInt(e.target.value)];
-            setLocalRange(newValue);
+            const newValue = [props.value[0], parseInt(e.target.value)] as [
+              number,
+              number
+            ];
+            props.onChange(newValue);
           }}
         />
-        <button onClick={() => props.onChange(localRange)}>
-          <Image src={refresh} alt={"reset"} width={20} height={20} />
-        </button>
       </div>
     </div>
   );
@@ -514,7 +570,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
 
 function SubInputLayout(props: { children: React.ReactNode }) {
   return (
-    <div className="w-full max-w-3xl flex gap-5 items-center">
+    <div className="flex flex-wrap gap-5 items-center rounded-lg bg-white p-3 shadow-sm border">
       {props.children}
     </div>
   );
