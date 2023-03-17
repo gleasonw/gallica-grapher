@@ -71,7 +71,7 @@ export default function Context() {
     return (
       <ResultsTable
         terms={splitTerms}
-        yearRange={[year || null, null]}
+        yearRange={[year || undefined, undefined]}
         month={month}
         day={day}
         source={source}
