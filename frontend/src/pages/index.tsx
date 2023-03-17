@@ -358,6 +358,8 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
             linkDistance={linkDistance}
           />
         </InputBubble>
+      </div>
+      <SubInputLayout>
         <YearRangeInput
           min={1500}
           max={2023}
@@ -366,8 +368,6 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
             searchStateDispatch({ type: "set_year_range", payload: value })
           }
         />
-      </div>
-      <SubInputLayout>
         <SelectInput
           options={["book", "periodical", "all"]}
           onChange={(new_source) => {
@@ -449,7 +449,7 @@ function ProximitySearchInput(props: {
   const translation = strings[lang];
   const [isOpen, setIsOpen] = React.useState(false);
   return isOpen ? (
-    <div className="flex flex-wrap gap-5 absolute top-full mt-5">
+    <div className="flex flex-wrap gap-5 mt-5">
       <input
         type="text"
         value={props.linkTerm}
@@ -506,7 +506,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
   return (
     <div
       className={
-        "flex flex-row text-md max-w-md flex-wrap gap-10 p-5 border rounded-lg shadow-sm"
+        "flex flex-row text-md max-w-md flex-wrap gap-10 p-3 border rounded-lg shadow-sm"
       }
     >
       {lang === "fr" ? "De" : "From"}
