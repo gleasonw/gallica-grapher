@@ -1,5 +1,5 @@
 import { Paper } from "../models/dbStructs";
-import { GraphTicket } from "../pages/GraphTicket";
+import { GraphTicket } from "./GraphTicket";
 
 export interface GraphPageState {
   tickets: GraphTicket[];

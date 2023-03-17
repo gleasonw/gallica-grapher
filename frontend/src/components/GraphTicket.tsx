@@ -13,24 +13,3 @@ export interface GraphTicket {
   link_distance?: number;
   example?: boolean;
 }
-
-export const initTickets = [
-  {
-    id: 0,
-    terms: ["brazza"],
-    grouping: "month",
-    example: true,
-  },
-  {
-    id: 1,
-    terms: ["congo"],
-    grouping: "month",
-    example: true,
-  },
-  {
-    id: -1,
-    terms: ["coloniale"],
-    grouping: "month",
-    example: true,
-  },
-] as GraphTicket[];

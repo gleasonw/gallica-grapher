@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GraphTicket } from "../pages/GraphTicket";
+import { GraphTicket } from "./GraphTicket";
 import Image from "next/image";
 import glassIcon from "./assets/glass.svg";
 import { SearchProgress } from "./SearchProgress";
@@ -7,7 +7,7 @@ import { seriesColors } from "./utils/makeHighcharts";
 import { useMutation } from "@tanstack/react-query";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
-import { LangContext } from "../pages/LangContext";
+import { LangContext } from "./LangContext";
 import InputBubble from "./InputBubble";
 import DashboardLayout from "./DashboardLayout";
 

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { LangContext } from "../pages/LangContext";
+import { LangContext } from "./LangContext";
 import { getStaticProps } from "../pages/index";
-import { GraphTicket } from "../pages/GraphTicket";
+import { GraphTicket } from "./GraphTicket";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { LangContext } from "../pages/LangContext";
-import { GraphTicket } from "../pages/GraphTicket";
+import { LangContext } from "./LangContext";
+import { GraphTicket } from "./GraphTicket";
 import { ResultsTable, TableProps, fetchContext } from "./ResultsTable";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";

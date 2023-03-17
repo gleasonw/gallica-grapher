@@ -12,7 +12,7 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
-import { LangContext } from "../pages/LangContext";
+import { LangContext } from "./LangContext";
 
 export interface TableProps {
   terms?: string[];

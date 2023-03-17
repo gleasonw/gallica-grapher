@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { LangContext } from "../pages/LangContext";
+import { LangContext } from "./LangContext";
 import { apiURL } from "./apiURL";
 import { useQuery } from "@tanstack/react-query";
 import { Paper } from "../models/dbStructs";

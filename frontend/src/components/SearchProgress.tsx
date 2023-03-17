@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { GraphTicket } from "../pages/GraphTicket";
+import { GraphTicket } from "./GraphTicket";
 import { ProgressType } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useQuery } from "@tanstack/react-query";

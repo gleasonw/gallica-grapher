@@ -33,13 +33,33 @@ import DashboardLayout from "../components/DashboardLayout";
 import { PaperSelector } from "../components/PaperSelector";
 import { SelectInput } from "../components/SelectInput";
 
-import { GraphTicket, initTickets } from "./GraphTicket";
-import { LangContext } from "./LangContext";
+import { LangContext } from "../components/LangContext";
 import link from "../components/assets/link.svg";
 import { SubInputLayout } from "../components/SubInputLayout";
+import { GraphTicket } from "../components/GraphTicket";
 
 type Page = "graph" | "context" | "info";
 
+const initTickets = [
+  {
+    id: 0,
+    terms: ["brazza"],
+    grouping: "month",
+    example: true,
+  },
+  {
+    id: 1,
+    terms: ["congo"],
+    grouping: "month",
+    example: true,
+  },
+  {
+    id: -1,
+    terms: ["coloniale"],
+    grouping: "month",
+    example: true,
+  },
+] as GraphTicket[];
 const strings = {
   fr: {
     title: "The Gallica Grapher",
