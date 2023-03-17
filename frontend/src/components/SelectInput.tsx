@@ -1,11 +1,11 @@
-import React from "react";
-
-interface SelectInputProps {
-  options: string[];
+interface SelectInputProps<T extends string | number> {
+  options: readonly T[];
   onChange: (value: string) => void;
   value?: string;
 }
-export const SelectInput: React.FC<SelectInputProps> = (props) => {
+export function SelectInput<T extends string | number>(
+  props: SelectInputProps<T>
+) {
   return (
     <select
       className={"border rounded-lg bg-white p-3 hover:cursor-pointer"}
@@ -19,4 +19,4 @@ export const SelectInput: React.FC<SelectInputProps> = (props) => {
       ))}
     </select>
   );
-};
+}

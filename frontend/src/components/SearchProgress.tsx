@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { Ticket } from "../pages/index";
+import { GraphTicket } from "../pages/GraphTicket";
 import { ProgressType } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useQuery } from "@tanstack/react-query";
 
 export const SearchProgress: React.FC<{
-  ticket: Ticket;
+  ticket: GraphTicket;
   onFetchComplete: (backend_source: "gallica" | "pyllica") => void;
   onNoRecordsFound: () => void;
 }> = (props) => {

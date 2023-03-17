@@ -7,15 +7,17 @@ import { useQuery } from "@tanstack/react-query";
 
 export const PaperSelector: React.FC<{
   papers: Paper[];
-  from: number;
-  to: number;
+  from?: number;
+  to?: number;
   onPaperAdd: (paper: Paper) => void;
   onPaperClick: (paper: Paper) => void;
   smallText?: boolean;
 }> = ({ papers, from, to, onPaperAdd, onPaperClick }) => {
-  async function fetchNumPapers(from: number, to: number) {
+  async function fetchNumPapers(from?: number, to?: number) {
+    const lowYear = from ? from : 0;
+    const highYear = to ? to : 9999;
     const response = await fetch(
-      `${apiURL}/api/numPapersOverRange/${from}/${to}`
+      `${apiURL}/api/numPapersOverRange/${lowYear}/${highYear}`
     );
     const data = await response.json();
     return data as number;

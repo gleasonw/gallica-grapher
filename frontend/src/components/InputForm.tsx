@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Ticket } from "../pages/index";
+import { GraphTicket } from "../pages/GraphTicket";
 import Image from "next/image";
 import glassIcon from "./assets/glass.svg";
 import { SearchProgress } from "./SearchProgress";
@@ -7,14 +7,15 @@ import { seriesColors } from "./utils/makeHighcharts";
 import { useMutation } from "@tanstack/react-query";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
-import { LangContext } from "../pages/index";
+import { LangContext } from "../pages/LangContext";
+import InputBubble from "./InputBubble";
+import DashboardLayout from "./DashboardLayout";
 
 export interface InputFormProps {
-  onCreateTicket: (ticket: Ticket) => void;
-  onDeleteTicket: (ticket?: Ticket) => void;
+  onCreateTicket: (ticket: GraphTicket) => void;
+  onDeleteTicket: (ticketID: number) => void;
   onDeleteExampleTickets: () => void;
-  tickets?: Ticket[];
-  onSliderChange: (value: [number, number]) => void;
+  tickets?: GraphTicket[];
   yearRange: [number, number];
 }
 
@@ -41,7 +42,9 @@ export const InputForm: React.FC<InputFormProps> = ({
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
-  async function postTicket(ticket: Ticket): Promise<{ requestid: number }> {
+  async function postTicket(
+    ticket: GraphTicket
+  ): Promise<{ requestid: number }> {
     const response = await fetch(`${apiURL}/api/init`, {
       method: "POST",
       headers: {
@@ -74,77 +77,60 @@ export const InputForm: React.FC<InputFormProps> = ({
   };
 
   return (
-    <div className="ml-10 mr-10 mb-10 flex flex-col gap-10">
-      <div className="justify-center items-center flex flex-col mt-10">
-        <div className="text-2xl relative w-full max-w-3xl">
-          <input
-            className={"p-5 w-full rounded-3xl border-2 hover:shadow-lg"}
-            placeholder={translation.search_for_word}
-            value={word || ""}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setWord(e.target.value)
-            }
-            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Enter") {
-                handleSubmit();
-              }
-            }}
-          />
-          <Image
-            src={glassIcon}
-            className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
-            alt="Search icon"
-            onClick={() => handleSubmit()}
-          />
-        </div>
-        {!submitted && <div className={"mt-10"}></div>}
-        {submitted && (
-          <SearchProgress
-            ticket={{
+    <DashboardLayout>
+      {!submitted && (
+        <InputBubble
+          word={word}
+          onWordChange={setWord}
+          onSubmit={handleSubmit}
+        />
+      )}
+      {submitted && (
+        <SearchProgress
+          ticket={{
+            id: ticketID,
+            terms: [word],
+            start_date: yearRange[0],
+            end_date: yearRange[1],
+            grouping: "month",
+          }}
+          onFetchComplete={(backendSource: "gallica" | "pyllica") => {
+            onCreateTicket({
               id: ticketID,
+              backend_source: backendSource,
               terms: [word],
               start_date: yearRange[0],
               end_date: yearRange[1],
               grouping: "month",
-            }}
-            onFetchComplete={(backendSource: "gallica" | "pyllica") => {
-              onCreateTicket({
-                id: ticketID,
-                backend_source: backendSource,
-                terms: [word],
-                start_date: yearRange[0],
-                end_date: yearRange[1],
-                grouping: "month",
-              });
-              setSubmitted(false);
-              setWord("");
-            }}
-            onNoRecordsFound={() => {
-              alert(translation.no_records_found);
-              setSubmitted(false);
-              setWord("");
-            }}
-          />
-        )}
-      </div>
+            });
+            setSubmitted(false);
+            setWord("");
+          }}
+          onNoRecordsFound={() => {
+            alert(translation.no_records_found);
+            setSubmitted(false);
+            setWord("");
+          }}
+        />
+      )}
       <TicketRow tickets={tickets} onGraphedTicketCardClick={onDeleteTicket} />
-    </div>
+    </DashboardLayout>
   );
 };
 
-const TicketRow: React.FC<{
-  tickets?: Ticket[];
+export const TicketRow: React.FC<{
+  tickets?: GraphTicket[];
   children?: React.ReactNode;
-  onGraphedTicketCardClick: (ticket?: Ticket) => void;
+  onGraphedTicketCardClick: (ticketID: number) => void;
 }> = ({ tickets, children, onGraphedTicketCardClick }) => {
   return (
-    <div className={"z-0 flex"}>
+    <div className={"z-0 flex self-start"}>
       <div className={"flex flex-wrap gap-10"}>
         {tickets?.map((ticket, index) => (
           <TicketCard
             key={ticket.id}
             ticket={ticket}
-            onClick={(ticket) => onGraphedTicketCardClick(ticket)}
+            onClick={onGraphedTicketCardClick}
             color={seriesColors[index % seriesColors.length]}
           />
         ))}
@@ -155,15 +141,15 @@ const TicketRow: React.FC<{
 };
 
 interface TicketProps {
-  ticket: Ticket;
-  onClick: (ticket?: Ticket) => void;
+  ticket: GraphTicket;
+  onClick: (ticketID: number) => void;
   color?: string;
 }
 
 const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
   return (
     <button
-      onClick={() => onClick(ticket)}
+      onClick={() => onClick(ticket.id)}
       className={`rounded-lg border-2 bg-white p-5 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
       style={{ borderColor: color }}
     >
