@@ -7,7 +7,6 @@ import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 import {
   ResultsTable,
-  TableProps,
   fetchContext,
 } from "../components/ResultsTable";
 import Info from "../components/Info";

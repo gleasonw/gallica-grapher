@@ -113,7 +113,7 @@ export function ResultsTable(props: TableProps) {
             date: record.date,
             page: (
               <a
-                className="underline font-medium"
+                className="underline font-medium text-blue-500 p-5"
                 href={contextRow.page_url}
                 target="_blank"
                 rel="noreferrer"
@@ -158,7 +158,7 @@ export function ResultsTable(props: TableProps) {
         ),
       } as const,
       {
-        Header: "Page",
+        Header: "Page Gallica",
         accessor: "page",
         aggregate: "unique",
         Aggregated: showFirstWhenAggregated,
