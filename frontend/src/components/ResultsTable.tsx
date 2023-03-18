@@ -113,12 +113,12 @@ export function ResultsTable(props: TableProps) {
             date: record.date,
             page: (
               <a
-                className="underline font-medium text-blue-500 p-5"
+                className="underline font-medium text-blue-500"
                 href={contextRow.page_url}
                 target="_blank"
                 rel="noreferrer"
               >
-                {contextRow.page}
+                p. {contextRow.page}
               </a>
             ),
             left_context: contextRow.left_context,
