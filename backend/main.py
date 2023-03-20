@@ -144,6 +144,23 @@ def graph_data(
         )
 
 
+# @app.get("/api/mostFrequentTerms")
+# def most_frequent_terms(
+#     root_gram: str,
+#     start_date: str,
+#     end_date: str,
+#     sample_size: int,
+#     top_n: int = 10,
+# ):
+#     counts = get_gallica_core(
+#         root_gram=root_gram,
+#         start_date=start_date,
+#         end_date=end_date,
+#         sample_size=sample_size,
+#     )
+#     return Counter(counts).most_common(top_n)
+
+
 @app.get("/api/gallicaRecords")
 async def fetch_records_from_gallica(
     year: Optional[int] = 0,

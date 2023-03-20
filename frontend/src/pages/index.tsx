@@ -421,14 +421,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
               })
             }
             onSubmit={handleSubmit}
-          >
-            <button
-              className="bg-blue-700 text-sm absolute right-5 top-4 pl-5 pr-5 hover:bg-blue-500 text-white rounded-full p-3 shadow-md"
-              onClick={handleSubmit}
-            >
-              Explore
-            </button>
-          </InputBubble>
+          ></InputBubble>
           <div className={"flex flex-wrap gap-10 justify-center"}>
             <SubInputLayout>
               <ProximitySearchInput
@@ -531,6 +524,12 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
             </SubInputLayout>
           </div>
         </div>
+        <button
+          className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white rounded-full p-3 shadow-md"
+          onClick={handleSubmit}
+        >
+          Explore
+        </button>
       </DashboardLayout>
       {tableProps && <ResultsTable {...tableProps} />}
     </>

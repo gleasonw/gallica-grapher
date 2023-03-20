@@ -51,8 +51,9 @@ def get_gram_data(
     fin=1950,
     resolution: Literal["default", "annee", "mois"] = "default",
 ):
+    format_gram = gram.replace(" ", "%20")
     df = pd.read_csv(
-        f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{gram}_from={debut}_to={fin}"
+        f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{format_gram}_from={debut}_to={fin}"
     )
     if resolution == "mois" and corpus != "livres":
         df = (
