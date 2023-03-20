@@ -111,7 +111,7 @@ export function searchStateReducer(
         ...state,
         cursor: action.payload,
       };
-    case "set_year_range":
+    case "set_context_range":
       return {
         ...state,
         yearRange: action.payload,

@@ -71,6 +71,7 @@ export const InputForm: React.FC<InputFormProps> = ({
       body: JSON.stringify(ticket),
     });
     const data = await response.json();
+    console.log(data);
     return data as { requestid: number };
   }
 
