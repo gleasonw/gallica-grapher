@@ -123,7 +123,7 @@ export default function Home({
       yearRange: [undefined, undefined],
       sort: "relevance",
       linkTerm: undefined,
-      linkDistance: 0,
+      linkDistance: undefined,
     } as SearchPageState
   );
 
