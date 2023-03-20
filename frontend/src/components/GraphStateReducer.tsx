@@ -81,7 +81,10 @@ export function graphStateReducer(
       return {
         ...state,
         tickets: state.tickets
-          ? [...state.tickets, action.payload]
+          ? [
+              ...state.tickets.filter((ticket) => !ticket.example),
+              action.payload,
+            ]
           : [action.payload],
       };
     case "remove_ticket":

@@ -11,12 +11,10 @@ from gallicaContextSearch import (
 )
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
-from www.database.displayDataResolvers import select_display_records
 from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from tasks import add
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
