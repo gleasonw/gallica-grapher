@@ -246,8 +246,12 @@ export function ResultsTable(props: TableProps) {
         {spinner}
         {pagination}
       </div>
-      <DesktopTable tableInstance={tableInstance} />
-      <MobileTable tableInstance={tableInstance} />
+      {tableInstance.data.length > 0 && (
+        <>
+          <DesktopTable tableInstance={tableInstance} />
+          <MobileTable tableInstance={tableInstance} />
+        </>
+      )}
       {pagination}
     </div>
   );

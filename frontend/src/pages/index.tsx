@@ -5,10 +5,7 @@ import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
 import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
-import {
-  ResultsTable,
-  fetchContext,
-} from "../components/ResultsTable";
+import { ResultsTable, fetchContext } from "../components/ResultsTable";
 import Info from "../components/Info";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -107,7 +104,8 @@ export default function Home({
 
   const [graphState, graphStateDispatch] = React.useReducer(graphStateReducer, {
     tickets: initTickets,
-    yearRange: [1750, 2020],
+    contextYearRange: [1750, 2020],
+    searchYearRange: [1750, 2020],
     month: undefined,
     grouping: "year",
     smoothing: 0,
@@ -293,7 +291,7 @@ function GraphAndTable({
   if (!graphState) {
     throw new Error("Graph state not initialized");
   }
-  const { tickets, yearRange } = graphState;
+  const { tickets, contextYearRange: yearRange } = graphState;
   const graphStateDispatch = React.useContext(GraphPageDispatchContext);
   if (!graphStateDispatch) {
     throw new Error("Graph dispatch not initialized");
@@ -314,7 +312,6 @@ function GraphAndTable({
           })
         }
         tickets={tickets}
-        yearRange={yearRange}
         onDeleteTicket={(ticketID) =>
           graphStateDispatch({
             type: "remove_ticket",
@@ -456,9 +453,10 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
                 min={1500}
                 max={2023}
                 value={yearRange}
+                showLabel={true}
                 onChange={(value) =>
                   searchStateDispatch({
-                    type: "set_year_range",
+                    type: "set_context_range",
                     payload: value,
                   })
                 }
@@ -541,7 +539,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
 
 function ProximitySearchInput(props: {
   onSetLinkTerm: (linkTerm: string) => void;
-  onSetLinkDistance: (linkDistance: number) => void;
+  onSetLinkDistance: (linkDistance?: number) => void;
   linkTerm?: string;
   linkDistance?: number;
 }) {
@@ -549,7 +547,6 @@ function ProximitySearchInput(props: {
   const translation = strings[lang];
   return (
     <div className="flex flex-wrap gap-5">
-      <Image src={link} alt={"proximity search icon"} width={30} height={30} />
       <input
         type="text"
         value={props.linkTerm}
@@ -557,10 +554,19 @@ function ProximitySearchInput(props: {
         className={"border p-2 rounded-lg shadow-sm"}
         placeholder={translation.linkTerm}
       />
+      <Image src={link} alt={"proximity search icon"} width={30} height={30} />
       <input
         type="number"
         value={props.linkDistance}
-        onChange={(e) => props.onSetLinkDistance(Number(e.target.value))}
+        onChange={(e) => {
+          const numVal = parseInt(e.target.value);
+          console.log(numVal);
+          if (typeof numVal === "number" && !isNaN(numVal) && numVal >= 0) {
+            props.onSetLinkDistance(numVal);
+          } else if (e.target.value === "") {
+            props.onSetLinkDistance(undefined);
+          }
+        }}
         className={"border p-2 rounded-lg shadow-sm"}
         placeholder={translation.linkDistance}
       />
@@ -573,17 +579,20 @@ interface YearRangeInputProps {
   max: number;
   value: [number | undefined, number | undefined];
   onChange: (value: [number | undefined, number | undefined]) => void;
+  showLabel?: boolean;
 }
 export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
   const { lang } = useContext(LangContext);
   return (
     <div>
-      <label
-        htmlFor={"year-range"}
-        className="block text-gray-700 text-sm font-bold mb-2"
-      >
-        {lang === "fr" ? "Années" : "Years"}
-      </label>
+      {props.showLabel && (
+        <label
+          htmlFor={"year-range"}
+          className="block text-gray-700 text-sm font-bold mb-2"
+        >
+          {lang === "fr" ? "Années" : "Years"}
+        </label>
+      )}
       <div
         className={
           "flex flex-row text-md max-w-md items-center flex-wrap gap-10 p-3"

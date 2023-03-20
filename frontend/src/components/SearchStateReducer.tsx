@@ -39,7 +39,7 @@ export interface SetCursorAction {
 }
 
 export interface SetYearRangeAction {
-  type: "set_year_range";
+  type: "set_context_range";
   payload: SearchPageState["yearRange"];
 }
 

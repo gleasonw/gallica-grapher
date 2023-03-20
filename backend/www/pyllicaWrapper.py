@@ -1,22 +1,25 @@
+from www.models import Ticket
 from gallicaGetter.utils.date import Date
 from gallicaGetter.periodOccurrenceWrapper import PeriodRecord
-from typing import Callable
+from typing import Callable, List, Literal
 from urllib.error import HTTPError
 import pandas as pd
 import urllib
 
 
-def get(args, on_no_records_found: Callable):
+def get(args: Ticket, on_no_records_found: Callable):
     """Get records from Pyllica. Interpret 500 error as no records found."""
-    converted_args = {"recherche": args.terms, "somme": True, "corpus": "presse"}
-    if start := args.start_date:
-        converted_args["debut"] = Date(start).year
-    if end := args.end_date:
-        converted_args["fin"] = Date(end).year
-    if args.grouping == "year":
-        converted_args["resolution"] = "annee"
+
+    if len(args.terms) > 1:
+        raise ValueError("Only one term at a time for Pyllica, for now")
     try:
-        periods = pyllicagram(**converted_args)
+        periods = get_gram_data(
+            gram=args.terms[0],
+            corpus="presse",
+            resolution="mois",
+            debut=int(Date(args.start_date).year),
+            fin=int(Date(args.end_date).year),
+        )
     except HTTPError:
         on_no_records_found()
         return
@@ -41,60 +44,33 @@ def convert_data_frame_to_grouped_record(frame):
     )
 
 
-def pyllicagram(
-    recherche, corpus="presse", debut=1789, fin=1950, resolution="default", somme=False
+def get_gram_data(
+    gram: str,
+    corpus: Literal["lemonde", "livres", "presse"] = "presse",
+    debut=1789,
+    fin=1950,
+    resolution: Literal["default", "annee", "mois"] = "default",
 ):
-    # forked from https://github.com/regicid/pyllicagram
-    # credits Benjamin Azoulay and Benoît de Courson
-
-    if not isinstance(recherche, str) and not isinstance(recherche, list):
-        raise ValueError("La recherche doit être une chaîne de caractères ou une liste")
-    if not isinstance(recherche, list):
-        recherche = [recherche]
-    assert corpus in [
-        "lemonde",
-        "livres",
-        "presse",
-    ], 'Vous devez choisir le corpus parmi "lemonde","livres" et "presse"'
-    assert resolution in [
-        "default",
-        "annee",
-        "mois",
-    ], 'Vous devez choisir la résolution parmi "default", "annee" ou "mois"'
-    for gram in recherche:
-        gram = urllib.parse.quote_plus(gram.lower()).replace("-", " ").replace("+", " ")
-        gram = gram.replace(" ", "%20")
-        df = pd.read_csv(
-            f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{gram}_from={debut}_to={fin}"
-        )
-        if resolution == "mois" and corpus != "livres":
-            df = (
-                df.groupby(["annee", "mois", "gram"])
-                .agg({"n": "sum", "total": "sum"})
-                .reset_index()
-            )
-        if resolution == "annee":
-            df = (
-                df.groupby(["annee", "gram"])
-                .agg({"n": "sum", "total": "sum"})
-                .reset_index()
-            )
-        if "result" in locals():
-            result = pd.concat([result, df])
-        else:
-            result = df
-    if somme:
-        result = (
-            result.groupby(
-                [
-                    "annee",
-                    *(("mois",) if "mois" in result.columns else ()),
-                    *(("jour",) if "jour" in result.columns else ()),
-                ]
-            )
-            .agg({"n": "sum", "total": "mean"})
+    df = pd.read_csv(
+        f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{gram}_from={debut}_to={fin}"
+    )
+    if resolution == "mois" and corpus != "livres":
+        df = (
+            df.groupby(["annee", "mois", "gram"])
+            .agg({"n": "sum", "total": "sum"})
             .reset_index()
         )
-        result["gram"] = "+".join(recherche)
-    result["ratio"] = result.n.values / result.total.values
-    return result
+    if resolution == "annee":
+        df = (
+            df.groupby(["annee", "gram"])
+            .agg({"n": "sum", "total": "sum"})
+            .reset_index()
+        )
+
+    def calc_ratio(row):
+        if row.total == 0:
+            return 0
+        return row.n / row.total
+
+    df["ratio"] = df.apply(lambda row: calc_ratio(row), axis=1)
+    return df

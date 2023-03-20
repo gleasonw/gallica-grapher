@@ -16,7 +16,6 @@ import {
   GraphPageDispatchContext,
   GraphPageStateContext,
 } from "./GraphContext";
-import { SubInputLayout } from "./SubInputLayout";
 
 interface ResultViewerProps {
   initVals: InferGetStaticPropsType<typeof getStaticProps>;
@@ -80,15 +79,15 @@ export function ResultViewer(props: ResultViewerProps) {
   if (!graphState || !graphStateDispatch)
     throw new Error("Graph state not initialized");
   const selectedPoint = React.useRef<Highcharts.Point>();
-  const { selectedTicket, grouping, smoothing, tickets, month, yearRange } =
+  const { selectedTicket, grouping, smoothing, tickets, month, contextYearRange: yearRange } =
     graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
-  function setSelectedTicket(ticket: number) {
+  function setSelectedTicket(ticketID?: number) {
     graphStateDispatch!({
       type: "set_selected_ticket",
-      payload: ticket,
+      payload: ticketID,
     });
   }
 
@@ -115,36 +114,46 @@ export function ResultViewer(props: ResultViewerProps) {
 
   function setYearRange(yearRange: [number | undefined, number | undefined]) {
     graphStateDispatch!({
-      type: "set_year_range",
+      type: "set_context_range",
       payload: yearRange,
     });
   }
 
-  if (tickets.length > 0 && !tickets.some((t) => t.id === selectedTicket)) {
+  if (
+    tickets &&
+    tickets.length > 0 &&
+    !tickets.some((t) => t.id === selectedTicket)
+  ) {
     setSelectedTicket(tickets[0].id);
     setMonth(undefined);
     setYearRange([undefined, undefined]);
   }
 
   const ticketData = useQueries({
-    queries: tickets.map((ticket) => {
-      return {
-        queryKey: ["ticket", ticket.id, grouping, smoothing],
-        queryFn: () =>
-          getTicketData(ticket.id, ticket.backend_source, grouping, smoothing),
-        placeholderData: props.initVals.initSeries.filter(
-          (series) => series.request_id === ticket.id
-        )[0],
-        keepPreviousData: true,
-        refetchOnWindowFocus: false,
-      };
-    }),
+    queries:
+      tickets?.map((ticket) => {
+        return {
+          queryKey: ["ticket", ticket.id, grouping, smoothing],
+          queryFn: () =>
+            getTicketData(
+              ticket.id,
+              ticket.backend_source,
+              grouping,
+              smoothing
+            ),
+          placeholderData: props.initVals.initSeries.filter(
+            (series) => series.request_id === ticket.id
+          )[0],
+          keepPreviousData: true,
+          refetchOnWindowFocus: false,
+        };
+      }) ?? [],
   });
 
   function handleSeriesClick(point: Highcharts.Point) {
     if (!graphStateDispatch) return;
     setSelectedTicket(
-      tickets.filter((t) => t.terms[0] === point.series.name)[0].id
+      tickets?.filter((t) => t.terms[0] === point.series.name)[0].id
     );
     const date = new Date(point.category);
     if (grouping === "year") {
@@ -205,13 +214,15 @@ export function ResultViewer(props: ResultViewerProps) {
         <div className={"max-w-sm"}>
           <SelectInput
             label={"Term"}
-            options={tickets.map((ticket) => ticket.terms[0])}
+            options={tickets?.map((ticket) => ticket.terms[0]) ?? []}
             onChange={(value: string) =>
               setSelectedTicket(
-                tickets.filter((t) => t.terms[0] === value)[0].id
+                tickets?.filter((t) => t.terms[0] === value)[0].id
               )
             }
-            value={tickets.filter((t) => t.id === selectedTicket)[0].terms[0]}
+            value={
+              tickets?.filter((t) => t.id === selectedTicket)?.[0]?.terms[0]
+            }
           />
         </div>
       </div>

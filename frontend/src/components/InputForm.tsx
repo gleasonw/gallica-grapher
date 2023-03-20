@@ -10,13 +10,17 @@ import { useContext } from "react";
 import { LangContext } from "./LangContext";
 import InputBubble from "./InputBubble";
 import DashboardLayout from "./DashboardLayout";
+import { YearRangeInput } from "../pages";
+import {
+  GraphPageDispatchContext,
+  GraphPageStateContext,
+} from "./GraphContext";
 
 export interface InputFormProps {
   onCreateTicket: (ticket: GraphTicket) => void;
   onDeleteTicket: (ticketID: number) => void;
   onDeleteExampleTickets: () => void;
   tickets?: GraphTicket[];
-  yearRange: [number?, number?];
 }
 
 const strings = {
@@ -33,18 +37,32 @@ const strings = {
 export const InputForm: React.FC<InputFormProps> = ({
   onCreateTicket,
   onDeleteTicket,
-  yearRange,
+  onDeleteExampleTickets,
   tickets,
 }) => {
   const [word, setWord] = useState<string>("");
   const [submitted, setSubmitted] = useState(false);
   const [ticketID, setTicketID] = useState<number>(0);
+  const graphStateDispatch = React.useContext(GraphPageDispatchContext);
+  const graphState = React.useContext(GraphPageStateContext);
+  if (!graphStateDispatch || !graphState)
+    throw new Error("No graph state dispatch found");
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
+  const { searchYearRange } = graphState;
+
+  function setSearchRange(newRange: [number | undefined, number | undefined]) {
+    console.log(newRange);
+    graphStateDispatch!({
+      type: "set_search_range",
+      payload: newRange,
+    });
+  }
 
   async function postTicket(
     ticket: GraphTicket
   ): Promise<{ requestid: number }> {
+    console.log(ticket);
     const response = await fetch(`${apiURL}/api/init`, {
       method: "POST",
       headers: {
@@ -62,8 +80,8 @@ export const InputForm: React.FC<InputFormProps> = ({
     mutation.mutateAsync(
       {
         terms: [word],
-        start_date: yearRange[0],
-        end_date: yearRange[1],
+        start_date: searchYearRange[0],
+        end_date: searchYearRange[1],
         grouping: "month",
         id: ticketID,
       },
@@ -71,6 +89,7 @@ export const InputForm: React.FC<InputFormProps> = ({
         onSuccess: (data) => {
           setTicketID(data.requestid);
           setSubmitted(true);
+          onDeleteExampleTickets();
         },
       }
     );
@@ -79,22 +98,39 @@ export const InputForm: React.FC<InputFormProps> = ({
   return (
     <DashboardLayout>
       {!submitted && (
-        <InputBubble word={word} onWordChange={setWord} onSubmit={handleSubmit}>
-          <Image
-            src={glassIcon}
-            className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
-            alt="Search icon"
-            onClick={handleSubmit}
+        <div
+          className={
+            "p-5 w-full flex flex-col justify-center items-center rounded-full"
+          }
+        >
+          <InputBubble
+            word={word}
+            onWordChange={setWord}
+            onSubmit={handleSubmit}
+          >
+            <Image
+              src={glassIcon}
+              className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
+              alt="Search icon"
+              onClick={handleSubmit}
+            />
+          </InputBubble>
+          <YearRangeInput
+            max={2021}
+            min={1500}
+            value={searchYearRange}
+            showLabel={false}
+            onChange={setSearchRange}
           />
-        </InputBubble>
+        </div>
       )}
       {submitted && (
         <SearchProgress
           ticket={{
             id: ticketID,
             terms: [word],
-            start_date: yearRange[0],
-            end_date: yearRange[1],
+            start_date: searchYearRange[0],
+            end_date: searchYearRange[1],
             grouping: "month",
           }}
           onFetchComplete={(backendSource: "gallica" | "pyllica") => {
@@ -102,8 +138,8 @@ export const InputForm: React.FC<InputFormProps> = ({
               id: ticketID,
               backend_source: backendSource,
               terms: [word],
-              start_date: yearRange[0],
-              end_date: yearRange[1],
+              start_date: searchYearRange[0],
+              end_date: searchYearRange[1],
               grouping: "month",
             });
             setSubmitted(false);

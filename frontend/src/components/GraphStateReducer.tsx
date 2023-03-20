@@ -2,8 +2,9 @@ import { Paper } from "../models/dbStructs";
 import { GraphTicket } from "./GraphTicket";
 
 export interface GraphPageState {
-  tickets: GraphTicket[];
-  yearRange: [number | undefined, number | undefined];
+  tickets?: GraphTicket[];
+  contextYearRange: [number | undefined, number | undefined];
+  searchYearRange: [number | undefined, number | undefined];
   month?: number;
   grouping: "year" | "month";
   smoothing: number;
@@ -33,9 +34,14 @@ export interface RemoveExampleTicketsAction {
   type: "remove_example_tickets";
 }
 
-export interface SetYearRangeAction {
-  type: "set_year_range";
-  payload: GraphPageState["yearRange"];
+export interface SetContextYearRangeAction {
+  type: "set_context_range";
+  payload: GraphPageState["contextYearRange"];
+}
+
+export interface SetSearchYearRangeAction {
+  type: "set_search_range";
+  payload: GraphPageState["contextYearRange"];
 }
 
 export interface SetMonthAction {
@@ -62,28 +68,33 @@ export function graphStateReducer(
   action:
     | AddTicketAction
     | RemoveTicketAction
-    | SetYearRangeAction
+    | SetContextYearRangeAction
     | SetMonthAction
     | SetGroupingAction
     | SetSmoothingAction
     | SetSelectedTicketAction
     | RemoveExampleTicketsAction
+    | SetSearchYearRangeAction
 ): GraphPageState {
   switch (action.type) {
     case "add_ticket":
       return {
         ...state,
-        tickets: [...state.tickets, action.payload],
+        tickets: state.tickets
+          ? [...state.tickets, action.payload]
+          : [action.payload],
       };
     case "remove_ticket":
       return {
         ...state,
-        tickets: state.tickets.filter((ticket) => ticket.id !== action.payload),
+        tickets: state.tickets?.filter(
+          (ticket) => ticket.id !== action.payload
+        ),
       };
-    case "set_year_range":
+    case "set_context_range":
       return {
         ...state,
-        yearRange: action.payload,
+        contextYearRange: action.payload,
       };
     case "set_month":
       return {
@@ -108,7 +119,12 @@ export function graphStateReducer(
     case "remove_example_tickets":
       return {
         ...state,
-        tickets: state.tickets.filter((ticket) => !ticket.example),
+        tickets: state.tickets?.filter((ticket) => !ticket.example),
+      };
+    case "set_search_range":
+      return {
+        ...state,
+        searchYearRange: action.payload,
       };
   }
 }
