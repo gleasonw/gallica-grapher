@@ -23,7 +23,7 @@ class HTMLContext(BaseModel):
     ark: str
 
 
-class ContextWrapper(GallicaWrapper):
+class Context(GallicaWrapper):
     """Wrapper for Gallica's ContentSearch API."""
 
     def parse(self, gallica_responses):
@@ -37,9 +37,6 @@ class ContextWrapper(GallicaWrapper):
                 ],
                 ark=response.query.ark,
             )
-
-    def get_endpoint_url(self):
-        return "https://gallica.bnf.fr/services/ContentSearch"
 
     async def get(
         self,
@@ -55,10 +52,7 @@ class ContextWrapper(GallicaWrapper):
                     session=session,
                     on_receive_response=on_receive_response,
                 )
-        queries = [
-            ContentQuery(ark=pair[0], terms=pair[1], endpoint_url=self.endpoint_url)
-            for pair in context_pairs
-        ]
+        queries = [ContentQuery(ark=pair[0], terms=pair[1]) for pair in context_pairs]
         return await self.get_records_for_queries(
             queries=queries,
             session=session,

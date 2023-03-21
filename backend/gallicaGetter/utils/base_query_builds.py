@@ -7,7 +7,6 @@ NUM_CODES_PER_BUNDLE = 10
 
 def build_base_queries(
     terms: List[str],
-    endpoint_url: str,
     grouping: str,
     link: Optional[Tuple[str, int]] = None,
     source: Optional[Literal["book", "periodical", "all"]] = None,
@@ -36,7 +35,6 @@ def build_base_queries(
                         codes=code_bundle,
                         start_date=start,
                         end_date=end,
-                        endpoint_url=endpoint_url,
                         start_index=c,
                         limit=limit or 1,
                         link=link,

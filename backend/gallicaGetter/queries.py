@@ -9,10 +9,10 @@ class VolumeQuery(BaseModel):
     terms: List[str]
     start_date: Optional[str]
     end_date: Optional[str]
-    endpoint_url: str
     start_index: int
     limit: int
     link: Optional[Tuple[str, int]] = None
+    endpoint_url: Literal["https://gallica.bnf.fr/SRU"] = "https://gallica.bnf.fr/SRU"
     source: Optional[Literal["book", "periodical", "all"]] = "all"
     codes: Optional[List[str]] = None
     sort: Optional[Literal["date", "relevance"]] = None
@@ -97,7 +97,7 @@ class PaperQuery:
 
     start_index: int
     limit: int
-    endpoint_url: str
+    endpoint_url: Literal["https://gallica.bnf.fr/SRU"] = "https://gallica.bnf.fr/SRU"
     codes: Optional[List[str]] = None
     cql: Optional[str] = None
     gallica_results_for_params: int = 0
@@ -133,7 +133,9 @@ class IssuesQuery:
     """Struct for query to Gallica's Issues API."""
 
     code: str
-    endpoint_url: str
+    endpoint_url: Literal[
+        "https://gallica.bnf.fr/services/Issues"
+    ] = "https://gallica.bnf.fr/services/Issues"
 
     @property
     def params(self):
@@ -164,7 +166,9 @@ class ContentQuery:
 
     ark: str
     terms: List[str]
-    endpoint_url: str
+    endpoint_url: Literal[
+        "https://gallica.bnf.fr/services/ContentSearch"
+    ] = "https://gallica.bnf.fr/services/ContentSearch"
 
     @property
     def params(self):

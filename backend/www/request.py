@@ -3,11 +3,9 @@ import io
 from www.models import Ticket, Progress
 import json
 from www.database.connContext import build_db_conn, build_redis_conn
-from typing import Any, Callable, Generator, List, Literal, Optional, Tuple
+from typing import Literal
 from gallicaGetter.utils.parse_xml import get_one_paper_from_record_batch
-from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper, VolumeRecord
-from gallicaGetter.papersWrapper import PaperRecord
-from gallicaGetter.periodOccurrenceWrapper import PeriodRecord
+from gallicaGetter.periodOccurrence import PeriodRecord
 import www.pyllicaWrapper as pyllica_wrapper
 
 

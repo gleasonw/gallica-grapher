@@ -33,7 +33,7 @@ class VolumeRecord:
     terms: List[str]
 
 
-class VolumeOccurrenceWrapper(GallicaWrapper):
+class VolumeOccurrence(GallicaWrapper):
     """Fetches occurrence metadata from Gallica's SRU API. There may be many occurrences in one Gallica record."""
 
     def parse(
@@ -57,9 +57,6 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
 
     def post_init(self):
         self.on_get_total_records: Optional[Callable[[int], None]] = None
-
-    def get_endpoint_url(self):
-        return "https://gallica.bnf.fr/SRU"
 
     async def get(
         self,
@@ -97,7 +94,6 @@ class VolumeOccurrenceWrapper(GallicaWrapper):
                 link=link,
                 source=source,
                 sort=sort,
-                endpoint_url=self.endpoint_url,
                 grouping="all",
                 limit=limit,
                 cursor=start_index,

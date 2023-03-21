@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import aiohttp.client_exceptions
@@ -5,6 +6,8 @@ import uvicorn
 import random
 from typing import List, Literal, Optional
 from pydantic import BaseModel
+from gallicaGetter.pagination import Pagination
+from gallicaGetter.pageText import PageText
 from gallicaContextSearch import (
     get_row_context,
     get_html_context,
@@ -15,6 +18,7 @@ from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+import aiohttp
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -142,6 +146,41 @@ def graph_data(
             average_window=average_window,
             conn=conn,
         )
+
+
+class FullTextResponse(BaseModel):
+    text: str
+    ark: str
+
+
+@app.get("/api/fullText")
+async def full_text(ark: str):
+    """Retrieve the full text of a document on Gallica."""
+    # limit number of concurrent requests with a semaphore
+    sem = asyncio.Semaphore(10)
+    try:
+        async with aiohttp.ClientSession() as session:
+            pagination_getter = Pagination()
+            page_text_getter = PageText()
+            pagination = await pagination_getter.get(
+                ark=ark, session=session, semaphore=sem
+            )
+            num_pages = list(pagination)[-1].page_count
+            page_texts = []
+            pages_data = await page_text_getter.get(
+                ark=ark, pages=list(range(num_pages)), session=session, semaphore=sem
+            )
+            pages_data = list(pages_data)
+            if pages_data:
+                for page in pages_data:
+                    page_texts.append(page.text)
+            return FullTextResponse(
+                text=" ".join(page_texts),
+                ark=ark,
+            )
+
+    except aiohttp.client_exceptions.ClientConnectorError:
+        raise HTTPException(status_code=503, detail="Could not connect to Gallica.")
 
 
 # @app.get("/api/mostFrequentTerms")

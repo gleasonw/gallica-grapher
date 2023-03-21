@@ -1,10 +1,10 @@
 from www.models import Ticket
 from gallicaGetter.utils.date import Date
-from gallicaGetter.periodOccurrenceWrapper import PeriodRecord
+from gallicaGetter.periodOccurrence import PeriodRecord
 from typing import Callable, List, Literal
 from urllib.error import HTTPError
 import pandas as pd
-import urllib
+from urllib.parse import quote
 
 
 def get(args: Ticket, on_no_records_found: Callable):

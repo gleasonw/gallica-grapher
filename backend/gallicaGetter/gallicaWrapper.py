@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Generator, Dict
+from typing import Any, Callable, Generator, Dict, List
 import asyncio
 import aiohttp
 import time
@@ -25,7 +25,6 @@ class GallicaWrapper:
     """Base class for Gallica API wrappers."""
 
     def __init__(self):
-        self.endpoint_url = self.get_endpoint_url()
         self.post_init()
 
     def get(self, **kwargs):
@@ -33,14 +32,9 @@ class GallicaWrapper:
             f"get() not implemented for {self.__class__.__name__}"
         )
 
-    def get_endpoint_url(self):
-        raise NotImplementedError(
-            f"get_endpoint_url() not implemented for {self.__class__.__name__}"
-        )
-
     def parse(
         self,
-        gallica_responses,
+        gallica_responses: List[Response],
     ) -> Generator[Any, None, None]:
         raise NotImplementedError(
             f"get_parser() not implemented for {self.__class__.__name__}"
@@ -72,7 +66,7 @@ async def fetch_from_gallica(
     session: aiohttp.ClientSession,
     on_receive_response: Callable[[Response], None] | None = None,
     semaphore=None,
-):
+) -> List[Response]:
     if type(queries) is not list:
         queries = [queries]
 
@@ -90,13 +84,14 @@ async def fetch_from_gallica(
     return await asyncio.gather(*tasks)
 
 
+# TODO: fix these typings, response for each query type
 async def get(
     query: VolumeQuery | PaperQuery | IssuesQuery | ContentQuery | FullTextQuery,
     session: aiohttp.ClientSession,
     semaphore: asyncio.Semaphore | None = None,
     on_receive_response: Callable[[Response], None] | None = None,
     num_retries=0,
-):
+) -> Response:
     if semaphore:
         async with semaphore:
             return await get(

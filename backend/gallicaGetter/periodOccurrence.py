@@ -27,7 +27,7 @@ class PeriodRecord:
         return self._date.day
 
 
-class PeriodOccurrenceWrapper(GallicaWrapper):
+class PeriodOccurrence(GallicaWrapper):
     """Fetches # occurrences of terms in a given period of time. Useful for making graphs."""
 
     async def get(
@@ -60,7 +60,6 @@ class PeriodOccurrenceWrapper(GallicaWrapper):
             start_date=start_date,
             end_date=end_date,
             codes=codes,
-            endpoint_url=self.endpoint_url,
             grouping=grouping,
         )
         return await self.get_records_for_queries(

@@ -24,7 +24,7 @@ class ParsedGallicaHTML:
         return self.text
 
 
-class FullTextWrapper(GallicaWrapper):
+class FullText(GallicaWrapper):
     """Wraps Gallica's full text API. Can be an expensive fetch, and is rate-limited."""
 
     def get_endpoint_url(self):

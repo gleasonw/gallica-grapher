@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 import aiohttp
-from gallicaGetter.issuesWrapper import IssuesWrapper
+from gallicaGetter.issues import Issues
 from gallicaGetter.utils.parse_xml import (
     get_paper_code_from_record_xml,
     get_paper_title_from_record_xml,
@@ -35,11 +35,11 @@ class PaperRecord:
             return False
 
 
-class PapersWrapper(GallicaWrapper):
+class Papers(GallicaWrapper):
     """There is no official Gallica endpoint for fetching paper metadata. This class fetches from two Gallica endpoints, SRU (titles, codes) and Issues (publishing years), to get all metadata."""
 
     def post_init(self):
-        self.issues_API = IssuesWrapper()
+        self.issues_API = Issues()
 
     def get_endpoint_url(self):
         return "https://gallica.bnf.fr/SRU"
@@ -56,7 +56,7 @@ class PapersWrapper(GallicaWrapper):
         if not arg_codes and get_all_results:
             # Fetch all results, indexing by the number of papers on Gallica. Lengthy fetch.
             queries = build_indexed_queries(
-                [PaperQuery(start_index=0, limit=1, endpoint_url=self.endpoint_url)],
+                [PaperQuery(start_index=0, limit=1)],
                 session=session,
             )
         elif not arg_codes and not get_all_results:
@@ -92,7 +92,6 @@ class PapersWrapper(GallicaWrapper):
                 start_index=0,
                 limit=NUM_CODES_PER_BUNDLE,
                 codes=code_bundle,
-                endpoint_url=self.endpoint_url,
             )
             sru_queries.append(sru_query)
         return sru_queries

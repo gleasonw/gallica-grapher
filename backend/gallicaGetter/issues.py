@@ -13,7 +13,7 @@ class IssueYearRecord:
     years: List[str]
 
 
-class IssuesWrapper(GallicaWrapper):
+class Issues(GallicaWrapper):
     """Fetches periodical periodical publishing years from Gallica's Issues API. Used in PapersWrapper."""
 
     def parse(self, gallica_responses):
@@ -21,9 +21,6 @@ class IssuesWrapper(GallicaWrapper):
             years = get_years_published(response.xml)
             code = response.query.code
             yield IssueYearRecord(code=code, years=years)
-
-    def get_endpoint_url(self):
-        return "https://gallica.bnf.fr/services/Issues"
 
     async def get(
         self, codes, session: aiohttp.ClientSession | None = None
@@ -33,7 +30,5 @@ class IssuesWrapper(GallicaWrapper):
                 return await self.get(codes, session)
         if type(codes) == str:
             codes = [codes]
-        queries = [
-            IssuesQuery(code=code, endpoint_url=self.endpoint_url) for code in codes
-        ]
+        queries = [IssuesQuery(code=code) for code in codes]
         return await self.get_records_for_queries(queries, session=session)

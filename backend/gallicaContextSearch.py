@@ -1,8 +1,7 @@
 import aiohttp.client_exceptions
-from aiohttp.client_reqrep import ConnectionKey
 from gallicaGetter.gallicaWrapper import Response
-from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper, VolumeRecord
-from gallicaGetter.contentWrapper import ContextWrapper, HTMLContext
+from gallicaGetter.volumeOccurrence import VolumeOccurrence, VolumeRecord
+from gallicaGetter.context import Context, HTMLContext
 from typing import Callable, List, Literal, Optional
 from pydantic import BaseModel
 from functools import partial
@@ -186,7 +185,7 @@ async def get_context(
 
     # get the volumes in which the term appears
     async with aiohttp.ClientSession() as session:
-        volume_Gallica_wrapper = VolumeOccurrenceWrapper()
+        volume_Gallica_wrapper = VolumeOccurrence()
         gallica_records = await volume_Gallica_wrapper.get(
             terms=terms,
             start_date=make_date_from_year_mon_day(year, month, day),
@@ -204,7 +203,7 @@ async def get_context(
         )
 
         # get the context for those volumes
-        content_wrapper = ContextWrapper()
+        content_wrapper = Context()
         keyed_records = {
             record.url.split("/")[-1]: record for record in gallica_records
         }

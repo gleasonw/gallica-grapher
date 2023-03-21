@@ -1,13 +1,34 @@
 import pytest
-from gallicaGetter.contentWrapper import ContextWrapper
-from gallicaGetter.issuesWrapper import IssuesWrapper
-from gallicaGetter.papersWrapper import PapersWrapper
+from gallicaGetter.pagination import Pagination
+from gallicaGetter.context import Context
+from gallicaGetter.issues import Issues
+from gallicaGetter.papers import Papers
 
-from gallicaGetter.volumeOccurrenceWrapper import VolumeOccurrenceWrapper
-from gallicaGetter.periodOccurrenceWrapper import PeriodOccurrenceWrapper
+from gallicaGetter.volumeOccurrence import VolumeOccurrence
+from gallicaGetter.periodOccurrence import PeriodOccurrence
+from gallicaGetter.pageText import PageText
 
 
-# could speed up by running the fetches in parallel. But hey, sometimes it's good to relax
+@pytest.mark.asyncio
+async def test_pagination():
+    getter = Pagination()
+    records = await getter.get("bpt6k607811b")
+    list_records = list(records)
+    first = list_records[0]
+    assert first.ark == "bpt6k607811b"
+    assert first.page_count == 4
+    assert first.has_content == True
+    assert first.has_toc == False
+
+
+@pytest.mark.asyncio
+async def test_get_page():
+    getter = PageText()
+    records = await getter.get("bpt6k607811b", 1)
+    list_records = list(records)
+    assert len(list_records) == 1
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("input", "expected_length"),
@@ -24,7 +45,7 @@ from gallicaGetter.periodOccurrenceWrapper import PeriodOccurrenceWrapper
     ],
 )
 async def test_get_volume_occurrences(input, expected_length):
-    getter = VolumeOccurrenceWrapper()
+    getter = VolumeOccurrence()
     records = await getter.get(**input, get_all_results=True)
     list_records = list(records)
     assert len(list_records) == expected_length
@@ -55,7 +76,7 @@ async def test_get_volume_occurrences(input, expected_length):
     ],
 )
 async def test_get_period_occurrences(input, expected_length):
-    getter = PeriodOccurrenceWrapper()
+    getter = PeriodOccurrence()
     records = await getter.get(**input)
     list_records = list(records)
     assert len(list_records) == expected_length
@@ -63,7 +84,7 @@ async def test_get_period_occurrences(input, expected_length):
 
 @pytest.mark.asyncio
 async def test_get_issues():
-    getter = IssuesWrapper()
+    getter = Issues()
     records = await getter.get("cb344484501")
     list_records = list(records)
     assert len(list_records) == 1
@@ -73,7 +94,7 @@ async def test_get_issues():
 
 @pytest.mark.asyncio
 async def test_get_content():
-    getter = ContextWrapper()
+    getter = Context()
     records = await getter.get([("bpt6k267221f", ["erratum"])])
     list_records = list(records)
     context = list_records[0]
@@ -82,7 +103,7 @@ async def test_get_content():
 
 @pytest.mark.asyncio
 async def test_get_papers_wrapper():
-    getter = PapersWrapper()
+    getter = Papers()
     papers = await getter.get(["cb32895690j"])
     paper = papers[0]
     assert paper.code == "cb32895690j"

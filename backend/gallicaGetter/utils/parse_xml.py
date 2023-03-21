@@ -113,3 +113,28 @@ def get_page_and_context_for_occurrence(xml_items) -> List[Tuple[str, str]]:
         content = content.text if content is not None else None
         items.append((page, content))
     return items
+
+
+def parse_ocr_xml_into_plain_text(xml: bytes) -> str:
+    try:
+        elements = etree.fromstring(xml, parser=etree.XMLParser(encoding="utf-8"))
+    except etree.XMLSyntaxError:
+        return ""
+    text = elements.find("{http://www.loc.gov/standards/alto/ns-v3#}Layout")
+    page = text[0]
+    print_space = page.find("{http://www.loc.gov/standards/alto/ns-v3#}PrintSpace")
+    text_blocks = print_space.findall(
+        "{http://www.loc.gov/standards/alto/ns-v3#}TextBlock"
+    )
+    text: List[str] = []
+    for text_block in text_blocks:
+        text_lines = text_block.findall(
+            "{http://www.loc.gov/standards/alto/ns-v3#}TextLine"
+        )
+        for text_line in text_lines:
+            string_elements = text_line.findall(
+                "{http://www.loc.gov/standards/alto/ns-v3#}String"
+            )
+            for string_element in string_elements:
+                text.append(string_element.attrib["CONTENT"])
+    return " ".join(text)
