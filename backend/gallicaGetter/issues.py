@@ -25,9 +25,6 @@ class Issues(GallicaWrapper):
     async def get(
         self, codes, session: aiohttp.ClientSession | None = None
     ) -> Generator[IssueYearRecord, None, None]:
-        if session is None:
-            async with aiohttp.ClientSession() as session:
-                return await self.get(codes, session)
         if type(codes) == str:
             codes = [codes]
         queries = [IssuesQuery(code=code) for code in codes]
