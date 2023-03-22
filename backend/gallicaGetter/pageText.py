@@ -31,7 +31,9 @@ class ConvertedXMLPage(BaseModel):
 class PageText(GallicaWrapper):
     """Wrapper for Gallica's RequestDigitalElement API, Gallica originally returns OCR in XML format for a document page. This class parses the XML to plain text for eventual JSON formatting."""
 
-    def parse(self, gallica_responses: List[Response]):
+    def parse(
+        self, gallica_responses: List[Response]
+    ) -> Generator[ConvertedXMLPage, None, None]:
         for response in gallica_responses:
             try:
                 elements = etree.fromstring(

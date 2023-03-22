@@ -256,10 +256,12 @@ async def get_occurrences_use_RequestDigitalElement(
     )
     for occurrence_page in page_data:
         record = keyed_documents[occurrence_page.ark]
+        terms_string = " ".join(record.terms)
         record.context.append(
             {
                 "page_num": occurrence_page.page_num,
                 "text": occurrence_page.text,
+                "page_url": f"{record.url}/f{occurrence_page.page_num}.image.r={terms_string}",
             }
         )
 
