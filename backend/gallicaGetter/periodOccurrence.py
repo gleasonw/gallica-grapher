@@ -66,9 +66,6 @@ class PeriodOccurrence(GallicaWrapper):
             queries=queries, on_receive_response=onProgressUpdate, session=session
         )
 
-    def get_endpoint_url(self):
-        return "https://gallica.bnf.fr/SRU"
-
     def parse(self, gallica_responses):
         for response in gallica_responses:
             count = get_num_records_from_gallica_xml(response.xml)

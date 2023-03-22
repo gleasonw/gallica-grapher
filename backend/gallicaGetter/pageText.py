@@ -9,9 +9,10 @@ from lxml import etree
 class PageQuery(BaseModel):
     ark: str
     page_num: int = 0
-    endpoint_url: Literal[
-        "https://gallica.bnf.fr/RequestDigitalElement"
-    ] = "https://gallica.bnf.fr/RequestDigitalElement"
+
+    @property
+    def endpoint_url(self):
+        return "https://gallica.bnf.fr/RequestDigitalElement"
 
     @property
     def params(self):

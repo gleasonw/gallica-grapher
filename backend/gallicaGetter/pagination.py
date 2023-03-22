@@ -8,9 +8,10 @@ from lxml import etree
 
 class PaginationQuery(BaseModel):
     ark: str
-    endpoint_url: Literal[
-        "https://gallica.bnf.fr/services/Pagination"
-    ] = "https://gallica.bnf.fr/services/Pagination"
+
+    @property
+    def endpoint_url(self):
+        return "https://gallica.bnf.fr/services/Pagination"
 
     @property
     def params(self):

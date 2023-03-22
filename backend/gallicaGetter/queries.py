@@ -12,12 +12,15 @@ class VolumeQuery(BaseModel):
     start_index: int
     limit: int
     link: Optional[Tuple[str, int]] = None
-    endpoint_url: Literal["https://gallica.bnf.fr/SRU"] = "https://gallica.bnf.fr/SRU"
     source: Optional[Literal["book", "periodical", "all"]] = "all"
     codes: Optional[List[str]] = None
     sort: Optional[Literal["date", "relevance"]] = None
     gallica_results_for_params: int = 0
     collapsing = False
+
+    @property
+    def endpoint_url(self):
+        return "https://gallica.bnf.fr/SRU"
 
     @property
     def params(self):
@@ -38,7 +41,6 @@ class VolumeQuery(BaseModel):
             codes=self.codes,
             start_date=self.start_date,
             end_date=self.end_date,
-            endpoint_url=self.endpoint_url,
             start_index=start_index,
             limit=num_records,
             link=self.link,
@@ -97,10 +99,13 @@ class PaperQuery:
 
     start_index: int
     limit: int
-    endpoint_url: Literal["https://gallica.bnf.fr/SRU"] = "https://gallica.bnf.fr/SRU"
     codes: Optional[List[str]] = None
     cql: Optional[str] = None
     gallica_results_for_params: int = 0
+
+    @property
+    def endpoint_url(self):
+        return "https://gallica.bnf.fr/SRU"
 
     def __post_init__(self):
         if self.codes and self.codes[0]:
@@ -112,7 +117,7 @@ class PaperQuery:
             self.cql = 'dc.type all "fascicule" and ocr.quality all "Texte disponible"'
 
     def make_copy(self, start_index: int, num_records: int):
-        return PaperQuery(start_index, num_records, self.endpoint_url, self.codes)
+        return PaperQuery(start_index, num_records, self.codes)
 
     @property
     def params(self):
@@ -133,9 +138,10 @@ class IssuesQuery:
     """Struct for query to Gallica's Issues API."""
 
     code: str
-    endpoint_url: Literal[
-        "https://gallica.bnf.fr/services/Issues"
-    ] = "https://gallica.bnf.fr/services/Issues"
+
+    @property
+    def endpoint_url(self):
+        return "https://gallica.bnf.fr/services/Issues"
 
     @property
     def params(self):
@@ -166,9 +172,10 @@ class ContentQuery:
 
     ark: str
     terms: List[str]
-    endpoint_url: Literal[
-        "https://gallica.bnf.fr/services/ContentSearch"
-    ] = "https://gallica.bnf.fr/services/ContentSearch"
+
+    @property
+    def endpoint_url(self):
+        return "https://gallica.bnf.fr/services/ContentSearch"
 
     @property
     def params(self):
