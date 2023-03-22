@@ -37,7 +37,7 @@ class GallicaWrapper:
         gallica_responses: List[Response],
     ) -> Generator[Any, None, None]:
         raise NotImplementedError(
-            f"get_parser() not implemented for {self.__class__.__name__}"
+            f"parse() not implemented for {self.__class__.__name__}"
         )
 
     def post_init(self):
