@@ -30,7 +30,7 @@ class PaginationData(BaseModel):
 
 
 class Pagination(GallicaWrapper):
-    """Wrapper for Gallica's RequestDigitalElement API, Gallica originally returns OCR in XML format for a document page. This class parses the XML to plain text for eventual JSON formatting."""
+    """Wraps Gallica's Pagination API."""
 
     def parse(self, gallica_responses: List[Response]):
         if not gallica_responses or len(gallica_responses) != 1:
