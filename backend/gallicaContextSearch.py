@@ -1,12 +1,14 @@
+import asyncio
 import aiohttp.client_exceptions
-from gallicaGetter.gallicaWrapper import Response
+from gallicaGetter.pageText import ConvertedXMLPage, PageQuery, PageText
 from gallicaGetter.volumeOccurrence import VolumeOccurrence, VolumeRecord
 from gallicaGetter.context import Context, HTMLContext
-from typing import Callable, List, Literal, Optional
+from typing import Callable, List, Literal, Optional, Tuple
 from pydantic import BaseModel
 from functools import partial
 from bs4 import BeautifulSoup
 import aiohttp
+from contextSearchArgs import ContextSearchArgs
 
 MAX_CONCURRENT_REQUESTS_FOR_CSV = 20
 
@@ -37,14 +39,25 @@ class GallicaRecordWithHTML(BaseModel):
     context: HTMLContext
 
 
+class GallicaRecordWithPages(BaseModel):
+    ark: str
+    paper_title: str
+    paper_code: str
+    terms: List[str]
+    date: str
+    url: str
+    context: List[ConvertedXMLPage]
+
+
 class UserResponse(BaseModel):
     records: List[GallicaRecordWithRows | GallicaRecordWithHTML]
     num_results: int
     origin_urls: List[str]
-    est_seconds_to_download: int
 
 
-def build_html_record(record: VolumeRecord, context: HTMLContext):
+def build_html_record(
+    record: VolumeRecord, context: HTMLContext, session: aiohttp.ClientSession
+):
     return GallicaRecordWithHTML(
         paper_title=record.paper_title,
         paper_code=record.paper_code,
@@ -55,7 +68,9 @@ def build_html_record(record: VolumeRecord, context: HTMLContext):
     )
 
 
-def build_row_record(record: VolumeRecord, context: HTMLContext):
+def build_row_record(
+    record: VolumeRecord, context: HTMLContext, session: aiohttp.ClientSession
+):
     """Split the Gallica HTML context on the highlighted spans, creating rows of pivot (span), left context, and right context."""
     rows: List[ContextRow] = []
 
@@ -127,118 +142,127 @@ def build_row_record(record: VolumeRecord, context: HTMLContext):
     )
 
 
-async def get_context(
-    terms: List[str],
-    codes: Optional[List[str]] = None,
-    year: Optional[int] = 0,
-    month: Optional[int] = 0,
-    end_year: Optional[int] = 0,
-    end_month: Optional[int] = 0,
-    day: Optional[int] = 0,
-    cursor: Optional[int] = 0,
-    limit: Optional[int] = 10,
-    link_term: Optional[str] = None,
-    link_distance: Optional[int] = 0,
-    source: Literal["book", "periodical", "all"] = "all",
-    sort: Literal["date", "relevance"] = "relevance",
-    parser: Callable[
-        [VolumeRecord, HTMLContext], GallicaRecordWithRows | GallicaRecordWithHTML
-    ] = build_html_record,
-) -> UserResponse:
+async def get_occurrences_and_context(
+    args: ContextSearchArgs,
+    on_get_total_records: Callable[[int], None],
+    on_get_origin_urls: Callable[[List[str]], None],
+    session: aiohttp.ClientSession,
+) -> Tuple[List[VolumeRecord], List[HTMLContext]]:
     """Queries Gallica's SRU and ContentSearch API's to get context for a given term in the archive."""
 
     link = None
-    if link_distance and link_term:
-        link_distance = int(link_distance)
-        link = (link_term, link_distance)
-
-    total_records = 0
-    origin_urls = []
-    sru_average_response = 0
-    content_average_response = 0
-
-    def set_total_records(num_records: int):
-        nonlocal total_records
-        total_records = num_records
-
-    def set_origin_urls(urls: List[str]):
-        nonlocal origin_urls
-        origin_urls = urls
-
-    def update_response_time(current_average: float, new: float):
-        if current_average == 0:
-            return new
-        else:
-            return (current_average + new) / 2
-
-    def update_sru_average_response_time(response: Response):
-        nonlocal sru_average_response
-        sru_average_response = update_response_time(
-            sru_average_response, response.elapsed_time
-        )
-
-    def update_content_average_response_time(response: Response):
-        nonlocal content_average_response
-        content_average_response = update_response_time(
-            content_average_response, response.elapsed_time
-        )
+    if args.link_distance and args.link_term:
+        link = (args.link_term, args.link_distance)
 
     # get the volumes in which the term appears
-    async with aiohttp.ClientSession() as session:
-        volume_Gallica_wrapper = VolumeOccurrence()
-        gallica_records = await volume_Gallica_wrapper.get(
-            terms=terms,
-            start_date=make_date_from_year_mon_day(year, month, day),
-            end_date=make_date_from_year_mon_day(end_year, end_month, day),
-            codes=codes,
-            source=source,
-            link=link,
-            limit=limit,
-            start_index=cursor or 0,
-            sort=sort,
-            on_get_total_records=set_total_records,
-            on_get_origin_urls=set_origin_urls,
-            on_receive_response=update_sru_average_response_time,
-            session=session,
+    volume_Gallica_wrapper = VolumeOccurrence()
+    gallica_records = await volume_Gallica_wrapper.get(
+        terms=args.terms,
+        start_date=make_date_from_year_mon_day(args.year, args.month, args.day),
+        end_date=make_date_from_year_mon_day(args.end_year, args.end_month, args.day),
+        codes=args.codes,
+        source=args.source,
+        link=link,
+        limit=args.limit,
+        start_index=args.cursor or 0,
+        sort=args.sort,
+        on_get_total_records=on_get_total_records,
+        on_get_origin_urls=on_get_origin_urls,
+        session=session,
+    )
+
+    gallica_records = list(gallica_records)
+
+    # get the context for those volumes
+    content_wrapper = Context()
+    context = await content_wrapper.get(
+        [(record.ark, record.terms) for record in gallica_records],
+        session=session,
+    )
+    return gallica_records, list(context)
+
+
+async def get_occurrences_use_ContentSearch(
+    args: ContextSearchArgs,
+    on_get_total_records: Callable[[int], None],
+    on_get_origin_urls: Callable[[List[str]], None],
+    session: aiohttp.ClientSession,
+    parser: Callable = build_html_record,
+) -> List[GallicaRecordWithHTML | GallicaRecordWithRows]:
+    records_with_context: List[GallicaRecordWithRows | GallicaRecordWithHTML] = []
+    documents, context = await get_occurrences_and_context(
+        args=args,
+        on_get_total_records=on_get_total_records,
+        on_get_origin_urls=on_get_origin_urls,
+        session=session,
+    )
+    keyed_documents = {record.ark: record for record in documents}
+    for context_response in context:
+        corresponding_record = keyed_documents[context_response.ark]
+        records_with_context.append(parser(corresponding_record, context_response))
+
+    return records_with_context
+
+
+get_html_context = partial(get_occurrences_use_ContentSearch, parser=build_html_record)
+
+get_row_context = partial(get_occurrences_use_ContentSearch, parser=build_row_record)
+
+
+async def get_occurrences_use_RequestDigitalElement(
+    args: ContextSearchArgs,
+    on_get_total_records: Callable[[int], None],
+    on_get_origin_urls: Callable[[List[str]], None],
+    session: aiohttp.ClientSession,
+) -> List[GallicaRecordWithPages]:
+
+    documents, context = await get_occurrences_and_context(
+        args=args,
+        on_get_total_records=on_get_total_records,
+        on_get_origin_urls=on_get_origin_urls,
+        session=session,
+    )
+
+    # context will be filled with page text for each occurrence
+    keyed_documents = {
+        record.ark: GallicaRecordWithPages(
+            paper_title=record.paper_title,
+            paper_code=record.paper_code,
+            terms=record.terms,
+            date=str(record.date),
+            url=record.url,
+            ark=record.ark,
+            context=[],
         )
+        for record in documents
+    }
 
-        # get the context for those volumes
-        content_wrapper = Context()
-        keyed_records = {
-            record.url.split("/")[-1]: record for record in gallica_records
-        }
-        context = await content_wrapper.get(
-            [
-                (record.url.split("/")[-1], record.terms)
-                for _, record in keyed_records.items()
-            ],
-            session=session,
-            on_receive_response=update_content_average_response_time,
-        )
+    # semaphore limits the number of concurrent page requests
+    sem = asyncio.Semaphore(10)
+    page_text_wrapper = PageText()
 
-        # combine the two
-        records_with_context: List[GallicaRecordWithRows | GallicaRecordWithHTML] = []
-        for context_response in context:
-            corresponding_record = keyed_records[context_response.ark]
-            records_with_context.append(parser(corresponding_record, context_response))
-
-        return UserResponse(
-            records=records_with_context,
-            num_results=total_records,
-            origin_urls=origin_urls,
-            est_seconds_to_download=int(
-                (
-                    (total_records / 50) * sru_average_response
-                    + total_records * content_average_response
+    queries: List[PageQuery] = []
+    for document_context in context:
+        record = keyed_documents[document_context.ark]
+        for page in document_context.pages:
+            queries.append(
+                PageQuery(
+                    ark=record.ark,
+                    page_num=int(page.page_num),
                 )
-                / MAX_CONCURRENT_REQUESTS_FOR_CSV
-            ),
-        )
+            )
 
+    # fetch the page text for each occurrence
+    page_data = await page_text_wrapper.get(
+        page_queries=queries,
+        session=session,
+        semaphore=sem,
+    )
+    for occurrence_page in page_data:
+        record = keyed_documents[occurrence_page.ark]
+        record.context.append(occurrence_page)
 
-get_html_context = partial(get_context, parser=build_html_record)
-
-get_row_context = partial(get_context, parser=build_row_record)
+    return list(keyed_documents.values())
 
 
 def make_date_from_year_mon_day(

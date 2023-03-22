@@ -32,6 +32,10 @@ class VolumeRecord:
     date: Date
     terms: List[str]
 
+    @property
+    def ark(self) -> str:
+        return self.url.split("/")[-1]
+
 
 class VolumeOccurrence(GallicaWrapper):
     """Fetches occurrence metadata from Gallica's SRU API. There may be many occurrences in one Gallica record."""

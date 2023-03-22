@@ -7,8 +7,9 @@ import random
 from typing import List, Literal, Optional
 from pydantic import BaseModel
 from gallicaGetter.pagination import Pagination
-from gallicaGetter.pageText import PageText
+from gallicaGetter.pageText import PageQuery, PageText
 from gallicaContextSearch import (
+    get_occurrences_use_RequestDigitalElement,
     get_row_context,
     get_html_context,
 )
@@ -19,6 +20,7 @@ from www.models import Ticket, Progress
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 import aiohttp
+from contextSearchArgs import ContextSearchArgs
 
 RECORD_LIMIT = 1000000
 MAX_DB_SIZE = 10000000
@@ -148,37 +150,23 @@ def graph_data(
         )
 
 
-class FullTextResponse(BaseModel):
-    text: str
-    ark: str
-
-
-@app.get("/api/fullText")
-async def full_text(ark: str):
-    """Retrieve the full text of a document on Gallica."""
+@app.get("/api/pageText")
+async def page_text(ark: str, page: int):
+    """Retrieve the full text of a document page on Gallica."""
     # limit number of concurrent requests with a semaphore
     sem = asyncio.Semaphore(10)
     try:
         async with aiohttp.ClientSession() as session:
-            pagination_getter = Pagination()
             page_text_getter = PageText()
-            pagination = await pagination_getter.get(
-                ark=ark, session=session, semaphore=sem
+            page_data = await page_text_getter.get(
+                page_queries=[PageQuery(ark=ark, page_num=page)],
+                session=session,
+                semaphore=sem,
             )
-            num_pages = list(pagination)[-1].page_count
-            page_texts = []
-            pages_data = await page_text_getter.get(
-                ark=ark, pages=list(range(num_pages)), session=session, semaphore=sem
-            )
-            pages_data = list(pages_data)
-            if pages_data:
-                for page in pages_data:
-                    page_texts.append(page.text)
-            return FullTextResponse(
-                text=" ".join(page_texts),
-                ark=ark,
-            )
-
+            page_data = list(page_data)
+            if page_data:
+                return page_data[0]
+            return None
     except aiohttp.client_exceptions.ClientConnectorError:
         raise HTTPException(status_code=503, detail="Could not connect to Gallica.")
 
@@ -215,8 +203,13 @@ async def fetch_records_from_gallica(
     source: Literal["book", "periodical", "all"] = "all",
     sort: Literal["date", "relevance"] = "relevance",
     row_split: Optional[bool] = False,
+    include_page_text: Optional[bool] = False,
 ):
     """API endpoint for the context table. To fetch multiple terms linked with OR in the Gallica CQL, pass multiple terms parameters: /api/gallicaRecords?terms=term1&terms=term2&terms=term3"""
+    params = locals()
+    params.pop("include_page_text")
+    params.pop("row_split")
+    args = ContextSearchArgs(**params)
     if limit and limit > 50:
         raise HTTPException(
             status_code=400,
@@ -234,27 +227,34 @@ async def fetch_records_from_gallica(
             else:
                 wrapped_terms.append(term)
 
-    if row_split:
-        context_getter = get_row_context
-    else:
-        context_getter = get_html_context
-    try:
-        return await context_getter(
-            year=year,
-            month=month,
-            end_year=end_year,
-            end_month=end_month,
-            terms=wrapped_terms,
-            codes=codes,
-            cursor=cursor,
-            limit=limit,
-            link_term=link_term,
-            link_distance=link_distance,
-            source=source,
-            sort=sort,
-        )
-    except aiohttp.client_exceptions.ClientConnectorError:
-        raise HTTPException(status_code=503, detail="Could not connect to Gallica.")
+    async with aiohttp.ClientSession() as session:
+        total_records = 0
+        origin_urls = []
+
+        def set_total_records(num_records: int):
+            nonlocal total_records
+            total_records = num_records
+
+        def set_origin_urls(urls: List[str]):
+            nonlocal origin_urls
+            origin_urls = urls
+
+        props = {
+            "args": args,
+            "session": session,
+            "on_get_origin_urls": set_origin_urls,
+            "on_get_total_records": set_total_records,
+        }
+
+        try:
+            if row_split:
+                return get_row_context(**props)
+            elif include_page_text:
+                return get_occurrences_use_RequestDigitalElement(**props)
+            else:
+                return get_html_context(**props)
+        except aiohttp.client_exceptions.ClientConnectorError:
+            raise HTTPException(status_code=503, detail="Could not connect to Gallica.")
 
 
 if __name__ == "__main__":
