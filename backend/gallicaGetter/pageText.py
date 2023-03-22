@@ -50,32 +50,33 @@ class PageText(GallicaWrapper):
                 continue
             name_space = name_space.split(" ")[0]
             layout = elements.find(f"{{{name_space}}}Layout")
-            if layout is not None:
-                page = layout.find(f"{{{name_space}}}Page")
-                if page is None:
+            if layout is None:
+                continue
+            page = layout.find(f"{{{name_space}}}Page")
+            if page is None:
+                continue
+            print_space = page.find(f"{{{name_space}}}PrintSpace")
+            if print_space is None:
+                continue
+            text_blocks = print_space.iterdescendants(f"{{{name_space}}}TextBlock")
+            if text_blocks is None:
+                continue
+            text: List[str] = []
+            for text_block in text_blocks:
+                text_lines = text_block.findall(f"{{{name_space}}}TextLine")
+                if text_lines is None:
                     continue
-                print_space = page.find(f"{{{name_space}}}PrintSpace")
-                if print_space is None:
-                    continue
-                text_blocks = print_space.iterdescendants(f"{{{name_space}}}TextBlock")
-                if text_blocks is None:
-                    continue
-                text: List[str] = []
-                for text_block in text_blocks:
-                    text_lines = text_block.findall(f"{{{name_space}}}TextLine")
-                    if text_lines is None:
+                for text_line in text_lines:
+                    string_elements = text_line.findall(f"{{{name_space}}}String")
+                    if string_elements is None:
                         continue
-                    for text_line in text_lines:
-                        string_elements = text_line.findall(f"{{{name_space}}}String")
-                        if string_elements is None:
-                            continue
-                        for string_element in string_elements:
-                            text.append(string_element.attrib.get("CONTENT"))
-                yield ConvertedXMLPage(
-                    page_num=response.query.page_num,
-                    ark=response.query.ark,
-                    text=" ".join(text),
-                )
+                    for string_element in string_elements:
+                        text.append(string_element.attrib.get("CONTENT"))
+            yield ConvertedXMLPage(
+                page_num=response.query.page_num,
+                ark=response.query.ark,
+                text=" ".join(text),
+            )
 
     async def get(
         self,

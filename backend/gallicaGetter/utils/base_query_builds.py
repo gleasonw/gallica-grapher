@@ -7,7 +7,7 @@ NUM_CODES_PER_BUNDLE = 10
 
 def build_base_queries(
     terms: List[str],
-    grouping: str,
+    grouping: Literal["year", "month", "all", "index_selection"],
     link: Optional[Tuple[str, int]] = None,
     source: Optional[Literal["book", "periodical", "all"]] = None,
     sort: Optional[Literal["date", "relevance"]] = None,
@@ -54,13 +54,11 @@ def bundle_codes(codes: Optional[List[str]]) -> List[List[str]]:
     ]
 
 
-def build_date_grouping(start_date, end_date, grouping) -> List[Tuple]:
+def build_date_grouping(
+    start_date, end_date, grouping: Literal["year", "month", "all", "index_selection"]
+) -> List[Tuple]:
     """
     Build date ranges to be used in a search query.
-    :param start_date: string date format YYYY-MM-DD
-    :param end_date: string date format YYYY-MM-DD
-    :param grouping: string in ('year', 'month', 'all')
-    :return: list of tuples of date ranges
     """
     if not start_date and not end_date:
         return [(None, None)]

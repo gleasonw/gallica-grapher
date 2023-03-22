@@ -5,7 +5,7 @@ from gallicaGetter.utils.date import Date
 from gallicaGetter.utils.parse_xml import get_num_records_from_gallica_xml
 from gallicaGetter.gallicaWrapper import GallicaWrapper
 from gallicaGetter.utils.base_query_builds import build_base_queries
-from typing import Generator, List, Optional
+from typing import Generator, List, Literal, Optional
 
 
 @dataclass(slots=True)
@@ -36,14 +36,10 @@ class PeriodOccurrence(GallicaWrapper):
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         codes: Optional[List[str]] = None,
-        grouping: str = "year",
+        grouping: Literal["year", "month"] = "year",
         onProgressUpdate=None,
         session: aiohttp.ClientSession | None = None,
     ) -> Generator[PeriodRecord, None, None]:
-        if grouping not in ["year", "month"]:
-            raise ValueError(
-                f'grouping must be either "year" or "month", not {grouping}'
-            )
         queries = build_base_queries(
             terms=terms,
             start_date=start_date,
