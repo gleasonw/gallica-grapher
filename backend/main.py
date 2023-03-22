@@ -1,4 +1,5 @@
 import asyncio
+from collections import Counter
 import json
 import os
 import aiohttp.client_exceptions
@@ -6,9 +7,14 @@ import uvicorn
 import random
 from typing import List, Literal, Optional
 from pydantic import BaseModel
+from gallicaGetter.mostFrequent import get_gallica_core
+from gallicaGetter.volumeOccurrence import VolumeOccurrence
 from gallicaGetter.pagination import Pagination
 from gallicaGetter.pageText import PageQuery, PageText
 from gallicaContextSearch import (
+    GallicaRecordWithHTML,
+    GallicaRecordWithPages,
+    GallicaRecordWithRows,
     get_occurrences_use_RequestDigitalElement,
     get_row_context,
     get_html_context,
@@ -153,39 +159,53 @@ def graph_data(
 @app.get("/api/pageText")
 async def page_text(ark: str, page: int):
     """Retrieve the full text of a document page on Gallica."""
-    # limit number of concurrent requests with a semaphore
-    sem = asyncio.Semaphore(10)
     try:
         async with aiohttp.ClientSession() as session:
             page_text_getter = PageText()
             page_data = await page_text_getter.get(
                 page_queries=[PageQuery(ark=ark, page_num=page)],
                 session=session,
-                semaphore=sem,
             )
             page_data = list(page_data)
-            if page_data:
+            if page_data and len(page_data) > 0:
                 return page_data[0]
             return None
     except aiohttp.client_exceptions.ClientConnectorError:
         raise HTTPException(status_code=503, detail="Could not connect to Gallica.")
 
 
-# @app.get("/api/mostFrequentTerms")
-# def most_frequent_terms(
-#     root_gram: str,
-#     start_date: str,
-#     end_date: str,
-#     sample_size: int,
-#     top_n: int = 10,
-# ):
-#     counts = get_gallica_core(
-#         root_gram=root_gram,
-#         start_date=start_date,
-#         end_date=end_date,
-#         sample_size=sample_size,
-#     )
-#     return Counter(counts).most_common(top_n)
+@app.get("/api/mostFrequentTerms")
+async def most_frequent_terms(
+    root_gram: str,
+    start_date: str,
+    end_date: str,
+    sample_size: int,
+    top_n: int = 10,
+):
+    if sample_size and sample_size > 50:
+        sample_size = 50
+    async with aiohttp.ClientSession() as session:
+        try:
+            counts = await get_gallica_core(
+                root_gram=root_gram,
+                start_date=start_date,
+                end_date=end_date,
+                sample_size=sample_size,
+                session=session,
+            )
+        except aiohttp.client_exceptions.ClientConnectorError:
+            return HTTPException(
+                status_code=503, detail="Could not connect to Gallica."
+            )
+    return Counter(counts).most_common(top_n)
+
+
+class UserResponse(BaseModel):
+    records: List[GallicaRecordWithRows] | List[GallicaRecordWithHTML] | List[
+        GallicaRecordWithPages
+    ]
+    num_results: int
+    origin_urls: List[str]
 
 
 @app.get("/api/gallicaRecords")
@@ -206,10 +226,20 @@ async def fetch_records_from_gallica(
     include_page_text: Optional[bool] = False,
 ):
     """API endpoint for the context table. To fetch multiple terms linked with OR in the Gallica CQL, pass multiple terms parameters: /api/gallicaRecords?terms=term1&terms=term2&terms=term3"""
-    params = locals()
-    params.pop("include_page_text")
-    params.pop("row_split")
-    args = ContextSearchArgs(**params)
+    args = ContextSearchArgs(
+        year=year,
+        month=month,
+        end_year=end_year,
+        end_month=end_month,
+        terms=terms,
+        codes=codes,
+        cursor=cursor,
+        limit=limit,
+        link_term=link_term,
+        link_distance=link_distance,
+        source=source,
+        sort=sort,
+    )
     if limit and limit > 50:
         raise HTTPException(
             status_code=400,
@@ -248,11 +278,16 @@ async def fetch_records_from_gallica(
 
         try:
             if row_split:
-                return get_row_context(**props)
+                records = await get_row_context(**props)
             elif include_page_text:
-                return get_occurrences_use_RequestDigitalElement(**props)
+                records = await get_occurrences_use_RequestDigitalElement(**props)
             else:
-                return get_html_context(**props)
+                records = await get_html_context(**props)
+            return UserResponse(
+                records=records,
+                num_results=total_records,
+                origin_urls=origin_urls,
+            )
         except aiohttp.client_exceptions.ClientConnectorError:
             raise HTTPException(status_code=503, detail="Could not connect to Gallica.")
 

@@ -13,6 +13,8 @@ from gallicaGetter.utils.index_query_builds import (
 from gallicaGetter.utils.date import Date
 from gallicaGetter.gallicaWrapper import GallicaWrapper, Response
 from gallicaGetter.utils.parse_xml import (
+    get_author_from_record_xml,
+    get_ocr_quality_from_record_xml,
     get_records_from_xml,
     get_paper_title_from_record_xml,
     get_paper_code_from_record_xml,
@@ -28,6 +30,8 @@ from typing import Callable, Generator, List, Literal, Optional, Tuple
 class VolumeRecord:
     paper_title: str
     paper_code: str
+    ocr_quality: float
+    author: str
     url: str
     date: Date
     terms: List[str]
@@ -56,6 +60,8 @@ class VolumeOccurrence(GallicaWrapper):
                     paper_code=get_paper_code_from_record_xml(record),
                     date=get_date_from_record_xml(record),
                     url=get_url_from_record(record),
+                    author=get_author_from_record_xml(record),
+                    ocr_quality=float(get_ocr_quality_from_record_xml(record)),
                     terms=response.query.terms,
                 )
 

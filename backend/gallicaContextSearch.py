@@ -3,7 +3,7 @@ import aiohttp.client_exceptions
 from gallicaGetter.pageText import ConvertedXMLPage, PageQuery, PageText
 from gallicaGetter.volumeOccurrence import VolumeOccurrence, VolumeRecord
 from gallicaGetter.context import Context, HTMLContext
-from typing import Callable, List, Literal, Optional, Tuple
+from typing import Callable, Dict, List, Literal, Optional, Tuple
 from pydantic import BaseModel
 from functools import partial
 from bs4 import BeautifulSoup
@@ -21,43 +21,30 @@ class ContextRow(BaseModel):
     page: str
 
 
-class GallicaRecordWithRows(BaseModel):
+class GallicaRecordBase(BaseModel):
     paper_title: str
     paper_code: str
+    ark: str
     terms: List[str]
     date: str
     url: str
+    author: str
+    ocr_quality: float
+
+
+class GallicaRecordWithRows(GallicaRecordBase):
     context: List[ContextRow]
 
 
-class GallicaRecordWithHTML(BaseModel):
-    paper_title: str
-    paper_code: str
-    terms: List[str]
-    date: str
-    url: str
+class GallicaRecordWithHTML(GallicaRecordBase):
     context: HTMLContext
 
 
-class GallicaRecordWithPages(BaseModel):
-    ark: str
-    paper_title: str
-    paper_code: str
-    terms: List[str]
-    date: str
-    url: str
-    context: List[ConvertedXMLPage]
+class GallicaRecordWithPages(GallicaRecordBase):
+    context: List[Dict[str, str | int]]
 
 
-class UserResponse(BaseModel):
-    records: List[GallicaRecordWithRows | GallicaRecordWithHTML]
-    num_results: int
-    origin_urls: List[str]
-
-
-def build_html_record(
-    record: VolumeRecord, context: HTMLContext, session: aiohttp.ClientSession
-):
+def build_html_record(record: VolumeRecord, context: HTMLContext):
     return GallicaRecordWithHTML(
         paper_title=record.paper_title,
         paper_code=record.paper_code,
@@ -65,12 +52,13 @@ def build_html_record(
         date=str(record.date),
         url=record.url,
         context=context,
+        ark=record.ark,
+        author=record.author,
+        ocr_quality=record.ocr_quality,
     )
 
 
-def build_row_record(
-    record: VolumeRecord, context: HTMLContext, session: aiohttp.ClientSession
-):
+def build_row_record(record: VolumeRecord, context: HTMLContext):
     """Split the Gallica HTML context on the highlighted spans, creating rows of pivot (span), left context, and right context."""
     rows: List[ContextRow] = []
 
@@ -139,6 +127,9 @@ def build_row_record(
         date=str(record.date),
         url=record.url,
         context=rows,
+        ark=record.ark,
+        author=record.author,
+        ocr_quality=record.ocr_quality,
     )
 
 
@@ -148,7 +139,7 @@ async def get_occurrences_and_context(
     on_get_origin_urls: Callable[[List[str]], None],
     session: aiohttp.ClientSession,
 ) -> Tuple[List[VolumeRecord], List[HTMLContext]]:
-    """Queries Gallica's SRU and ContentSearch API's to get context for a given term in the archive."""
+    """Queries Gallica's SRU and ContentSearch API's to get metadata and context for a given term in the archive."""
 
     link = None
     if args.link_distance and args.link_term:
@@ -188,8 +179,10 @@ async def get_occurrences_use_ContentSearch(
     on_get_origin_urls: Callable[[List[str]], None],
     session: aiohttp.ClientSession,
     parser: Callable = build_html_record,
-) -> List[GallicaRecordWithHTML | GallicaRecordWithRows]:
-    records_with_context: List[GallicaRecordWithRows | GallicaRecordWithHTML] = []
+) -> List[GallicaRecordWithHTML] | List[GallicaRecordWithRows]:
+    """Queries Gallica's SRU and ContentSearch API's to get context for a given term in the archive."""
+
+    records_with_context: List[GallicaRecordWithRows] | List[GallicaRecordWithHTML] = []
     documents, context = await get_occurrences_and_context(
         args=args,
         on_get_total_records=on_get_total_records,
@@ -215,6 +208,7 @@ async def get_occurrences_use_RequestDigitalElement(
     on_get_origin_urls: Callable[[List[str]], None],
     session: aiohttp.ClientSession,
 ) -> List[GallicaRecordWithPages]:
+    """Queries Gallica's SRU, ContentSearch, and RequestDigitalElement API's to get metadata and page text for term occurrences."""
 
     documents, context = await get_occurrences_and_context(
         args=args,
@@ -232,6 +226,8 @@ async def get_occurrences_use_RequestDigitalElement(
             date=str(record.date),
             url=record.url,
             ark=record.ark,
+            author=record.author,
+            ocr_quality=record.ocr_quality,
             context=[],
         )
         for record in documents
@@ -260,7 +256,12 @@ async def get_occurrences_use_RequestDigitalElement(
     )
     for occurrence_page in page_data:
         record = keyed_documents[occurrence_page.ark]
-        record.context.append(occurrence_page)
+        record.context.append(
+            {
+                "page_num": occurrence_page.page_num,
+                "text": occurrence_page.text,
+            }
+        )
 
     return list(keyed_documents.values())
 

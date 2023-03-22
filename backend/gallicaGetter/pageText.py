@@ -3,7 +3,6 @@ from typing import Generator, List, Literal
 import aiohttp
 from gallicaGetter.gallicaWrapper import GallicaWrapper, Response
 from pydantic import BaseModel
-from gallicaGetter.utils.parse_xml import parse_ocr_xml_into_plain_text
 from lxml import etree
 
 
@@ -55,7 +54,7 @@ class PageText(GallicaWrapper):
                 print_space = page.find(f"{{{name_space}}}PrintSpace")
                 if print_space is None:
                     continue
-                text_blocks = print_space.findall(f"{{{name_space}}}TextBlock")
+                text_blocks = print_space.iterdescendants(f"{{{name_space}}}TextBlock")
                 if text_blocks is None:
                     continue
                 text: List[str] = []

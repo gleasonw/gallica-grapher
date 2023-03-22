@@ -6,7 +6,7 @@ from gallicaGetter.papers import Papers
 
 from gallicaGetter.volumeOccurrence import VolumeOccurrence
 from gallicaGetter.periodOccurrence import PeriodOccurrence
-from gallicaGetter.pageText import PageText
+from gallicaGetter.pageText import PageQuery, PageText
 
 
 @pytest.mark.asyncio
@@ -24,9 +24,13 @@ async def test_pagination():
 @pytest.mark.asyncio
 async def test_get_page():
     getter = PageText()
-    records = await getter.get("bpt6k607811b", 1)
+    records = await getter.get(page_queries=[PageQuery(ark="bpt6k607811b", page_num=1)])
     list_records = list(records)
     assert len(list_records) == 1
+    first_record = list_records[0]
+    assert first_record.ark == "bpt6k607811b"
+    assert first_record.page_num == 1
+    assert type(first_record.text) == str
 
 
 @pytest.mark.asyncio
