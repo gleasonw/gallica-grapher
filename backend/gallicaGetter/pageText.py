@@ -83,12 +83,6 @@ class PageText(GallicaWrapper):
         session: aiohttp.ClientSession | None = None,
         semaphore: asyncio.Semaphore | None = None,
     ) -> Generator[ConvertedXMLPage, None, None]:
-        if session is None:
-            async with aiohttp.ClientSession() as session:
-                return await self.get(
-                    page_queries=page_queries,
-                    session=session,
-                )
         return await self.get_records_for_queries(
             queries=page_queries,
             session=session,

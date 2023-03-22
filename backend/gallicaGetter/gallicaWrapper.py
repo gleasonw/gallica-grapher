@@ -46,11 +46,18 @@ class GallicaWrapper:
     async def get_records_for_queries(
         self,
         queries,
-        session: aiohttp.ClientSession,
+        session: aiohttp.ClientSession | None = None,
         semaphore: asyncio.Semaphore | None = None,
         on_receive_response: Callable[[Response], None] | None = None,
     ):
         """The core abstraction for fetching record xml from gallica and parsing it to Python objects. Called by all subclasses."""
+        if session is None:
+            async with aiohttp.ClientSession() as session:
+                return await self.get_records_for_queries(
+                    queries=queries,
+                    session=session,
+                    semaphore=semaphore,
+                )
         raw_response = await fetch_from_gallica(
             queries,
             session=session,

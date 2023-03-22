@@ -45,13 +45,6 @@ class Context(GallicaWrapper):
         session: aiohttp.ClientSession | None = None,
         semaphore: asyncio.Semaphore | None = None,
     ) -> Generator[HTMLContext, None, None]:
-        if session is None:
-            async with aiohttp.ClientSession() as session:
-                return await self.get(
-                    context_pairs=context_pairs,
-                    session=session,
-                    on_receive_response=on_receive_response,
-                )
         queries = [ContentQuery(ark=pair[0], terms=pair[1]) for pair in context_pairs]
         return await self.get_records_for_queries(
             queries=queries,

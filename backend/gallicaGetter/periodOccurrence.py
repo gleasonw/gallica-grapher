@@ -40,17 +40,6 @@ class PeriodOccurrence(GallicaWrapper):
         onProgressUpdate=None,
         session: aiohttp.ClientSession | None = None,
     ) -> Generator[PeriodRecord, None, None]:
-        if session is None:
-            async with aiohttp.ClientSession() as session:
-                return await self.get(
-                    terms=terms,
-                    start_date=start_date,
-                    end_date=end_date,
-                    codes=codes,
-                    grouping=grouping,
-                    onProgressUpdate=onProgressUpdate,
-                    session=session,
-                )
         if grouping not in ["year", "month"]:
             raise ValueError(
                 f'grouping must be either "year" or "month", not {grouping}'

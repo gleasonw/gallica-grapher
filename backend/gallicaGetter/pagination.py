@@ -61,12 +61,6 @@ class Pagination(GallicaWrapper):
         session: aiohttp.ClientSession | None = None,
         semaphore: asyncio.Semaphore | None = None,
     ) -> Generator[PaginationData, None, None]:
-        if session is None:
-            async with aiohttp.ClientSession() as session:
-                return await self.get(
-                    ark=ark,
-                    session=session,
-                )
         query = PaginationQuery(ark=ark)
         return await self.get_records_for_queries(
             queries=[query],
