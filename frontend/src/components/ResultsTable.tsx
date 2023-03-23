@@ -197,9 +197,6 @@ export function ResultsTable(props: TableProps) {
   );
   const total_results = Number(data?.num_results) ?? 0;
   const cursorMax = Math.floor(total_results / limit);
-  const documentHeader = tableInstance.headerGroups[0].headers.filter(
-    (h) => h.id === "document"
-  )[0];
 
   const pagination = currentPage && !isFetching && (
     <QueryPagination
@@ -231,7 +228,7 @@ export function ResultsTable(props: TableProps) {
       />
     </div>
   );
-
+  //TODO: show active filters, replicate gamepass ui
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
       <div className={"ml-5 flex flex-col mb-10"}>
