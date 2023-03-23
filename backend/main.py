@@ -175,6 +175,11 @@ async def page_text(ark: str, page: int):
         raise HTTPException(status_code=503, detail="Could not connect to Gallica.")
 
 
+class MostFrequentRecord(BaseModel):
+    term: str
+    count: int
+
+
 @app.get("/api/mostFrequentTerms")
 async def most_frequent_terms(
     root_gram: str,
@@ -204,7 +209,8 @@ async def most_frequent_terms(
             return HTTPException(
                 status_code=503, detail="Could not connect to Gallica."
             )
-    return Counter(counts).most_common(top_n)
+    top = Counter(counts).most_common(top_n)
+    return [MostFrequentRecord(term=term, count=count) for term, count in top]
 
 
 class UserResponse(BaseModel):

@@ -39,6 +39,11 @@ export interface ProgressType {
   backend_source: "gallica" | "pyllica";
 }
 
+export interface FrequentTerm {
+  term: string;
+  count: number;
+}
+
 export interface GraphData {
   request_id: number;
   data: [number, number][];

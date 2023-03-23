@@ -6,16 +6,17 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
-import { GraphData } from "../models/dbStructs";
+import { FrequentTerm, GraphData } from "../models/dbStructs";
 import { InferGetStaticPropsType } from "next";
 import { makeOptions } from "./utils/makeHighcharts";
 import {
   GraphPageDispatchContext,
   GraphPageStateContext,
 } from "./GraphContext";
+import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 
 interface ResultViewerProps {
   initVals: InferGetStaticPropsType<typeof getStaticProps>;
@@ -286,6 +287,74 @@ export function ResultViewer(props: ResultViewerProps) {
         selectedTicket={selectedTicket}
         limit={10}
       />
+    </div>
+  );
+}
+
+function ActiveFilters(props: {
+  filters: { label: any; onClick: () => void }[];
+}) {
+  return (
+    <div className={"flex flex-row gap-2"}>
+      {props.filters.map((filter) => {
+        if (filter.label) {
+          return (
+            <button
+              className={
+                "flex flex-row gap-5 items-center border rounded-md p-3 hover:bg-zinc-100"
+              }
+              key={filter.label}
+              onClick={filter.onClick}
+            >
+              <div>{filter.label}</div>
+              <div>X</div>
+            </button>
+          );
+        }
+      })}
+    </div>
+  );
+}
+
+function FrequencyContext(props: {
+  yearRange: [number | undefined, number | undefined];
+  month?: number;
+  term?: string;
+}) {
+  async function getFrequencyData(
+    yearRange: [number | undefined, number | undefined],
+    month?: number,
+    term?: string
+  ) {
+    const [start, end] = yearRange;
+    const url = addQueryParamsIfExist(`${apiURL}/api/mostFrequentTerms`, {
+      start_year: start,
+      start_month: month,
+      end_year: end,
+      end_month: month,
+      root_gram: term,
+      sample_size: 30,
+    });
+    console.log(url);
+    const response = await fetch(url);
+    return (await response.json()) as FrequentTerm[];
+  }
+
+  const { data, isFetching } = useQuery(
+    ["frequency", props.yearRange, props.month, props.term],
+    () => getFrequencyData(props.yearRange, props.month, props.term)
+  );
+
+  if (isFetching) return <div>Loading...</div>;
+  if (!data) return <div>No data</div>;
+  return (
+    <div className={"flex gap-10 flex-wrap"}>
+      {data.map((term) => (
+        <div className={"flex flex-col gap-2"} key={term.term}>
+          <div className={"text-xl"}>{term.term}</div>
+          <div className={"text-sm"}>{term.count}</div>
+        </div>
+      ))}
     </div>
   );
 }
