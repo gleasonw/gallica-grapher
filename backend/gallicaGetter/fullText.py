@@ -8,7 +8,7 @@ from gallicaGetter.gallicaWrapper import GallicaWrapper
 
 @dataclass(slots=True)
 class ParsedGallicaHTML:
-    html: str
+    html: bytes
     soup: BeautifulSoup | None = None
     text: str = ""
 
@@ -27,15 +27,11 @@ class ParsedGallicaHTML:
 class FullText(GallicaWrapper):
     """Wraps Gallica's full text API. Can be an expensive fetch, and is rate-limited."""
 
-    def get_endpoint_url(self):
-        return "https://gallica.bnf.fr"
-
     def parse(self, gallica_responses):
         return (ParsedGallicaHTML(response.xml) for response in gallica_responses)
 
-    def get(self, ark_codes) -> Generator[ParsedGallicaHTML, None, None]:
+    async def get(self, ark_codes) -> Generator[ParsedGallicaHTML, None, None]:
         if type(ark_codes) is not list:
             ark_codes = [ark_codes]
         queries = [FullTextQuery(ark=code) for code in ark_codes]
-        return self.get_records_for_queries(queries=queries)
-
+        return await self.get_records_for_queries(queries=queries)
