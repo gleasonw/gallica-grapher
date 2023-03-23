@@ -239,25 +239,6 @@ async def fetch_records_from_gallica(
     include_page_text: Optional[bool] = False,
 ):
     """API endpoint for the context table. To fetch multiple terms linked with OR in the Gallica CQL, pass multiple terms parameters: /api/gallicaRecords?terms=term1&terms=term2&terms=term3"""
-    args = ContextSearchArgs(
-        year=year,
-        month=month,
-        end_year=end_year,
-        end_month=end_month,
-        terms=terms,
-        codes=codes,
-        cursor=cursor,
-        limit=limit,
-        link_term=link_term,
-        link_distance=link_distance,
-        source=source,
-        sort=sort,
-    )
-    if limit and limit > 50:
-        raise HTTPException(
-            status_code=400,
-            detail="Limit must be less than or equal to 50, the maximum number of records for one request to Gallica.",
-        )
 
     # ensure multi-word terms are wrapped in quotes for an exact search in Gallica; don't double wrap though
     wrapped_terms = []
@@ -269,6 +250,27 @@ async def fetch_records_from_gallica(
                 wrapped_terms.append(f'"{term}"')
             else:
                 wrapped_terms.append(term)
+
+    args = ContextSearchArgs(
+        year=year,
+        month=month,
+        end_year=end_year,
+        end_month=end_month,
+        terms=wrapped_terms,
+        codes=codes,
+        cursor=cursor,
+        limit=limit,
+        link_term=link_term,
+        link_distance=link_distance,
+        source=source,
+        sort=sort,
+    )
+
+    if limit and limit > 50:
+        raise HTTPException(
+            status_code=400,
+            detail="Limit must be less than or equal to 50, the maximum number of records for one request to Gallica.",
+        )
 
     async with aiohttp.ClientSession() as session:
         total_records = 0
