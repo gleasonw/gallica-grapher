@@ -18,6 +18,7 @@ from gallicaContextSearch import (
     get_occurrences_use_RequestDigitalElement,
     get_row_context,
     get_html_context,
+    make_date_from_year_mon_day,
 )
 from www.database.connContext import build_db_conn, build_redis_conn
 from www.database.graphDataResolver import build_highcharts_series
@@ -177,10 +178,12 @@ async def page_text(ark: str, page: int):
 @app.get("/api/mostFrequentTerms")
 async def most_frequent_terms(
     root_gram: str,
-    start_date: str,
-    end_date: str,
     sample_size: int,
     top_n: int = 10,
+    start_year: Optional[int] = None,
+    start_month: Optional[int] = None,
+    end_year: Optional[int] = None,
+    end_month: Optional[int] = None,
 ):
     if sample_size and sample_size > 50:
         sample_size = 50
@@ -188,8 +191,12 @@ async def most_frequent_terms(
         try:
             counts = await get_gallica_core(
                 root_gram=root_gram,
-                start_date=start_date,
-                end_date=end_date,
+                start_date=make_date_from_year_mon_day(
+                    year=start_year, month=start_month, day=1
+                ),
+                end_date=make_date_from_year_mon_day(
+                    year=end_year, month=end_month, day=1
+                ),
                 sample_size=sample_size,
                 session=session,
             )

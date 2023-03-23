@@ -57,6 +57,20 @@ const strings = {
     ),
     grouping: "Résolution",
     smoothing: "Lissage",
+    months: [
+      "Janvier",
+      "Février",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juillet",
+      "Août",
+      "Septembre",
+      "Octobre",
+      "Novembre",
+      "Décembre",
+    ],
   },
   en: {
     zoom_out: "Zoom out",
@@ -70,6 +84,20 @@ const strings = {
     ),
     grouping: "Grouping",
     smoothing: "Smoothing",
+    months: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ],
   },
 };
 
@@ -79,10 +107,17 @@ export function ResultViewer(props: ResultViewerProps) {
   if (!graphState || !graphStateDispatch)
     throw new Error("Graph state not initialized");
   const selectedPoint = React.useRef<Highcharts.Point>();
-  const { selectedTicket, grouping, smoothing, tickets, month, contextYearRange: yearRange } =
-    graphState;
+  const {
+    selectedTicket,
+    grouping,
+    smoothing,
+    tickets,
+    month,
+    contextYearRange: yearRange,
+  } = graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
+  const currentTicket = tickets?.filter((t) => t.id === selectedTicket)[0];
 
   function setSelectedTicket(ticketID?: number) {
     graphStateDispatch!({
@@ -211,9 +246,8 @@ export function ResultViewer(props: ResultViewerProps) {
       <HighchartsReact highcharts={Highcharts} options={highchartsOpts} />
       <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
         {translation.gallicagram_plug}
-        <div className={"max-w-sm"}>
+        <div className={"flex wrap gap-5"}>
           <SelectInput
-            label={"Term"}
             options={tickets?.map((ticket) => ticket.terms[0]) ?? []}
             onChange={(value: string) =>
               setSelectedTicket(
@@ -223,6 +257,21 @@ export function ResultViewer(props: ResultViewerProps) {
             value={
               tickets?.filter((t) => t.id === selectedTicket)?.[0]?.terms[0]
             }
+          />
+          <ActiveFilters
+            filters={[
+              {
+                label:
+                  yearRange[0] && yearRange[1]
+                    ? `${yearRange[0]} - ${yearRange[1]}`
+                    : undefined,
+                onClick: () => setYearRange([undefined, undefined]),
+              },
+              {
+                label: month ? translation.months[month - 1] : undefined,
+                onClick: () => setMonth(undefined),
+              },
+            ]}
           />
         </div>
       </div>
