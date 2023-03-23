@@ -30,7 +30,7 @@ export interface TableProps {
 }
 
 export const fetchContext = async (pageParam = 0, props: TableProps) => {
-  let baseUrl = `${apiURL}/api/gallicaRecords`;
+  let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...props,
     children: undefined,
