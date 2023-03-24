@@ -244,10 +244,10 @@ export function ResultsTable(props: TableProps) {
         {pagination}
       </div>
       {tableInstance.data.length > 0 && (
-        <>
+        <div className={"flex flex-col justify-center items-center"}>
           <DesktopTable tableInstance={tableInstance} />
           <MobileTable tableInstance={tableInstance} />
-        </>
+        </div>
       )}
       {pagination}
     </div>
