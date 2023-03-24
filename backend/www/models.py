@@ -33,7 +33,6 @@ class Ticket(BaseModel):
     end_date: int
     codes: Optional[List[str]] = None
     grouping: Literal["month", "year", "all"] = "year"
-    id: Optional[int] = None
     backend_source: Literal["gallica", "pyllica"] = "pyllica"
     cached_response: Optional[List[VolumeQuery]] = None
     link: Optional[Tuple[str, int]] = None
