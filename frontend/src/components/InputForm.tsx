@@ -76,7 +76,6 @@ export const InputForm: React.FC<InputFormProps> = ({
   const mutation = useMutation(postTicket);
 
   const handleSubmit = () => {
-    setSubmitted(true);
     mutation.mutateAsync(
       {
         terms: [word],
@@ -88,6 +87,7 @@ export const InputForm: React.FC<InputFormProps> = ({
       {
         onSuccess: (data) => {
           setTicketID(data.requestid);
+          setSubmitted(true);
         },
       }
     );
