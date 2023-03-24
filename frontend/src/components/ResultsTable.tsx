@@ -10,7 +10,6 @@ import {
 } from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
-import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
 
@@ -49,6 +48,7 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
+  const [charLimit, setCharLimit] = React.useState(80);
   const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
   const strings = {
@@ -103,7 +103,6 @@ export function ResultsTable(props: TableProps) {
   });
 
   const currentPage = data;
-
   const tableData = React.useMemo(
     () =>
       currentPage?.records
@@ -121,17 +120,17 @@ export function ResultsTable(props: TableProps) {
                 p. {contextRow.page}
               </a>
             ),
-            left_context: contextRow.left_context,
+            left_context: contextRow.left_context.slice(-charLimit),
             pivot: (
               <span className={"text-blue-500 font-medium"}>
                 {contextRow.pivot}
               </span>
             ),
-            right_context: contextRow.right_context,
+            right_context: contextRow.right_context.slice(0, charLimit),
           }))
         )
         .flat() ?? [],
-    [currentPage]
+    [currentPage, charLimit]
   );
 
   function showFirstWhenAggregated({ value }: { value: string[] }) {
@@ -380,7 +379,7 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
 
 function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
-    <table className={"shadow-md hidden md:block lg:block w-screen"}>
+    <table className={"shadow-xl hidden md:block lg:block xl:block"}>
       <thead>
         {props.tableInstance.headerGroups.map((headerGroup, index) => (
           <tr {...headerGroup.getHeaderGroupProps()} key={index}>
@@ -421,7 +420,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                   <td
                     {...cell.getCellProps()}
                     key={index}
-                    className={"pl-3 pr-3 pt-2 pb-2" + twStyle}
+                    className={"pl-6 pr-6 pt-2 pb-2" + twStyle}
                   >
                     {cellRender(row, cell)}
                   </td>
