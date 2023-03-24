@@ -227,23 +227,29 @@ export function ResultViewer(props: ResultViewerProps) {
 
   return (
     <div className={"h-full w-full bg-white"}>
-      <div className={"ml-10 mb-5 flex flex-row gap-10"}>
-        <InputLabel label={translation.grouping}>
-          <SelectInput
-            options={["year", "month"]}
-            onChange={(value: string) => setGrouping(value as "year" | "month")}
-            value={grouping}
-          />
-        </InputLabel>
-        <InputLabel label={translation.smoothing}>
-          <SelectInput
-            options={["0", "1", "2", "3", "4", "5", "10", "20", "50"]}
-            onChange={(value: string) => setSmoothing(parseInt(value))}
-            value={smoothing.toString()}
-          />
-        </InputLabel>
+      <div className={"relative"}>
+        <div
+          className={"ml-10 absolute -top-10 right-2 z-40 mb-5 flex flex-row gap-10"}
+        >
+          <InputLabel label={translation.grouping}>
+            <SelectInput
+              options={["year", "month"]}
+              onChange={(value: string) =>
+                setGrouping(value as "year" | "month")
+              }
+              value={grouping}
+            />
+          </InputLabel>
+          <InputLabel label={translation.smoothing}>
+            <SelectInput
+              options={["0", "1", "2", "3", "4", "5", "10", "20", "50"]}
+              onChange={(value: string) => setSmoothing(parseInt(value))}
+              value={smoothing.toString()}
+            />
+          </InputLabel>
+        </div>
+        <HighchartsReact highcharts={Highcharts} options={highchartsOpts} />
       </div>
-      <HighchartsReact highcharts={Highcharts} options={highchartsOpts} />
       <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
         {translation.gallicagram_plug}
         <div className={"flex wrap gap-10"}>

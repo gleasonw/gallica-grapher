@@ -379,12 +379,12 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
 
 function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
-    <table className={"shadow-xl hidden md:block lg:block xl:block"}>
+    <table className={"shadow-xl rounded-xl border hidden md:block lg:block xl:block"}>
       <thead>
         {props.tableInstance.headerGroups.map((headerGroup, index) => (
           <tr {...headerGroup.getHeaderGroupProps()} key={index}>
             {headerGroup.headers.map((column, index) => (
-              <th {...column.getHeaderProps()} key={index}>
+              <th {...column.getHeaderProps()} key={index} className={"p-2 font-medium"}>
                 {column.render("Header")}
               </th>
             ))}

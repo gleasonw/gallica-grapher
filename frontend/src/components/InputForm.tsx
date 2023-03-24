@@ -37,7 +37,6 @@ const strings = {
 export const InputForm: React.FC<InputFormProps> = ({
   onCreateTicket,
   onDeleteTicket,
-  onDeleteExampleTickets,
   tickets,
 }) => {
   const [word, setWord] = useState<string>("");
@@ -99,7 +98,7 @@ export const InputForm: React.FC<InputFormProps> = ({
       {!submitted && (
         <div
           className={
-            "p-5 w-full flex flex-col justify-center items-center rounded-full"
+            "w-full flex flex-col justify-center items-center rounded-full"
           }
         >
           <InputBubble
@@ -151,7 +150,6 @@ export const InputForm: React.FC<InputFormProps> = ({
           }}
         />
       )}
-      <div></div>
       <TicketRow tickets={tickets} onGraphedTicketCardClick={onDeleteTicket} />
     </DashboardLayout>
   );
@@ -189,7 +187,7 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
   return (
     <button
       onClick={() => onClick(ticket.id)}
-      className={`rounded-lg border-2 bg-white p-5 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
+      className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
       style={{ borderColor: color }}
     >
       <div className={`relative h-full w-full`}>
