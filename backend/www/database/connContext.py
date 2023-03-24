@@ -8,7 +8,7 @@ def build_db_conn():
 
 class Postgres:
     def __init__(self):
-        if os.environ.get("DB_HOST"):
+        if os.environ.get("DB_URL"):
             self.conn = init_prod()
         else:
             self.conn = init_local()

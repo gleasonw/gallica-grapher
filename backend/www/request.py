@@ -3,8 +3,6 @@ import io
 from www.models import Ticket, Progress
 from www.database.connContext import build_db_conn
 from typing import Callable, Literal
-from gallicaGetter.utils.parse_xml import get_one_paper_from_record_batch
-from gallicaGetter.periodOccurrence import PeriodRecord
 import www.pyllicaWrapper as pyllica_wrapper
 
 
@@ -45,7 +43,6 @@ class Request(threading.Thread):
 
                 csv_file_like_object = io.StringIO()
                 for record in pyllica_records:
-                    assert isinstance(record, PeriodRecord)
                     row = (
                         record.year,
                         record.month,
