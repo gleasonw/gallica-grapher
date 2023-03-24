@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import os
 import uvicorn
 import random
@@ -10,10 +9,6 @@ from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-RECORD_LIMIT = 1000000
-MAX_DB_SIZE = 10000000
-
 app = FastAPI()
 
 origins = ["*"]
@@ -32,7 +27,6 @@ request_progress: Dict[int, Progress] = {}
 @app.get("/")
 def index():
     return {"message": "ok"}
-
 
 @app.post("/api/init")
 def init(ticket: Ticket):

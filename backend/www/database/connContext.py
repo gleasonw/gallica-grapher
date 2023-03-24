@@ -1,5 +1,4 @@
 import psycopg2
-import redis
 import os
 
 
@@ -9,7 +8,7 @@ def build_db_conn():
 
 class Postgres:
     def __init__(self):
-        if os.environ.get("DATABASE_URL"):
+        if os.environ.get("DB_HOST"):
             self.conn = init_prod()
         else:
             self.conn = init_local()
@@ -36,5 +35,4 @@ def init_local():
 
 
 def init_prod():
-    DATABASE_URL = os.environ["DATABASE_URL"]
-    return psycopg2.connect(DATABASE_URL)
+    return psycopg2.connect(os.environ.get("DB_URL"))
