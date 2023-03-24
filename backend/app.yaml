@@ -1,4 +1,0 @@
-runtime: python311
-entrypoint: python3 -m main
-env_variables:
-  DB_URL: "postgres://tsdbadmin:LeCoeurRaces!@jcc4evsufc.dekzll83jw.tsdb.cloud.timescale.com:32677/tsdb?sslmode=require"
