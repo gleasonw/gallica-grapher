@@ -143,7 +143,7 @@ export function ResultsTable(props: TableProps) {
         Header: "Document",
         accessor: "document",
         Cell: ({ value }: { value: string }) => (
-          <div className={"flex flex-col gap-2"}>
+          <div className={""}>
             {value.split("||").map((v, i) =>
               i === 0 ? (
                 <div className="italic" key={v}>
@@ -230,7 +230,7 @@ export function ResultsTable(props: TableProps) {
   //TODO: show active filters, replicate gamepass ui
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-      <div className={"ml-5 flex flex-col mb-10"}>
+      <div className={"ml-5 flex flex-col mb-2"}>
         <h1 className={"text-2xl flex flex-col gap-2"}>
           {!currentPage && !isFetching && <p>No results found</p>}
           {currentPage && (
@@ -440,7 +440,7 @@ function cellRender(row: Row, cell: Cell) {
     // @ts-ignore
     cell.isGrouped ? (
       // If it's a grouped cell, add an expander and row count
-      <>
+      <div className={"flex gap-3"}>
         <span className={"text-xl"}>
           {
             // @ts-ignore
@@ -448,7 +448,7 @@ function cellRender(row: Row, cell: Cell) {
           }
         </span>{" "}
         ({row.subRows.length}) {cell.render("Cell")}
-      </>
+      </div>
     ) : // @ts-ignore
     cell.isAggregated ? (
       // If the cell is aggregated, use the Aggregated
