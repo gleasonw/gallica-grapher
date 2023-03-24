@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from typing import List, Literal, Optional, Tuple
-from gallicaGetter.queries import VolumeQuery
 
 
 class Progress(BaseModel):
@@ -34,6 +33,5 @@ class Ticket(BaseModel):
     codes: Optional[List[str]] = None
     grouping: Literal["month", "year", "all"] = "year"
     backend_source: Literal["gallica", "pyllica"] = "pyllica"
-    cached_response: Optional[List[VolumeQuery]] = None
     link: Optional[Tuple[str, int]] = None
     source: Optional[Literal["book", "periodical", "all"]] = "all"

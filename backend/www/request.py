@@ -1,8 +1,7 @@
 import threading
 import io
 from www.models import Ticket, Progress
-import json
-from www.database.connContext import build_db_conn 
+from www.database.connContext import build_db_conn
 from typing import Callable, Literal
 from gallicaGetter.utils.parse_xml import get_one_paper_from_record_batch
 from gallicaGetter.periodOccurrence import PeriodRecord
