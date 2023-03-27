@@ -36,7 +36,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       month={props.month}
       day={props.day}
       yearRange={props.yearRange}
-      limit={10}
+      limit={20}
       initialRecords={props.initialRecords}
       source={"periodical"}
     >

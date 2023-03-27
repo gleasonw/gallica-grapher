@@ -37,7 +37,6 @@ const strings = {
 export const InputForm: React.FC<InputFormProps> = ({
   onCreateTicket,
   onDeleteTicket,
-  onDeleteExampleTickets,
   tickets,
 }) => {
   const [word, setWord] = useState<string>("");
@@ -96,33 +95,31 @@ export const InputForm: React.FC<InputFormProps> = ({
 
   return (
     <DashboardLayout>
-      {!submitted && (
-        <div
-          className={
-            "p-5 w-full flex flex-col justify-center items-center rounded-full"
-          }
+      <div
+        className={
+          "w-full flex flex-col justify-center items-center rounded-full"
+        }
+      >
+        <InputBubble
+          word={word}
+          onWordChange={submitted ? () => undefined : setWord}
+          onSubmit={handleSubmit}
         >
-          <InputBubble
-            word={word}
-            onWordChange={setWord}
-            onSubmit={handleSubmit}
-          >
-            <Image
-              src={glassIcon}
-              className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
-              alt="Search icon"
-              onClick={handleSubmit}
-            />
-          </InputBubble>
-          <YearRangeInput
-            max={2021}
-            min={1500}
-            value={searchYearRange}
-            showLabel={false}
-            onChange={setSearchRange}
+          <Image
+            src={glassIcon}
+            className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
+            alt="Search icon"
+            onClick={handleSubmit}
           />
-        </div>
-      )}
+        </InputBubble>
+        <YearRangeInput
+          max={2021}
+          min={1500}
+          value={searchYearRange}
+          showLabel={false}
+          onChange={setSearchRange}
+        />
+      </div>
       {submitted && (
         <SearchProgress
           ticket={{
@@ -151,8 +148,11 @@ export const InputForm: React.FC<InputFormProps> = ({
           }}
         />
       )}
-      <div></div>
-      <TicketRow tickets={tickets} onGraphedTicketCardClick={onDeleteTicket} />
+      <TicketRow
+        tickets={tickets}
+        onGraphedTicketCardClick={onDeleteTicket}
+        submitted={submitted}
+      />
     </DashboardLayout>
   );
 };
@@ -161,7 +161,8 @@ export const TicketRow: React.FC<{
   tickets?: GraphTicket[];
   children?: React.ReactNode;
   onGraphedTicketCardClick: (ticketID: number) => void;
-}> = ({ tickets, children, onGraphedTicketCardClick }) => {
+  submitted: boolean;
+}> = ({ tickets, children, onGraphedTicketCardClick, submitted }) => {
   return (
     <div className={"z-0 flex self-start"}>
       <div className={"flex flex-wrap gap-10"}>
@@ -173,6 +174,26 @@ export const TicketRow: React.FC<{
             color={seriesColors[index % seriesColors.length]}
           />
         ))}
+        {submitted && (
+          <div
+            className={"rounded-lg border-2 bg-white p-3 text-xl shadow-md"}
+            style={{
+              borderColor:
+                seriesColors[tickets?.length || 0 % seriesColors.length],
+            }}
+          >
+            <div className="flex items-center justify-center mt-2">
+              <div
+                className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                role="status"
+              >
+                <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                  Loading...
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       {children}
     </div>
@@ -189,7 +210,7 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
   return (
     <button
       onClick={() => onClick(ticket.id)}
-      className={`rounded-lg border-2 bg-white p-5 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
+      className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
       style={{ borderColor: color }}
     >
       <div className={`relative h-full w-full`}>

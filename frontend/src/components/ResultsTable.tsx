@@ -10,7 +10,6 @@ import {
 } from "react-table";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
-import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
 
@@ -49,6 +48,7 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
+  const [charLimit, setCharLimit] = React.useState(80);
   const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
   const strings = {
@@ -103,7 +103,6 @@ export function ResultsTable(props: TableProps) {
   });
 
   const currentPage = data;
-
   const tableData = React.useMemo(
     () =>
       currentPage?.records
@@ -121,17 +120,17 @@ export function ResultsTable(props: TableProps) {
                 p. {contextRow.page}
               </a>
             ),
-            left_context: contextRow.left_context,
+            left_context: contextRow.left_context.slice(-charLimit),
             pivot: (
               <span className={"text-blue-500 font-medium"}>
                 {contextRow.pivot}
               </span>
             ),
-            right_context: contextRow.right_context,
+            right_context: contextRow.right_context.slice(0, charLimit),
           }))
         )
         .flat() ?? [],
-    [currentPage]
+    [currentPage, charLimit]
   );
 
   function showFirstWhenAggregated({ value }: { value: string[] }) {
@@ -144,7 +143,7 @@ export function ResultsTable(props: TableProps) {
         Header: "Document",
         accessor: "document",
         Cell: ({ value }: { value: string }) => (
-          <div className={"flex flex-col gap-2"}>
+          <div className={""}>
             {value.split("||").map((v, i) =>
               i === 0 ? (
                 <div className="italic" key={v}>
@@ -231,7 +230,7 @@ export function ResultsTable(props: TableProps) {
   //TODO: show active filters, replicate gamepass ui
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-      <div className={"ml-5 flex flex-col mb-10"}>
+      <div className={"ml-5 flex flex-col mb-2"}>
         <h1 className={"text-2xl flex flex-col gap-2"}>
           {!currentPage && !isFetching && <p>No results found</p>}
           {currentPage && (
@@ -244,10 +243,10 @@ export function ResultsTable(props: TableProps) {
         {pagination}
       </div>
       {tableInstance.data.length > 0 && (
-        <>
+        <div className={"flex flex-col justify-center items-center"}>
           <DesktopTable tableInstance={tableInstance} />
           <MobileTable tableInstance={tableInstance} />
-        </>
+        </div>
       )}
       {pagination}
     </div>
@@ -380,12 +379,12 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
 
 function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
-    <table className={"shadow-md hidden md:block lg:block w-screen"}>
+    <table className={"shadow-xl rounded-xl border hidden md:block lg:block xl:block"}>
       <thead>
         {props.tableInstance.headerGroups.map((headerGroup, index) => (
           <tr {...headerGroup.getHeaderGroupProps()} key={index}>
             {headerGroup.headers.map((column, index) => (
-              <th {...column.getHeaderProps()} key={index}>
+              <th {...column.getHeaderProps()} key={index} className={"p-2 font-medium"}>
                 {column.render("Header")}
               </th>
             ))}
@@ -421,7 +420,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                   <td
                     {...cell.getCellProps()}
                     key={index}
-                    className={"pl-3 pr-3 pt-2 pb-2" + twStyle}
+                    className={"pl-6 pr-6 pt-2 pb-2" + twStyle}
                   >
                     {cellRender(row, cell)}
                   </td>
@@ -441,7 +440,7 @@ function cellRender(row: Row, cell: Cell) {
     // @ts-ignore
     cell.isGrouped ? (
       // If it's a grouped cell, add an expander and row count
-      <>
+      <div className={"flex gap-3"}>
         <span className={"text-xl"}>
           {
             // @ts-ignore
@@ -449,7 +448,7 @@ function cellRender(row: Row, cell: Cell) {
           }
         </span>{" "}
         ({row.subRows.length}) {cell.render("Cell")}
-      </>
+      </div>
     ) : // @ts-ignore
     cell.isAggregated ? (
       // If the cell is aggregated, use the Aggregated

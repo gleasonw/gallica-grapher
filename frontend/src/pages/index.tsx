@@ -593,9 +593,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
         </label>
       )}
       <div
-        className={
-          "flex flex-row text-md max-w-md items-center flex-wrap gap-10 p-3"
-        }
+        className={"flex flex-row text-md max-w-md items-center gap-10 p-3"}
         id={"year-range"}
       >
         <input
