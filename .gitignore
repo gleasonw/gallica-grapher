@@ -18,6 +18,7 @@ node_modules/
 .idea/
 .idea
 
+backend/gallicaGetter
 # Distribution / packaging
 .Python
 build/

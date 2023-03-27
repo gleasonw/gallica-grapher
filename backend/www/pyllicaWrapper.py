@@ -52,6 +52,7 @@ def get_gram_data(
     resolution: Literal["default", "annee", "mois"] = "default",
 ):
     format_gram = gram.replace(" ", "%20")
+    format_gram = quote(format_gram, encoding="utf-8")
     df = pd.read_csv(
         f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{format_gram}_from={debut}_to={fin}"
     )
