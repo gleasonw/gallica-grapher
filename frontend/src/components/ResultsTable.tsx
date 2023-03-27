@@ -112,12 +112,12 @@ export function ResultsTable(props: TableProps) {
             date: record.date,
             page: (
               <a
-                className="underline font-medium text-blue-500"
+                className="underline font-medium text-blue-500 p-2"
                 href={contextRow.page_url}
                 target="_blank"
                 rel="noreferrer"
               >
-                p. {contextRow.page}
+                Image
               </a>
             ),
             left_context: contextRow.left_context.slice(-charLimit),
@@ -157,7 +157,7 @@ export function ResultsTable(props: TableProps) {
         ),
       } as const,
       {
-        Header: "Page Gallica",
+        Header: "Gallica",
         accessor: "page",
         aggregate: "unique",
         Aggregated: showFirstWhenAggregated,
@@ -379,12 +379,20 @@ function MobileTable(props: { tableInstance: TableInstance<any> }) {
 
 function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
-    <table className={"shadow-xl rounded-xl border hidden md:block lg:block xl:block"}>
+    <table
+      className={
+        "shadow-xl rounded-xl border hidden md:block lg:block xl:block"
+      }
+    >
       <thead>
         {props.tableInstance.headerGroups.map((headerGroup, index) => (
           <tr {...headerGroup.getHeaderGroupProps()} key={index}>
             {headerGroup.headers.map((column, index) => (
-              <th {...column.getHeaderProps()} key={index} className={"p-2 font-medium"}>
+              <th
+                {...column.getHeaderProps()}
+                key={index}
+                className={"p-2 font-medium"}
+              >
                 {column.render("Header")}
               </th>
             ))}
