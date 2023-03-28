@@ -351,41 +351,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
     term,
     tableProps,
   } = searchState;
-
-  function makeDisplayCQL() {
-    let termCQL = "";
-    let dateCQL = "";
-    let paperCQL = "";
-    let corpusCQL = "";
-    if (term) {
-      if (linkTerm) {
-        termCQL = `text adj "${term}" prox/unit=word/distance=${linkDistance} "${linkTerm}"`;
-      } else {
-        termCQL = `text adj "${term}"`;
-      }
-    }
-    if (yearRange[0] && yearRange[1]) {
-      dateCQL = `gallicapublication_date >= "${yearRange[0]}-01-01" and gallicapublication_date <= "${yearRange[1]}-12-31"`;
-    }
-    if (papers && papers.length > 0) {
-      const formattedCodes = papers.map((paper) => `${paper.code}_date`);
-      paperCQL =
-        'arkPress adj "' + formattedCodes.join('" or arkPress adj "') + '"';
-    } else {
-      if (source === "periodical") {
-        corpusCQL = 'dc.type all "fascicule"';
-      } else if (source === "book") {
-        corpusCQL = 'dc.type all "monographie"';
-      }
-    }
-    const cql = [termCQL, dateCQL, paperCQL, corpusCQL]
-      .filter((cql) => cql !== "")
-      .join(" and ");
-    if (sort === "date") {
-      return `${cql} sortby dc.date/sort.ascending`;
-    }
-    return cql;
-  }
+  console.log(tableProps);
 
   function handleSubmit() {
     searchStateDispatch!({
