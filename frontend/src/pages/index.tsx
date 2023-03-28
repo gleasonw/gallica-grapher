@@ -104,8 +104,8 @@ export default function Home({
 
   const [graphState, graphStateDispatch] = React.useReducer(graphStateReducer, {
     tickets: initTickets,
-    contextYearRange: [1750, 2020],
-    searchYearRange: [1750, 2020],
+    contextYearRange: [1789, 1950],
+    searchYearRange: [1789, 1950],
     month: undefined,
     grouping: "year",
     smoothing: 0,
