@@ -354,6 +354,9 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
   console.log(tableProps);
 
   function handleSubmit() {
+    if (!term) {
+      return;
+    }
     searchStateDispatch!({
       type: "set_table_props",
       payload: {
