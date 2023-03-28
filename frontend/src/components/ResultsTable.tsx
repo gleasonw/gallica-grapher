@@ -26,6 +26,7 @@ export interface TableProps {
   limit: number;
   sort?: "date" | "relevance" | null;
   initialRecords?: Awaited<ReturnType<typeof fetchContext>>;
+  all_context?: boolean;
 }
 
 export const fetchContext = async (pageParam = 0, props: TableProps) => {
