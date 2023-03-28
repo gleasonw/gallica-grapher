@@ -40,6 +40,7 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
     year: props.yearRange?.[0],
     end_year: props.yearRange?.[1],
     yearRange: undefined,
+    all_context: props.all_context,
   });
   console.log(url);
   const response = await fetch(url);

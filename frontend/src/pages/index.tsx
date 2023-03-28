@@ -531,7 +531,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
           Explore
         </button>
       </DashboardLayout>
-      {tableProps && <ResultsTable {...tableProps} />}
+      {tableProps && <ResultsTable {...{ ...tableProps, all_context: true }} />}
     </>
   );
 }

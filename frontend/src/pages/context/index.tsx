@@ -79,6 +79,7 @@ export default function Context() {
         link_term={link_term}
         limit={20}
         link_distance={link_distance}
+        all_context={true}
         sort={sort}
       />
     );
