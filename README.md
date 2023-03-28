@@ -6,7 +6,7 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 
 This app relies heavily on the [Gallica API](https://api.bnf.fr/fr/api-document-de-gallica) and [Pyllicagram](https://github.com/regicid/pyllicagram). You can find the Gallica JSON API I built in the [gallica-getter](https://github.com/gleasonw/gallica-getter) repository.
 
-## Important files:
+### Important files:
 
 [main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
 * api routes for the frontend marked by the @app FastAPI decorator
