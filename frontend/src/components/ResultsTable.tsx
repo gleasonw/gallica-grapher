@@ -199,7 +199,7 @@ export function ResultsTable(props: TableProps) {
   const total_results = Number(data?.num_results) ?? 0;
   const cursorMax = Math.floor(total_results / limit);
 
-  const pagination = currentPage && !isFetching && (
+  const pagination = currentPage && (
     <QueryPagination
       onPageIncrement={() => setSelectedPage(selectedPage + 1)}
       onPageDecrement={() => setSelectedPage(selectedPage - 1)}
@@ -214,6 +214,7 @@ export function ResultsTable(props: TableProps) {
         cursorMax={cursorMax}
         onCursorIncrement={setSelectedPage}
         onCursorDecrement={setSelectedPage}
+        key={selectedPage}
       />
       <p className={"ml-3 md:ml-5 lg:ml-5"}>
         {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
@@ -241,8 +242,8 @@ export function ResultsTable(props: TableProps) {
             </div>
           )}
         </h1>
-        {spinner}
         {pagination}
+        {spinner}
       </div>
       {tableInstance.data.length > 0 && (
         <div
@@ -309,10 +310,6 @@ interface CursorInputProps {
 function CursorInput(props: CursorInputProps) {
   const [localCursor, setLocalCursor] = React.useState(props.cursor);
 
-  React.useEffect(() => {
-    setLocalCursor(props.cursor);
-  }, [props.cursor]);
-
   const handleLocalCursorChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -329,9 +326,9 @@ function CursorInput(props: CursorInputProps) {
     }
 
     if (valueToPropagate > props.cursor) {
-      props.onCursorIncrement(valueToPropagate - props.cursor);
+      props.onCursorIncrement(valueToPropagate);
     } else if (valueToPropagate < props.cursor) {
-      props.onCursorDecrement(props.cursor - valueToPropagate);
+      props.onCursorDecrement(valueToPropagate);
     }
     setLocalCursor(valueToPropagate);
   };
