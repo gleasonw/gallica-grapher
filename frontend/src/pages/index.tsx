@@ -389,7 +389,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
             onSubmit={handleSubmit}
           ></InputBubble>
           <AnimatePresence>
-            {term && (
+            {term && !term.includes(" ") && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
