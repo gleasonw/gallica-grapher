@@ -77,6 +77,8 @@ export function ResultsTable(props: TableProps) {
   };
   const translation = strings[lang];
 
+  React.useEffect(() => setSelectedPage(1), [props]);
+
   const { isFetching, data } = useQuery({
     queryKey: [
       "context",
