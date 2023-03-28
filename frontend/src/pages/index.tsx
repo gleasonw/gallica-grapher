@@ -388,25 +388,33 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
             }
             onSubmit={handleSubmit}
           ></InputBubble>
+          <AnimatePresence>
+            {term && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <ProximitySearchInput
+                  linkTerm={linkTerm}
+                  linkDistance={linkDistance}
+                  onSetLinkDistance={(new_distance) =>
+                    searchStateDispatch({
+                      type: "set_link_distance",
+                      payload: new_distance,
+                    })
+                  }
+                  onSetLinkTerm={(new_term) =>
+                    searchStateDispatch({
+                      type: "set_link_term",
+                      payload: new_term,
+                    })
+                  }
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div className={"flex flex-wrap gap-10 justify-center"}>
-            <SubInputLayout>
-              <ProximitySearchInput
-                linkTerm={linkTerm}
-                linkDistance={linkDistance}
-                onSetLinkDistance={(new_distance) =>
-                  searchStateDispatch({
-                    type: "set_link_distance",
-                    payload: new_distance,
-                  })
-                }
-                onSetLinkTerm={(new_term) =>
-                  searchStateDispatch({
-                    type: "set_link_term",
-                    payload: new_term,
-                  })
-                }
-              />
-            </SubInputLayout>
             <SubInputLayout>
               <YearRangeInput
                 min={1500}

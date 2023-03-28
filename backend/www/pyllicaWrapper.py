@@ -1,7 +1,7 @@
 from www.models import Ticket
 from gallicaGetter.utils.date import Date
 from gallicaGetter.periodOccurrence import PeriodRecord
-from typing import Callable, List, Literal
+from typing import Callable, Literal
 from urllib.error import HTTPError
 import pandas as pd
 from urllib.parse import quote
