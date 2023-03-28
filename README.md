@@ -6,7 +6,7 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 
 This app relies heavily on the [Gallica API](https://api.bnf.fr/fr/api-document-de-gallica) and [Pyllicagram](https://github.com/regicid/pyllicagram). You can find the Gallica JSON API I built in the [gallica-getter](https://github.com/gleasonw/gallica-getter) repository.
 
-#### Important server-side files:
+#### Server:
 
 #### [main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
 * api routes for the frontend marked by the @app FastAPI decorator
@@ -14,7 +14,7 @@ This app relies heavily on the [Gallica API](https://api.bnf.fr/fr/api-document-
 #### [request.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/www/request.py)
 * The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
 
-#### Important client-side files:
+#### Client:
 
 [Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/components)
 * Contains the React components for the graph, table, paper dropdown, and every UI component. 
