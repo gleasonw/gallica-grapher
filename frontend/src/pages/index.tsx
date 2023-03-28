@@ -386,33 +386,14 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
               })
             }
             onSubmit={handleSubmit}
-          ></InputBubble>
-          <AnimatePresence>
-            {term && !term.includes(" ") && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <ProximitySearchInput
-                  linkTerm={linkTerm}
-                  linkDistance={linkDistance}
-                  onSetLinkDistance={(new_distance) =>
-                    searchStateDispatch({
-                      type: "set_link_distance",
-                      payload: new_distance,
-                    })
-                  }
-                  onSetLinkTerm={(new_term) =>
-                    searchStateDispatch({
-                      type: "set_link_term",
-                      payload: new_term,
-                    })
-                  }
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          >
+            <button
+              className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md"
+              onClick={handleSubmit}
+            >
+              Explore
+            </button>
+          </InputBubble>
           <div className={"flex flex-wrap gap-10 justify-center"}>
             <SubInputLayout>
               <YearRangeInput
@@ -496,13 +477,31 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
               />
             </SubInputLayout>
           </div>
+          <div
+            className={
+              !term || term.includes(" ")
+                ? "opacity-0 transition-opacity duration-500"
+                : "opacity-100 transition-opacity duration-500"
+            }
+          >
+            <ProximitySearchInput
+              linkTerm={linkTerm}
+              linkDistance={linkDistance}
+              onSetLinkDistance={(new_distance) =>
+                searchStateDispatch({
+                  type: "set_link_distance",
+                  payload: new_distance,
+                })
+              }
+              onSetLinkTerm={(new_term) =>
+                searchStateDispatch({
+                  type: "set_link_term",
+                  payload: new_term,
+                })
+              }
+            />
+          </div>
         </div>
-        <button
-          className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white rounded-full p-3 shadow-md"
-          onClick={handleSubmit}
-        >
-          Explore
-        </button>
       </DashboardLayout>
       {tableProps && <ResultsTable {...{ ...tableProps, all_context: true }} />}
     </>
