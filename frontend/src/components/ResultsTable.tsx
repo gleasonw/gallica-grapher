@@ -37,7 +37,6 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
     cursor: pageParam,
     limit: props.limit,
     row_split: true,
-    all_context: true,
     year: props.yearRange?.[0],
     end_year: props.yearRange?.[1],
     yearRange: undefined,
