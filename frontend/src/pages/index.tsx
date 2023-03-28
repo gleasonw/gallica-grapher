@@ -377,7 +377,6 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
             "w-full flex flex-col justify-center gap-10 items-center rounded-lg pt-5 pb-5"
           }
         >
-          Work in progress! Direct CQL query option coming soon.
           <InputBubble
             word={term}
             onWordChange={(word) =>
