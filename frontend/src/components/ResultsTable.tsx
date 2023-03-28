@@ -224,10 +224,13 @@ export function ResultsTable(props: TableProps) {
     </QueryPagination>
   );
 
-  const spinner = isFetching && (
+  const spinner = (
     <div className={"flex justify-center items-center"}>
       <div
-        className=" h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+        className={
+          " h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] transition-opacity duration-150 " +
+          (isFetching ? "opacity-100" : "opacity-0")
+        }
         role="status"
       />
     </div>
@@ -277,27 +280,33 @@ function QueryPagination(props: {
         "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl transition-all duration-300"
       }
     >
-      {props.selectedPage !== 1 && (
-        <div className={"flex flex-row justify-between"}>
-          <button onClick={props.onFirstPage} className={"p-3"}>
-            {"<<"}
-          </button>
-          <button className={"p-4"} onClick={props.onPageDecrement}>
-            {"<"}
-          </button>
-        </div>
-      )}
+      <div
+        className={
+          "flex flex-row justify-between transition-opacity " +
+          (props.selectedPage !== 1 ? "opacity-100" : "opacity-0")
+        }
+      >
+        <button onClick={props.onFirstPage} className={"p-3"}>
+          {"<<"}
+        </button>
+        <button className={"p-4"} onClick={props.onPageDecrement}>
+          {"<"}
+        </button>
+      </div>
       {props.children}
-      {props.selectedPage !== props.cursorMax && (
-        <div className={"flex flex-row justify-between"}>
-          <button className={"p-4"} onClick={props.onPageIncrement}>
-            {">"}
-          </button>
-          <button onClick={props.onLastPage} className={"p-3"}>
-            {">>"}
-          </button>
-        </div>
-      )}
+      <div
+        className={
+          "flex flex-row justify-between " +
+          (props.selectedPage !== props.cursorMax ? "opacity-100" : "opacity-0")
+        }
+      >
+        <button className={"p-4"} onClick={props.onPageIncrement}>
+          {">"}
+        </button>
+        <button onClick={props.onLastPage} className={"p-3"}>
+          {">>"}
+        </button>
+      </div>
     </div>
   );
 }
