@@ -37,6 +37,7 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
     cursor: pageParam,
     limit: props.limit,
     row_split: true,
+    all_context: true,
     year: props.yearRange?.[0],
     end_year: props.yearRange?.[1],
     yearRange: undefined,
@@ -48,7 +49,7 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
-  const [charLimit, setCharLimit] = React.useState(80);
+  const [charLimit, setCharLimit] = React.useState(70);
   const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
   const strings = {
@@ -112,7 +113,7 @@ export function ResultsTable(props: TableProps) {
             date: record.date,
             page: (
               <a
-                className="underline font-medium text-blue-500 p-2"
+                className="underline font-medium p-2"
                 href={contextRow.page_url}
                 target="_blank"
                 rel="noreferrer"
@@ -243,7 +244,11 @@ export function ResultsTable(props: TableProps) {
         {pagination}
       </div>
       {tableInstance.data.length > 0 && (
-        <div className={"flex flex-col justify-center items-center"}>
+        <div
+          className={
+            "flex ease-in-out first-letter:flex-col justify-center items-center transition-all duration-1000"
+          }
+        >
           <DesktopTable tableInstance={tableInstance} />
           <MobileTable tableInstance={tableInstance} />
         </div>
@@ -265,7 +270,7 @@ function QueryPagination(props: {
   return (
     <div
       className={
-        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl"
+        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl transition-all duration-300"
       }
     >
       {props.selectedPage !== 1 && (
@@ -381,7 +386,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
     <table
       className={
-        "shadow-xl rounded-xl border hidden md:block lg:block xl:block"
+        "shadow-xl rounded-xl border hidden md:block lg:block xl:block transition-all duration-300"
       }
     >
       <thead>
