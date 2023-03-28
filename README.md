@@ -4,6 +4,8 @@
 
 If you have an idea, suggestion, or question about the code, don't hesitate to make a pull request or new issue. 
 
+This app relies heavily on the [Gallica API](https://api.bnf.fr/fr/api-document-de-gallica) and [Pyllicagram](https://github.com/regicid/pyllicagram). You can find the Python proxy API I built in the [gallica-getter](https://github.com/gleasonw/gallica-getter) repository.
+
 #### Important server-side files:
 
 #### [main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
@@ -11,8 +13,6 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 
 #### [request.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/www/request.py)
 * The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
-
-Context is provided by the Gallica API. You can find the Python proxy API I built in the [gallica-getter](https://github.com/gleasonw/gallica-getter) repository.
 
 #### Important client-side files:
 
