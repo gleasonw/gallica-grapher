@@ -8,10 +8,10 @@ This app relies heavily on the [Gallica API](https://api.bnf.fr/fr/api-document-
 
 ## Important files:
 
-#### [main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
+[main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
 * api routes for the frontend marked by the @app FastAPI decorator
 
-#### [request.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/www/request.py)
+[request.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/www/request.py)
 * The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
 
 [Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/components)
