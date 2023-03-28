@@ -41,6 +41,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 }) => {
   const [word, setWord] = useState<string>("");
   const [submitted, setSubmitted] = useState(false);
+  const [fetching, setFetching] = useState(false);
   const [ticketID, setTicketID] = useState<number>(0);
   const graphStateDispatch = React.useContext(GraphPageDispatchContext);
   const graphState = React.useContext(GraphPageStateContext);
@@ -76,6 +77,7 @@ export const InputForm: React.FC<InputFormProps> = ({
   const mutation = useMutation(postTicket);
 
   const handleSubmit = () => {
+    setSubmitted(true);
     mutation.mutateAsync(
       {
         terms: [word],
@@ -87,7 +89,7 @@ export const InputForm: React.FC<InputFormProps> = ({
       {
         onSuccess: (data) => {
           setTicketID(data.requestid);
-          setSubmitted(true);
+          setFetching(true);
         },
       }
     );
@@ -120,7 +122,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           onChange={setSearchRange}
         />
       </div>
-      {submitted && (
+      {fetching && (
         <SearchProgress
           ticket={{
             id: ticketID,
@@ -138,12 +140,13 @@ export const InputForm: React.FC<InputFormProps> = ({
               end_date: searchYearRange[1],
               grouping: "month",
             });
+            setFetching(false);
             setSubmitted(false);
             setWord("");
           }}
           onNoRecordsFound={() => {
             alert(translation.no_records_found);
-            setSubmitted(false);
+            setFetching(false);
             setWord("");
           }}
         />
