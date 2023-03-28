@@ -484,7 +484,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
               <SelectInput
                 label={"limit"}
                 value={limit}
-                options={[10, 20, 50, 100]}
+                options={[10, 20, 50]}
                 onChange={(lim) => {
                   const new_limit = parseInt(lim);
                   if (typeof new_limit === "number") {
