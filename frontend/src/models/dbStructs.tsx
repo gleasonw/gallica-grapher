@@ -1,12 +1,15 @@
 export interface GallicaResponse {
-  records: GallicaRecord[];
+  records: VolumeRecord[];
   num_results: string;
   origin_urls: string[];
 }
 
-export interface GallicaRecord {
+export interface VolumeRecord {
   paper_title: string;
   paper_code: string;
+  ocr_quality: number;
+  author: string;
+  ark: string;
   url: string;
   date: string;
   terms: string[];

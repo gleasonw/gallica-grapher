@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Cell,
   Row,
@@ -12,6 +12,7 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
+import { apiURL } from "./apiURL";
 
 export interface TableProps {
   terms?: string[];
@@ -30,8 +31,8 @@ export interface TableProps {
 }
 
 export const fetchContext = async (pageParam = 0, props: TableProps) => {
-  let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
-  let url = addQueryParamsIfExist(baseUrl, {
+  let baseURL = "https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords";
+  let url = addQueryParamsIfExist(baseURL, {
     ...props,
     children: undefined,
     initialRecords: undefined,
@@ -115,14 +116,26 @@ export function ResultsTable(props: TableProps) {
             document: `${record.paper_title}||${record.date}`,
             date: record.date,
             page: (
-              <a
-                className="underline font-medium p-2"
-                href={contextRow.page_url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Image
-              </a>
+              <div className={"flex flex-col"}>
+                <ImageSnippet
+                  ark={record.ark}
+                  term={record.terms[0]}
+                  url={contextRow.page_url}
+                  key={
+                    contextRow.left_context +
+                    contextRow.pivot +
+                    contextRow.right_context
+                  }
+                />
+                <a
+                  className="underline font-medium p-2"
+                  href={contextRow.page_url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Image
+                </a>
+              </div>
             ),
             left_context: contextRow.left_context.slice(-charLimit),
             pivot: (
@@ -487,5 +500,42 @@ function cellRender(row: Row, cell: Cell) {
     cell.isPlaceholder ? null : cell.column.id !== "date" ? ( // Otherwise, just render the regular cell // For cells with repeated values, render null
       cell.render("Cell")
     ) : null
+  );
+}
+
+function ImageSnippet(props: { ark: string; term: string; url: string }) {
+  const [image, setImage] = React.useState("");
+
+  const last_el = props.url.split("/").pop();
+  const page_sec = last_el?.split(".")?.[0];
+  const page = page_sec?.slice(1);
+
+  async function doFetch() {
+    const url = addQueryParamsIfExist(`${apiURL}/api/imageSnippet`, {
+      ark: props.ark,
+      term: props.term,
+      page: page,
+    });
+    const response = await fetch(url);
+    const imgString = await response.json();
+    setImage(imgString);
+  }
+
+  const mutation = useMutation(doFetch, {
+    onSuccess: () => {
+      console.log("success");
+    },
+  });
+
+  return (
+    <div className={"flex flex-col gap-2"}>
+      <button
+        onClick={() => mutation.mutate()}
+        className={"text-blue-500 p-5 hover:bg-red-500"}
+      >
+        Fetch image
+      </button>
+      {image && <img src={image} />}
+    </div>
   );
 }

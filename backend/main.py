@@ -1,4 +1,7 @@
+import base64
+import json
 import os
+import aiohttp
 import uvicorn
 import random
 from typing import Dict, Literal
@@ -9,6 +12,7 @@ from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
 origins = ["*"]
@@ -27,6 +31,7 @@ request_progress: Dict[int, Progress] = {}
 @app.get("/")
 def index():
     return {"message": "ok"}
+
 
 @app.post("/api/init")
 def init(ticket: Ticket):
@@ -125,6 +130,25 @@ def graph_data(
             average_window=average_window,
             conn=conn,
         )
+
+
+@app.get("/api/imageSnippet")
+async def image_snippet(ark: str, term: str, page: int):
+    url = "https://rapportgallica.bnf.fr/api/snippet"
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "ark": ark,
+        "isPeriodique": True,
+        "pages": [page],
+        "query": f'(gallica any "{term}")',
+        "limitSnippets": 1,
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers, json=data) as resp:
+            if resp.status != 200:
+                return {"error": "error"}
+            result = await resp.json()
+            return result[0]["snippetBeans"][0]["content"]
 
 
 if __name__ == "__main__":
