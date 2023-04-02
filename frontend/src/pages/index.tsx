@@ -482,7 +482,7 @@ function SearchableContext(props: { initRecords: GallicaResponse }) {
           </div>
           <div
             className={
-              !term || term.includes(" ")
+              !term
                 ? "opacity-0 transition-opacity duration-500"
                 : "opacity-100 transition-opacity duration-500"
             }
