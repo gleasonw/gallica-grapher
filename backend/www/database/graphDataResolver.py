@@ -90,7 +90,7 @@ def get_sql_for_grouping(
                 OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
                 FROM binned_frequencies)
 
-            SELECT year, month, day, avgFrequency::float8
+            SELECT year, month, day, avgFrequency
             FROM averaged_frequencies;
 
             """
@@ -110,7 +110,7 @@ def get_sql_for_grouping(
                         AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
                 FROM binned_frequencies)
 
-            SELECT year, month, avgFrequency::float8 
+            SELECT year, month, avgFrequency
             FROM averaged_frequencies;
             
             """
@@ -129,14 +129,14 @@ def get_sql_for_grouping(
                         AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
                 FROM binned_frequencies)
 
-            SELECT year, avgFrequency::float8
+            SELECT year, avgFrequency
             FROM averaged_frequencies;
             
             """
         case ("year", "pyllica"):
             return """
             
-            SELECT year, avgFrequency::float8 
+            SELECT year, avgFrequency
             FROM (
                 SELECT year, AVG(count) 
                 OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
@@ -153,7 +153,7 @@ def get_sql_for_grouping(
         case ("month", "pyllica"):
             return """
             
-            SELECT year, month, avgFrequency::float8
+            SELECT year, month, avgFrequency
             FROM (
                 SELECT year, month, AVG(count) 
                 OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
@@ -192,6 +192,7 @@ def get_search_terms_by_grouping(
 
 
 def get_from_db(conn, params: Tuple, sql: str):
+    print(sql)
     with conn.cursor() as curs:
         curs.execute(sql, params)
         return curs.fetchall()

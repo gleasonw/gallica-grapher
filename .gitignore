@@ -7,6 +7,7 @@ __pycache__
 backend/*.yaml
 *.yaml
 .flaskenv
+backend/.glcoudignore
 
 # C extensions
 *.so
