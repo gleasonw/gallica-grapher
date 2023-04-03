@@ -2,7 +2,7 @@ import { Paper } from "../models/dbStructs";
 import { TableProps } from "./ResultsTable";
 
 export interface SearchPageState {
-  term: string;
+  terms: string;
   papers?: Paper[];
   source: "book" | "periodical" | "all";
   limit: number;
@@ -11,7 +11,7 @@ export interface SearchPageState {
   sort: "date" | "relevance";
   linkTerm?: string;
   linkDistance?: number;
-  tableProps?: TableProps;
+  tableFetchParams?: TableProps;
 }
 export interface AddPaperAction {
   type: "add_paper";
@@ -60,12 +60,17 @@ export interface SetLinkDistanceAction {
 
 export interface SetTermsAction {
   type: "set_terms";
-  payload: SearchPageState["term"];
+  payload: SearchPageState["terms"];
 }
 
 export interface SetTablePropsAction {
   type: "set_table_props";
-  payload: SearchPageState["tableProps"];
+  payload: SearchPageState["tableFetchParams"];
+}
+
+export interface ResetToInitialStateAction {
+  type: "reset_to_initial_state";
+  payload: SearchPageState;
 }
 
 export function searchStateReducer(
@@ -82,8 +87,8 @@ export function searchStateReducer(
     | SetLinkDistanceAction
     | SetTermsAction
     | SetTablePropsAction
+    | ResetToInitialStateAction
 ): SearchPageState {
-  console.log(action);
   switch (action.type) {
     case "add_paper":
       return {
@@ -136,12 +141,14 @@ export function searchStateReducer(
     case "set_terms":
       return {
         ...state,
-        term: action.payload,
+        terms: action.payload,
       };
     case "set_table_props":
       return {
         ...state,
-        tableProps: action.payload,
+        tableFetchParams: action.payload,
       };
+    case "reset_to_initial_state":
+      return action.payload;
   }
 }

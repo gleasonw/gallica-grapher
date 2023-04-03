@@ -1,4 +1,4 @@
-import { ResultsTable } from "../../components/ResultsTable";
+import { ResultsTable, fetchContext } from "../../components/ResultsTable";
 import { useRouter } from "next/router";
 import React from "react";
 import { YearRangeInput } from "..";
@@ -20,8 +20,9 @@ import {
   SearchPageStateContext,
 } from "../../components/SearchContext";
 import { z } from "zod";
-import { table } from "console";
 import { GetServerSideProps } from "next/types";
+import { GallicaResponse } from "../../models/dbStructs";
+import { tab } from "@material-tailwind/react";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -41,22 +42,46 @@ const searchPageState = z.object({
   cursor: z.number().nullish(),
 });
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  // fetch the parameters and return them as props
+export const getServerSideProps = async ({ query }: { query: any }) => {
+  const result = searchPageState.safeParse(query);
+  let initRecords: GallicaResponse | null = null;
+  if (result.success) {
+    initRecords = await fetchContext(0, {
+      terms: [result.data.terms],
+      yearRange: [
+        result.data.year ?? undefined,
+        result.data.end_year ?? undefined,
+      ],
+      source: result.data.source ?? "all",
+      link_term: result.data.link_term ?? undefined,
+      link_distance: result.data.link_distance ?? undefined,
+      codes: result.data.codes ?? undefined,
+      limit: result.data.limit ?? 10,
+      sort: result.data.sort ?? "relevance",
+    });
+  }
+
   return {
     props: {
       query: query,
+      initRecords,
     },
   };
 };
 
-export default function Context({ query }: { query: any }) {
+export default function Context({
+  query,
+  initRecords,
+}: {
+  query: any;
+  initRecords: GallicaResponse | undefined;
+}) {
   let initParams: SearchPageState;
 
   const result = searchPageState.safeParse(query);
   if (result.success) {
     initParams = {
-      term: result.data.terms,
+      terms: result.data.terms,
       papers: undefined,
       source: result.data.source ?? "all",
       limit: result.data.limit ?? 10,
@@ -71,7 +96,7 @@ export default function Context({ query }: { query: any }) {
     };
   } else {
     initParams = {
-      term: "",
+      terms: "",
       papers: undefined,
       source: "all",
       limit: 10,
@@ -91,7 +116,7 @@ export default function Context({ query }: { query: any }) {
     <SearchPageStateContext.Provider value={searchState}>
       <SearchPageDispatchContext.Provider value={searchStateDispatch}>
         <NavBar />
-        <SearchableContext />
+        <SearchableContext initRecords={initRecords} initParams={initParams} />
       </SearchPageDispatchContext.Provider>
     </SearchPageStateContext.Provider>
   );
@@ -113,8 +138,10 @@ const strings = {
   },
 };
 
-function SearchableContext() {
-  const translation = strings["fr"];
+function SearchableContext(props: {
+  initRecords?: GallicaResponse;
+  initParams: SearchPageState;
+}) {
   const searchState = React.useContext(SearchPageStateContext);
   const searchStateDispatch = React.useContext(SearchPageDispatchContext);
 
@@ -129,14 +156,53 @@ function SearchableContext() {
     linkTerm,
     linkDistance,
     sort,
-    term,
-    tableProps,
+    terms: term,
+    tableFetchParams,
   } = searchState;
 
   function handleSubmit() {
-    if (!term) {
+    if (!term || !searchState) {
       return;
     }
+    const params = new URLSearchParams();
+    if (searchState.terms !== "") {
+      params.append("terms", searchState.terms);
+    }
+    if (searchState.source !== "all") {
+      params.append("source", searchState.source);
+    }
+    if (searchState.yearRange[0] !== undefined) {
+      params.append("year", searchState.yearRange[0].toString());
+    }
+    if (searchState.yearRange[1] !== undefined) {
+      params.append("end_year", searchState.yearRange[1].toString());
+    }
+    if (searchState.linkTerm !== undefined) {
+      params.append("link_term", searchState.linkTerm);
+    }
+    if (searchState.linkDistance !== undefined) {
+      params.append("link_distance", searchState.linkDistance.toString());
+    }
+    if (searchState.limit !== 10) {
+      params.append("limit", searchState.limit.toString());
+    }
+    if (searchState.sort !== "relevance") {
+      params.append("sort", searchState.sort);
+    }
+    if (searchState.cursor !== 0) {
+      params.append("cursor", searchState.cursor.toString());
+    }
+    if (searchState.papers) {
+      searchState.papers.forEach((paper) => {
+        params.append("codes", paper.code);
+      });
+    }
+    // update url without reloading
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${params.toString()}`
+    );
     searchStateDispatch!({
       type: "set_table_props",
       payload: {
@@ -286,7 +352,17 @@ function SearchableContext() {
           </div>
         </div>
       </DashboardLayout>
-      {tableProps && <ResultsTable {...{ ...tableProps, all_context: true }} />}
+      {tableFetchParams ? (
+        <ResultsTable {...{ ...tableFetchParams, all_context: true }} />
+      ) : (
+        <ResultsTable
+          {...{
+            ...props.initParams,
+            initialRecords: props.initRecords,
+            terms: [props.initParams.terms],
+          }}
+        />
+      )}
     </>
   );
 }
@@ -314,7 +390,6 @@ function ProximitySearchInput(props: {
         value={props.linkDistance}
         onChange={(e) => {
           const numVal = parseInt(e.target.value);
-          console.log(numVal);
           if (typeof numVal === "number" && !isNaN(numVal) && numVal >= 0) {
             props.onSetLinkDistance(numVal);
           } else if (e.target.value === "") {

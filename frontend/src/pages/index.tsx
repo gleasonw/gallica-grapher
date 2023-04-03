@@ -15,9 +15,6 @@ import {
 import { LangContext } from "../components/LangContext";
 import { GraphTicket } from "../components/GraphTicket";
 import NavBar from "../components/NavBar";
-import { useRouter } from "next/router";
-
-type Page = "graph" | "context" | "info";
 
 const initTickets = [
   {
@@ -90,7 +87,7 @@ export default function Home({
     smoothing: 0,
     selectedTicket: initTickets[0].id,
   } as GraphPageState);
-
+  const [count, setCount] = React.useState(0);
 
   return (
     <GraphPageDispatchContext.Provider value={graphStateDispatch}>

@@ -238,6 +238,8 @@ export function ResultsTable(props: TableProps) {
   //TODO: show active filters, replicate gamepass ui
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
+      {tableInstance.data.length > 0 && (
+        <div>
       <div className={"ml-5 flex flex-col mb-2"}>
         <h1 className={"text-2xl flex flex-col gap-2"}>
           {!currentPage && !isFetching && <p>No results found</p>}
@@ -250,17 +252,17 @@ export function ResultsTable(props: TableProps) {
         {pagination}
         {spinner}
       </div>
-      {tableInstance.data.length > 0 && (
-        <div
-          className={
-            "flex ease-in-out first-letter:flex-col justify-center items-center transition-all duration-1000"
-          }
-        >
-          <DesktopTable tableInstance={tableInstance} />
-          <MobileTable tableInstance={tableInstance} />
-        </div>
-      )}
+      <div
+        className={
+          "flex ease-in-out first-letter:flex-col justify-center items-center transition-all duration-1000"
+        }
+      >
+        <DesktopTable tableInstance={tableInstance} />
+        <MobileTable tableInstance={tableInstance} />
+      </div>
       {pagination}
+      </div>
+      )}
     </div>
   );
 }
