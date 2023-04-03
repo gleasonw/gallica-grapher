@@ -83,6 +83,7 @@ export function searchStateReducer(
     | SetTermsAction
     | SetTablePropsAction
 ): SearchPageState {
+  console.log(action);
   switch (action.type) {
     case "add_paper":
       return {
