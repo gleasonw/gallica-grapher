@@ -7,7 +7,7 @@ import { SelectInput } from "./SelectInput";
 import { PaperDropdown } from "./PaperDropdown";
 import { Paper } from "../models/dbStructs";
 
-export interface TicketTableProps<T> extends TableProps<T> {
+export interface TicketTableProps extends TableProps {
   onSelectMonth: (month: number) => void;
   onSelectYear: (year: number) => void;
   onSelectTicket: (ticketID: number) => void;
@@ -15,7 +15,7 @@ export interface TicketTableProps<T> extends TableProps<T> {
   tickets?: GraphTicket[];
 }
 
-export function TicketResultTable<T>(props: TicketTableProps<T>){
+export function TicketResultTable(props: TicketTableProps){
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();

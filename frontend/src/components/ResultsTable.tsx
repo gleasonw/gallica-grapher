@@ -12,24 +12,20 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
-import listsEqual from "./utils/listsEqual";
 
 export interface TableProps {
   terms?: string[];
   codes?: string[];
-  day?: number | null;
-  month?: number | null;
+  day?: number;
+  month?: number;
   yearRange?: [number | undefined, number | undefined];
-  source?: "book" | "periodical" | "all" | null;
-  link_term?: string | null;
-  link_distance?: number | null;
+  source?: "book" | "periodical" | "all";
+  link_term?: string;
+  link_distance?: number;
   children?: React.ReactNode;
-  limit: number;
-  sort?: "date" | "relevance" | null;
-  initialRecords?: {
-    key: any[];
-    data?: Awaited<ReturnType<typeof fetchContext> | undefined>;
-  };
+  limit?: number;
+  sort?: "date" | "relevance";
+  initialRecords?: Awaited<ReturnType<typeof fetchContext> | undefined>;
   all_context?: boolean;
 }
 
@@ -82,37 +78,43 @@ export function ResultsTable(props: TableProps) {
     },
   };
   const translation = strings[lang];
-  const fetchProps = [
-    props.yearRange,
-    props.month,
-    props.day,
-    props.codes,
-    props.terms,
-    props.source,
-    props.link_term,
-    props.link_distance,
-    props.limit,
-    props.sort,
-    selectedPage - 1
-  ];
 
   React.useEffect(() => setSelectedPage(1), [props]);
-  const contextKey = ["context", selectedPage, ...fetchProps];
+  const {
+    yearRange,
+    month,
+    day,
+    codes,
+    terms,
+    source,
+    link_term,
+    link_distance,
+    sort,
+  } = props;
 
   const { isFetching, data } = useQuery({
-    queryKey: contextKey,
+    queryKey: [
+      "context",
+      {
+        yearRange,
+        month,
+        day,
+        codes,
+        terms,
+        source,
+        link_term,
+        link_distance,
+        sort,
+      },
+    ],
     queryFn: () =>
-      fetchContext((selectedPage - 1) * props.limit, {
+      fetchContext((selectedPage - 1) * (props.limit ? props.limit : 10), {
         ...props,
         children: undefined,
       }),
     staleTime: Infinity,
     keepPreviousData: true,
-    initialData: props.initialRecords
-      ? listsEqual(props.initialRecords.key, fetchProps)
-        ? props.initialRecords.data
-        : undefined
-      : undefined,
+    initialData: props.initialRecords,
   });
 
   const currentPage = data;

@@ -15,11 +15,10 @@ import {
   GraphPageStateContext,
 } from "./GraphContext";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import listsEqual from "./utils/listsEqual";
 
-interface ResultViewerProps<T> {
-  initRecords: { key: T[]; data?: GallicaResponse };
-  initGraphData: { key: T[]; data?: GraphData[] };
+interface ResultViewerProps {
+  initRecords: GallicaResponse;
+  initGraphData: GraphData[];
 }
 
 export async function getTicketData(
@@ -102,7 +101,7 @@ const strings = {
   },
 };
 
-export function ResultViewer<T>(props: ResultViewerProps<T>) {
+export function ResultViewer(props: ResultViewerProps) {
   const graphState = useContext(GraphPageStateContext);
   const graphStateDispatch = useContext(GraphPageDispatchContext);
   if (!graphState || !graphStateDispatch)
@@ -118,7 +117,6 @@ export function ResultViewer<T>(props: ResultViewerProps<T>) {
   } = graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
-  const initSeries = props.initGraphData;
 
   function setSelectedTicket(ticketID?: number) {
     graphStateDispatch!({
@@ -168,8 +166,9 @@ export function ResultViewer<T>(props: ResultViewerProps<T>) {
   const ticketData = useQueries({
     queries:
       tickets?.map((ticket) => {
+        const { id } = ticket;
         return {
-          queryKey: ["ticket", ticket.id, grouping, smoothing],
+          queryKey: ["ticket", { id, grouping, smoothing }],
           queryFn: () =>
             getTicketData(
               ticket.id,
@@ -177,15 +176,9 @@ export function ResultViewer<T>(props: ResultViewerProps<T>) {
               grouping,
               smoothing
             ),
-          initialData: props.initGraphData
-            ? listsEqual(props.initGraphData.key, [grouping, smoothing] as T[])
-              ? props.initGraphData.data?.filter(
-                  (series) => series.request_id === ticket.id
-                )[0]
-              : undefined
-            : undefined,
           keepPreviousData: true,
           refetchOnWindowFocus: false,
+          initialData: props.initGraphData,
         };
       }) ?? [],
   });

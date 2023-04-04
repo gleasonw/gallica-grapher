@@ -1,4 +1,8 @@
-import { ResultsTable, fetchContext } from "../../components/ResultsTable";
+import {
+  ResultsTable,
+  TableProps,
+  fetchContext,
+} from "../../components/ResultsTable";
 import React from "react";
 import { YearRangeInput } from "..";
 import DashboardLayout from "../../components/DashboardLayout";
@@ -20,6 +24,7 @@ import {
 } from "../../components/SearchContext";
 import { z } from "zod";
 import { GallicaResponse } from "../../models/dbStructs";
+import { useQueryClient } from "@tanstack/react-query";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -74,20 +79,21 @@ export default function Context({
   initRecords: GallicaResponse | undefined;
 }) {
   let initParams: SearchPageState;
+  const queryClient = useQueryClient();
+  console.log(queryClient.getQueryCache());
 
   const result = searchPageState.safeParse(query);
   if (result.success) {
     initParams = {
       terms: result.data.terms,
       papers: undefined,
-      source: result.data.source ?? "all",
-      limit: result.data.limit ?? 10,
-      cursor: result.data.cursor ?? 0,
-      yearRange: [
-        result.data.year ?? undefined,
-        result.data.end_year ?? undefined,
-      ],
-      sort: result.data.sort ?? "relevance",
+      source: result.data.source ?? undefined,
+      limit: result.data.limit ?? undefined,
+      cursor: result.data.cursor ?? undefined,
+      yearRange: result.data.year
+        ? [result.data.year, result.data.end_year ?? undefined]
+        : [undefined, undefined],
+      sort: result.data.sort ?? undefined,
       linkTerm: result.data.link_term ?? undefined,
       linkDistance: result.data.link_distance ?? undefined,
     };
@@ -95,11 +101,11 @@ export default function Context({
     initParams = {
       terms: "",
       papers: undefined,
-      source: "all",
-      limit: 10,
-      cursor: 0,
-      yearRange: [undefined, undefined],
-      sort: "relevance",
+      source: undefined,
+      limit: undefined,
+      cursor: undefined,
+      yearRange: undefined,
+      sort: undefined,
       linkTerm: undefined,
       linkDistance: undefined,
     };
@@ -162,56 +168,47 @@ function SearchableContext(props: {
       return;
     }
     const params = new URLSearchParams();
-    if (searchState.terms !== "") {
-      params.append("terms", searchState.terms);
+    const searchStateKeys = Object.keys(searchState) as Array<
+      keyof SearchPageState
+    >;
+    for (const key of searchStateKeys) {
+      if (key === "papers" || key === "yearRange" || key === "tableFetchParams") {
+        continue;
+      }
+      if (searchState[key] !== "" && searchState[key] !== undefined) {
+        const stringified = searchState[key]?.toString();
+        if (stringified) {
+          params.append(key, stringified);
+        }
+      }
     }
-    if (searchState.source !== "all") {
-      params.append("source", searchState.source);
+    if (searchState.yearRange) {
+      const [start, end] = searchState.yearRange;
+      if (start) {
+        params.append("year", start.toString());
+      }
+      if (end) {
+        params.append("end_year", end.toString());
+      }
     }
-    if (searchState.yearRange[0] !== undefined) {
-      params.append("year", searchState.yearRange[0].toString());
-    }
-    if (searchState.yearRange[1] !== undefined) {
-      params.append("end_year", searchState.yearRange[1].toString());
-    }
-    if (searchState.linkTerm !== undefined) {
-      params.append("link_term", searchState.linkTerm);
-    }
-    if (searchState.linkDistance !== undefined) {
-      params.append("link_distance", searchState.linkDistance.toString());
-    }
-    if (searchState.limit !== 10) {
-      params.append("limit", searchState.limit.toString());
-    }
-    if (searchState.sort !== "relevance") {
-      params.append("sort", searchState.sort);
-    }
-    if (searchState.cursor !== 0) {
-      params.append("cursor", searchState.cursor.toString());
-    }
-    if (searchState.papers) {
-      searchState.papers.forEach((paper) => {
-        params.append("codes", paper.code);
-      });
-    }
-    // update url without reloading
     window.history.replaceState(
       {},
       "",
       `${window.location.pathname}?${params.toString()}`
     );
+    const newProps: TableProps = {
+      limit,
+      codes: papers?.map((paper) => paper.code),
+      link_distance: linkDistance,
+      link_term: linkTerm,
+      sort,
+      source,
+      terms: [term],
+      yearRange,
+    };
     searchStateDispatch!({
       type: "set_table_props",
-      payload: {
-        limit,
-        codes: papers?.map((paper) => paper.code),
-        link_distance: linkDistance,
-        link_term: linkTerm,
-        sort,
-        source,
-        terms: [term],
-        yearRange,
-      },
+      payload: newProps,
     });
   }
 
@@ -276,8 +273,8 @@ function SearchableContext(props: {
               {source === "periodical" && (
                 <PaperSelector
                   papers={papers}
-                  from={yearRange[0]}
-                  to={yearRange[1]}
+                  from={yearRange?.[0]}
+                  to={yearRange?.[1]}
                   onPaperAdd={(new_paper) =>
                     searchStateDispatch({
                       type: "add_paper",
@@ -355,13 +352,7 @@ function SearchableContext(props: {
         <ResultsTable
           {...{
             ...props.initParams,
-            initialRecords: {
-              key: Object.values({
-                ...props.initParams,
-                terms: [props.initParams.terms],
-              }),
-              data: props.initRecords,
-            },
+            initialRecords: props.initRecords,
             terms: [props.initParams.terms],
           }}
         />

@@ -4,11 +4,11 @@ import { TableProps } from "./ResultsTable";
 export interface SearchPageState {
   terms: string;
   papers?: Paper[];
-  source: "book" | "periodical" | "all";
-  limit: number;
-  cursor: number;
-  yearRange: [number | undefined, number | undefined];  
-  sort: "date" | "relevance";
+  source?: "book" | "periodical" | "all";
+  limit?: number;
+  cursor?: number;
+  yearRange?: [number | undefined, number | undefined];  
+  sort?: "date" | "relevance";
   linkTerm?: string;
   linkDistance?: number;
   tableFetchParams?: TableProps;

@@ -52,13 +52,12 @@ const strings = {
   },
 };
 
-const initRecordParams : TableProps = {
+const initRecordParams: TableProps = {
   terms: initTickets[0].terms,
   limit: 15,
   source: "periodical",
   yearRange: [1789, 1950],
   codes: [],
-  nonsense: 0
 };
 
 const initGraphParams = {
@@ -102,7 +101,6 @@ export default function Home({
     smoothing: 0,
     selectedTicket: initTickets[0].id,
   } as GraphPageState);
-  const [count, setCount] = React.useState(0);
 
   return (
     <GraphPageDispatchContext.Provider value={graphStateDispatch}>
@@ -158,19 +156,7 @@ function GraphAndTable({
         }
       />
       {tickets && tickets.length > 0 && (
-        <ResultViewer
-          initRecords={{
-            key: Object.values({
-              ...initRecordParams,
-              terms: initRecordParams.terms,
-            }),
-            data: initRecords,
-          }}
-          initGraphData={{
-            key: ["year", 0],
-            data: initSeries,
-          }}
-        />
+        <ResultViewer initRecords={initRecords} initGraphData={initSeries} />
       )}
     </div>
   );
@@ -179,7 +165,7 @@ function GraphAndTable({
 interface YearRangeInputProps {
   min: number;
   max: number;
-  value: [number | undefined, number | undefined];
+  value?: [number | undefined, number | undefined];
   onChange: (value: [number | undefined, number | undefined]) => void;
   showLabel?: boolean;
 }
@@ -202,11 +188,11 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
         <input
           className="w-20 border p-3  rounded-lg"
           type="number"
-          value={props.value[0]}
+          value={props.value?.[0]}
           onChange={(e) => {
             const newValue = parseInt(e.target.value);
             if (typeof newValue === "number") {
-              props.onChange([newValue, props.value[1]]);
+              props.onChange([newValue, props.value?.[1]]);
             }
           }}
         />
@@ -214,11 +200,11 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
         <input
           className="w-20 p-3 rounded-lg border"
           type="number"
-          value={props.value[1]}
+          value={props.value?.[1]}
           onChange={(e) => {
             const newValue = parseInt(e.target.value);
             if (typeof newValue === "number") {
-              props.onChange([props.value[0], newValue]);
+              props.onChange([props.value?.[0], newValue]);
             }
           }}
         />
