@@ -7,16 +7,15 @@ import { SelectInput } from "./SelectInput";
 import { PaperDropdown } from "./PaperDropdown";
 import { Paper } from "../models/dbStructs";
 
-export interface TicketTableProps extends TableProps {
+export interface TicketTableProps<T> extends TableProps<T> {
   onSelectMonth: (month: number) => void;
   onSelectYear: (year: number) => void;
   onSelectTicket: (ticketID: number) => void;
   selectedTicket?: number;
   tickets?: GraphTicket[];
-  initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
 
-export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
+export function TicketResultTable<T>(props: TicketTableProps<T>){
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();

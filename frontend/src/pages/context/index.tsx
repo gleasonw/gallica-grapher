@@ -1,5 +1,4 @@
 import { ResultsTable, fetchContext } from "../../components/ResultsTable";
-import { useRouter } from "next/router";
 import React from "react";
 import { YearRangeInput } from "..";
 import DashboardLayout from "../../components/DashboardLayout";
@@ -20,9 +19,7 @@ import {
   SearchPageStateContext,
 } from "../../components/SearchContext";
 import { z } from "zod";
-import { GetServerSideProps } from "next/types";
 import { GallicaResponse } from "../../models/dbStructs";
-import { tab } from "@material-tailwind/react";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -358,7 +355,13 @@ function SearchableContext(props: {
         <ResultsTable
           {...{
             ...props.initParams,
-            initialRecords: props.initRecords,
+            initialRecords: {
+              key: Object.values({
+                ...props.initParams,
+                terms: [props.initParams.terms],
+              }),
+              data: props.initRecords,
+            },
             terms: [props.initParams.terms],
           }}
         />

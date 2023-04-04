@@ -7,7 +7,7 @@ export interface SearchPageState {
   source: "book" | "periodical" | "all";
   limit: number;
   cursor: number;
-  yearRange: [number | undefined, number | undefined];
+  yearRange: [number | undefined, number | undefined];  
   sort: "date" | "relevance";
   linkTerm?: string;
   linkDistance?: number;

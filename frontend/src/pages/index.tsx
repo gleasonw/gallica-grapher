@@ -3,7 +3,7 @@ import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
 import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
 import { GetStaticProps, InferGetStaticPropsType } from "next/types";
-import { fetchContext } from "../components/ResultsTable";
+import { TableProps, fetchContext } from "../components/ResultsTable";
 import {
   graphStateReducer,
   GraphPageState,
@@ -52,18 +52,33 @@ const strings = {
   },
 };
 
+const initRecordParams : TableProps = {
+  terms: initTickets[0].terms,
+  limit: 15,
+  source: "periodical",
+  yearRange: [1789, 1950],
+  codes: [],
+  nonsense: 0
+};
+
+const initGraphParams = {
+  grouping: "year",
+  smoothing: 0,
+};
+
 export const getStaticProps: GetStaticProps<{
   initRecords: GallicaResponse;
   initSeries: GraphData[];
 }> = async () => {
-  const records = await fetchContext(0, {
-    terms: initTickets[0].terms,
-    limit: 10,
-    source: "periodical",
-  });
+  const records = await fetchContext(0, initRecordParams);
   const initSeries = await Promise.all(
     initTickets.map((ticket) => {
-      return getTicketData(ticket.id, ticket.backend_source, "year", 0);
+      return getTicketData(
+        ticket.id,
+        ticket.backend_source,
+        initGraphParams.grouping,
+        initGraphParams.smoothing
+      );
     })
   );
   return {
@@ -143,7 +158,19 @@ function GraphAndTable({
         }
       />
       {tickets && tickets.length > 0 && (
-        <ResultViewer initVals={{ initRecords, initSeries }} />
+        <ResultViewer
+          initRecords={{
+            key: Object.values({
+              ...initRecordParams,
+              terms: initRecordParams.terms,
+            }),
+            data: initRecords,
+          }}
+          initGraphData={{
+            key: ["year", 0],
+            data: initSeries,
+          }}
+        />
       )}
     </div>
   );

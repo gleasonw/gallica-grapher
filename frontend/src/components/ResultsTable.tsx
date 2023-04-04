@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Cell,
   Row,
@@ -12,6 +12,7 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
+import listsEqual from "./utils/listsEqual";
 
 export interface TableProps {
   terms?: string[];
@@ -25,11 +26,14 @@ export interface TableProps {
   children?: React.ReactNode;
   limit: number;
   sort?: "date" | "relevance" | null;
-  initialRecords?: Awaited<ReturnType<typeof fetchContext>>;
+  initialRecords?: {
+    key: any[];
+    data?: Awaited<ReturnType<typeof fetchContext> | undefined>;
+  };
   all_context?: boolean;
 }
 
-export const fetchContext = async (pageParam = 0, props: TableProps) => {
+export async function fetchContext(pageParam = 0, props: TableProps) {
   let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...props,
@@ -46,7 +50,7 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
   console.log(url);
   const response = await fetch(url);
   return (await response.json()) as GallicaResponse;
-};
+}
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
@@ -78,24 +82,25 @@ export function ResultsTable(props: TableProps) {
     },
   };
   const translation = strings[lang];
+  const fetchProps = [
+    props.yearRange,
+    props.month,
+    props.day,
+    props.codes,
+    props.terms,
+    props.source,
+    props.link_term,
+    props.link_distance,
+    props.limit,
+    props.sort,
+    selectedPage - 1
+  ];
 
   React.useEffect(() => setSelectedPage(1), [props]);
+  const contextKey = ["context", selectedPage, ...fetchProps];
 
   const { isFetching, data } = useQuery({
-    queryKey: [
-      "context",
-      props.yearRange,
-      props.month,
-      props.day,
-      props.codes,
-      props.terms,
-      props.source,
-      props.link_term,
-      props.link_distance,
-      props.limit,
-      props.sort,
-      selectedPage,
-    ],
+    queryKey: contextKey,
     queryFn: () =>
       fetchContext((selectedPage - 1) * props.limit, {
         ...props,
@@ -103,7 +108,11 @@ export function ResultsTable(props: TableProps) {
       }),
     staleTime: Infinity,
     keepPreviousData: true,
-    placeholderData: props.initialRecords,
+    initialData: props.initialRecords
+      ? listsEqual(props.initialRecords.key, fetchProps)
+        ? props.initialRecords.data
+        : undefined
+      : undefined,
   });
 
   const currentPage = data;
@@ -240,28 +249,27 @@ export function ResultsTable(props: TableProps) {
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
       {tableInstance.data.length > 0 && (
         <div>
-      <div className={"ml-5 flex flex-col mb-2"}>
-        <h1 className={"text-2xl flex flex-col gap-2"}>
-          {!currentPage && !isFetching && <p>No results found</p>}
-          {currentPage && (
-            <div className={"flex flex-row gap-10"}>
-              {total_results.toLocaleString()} {translation.total_docs}
-            </div>
-          )}
-        </h1>
-        {pagination}
-        {spinner}
-      </div>
-      <div
-        className={
-          "flex ease-in-out first-letter:flex-col justify-center items-center transition-all duration-1000"
-        }
-      >
-        <DesktopTable tableInstance={tableInstance} />
-        <MobileTable tableInstance={tableInstance} />
-      </div>
-      {pagination}
-      </div>
+          <div className={"ml-5 flex flex-col mb-2"}>
+            <h1 className={"text-2xl flex flex-col gap-2"}>
+              {!currentPage && !isFetching && <p>No results found</p>}
+              {currentPage && (
+                <div className={"flex flex-row gap-10"}>
+                  {total_results.toLocaleString()} {translation.total_docs}
+                </div>
+              )}
+            </h1>
+            {pagination}
+            {spinner}
+          </div>
+          <div
+            className={
+              "flex ease-in-out first-letter:flex-col justify-center items-center transition-all duration-1000"
+            }
+          >
+            <DesktopTable tableInstance={tableInstance} />
+            <MobileTable tableInstance={tableInstance} />
+          </div>
+        </div>
       )}
     </div>
   );

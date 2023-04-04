@@ -25,6 +25,8 @@ export default function NavBar() {
     infoLinkStyle += borderBottomFocus;
   }
 
+  //TODO: before navigate, store state in local storage
+
   const styleMap: { [key: string]: string } = {
     graph: homeLinkStyle,
     context: exploreLinkStyle,
