@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { LangContext } from "./LangContext";
-import { getStaticProps } from "../pages/index";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";
@@ -15,6 +14,7 @@ import {
   GraphPageStateContext,
 } from "./GraphContext";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
+import currentParamObjectEqualsInitial from "./utils/objectsEqual";
 
 interface ResultViewerProps {
   initRecords: GallicaResponse;
@@ -23,14 +23,14 @@ interface ResultViewerProps {
 
 export async function getTicketData(
   id: number,
-  backend_source: "gallica" | "pyllica" = "pyllica",
   grouping: string,
   smoothing: number
 ) {
   const response = await fetch(
-    `${apiURL}/api/graphData?request_id=${id}&backend_source=${backend_source}&grouping=${grouping}&average_window=${smoothing}`
+    `${apiURL}/api/graphData?request_id=${id}&backend_source=pyllica&grouping=${grouping}&average_window=${smoothing}`
   );
   const data = (await response.json()) as GraphData;
+  console.log(data.data.length);
   return data;
 }
 
@@ -106,7 +106,6 @@ export function ResultViewer(props: ResultViewerProps) {
   const graphStateDispatch = useContext(GraphPageDispatchContext);
   if (!graphState || !graphStateDispatch)
     throw new Error("Graph state not initialized");
-  const selectedPoint = React.useRef<Highcharts.Point>();
   const {
     selectedTicket,
     grouping,
@@ -117,6 +116,11 @@ export function ResultViewer(props: ResultViewerProps) {
   } = graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
+
+  const initialGraphParams = React.useRef({
+    grouping,
+    smoothing,
+  });
 
   function setSelectedTicket(ticketID?: number) {
     graphStateDispatch!({
@@ -133,6 +137,7 @@ export function ResultViewer(props: ResultViewerProps) {
   }
 
   function setSmoothing(smoothing: number) {
+    console.log({ smoothing });
     graphStateDispatch!({
       type: "set_smoothing",
       payload: smoothing,
@@ -169,16 +174,16 @@ export function ResultViewer(props: ResultViewerProps) {
         const { id } = ticket;
         return {
           queryKey: ["ticket", { id, grouping, smoothing }],
-          queryFn: () =>
-            getTicketData(
-              ticket.id,
-              ticket.backend_source,
-              grouping,
-              smoothing
-            ),
+          queryFn: () => getTicketData(ticket.id, grouping, smoothing),
           keepPreviousData: true,
-          refetchOnWindowFocus: false,
-          initialData: props.initGraphData,
+          initialData: currentParamObjectEqualsInitial(
+            { grouping, smoothing },
+            initialGraphParams.current
+          )
+            ? props.initGraphData.find(
+                (ticket_series) => ticket_series.request_id === id
+              )
+            : undefined,
         };
       }) ?? [],
   });
@@ -222,7 +227,6 @@ export function ResultViewer(props: ResultViewerProps) {
     handleSeriesClick,
     ticketData
   );
-
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"relative"}>

@@ -12,6 +12,7 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
+import currentParamObjectEqualsInitial from "./utils/objectsEqual";
 
 export interface TableProps {
   terms?: string[];
@@ -80,6 +81,7 @@ export function ResultsTable(props: TableProps) {
   const translation = strings[lang];
 
   React.useEffect(() => setSelectedPage(1), [props]);
+
   const {
     yearRange,
     month,
@@ -91,6 +93,35 @@ export function ResultsTable(props: TableProps) {
     link_distance,
     sort,
   } = props;
+
+  // this will be used to check if we can use ssr data... maybe a better way?
+  const initialFetchParams = React.useRef({
+    yearRange,
+    month,
+    day,
+    codes,
+    terms,
+    source,
+    link_term,
+    link_distance,
+    sort,
+    selectedPage,
+    limit,
+  });
+
+  const currentFetchParams = {
+    yearRange,
+    month,
+    day,
+    codes,
+    terms,
+    source,
+    link_term,
+    link_distance,
+    sort,
+    selectedPage,
+    limit,
+  };
 
   const { isFetching, data } = useQuery({
     queryKey: [
@@ -105,6 +136,8 @@ export function ResultsTable(props: TableProps) {
         link_term,
         link_distance,
         sort,
+        selectedPage,
+        limit,
       },
     ],
     queryFn: () =>
@@ -114,7 +147,13 @@ export function ResultsTable(props: TableProps) {
       }),
     staleTime: Infinity,
     keepPreviousData: true,
-    initialData: props.initialRecords,
+    initialData: () =>
+      currentParamObjectEqualsInitial(
+        initialFetchParams.current,
+        currentFetchParams
+      )
+        ? props.initialRecords
+        : undefined,
   });
 
   const currentPage = data;
@@ -218,7 +257,7 @@ export function ResultsTable(props: TableProps) {
       onPageDecrement={() => setSelectedPage(selectedPage - 1)}
       selectedPage={selectedPage}
       cursorMax={cursorMax}
-      onLastPage={() => setSelectedPage(cursorMax)}
+      onLastPage={() => setSelectedPage(cursorMax + 1)}
       onFirstPage={() => setSelectedPage(1)}
     >
       <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
@@ -230,7 +269,7 @@ export function ResultsTable(props: TableProps) {
         key={selectedPage}
       />
       <p className={"ml-3 md:ml-5 lg:ml-5"}>
-        {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
+        {lang === "fr" ? "de" : "of"} {(cursorMax + 1).toLocaleString()}
       </p>
     </QueryPagination>
   );
@@ -246,7 +285,7 @@ export function ResultsTable(props: TableProps) {
       />
     </div>
   );
-  //TODO: show active filters, replicate gamepass ui
+
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
       {tableInstance.data.length > 0 && (
@@ -289,19 +328,22 @@ function QueryPagination(props: {
   return (
     <div
       className={
-        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl transition-all duration-300"
+        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl "
       }
     >
       <div
         className={
-          "flex flex-row justify-between transition-opacity " +
-          (props.selectedPage !== 1 ? "opacity-100" : "opacity-0")
+          "flex flex-row justify-between " +
+          (props.selectedPage > 1 ? "opacity-100" : "opacity-0")
         }
       >
         <button onClick={props.onFirstPage} className={"p-3"}>
           {"<<"}
         </button>
-        <button className={"p-4"} onClick={props.onPageDecrement}>
+        <button
+          className={"p-4"}
+          onClick={props.selectedPage > 1 ? props.onPageDecrement : undefined}
+        >
           {"<"}
         </button>
       </div>
@@ -309,10 +351,17 @@ function QueryPagination(props: {
       <div
         className={
           "flex flex-row justify-between " +
-          (props.selectedPage !== props.cursorMax ? "opacity-100" : "opacity-0")
+          (props.selectedPage <= props.cursorMax ? "opacity-100" : "opacity-0")
         }
       >
-        <button className={"p-4"} onClick={props.onPageIncrement}>
+        <button
+          className={"p-4"}
+          onClick={
+            props.selectedPage <= props.cursorMax
+              ? props.onPageIncrement
+              : undefined
+          }
+        >
           {">"}
         </button>
         <button onClick={props.onLastPage} className={"p-3"}>

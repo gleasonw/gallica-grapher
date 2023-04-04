@@ -79,8 +79,6 @@ export default function Context({
   initRecords: GallicaResponse | undefined;
 }) {
   let initParams: SearchPageState;
-  const queryClient = useQueryClient();
-  console.log(queryClient.getQueryCache());
 
   const result = searchPageState.safeParse(query);
   if (result.success) {
@@ -172,7 +170,11 @@ function SearchableContext(props: {
       keyof SearchPageState
     >;
     for (const key of searchStateKeys) {
-      if (key === "papers" || key === "yearRange" || key === "tableFetchParams") {
+      if (
+        key === "papers" ||
+        key === "yearRange" ||
+        key === "tableFetchParams"
+      ) {
         continue;
       }
       if (searchState[key] !== "" && searchState[key] !== undefined) {

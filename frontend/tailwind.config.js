@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const percentageWidth = require('tailwindcss-percentage-width');
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx}",
@@ -8,8 +7,5 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [
-    require("@tailwindcss/typography"),
-    percentageWidth,
-  ],
-}
+  plugins: [require("@tailwindcss/typography")],
+};

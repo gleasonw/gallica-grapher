@@ -2,7 +2,12 @@ import React, { useContext } from "react";
 import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
 import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
-import { GetStaticProps, InferGetStaticPropsType } from "next/types";
+import {
+  GetServerSideProps,
+  GetStaticProps,
+  InferGetServerSidePropsType,
+  InferGetStaticPropsType,
+} from "next/types";
 import { TableProps, fetchContext } from "../components/ResultsTable";
 import {
   graphStateReducer,
@@ -15,27 +20,9 @@ import {
 import { LangContext } from "../components/LangContext";
 import { GraphTicket } from "../components/GraphTicket";
 import NavBar from "../components/NavBar";
+import { z } from "zod";
+import { apiURL } from "../components/apiURL";
 
-const initTickets = [
-  {
-    id: 0,
-    terms: ["brazza"],
-    grouping: "month",
-    example: true,
-  },
-  {
-    id: 1,
-    terms: ["congo"],
-    grouping: "month",
-    example: true,
-  },
-  {
-    id: -1,
-    terms: ["coloniale"],
-    grouping: "month",
-    example: true,
-  },
-] as GraphTicket[];
 const strings = {
   fr: {
     title: "The Gallica Grapher",
@@ -52,38 +39,107 @@ const strings = {
   },
 };
 
-const initRecordParams: TableProps = {
-  terms: initTickets[0].terms,
-  limit: 15,
-  source: "periodical",
-  yearRange: [1789, 1950],
-  codes: [],
-};
-
 const initGraphParams = {
   grouping: "year",
   smoothing: 0,
 };
 
-export const getStaticProps: GetStaticProps<{
+const graphStateURL = z.object({
+  ticket_id: z.coerce.number().array(),
+  context_year: z.coerce.number().nullish(),
+  context_end_year: z.coerce.number().nullish(),
+  context_month: z.coerce.number().nullish(),
+  grouping: z.string().nullish(),
+  smoothing: z.coerce.number().nullish(),
+  context_selected_ticket: z.coerce.number().nullish(),
+});
+
+export const getServerSideProps: GetServerSideProps<{
   initRecords: GallicaResponse;
   initSeries: GraphData[];
-}> = async () => {
-  const records = await fetchContext(0, initRecordParams);
-  const initSeries = await Promise.all(
-    initTickets.map((ticket) => {
-      return getTicketData(
-        ticket.id,
-        ticket.backend_source,
-        initGraphParams.grouping,
-        initGraphParams.smoothing
-      );
-    })
-  );
+  initTickets: GraphTicket[];
+}> = async ({ query }) => {
+  if (query.ticket_id) {
+    if (!Array.isArray(query.ticket_id)) {
+      query.ticket_id = [query.ticket_id];
+    }
+  }
+  const result = graphStateURL.safeParse(query);
+  let records: GallicaResponse;
+  let initSeries: GraphData[];
+  let initTickets: GraphTicket[];
+  if (result.success) {
+    const ticketsWithState = await Promise.all(
+      result.data.ticket_id.map(async (ticket_id) => {
+        const result = await fetch(`${apiURL}/api/ticketState/${ticket_id}`);
+        return (await result.json()) as GraphTicket;
+      })
+    );
+    const selectedTicket = ticketsWithState.find(
+      (ticket) => ticket.id === result.data.context_selected_ticket
+    );
+    let initContextParams: TableProps = {
+      terms: selectedTicket?.terms || ticketsWithState[0].terms,
+      limit: 15,
+      source: "periodical",
+      yearRange: [
+        result.data.context_year || 1789,
+        result.data.context_end_year || 1950,
+      ],
+      month: result.data.context_month || undefined,
+    };
+    records = await fetchContext(0, initContextParams);
+    initSeries = await Promise.all(
+      ticketsWithState.map((ticket) => {
+        return getTicketData(
+          ticket.id,
+          result.data.grouping || "year",
+          result.data.smoothing || 0
+        );
+      })
+    );
+    initTickets = ticketsWithState;
+  } else {
+    initTickets = [
+      {
+        id: 0,
+        terms: ["brazza"],
+        example: true,
+      },
+      {
+        id: 1,
+        terms: ["congo"],
+        example: true,
+      },
+      {
+        id: -1,
+        terms: ["coloniale"],
+        example: true,
+      },
+    ];
+    const initRecordParams: TableProps = {
+      terms: initTickets[0].terms,
+      limit: 15,
+      source: "periodical",
+      yearRange: [1789, 1950],
+      codes: [],
+    };
+    records = await fetchContext(0, initRecordParams);
+    initSeries = await Promise.all(
+      initTickets.map((ticket) => {
+        return getTicketData(
+          ticket.id,
+          initGraphParams.grouping,
+          initGraphParams.smoothing
+        );
+      })
+    );
+  }
   return {
     props: {
       initRecords: records,
       initSeries: initSeries,
+      initTickets: initTickets,
     },
   };
 };
@@ -91,14 +147,15 @@ export const getStaticProps: GetStaticProps<{
 export default function Home({
   initRecords,
   initSeries,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+  initTickets,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [graphState, graphStateDispatch] = React.useReducer(graphStateReducer, {
     tickets: initTickets,
     contextYearRange: [1789, 1950],
     searchYearRange: [1789, 1950],
     month: undefined,
-    grouping: "year",
-    smoothing: 0,
+    grouping: initGraphParams.grouping,
+    smoothing: initGraphParams.smoothing,
     selectedTicket: initTickets[0].id,
   } as GraphPageState);
 
@@ -115,7 +172,7 @@ export default function Home({
 function GraphAndTable({
   initRecords,
   initSeries,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
   const graphState = React.useContext(GraphPageStateContext);

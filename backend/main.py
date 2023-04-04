@@ -9,6 +9,7 @@ from www.request import Request
 from www.models import Ticket, Progress
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
 origins = ["*"]
@@ -27,6 +28,7 @@ request_progress: Dict[int, Progress] = {}
 @app.get("/")
 def index():
     return {"message": "ok"}
+
 
 @app.post("/api/init")
 def init(ticket: Ticket):
@@ -108,6 +110,32 @@ def get_num_papers_over_range(start: int, end: int):
             num_papers_over_range = curs.fetchone()
         count = num_papers_over_range and num_papers_over_range[0]
     return count
+
+
+@app.get("/api/ticketState/{request_id}")
+def ticket_state(request_id: int):
+    # get unique searchterms, min/max year from db
+    with build_db_conn() as conn:
+        with conn.cursor() as curs:
+            curs.execute(
+                """
+                SELECT ARRAY_AGG(DISTINCT searchterm), MIN(year), MAX(year)
+                    FROM groupcounts
+                    WHERE requestid = %s
+                    GROUP BY requestid
+                    ;
+                """,
+                (request_id,),
+            )
+            res = curs.fetchone()
+            if res is not None:
+                searchterms, min_year, max_year = res
+                return {
+                    "id": request_id,
+                    "terms": searchterms,
+                    "start_date": min_year,
+                    "end_date": max_year,
+                }
 
 
 @app.get("/api/graphData")
