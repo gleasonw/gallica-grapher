@@ -9,8 +9,8 @@ export interface SearchPageState {
   cursor?: number;
   yearRange?: [number | undefined, number | undefined];  
   sort?: "date" | "relevance";
-  linkTerm?: string;
-  linkDistance?: number;
+  link_term?: string;
+  link_distance?: number;
   tableFetchParams?: TableProps;
 }
 export interface AddPaperAction {
@@ -50,12 +50,12 @@ export interface SetSortAction {
 
 export interface SetLinkTermAction {
   type: "set_link_term";
-  payload: SearchPageState["linkTerm"];
+  payload: SearchPageState["link_term"];
 }
 
 export interface SetLinkDistanceAction {
   type: "set_link_distance";
-  payload: SearchPageState["linkDistance"];
+  payload: SearchPageState["link_distance"];
 }
 
 export interface SetTermsAction {
@@ -131,12 +131,12 @@ export function searchStateReducer(
     case "set_link_term":
       return {
         ...state,
-        linkTerm: action.payload,
+        link_term: action.payload,
       };
     case "set_link_distance":
       return {
         ...state,
-        linkDistance: action.payload,
+        link_distance: action.payload,
       };
     case "set_terms":
       return {

@@ -96,8 +96,8 @@ export default function Context({
         ? [result.data.year, result.data.end_year ?? undefined]
         : [undefined, undefined],
       sort: result.data.sort ?? undefined,
-      linkTerm: result.data.link_term ?? undefined,
-      linkDistance: result.data.link_distance ?? undefined,
+      link_term: result.data.link_term ?? undefined,
+      link_distance: result.data.link_distance ?? undefined,
     };
   } else {
     initParams = {
@@ -108,8 +108,8 @@ export default function Context({
       cursor: undefined,
       yearRange: undefined,
       sort: undefined,
-      linkTerm: undefined,
-      linkDistance: undefined,
+      link_term: undefined,
+      link_distance: undefined,
     };
   }
   const [searchState, searchStateDispatch] = React.useReducer(
@@ -158,8 +158,8 @@ function SearchableContext(props: {
     source,
     papers,
     limit,
-    linkTerm,
-    linkDistance,
+    link_term: linkTerm,
+    link_distance: linkDistance,
     sort,
     terms: term,
     tableFetchParams,
