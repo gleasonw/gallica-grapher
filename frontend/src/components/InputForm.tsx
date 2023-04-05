@@ -52,7 +52,6 @@ export const InputForm: React.FC<InputFormProps> = ({
   const { searchYearRange } = graphState;
 
   function setSearchRange(newRange: [number | undefined, number | undefined]) {
-    console.log(newRange);
     graphStateDispatch!({
       type: "set_search_range",
       payload: newRange,

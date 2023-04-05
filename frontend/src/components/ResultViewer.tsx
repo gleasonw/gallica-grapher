@@ -30,7 +30,6 @@ export async function getTicketData(
     `${apiURL}/api/graphData?request_id=${id}&backend_source=pyllica&grouping=${grouping}&average_window=${smoothing}`
   );
   const data = (await response.json()) as GraphData;
-  console.log(data.data.length);
   return data;
 }
 
@@ -137,7 +136,6 @@ export function ResultViewer(props: ResultViewerProps) {
   }
 
   function setSmoothing(smoothing: number) {
-    console.log({ smoothing });
     graphStateDispatch!({
       type: "set_smoothing",
       payload: smoothing,
@@ -190,9 +188,10 @@ export function ResultViewer(props: ResultViewerProps) {
 
   function handleSeriesClick(point: Highcharts.Point) {
     if (!graphStateDispatch) return;
-    setSelectedTicket(
-      tickets?.filter((t) => t.terms[0] === point.series.name)[0].id
-    );
+    const correspondingTicket = tickets?.find((t) => t.terms[0] === point.series.name);
+    if (correspondingTicket){
+      setSelectedTicket(correspondingTicket.id);
+    }
     const date = new Date(point.category);
     if (grouping === "year") {
       setMonth(undefined);
@@ -344,7 +343,6 @@ function FrequencyContext(props: {
       root_gram: term,
       sample_size: 30,
     });
-    console.log(url);
     const response = await fetch(url);
     return (await response.json()) as FrequentTerm[];
   }
