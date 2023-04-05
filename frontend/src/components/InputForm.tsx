@@ -83,7 +83,6 @@ export const InputForm: React.FC<InputFormProps> = ({
         terms: [word],
         start_date: searchYearRange[0],
         end_date: searchYearRange[1],
-        grouping: "month",
         id: ticketID,
       },
       {
@@ -129,16 +128,13 @@ export const InputForm: React.FC<InputFormProps> = ({
             terms: [word],
             start_date: searchYearRange[0],
             end_date: searchYearRange[1],
-            grouping: "month",
           }}
           onFetchComplete={(backendSource: "gallica" | "pyllica") => {
             onCreateTicket({
               id: ticketID,
-              backend_source: backendSource,
               terms: [word],
               start_date: searchYearRange[0],
               end_date: searchYearRange[1],
-              grouping: "month",
             });
             setFetching(false);
             setSubmitted(false);
@@ -221,7 +217,6 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
           <p>{ticket.terms.join(", ")}</p>
           <p className={"text-zinc-600"}>x</p>
         </div>
-        <div>{ticket.papers?.map((paper) => paper.title).join(", ")}</div>
       </div>
     </button>
   );

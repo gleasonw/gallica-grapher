@@ -1,13 +1,8 @@
 import React, { useContext } from "react";
 import { InputForm } from "../components/InputForm";
 import { ResultViewer, getTicketData } from "../components/ResultViewer";
-import { GallicaResponse, GraphData, Paper } from "../models/dbStructs";
-import {
-  GetServerSideProps,
-  GetStaticProps,
-  InferGetServerSidePropsType,
-  InferGetStaticPropsType,
-} from "next/types";
+import { GallicaResponse, GraphData } from "../models/dbStructs";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
 import { TableProps, fetchContext } from "../components/ResultsTable";
 import {
   graphStateReducer,
@@ -22,6 +17,7 @@ import { GraphTicket } from "../components/GraphTicket";
 import NavBar from "../components/NavBar";
 import { z } from "zod";
 import { apiURL } from "../components/apiURL";
+import Head from "next/head";
 
 const strings = {
   fr: {
@@ -159,9 +155,41 @@ export default function Home({
     selectedTicket: initTickets[0].id,
   } as GraphPageState);
 
+  React.useEffect(() => {
+    if (graphState.tickets?.some((ticket) => ticket.example)) {
+      return;
+    }
+    const params = new URLSearchParams();
+    if (graphState.tickets) {
+      for (const ticket of graphState.tickets) {
+        params.append("ticket_id", ticket.id.toString());
+      }
+    }
+    const [start, end] = graphState.contextYearRange;
+    if (start) {
+      params.append("context_year", start.toString());
+    }
+    if (end) {
+      params.append("context_end_year", end.toString());
+    }
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${params.toString()}`
+    );
+  }, [graphState]);
+
   return (
     <GraphPageDispatchContext.Provider value={graphStateDispatch}>
       <GraphPageStateContext.Provider value={graphState}>
+        <Head>
+          <title>Gallica Grapher</title>
+          <meta
+            name="Graph word occurrences in archived French periodicals."
+            content="Gallica Grapher"
+          />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
         <NavBar />
         <GraphAndTable initRecords={initRecords} initSeries={initSeries} />
       </GraphPageStateContext.Provider>
@@ -169,10 +197,10 @@ export default function Home({
   );
 }
 
-function GraphAndTable({
-  initRecords,
-  initSeries,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function GraphAndTable(props: {
+  initRecords: GallicaResponse;
+  initSeries: GraphData[];
+}) {
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
   const graphState = React.useContext(GraphPageStateContext);
@@ -213,7 +241,10 @@ function GraphAndTable({
         }
       />
       {tickets && tickets.length > 0 && (
-        <ResultViewer initRecords={initRecords} initGraphData={initSeries} />
+        <ResultViewer
+          initRecords={props.initRecords}
+          initGraphData={props.initSeries}
+        />
       )}
     </div>
   );

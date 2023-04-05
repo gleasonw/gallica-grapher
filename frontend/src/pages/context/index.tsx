@@ -24,7 +24,6 @@ import {
 } from "../../components/SearchContext";
 import { z } from "zod";
 import { GallicaResponse } from "../../models/dbStructs";
-import { useQueryClient } from "@tanstack/react-query";
 
 const searchPageState = z.object({
   terms: z.string(),

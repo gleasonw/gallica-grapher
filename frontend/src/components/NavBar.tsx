@@ -4,20 +4,25 @@ import Image from "next/image";
 import React from "react";
 import { useRouter } from "next/router";
 
+const pages = {
+  "": "Graph",
+  context: "Context",
+  info: "Info",
+};
+
+type urlPage = keyof typeof pages;
+
 export default function NavBar() {
   const [showSidebar, setShowSidebar] = React.useState(false);
   const [lang, setLang] = React.useState<"fr" | "en">("fr");
   const router = useRouter();
-  let currentPage = router.pathname.split("/")[1];
-  if (currentPage === "") {
-    currentPage = "graph";
-  }
+  const currentPage = router.pathname.split("/")[1] as urlPage;
   const linkStyle = "p-5 hover:cursor-pointer";
   let homeLinkStyle = linkStyle;
   let exploreLinkStyle = linkStyle;
   let infoLinkStyle = linkStyle;
   const borderBottomFocus = " border-b border-blue-500 border-b-4";
-  if (currentPage === "graph") {
+  if (currentPage === "") {
     homeLinkStyle += borderBottomFocus;
   } else if (currentPage === "context") {
     exploreLinkStyle += borderBottomFocus;
@@ -25,19 +30,22 @@ export default function NavBar() {
     infoLinkStyle += borderBottomFocus;
   }
 
-  //TODO: before navigate, store state in local storage
-
-  const styleMap: { [key: string]: string } = {
-    graph: homeLinkStyle,
+  const styleMap = {
+    "": homeLinkStyle,
     context: exploreLinkStyle,
     info: infoLinkStyle,
   };
 
-  const links = [
-    { name: "Graph", href: "/" },
-    { name: "Context", href: "/context" },
-    { name: "Info", href: "/info" },
-  ];
+  function storeCurrentURLAndGetNext(navTo: urlPage, navFrom: urlPage) {
+    const currentURL = window.location.href;
+    localStorage.setItem(navFrom, currentURL);
+    const storedURL = localStorage.getItem(navTo);
+    if (storedURL) {
+      router.push(storedURL);
+      return;
+    }
+    router.push(`/${navTo.toLowerCase()}`);
+  }
 
   return (
     <div className="flex flex-col">
@@ -60,14 +68,14 @@ export default function NavBar() {
               Gallica Grapher
             </Link>
             <div className="hidden lg:flex xl:flex items-center">
-              {links.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={styleMap[link.name.toLowerCase()]}
+              {Object.keys(pages).map((link: urlPage) => (
+                <a
+                  key={link}
+                  onClick={() => storeCurrentURLAndGetNext(link, currentPage)}
+                  className={styleMap[link]}
                 >
-                  {link.name}
-                </Link>
+                  {pages[link]}
+                </a>
               ))}
             </div>
           </div>
@@ -108,15 +116,14 @@ export default function NavBar() {
                 }
               >
                 {links.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
+                  <a
+                    key={link}
                     className={
                       "p-5 w-60 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
                     }
                   >
-                    {link.name}
-                  </Link>
+                    {link === "" ? "Graph" : link}
+                  </a>
                 ))}
               </div>
             </motion.div>
