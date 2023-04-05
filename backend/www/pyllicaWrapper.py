@@ -51,6 +51,7 @@ def get_gram_data(
     fin=1950,
     resolution: Literal["default", "annee", "mois"] = "default",
 ):
+    gram = gram.lower()
     format_gram = quote(gram, encoding="utf-8")
     df = pd.read_csv(
         f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{format_gram}_from={debut}_to={fin}"

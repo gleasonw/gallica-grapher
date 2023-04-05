@@ -68,13 +68,18 @@ export default function NavBar() {
               Gallica Grapher
             </Link>
             <div className="hidden lg:flex xl:flex items-center">
-              {Object.keys(pages).map((link: urlPage) => (
+              {Object.keys(pages).map((link) => (
                 <a
                   key={link}
-                  onClick={() => storeCurrentURLAndGetNext(link, currentPage)}
-                  className={styleMap[link]}
+                  onClick={() =>
+                    storeCurrentURLAndGetNext(
+                      link as keyof typeof pages,
+                      currentPage
+                    )
+                  }
+                  className={styleMap[link as keyof typeof pages]}
                 >
-                  {pages[link]}
+                  {pages[link as keyof typeof pages]}
                 </a>
               ))}
             </div>
@@ -115,7 +120,7 @@ export default function NavBar() {
                   "absolute bg-white z-40 flex flex-col gap-1 p-2 h-screen border-r shadow-md"
                 }
               >
-                {links.map((link) => (
+                {Object.keys(pages).map((link) => (
                   <a
                     key={link}
                     className={

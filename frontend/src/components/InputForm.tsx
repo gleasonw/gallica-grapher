@@ -143,6 +143,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           onNoRecordsFound={() => {
             alert(translation.no_records_found);
             setFetching(false);
+            setSubmitted(false);
             setWord("");
           }}
         />

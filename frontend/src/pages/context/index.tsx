@@ -24,6 +24,7 @@ import {
 } from "../../components/SearchContext";
 import { z } from "zod";
 import { GallicaResponse } from "../../models/dbStructs";
+import { GetServerSideProps } from "next";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -43,7 +44,11 @@ const searchPageState = z.object({
   cursor: z.number().nullish(),
 });
 
-export const getServerSideProps = async ({ query }: { query: any }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  query,
+  res,
+}) => {
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
   const result = searchPageState.safeParse(query);
   let initRecords: GallicaResponse | null = null;
   if (result.success) {

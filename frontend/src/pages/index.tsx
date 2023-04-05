@@ -54,7 +54,8 @@ export const getServerSideProps: GetServerSideProps<{
   initRecords: GallicaResponse;
   initSeries: GraphData[];
   initTickets: GraphTicket[];
-}> = async ({ query }) => {
+}> = async ({ query, res }) => {
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
   if (query.ticket_id) {
     if (!Array.isArray(query.ticket_id)) {
       query.ticket_id = [query.ticket_id];
