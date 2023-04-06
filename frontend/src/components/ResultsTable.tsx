@@ -275,10 +275,10 @@ export function ResultsTable(props: TableProps) {
           </div>
         </div>
       ) : (
-        <p>No results found or unable to connect to Gallica.</p>
-      )
-    
-    }
+        <p className={"text-center"}>
+          No results for these params (or unable to connect to Gallica)
+        </p>
+      )}
     </div>
   );
 }

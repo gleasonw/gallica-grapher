@@ -36,17 +36,6 @@ export default function NavBar() {
     info: infoLinkStyle,
   };
 
-  function storeCurrentURLAndGetNext(navTo: urlPage, navFrom: urlPage) {
-    const currentURL = window.location.href;
-    localStorage.setItem(navFrom, currentURL);
-    const storedURL = localStorage.getItem(navTo);
-    if (storedURL) {
-      router.push(storedURL);
-      return;
-    }
-    router.push(`/${navTo.toLowerCase()}`);
-  }
-
   return (
     <div className="flex flex-col">
       <div className="flex flex-col sticky top-0 z-50">
@@ -69,18 +58,13 @@ export default function NavBar() {
             </Link>
             <div className="hidden lg:flex xl:flex items-center">
               {Object.keys(pages).map((link) => (
-                <a
+                <Link
                   key={link}
-                  onClick={() =>
-                    storeCurrentURLAndGetNext(
-                      link as keyof typeof pages,
-                      currentPage
-                    )
-                  }
                   className={styleMap[link as keyof typeof pages]}
+                  href={`/${link}`}
                 >
                   {pages[link as keyof typeof pages]}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -121,14 +105,15 @@ export default function NavBar() {
                 }
               >
                 {Object.keys(pages).map((link) => (
-                  <a
+                  <Link
                     key={link}
                     className={
                       "p-5 w-60 hover:bg-blue-100 rounded-lg hover:cursor-pointer"
                     }
+                    href={`/${link}`}
                   >
                     {link === "" ? "Graph" : link}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </motion.div>
