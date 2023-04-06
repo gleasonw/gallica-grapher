@@ -355,7 +355,7 @@ function ProximitySearchInput(props: {
     <div className="flex flex-wrap gap-5">
       <input
         type="text"
-        value={props.linkTerm}
+        value={props.linkTerm || ""}
         onChange={(e) => props.onSetLinkTerm(e.target.value)}
         className={"border p-2 rounded-lg shadow-sm"}
         placeholder={translation.linkTerm}

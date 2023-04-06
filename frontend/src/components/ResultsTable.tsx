@@ -251,7 +251,7 @@ export function ResultsTable(props: TableProps) {
 
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-      {tableInstance.data.length > 0 && (
+      {tableInstance.data.length > 0 ? (
         <div>
           <div className={"ml-5 flex flex-col mb-2"}>
             <h1 className={"text-2xl flex flex-col gap-2"}>
@@ -274,7 +274,11 @@ export function ResultsTable(props: TableProps) {
             <MobileTable tableInstance={tableInstance} />
           </div>
         </div>
-      )}
+      ) : (
+        <p>No results found or unable to connect to Gallica.</p>
+      )
+    
+    }
     </div>
   );
 }

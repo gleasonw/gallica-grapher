@@ -35,7 +35,7 @@ export function TicketResultTable(props: TicketTableProps) {
       month={props.month}
       day={props.day}
       yearRange={props.yearRange}
-      limit={15}
+      limit={props.limit}
       source={"periodical"}
     >
       <div>
