@@ -51,7 +51,7 @@ export default function Context() {
           initParams={{
             terms: result.data.terms,
             papers: undefined,
-            source: result.data.source ?? undefined,
+            source: result.data.source ?? "all",
             limit: result.data.limit ?? undefined,
             cursor: result.data.cursor ?? undefined,
             yearRange: result.data.year
@@ -61,13 +61,14 @@ export default function Context() {
             link_term: result.data.link_term ?? undefined,
             link_distance: result.data.link_distance ?? undefined,
           }}
+          key={JSON.stringify(router.query)}
         />
       ) : (
         <SearchableContext
           initParams={{
             terms: "",
             papers: undefined,
-            source: undefined,
+            source: "all",
             limit: undefined,
             cursor: undefined,
             yearRange: undefined,
@@ -75,6 +76,7 @@ export default function Context() {
             link_term: undefined,
             link_distance: undefined,
           }}
+          key={JSON.stringify(router.query)}
         />
       )}
     </>
@@ -98,6 +100,7 @@ const strings = {
 };
 
 function SearchableContext(props: { initParams: SearchPageState }) {
+  console.log(props.initParams)
   const [searchState, searchStateDispatch] = React.useReducer(
     searchStateReducer,
     props.initParams
@@ -170,6 +173,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
       payload: newProps,
     });
   }
+  console.log(searchState.terms)
 
   return (
     <SearchPageStateContext.Provider value={searchState}>

@@ -1,4 +1,5 @@
 from www.models import Ticket
+import aiohttp
 from gallicaGetter.utils.date import Date
 from gallicaGetter.periodOccurrence import PeriodRecord
 from typing import Callable, Literal
@@ -53,9 +54,9 @@ def get_gram_data(
 ):
     gram = gram.lower()
     format_gram = quote(gram, encoding="utf-8")
-    df = pd.read_csv(
-        f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{format_gram}_from={debut}_to={fin}"
-    )
+    url = f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{format_gram}_from={debut}_to={fin}"
+    print(url)
+    df = pd.read_csv(url)
     if resolution == "mois" and corpus != "livres":
         df = (
             df.groupby(["annee", "mois", "gram"])

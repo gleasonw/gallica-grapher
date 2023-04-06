@@ -295,7 +295,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
         <input
           className="w-20 border p-3  rounded-lg"
           type="number"
-          value={props.value?.[0]}
+          value={props.value?.[0] || ""}
           onChange={(e) => {
             const newValue = parseInt(e.target.value);
             if (typeof newValue === "number") {
@@ -307,7 +307,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
         <input
           className="w-20 p-3 rounded-lg border"
           type="number"
-          value={props.value?.[1]}
+          value={props.value?.[1] || ""}
           onChange={(e) => {
             const newValue = parseInt(e.target.value);
             if (typeof newValue === "number") {

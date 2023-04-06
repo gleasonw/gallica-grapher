@@ -112,12 +112,6 @@ export function ResultsTable(props: TableProps) {
   };
 
   const staticData = useContext(StaticPropContext);
-  console.log(
-    currentParamObjectEqualsInitial(
-      staticData?.staticRecordParams,
-      currentFetchParams
-    )
-  );
 
   const { isFetching, data } = useQuery({
     queryKey: [

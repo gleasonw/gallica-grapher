@@ -5,7 +5,6 @@ export default function currentParamObjectEqualsInitial(
   if(!currentParams || !initialParams) return false;
   return Object.keys(currentParams).every((key) => {
     const item = currentParams[key];
-    console.log(key, item)
     if (Array.isArray(item)) {
       return item.every((item, index) => {
         return item === initialParams[key][index];
