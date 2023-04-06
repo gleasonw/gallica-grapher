@@ -274,6 +274,8 @@ export function ResultsTable(props: TableProps) {
             <MobileTable tableInstance={tableInstance} />
           </div>
         </div>
+      ) : isFetching ? (
+        spinner
       ) : (
         <p className={"text-center"}>
           No results for these params (or unable to connect to Gallica)
