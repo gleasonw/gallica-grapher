@@ -15,6 +15,8 @@ import {
 } from "./GraphContext";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import currentParamObjectEqualsInitial from "./utils/objectsEqual";
+import { STATIC_PROPS_ID } from "next/dist/shared/lib/constants";
+import { StaticPropContext } from "./StaticPropContext";
 
 export async function getTicketData(
   id: number,
@@ -116,6 +118,8 @@ export function ResultViewer() {
     smoothing,
   });
 
+  const staticData = useContext(StaticPropContext);
+
   function setSelectedTicket(ticketID?: number) {
     graphStateDispatch!({
       type: "set_selected_ticket",
@@ -169,6 +173,14 @@ export function ResultViewer() {
           queryKey: ["ticket", { id, grouping, smoothing }],
           queryFn: () => getTicketData(ticket.id, grouping, smoothing),
           keepPreviousData: true,
+          initialData: currentParamObjectEqualsInitial(
+            staticData?.staticSeriesParams?.find((p) => p.id === id),
+            { id, grouping, smoothing }
+          )
+            ? staticData?.staticSeries.find(
+                (ticket_series) => ticket_series.request_id === id
+              )
+            : undefined,
         };
       }) ?? [],
   });

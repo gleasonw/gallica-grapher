@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { InputForm } from "../components/InputForm";
-import { ResultViewer } from "../components/ResultViewer";
-import { GetServerSideProps } from "next/types";
+import { ResultViewer, getTicketData } from "../components/ResultViewer";
+import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 import {
   graphStateReducer,
   GraphPageState,
@@ -18,6 +18,9 @@ import { apiURL } from "../components/apiURL";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useQueries, useQuery } from "@tanstack/react-query";
+import { GallicaResponse, GraphData } from "../models/dbStructs";
+import { TableProps, fetchContext } from "../components/ResultsTable";
+import { StaticPropContext } from "../components/StaticPropContext";
 
 const strings = {
   fr: {
@@ -50,8 +53,72 @@ const graphStateURL = z.object({
   context_selected_ticket: z.coerce.number().nullish(),
 });
 
-export default function Home() {
-  // TODO: if initTickets is empty, check local storage, else use default tickets
+const initTickets = [
+  {
+    id: 0,
+    terms: ["brazza"],
+    example: true,
+  },
+  {
+    id: 1,
+    terms: ["congo"],
+    example: true,
+  },
+  {
+    id: -1,
+    terms: ["coloniale"],
+    example: true,
+  },
+];
+
+export const getStaticProps: GetStaticProps<{
+  staticRecords: GallicaResponse;
+  staticSeries: GraphData[];
+  staticRecordParams: TableProps;
+  staticSeriesParams: {
+    id: number;
+    grouping: string;
+    smoothing: number;
+  }[];
+}> = async () => {
+  const staticRecordParams = {
+    terms: initTickets[0].terms,
+    limit: 10,
+    source: "periodical" as const,
+    yearRange: [1789, 1950] as [number, number],
+    selectedPage: 1,
+  };
+  const staticSeriesParams = initTickets.map((ticket) => ({
+    id: ticket.id,
+    grouping: "year",
+    smoothing: 0,
+  }));
+  const staticRecords = await fetchContext(0, {
+    terms: initTickets[0].terms,
+    limit: 10,
+    source: "periodical",
+  });
+  const staticSeries = await Promise.all(
+    initTickets.map((ticket) => {
+      return getTicketData(ticket.id, "year", 0);
+    })
+  );
+  return {
+    props: {
+      staticRecordParams,
+      staticRecords,
+      staticSeries,
+      staticSeriesParams,
+    },
+  };
+};
+
+export default function Home({
+  staticRecords,
+  staticSeries,
+  staticRecordParams,
+  staticSeriesParams,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter();
   const query = router.query;
   if (query.ticket_id) {
@@ -60,12 +127,22 @@ export default function Home() {
     }
   }
   const result = graphStateURL.safeParse(query);
-  if (result.success) {
-    console.log("load from remote");
-    return <LoadGraphStateFromRemoteTicket urlState={result.data} />;
-  } else {
-    return <LoadGraphStateFromLocal />;
-  }
+  return (
+    <StaticPropContext.Provider
+      value={{
+        staticRecords,
+        staticSeries,
+        staticRecordParams,
+        staticSeriesParams,
+      }}
+    >
+      {result.success ? (
+        <LoadGraphStateFromRemoteTicket urlState={result.data} />
+      ) : (
+        <LoadGraphStateFromLocal />
+      )}
+    </StaticPropContext.Provider>
+  );
 }
 
 function LoadGraphStateFromRemoteTicket(props: {
@@ -93,27 +170,7 @@ function LoadGraphStateFromRemoteTicket(props: {
 }
 
 function LoadGraphStateFromLocal() {
-  return (
-    <GraphPage
-      initTickets={[
-        {
-          id: 0,
-          terms: ["brazza"],
-          example: true,
-        },
-        {
-          id: 1,
-          terms: ["congo"],
-          example: true,
-        },
-        {
-          id: -1,
-          terms: ["coloniale"],
-          example: true,
-        },
-      ]}
-    />
-  );
+  return <GraphPage initTickets={initTickets} />;
 }
 
 function GraphPage(props: { initTickets?: GraphTicket[] }) {

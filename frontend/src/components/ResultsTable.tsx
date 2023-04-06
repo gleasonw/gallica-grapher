@@ -12,6 +12,8 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
+import { StaticPropContext } from "./StaticPropContext";
+import currentParamObjectEqualsInitial from "./utils/objectsEqual";
 
 export interface TableProps {
   terms?: string[];
@@ -92,6 +94,25 @@ export function ResultsTable(props: TableProps) {
     sort,
   } = props;
 
+  // this will be used to check if we can use ssr data... maybe a better way?
+
+  const currentFetchParams = {
+    yearRange,
+    month,
+    day,
+    codes,
+    terms,
+    source,
+    link_term,
+    link_distance,
+    sort,
+    selectedPage,
+    limit,
+  };
+
+  const staticData = useContext(StaticPropContext);
+  console.log(currentParamObjectEqualsInitial(staticData?.staticRecordParams, currentFetchParams));
+
   const { isFetching, data } = useQuery({
     queryKey: [
       "context",
@@ -116,6 +137,10 @@ export function ResultsTable(props: TableProps) {
       }),
     staleTime: Infinity,
     keepPreviousData: true,
+    initialData: () =>
+      currentParamObjectEqualsInitial(staticData?.staticRecordParams, currentFetchParams)
+        ? staticData?.staticRecords
+        : undefined,
   });
 
   const currentPage = data;
