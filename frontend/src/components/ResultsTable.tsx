@@ -14,6 +14,7 @@ import { useContext } from "react";
 import { LangContext } from "./LangContext";
 import { StaticPropContext } from "./StaticPropContext";
 import currentParamObjectEqualsInitial from "./utils/objectsEqual";
+import { Spinner } from "./Spinner";
 
 export interface TableProps {
   terms?: string[];
@@ -111,7 +112,12 @@ export function ResultsTable(props: TableProps) {
   };
 
   const staticData = useContext(StaticPropContext);
-  console.log(currentParamObjectEqualsInitial(staticData?.staticRecordParams, currentFetchParams));
+  console.log(
+    currentParamObjectEqualsInitial(
+      staticData?.staticRecordParams,
+      currentFetchParams
+    )
+  );
 
   const { isFetching, data } = useQuery({
     queryKey: [
@@ -138,7 +144,10 @@ export function ResultsTable(props: TableProps) {
     staleTime: Infinity,
     keepPreviousData: true,
     initialData: () =>
-      currentParamObjectEqualsInitial(staticData?.staticRecordParams, currentFetchParams)
+      currentParamObjectEqualsInitial(
+        staticData?.staticRecordParams,
+        currentFetchParams
+      )
         ? staticData?.staticRecords
         : undefined,
   });
@@ -261,18 +270,6 @@ export function ResultsTable(props: TableProps) {
     </QueryPagination>
   );
 
-  const spinner = (
-    <div className={"flex justify-center items-center"}>
-      <div
-        className={
-          " h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] transition-opacity duration-150 " +
-          (isFetching ? "opacity-100" : "opacity-0")
-        }
-        role="status"
-      />
-    </div>
-  );
-
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
       {tableInstance.data.length > 0 ? (
@@ -287,7 +284,7 @@ export function ResultsTable(props: TableProps) {
               )}
             </h1>
             {pagination}
-            {spinner}
+            <Spinner isFetching={isFetching} />
           </div>
           <div
             className={
@@ -299,7 +296,7 @@ export function ResultsTable(props: TableProps) {
           </div>
         </div>
       ) : isFetching ? (
-        spinner
+        <Spinner isFetching={isFetching} />
       ) : (
         <p className={"text-center"}>
           No results for these params (or unable to connect to Gallica)

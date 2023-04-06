@@ -21,6 +21,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { GallicaResponse, GraphData } from "../models/dbStructs";
 import { TableProps, fetchContext } from "../components/ResultsTable";
 import { StaticPropContext } from "../components/StaticPropContext";
+import { Spinner } from "../components/Spinner";
 
 const strings = {
   fr: {
@@ -161,7 +162,11 @@ function LoadGraphStateFromRemoteTicket(props: {
     },
   });
   if (ticketsWithState.status === "loading") {
-    return <div>Loading...</div>;
+    return (
+      <div className={"flex justify-center items-center"}>
+        <Spinner isFetching={true} />
+      </div>
+    );
   }
   if (!ticketsWithState.data) {
     return <div>Could not load tickets</div>;
