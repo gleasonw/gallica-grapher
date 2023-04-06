@@ -26,7 +26,6 @@ export interface TableProps {
   children?: React.ReactNode;
   limit?: number;
   sort?: "date" | "relevance";
-  initialRecords?: Awaited<ReturnType<typeof fetchContext> | undefined>;
   all_context?: boolean;
 }
 
@@ -94,35 +93,6 @@ export function ResultsTable(props: TableProps) {
     sort,
   } = props;
 
-  // this will be used to check if we can use ssr data... maybe a better way?
-  const initialFetchParams = React.useRef({
-    yearRange,
-    month,
-    day,
-    codes,
-    terms,
-    source,
-    link_term,
-    link_distance,
-    sort,
-    selectedPage,
-    limit,
-  });
-
-  const currentFetchParams = {
-    yearRange,
-    month,
-    day,
-    codes,
-    terms,
-    source,
-    link_term,
-    link_distance,
-    sort,
-    selectedPage,
-    limit,
-  };
-
   const { isFetching, data } = useQuery({
     queryKey: [
       "context",
@@ -147,13 +117,6 @@ export function ResultsTable(props: TableProps) {
       }),
     staleTime: Infinity,
     keepPreviousData: true,
-    initialData: () =>
-      currentParamObjectEqualsInitial(
-        initialFetchParams.current,
-        currentFetchParams
-      )
-        ? props.initialRecords
-        : undefined,
   });
 
   const currentPage = data;

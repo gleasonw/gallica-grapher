@@ -1,9 +1,8 @@
 import React, { useContext } from "react";
 import { InputForm } from "../components/InputForm";
-import { ResultViewer, getTicketData } from "../components/ResultViewer";
-import { GallicaResponse, GraphData } from "../models/dbStructs";
+import { ResultViewer } from "../components/ResultViewer";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
-import { TableProps, fetchContext } from "../components/ResultsTable";
+import { TableProps } from "../components/ResultsTable";
 import {
   graphStateReducer,
   GraphPageState,
@@ -51,8 +50,6 @@ const graphStateURL = z.object({
 });
 
 export const getServerSideProps: GetServerSideProps<{
-  initRecords: GallicaResponse;
-  initSeries: GraphData[];
   initTickets: GraphTicket[];
 }> = async ({ query, res }) => {
   res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
@@ -62,8 +59,6 @@ export const getServerSideProps: GetServerSideProps<{
     }
   }
   const result = graphStateURL.safeParse(query);
-  let records: GallicaResponse;
-  let initSeries: GraphData[];
   let initTickets: GraphTicket[];
   if (result.success) {
     const ticketsWithState = await Promise.all(
@@ -85,16 +80,6 @@ export const getServerSideProps: GetServerSideProps<{
       ],
       month: result.data.context_month || undefined,
     };
-    records = await fetchContext(0, initContextParams);
-    initSeries = await Promise.all(
-      ticketsWithState.map((ticket) => {
-        return getTicketData(
-          ticket.id,
-          result.data.grouping || "year",
-          result.data.smoothing || 0
-        );
-      })
-    );
     initTickets = ticketsWithState;
   } else {
     initTickets = [
@@ -121,29 +106,15 @@ export const getServerSideProps: GetServerSideProps<{
       yearRange: [1789, 1950],
       codes: [],
     };
-    records = await fetchContext(0, initRecordParams);
-    initSeries = await Promise.all(
-      initTickets.map((ticket) => {
-        return getTicketData(
-          ticket.id,
-          initGraphParams.grouping,
-          initGraphParams.smoothing
-        );
-      })
-    );
   }
   return {
     props: {
-      initRecords: records,
-      initSeries: initSeries,
       initTickets: initTickets,
     },
   };
 };
 
 export default function Home({
-  initRecords,
-  initSeries,
   initTickets,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [graphState, graphStateDispatch] = React.useReducer(graphStateReducer, {
@@ -192,16 +163,13 @@ export default function Home({
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <NavBar />
-        <GraphAndTable initRecords={initRecords} initSeries={initSeries} />
+        <GraphAndTable />
       </GraphPageStateContext.Provider>
     </GraphPageDispatchContext.Provider>
   );
 }
 
-function GraphAndTable(props: {
-  initRecords: GallicaResponse;
-  initSeries: GraphData[];
-}) {
+function GraphAndTable() {
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
   const graphState = React.useContext(GraphPageStateContext);
@@ -241,12 +209,7 @@ function GraphAndTable(props: {
           })
         }
       />
-      {tickets && tickets.length > 0 && (
-        <ResultViewer
-          initRecords={props.initRecords}
-          initGraphData={props.initSeries}
-        />
-      )}
+      {tickets && tickets.length > 0 && <ResultViewer />}
     </div>
   );
 }

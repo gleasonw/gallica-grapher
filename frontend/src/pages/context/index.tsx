@@ -44,40 +44,16 @@ const searchPageState = z.object({
   cursor: z.number().nullish(),
 });
 
-export const getServerSideProps: GetServerSideProps = async ({
-  query,
-  res,
-}) => {
-  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-  const result = searchPageState.safeParse(query);
-  let initRecords: GallicaResponse | null = null;
-  if (result.success) {
-    initRecords = await fetchContext(0, {
-      terms: [result.data.terms],
-      yearRange: [
-        result.data.year ?? undefined,
-        result.data.end_year ?? undefined,
-      ],
-      source: result.data.source ?? "all",
-      link_term: result.data.link_term ?? undefined,
-      link_distance: result.data.link_distance ?? undefined,
-      codes: result.data.codes ?? undefined,
-      limit: result.data.limit ?? 10,
-      sort: result.data.sort ?? "relevance",
-    });
-  }
-
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   return {
     props: {
       query: query,
-      initRecords,
     },
   };
 };
 
 export default function Context({
   query,
-  initRecords,
 }: {
   query: any;
   initRecords: GallicaResponse | undefined;
@@ -121,7 +97,7 @@ export default function Context({
     <SearchPageStateContext.Provider value={searchState}>
       <SearchPageDispatchContext.Provider value={searchStateDispatch}>
         <NavBar />
-        <SearchableContext initRecords={initRecords} initParams={initParams} />
+        <SearchableContext initParams={initParams} />
       </SearchPageDispatchContext.Provider>
     </SearchPageStateContext.Provider>
   );

@@ -16,11 +16,6 @@ import {
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import currentParamObjectEqualsInitial from "./utils/objectsEqual";
 
-interface ResultViewerProps {
-  initRecords: GallicaResponse;
-  initGraphData: GraphData[];
-}
-
 export async function getTicketData(
   id: number,
   grouping: string,
@@ -100,7 +95,7 @@ const strings = {
   },
 };
 
-export function ResultViewer(props: ResultViewerProps) {
+export function ResultViewer() {
   const graphState = useContext(GraphPageStateContext);
   const graphStateDispatch = useContext(GraphPageDispatchContext);
   if (!graphState || !graphStateDispatch)
@@ -174,22 +169,16 @@ export function ResultViewer(props: ResultViewerProps) {
           queryKey: ["ticket", { id, grouping, smoothing }],
           queryFn: () => getTicketData(ticket.id, grouping, smoothing),
           keepPreviousData: true,
-          initialData: currentParamObjectEqualsInitial(
-            { grouping, smoothing },
-            initialGraphParams.current
-          )
-            ? props.initGraphData.find(
-                (ticket_series) => ticket_series.request_id === id
-              )
-            : undefined,
         };
       }) ?? [],
   });
 
   function handleSeriesClick(point: Highcharts.Point) {
     if (!graphStateDispatch) return;
-    const correspondingTicket = tickets?.find((t) => t.terms[0] === point.series.name);
-    if (correspondingTicket){
+    const correspondingTicket = tickets?.find(
+      (t) => t.terms[0] === point.series.name
+    );
+    if (correspondingTicket) {
       setSelectedTicket(correspondingTicket.id);
     }
     const date = new Date(point.category);
@@ -285,7 +274,6 @@ export function ResultViewer(props: ResultViewerProps) {
         </div>
       </div>
       <TicketResultTable
-        initialRecords={props.initRecords}
         tickets={tickets}
         month={month}
         yearRange={yearRange}

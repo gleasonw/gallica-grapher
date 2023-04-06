@@ -15,7 +15,7 @@ export interface TicketTableProps extends TableProps {
   tickets?: GraphTicket[];
 }
 
-export function TicketResultTable(props: TicketTableProps){
+export function TicketResultTable(props: TicketTableProps) {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
@@ -36,7 +36,6 @@ export function TicketResultTable(props: TicketTableProps){
       day={props.day}
       yearRange={props.yearRange}
       limit={15}
-      initialRecords={props.initialRecords}
       source={"periodical"}
     >
       <div>
@@ -103,4 +102,4 @@ export function TicketResultTable(props: TicketTableProps){
       </div>
     </ResultsTable>
   );
-};
+}
