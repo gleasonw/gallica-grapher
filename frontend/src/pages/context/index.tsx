@@ -40,14 +40,8 @@ const searchPageState = z.object({
 });
 
 export default function Context() {
-  let initParams: SearchPageState;
   const router = useRouter();
-
   const result = searchPageState.safeParse(router.query);
-  if (result.success) {
-  } else {
-    // TODO: try to load state from local storage
-  }
 
   return (
     <>
