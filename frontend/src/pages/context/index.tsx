@@ -20,6 +20,7 @@ import {
 } from "../../components/SearchContext";
 import { z } from "zod";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -45,6 +46,13 @@ export default function Context() {
 
   return (
     <>
+      <Head>
+        <title>Gallica Context</title>
+        <meta
+          name="View context surrounding occurrences of words in the French national archive."
+          content="Gallica Context"
+        />
+      </Head>
       <NavBar />
       {result.success ? (
         <SearchableContext
@@ -100,7 +108,7 @@ const strings = {
 };
 
 function SearchableContext(props: { initParams: SearchPageState }) {
-  console.log(props.initParams)
+  console.log(props.initParams);
   const [searchState, searchStateDispatch] = React.useReducer(
     searchStateReducer,
     props.initParams
@@ -173,7 +181,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
       payload: newProps,
     });
   }
-  console.log(searchState.terms)
+  console.log(searchState.terms);
 
   return (
     <SearchPageStateContext.Provider value={searchState}>
