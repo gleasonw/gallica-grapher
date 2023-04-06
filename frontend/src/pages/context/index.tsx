@@ -119,10 +119,7 @@ const strings = {
   },
 };
 
-function SearchableContext(props: {
-  initRecords?: GallicaResponse;
-  initParams: SearchPageState;
-}) {
+function SearchableContext(props: { initParams: SearchPageState }) {
   const searchState = React.useContext(SearchPageStateContext);
   const searchStateDispatch = React.useContext(SearchPageDispatchContext);
 
@@ -331,13 +328,14 @@ function SearchableContext(props: {
       {tableFetchParams ? (
         <ResultsTable {...{ ...tableFetchParams, all_context: true }} />
       ) : (
-        <ResultsTable
-          {...{
-            ...props.initParams,
-            initialRecords: props.initRecords,
-            terms: [props.initParams.terms],
-          }}
-        />
+        props.initParams.terms !== "" && (
+          <ResultsTable
+            {...{
+              ...props.initParams,
+              terms: [props.initParams.terms],
+            }}
+          />
+        )
       )}
     </>
   );
