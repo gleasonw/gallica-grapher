@@ -1,8 +1,7 @@
 import React, { useContext } from "react";
 import { InputForm } from "../components/InputForm";
 import { ResultViewer } from "../components/ResultViewer";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
-import { TableProps } from "../components/ResultsTable";
+import { GetServerSideProps } from "next/types";
 import {
   graphStateReducer,
   GraphPageState,
@@ -17,6 +16,8 @@ import NavBar from "../components/NavBar";
 import { z } from "zod";
 import { apiURL } from "../components/apiURL";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useQueries, useQuery } from "@tanstack/react-query";
 
 const strings = {
   fr: {
@@ -49,82 +50,81 @@ const graphStateURL = z.object({
   context_selected_ticket: z.coerce.number().nullish(),
 });
 
-export const getServerSideProps: GetServerSideProps<{
-  initTickets: GraphTicket[];
-}> = async ({ query, res }) => {
-  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+export default function Home() {
+  // TODO: if initTickets is empty, check local storage, else use default tickets
+  const router = useRouter();
+  const query = router.query;
   if (query.ticket_id) {
     if (!Array.isArray(query.ticket_id)) {
       query.ticket_id = [query.ticket_id];
     }
   }
   const result = graphStateURL.safeParse(query);
-  let initTickets: GraphTicket[];
   if (result.success) {
-    const ticketsWithState = await Promise.all(
-      result.data.ticket_id.map(async (ticket_id) => {
-        const result = await fetch(`${apiURL}/api/ticketState/${ticket_id}`);
-        return (await result.json()) as GraphTicket;
-      })
-    );
-    const selectedTicket = ticketsWithState.find(
-      (ticket) => ticket.id === result.data.context_selected_ticket
-    );
-    let initContextParams: TableProps = {
-      terms: selectedTicket?.terms || ticketsWithState[0].terms,
-      limit: 15,
-      source: "periodical",
-      yearRange: [
-        result.data.context_year || 1789,
-        result.data.context_end_year || 1950,
-      ],
-      month: result.data.context_month || undefined,
-    };
-    initTickets = ticketsWithState;
+    console.log("load from remote");
+    return <LoadGraphStateFromRemoteTicket urlState={result.data} />;
   } else {
-    initTickets = [
-      {
-        id: 0,
-        terms: ["brazza"],
-        example: true,
-      },
-      {
-        id: 1,
-        terms: ["congo"],
-        example: true,
-      },
-      {
-        id: -1,
-        terms: ["coloniale"],
-        example: true,
-      },
-    ];
-    const initRecordParams: TableProps = {
-      terms: initTickets[0].terms,
-      limit: 15,
-      source: "periodical",
-      yearRange: [1789, 1950],
-      codes: [],
-    };
+    return <LoadGraphStateFromLocal />;
   }
-  return {
-    props: {
-      initTickets: initTickets,
-    },
-  };
-};
+}
 
-export default function Home({
-  initTickets,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function LoadGraphStateFromRemoteTicket(props: {
+  urlState: typeof graphStateURL._output;
+}) {
+  const ticketsWithState = useQuery({
+    queryKey: ["tickets"],
+    queryFn: async () => {
+      const ticketsWithState = await Promise.all(
+        props.urlState.ticket_id.map(async (ticket_id) => {
+          const result = await fetch(`${apiURL}/api/ticketState/${ticket_id}`);
+          return (await result.json()) as GraphTicket;
+        })
+      );
+      return ticketsWithState;
+    },
+  });
+  if (ticketsWithState.status === "loading") {
+    return <div>Loading...</div>;
+  }
+  if (!ticketsWithState.data) {
+    return <div>Could not load tickets</div>;
+  }
+  return <GraphPage initTickets={ticketsWithState.data} />;
+}
+
+function LoadGraphStateFromLocal() {
+  return (
+    <GraphPage
+      initTickets={[
+        {
+          id: 0,
+          terms: ["brazza"],
+          example: true,
+        },
+        {
+          id: 1,
+          terms: ["congo"],
+          example: true,
+        },
+        {
+          id: -1,
+          terms: ["coloniale"],
+          example: true,
+        },
+      ]}
+    />
+  );
+}
+
+function GraphPage(props: { initTickets?: GraphTicket[] }) {
   const [graphState, graphStateDispatch] = React.useReducer(graphStateReducer, {
-    tickets: initTickets,
+    tickets: props.initTickets,
     contextYearRange: [1789, 1950],
     searchYearRange: [1789, 1950],
     month: undefined,
     grouping: initGraphParams.grouping,
     smoothing: initGraphParams.smoothing,
-    selectedTicket: initTickets[0].id,
+    selectedTicket: props.initTickets?.[0].id,
   } as GraphPageState);
 
   React.useEffect(() => {
@@ -137,17 +137,10 @@ export default function Home({
         params.append("ticket_id", ticket.id.toString());
       }
     }
-    const [start, end] = graphState.contextYearRange;
-    if (start) {
-      params.append("context_year", start.toString());
-    }
-    if (end) {
-      params.append("context_end_year", end.toString());
-    }
     window.history.replaceState(
       {},
       "",
-      `${window.location.pathname}?${params.toString()}`
+      `${window.location.pathname.split("/")[0]}?${params.toString()}`
     );
   }, [graphState]);
 
