@@ -2,6 +2,7 @@ export default function currentParamObjectEqualsInitial(
   currentParams: any,
   initialParams: any
 ): boolean {
+  if(!currentParams || !initialParams) return false;
   return Object.keys(currentParams).every((key) => {
     const item = currentParams[key];
     console.log(key, item)
