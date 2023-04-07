@@ -150,10 +150,33 @@ export function ResultsTable(props: TableProps) {
   const tableData = React.useMemo(
     () =>
       currentPage?.records
-        ?.map((record) =>
-          record.context.map((contextRow) => ({
+        ?.map((record) => {
+          const documentMeta = {
             document: `${record.paper_title}||${record.date}||${record.url}`,
             date: record.date,
+          };
+          if (record.context.length === 0) {
+            return [
+              {
+                ...documentMeta,
+                page: (
+                  <a
+                    href={record.url}
+                    target={"_blank"}
+                    rel={"noreferrer"}
+                    className={"font-medium underline"}
+                  >
+                    {record.url}
+                  </a>
+                ),
+                left_context: "",
+                pivot: "Unable to connect to Gallica's ContentSearch API",
+                right_context: "",
+              },
+            ];
+          }
+          return record.context.map((contextRow) => ({
+            ...documentMeta,
             page: (
               <a
                 className="underline font-medium p-2"
@@ -171,8 +194,8 @@ export function ResultsTable(props: TableProps) {
               </span>
             ),
             right_context: contextRow.right_context.slice(0, charLimit),
-          }))
-        )
+          }));
+        })
         .flat() ?? [],
     [currentPage, charLimit]
   );
