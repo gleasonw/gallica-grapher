@@ -152,7 +152,7 @@ export function ResultsTable(props: TableProps) {
       currentPage?.records
         ?.map((record) =>
           record.context.map((contextRow) => ({
-            document: `${record.paper_title}||${record.date}`,
+            document: `${record.paper_title}||${record.date}||${record.url}`,
             date: record.date,
             page: (
               <a
@@ -188,15 +188,18 @@ export function ResultsTable(props: TableProps) {
         accessor: "document",
         Cell: ({ value }: { value: string }) => (
           <div className={""}>
-            {value.split("||").map((v, i) =>
-              i === 0 ? (
-                <div className="italic" key={v}>
-                  {v}
-                </div>
-              ) : (
-                <div key={v}>{v}</div>
-              )
-            )}
+            {value
+              .split("||")
+              .slice(0, 2)
+              .map((v, i) =>
+                i === 0 ? (
+                  <div className="italic" key={v}>
+                    {v}
+                  </div>
+                ) : (
+                  <div key={v}>{v}</div>
+                )
+              )}
           </div>
         ),
       } as const,
