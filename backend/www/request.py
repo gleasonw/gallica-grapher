@@ -6,8 +6,8 @@ from typing import Callable, Literal
 import www.pyllicaWrapper as pyllica_wrapper
 
 
-class Request(threading.Thread):
-    """A thread that spawns for each user and calls the core fetch --> parse --> store to database logic"""
+class Request:
+    """A co-routine that spawns for each user and calls the core fetch --> parse --> store to database logic"""
 
     def __init__(
         self,
@@ -29,10 +29,10 @@ class Request(threading.Thread):
         ] = "running"
         super().__init__()
 
-    def run(self):
+    async def run(self):
         """Fetch records for user from Pyllica and insert to DB for graphing"""
         with build_db_conn() as db_conn:
-            if pyllica_records := pyllica_wrapper.get(
+            if pyllica_records := await pyllica_wrapper.get(
                 self.ticket, on_no_records_found=self.set_no_records
             ):
 

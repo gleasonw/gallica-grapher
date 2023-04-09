@@ -1,3 +1,4 @@
+import asyncio
 import os
 import uvicorn
 import random
@@ -7,7 +8,7 @@ from www.database.connContext import build_db_conn
 from www.database.graphDataResolver import build_highcharts_series
 from www.request import Request
 from www.models import Ticket, Progress
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -30,21 +31,25 @@ def index():
     return {"message": "ok"}
 
 
-@app.post("/api/init")
-def init(ticket: Ticket):
-    global requestID
+async def graph_request(ticket: Ticket, id: int):
     global request_progress
 
     def handle_update_progress(progress: Progress):
         request_progress[requestID] = progress
 
-    requestID += 1
     request = Request(
         ticket=ticket,
-        id=requestID,
+        id=id,
         on_update_progress=handle_update_progress,
     )
-    request.start()
+    await request.run()
+
+
+@app.post("/api/init")
+def init(ticket: Ticket, background_tasks: BackgroundTasks):
+    global requestID
+    requestID += 1
+    background_tasks.add_task(graph_request, ticket, requestID)
     return {"requestid": requestID}
 
 

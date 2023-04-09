@@ -1,3 +1,4 @@
+from io import StringIO
 from www.models import Ticket
 import aiohttp
 from gallicaGetter.utils.date import Date
@@ -8,13 +9,13 @@ import pandas as pd
 from urllib.parse import quote
 
 
-def get(args: Ticket, on_no_records_found: Callable):
+async def get(args: Ticket, on_no_records_found: Callable):
     """Get records from Pyllica. Interpret 500 error as no records found."""
 
     if len(args.terms) > 1:
         raise ValueError("Only one term at a time for Pyllica, for now")
     try:
-        periods = get_gram_data(
+        periods = await get_gram_data(
             gram=args.terms[0],
             corpus="presse",
             resolution="mois",
@@ -45,35 +46,41 @@ def convert_data_frame_to_grouped_record(frame):
     )
 
 
-def get_gram_data(
+async def get_gram_data(
     gram: str,
     corpus: Literal["lemonde", "livres", "presse"] = "presse",
     debut=1789,
     fin=1950,
     resolution: Literal["default", "annee", "mois"] = "default",
 ):
-    gram = gram.lower()
-    format_gram = quote(gram, encoding="utf-8")
-    url = f"https://shiny.ens-paris-saclay.fr/guni/corpus={corpus}_{format_gram}_from={debut}_to={fin}"
-    print(url)
-    df = pd.read_csv(url)
-    if resolution == "mois" and corpus != "livres":
-        df = (
-            df.groupby(["annee", "mois", "gram"])
-            .agg({"n": "sum", "total": "sum"})
-            .reset_index()
-        )
-    if resolution == "annee":
-        df = (
-            df.groupby(["annee", "gram"])
-            .agg({"n": "sum", "total": "sum"})
-            .reset_index()
-        )
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            "https://shiny.ens-paris-saclay.fr/guni/query",
+            params={
+                "corpus": corpus,
+                "mot": gram.lower(),
+                "from": debut,
+                "to": fin,
+            },
+        ) as response:
+            df = pd.read_csv(StringIO(await response.text()))
+            if resolution == "mois" and corpus != "livres":
+                df = (
+                    df.groupby(["annee", "mois", "gram"])
+                    .agg({"n": "sum", "total": "sum"})
+                    .reset_index()
+                )
+            if resolution == "annee":
+                df = (
+                    df.groupby(["annee", "gram"])
+                    .agg({"n": "sum", "total": "sum"})
+                    .reset_index()
+                )
 
-    def calc_ratio(row):
-        if row.total == 0:
-            return 0
-        return row.n / row.total
+            def calc_ratio(row):
+                if row.total == 0:
+                    return 0
+                return row.n / row.total
 
-    df["ratio"] = df.apply(lambda row: calc_ratio(row), axis=1)
-    return df
+            df["ratio"] = df.apply(lambda row: calc_ratio(row), axis=1)
+            return df
