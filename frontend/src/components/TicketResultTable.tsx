@@ -13,10 +13,9 @@ export interface TicketTableProps extends TableProps {
   onSelectTicket: (ticketID: number) => void;
   selectedTicket?: number;
   tickets?: GraphTicket[];
-  initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
 
-export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
+export function TicketResultTable(props: TicketTableProps) {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
@@ -36,8 +35,7 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       month={props.month}
       day={props.day}
       yearRange={props.yearRange}
-      limit={15}
-      initialRecords={props.initialRecords}
+      limit={props.limit}
       source={"periodical"}
     >
       <div>
@@ -104,4 +102,4 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       </div>
     </ResultsTable>
   );
-};
+}

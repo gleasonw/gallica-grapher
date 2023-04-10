@@ -12,24 +12,26 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
+import { StaticPropContext } from "./StaticPropContext";
+import currentParamObjectEqualsInitial from "./utils/objectsEqual";
+import { Spinner } from "./Spinner";
 
 export interface TableProps {
   terms?: string[];
   codes?: string[];
-  day?: number | null;
-  month?: number | null;
+  day?: number;
+  month?: number;
   yearRange?: [number | undefined, number | undefined];
-  source?: "book" | "periodical" | "all" | null;
-  link_term?: string | null;
-  link_distance?: number | null;
+  source?: "book" | "periodical" | "all";
+  link_term?: string;
+  link_distance?: number;
   children?: React.ReactNode;
-  limit: number;
-  sort?: "date" | "relevance" | null;
-  initialRecords?: Awaited<ReturnType<typeof fetchContext>>;
+  limit?: number;
+  sort?: "date" | "relevance";
   all_context?: boolean;
 }
 
-export const fetchContext = async (pageParam = 0, props: TableProps) => {
+export async function fetchContext(pageParam = 0, props: TableProps) {
   let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...props,
@@ -46,7 +48,7 @@ export const fetchContext = async (pageParam = 0, props: TableProps) => {
   console.log(url);
   const response = await fetch(url);
   return (await response.json()) as GallicaResponse;
-};
+}
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
@@ -81,39 +83,100 @@ export function ResultsTable(props: TableProps) {
 
   React.useEffect(() => setSelectedPage(1), [props]);
 
+  const {
+    yearRange,
+    month,
+    day,
+    codes,
+    terms,
+    source,
+    link_term,
+    link_distance,
+    sort,
+  } = props;
+
+  // this will be used to check if we can use ssr data... maybe a better way?
+
+  const currentFetchParams = {
+    yearRange,
+    month,
+    day,
+    codes,
+    terms,
+    source,
+    link_term,
+    link_distance,
+    sort,
+    selectedPage,
+    limit,
+  };
+
+  const staticData = useContext(StaticPropContext);
+
   const { isFetching, data } = useQuery({
     queryKey: [
       "context",
-      props.yearRange,
-      props.month,
-      props.day,
-      props.codes,
-      props.terms,
-      props.source,
-      props.link_term,
-      props.link_distance,
-      props.limit,
-      props.sort,
-      selectedPage,
+      {
+        yearRange,
+        month,
+        day,
+        codes,
+        terms,
+        source,
+        link_term,
+        link_distance,
+        sort,
+        selectedPage,
+        limit,
+      },
     ],
     queryFn: () =>
-      fetchContext((selectedPage - 1) * props.limit, {
+      fetchContext((selectedPage - 1) * (props.limit ? props.limit : 10), {
         ...props,
         children: undefined,
       }),
     staleTime: Infinity,
     keepPreviousData: true,
-    placeholderData: props.initialRecords,
+    initialData: () =>
+      currentParamObjectEqualsInitial(
+        staticData?.staticRecordParams,
+        currentFetchParams
+      )
+        ? staticData?.staticRecords
+        : undefined,
   });
 
   const currentPage = data;
   const tableData = React.useMemo(
     () =>
       currentPage?.records
-        ?.map((record) =>
-          record.context.map((contextRow) => ({
-            document: `${record.paper_title}||${record.date}`,
+        ?.map((record) => {
+          const documentMeta = {
+            document: `${record.paper_title}||${record.date}||${record.url}`,
             date: record.date,
+          };
+          if (record.context.length === 0) {
+            return [
+              {
+                ...documentMeta,
+                page: (
+                  <a
+                    href={record.url}
+                    target={"_blank"}
+                    rel={"noreferrer"}
+                    className={"font-medium underline"}
+                  >
+                    {record.url}
+                  </a>
+                ),
+                left_context: "",
+                pivot: "Unable to connect to Gallica's ContentSearch API",
+                right_context: "",
+              },
+            ];
+          }
+          return record.context.map((contextRow) => ({
+            ...documentMeta,
             page: (
               <a
                 className="underline font-medium p-2"
@@ -131,8 +194,8 @@ export function ResultsTable(props: TableProps) {
               </span>
             ),
             right_context: contextRow.right_context.slice(0, charLimit),
-          }))
-        )
+          }));
+        })
         .flat() ?? [],
     [currentPage, charLimit]
   );
@@ -148,15 +211,18 @@ export function ResultsTable(props: TableProps) {
         accessor: "document",
         Cell: ({ value }: { value: string }) => (
           <div className={""}>
-            {value.split("||").map((v, i) =>
-              i === 0 ? (
-                <div className="italic" key={v}>
-                  {v}
-                </div>
-              ) : (
-                <div key={v}>{v}</div>
-              )
-            )}
+            {value
+              .split("||")
+              .slice(0, 2)
+              .map((v, i) =>
+                i === 0 ? (
+                  <div className="italic" key={v}>
+                    {v}
+                  </div>
+                ) : (
+                  <div key={v}>{v}</div>
+                )
+              )}
           </div>
         ),
       } as const,
@@ -207,7 +273,7 @@ export function ResultsTable(props: TableProps) {
       onPageDecrement={() => setSelectedPage(selectedPage - 1)}
       selectedPage={selectedPage}
       cursorMax={cursorMax}
-      onLastPage={() => setSelectedPage(cursorMax)}
+      onLastPage={() => setSelectedPage(cursorMax + 1)}
       onFirstPage={() => setSelectedPage(1)}
     >
       <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
@@ -219,48 +285,43 @@ export function ResultsTable(props: TableProps) {
         key={selectedPage}
       />
       <p className={"ml-3 md:ml-5 lg:ml-5"}>
-        {lang === "fr" ? "de" : "of"} {cursorMax.toLocaleString()}
+        {lang === "fr" ? "de" : "of"} {(cursorMax + 1).toLocaleString()}
       </p>
     </QueryPagination>
   );
 
-  const spinner = (
-    <div className={"flex justify-center items-center"}>
-      <div
-        className={
-          " h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] transition-opacity duration-150 " +
-          (isFetching ? "opacity-100" : "opacity-0")
-        }
-        role="status"
-      />
-    </div>
-  );
-  //TODO: show active filters, replicate gamepass ui
   return (
     <div className={"mt-5 flex flex-col justify-center mb-20"}>
-      <div className={"ml-5 flex flex-col mb-2"}>
-        <h1 className={"text-2xl flex flex-col gap-2"}>
-          {!currentPage && !isFetching && <p>No results found</p>}
-          {currentPage && (
-            <div className={"flex flex-row gap-10"}>
-              {total_results.toLocaleString()} {translation.total_docs}
-            </div>
-          )}
-        </h1>
-        {pagination}
-        {spinner}
-      </div>
-      {tableInstance.data.length > 0 && (
-        <div
-          className={
-            "flex ease-in-out first-letter:flex-col justify-center items-center transition-all duration-1000"
-          }
-        >
-          <DesktopTable tableInstance={tableInstance} />
-          <MobileTable tableInstance={tableInstance} />
+      {tableInstance.data.length > 0 ? (
+        <div>
+          <div className={"ml-5 flex flex-col mb-2"}>
+            <h1 className={"text-2xl flex flex-col gap-2"}>
+              {!currentPage && !isFetching && <p>No results found</p>}
+              {currentPage && (
+                <div className={"flex flex-row gap-10"}>
+                  {total_results.toLocaleString()} {translation.total_docs}
+                </div>
+              )}
+            </h1>
+            {pagination}
+            <Spinner isFetching={isFetching} />
+          </div>
+          <div
+            className={
+              "flex ease-in-out first-letter:flex-col justify-center items-center transition-all duration-1000"
+            }
+          >
+            <DesktopTable tableInstance={tableInstance} />
+            <MobileTable tableInstance={tableInstance} />
+          </div>
         </div>
+      ) : isFetching ? (
+        <Spinner isFetching={isFetching} />
+      ) : (
+        <p className={"text-center"}>
+          No results for these params (or unable to connect to Gallica)
+        </p>
       )}
-      {pagination}
     </div>
   );
 }
@@ -277,19 +338,22 @@ function QueryPagination(props: {
   return (
     <div
       className={
-        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl transition-all duration-300"
+        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl "
       }
     >
       <div
         className={
-          "flex flex-row justify-between transition-opacity " +
-          (props.selectedPage !== 1 ? "opacity-100" : "opacity-0")
+          "flex flex-row justify-between " +
+          (props.selectedPage > 1 ? "opacity-100" : "opacity-0")
         }
       >
         <button onClick={props.onFirstPage} className={"p-3"}>
           {"<<"}
         </button>
-        <button className={"p-4"} onClick={props.onPageDecrement}>
+        <button
+          className={"p-4"}
+          onClick={props.selectedPage > 1 ? props.onPageDecrement : undefined}
+        >
           {"<"}
         </button>
       </div>
@@ -297,10 +361,17 @@ function QueryPagination(props: {
       <div
         className={
           "flex flex-row justify-between " +
-          (props.selectedPage !== props.cursorMax ? "opacity-100" : "opacity-0")
+          (props.selectedPage <= props.cursorMax ? "opacity-100" : "opacity-0")
         }
       >
-        <button className={"p-4"} onClick={props.onPageIncrement}>
+        <button
+          className={"p-4"}
+          onClick={
+            props.selectedPage <= props.cursorMax
+              ? props.onPageIncrement
+              : undefined
+          }
+        >
           {">"}
         </button>
         <button onClick={props.onLastPage} className={"p-3"}>

@@ -2,16 +2,16 @@ import { Paper } from "../models/dbStructs";
 import { TableProps } from "./ResultsTable";
 
 export interface SearchPageState {
-  term: string;
+  terms: string;
   papers?: Paper[];
-  source: "book" | "periodical" | "all";
-  limit: number;
-  cursor: number;
-  yearRange: [number | undefined, number | undefined];
-  sort: "date" | "relevance";
-  linkTerm?: string;
-  linkDistance?: number;
-  tableProps?: TableProps;
+  source?: "book" | "periodical" | "all";
+  limit?: number;
+  cursor?: number;
+  yearRange?: [number | undefined, number | undefined];  
+  sort?: "date" | "relevance";
+  link_term?: string;
+  link_distance?: number;
+  tableFetchParams?: TableProps;
 }
 export interface AddPaperAction {
   type: "add_paper";
@@ -50,22 +50,27 @@ export interface SetSortAction {
 
 export interface SetLinkTermAction {
   type: "set_link_term";
-  payload: SearchPageState["linkTerm"];
+  payload: SearchPageState["link_term"];
 }
 
 export interface SetLinkDistanceAction {
   type: "set_link_distance";
-  payload: SearchPageState["linkDistance"];
+  payload: SearchPageState["link_distance"];
 }
 
 export interface SetTermsAction {
   type: "set_terms";
-  payload: SearchPageState["term"];
+  payload: SearchPageState["terms"];
 }
 
 export interface SetTablePropsAction {
   type: "set_table_props";
-  payload: SearchPageState["tableProps"];
+  payload: SearchPageState["tableFetchParams"];
+}
+
+export interface ResetToInitialStateAction {
+  type: "reset_to_initial_state";
+  payload: SearchPageState;
 }
 
 export function searchStateReducer(
@@ -82,6 +87,7 @@ export function searchStateReducer(
     | SetLinkDistanceAction
     | SetTermsAction
     | SetTablePropsAction
+    | ResetToInitialStateAction
 ): SearchPageState {
   switch (action.type) {
     case "add_paper":
@@ -125,22 +131,24 @@ export function searchStateReducer(
     case "set_link_term":
       return {
         ...state,
-        linkTerm: action.payload,
+        link_term: action.payload,
       };
     case "set_link_distance":
       return {
         ...state,
-        linkDistance: action.payload,
+        link_distance: action.payload,
       };
     case "set_terms":
       return {
         ...state,
-        term: action.payload,
+        terms: action.payload,
       };
     case "set_table_props":
       return {
         ...state,
-        tableProps: action.payload,
+        tableFetchParams: action.payload,
       };
+    case "reset_to_initial_state":
+      return action.payload;
   }
 }

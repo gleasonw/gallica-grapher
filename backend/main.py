@@ -1,3 +1,4 @@
+import asyncio
 import os
 import uvicorn
 import random
@@ -7,8 +8,9 @@ from www.database.connContext import build_db_conn
 from www.database.graphDataResolver import build_highcharts_series
 from www.request import Request
 from www.models import Ticket, Progress
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
 origins = ["*"]
@@ -28,21 +30,26 @@ request_progress: Dict[int, Progress] = {}
 def index():
     return {"message": "ok"}
 
-@app.post("/api/init")
-def init(ticket: Ticket):
-    global requestID
+
+async def graph_request(ticket: Ticket, id: int):
     global request_progress
 
     def handle_update_progress(progress: Progress):
         request_progress[requestID] = progress
 
-    requestID += 1
     request = Request(
         ticket=ticket,
-        id=requestID,
+        id=id,
         on_update_progress=handle_update_progress,
     )
-    request.start()
+    await request.run()
+
+
+@app.post("/api/init")
+def init(ticket: Ticket, background_tasks: BackgroundTasks):
+    global requestID
+    requestID += 1
+    background_tasks.add_task(graph_request, ticket, requestID)
     return {"requestid": requestID}
 
 
@@ -108,6 +115,32 @@ def get_num_papers_over_range(start: int, end: int):
             num_papers_over_range = curs.fetchone()
         count = num_papers_over_range and num_papers_over_range[0]
     return count
+
+
+@app.get("/api/ticketState/{request_id}")
+def ticket_state(request_id: int):
+    # get unique searchterms, min/max year from db
+    with build_db_conn() as conn:
+        with conn.cursor() as curs:
+            curs.execute(
+                """
+                SELECT ARRAY_AGG(DISTINCT searchterm), MIN(year), MAX(year)
+                    FROM groupcounts
+                    WHERE requestid = %s
+                    GROUP BY requestid
+                    ;
+                """,
+                (request_id,),
+            )
+            res = curs.fetchone()
+            if res is not None:
+                searchterms, min_year, max_year = res
+                return {
+                    "id": request_id,
+                    "terms": searchterms,
+                    "start_date": min_year,
+                    "end_date": max_year,
+                }
 
 
 @app.get("/api/graphData")

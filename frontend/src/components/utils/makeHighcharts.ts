@@ -14,7 +14,6 @@ export const seriesColors = [
   "#91e8e1",
 ];
 
-
 export function makeOptions(
   onSetExtremes: (e: any) => void,
   onSeriesClick: (e: any) => void,
