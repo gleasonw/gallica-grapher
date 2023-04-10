@@ -9,6 +9,8 @@ export interface GraphPageState {
   grouping: "year" | "month";
   smoothing: number;
   selectedTicket?: number;
+  source: "presse" | "livres" | "lemonde";
+  linkTerm?: string;
 }
 export interface AddPaperAction {
   type: "add_paper";
@@ -63,6 +65,17 @@ export interface SetSelectedTicketAction {
   type: "set_selected_ticket";
   payload: GraphPageState["selectedTicket"];
 }
+
+export interface SetLinkTermAction {
+  type: "set_link_term";
+  payload: GraphPageState["linkTerm"];
+}
+
+export interface SetSource {
+  type: "set_source";
+  payload: GraphPageState["source"];
+}
+
 export function graphStateReducer(
   state: GraphPageState,
   action:
@@ -75,6 +88,8 @@ export function graphStateReducer(
     | SetSelectedTicketAction
     | RemoveExampleTicketsAction
     | SetSearchYearRangeAction
+    | SetSource
+    | SetLinkTermAction
 ): GraphPageState {
   switch (action.type) {
     case "add_ticket":
@@ -128,6 +143,16 @@ export function graphStateReducer(
       return {
         ...state,
         searchYearRange: action.payload,
+      };
+    case "set_source":
+      return {
+        ...state,
+        source: action.payload,
+      };
+    case "set_link_term":
+      return {
+        ...state,
+        linkTerm: action.payload,
       };
   }
 }

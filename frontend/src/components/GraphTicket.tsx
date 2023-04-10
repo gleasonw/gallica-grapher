@@ -7,4 +7,6 @@ export interface GraphTicket {
   start_date?: number;
   end_date?: number;
   example?: boolean;
+  source: "presse" | "livres" | "lemonde";
+  linkTerm?: string;
 }

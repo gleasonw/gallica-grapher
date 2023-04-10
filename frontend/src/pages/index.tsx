@@ -22,6 +22,7 @@ import { GallicaResponse, GraphData } from "../models/dbStructs";
 import { TableProps, fetchContext } from "../components/ResultsTable";
 import { StaticPropContext } from "../components/StaticPropContext";
 import { Spinner } from "../components/Spinner";
+import { AnimatePresence, motion } from "framer-motion";
 
 const strings = {
   fr: {
@@ -59,16 +60,19 @@ const initTickets = [
     id: 0,
     terms: ["brazza"],
     example: true,
+    source: "presse" as const,
   },
   {
     id: 1,
     terms: ["congo"],
     example: true,
+    source: "presse" as const,
   },
   {
     id: -1,
     terms: ["coloniale"],
     example: true,
+    source: "presse" as const,
   },
 ];
 
@@ -93,6 +97,7 @@ export const getStaticProps: GetStaticProps<{
     id: ticket.id,
     grouping: "year",
     smoothing: 0,
+    source: "presse",
   }));
   const staticRecords = await fetchContext(0, {
     terms: initTickets[0].terms,
@@ -181,12 +186,14 @@ function LoadGraphStateFromLocal() {
 function GraphPage(props: { initTickets?: GraphTicket[] }) {
   const [graphState, graphStateDispatch] = React.useReducer(graphStateReducer, {
     tickets: props.initTickets,
-    contextYearRange: [1789, 1950],
-    searchYearRange: [1789, 1950],
+    contextYearRange: [undefined, undefined],
+    searchYearRange: [undefined, undefined],
     month: undefined,
     grouping: initGraphParams.grouping,
     smoothing: initGraphParams.smoothing,
     selectedTicket: props.initTickets?.[0].id,
+    source: "presse",
+    linkTerm: undefined,
   } as GraphPageState);
 
   React.useEffect(() => {
@@ -264,7 +271,18 @@ function GraphAndTable() {
           })
         }
       />
-      {tickets && tickets.length > 0 && <ResultViewer />}
+      <AnimatePresence>
+        {tickets && tickets.length > 0 && (
+          <motion.div
+            key={"graph"}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <ResultViewer />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -273,6 +291,7 @@ interface YearRangeInputProps {
   min: number;
   max: number;
   value?: [number | undefined, number | undefined];
+  placeholder?: [number, number];
   onChange: (value: [number | undefined, number | undefined]) => void;
   showLabel?: boolean;
 }
@@ -302,6 +321,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
               props.onChange([newValue, props.value?.[1]]);
             }
           }}
+          placeholder={props.placeholder?.[0].toString()}
         />
         {lang === "fr" ? "à" : "to"}
         <input
@@ -314,6 +334,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
               props.onChange([props.value?.[0], newValue]);
             }
           }}
+          placeholder={props.placeholder?.[1].toString()}
         />
       </div>
     </div>

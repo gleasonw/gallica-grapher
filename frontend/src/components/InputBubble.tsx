@@ -10,7 +10,7 @@ export default function InputBubble(props: {
   return (
     <div className="text-2xl relative w-full max-w-3xl">
       <input
-        className={"p-5 w-full rounded-3xl border-2 hover:shadow-lg"}
+        className={"p-5 w-full rounded-3xl border-2 shadow-lg "}
         placeholder={"rechercher un mot"}
         value={props.word || ""}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -22,6 +22,7 @@ export default function InputBubble(props: {
           }
         }}
       />
+      <div className={"m-5"}></div>
       {props.children}
     </div>
   );

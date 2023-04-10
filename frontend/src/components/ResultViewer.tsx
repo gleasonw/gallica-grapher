@@ -15,7 +15,6 @@ import {
 } from "./GraphContext";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import currentParamObjectEqualsInitial from "./utils/objectsEqual";
-import { STATIC_PROPS_ID } from "next/dist/shared/lib/constants";
 import { StaticPropContext } from "./StaticPropContext";
 
 export async function getTicketData(
@@ -232,7 +231,7 @@ export function ResultViewer() {
       <div className={"relative"}>
         <div
           className={
-            "ml-10 absolute -top-10 right-2 z-40 mb-5 flex flex-row gap-10"
+            "ml-10 absolute -top-20 right-2 z-40 mb-5 flex flex-row gap-5"
           }
         >
           <InputLabel label={translation.grouping}>

@@ -3,12 +3,9 @@ import React from "react";
 import { YearRangeInput } from "..";
 import DashboardLayout from "../../components/DashboardLayout";
 import InputBubble from "../../components/InputBubble";
-import { LangContext } from "../../components/LangContext";
 import { PaperSelector } from "../../components/PaperSelector";
 import { SelectInput } from "../../components/SelectInput";
 import { SubInputLayout } from "../../components/SubInputLayout";
-import link from "./link.svg";
-import Image from "next/image";
 import {
   SearchPageState,
   searchStateReducer,
@@ -21,6 +18,7 @@ import {
 import { z } from "zod";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { ProximitySearchInput } from "../../components/ProximitySearchInput";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -91,7 +89,7 @@ export default function Context() {
   );
 }
 
-const strings = {
+export const strings = {
   fr: {
     title: "The Gallica Grapher",
     description:
@@ -294,7 +292,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
             </div>
             <div
               className={
-                !term || term.includes(" ")
+                !term
                   ? "opacity-0 transition-opacity duration-500"
                   : "opacity-100 transition-opacity duration-500"
               }
@@ -332,41 +330,5 @@ function SearchableContext(props: { initParams: SearchPageState }) {
         )}
       </SearchPageDispatchContext.Provider>
     </SearchPageStateContext.Provider>
-  );
-}
-
-function ProximitySearchInput(props: {
-  onSetLinkTerm: (linkTerm: string) => void;
-  onSetLinkDistance: (linkDistance?: number) => void;
-  linkTerm?: string;
-  linkDistance?: number;
-}) {
-  const { lang } = React.useContext(LangContext);
-  const translation = strings[lang];
-  return (
-    <div className="flex flex-wrap gap-5">
-      <input
-        type="text"
-        value={props.linkTerm || ""}
-        onChange={(e) => props.onSetLinkTerm(e.target.value)}
-        className={"border p-2 rounded-lg shadow-sm"}
-        placeholder={translation.linkTerm}
-      />
-      <Image src={link} alt={"proximity search icon"} width={30} height={30} />
-      <input
-        type="number"
-        value={props.linkDistance}
-        onChange={(e) => {
-          const numVal = parseInt(e.target.value);
-          if (typeof numVal === "number" && !isNaN(numVal) && numVal >= 0) {
-            props.onSetLinkDistance(numVal);
-          } else if (e.target.value === "") {
-            props.onSetLinkDistance(undefined);
-          }
-        }}
-        className={"border p-2 rounded-lg shadow-sm"}
-        placeholder={translation.linkDistance}
-      />
-    </div>
   );
 }

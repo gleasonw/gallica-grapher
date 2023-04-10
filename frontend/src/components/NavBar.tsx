@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { useRouter } from "next/router";
+import { listenForOutsideClicks } from "./utils/listenForOutsideClicks";
 
 const pages = {
   "": "Graph",
@@ -14,6 +15,8 @@ type urlPage = keyof typeof pages;
 
 export default function NavBar() {
   const [showSidebar, setShowSidebar] = React.useState(false);
+  const menuRef = React.useRef<HTMLElement | null>(null);
+  const [listening, setListening] = React.useState(false);
   const [lang, setLang] = React.useState<"fr" | "en">("fr");
   const router = useRouter();
   const currentPage = router.pathname.split("/")[1] as urlPage;
@@ -29,6 +32,10 @@ export default function NavBar() {
   } else if (currentPage === "info") {
     infoLinkStyle += borderBottomFocus;
   }
+
+  React.useEffect(() => {
+    listenForOutsideClicks(listening, setListening, menuRef, setShowSidebar);
+  }, [listening, menuRef, setShowSidebar]);
 
   const styleMap = {
     "": homeLinkStyle,
@@ -69,14 +76,6 @@ export default function NavBar() {
             </div>
           </div>
           <div className={"flex flex-row gap-5 align-center justify-center"}>
-            <select
-              onChange={() => setLang(lang === "fr" ? "en" : "fr")}
-              value={lang}
-              className={""}
-            >
-              <option value="fr">Français</option>
-              <option value="en">English</option>
-            </select>
             <Link
               href={"https://github.com/gleasonw/gallica-grapher"}
               target={"_blank"}
@@ -112,7 +111,7 @@ export default function NavBar() {
                     }
                     href={`/${link}`}
                   >
-                    {link === "" ? "Graph" : link}
+                    {pages[link as keyof typeof pages]}
                   </Link>
                 ))}
               </div>
