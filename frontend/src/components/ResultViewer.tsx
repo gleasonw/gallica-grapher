@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { LangContext } from "./LangContext";
-import { getStaticProps } from "../pages/index";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";
@@ -8,27 +7,23 @@ import { SelectInput } from "./SelectInput";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
-import { FrequentTerm, GraphData } from "../models/dbStructs";
-import { InferGetStaticPropsType } from "next";
+import { FrequentTerm, GallicaResponse, GraphData } from "../models/dbStructs";
 import { makeOptions } from "./utils/makeHighcharts";
 import {
   GraphPageDispatchContext,
   GraphPageStateContext,
 } from "./GraphContext";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-
-interface ResultViewerProps {
-  initVals: InferGetStaticPropsType<typeof getStaticProps>;
-}
+import currentParamObjectEqualsInitial from "./utils/objectsEqual";
+import { StaticPropContext } from "./StaticPropContext";
 
 export async function getTicketData(
   id: number,
-  backend_source: "gallica" | "pyllica" = "pyllica",
   grouping: string,
   smoothing: number
 ) {
   const response = await fetch(
-    `${apiURL}/api/graphData?request_id=${id}&backend_source=${backend_source}&grouping=${grouping}&average_window=${smoothing}`
+    `${apiURL}/api/graphData?request_id=${id}&backend_source=pyllica&grouping=${grouping}&average_window=${smoothing}`
   );
   const data = (await response.json()) as GraphData;
   return data;
@@ -101,12 +96,11 @@ const strings = {
   },
 };
 
-export function ResultViewer(props: ResultViewerProps) {
+export function ResultViewer() {
   const graphState = useContext(GraphPageStateContext);
   const graphStateDispatch = useContext(GraphPageDispatchContext);
   if (!graphState || !graphStateDispatch)
     throw new Error("Graph state not initialized");
-  const selectedPoint = React.useRef<Highcharts.Point>();
   const {
     selectedTicket,
     grouping,
@@ -117,7 +111,8 @@ export function ResultViewer(props: ResultViewerProps) {
   } = graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
-  const currentTicket = tickets?.filter((t) => t.id === selectedTicket)[0];
+
+  const staticData = useContext(StaticPropContext);
 
   function setSelectedTicket(ticketID?: number) {
     graphStateDispatch!({
@@ -167,29 +162,31 @@ export function ResultViewer(props: ResultViewerProps) {
   const ticketData = useQueries({
     queries:
       tickets?.map((ticket) => {
+        const { id } = ticket;
         return {
-          queryKey: ["ticket", ticket.id, grouping, smoothing],
-          queryFn: () =>
-            getTicketData(
-              ticket.id,
-              ticket.backend_source,
-              grouping,
-              smoothing
-            ),
-          placeholderData: props.initVals.initSeries.filter(
-            (series) => series.request_id === ticket.id
-          )[0],
+          queryKey: ["ticket", { id, grouping, smoothing }],
+          queryFn: () => getTicketData(ticket.id, grouping, smoothing),
           keepPreviousData: true,
-          refetchOnWindowFocus: false,
+          initialData: currentParamObjectEqualsInitial(
+            staticData?.staticSeriesParams?.find((p) => p.id === id),
+            { id, grouping, smoothing }
+          )
+            ? staticData?.staticSeries.find(
+                (ticket_series) => ticket_series.request_id === id
+              )
+            : undefined,
         };
       }) ?? [],
   });
 
   function handleSeriesClick(point: Highcharts.Point) {
     if (!graphStateDispatch) return;
-    setSelectedTicket(
-      tickets?.filter((t) => t.terms[0] === point.series.name)[0].id
+    const correspondingTicket = tickets?.find(
+      (t) => t.terms[0] === point.series.name
     );
+    if (correspondingTicket) {
+      setSelectedTicket(correspondingTicket.id);
+    }
     const date = new Date(point.category);
     if (grouping === "year") {
       setMonth(undefined);
@@ -224,12 +221,13 @@ export function ResultViewer(props: ResultViewerProps) {
     handleSeriesClick,
     ticketData
   );
-
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"relative"}>
         <div
-          className={"ml-10 absolute -top-10 right-2 z-40 mb-5 flex flex-row gap-10"}
+          className={
+            "ml-10 absolute -top-20 right-2 z-40 mb-5 flex flex-row gap-5"
+          }
         >
           <InputLabel label={translation.grouping}>
             <SelectInput
@@ -282,7 +280,6 @@ export function ResultViewer(props: ResultViewerProps) {
         </div>
       </div>
       <TicketResultTable
-        initialRecords={props.initVals.initRecords}
         tickets={tickets}
         month={month}
         yearRange={yearRange}
@@ -340,7 +337,6 @@ function FrequencyContext(props: {
       root_gram: term,
       sample_size: 30,
     });
-    console.log(url);
     const response = await fetch(url);
     return (await response.json()) as FrequentTerm[];
   }

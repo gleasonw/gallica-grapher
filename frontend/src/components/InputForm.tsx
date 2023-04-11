@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { GraphTicket } from "./GraphTicket";
 import Image from "next/image";
-import glassIcon from "./assets/glass.svg";
+import link from "./assets/link.svg";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./utils/makeHighcharts";
 import { useMutation } from "@tanstack/react-query";
@@ -15,6 +15,8 @@ import {
   GraphPageDispatchContext,
   GraphPageStateContext,
 } from "./GraphContext";
+import { SubInputLayout } from "./SubInputLayout";
+import { SelectInput } from "./SelectInput";
 
 export interface InputFormProps {
   onCreateTicket: (ticket: GraphTicket) => void;
@@ -38,6 +40,7 @@ export const InputForm: React.FC<InputFormProps> = ({
   onCreateTicket,
   onDeleteTicket,
   tickets,
+  onDeleteExampleTickets,
 }) => {
   const [word, setWord] = useState<string>("");
   const [submitted, setSubmitted] = useState(false);
@@ -49,10 +52,9 @@ export const InputForm: React.FC<InputFormProps> = ({
     throw new Error("No graph state dispatch found");
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
-  const { searchYearRange } = graphState;
+  const { searchYearRange, source, linkTerm } = graphState;
 
   function setSearchRange(newRange: [number | undefined, number | undefined]) {
-    console.log(newRange);
     graphStateDispatch!({
       type: "set_search_range",
       payload: newRange,
@@ -62,44 +64,56 @@ export const InputForm: React.FC<InputFormProps> = ({
   async function postTicket(
     ticket: GraphTicket
   ): Promise<{ requestid: number }> {
-    console.log(ticket);
     const response = await fetch(`${apiURL}/api/init`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(ticket),
+      body: JSON.stringify({...ticket, link_term: ticket.linkTerm}),
     });
     const data = await response.json();
     return data as { requestid: number };
   }
 
   const mutation = useMutation(postTicket);
+  const currentTicket: GraphTicket = {
+    terms: [word],
+    start_date: searchYearRange[0],
+    end_date: searchYearRange[1],
+    id: ticketID,
+    source,
+    linkTerm,
+  };
+
+  const reset = () => {
+    setFetching(false);
+    setSubmitted(false);
+    setWord("");
+  };
 
   const handleSubmit = () => {
+    if (!word) return;
     setSubmitted(true);
-    mutation.mutateAsync(
-      {
-        terms: [word],
-        start_date: searchYearRange[0],
-        end_date: searchYearRange[1],
-        grouping: "month",
-        id: ticketID,
+    onDeleteExampleTickets();
+    mutation.mutateAsync(currentTicket, {
+      onSuccess: (data) => {
+        setTicketID(data.requestid);
+        setFetching(true);
       },
-      {
-        onSuccess: (data) => {
-          setTicketID(data.requestid);
-          setFetching(true);
-        },
-      }
-    );
+    });
   };
+
+  const corpusOptions: GraphTicket["source"][] = [
+    "presse",
+    "livres",
+    "lemonde",
+  ];
 
   return (
     <DashboardLayout>
       <div
         className={
-          "w-full flex flex-col justify-center items-center rounded-full"
+          "w-full flex flex-col justify-center items-center rounded-full gap-5"
         }
       >
         <InputBubble
@@ -107,55 +121,87 @@ export const InputForm: React.FC<InputFormProps> = ({
           onWordChange={submitted ? () => undefined : setWord}
           onSubmit={handleSubmit}
         >
-          <Image
-            src={glassIcon}
-            className={"w-8 h-8 absolute top-5 right-5 hover:cursor-pointer"}
-            alt="Search icon"
+          <button
+            className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md"
             onClick={handleSubmit}
-          />
+          >
+            Explore
+          </button>
         </InputBubble>
-        <YearRangeInput
-          max={2021}
-          min={1500}
-          value={searchYearRange}
-          showLabel={false}
-          onChange={setSearchRange}
-        />
+        <div className={"flex flex-wrap gap-10 justify-center"}>
+          <SubInputLayout>
+            <YearRangeInput
+              max={2021}
+              min={1500}
+              value={searchYearRange}
+              showLabel={true}
+              onChange={setSearchRange}
+              placeholder={[1789, 1950]}
+            />
+          </SubInputLayout>
+          <SubInputLayout>
+            <SelectInput
+              label={"corpus"}
+              options={corpusOptions}
+              value={source}
+              onChange={(new_source) => {
+                if (
+                  new_source === "presse" ||
+                  new_source === "livres" ||
+                  new_source === "lemonde"
+                ) {
+                  graphStateDispatch({
+                    type: "set_source",
+                    payload: new_source,
+                  });
+                }
+              }}
+            />
+          </SubInputLayout>
+          <SubInputLayout>
+            <div className={"flex flex-col"}>
+              <label
+                htmlFor={"link-term"}
+                className="flex text-gray-700 text-sm font-bold mb-2 items-center gap-5"
+              >
+                {"Proximité"}
+                <Image src={link} alt="link" width={25} height={25} />3
+              </label>
+              <input
+                type="text"
+                className={"border p-2 rounded-lg shadow-sm"}
+                value={linkTerm}
+                onChange={(e) =>
+                  graphStateDispatch({
+                    type: "set_link_term",
+                    payload: e.target.value,
+                  })
+                }
+              />
+            </div>
+          </SubInputLayout>
+        </div>
       </div>
       {fetching && (
         <SearchProgress
-          ticket={{
-            id: ticketID,
-            terms: [word],
-            start_date: searchYearRange[0],
-            end_date: searchYearRange[1],
-            grouping: "month",
-          }}
-          onFetchComplete={(backendSource: "gallica" | "pyllica") => {
-            onCreateTicket({
-              id: ticketID,
-              backend_source: backendSource,
-              terms: [word],
-              start_date: searchYearRange[0],
-              end_date: searchYearRange[1],
-              grouping: "month",
-            });
-            setFetching(false);
-            setSubmitted(false);
-            setWord("");
+          ticket={currentTicket}
+          onFetchComplete={() => {
+            onCreateTicket(currentTicket);
+            reset();
           }}
           onNoRecordsFound={() => {
             alert(translation.no_records_found);
-            setFetching(false);
-            setWord("");
+            reset();
           }}
         />
       )}
+      <div className={"m-2"} />
       <TicketRow
         tickets={tickets}
         onGraphedTicketCardClick={onDeleteTicket}
         submitted={submitted}
       />
+      <div className={"m-2"} />
     </DashboardLayout>
   );
 };
@@ -221,7 +267,6 @@ const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
           <p>{ticket.terms.join(", ")}</p>
           <p className={"text-zinc-600"}>x</p>
         </div>
-        <div>{ticket.papers?.map((paper) => paper.title).join(", ")}</div>
       </div>
     </button>
   );

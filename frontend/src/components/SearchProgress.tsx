@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const SearchProgress: React.FC<{
   ticket: GraphTicket;
-  onFetchComplete: (backend_source: "gallica" | "pyllica") => void;
+  onFetchComplete: () => void;
   onNoRecordsFound: () => void;
 }> = (props) => {
   async function fetchProgress() {
@@ -32,7 +32,7 @@ export const SearchProgress: React.FC<{
       onNoRecordsFound();
     }
     if (data && data.state === "completed") {
-      onFetchComplete(data.backend_source);
+      onFetchComplete();
     }
   }, [data, onFetchComplete, onNoRecordsFound]);
 

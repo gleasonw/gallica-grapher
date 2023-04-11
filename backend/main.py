@@ -1,5 +1,3 @@
-import base64
-import json
 import os
 import aiohttp
 import uvicorn
@@ -10,7 +8,7 @@ from www.database.connContext import build_db_conn
 from www.database.graphDataResolver import build_highcharts_series
 from www.request import Request
 from www.models import Ticket, Progress
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -33,21 +31,25 @@ def index():
     return {"message": "ok"}
 
 
-@app.post("/api/init")
-def init(ticket: Ticket):
-    global requestID
+async def graph_request(ticket: Ticket, id: int):
     global request_progress
 
     def handle_update_progress(progress: Progress):
         request_progress[requestID] = progress
 
-    requestID += 1
     request = Request(
         ticket=ticket,
-        id=requestID,
+        id=id,
         on_update_progress=handle_update_progress,
     )
-    request.start()
+    await request.run()
+
+
+@app.post("/api/init")
+def init(ticket: Ticket, background_tasks: BackgroundTasks):
+    global requestID
+    requestID += 1
+    background_tasks.add_task(graph_request, ticket, requestID)
     return {"requestid": requestID}
 
 
@@ -115,6 +117,33 @@ def get_num_papers_over_range(start: int, end: int):
     return count
 
 
+@app.get("/api/ticketState/{request_id}")
+def ticket_state(request_id: int):
+    # get unique searchterms, min/max year from db
+    with build_db_conn() as conn:
+        with conn.cursor() as curs:
+            curs.execute(
+                """
+                SELECT group_concat(DISTINCT searchterm), MIN(year), MAX(year)
+                    FROM groupcounts
+                    WHERE requestid = %s
+                    GROUP BY requestid
+                    ;
+                """,
+                (request_id,),
+            )
+            res = curs.fetchone()
+            if res is not None:
+                searchterms, min_year, max_year = res
+                print(searchterms)
+                return {
+                    "id": request_id,
+                    "terms": [searchterms],
+                    "start_date": min_year,
+                    "end_date": max_year,
+                }
+
+
 @app.get("/api/graphData")
 def graph_data(
     request_id: int,
@@ -152,4 +181,5 @@ async def image_snippet(ark: str, term: str, page: int):
 
 
 if __name__ == "__main__":
+    print("Running on port", os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))

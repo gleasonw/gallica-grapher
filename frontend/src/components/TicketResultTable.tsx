@@ -13,31 +13,36 @@ export interface TicketTableProps extends TableProps {
   onSelectTicket: (ticketID: number) => void;
   selectedTicket?: number;
   tickets?: GraphTicket[];
-  initialRecords: Awaited<ReturnType<typeof fetchContext>>;
 }
 
-export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
+export function TicketResultTable(props: TicketTableProps) {
   const [selectedPapers, setSelectedPapers] = React.useState<
     Paper[] | undefined
   >();
 
   const { lang } = useContext(LangContext);
 
+  const thereAreTickets = props.tickets && props.tickets.length > 0;
+
   return (
     <ResultsTable
       terms={
-        (props.tickets &&
-          props.tickets.length > 0 &&
-          props.tickets.filter((t) => t.id === props.selectedTicket)[0]
+        (thereAreTickets &&
+          props.tickets!.filter((t) => t.id === props.selectedTicket)[0]
             ?.terms) ||
         []
       }
+      link_term={
+        thereAreTickets
+          ? props.tickets?.find((t) => t.id === props.selectedTicket)?.linkTerm
+          : undefined
+      }
+      link_distance={3}
       codes={selectedPapers?.map((p) => p.code) || []}
       month={props.month}
       day={props.day}
       yearRange={props.yearRange}
-      limit={15}
-      initialRecords={props.initialRecords}
+      limit={props.limit}
       source={"periodical"}
     >
       <div>
@@ -104,4 +109,4 @@ export const TicketResultTable: React.FC<TicketTableProps> = (props) => {
       </div>
     </ResultsTable>
   );
-};
+}

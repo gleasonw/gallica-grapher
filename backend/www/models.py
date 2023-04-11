@@ -28,10 +28,10 @@ class Series(BaseModel):
 
 class Ticket(BaseModel):
     terms: List[str]
-    start_date: int
-    end_date: int
+    start_date: Optional[int]
+    end_date: Optional[int]
     codes: Optional[List[str]] = None
     grouping: Literal["month", "year", "all"] = "year"
     backend_source: Literal["gallica", "pyllica"] = "pyllica"
-    link: Optional[Tuple[str, int]] = None
-    source: Optional[Literal["book", "periodical", "all"]] = "all"
+    source: Literal["livres", "presse", "lemonde"] = "presse"
+    link_term: Optional[str] = None
