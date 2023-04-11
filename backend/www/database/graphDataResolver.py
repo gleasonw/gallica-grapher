@@ -1,5 +1,5 @@
 import datetime
-from typing import Literal, Tuple
+from typing import List, Literal, Tuple
 
 import ciso8601
 
@@ -21,6 +21,10 @@ def build_highcharts_series(
         conn=conn,
     )
     data_with_proper_date_format = list(map(get_row_timestamp, data))
+    if average_window:
+        data_with_proper_date_format = get_moving_average(
+            data_with_proper_date_format, average_window
+        )
     search_terms = get_search_terms_by_grouping(
         backend_source=backend_source, request_id=request_id, conn=conn
     )
@@ -29,6 +33,21 @@ def build_highcharts_series(
     return Series(
         name=f"{search_terms}", data=data_with_proper_date_format, request_id=request_id
     )
+
+
+def get_moving_average(
+    data: List[Tuple[float, float]], window: int
+) -> List[Tuple[float, float]]:
+    unpacked_data = [x for x in data]
+    for i in range(1, len(unpacked_data)):
+        if i < window:
+            window_data = data[:i]
+        else:
+            window_data = data[i - window : i]
+        window_data = [x[1] for x in window_data]
+        average = sum(window_data) / len(window_data)
+        unpacked_data[i] = (unpacked_data[i][0], average)
+    return unpacked_data
 
 
 def get_row_timestamp(row: Tuple) -> Tuple[float, float]:

@@ -36,7 +36,6 @@ class Request:
                 self.ticket, on_no_records_found=self.set_no_records
             ):
                 with db_conn.cursor() as curs:
-                    print("Inserting records")
                     curs.executemany(
                         """INSERT INTO groupcounts (year, month, searchterm, requestid, count)
                     VALUES (%s, %s, %s, %s, %s)""",
