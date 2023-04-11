@@ -290,30 +290,22 @@ function SearchableContext(props: { initParams: SearchPageState }) {
                 />
               </SubInputLayout>
             </div>
-            <div
-              className={
-                !term
-                  ? "opacity-0 transition-opacity duration-500"
-                  : "opacity-100 transition-opacity duration-500"
+            <ProximitySearchInput
+              linkTerm={linkTerm}
+              linkDistance={linkDistance}
+              onSetLinkDistance={(new_distance) =>
+                searchStateDispatch({
+                  type: "set_link_distance",
+                  payload: new_distance,
+                })
               }
-            >
-              <ProximitySearchInput
-                linkTerm={linkTerm}
-                linkDistance={linkDistance}
-                onSetLinkDistance={(new_distance) =>
-                  searchStateDispatch({
-                    type: "set_link_distance",
-                    payload: new_distance,
-                  })
-                }
-                onSetLinkTerm={(new_term) =>
-                  searchStateDispatch({
-                    type: "set_link_term",
-                    payload: new_term,
-                  })
-                }
-              />
-            </div>
+              onSetLinkTerm={(new_term) =>
+                searchStateDispatch({
+                  type: "set_link_term",
+                  payload: new_term,
+                })
+              }
+            />
           </div>
         </DashboardLayout>
         {tableFetchParams ? (
