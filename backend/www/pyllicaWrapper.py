@@ -11,7 +11,6 @@ from urllib.parse import quote
 
 async def get(args: Ticket, on_no_records_found: Callable):
     """Get records from Pyllica. Interpret 500 error as no records found."""
-    print(args.link_term)
     if len(args.terms) > 1:
         raise ValueError("Only one term at a time for Pyllica, for now")
     if args.start_date is None:

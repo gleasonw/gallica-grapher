@@ -1,5 +1,5 @@
 import datetime
-from typing import Literal, Tuple
+from typing import List, Literal, Tuple
 
 import ciso8601
 
@@ -15,19 +15,16 @@ def build_highcharts_series(
     average_window: int,
     conn,
 ) -> Series:
-    # TODO: why on earth does the order matter?
-    if backend_source == "gallica":
-        psycop_params = (request_id, average_window)
-    elif backend_source == "pyllica":
-        psycop_params = (average_window, request_id)
-    else:
-        raise ValueError(f"Invalid backend_source: {backend_source}")
     data = get_from_db(
-        params=psycop_params,
+        params=(request_id,),
         sql=get_sql_for_grouping(grouping, backend_source),
         conn=conn,
     )
     data_with_proper_date_format = list(map(get_row_timestamp, data))
+    if average_window:
+        data_with_proper_date_format = get_moving_average(
+            data_with_proper_date_format, average_window
+        )
     search_terms = get_search_terms_by_grouping(
         backend_source=backend_source, request_id=request_id, conn=conn
     )
@@ -36,6 +33,21 @@ def build_highcharts_series(
     return Series(
         name=f"{search_terms}", data=data_with_proper_date_format, request_id=request_id
     )
+
+
+def get_moving_average(
+    data: List[Tuple[float, float]], window: int
+) -> List[Tuple[float, float]]:
+    unpacked_data = [x for x in data]
+    for i in range(1, len(unpacked_data)):
+        if i < window:
+            window_data = data[:i]
+        else:
+            window_data = data[i - window : i]
+        window_data = [x[1] for x in window_data]
+        average = sum(window_data) / len(window_data)
+        unpacked_data[i] = (unpacked_data[i][0], average)
+    return unpacked_data
 
 
 def get_row_timestamp(row: Tuple) -> Tuple[float, float]:
@@ -73,99 +85,21 @@ def get_sql_for_grouping(
     backend_source: Literal["gallica", "pyllica"],
 ):
     match (grouping, backend_source):
-        case ("day", "gallica"):
-            return """
-
-            WITH binned_frequencies AS (
-                SELECT year, month, day, count(*) AS mentions 
-                FROM results 
-                WHERE requestid = %s
-                AND month IS NOT NULL
-                AND day IS NOT NULL
-                GROUP BY year, month, day 
-                ORDER BY year, month, day),
-
-                averaged_frequencies AS (
-                SELECT year, month, day, AVG(mentions) 
-                OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-                FROM binned_frequencies)
-
-            SELECT year, month, day, avgFrequency::float8
-            FROM averaged_frequencies;
-
-            """
-        case ("month", "gallica"):
-            return """
-
-            WITH binned_frequencies AS
-                (SELECT year, month, count(*) AS mentions 
-                FROM results continuous
-                WHERE requestid = %s
-                AND month IS NOT NULL
-                GROUP BY year, month
-                ORDER BY year,month),
-
-                averaged_frequencies AS 
-                (SELECT year, month, 
-                        AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-                FROM binned_frequencies)
-
-            SELECT year, month, avgFrequency::float8 
-            FROM averaged_frequencies;
-            
-            """
-        case ("year", "gallica"):
-            return """
-
-            WITH binned_frequencies AS
-                (SELECT year, count(*) AS mentions 
-                FROM results 
-                WHERE requestid=%s
-                GROUP BY year 
-                ORDER BY year),
-
-                averaged_frequencies AS
-                (SELECT year, 
-                        AVG(mentions) OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-                FROM binned_frequencies)
-
-            SELECT year, avgFrequency::float8
-            FROM averaged_frequencies;
-            
-            """
         case ("year", "pyllica"):
             return """
-            
-            SELECT year, avgFrequency::float8 
-            FROM (
-                SELECT year, AVG(count) 
-                OVER(ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-                FROM (
-                    SELECT year, sum(count) as count
-                    FROM groupcounts
-                    WHERE requestid = %s
-                    GROUP BY year
-                    ORDER BY year
-                ) AS counts
-            ) AS avgedCounts;
-            
+            SELECT year, sum(count) as count
+            FROM groupcounts
+            WHERE requestid = %s
+            GROUP BY year
+            ORDER BY year;
             """
         case ("month", "pyllica"):
             return """
-            
-            SELECT year, month, avgFrequency::float8
-            FROM (
-                SELECT year, month, AVG(count) 
-                OVER (ROWS BETWEEN %s PRECEDING AND CURRENT ROW) AS avgFrequency
-                FROM (
-                    SELECT year, month, sum(count) as count
-                    FROM groupcounts
-                    WHERE requestid = %s
-                    GROUP BY year, month
-                    ORDER BY year, month
-                ) AS counts
-            ) AS avgedCounts;
-            
+            SELECT year, month, sum(count) as count
+            FROM groupcounts
+            WHERE requestid = %s
+            GROUP BY year, month
+            ORDER BY year, month;
             """
         case _:
             raise ValueError(
@@ -181,7 +115,7 @@ def get_search_terms_by_grouping(
     table = "FROM results" if backend_source == "gallica" else "FROM groupcounts"
 
     get_terms = f"""
-        SELECT array_agg(DISTINCT searchterm) 
+        SELECT group_concat(DISTINCT searchterm) 
         {table}
         WHERE requestid=%s 
         """

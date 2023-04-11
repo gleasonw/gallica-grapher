@@ -35,39 +35,22 @@ class Request:
             if pyllica_records := await pyllica_wrapper.get(
                 self.ticket, on_no_records_found=self.set_no_records
             ):
-
-                def clean_csv_row(value):
-                    if value is None:
-                        return r"\N"
-                    return str(value).replace("|", "\\|")
-
-                csv_file_like_object = io.StringIO()
-                for record in pyllica_records:
-                    row = (
-                        record.year,
-                        record.month,
-                        record.day,
-                        record.term,
-                        self.id,
-                        record.count,
-                    )
-                    csv_file_like_object.write("|".join(map(clean_csv_row, row)) + "\n")
-
-                csv_file_like_object.seek(0)
                 with db_conn.cursor() as curs:
-                    curs.copy_from(
-                        csv_file_like_object,
-                        "groupcounts",
-                        sep="|",
-                        columns=(
-                            "year",
-                            "month",
-                            "day",
-                            "searchterm",
-                            "requestid",
-                            "count",
-                        ),
+                    curs.executemany(
+                        """INSERT INTO groupcounts (year, month, searchterm, requestid, count)
+                    VALUES (%s, %s, %s, %s, %s)""",
+                        [
+                            (
+                                record.year,
+                                record.month,
+                                record.term,
+                                self.id,
+                                record.count,
+                            )
+                            for record in pyllica_records
+                        ],
                     )
+
             if self.state not in ["too_many_records", "no_records"]:
                 self.state = "completed"
             self.on_update_progress(
