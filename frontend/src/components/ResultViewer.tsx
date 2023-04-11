@@ -112,11 +112,6 @@ export function ResultViewer() {
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
-  const initialGraphParams = React.useRef({
-    grouping,
-    smoothing,
-  });
-
   const staticData = useContext(StaticPropContext);
 
   function setSelectedTicket(ticketID?: number) {

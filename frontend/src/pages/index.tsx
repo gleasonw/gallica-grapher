@@ -90,20 +90,14 @@ export const getStaticProps: GetStaticProps<{
     terms: initTickets[0].terms,
     limit: 10,
     source: "periodical" as const,
-    yearRange: [1789, 1950] as [number, number],
     selectedPage: 1,
   };
   const staticSeriesParams = initTickets.map((ticket) => ({
     id: ticket.id,
     grouping: "year",
     smoothing: 0,
-    source: "presse",
   }));
-  const staticRecords = await fetchContext(0, {
-    terms: initTickets[0].terms,
-    limit: 10,
-    source: "periodical",
-  });
+  const staticRecords = await fetchContext(0, staticRecordParams);
   const staticSeries = await Promise.all(
     initTickets.map((ticket) => {
       return getTicketData(ticket.id, "year", 0);
