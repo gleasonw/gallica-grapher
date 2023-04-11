@@ -22,15 +22,22 @@ export function TicketResultTable(props: TicketTableProps) {
 
   const { lang } = useContext(LangContext);
 
+  const thereAreTickets = props.tickets && props.tickets.length > 0;
+
   return (
     <ResultsTable
       terms={
-        (props.tickets &&
-          props.tickets.length > 0 &&
-          props.tickets.filter((t) => t.id === props.selectedTicket)[0]
+        (thereAreTickets &&
+          props.tickets!.filter((t) => t.id === props.selectedTicket)[0]
             ?.terms) ||
         []
       }
+      link_term={
+        thereAreTickets
+          ? props.tickets?.find((t) => t.id === props.selectedTicket)?.linkTerm
+          : undefined
+      }
+      link_distance={3}
       codes={selectedPapers?.map((p) => p.code) || []}
       month={props.month}
       day={props.day}
