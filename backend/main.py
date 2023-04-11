@@ -124,7 +124,7 @@ def ticket_state(request_id: int):
         with conn.cursor() as curs:
             curs.execute(
                 """
-                SELECT ARRAY_AGG(DISTINCT searchterm), MIN(year), MAX(year)
+                SELECT group_concat(DISTINCT searchterm), MIN(year), MAX(year)
                     FROM groupcounts
                     WHERE requestid = %s
                     GROUP BY requestid
@@ -135,9 +135,10 @@ def ticket_state(request_id: int):
             res = curs.fetchone()
             if res is not None:
                 searchterms, min_year, max_year = res
+                print(searchterms)
                 return {
                     "id": request_id,
-                    "terms": searchterms,
+                    "terms": [searchterms],
                     "start_date": min_year,
                     "end_date": max_year,
                 }
