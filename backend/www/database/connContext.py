@@ -1,5 +1,5 @@
 import os
-import MySQLdb
+import pymysql
 import dotenv
 
 dotenv.load_dotenv()
@@ -10,14 +10,13 @@ def build_db_conn():
 
 
 class MySQL:
+    
     def __init__(self):
-        print("Opening connection")
-        self.conn = MySQLdb.connect(
+        self.conn = pymysql.connect(
             host=os.environ.get("HOST"),
             user=os.environ.get("DB_USER"),
-            passwd=os.environ.get("PASSWORD"),
-            db=os.environ.get("DATABASE"),
-            ssl_mode="VERIFY_IDENTITY",
+            password=os.environ.get("PASSWORD"),
+            database=os.environ.get("DATABASE"),
             ssl={"ca": "/etc/ssl/certs/ca-certificates.crt"},
         )
 
