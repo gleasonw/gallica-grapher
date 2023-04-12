@@ -94,7 +94,7 @@ export function ResultsTable(props: TableProps) {
     },
   };
   const translation = strings[lang];
-  const charLimit = 70;
+  const charLimit = 80;
 
   React.useEffect(() => {
     setSelectedPage(1);
