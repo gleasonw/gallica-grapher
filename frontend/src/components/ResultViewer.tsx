@@ -14,7 +14,7 @@ import {
   GraphPageStateContext,
 } from "./GraphContext";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import currentParamObjectEqualsInitial from "./utils/objectsEqual";
+import allAinB from "./utils/objectsEqual";
 import { StaticPropContext } from "./StaticPropContext";
 
 export async function getTicketData(
@@ -167,7 +167,7 @@ export function ResultViewer() {
           queryKey: ["ticket", { id, grouping, smoothing }],
           queryFn: () => getTicketData(ticket.id, grouping, smoothing),
           keepPreviousData: true,
-          initialData: currentParamObjectEqualsInitial(
+          initialData: allAinB(
             staticData?.staticSeriesParams?.find((p) => p.id === id),
             { id, grouping, smoothing }
           )

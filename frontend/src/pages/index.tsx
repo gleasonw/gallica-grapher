@@ -17,7 +17,7 @@ import { z } from "zod";
 import { apiURL } from "../components/apiURL";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { GallicaResponse, GraphData } from "../models/dbStructs";
 import { TableProps, fetchContext } from "../components/ResultsTable";
 import { StaticPropContext } from "../components/StaticPropContext";
@@ -91,6 +91,7 @@ export const getStaticProps: GetStaticProps<{
     limit: 10,
     source: "periodical" as const,
     selectedPage: 1,
+    customWindow: 0,
   };
   const staticSeriesParams = initTickets.map((ticket) => ({
     id: ticket.id,

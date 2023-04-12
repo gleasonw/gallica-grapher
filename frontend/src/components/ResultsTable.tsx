@@ -13,7 +13,7 @@ import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
 import { apiURL } from "./apiURL";
-import currentParamObjectEqualsInitial from "./utils/objectsEqual";
+import allAinB from "./utils/objectsEqual";
 import { Spinner } from "./Spinner";
 import { StaticPropContext } from "./StaticPropContext";
 import Image from "next/image";
@@ -66,7 +66,7 @@ async function fetchCustomWindowContext(args: APIargs, window: number) {
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
-  const [customWindow, setCustomWindow] = React.useState(0);
+  const [customWindow, setCustomWindow] = React.useState<number>(0);
   const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
   const strings = {
@@ -93,7 +93,6 @@ export function ResultsTable(props: TableProps) {
       download_csv: "Download CSV page",
     },
   };
-  const translation = strings[lang];
   const charLimit = 80;
 
   React.useEffect(() => {
@@ -170,10 +169,7 @@ export function ResultsTable(props: TableProps) {
     staleTime: Infinity,
     keepPreviousData: true,
     initialData: () =>
-      currentParamObjectEqualsInitial(
-        staticData?.staticRecordParams,
-        currentFetchParams
-      )
+      allAinB(staticData?.staticRecordParams, currentFetchParams)
         ? staticData?.staticRecords
         : undefined,
   });
