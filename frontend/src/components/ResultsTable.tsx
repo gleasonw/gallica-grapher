@@ -332,21 +332,6 @@ export function ResultsTable(props: TableProps) {
         <div>
           <div className={"ml-5 flex flex-col mb-2"}>
             {pagination}
-            <SubInputLayout>
-              Augmente la taille du contexte
-              {[0, 80, 200, 500].map((window) => (
-                <button
-                  className={
-                    "p-3 rounded-lg border shadow-sm hover:bg-zinc-300 " +
-                    (customWindow === window ? "bg-zinc-300" : "")
-                  }
-                  key={window}
-                  onClick={() => setCustomWindow(window)}
-                >
-                  {window === 0 ? "Base" : window}
-                </button>
-              ))}
-            </SubInputLayout>
             <Spinner isFetching={isFetching} />
           </div>
           <div className={"pl-5 pr-5"}>
