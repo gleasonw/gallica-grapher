@@ -106,7 +106,6 @@ export const InputForm: React.FC<InputFormProps> = ({
   const corpusOptions: GraphTicket["source"][] = [
     "presse",
     "livres",
-    "lemonde",
   ];
 
   return (
