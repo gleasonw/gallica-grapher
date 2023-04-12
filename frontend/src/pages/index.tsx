@@ -97,7 +97,7 @@ export const getStaticProps: GetStaticProps<{
     grouping: "year",
     smoothing: 0,
   }));
-  const staticRecords = await fetchContext(0, staticRecordParams);
+  const staticRecords = await fetchContext(staticRecordParams);
   const staticSeries = await Promise.all(
     initTickets.map((ticket) => {
       return getTicketData(ticket.id, "year", 0);

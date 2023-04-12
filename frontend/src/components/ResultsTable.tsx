@@ -16,6 +16,9 @@ import { apiURL } from "./apiURL";
 import currentParamObjectEqualsInitial from "./utils/objectsEqual";
 import { Spinner } from "./Spinner";
 import { StaticPropContext } from "./StaticPropContext";
+import Image from "next/image";
+import { SubInputLayout } from "./SubInputLayout";
+import { SelectInput } from "./SelectInput";
 
 export interface TableProps {
   terms?: string[];
@@ -32,19 +35,29 @@ export interface TableProps {
   all_context?: boolean;
 }
 
-export async function fetchContext(pageParam = 0, props: TableProps) {
+type APIargs = Omit<TableProps, "children" | "initialRecords"> & {
+  cursor?: number;
+  year?: number;
+  end_year?: number;
+};
+
+export async function fetchContext(args: APIargs) {
   let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
-    ...props,
-    children: undefined,
-    initialRecords: undefined,
-    cursor: pageParam,
-    limit: props.limit,
+    ...args,
+    all_context: args.all_context,
     row_split: true,
-    year: props.yearRange?.[0],
-    end_year: props.yearRange?.[1],
-    yearRange: undefined,
-    all_context: props.all_context,
+  });
+  console.log(url);
+  const response = await fetch(url);
+  return (await response.json()) as GallicaResponse;
+}
+
+async function fetchCustomWindowContext(args: APIargs, window: number) {
+  let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/customWindowGallicaRecords`;
+  let url = addQueryParamsIfExist(baseUrl, {
+    ...args,
+    window_size: window,
   });
   console.log(url);
   const response = await fetch(url);
@@ -53,7 +66,7 @@ export async function fetchContext(pageParam = 0, props: TableProps) {
 
 export function ResultsTable(props: TableProps) {
   const [selectedPage, setSelectedPage] = React.useState(1);
-  const [charLimit, setCharLimit] = React.useState(70);
+  const [customWindow, setCustomWindow] = React.useState(0);
   const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
   const strings = {
@@ -81,8 +94,11 @@ export function ResultsTable(props: TableProps) {
     },
   };
   const translation = strings[lang];
+  const charLimit = 70;
 
-  React.useEffect(() => setSelectedPage(1), [props]);
+  React.useEffect(() => {
+    setSelectedPage(1);
+  }, [props]);
 
   const {
     yearRange,
@@ -129,13 +145,28 @@ export function ResultsTable(props: TableProps) {
         sort,
         selectedPage,
         limit,
+        customWindow,
       },
     ],
-    queryFn: () =>
-      fetchContext((selectedPage - 1) * (props.limit ? props.limit : 10), {
-        ...props,
-        children: undefined,
-      }),
+    queryFn: () => {
+      const apiArgs: APIargs = {
+        terms,
+        codes,
+        month,
+        source,
+        link_term,
+        link_distance,
+        sort,
+        cursor: (selectedPage - 1) * (props.limit ? props.limit : 10),
+        limit: props.limit,
+        year: props.yearRange?.[0],
+        end_year: props.yearRange?.[1],
+      };
+      if (customWindow > 0) {
+        return fetchCustomWindowContext(apiArgs, customWindow);
+      }
+      return fetchContext(apiArgs);
+    },
     staleTime: Infinity,
     keepPreviousData: true,
     initialData: () =>
@@ -179,17 +210,7 @@ export function ResultsTable(props: TableProps) {
           return record.context.map((contextRow) => ({
             ...documentMeta,
             page: (
-              <div className={"flex flex-col"}>
-                <ImageSnippet
-                  ark={record.ark}
-                  term={record.terms[0]}
-                  url={contextRow.page_url}
-                  key={
-                    contextRow.left_context +
-                    contextRow.pivot +
-                    contextRow.right_context
-                  }
-                />
+              <div className={"flex"}>
                 <a
                   className="underline font-medium p-2"
                   href={contextRow.page_url}
@@ -200,17 +221,23 @@ export function ResultsTable(props: TableProps) {
                 </a>
               </div>
             ),
-            left_context: contextRow.left_context.slice(-charLimit),
+            left_context:
+              customWindow === 0
+                ? contextRow.left_context.slice(-charLimit)
+                : contextRow.left_context,
             pivot: (
               <span className={"text-blue-500 font-medium"}>
                 {contextRow.pivot}
               </span>
             ),
-            right_context: contextRow.right_context.slice(0, charLimit),
+            right_context:
+              customWindow === 0
+                ? contextRow.right_context.slice(0, charLimit)
+                : contextRow.right_context,
           }));
         })
         .flat() ?? [],
-    [currentPage, charLimit]
+    [currentPage, charLimit, customWindow]
   );
 
   function showFirstWhenAggregated({ value }: { value: string[] }) {
@@ -304,26 +331,29 @@ export function ResultsTable(props: TableProps) {
   );
 
   return (
-    <div className={"mt-5 flex flex-col justify-center mb-20"}>
+    <div className={" flex flex-col justify-center mb-20"}>
       {tableInstance.data.length > 0 ? (
         <div>
           <div className={"ml-5 flex flex-col mb-2"}>
-            <h1 className={"text-2xl flex flex-col gap-2"}>
-              {!currentPage && !isFetching && <p>No results found</p>}
-              {currentPage && (
-                <div className={"flex flex-row gap-10"}>
-                  {total_results.toLocaleString()} {translation.total_docs}
-                </div>
-              )}
-            </h1>
             {pagination}
+            <SubInputLayout>
+              Augmente la taille du contexte
+              {[0, 80, 200, 500].map((window) => (
+                <button
+                  className={
+                    "p-3 rounded-lg border shadow-sm hover:bg-zinc-300 " +
+                    (customWindow === window ? "bg-zinc-300" : "")
+                  }
+                  key={window}
+                  onClick={() => setCustomWindow(window)}
+                >
+                  {window === 0 ? "Base" : window}
+                </button>
+              ))}
+            </SubInputLayout>
             <Spinner isFetching={isFetching} />
           </div>
-          <div
-            className={
-              "flex ease-in-out first-letter:flex-col justify-center items-center transition-all duration-1000"
-            }
-          >
+          <div className={"pl-5 pr-5"}>
             <DesktopTable tableInstance={tableInstance} />
             <MobileTable tableInstance={tableInstance} />
           </div>
@@ -479,7 +509,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
     <table
       className={
-        "shadow-xl rounded-xl border hidden md:block lg:block xl:block transition-all duration-300"
+        "shadow-xl rounded-xl border transition-all duration-300 max-w-full table-auto w-full"
       }
     >
       <thead>
@@ -489,7 +519,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
               <th
                 {...column.getHeaderProps()}
                 key={index}
-                className={"p-2 font-medium"}
+                className={"pb-2 pt-2 font-medium"}
               >
                 {column.render("Header")}
               </th>
@@ -497,13 +527,13 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
           </tr>
         ))}
       </thead>
-      <tbody {...props.tableInstance.getTableBodyProps()}>
+      <tbody {...props.tableInstance.getTableBodyProps()} className={""}>
         {props.tableInstance.rows.map((row, index) => {
           props.tableInstance.prepareRow(row);
           return (
             <tr
               {...row.getRowProps()}
-              className={"odd:bg-zinc-100"}
+              className={"odd:bg-zinc-100 w-full"}
               {
                 // @ts-ignore
                 ...row.getToggleRowExpandedProps()
@@ -526,7 +556,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
                   <td
                     {...cell.getCellProps()}
                     key={index}
-                    className={"pl-6 pr-6 pt-2 pb-2" + twStyle}
+                    className={"pl-4 pr-4 pt-2 pb-2" + twStyle}
                   >
                     {cellRender(row, cell)}
                   </td>
@@ -588,25 +618,29 @@ function ImageSnippet(props: { ark: string; term: string; url: string }) {
       page: page,
     });
     const response = await fetch(url);
-    const imgString = await response.json();
+    const imgString = (await response.json()) as string;
     setImage(imgString);
   }
 
-  const mutation = useMutation(doFetch, {
-    onSuccess: () => {
-      console.log("success");
-    },
-  });
+  const { mutate, isLoading } = useMutation(doFetch, {});
 
   return (
     <div className={"flex flex-col gap-2"}>
-      <button
-        onClick={() => mutation.mutate()}
-        className={"text-blue-500 p-5 hover:bg-red-500"}
-      >
-        Fetch image
-      </button>
-      {image && <img src={image} />}
+      {image ? (
+        <img
+          src={image}
+          alt={props.term}
+          className={"w-auto h-auto absolute"}
+        />
+      ) : (
+        <button
+          onClick={() => mutate()}
+          className={"text-blue-500 p-2 hover:bg-red-500"}
+        >
+          Fetch image
+        </button>
+      )}
+      {isLoading && <div>Loading...</div>}
     </div>
   );
 }
