@@ -2,36 +2,35 @@ import React, { useEffect } from "react";
 import { GraphTicket } from "./GraphTicket";
 import { ProgressType } from "../models/dbStructs";
 import { apiURL } from "./apiURL";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 
 export const SearchProgress: React.FC<{
-  ticket: GraphTicket;
+  batchTicket: GraphTicket[];
   onFetchComplete: () => void;
   onNoRecordsFound: () => void;
 }> = (props) => {
-  async function fetchProgress() {
-    const response = await fetch(`${apiURL}/poll/progress/${props.ticket.id}`);
+  async function fetchProgress(id: number) {
+    const response = await fetch(`${apiURL}/poll/progress/${id}`);
     const data = (await response.json()) as ProgressType;
     return data;
   }
-  const { data } = useQuery({
-    queryKey: ["progress", props.ticket.id],
-    queryFn: fetchProgress,
-    refetchInterval: (data) => {
-      if (data && data.state === "completed") {
-        return false;
-      } else {
-        return 1000;
-      }
-    },
+  const data = useQueries({
+    queries: props.batchTicket.map((ticket) => ({
+      queryKey: ["progress", ticket.id],
+      queryFn: () => fetchProgress(ticket.id),
+      refetchInterval: (data) => {
+        if (data && data.state === "completed") {
+          return false;
+        } else {
+          return 1000;
+        }
+      },
+    })),
   });
 
   const { onFetchComplete, onNoRecordsFound } = props;
   useEffect(() => {
-    if (data && data.state === "no_records") {
-      onNoRecordsFound();
-    }
-    if (data && data.state === "completed") {
+    if (data.every((d) => d.data?.state === "completed")) {
       onFetchComplete();
     }
   }, [data, onFetchComplete, onNoRecordsFound]);

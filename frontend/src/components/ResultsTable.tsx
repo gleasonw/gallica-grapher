@@ -16,9 +16,6 @@ import { apiURL } from "./apiURL";
 import allAinB from "./utils/objectsEqual";
 import { Spinner } from "./Spinner";
 import { StaticPropContext } from "./StaticPropContext";
-import Image from "next/image";
-import { SubInputLayout } from "./SubInputLayout";
-import { SelectInput } from "./SelectInput";
 
 export interface TableProps {
   terms?: string[];
@@ -112,7 +109,6 @@ export function ResultsTable(props: TableProps) {
   } = props;
 
   // this will be used to check if we can use ssr data... maybe a better way?
-
   const currentFetchParams = {
     yearRange,
     month,
@@ -125,6 +121,7 @@ export function ResultsTable(props: TableProps) {
     sort,
     selectedPage,
     limit,
+    customWindow,
   };
 
   const staticData = useContext(StaticPropContext);
@@ -161,7 +158,7 @@ export function ResultsTable(props: TableProps) {
         year: props.yearRange?.[0],
         end_year: props.yearRange?.[1],
       };
-      if (customWindow > 0) {
+      if (customWindow) {
         return fetchCustomWindowContext(apiArgs, customWindow);
       }
       return fetchContext(apiArgs);

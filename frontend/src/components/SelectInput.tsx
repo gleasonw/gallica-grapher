@@ -11,7 +11,7 @@ export function SelectInput<T extends string | number>(
     <div className={"flex flex-col"}>
       <label
         htmlFor={props.label}
-        className="block text-gray-700 text-sm font-bold mb-2"
+        className="block text-gray-700 text-sm font-bold"
       >
         {props.label}
       </label>

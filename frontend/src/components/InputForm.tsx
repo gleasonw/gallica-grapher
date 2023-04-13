@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { GraphTicket } from "./GraphTicket";
-import Image from "next/image";
-import link from "./assets/link.svg";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./utils/makeHighcharts";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
+import { Spinner } from "./Spinner";
 import InputBubble from "./InputBubble";
 import DashboardLayout from "./DashboardLayout";
 import { YearRangeInput } from "../pages";
@@ -15,13 +14,14 @@ import {
   GraphPageDispatchContext,
   GraphPageStateContext,
 } from "./GraphContext";
-import { SubInputLayout } from "./SubInputLayout";
 import { SelectInput } from "./SelectInput";
+import { ProgressType } from "../models/dbStructs";
 
 export interface InputFormProps {
   onCreateTicket: (ticket: GraphTicket) => void;
   onDeleteTicket: (ticketID: number) => void;
   onDeleteExampleTickets: () => void;
+  onRefetch: () => void;
   tickets?: GraphTicket[];
 }
 
@@ -36,6 +36,15 @@ const strings = {
   },
 };
 
+interface TicketToPost extends Omit<GraphTicket, "id"> {
+  id?: number;
+  replacingTicketID?: number;
+}
+
+interface FetchingTicket extends GraphTicket {
+  replacingTicketID?: number;
+}
+
 export const InputForm: React.FC<InputFormProps> = ({
   onCreateTicket,
   onDeleteTicket,
@@ -43,70 +52,89 @@ export const InputForm: React.FC<InputFormProps> = ({
   onDeleteExampleTickets,
 }) => {
   const [word, setWord] = useState<string>("");
-  const [submitted, setSubmitted] = useState(false);
-  const [fetching, setFetching] = useState(false);
-  const [ticketID, setTicketID] = useState<number>(0);
+
+  const [fetchingTickets, setFetchingTickets] = useState<FetchingTicket[]>([]);
+  const [refetching, setRefetching] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const { lang } = useContext(LangContext);
+  const translation = strings[lang];
+
   const graphStateDispatch = React.useContext(GraphPageDispatchContext);
   const graphState = React.useContext(GraphPageStateContext);
   if (!graphStateDispatch || !graphState)
     throw new Error("No graph state dispatch found");
-  const { lang } = useContext(LangContext);
-  const translation = strings[lang];
   const { searchYearRange, source, linkTerm } = graphState;
 
-  function setSearchRange(newRange: [number | undefined, number | undefined]) {
+  async function setSearchRange(
+    newRange: [number | undefined, number | undefined]
+  ) {
+    const [newLow, newHigh] = newRange;
+    let [low, high] = searchYearRange;
+    if (!low) {
+      low = 1789;
+    }
+    if (!high) {
+      high = 1950;
+    }
+    if ((newLow && newLow < low) || (newHigh && newHigh > high)) {
+      const ticketsWithNewRange: TicketToPost[] | undefined = tickets?.map(
+        (ticket) => ({
+          ...ticket,
+          id: undefined,
+          replacingTicketID: ticket.id,
+          start_date: newLow || ticket.start_date,
+          end_date: newHigh || ticket.end_date,
+        })
+      );
+      if (ticketsWithNewRange) {
+        setRefetching(true);
+        handlePost(ticketsWithNewRange);
+      }
+    }
     graphStateDispatch!({
       type: "set_search_range",
       payload: newRange,
     });
   }
 
-  async function postTicket(
-    ticket: GraphTicket
-  ): Promise<{ requestid: number }> {
+  async function postTicket(ticket: TicketToPost): Promise<FetchingTicket> {
     const response = await fetch(`${apiURL}/api/init`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({...ticket, link_term: ticket.linkTerm}),
+      body: JSON.stringify({ ...ticket, link_term: ticket.linkTerm }),
     });
-    const data = await response.json();
-    return data as { requestid: number };
+    const data = (await response.json()) as { requestid: number };
+    return { ...ticket, id: data.requestid };
   }
 
   const mutation = useMutation(postTicket);
-  const currentTicket: GraphTicket = {
+
+  async function handlePost(ticketBatch: TicketToPost[]) {
+    const responseTickets = await Promise.all(
+      ticketBatch?.map((ticket) => mutation.mutateAsync(ticket)) || []
+    );
+    setFetchingTickets(responseTickets);
+  }
+
+  const ticketInForm: TicketToPost = {
     terms: [word],
     start_date: searchYearRange[0],
     end_date: searchYearRange[1],
-    id: ticketID,
     source,
     linkTerm,
   };
 
-  const reset = () => {
-    setFetching(false);
-    setSubmitted(false);
-    setWord("");
-  };
-
-  const handleSubmit = () => {
+  function handleSubmit() {
     if (!word) return;
-    setSubmitted(true);
     onDeleteExampleTickets();
-    mutation.mutateAsync(currentTicket, {
-      onSuccess: (data) => {
-        setTicketID(data.requestid);
-        setFetching(true);
-      },
-    });
-  };
+    setSubmitted(true);
+    setWord("");
+    handlePost([ticketInForm]);
+  }
 
-  const corpusOptions: GraphTicket["source"][] = [
-    "presse",
-    "livres",
-  ];
+  const corpusOptions: GraphTicket["source"][] = ["presse", "livres"];
 
   return (
     <DashboardLayout>
@@ -127,141 +155,150 @@ export const InputForm: React.FC<InputFormProps> = ({
             Explore
           </button>
         </InputBubble>
-        <div className={"flex flex-wrap gap-10 justify-center"}>
-          <SubInputLayout>
-            <YearRangeInput
-              max={2021}
-              min={1500}
-              value={searchYearRange}
-              showLabel={true}
-              onChange={setSearchRange}
-              placeholder={[1789, 1950]}
-            />
-          </SubInputLayout>
-          <SubInputLayout>
-            <SelectInput
-              label={"corpus"}
-              options={corpusOptions}
-              value={source}
-              onChange={(new_source) => {
-                if (
-                  new_source === "presse" ||
-                  new_source === "livres" ||
-                  new_source === "lemonde"
-                ) {
-                  graphStateDispatch({
-                    type: "set_source",
-                    payload: new_source,
-                  });
-                }
-              }}
-            />
-          </SubInputLayout>
-          <SubInputLayout>
-            <div className={"flex flex-col"}>
-              <label
-                htmlFor={"link-term"}
-                className="flex text-gray-700 text-sm font-bold mb-2 items-center gap-5"
-              >
-                {"Proximité"}
-                <Image src={link} alt="link" width={25} height={25} />3
-              </label>
-              <input
-                type="text"
-                className={"border p-2 rounded-lg shadow-sm"}
-                value={linkTerm}
-                onChange={(e) =>
-                  graphStateDispatch({
-                    type: "set_link_term",
-                    payload: e.target.value,
-                  })
-                }
-              />
-            </div>
-          </SubInputLayout>
+        <div className={"flex flex-wrap gap-10 items-center justify-center"}>
+          <YearRangeInput
+            max={2021}
+            min={1500}
+            value={searchYearRange}
+            onChange={setSearchRange}
+            placeholder={[1789, 1950]}
+          />
+          <SelectInput
+            options={corpusOptions}
+            value={source}
+            onChange={(new_source) => {
+              if (
+                new_source === "presse" ||
+                new_source === "livres" ||
+                new_source === "lemonde"
+              ) {
+                graphStateDispatch({
+                  type: "set_source",
+                  payload: new_source,
+                });
+              }
+            }}
+          />
+          <input
+            type="text"
+            className={"border p-2 rounded-lg shadow-sm"}
+            value={linkTerm}
+            placeholder={"Proximité (3)"}
+            onChange={(e) =>
+              graphStateDispatch({
+                type: "set_link_term",
+                payload: e.target.value,
+              })
+            }
+          />
         </div>
       </div>
-      {fetching && (
+      <div className={"m-2"} />
+      {fetchingTickets && fetchingTickets.length > 0 && (
         <SearchProgress
-          ticket={currentTicket}
+          batchTicket={fetchingTickets}
           onFetchComplete={() => {
-            onCreateTicket(currentTicket);
-            reset();
+            setRefetching(false);
+            setSubmitted(false);
+            for (let i = 0; i < fetchingTickets.length; i++) {
+              const ticket = fetchingTickets[i];
+              if (ticket.replacingTicketID) {
+                onDeleteTicket(ticket.replacingTicketID);
+              }
+              onCreateTicket(ticket);
+            }
+            setFetchingTickets([]);
           }}
-          onNoRecordsFound={() => {
-            alert(translation.no_records_found);
-            reset();
-          }}
+          onNoRecordsFound={() => console.log("no records found")}
         />
       )}
-      <div className={"m-2"} />
       <TicketRow
         tickets={tickets}
-        onGraphedTicketCardClick={onDeleteTicket}
+        refetching={refetching}
         submitted={submitted}
+        onGraphedTicketCardClick={onDeleteTicket}
       />
       <div className={"m-2"} />
     </DashboardLayout>
   );
 };
 
-export const TicketRow: React.FC<{
+function TicketRow(props: {
   tickets?: GraphTicket[];
   children?: React.ReactNode;
   onGraphedTicketCardClick: (ticketID: number) => void;
   submitted: boolean;
-}> = ({ tickets, children, onGraphedTicketCardClick, submitted }) => {
+  refetching: boolean;
+}) {
   return (
     <div className={"z-0 flex self-start"}>
       <div className={"flex flex-wrap gap-10"}>
-        {tickets?.map((ticket, index) => (
-          <TicketCard
-            key={ticket.id}
-            ticket={ticket}
-            onClick={onGraphedTicketCardClick}
-            color={seriesColors[index % seriesColors.length]}
-          />
-        ))}
-        {submitted && (
-          <div
-            className={"rounded-lg border-2 bg-white p-3 text-xl shadow-md"}
-            style={{
-              borderColor:
-                seriesColors[tickets?.length || 0 % seriesColors.length],
-            }}
+        {props.tickets?.map((ticket, index) =>
+          props.refetching ? (
+            <ColorBubble
+              key={ticket.id}
+              color={seriesColors[index % seriesColors.length]}
+            >
+              <Spinner isFetching />
+            </ColorBubble>
+          ) : (
+            <TicketCard
+              key={ticket.id}
+              ticket={ticket}
+              onClick={props.onGraphedTicketCardClick}
+              color={seriesColors[index % seriesColors.length]}
+              refetching={props.refetching}
+            />
+          )
+        )}
+        {props.submitted && (
+          <ColorBubble
+            color={
+              seriesColors[props.tickets?.length || 0 % seriesColors.length]
+            }
           >
-            <div className="flex items-center justify-center mt-2">
-              <div
-                className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                role="status"
-              >
-                <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                  Loading...
-                </span>
-              </div>
-            </div>
-          </div>
+            <Spinner isFetching />
+          </ColorBubble>
         )}
       </div>
-      {children}
+      {props.children}
     </div>
   );
-};
+}
+
+function ColorBubble(props: { color: string; children: React.ReactNode }) {
+  return (
+    <div
+      className={"rounded-lg border-2 bg-white p-3 text-xl shadow-md"}
+      style={{
+        borderColor: props.color,
+      }}
+    >
+      {props.children}
+    </div>
+  );
+}
 
 interface TicketProps {
   ticket: GraphTicket;
   onClick: (ticketID: number) => void;
   color?: string;
+  refetching?: boolean;
 }
 
-const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
+const TicketCard: React.FC<TicketProps> = ({
+  ticket,
+  onClick,
+  color,
+  refetching,
+}) => {
   return (
     <button
       onClick={() => onClick(ticket.id)}
       className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
       style={{ borderColor: color }}
     >
-      <div className={`relative h-full w-full`}>
+      <div className={`relative h-full w-full flex flex-col`}>
         <div className={"flex flex-row gap-10"}>
           <p>{ticket.terms.join(", ")}</p>
           <p className={"text-zinc-600"}>x</p>

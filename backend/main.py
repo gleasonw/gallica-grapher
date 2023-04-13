@@ -1,3 +1,4 @@
+import asyncio
 import os
 import aiohttp
 import uvicorn
@@ -35,14 +36,15 @@ async def graph_request(ticket: Ticket, id: int):
     global request_progress
 
     def handle_update_progress(progress: Progress):
-        request_progress[requestID] = progress
+        print(progress, id)
+        request_progress[id] = progress
 
     request = Request(
         ticket=ticket,
         id=id,
         on_update_progress=handle_update_progress,
     )
-    await request.run()
+    asyncio.create_task(request.run())
 
 
 @app.post("/api/init")
@@ -56,6 +58,7 @@ def init(ticket: Ticket, background_tasks: BackgroundTasks):
 @app.get("/poll/progress/{request_id}")
 def poll_request_state(request_id: int):
     global request_progress
+    print(request_progress)
     current_progress = request_progress.get(int(request_id))
     if current_progress and current_progress.state == "completed":
         del request_progress[int(request_id)]
