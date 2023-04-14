@@ -26,6 +26,9 @@ export function makeOptions(
         type: "x",
       },
     },
+    rangeSelector: {
+      enabled: false,
+    },
     title: {
       text: "",
     },

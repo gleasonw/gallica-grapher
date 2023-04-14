@@ -108,11 +108,34 @@ export function ResultViewer() {
     tickets,
     month,
     contextYearRange: yearRange,
+    searchYearRange,
   } = graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
   const staticData = useContext(StaticPropContext);
+  const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
+
+  React.useEffect(() => {
+    function updateExtremes(from: number, to: number) {
+      const chart = chartComponentRef.current?.chart;
+      chart?.xAxis[0].setExtremes(Date.UTC(from, 0, 1), Date.UTC(to, 11, 31));
+    }
+    if (chartComponentRef.current) {
+      const chart = chartComponentRef.current.chart;
+      if (chart) {
+        if (searchYearRange[0] && searchYearRange[1]) {
+          updateExtremes(searchYearRange[0], searchYearRange[1]);
+        } else if (searchYearRange[0]) {
+          updateExtremes(searchYearRange[0], 1950);
+        } else if (searchYearRange[1]) {
+          updateExtremes(1789, searchYearRange[1]);
+        } else {
+          chart.xAxis[0].setExtremes(undefined, undefined);
+        }
+      }
+    }
+  }, [searchYearRange]);
 
   function setSelectedTicket(ticketID?: number) {
     graphStateDispatch!({
@@ -221,6 +244,7 @@ export function ResultViewer() {
     handleSeriesClick,
     ticketData
   );
+
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"relative"}>
@@ -246,7 +270,11 @@ export function ResultViewer() {
             />
           </InputLabel>
         </div>
-        <HighchartsReact highcharts={Highcharts} options={highchartsOpts} />
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={highchartsOpts}
+          ref={chartComponentRef}
+        />
       </div>
       <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
         {translation.gallicagram_plug}

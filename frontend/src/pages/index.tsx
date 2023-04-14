@@ -146,6 +146,8 @@ export default function Home({
   );
 }
 
+type InitTicket = GraphTicket & { start_date: number, end_date: number };
+
 function LoadGraphStateFromRemoteTicket(props: {
   urlState: typeof graphStateURL._output;
 }) {
@@ -155,7 +157,7 @@ function LoadGraphStateFromRemoteTicket(props: {
       const ticketsWithState = await Promise.all(
         props.urlState.ticket_id.map(async (ticket_id) => {
           const result = await fetch(`${apiURL}/api/ticketState/${ticket_id}`);
-          return (await result.json()) as GraphTicket;
+          return (await result.json()) as InitTicket;
         })
       );
       return ticketsWithState;
@@ -299,7 +301,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
       {props.showLabel && (
         <label
           htmlFor={"year-range"}
-          className="block text-gray-700 text-sm font-bold mb-2"
+          className="block text-gray-700 text-sm font-bold"
         >
           {lang === "fr" ? "Années" : "Years"}
         </label>

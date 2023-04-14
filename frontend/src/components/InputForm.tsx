@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { GraphTicket } from "./GraphTicket";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./utils/makeHighcharts";
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
@@ -15,13 +20,12 @@ import {
   GraphPageStateContext,
 } from "./GraphContext";
 import { SelectInput } from "./SelectInput";
-import { ProgressType } from "../models/dbStructs";
+import { GraphData } from "../models/dbStructs";
 
 export interface InputFormProps {
   onCreateTicket: (ticket: GraphTicket) => void;
   onDeleteTicket: (ticketID: number) => void;
   onDeleteExampleTickets: () => void;
-  onRefetch: () => void;
   tickets?: GraphTicket[];
 }
 
@@ -59,11 +63,13 @@ export const InputForm: React.FC<InputFormProps> = ({
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
+  const queryClient = useQueryClient();
+
   const graphStateDispatch = React.useContext(GraphPageDispatchContext);
   const graphState = React.useContext(GraphPageStateContext);
   if (!graphStateDispatch || !graphState)
     throw new Error("No graph state dispatch found");
-  const { searchYearRange, source, linkTerm } = graphState;
+  const { searchYearRange, source, linkTerm, grouping, smoothing } = graphState;
 
   async function setSearchRange(
     newRange: [number | undefined, number | undefined]
@@ -77,18 +83,34 @@ export const InputForm: React.FC<InputFormProps> = ({
       high = 1950;
     }
     if ((newLow && newLow < low) || (newHigh && newHigh > high)) {
-      const ticketsWithNewRange: TicketToPost[] | undefined = tickets?.map(
-        (ticket) => ({
-          ...ticket,
-          id: undefined,
-          replacingTicketID: ticket.id,
-          start_date: newLow || ticket.start_date,
-          end_date: newHigh || ticket.end_date,
-        })
-      );
-      if (ticketsWithNewRange) {
-        setRefetching(true);
-        handlePost(ticketsWithNewRange);
+      // check if the current tickets have the data already
+      // prevents refetching data if we're just changing the zoom
+      const ticketData = queryClient.getQueryData([
+        "ticket",
+        { id: tickets?.[0]?.id, grouping, smoothing },
+      ]) as GraphData;
+      if (ticketData) {
+        const lowUnix = ticketData.data[0][0];
+        const highUnix = ticketData.data[ticketData.data.length - 1][0];
+        const lowYear = new Date(lowUnix).getFullYear() - 1;
+        const highYear = new Date(highUnix).getFullYear() + 1;
+        console.log(lowYear, highYear);
+        if ((newLow && newLow < lowYear) || (newHigh && newHigh > highYear)) {
+          const ticketsWithNewRange: TicketToPost[] | undefined = tickets?.map(
+            (ticket) => ({
+              ...ticket,
+              id: undefined,
+              replacingTicketID: ticket.id,
+              start_date: newLow || ticket.start_date,
+              end_date: newHigh || ticket.end_date,
+            })
+          );
+
+          if (ticketsWithNewRange) {
+            setRefetching(true);
+            handlePost(ticketsWithNewRange);
+          }
+        }
       }
     }
     graphStateDispatch!({

@@ -208,87 +208,62 @@ function SearchableContext(props: { initParams: SearchPageState }) {
               </button>
             </InputBubble>
             <div className={"flex flex-wrap gap-10 justify-center"}>
-              <SubInputLayout>
-                <YearRangeInput
-                  min={1500}
-                  max={2023}
-                  value={yearRange}
-                  showLabel={true}
-                  onChange={(value) =>
+              <YearRangeInput
+                min={1500}
+                max={2023}
+                value={yearRange}
+                showLabel={true}
+                onChange={(value) =>
+                  searchStateDispatch({
+                    type: "set_context_range",
+                    payload: value,
+                  })
+                }
+              />
+              <SelectInput
+                label={"corpus"}
+                options={["book", "periodical", "all"]}
+                value={source}
+                onChange={(new_source) => {
+                  if (
+                    new_source === "book" ||
+                    new_source === "periodical" ||
+                    new_source === "all"
+                  ) {
                     searchStateDispatch({
-                      type: "set_context_range",
-                      payload: value,
-                    })
+                      type: "set_source",
+                      payload: new_source,
+                    });
                   }
-                />
-              </SubInputLayout>
-              <SubInputLayout>
-                <SelectInput
-                  label={"corpus"}
-                  options={["book", "periodical", "all"]}
-                  value={source}
-                  onChange={(new_source) => {
-                    if (
-                      new_source === "book" ||
-                      new_source === "periodical" ||
-                      new_source === "all"
-                    ) {
-                      searchStateDispatch({
-                        type: "set_source",
-                        payload: new_source,
-                      });
-                    }
-                  }}
-                />
-                {source === "periodical" && (
-                  <PaperSelector
-                    papers={papers}
-                    from={yearRange?.[0]}
-                    to={yearRange?.[1]}
-                    onPaperAdd={(new_paper) =>
-                      searchStateDispatch({
-                        type: "add_paper",
-                        payload: new_paper,
-                      })
-                    }
-                    onPaperClick={(paperCode) => {
-                      searchStateDispatch({
-                        type: "remove_paper",
-                        payload: paperCode.code,
-                      });
-                    }}
-                  />
-                )}
-              </SubInputLayout>
-              <SubInputLayout>
-                <SelectInput
-                  label={"sort"}
-                  value={sort}
-                  options={["date", "relevance"]}
-                  onChange={(new_sort) => {
-                    if (new_sort === "date" || new_sort === "relevance") {
-                      searchStateDispatch({
-                        type: "set_sort",
-                        payload: new_sort,
-                      });
-                    }
-                  }}
-                />
-                <SelectInput
-                  label={"limit"}
-                  value={limit}
-                  options={[10, 20, 50]}
-                  onChange={(lim) => {
-                    const new_limit = parseInt(lim);
-                    if (typeof new_limit === "number") {
-                      searchStateDispatch({
-                        type: "set_limit",
-                        payload: new_limit,
-                      });
-                    }
-                  }}
-                />
-              </SubInputLayout>
+                }}
+              />
+              <SelectInput
+                label={"sort"}
+                value={sort}
+                options={["date", "relevance"]}
+                onChange={(new_sort) => {
+                  if (new_sort === "date" || new_sort === "relevance") {
+                    searchStateDispatch({
+                      type: "set_sort",
+                      payload: new_sort,
+                    });
+                  }
+                }}
+              />
+              <SelectInput
+                label={"limit"}
+                value={limit}
+                options={[10, 20, 50]}
+                onChange={(lim) => {
+                  const new_limit = parseInt(lim);
+                  if (typeof new_limit === "number") {
+                    searchStateDispatch({
+                      type: "set_limit",
+                      payload: new_limit,
+                    });
+                  }
+                }}
+              />
             </div>
             <ProximitySearchInput
               linkTerm={linkTerm}
