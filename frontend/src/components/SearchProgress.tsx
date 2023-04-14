@@ -18,6 +18,7 @@ export const SearchProgress: React.FC<{
     queries: props.batchTicket.map((ticket) => ({
       queryKey: ["progress", ticket.id],
       queryFn: () => fetchProgress(ticket.id),
+      //@ts-ignore
       refetchInterval: (data) => {
         if (data && data.state === "completed") {
           return false;
