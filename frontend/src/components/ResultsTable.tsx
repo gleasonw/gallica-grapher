@@ -487,7 +487,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
     <table
       className={
-        "shadow-xl rounded-xl border transition-all duration-300 max-w-full table-auto w-full"
+        "shadow-xl rounded-xl border hidden md:table lg:table xl:table transition-all duration-300 max-w-full table-auto w-full"
       }
     >
       <thead>

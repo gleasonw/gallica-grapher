@@ -11,7 +11,7 @@ def build_db_conn():
 
 class MySQL:
     def __init__(self):
-        if os.environ.get("PORT"):
+        if os.environ.get("IS_DEV"):
             self.conn = pymysql.connect(
                 host=os.environ.get("HOST"),
                 user=os.environ.get("DB_USER"),
@@ -21,6 +21,7 @@ class MySQL:
             )
         else:
             # prod
+            print("connecting to prod")
             self.conn = pymysql.connect(
                 host=os.environ.get("HOST"),
                 user=os.environ.get("DB_USER"),

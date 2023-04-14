@@ -4,8 +4,6 @@ ciso8601==2.2.0
 fastapi==0.95.0
 lxml==4.9.2
 pandas==1.5.2
-psycopg2==2.9.6
-psycopg2_binary==2.9.5
 pydantic==1.10.2
 pymysql==1.0.3
 pytest==7.2.1
