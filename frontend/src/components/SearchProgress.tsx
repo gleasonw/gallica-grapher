@@ -32,6 +32,8 @@ export const SearchProgress: React.FC<{
   if (data && data.length === props.batchTicket.length) {
     if (data.every((ticket) => ticket?.data?.state === "completed")) {
       props.onFetchComplete();
+    } else if (data.every((ticket) => ticket?.data?.state === "no_records")) {
+      props.onNoRecordsFound();
     }
   }
 
