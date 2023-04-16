@@ -231,7 +231,12 @@ export const InputForm: React.FC<InputFormProps> = ({
             }
             setFetchingTickets([]);
           }}
-          onNoRecordsFound={() => console.log("no records found")}
+          onNoRecordsFound={() => {
+            setRefetching(false);
+            setSubmitted(false);
+            setFetchingTickets([]);
+            alert(translation.no_records_found);
+          }}
         />
       )}
       <TicketRow
