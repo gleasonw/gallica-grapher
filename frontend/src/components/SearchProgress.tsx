@@ -29,12 +29,11 @@ export const SearchProgress: React.FC<{
     })),
   });
 
-  const { onFetchComplete, onNoRecordsFound } = props;
-  useEffect(() => {
-    if (data.every((d) => d.data?.state === "completed")) {
-      onFetchComplete();
+  if (data && data.length === props.batchTicket.length) {
+    if (data.every((ticket) => ticket?.data?.state === "completed")) {
+      props.onFetchComplete();
     }
-  }, [data, onFetchComplete, onNoRecordsFound]);
+  }
 
   return <></>;
 };
