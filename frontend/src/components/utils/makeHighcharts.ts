@@ -22,7 +22,6 @@ export function makeOptions(
   return {
     chart: {
       type: "line",
-    height: (6 / 16 * 100) + '%',
       zooming: {
         type: "x",
       },
