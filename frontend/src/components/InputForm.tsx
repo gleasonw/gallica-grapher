@@ -140,6 +140,12 @@ export const InputForm: React.FC<InputFormProps> = ({
     setFetchingTickets(responseTickets);
   }
 
+  function reset() {
+    setRefetching(false);
+    setSubmitted(false);
+    setFetchingTickets([]);
+  }
+
   const ticketInForm: TicketToPost = {
     terms: [word],
     start_date: searchYearRange[0],
@@ -220,8 +226,6 @@ export const InputForm: React.FC<InputFormProps> = ({
         <SearchProgress
           batchTicket={fetchingTickets}
           onFetchComplete={() => {
-            setRefetching(false);
-            setSubmitted(false);
             for (let i = 0; i < fetchingTickets.length; i++) {
               const ticket = fetchingTickets[i];
               if (ticket.replacingTicketID) {
@@ -229,12 +233,10 @@ export const InputForm: React.FC<InputFormProps> = ({
               }
               onCreateTicket(ticket);
             }
-            setFetchingTickets([]);
+            reset();
           }}
           onNoRecordsFound={() => {
-            setRefetching(false);
-            setSubmitted(false);
-            setFetchingTickets([]);
+            reset();
             alert(translation.no_records_found);
           }}
         />
