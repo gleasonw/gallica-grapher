@@ -166,7 +166,7 @@ export function ResultsTable(props: TableProps) {
     staleTime: Infinity,
     keepPreviousData: true,
     initialData: () =>
-      allAinB(staticData?.staticRecordParams, currentFetchParams)
+      allAinB(currentFetchParams, staticData?.staticRecordParams)
         ? staticData?.staticRecords
         : undefined,
   });

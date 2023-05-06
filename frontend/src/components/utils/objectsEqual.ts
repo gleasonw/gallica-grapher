@@ -3,11 +3,12 @@ export default function allAinB(
   b: any
 ): boolean {
   if(!a || !b) return false;
+  console.log(a, b)
   return Object.keys(a).every((key) => {
     const item = a[key];
     if (Array.isArray(item)) {
       return item.every((item, index) => {
-        return item === b[key][index];
+        return item === b[key]?.[index];
       });
     }
     return a[key] === b[key];
