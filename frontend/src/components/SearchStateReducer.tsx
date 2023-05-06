@@ -7,7 +7,8 @@ export interface SearchPageState {
   source?: "book" | "periodical" | "all";
   limit?: number;
   cursor?: number;
-  yearRange?: [number | undefined, number | undefined];  
+  yearRange?: [number | undefined, number | undefined]; 
+  month?: number; 
   sort?: "date" | "relevance";
   link_term?: string;
   link_distance?: number;

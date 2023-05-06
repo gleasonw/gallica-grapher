@@ -24,6 +24,7 @@ const searchPageState = z.object({
   terms: z.string(),
   year: z.coerce.number().nullish(),
   end_year: z.coerce.number().nullish(),
+  month: z.coerce.number().nullish(),
   day: z.coerce.number().nullish(),
   source: z
     .literal("book")
@@ -63,6 +64,7 @@ export default function Context() {
             yearRange: result.data.year
               ? [result.data.year, result.data.end_year ?? undefined]
               : [undefined, undefined],
+            month: result.data.month ?? undefined,
             sort: result.data.sort ?? undefined,
             link_term: result.data.link_term ?? undefined,
             link_distance: result.data.link_distance ?? undefined,
@@ -117,6 +119,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
   }
   const {
     yearRange,
+    month,
     source,
     papers,
     limit,
@@ -173,6 +176,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
       source,
       terms: [term],
       yearRange,
+      month
     };
     searchStateDispatch!({
       type: "set_table_props",

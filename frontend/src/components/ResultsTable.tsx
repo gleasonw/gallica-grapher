@@ -156,7 +156,7 @@ export function ResultsTable(props: TableProps) {
         cursor: (selectedPage - 1) * (props.limit ? props.limit : 10),
         limit: props.limit,
         year: props.yearRange?.[0],
-        end_year: props.yearRange?.[1],
+        end_year: month ? undefined : props.yearRange?.[1],
       };
       if (customWindow) {
         return fetchCustomWindowContext(apiArgs, customWindow);
