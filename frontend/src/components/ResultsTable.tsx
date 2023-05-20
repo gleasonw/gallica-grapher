@@ -90,7 +90,7 @@ export function ResultsTable(props: TableProps) {
       download_csv: "Download CSV page",
     },
   };
-  const charLimit = 80;
+  const charLimit = 70;
 
   React.useEffect(() => {
     setSelectedPage(1);
