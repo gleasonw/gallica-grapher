@@ -331,7 +331,7 @@ export function ResultsTable(props: TableProps) {
             {pagination}
             <Spinner isFetching={isFetching} />
           </div>
-          <div className={"pl-5 pr-5"}>
+          <div>
             <DesktopTable tableInstance={tableInstance} />
             <MobileTable tableInstance={tableInstance} />
           </div>
