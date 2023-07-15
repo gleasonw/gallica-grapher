@@ -19,6 +19,8 @@ import { z } from "zod";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { ProximitySearchInput } from "../../components/ProximitySearchInput";
+import { ContextTypeToggle } from "../../components/ContextTypeToggle";
+import { ImageTable } from "../../components/ImageTable";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -183,7 +185,8 @@ function SearchableContext(props: { initParams: SearchPageState }) {
       payload: newProps,
     });
   }
-  console.log(searchState.terms);
+
+  const [contextType, setContextType] = React.useState<"ocr" | "image">("ocr");
 
   return (
     <SearchPageStateContext.Provider value={searchState}>
@@ -287,8 +290,13 @@ function SearchableContext(props: { initParams: SearchPageState }) {
             />
           </div>
         </DashboardLayout>
+        <ContextTypeToggle value={contextType} onChange={setContextType} />
         {tableFetchParams ? (
-          <OCRTable {...{ ...tableFetchParams, all_context: true }} />
+          contextType === "ocr" ? (
+            <OCRTable {...{ ...tableFetchParams, all_context: true }} />
+          ) : (
+            <ImageTable {...{ ...tableFetchParams, all_context: true }} />
+          )
         ) : (
           props.initParams.terms !== "" && (
             <OCRTable
