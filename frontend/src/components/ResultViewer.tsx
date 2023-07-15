@@ -20,6 +20,7 @@ import { ImageTable } from "./ImageTable";
 import { PaperDropdown } from "./PaperDropdown";
 import { OCRTable, TableProps } from "./OCRTable";
 import { ContextTypeToggle } from "./ContextTypeToggle";
+import { OccurrenceContext } from "./OccurrenceContext";
 
 export async function getTicketData(
   id: number,
@@ -116,8 +117,6 @@ export function ResultViewer() {
   } = graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
-
-  const [contextType, setContextType] = useState<"ocr" | "image">("image");
 
   const staticData = useContext(StaticPropContext);
   const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
@@ -256,88 +255,6 @@ export function ResultViewer() {
     Paper[] | undefined
   >();
 
-  const tableProps: TableProps = {
-    terms:
-      (thereAreTickets &&
-        tickets!.filter((t) => t.id === selectedTicket)[0]?.terms) ||
-      [],
-    link_term: thereAreTickets
-      ? tickets?.find((t) => t.id === selectedTicket)?.linkTerm
-      : undefined,
-    link_distance: 3,
-    codes: selectedPapers?.map((p) => p.code) || [],
-    month,
-    yearRange,
-    source: "periodical",
-  };
-
-  const tableFilters = (
-    <>
-      <div className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}>
-        <InputLabel label={lang === "fr" ? "Année" : "Year"}>
-          <input
-            type={"number"}
-            className={"border rounded-lg bg-white p-3"}
-            value={yearRange![0] || ""}
-            onChange={(e) =>
-              setYearRange([parseInt(e.target.value), undefined])
-            }
-          />
-        </InputLabel>
-        <InputLabel label={lang === "fr" ? "Mois" : "Month"}>
-          <SelectInput
-            options={Array.from(Array(12).keys()).map((i) => String(i))}
-            onChange={(value) => setMonth(parseInt(value))}
-            value={month ? String(month) : undefined}
-          />
-        </InputLabel>
-        <InputLabel label={"Ticket"}>
-          <select
-            onChange={(e) => {
-              setSelectedTicket(parseInt(e.target.value));
-            }}
-            className={"border rounded-lg  bg-white p-3"}
-            value={selectedTicket || ""}
-          >
-            {tickets?.map((ticket) => (
-              <option key={ticket.id} value={ticket.id}>
-                {ticket.terms}
-              </option>
-            ))}
-          </select>
-        </InputLabel>
-        <InputLabel label={lang === "fr" ? "Périodique" : "Periodical"}>
-          <PaperDropdown
-            onClick={(paper) => {
-              if (selectedPapers) {
-                setSelectedPapers([...selectedPapers, paper]);
-              } else {
-                setSelectedPapers([paper]);
-              }
-            }}
-          />
-        </InputLabel>
-      </div>
-      <div className={"flex flex-row flex-wrap"}>
-        {selectedPapers?.map((paper) => (
-          <button
-            onClick={() => {
-              if (selectedPapers) {
-                setSelectedPapers(
-                  selectedPapers.filter((p) => p.code !== paper.code)
-                );
-              }
-            }}
-            key={paper.code}
-            className={"m-5 ml-0 mb-0 border p-5 hover:bg-zinc-100"}
-          >
-            {paper.title}
-          </button>
-        ))}
-      </div>
-    </>
-  );
-
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"relative"}>
@@ -400,12 +317,86 @@ export function ResultViewer() {
           />
         </div>
       </div>
-      <ContextTypeToggle value={contextType} onChange={setContextType} />
-      {contextType === "ocr" ? (
-        <OCRTable {...tableProps}>{tableFilters}</OCRTable>
-      ) : (
-        <ImageTable {...tableProps}>{tableFilters}</ImageTable>
-      )}
+      <OccurrenceContext
+        terms={
+          (thereAreTickets &&
+            tickets!.filter((t) => t.id === selectedTicket)[0]?.terms) ||
+          []
+        }
+        link_term={
+          thereAreTickets
+            ? tickets?.find((t) => t.id === selectedTicket)?.linkTerm
+            : undefined
+        }
+        link_distance={3}
+        codes={selectedPapers?.map((p) => p.code) || []}
+        month={month}
+        yearRange={yearRange}
+        source="periodical"
+      >
+        <div className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}>
+          <InputLabel label={lang === "fr" ? "Année" : "Year"}>
+            <input
+              type={"number"}
+              className={"border rounded-lg bg-white p-3"}
+              value={yearRange![0] || ""}
+              onChange={(e) =>
+                setYearRange([parseInt(e.target.value), undefined])
+              }
+            />
+          </InputLabel>
+          <InputLabel label={lang === "fr" ? "Mois" : "Month"}>
+            <SelectInput
+              options={Array.from(Array(12).keys()).map((i) => String(i))}
+              onChange={(value) => setMonth(parseInt(value))}
+              value={month ? String(month) : undefined}
+            />
+          </InputLabel>
+          <InputLabel label={"Ticket"}>
+            <select
+              onChange={(e) => {
+                setSelectedTicket(parseInt(e.target.value));
+              }}
+              className={"border rounded-lg  bg-white p-3"}
+              value={selectedTicket || ""}
+            >
+              {tickets?.map((ticket) => (
+                <option key={ticket.id} value={ticket.id}>
+                  {ticket.terms}
+                </option>
+              ))}
+            </select>
+          </InputLabel>
+          <InputLabel label={lang === "fr" ? "Périodique" : "Periodical"}>
+            <PaperDropdown
+              onClick={(paper) => {
+                if (selectedPapers) {
+                  setSelectedPapers([...selectedPapers, paper]);
+                } else {
+                  setSelectedPapers([paper]);
+                }
+              }}
+            />
+          </InputLabel>
+        </div>
+        <div className={"flex flex-row flex-wrap"}>
+          {selectedPapers?.map((paper) => (
+            <button
+              onClick={() => {
+                if (selectedPapers) {
+                  setSelectedPapers(
+                    selectedPapers.filter((p) => p.code !== paper.code)
+                  );
+                }
+              }}
+              key={paper.code}
+              className={"m-5 ml-0 mb-0 border p-5 hover:bg-zinc-100"}
+            >
+              {paper.title}
+            </button>
+          ))}
+        </div>
+      </OccurrenceContext>
     </div>
   );
 }

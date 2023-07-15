@@ -1,11 +1,9 @@
-import { OCRTable, TableProps } from "../../components/OCRTable";
+import { TableProps } from "../../components/OCRTable";
 import React from "react";
 import { YearRangeInput } from "..";
 import DashboardLayout from "../../components/DashboardLayout";
 import InputBubble from "../../components/InputBubble";
-import { PaperSelector } from "../../components/PaperSelector";
 import { SelectInput } from "../../components/SelectInput";
-import { SubInputLayout } from "../../components/SubInputLayout";
 import {
   SearchPageState,
   searchStateReducer,
@@ -19,8 +17,7 @@ import { z } from "zod";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { ProximitySearchInput } from "../../components/ProximitySearchInput";
-import { ContextTypeToggle } from "../../components/ContextTypeToggle";
-import { ImageTable } from "../../components/ImageTable";
+import { OccurrenceContext } from "../../components/OccurrenceContext";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -110,7 +107,6 @@ export const strings = {
 };
 
 function SearchableContext(props: { initParams: SearchPageState }) {
-  console.log(props.initParams);
   const [searchState, searchStateDispatch] = React.useReducer(
     searchStateReducer,
     props.initParams
@@ -186,7 +182,18 @@ function SearchableContext(props: { initParams: SearchPageState }) {
     });
   }
 
-  const [contextType, setContextType] = React.useState<"ocr" | "image">("ocr");
+  let contextParams: TableProps = {};
+  if (props.initParams.terms) {
+    contextParams = {
+      ...props.initParams,
+      terms: [props.initParams.terms],
+    };
+  } else {
+    contextParams = {
+      ...tableFetchParams,
+      all_context: true,
+    };
+  }
 
   return (
     <SearchPageStateContext.Provider value={searchState}>
@@ -290,31 +297,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
             />
           </div>
         </DashboardLayout>
-        <ContextTypeToggle value={contextType} onChange={setContextType} />
-        {tableFetchParams ? (
-          contextType === "ocr" ? (
-            <OCRTable {...{ ...tableFetchParams, all_context: true }} />
-          ) : (
-            <ImageTable {...{ ...tableFetchParams, all_context: true }} />
-          )
-        ) : (
-          props.initParams.terms !== "" &&
-          (contextType === "ocr" ? (
-            <OCRTable
-              {...{
-                ...props.initParams,
-                terms: [props.initParams.terms],
-              }}
-            />
-          ) : (
-            <ImageTable
-              {...{
-                ...props.initParams,
-                terms: [props.initParams.terms],
-              }}
-            />
-          ))
-        )}
+        <OccurrenceContext {...contextParams} />
       </SearchPageDispatchContext.Provider>
     </SearchPageStateContext.Provider>
   );
