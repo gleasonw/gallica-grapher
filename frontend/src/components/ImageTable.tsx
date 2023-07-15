@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import Image from "next/image";
 import { QueryPagination } from "./QueryPagination";
-import { CursorInput } from "./CursorInput";
 
 async function fetchImages(args: APIargs) {
   const url = addQueryParamsIfExist(
@@ -18,21 +17,20 @@ async function fetchImages(args: APIargs) {
   return (await response.json()) as GallicaResponse;
 }
 
-export function ImageTable(props: TableProps) {
-  const [selectedPage, setSelectedPage] = React.useState(1);
-
-  const {
-    yearRange,
-    month,
-    day,
-    codes,
-    terms,
-    source,
-    link_term,
-    link_distance,
-    sort,
-  } = props;
-
+export function ImageTable({
+  codes,
+  terms,
+  yearRange,
+  month,
+  day,
+  source,
+  link_term,
+  link_distance,
+  sort,
+  selectedPage,
+  onSelectedPageChange,
+}: TableProps) {
+  const limit = 10;
   const { data, isLoading, isRefetching } = useQuery({
     queryKey: [
       "gallicaRecords",
@@ -58,10 +56,10 @@ export function ImageTable(props: TableProps) {
         link_term,
         link_distance,
         sort,
-        cursor: (selectedPage - 1) * (props.limit ? props.limit : 10),
-        limit: props.limit,
-        year: props.yearRange?.[0],
-        end_year: month ? undefined : props.yearRange?.[1],
+        cursor: (selectedPage - 1) * (limit ? limit : 10),
+        limit: limit,
+        year: yearRange?.[0],
+        end_year: month ? undefined : yearRange?.[1],
       }),
     keepPreviousData: true,
     staleTime: Infinity,
@@ -93,23 +91,10 @@ export function ImageTable(props: TableProps) {
     return (
       <>
         <QueryPagination
-          onPageIncrement={() => setSelectedPage(selectedPage + 1)}
-          onPageDecrement={() => setSelectedPage(selectedPage - 1)}
           selectedPage={selectedPage}
           cursorMax={cursorMax}
-          onLastPage={() => setSelectedPage(cursorMax + 1)}
-          onFirstPage={() => setSelectedPage(1)}
-        >
-          <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
-          <CursorInput
-            cursor={selectedPage}
-            cursorMax={cursorMax}
-            onCursorIncrement={setSelectedPage}
-            onCursorDecrement={setSelectedPage}
-            key={selectedPage}
-          />
-          <p className={"ml-3 md:ml-5 lg:ml-5"}>/ {cursorMax + 1}</p>
-        </QueryPagination>
+          onChange={onSelectedPageChange}
+        />
         <div className={"flex flex-col gap-20 md:m-5"}>
           {data?.records?.map((record) => (
             <div
@@ -123,7 +108,7 @@ export function ImageTable(props: TableProps) {
               <h4>{record.date}</h4>
               <ImageSnippet
                 ark={record.ark}
-                term={props.terms?.[0] ?? ""}
+                term={terms?.[0] ?? ""}
                 url={record.context?.[0]?.page_url ?? ""}
               />
             </div>
@@ -134,8 +119,16 @@ export function ImageTable(props: TableProps) {
   }
 }
 
-function ImageSnippet(props: { ark: string; term: string; url: string }) {
-  const last_el = props.url.split("/").pop();
+function ImageSnippet({
+  ark,
+  term,
+  url,
+}: {
+  ark: string;
+  term: string;
+  url: string;
+}) {
+  const last_el = url.split("/").pop();
   const page_sec = last_el?.split(".")?.[0];
   const page = page_sec?.slice(1);
 
@@ -143,8 +136,8 @@ function ImageSnippet(props: { ark: string; term: string; url: string }) {
     const url = addQueryParamsIfExist(
       `https://gallica-grapher-production.up.railway.app/api/image`,
       {
-        ark: props.ark,
-        term: props.term,
+        ark: ark,
+        term: term,
         page: page,
       }
     );
@@ -154,7 +147,7 @@ function ImageSnippet(props: { ark: string; term: string; url: string }) {
   }
 
   const { data, isLoading } = useQuery({
-    queryKey: ["imageSnippet", { ark: props.ark, term: props.term }],
+    queryKey: ["imageSnippet", { ark: ark, term: term }],
     queryFn: doFetch,
     keepPreviousData: true,
     staleTime: Infinity,
@@ -165,8 +158,8 @@ function ImageSnippet(props: { ark: string; term: string; url: string }) {
       className={"bg-gray-400 rounded h-80 w-full mb-4 animate-pulse border"}
     />
   ) : (
-    <Link href={props.url} target={"_blank"}>
-      <Image src={data?.image ?? ""} alt={props.term} width={700} height={80} />
+    <Link href={url} target={"_blank"}>
+      <Image src={data?.image ?? ""} alt={term} width={700} height={80} />
     </Link>
   );
 }

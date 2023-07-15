@@ -1,25 +1,20 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { LangContext } from "./LangContext";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { apiURL } from "./apiURL";
-import { FrequentTerm, GraphData, Paper } from "../models/dbStructs";
+import { GraphData, Paper } from "../models/dbStructs";
 import { makeOptions } from "./utils/makeHighcharts";
 import {
   GraphPageDispatchContext,
   GraphPageStateContext,
 } from "./GraphContext";
-import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import allAinB from "./utils/objectsEqual";
 import { StaticPropContext } from "./StaticPropContext";
-import * as ToggleGroup from "@radix-ui/react-toggle-group";
-import { ImageTable } from "./ImageTable";
 import { PaperDropdown } from "./PaperDropdown";
-import { OCRTable, TableProps } from "./OCRTable";
-import { ContextTypeToggle } from "./ContextTypeToggle";
 import { OccurrenceContext } from "./OccurrenceContext";
 
 export async function getTicketData(

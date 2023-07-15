@@ -183,7 +183,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
   }
 
   let contextParams: TableProps = {};
-  if (props.initParams.terms) {
+  if (props.initParams.terms && !tableFetchParams?.terms) {
     contextParams = {
       ...props.initParams,
       terms: [props.initParams.terms],

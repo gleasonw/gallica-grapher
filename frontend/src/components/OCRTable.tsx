@@ -1,5 +1,5 @@
 import React from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   Cell,
   Row,
@@ -12,31 +12,14 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
-import { apiURL } from "./apiURL";
 import allAinB from "./utils/objectsEqual";
 import { Spinner } from "./Spinner";
 import { StaticPropContext } from "./StaticPropContext";
 import { QueryPagination } from "./QueryPagination";
-import { CursorInput } from "./CursorInput";
+import { ContextProps } from "./OccurrenceContext";
 
-export interface TableProps {
-  terms?: string[];
-  codes?: string[];
-  day?: number;
-  month?: number;
-  yearRange?: [number | undefined, number | undefined];
-  source?: "book" | "periodical" | "all";
-  link_term?: string;
-  link_distance?: number;
-  children?: React.ReactNode;
-  limit?: number;
-  sort?: "date" | "relevance";
-  all_context?: boolean;
-}
-
-export type APIargs = Omit<TableProps, "children" | "initialRecords"> & {
+export type APIargs = ContextProps & {
   cursor?: number;
-  year?: number;
   end_year?: number;
 };
 
@@ -44,10 +27,11 @@ export async function fetchContext(args: APIargs) {
   let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
-    all_context: args.all_context,
+    all_context: true,
     row_split: true,
+    limit: 10,
+    year: args.yearRange?.[0],
   });
-  console.log(url);
   const response = await fetch(url);
   return (await response.json()) as GallicaResponse;
 }
@@ -62,88 +46,53 @@ async function fetchCustomWindowContext(args: APIargs, window: number) {
   return (await response.json()) as GallicaResponse;
 }
 
-export function OCRTable(props: TableProps) {
-  const [selectedPage, setSelectedPage] = React.useState(1);
+export function OCRTable({
+  codes,
+  terms,
+  yearRange,
+  month,
+  source,
+  link_term,
+  link_distance,
+  selectedPage,
+  onSelectedPageChange,
+}: ContextProps & {
+  selectedPage: number;
+  onSelectedPageChange: (page: number) => void;
+}) {
   const [customWindow, setCustomWindow] = React.useState<number>(0);
-  const limit = props.limit || 10;
   const { lang } = useContext(LangContext);
-  const strings = {
-    fr: {
-      noResults: "Aucun résultat",
-      loading_next: "Chargement de la prochaine page...",
-      loading_previous: "Chargement de la page précédente...",
-      error: "Erreur",
-      total_docs: "documents",
-      num_docs_page: `Les occurrences dans ${limit} documents sont affichées`,
-      group_by_doc: "Regrouper par document",
-      ungroup_by_doc: "Dégrouper par document",
-      download_csv: "Télécharger page CSV",
-    },
-    en: {
-      noResults: "No results",
-      loading_next: "Loading next page...",
-      loading_previous: "Loading previous page...",
-      error: "Error",
-      total_docs: "documents",
-      num_docs_page: `Occurrences in ${limit} documents are displayed`,
-      group_by_doc: "Group by document",
-      ungroup_by_doc: "Ungroup by document",
-      download_csv: "Download CSV page",
-    },
-  };
   const charLimit = 70;
-
-  React.useEffect(() => {
-    setSelectedPage(1);
-  }, [props.terms]);
-
-  const {
-    yearRange,
-    month,
-    day,
-    codes,
-    terms,
-    source,
-    link_term,
-    link_distance,
-    sort,
-  } = props;
+  const limit = 10;
 
   // this will be used to check if we can use ssr data... maybe a better way?
   const currentFetchParams = {
     yearRange,
     month,
-    day,
     codes,
     terms,
     source,
     link_term,
     link_distance,
-    sort,
     selectedPage,
     limit,
     customWindow,
   };
 
   const staticData = useContext(StaticPropContext);
-
   const { isFetching, data } = useQuery({
     queryKey: [
       "context",
-      {
-        yearRange,
-        month,
-        day,
-        codes,
-        terms,
-        source,
-        link_term,
-        link_distance,
-        sort,
-        selectedPage,
-        limit,
-        customWindow,
-      },
+      yearRange,
+      month,
+      codes,
+      terms,
+      source,
+      link_term,
+      link_distance,
+      selectedPage,
+      limit,
+      customWindow,
     ],
     queryFn: () => {
       const apiArgs: APIargs = {
@@ -153,11 +102,9 @@ export function OCRTable(props: TableProps) {
         source,
         link_term,
         link_distance,
-        sort,
-        cursor: (selectedPage - 1) * (props.limit ? props.limit : 10),
-        limit: props.limit,
-        year: props.yearRange?.[0],
-        end_year: month ? undefined : props.yearRange?.[1],
+        cursor: (selectedPage - 1) * (limit ? limit : 10),
+        yearRange,
+        end_year: month ? undefined : yearRange?.[1],
       };
       if (customWindow) {
         return fetchCustomWindowContext(apiArgs, customWindow);
@@ -307,25 +254,10 @@ export function OCRTable(props: TableProps) {
         <div>
           <div className={"ml-5 flex flex-col mb-2"}>
             <QueryPagination
-              onPageIncrement={() => setSelectedPage(selectedPage + 1)}
-              onPageDecrement={() => setSelectedPage(selectedPage - 1)}
               selectedPage={selectedPage}
               cursorMax={cursorMax}
-              onLastPage={() => setSelectedPage(cursorMax + 1)}
-              onFirstPage={() => setSelectedPage(1)}
-            >
-              <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
-              <CursorInput
-                cursor={selectedPage}
-                cursorMax={cursorMax}
-                onCursorIncrement={setSelectedPage}
-                onCursorDecrement={setSelectedPage}
-                key={selectedPage}
-              />
-              <p className={"ml-3 md:ml-5 lg:ml-5"}>
-                / {(cursorMax + 1).toLocaleString()}
-              </p>
-            </QueryPagination>
+              onChange={onSelectedPageChange}
+            />
             <Spinner isFetching={isFetching} />
           </div>
           <div>
