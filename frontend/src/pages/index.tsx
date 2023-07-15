@@ -248,11 +248,7 @@ function GraphAndTable() {
         {" "}
         {translation.description}{" "}
       </div>
-      <h3 className={"text-3xl text-center"}>
-        Le graph est en cours de maintenance. A bientot avec de nouvelles
-        fonctionnalités !
-      </h3>
-      {/* <InputForm
+      <InputForm
         onCreateTicket={(ticket) =>
           graphStateDispatch({
             type: "add_ticket",
@@ -283,7 +279,7 @@ function GraphAndTable() {
             <ResultViewer />
           </motion.div>
         )}
-      </AnimatePresence> */}
+      </AnimatePresence>
     </div>
   );
 }

@@ -58,7 +58,6 @@ async function fetchCustomWindowContext(args: APIargs, window: number) {
     ...args,
     window_size: window,
   });
-  console.log(url);
   const response = await fetch(url);
   return (await response.json()) as GallicaResponse;
 }
@@ -96,7 +95,7 @@ export function OCRTable(props: TableProps) {
 
   React.useEffect(() => {
     setSelectedPage(1);
-  }, [props]);
+  }, [props.terms]);
 
   const {
     yearRange,
@@ -339,7 +338,11 @@ export function OCRTable(props: TableProps) {
           </div>
         </div>
       ) : isFetching ? (
-        <Spinner isFetching={isFetching} />
+        <div
+          className={
+            "bg-gray-400 h-96 rounded w-full mb-4 animate-pulse border m-10"
+          }
+        />
       ) : (
         <p className={"text-center"}>
           No results for these params (or unable to connect to Gallica)
@@ -476,46 +479,5 @@ function cellRender(row: Row, cell: Cell) {
     cell.isPlaceholder ? null : cell.column.id !== "date" ? ( // Otherwise, just render the regular cell // For cells with repeated values, render null
       cell.render("Cell")
     ) : null
-  );
-}
-
-function ImageSnippet(props: { ark: string; term: string; url: string }) {
-  const [image, setImage] = React.useState("");
-
-  const last_el = props.url.split("/").pop();
-  const page_sec = last_el?.split(".")?.[0];
-  const page = page_sec?.slice(1);
-
-  async function doFetch() {
-    const url = addQueryParamsIfExist(`${apiURL}/api/imageSnippet`, {
-      ark: props.ark,
-      term: props.term,
-      page: page,
-    });
-    const response = await fetch(url);
-    const imgString = (await response.json()) as string;
-    setImage(imgString);
-  }
-
-  const { mutate, isLoading } = useMutation(doFetch, {});
-
-  return (
-    <div className={"flex flex-col gap-2"}>
-      {image ? (
-        <img
-          src={image}
-          alt={props.term}
-          className={"w-auto h-auto absolute"}
-        />
-      ) : (
-        <button
-          onClick={() => mutate()}
-          className={"text-blue-500 p-2 hover:bg-red-500"}
-        >
-          Fetch image
-        </button>
-      )}
-      {isLoading && <div>Loading...</div>}
-    </div>
   );
 }
