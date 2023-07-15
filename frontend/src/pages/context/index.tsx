@@ -298,14 +298,22 @@ function SearchableContext(props: { initParams: SearchPageState }) {
             <ImageTable {...{ ...tableFetchParams, all_context: true }} />
           )
         ) : (
-          props.initParams.terms !== "" && (
+          props.initParams.terms !== "" &&
+          (contextType === "ocr" ? (
             <OCRTable
               {...{
                 ...props.initParams,
                 terms: [props.initParams.terms],
               }}
             />
-          )
+          ) : (
+            <ImageTable
+              {...{
+                ...props.initParams,
+                terms: [props.initParams.terms],
+              }}
+            />
+          ))
         )}
       </SearchPageDispatchContext.Provider>
     </SearchPageStateContext.Provider>
