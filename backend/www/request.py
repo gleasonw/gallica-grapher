@@ -69,7 +69,18 @@ class Request:
                     )
                 )
             except HTTPException:
-                self.on_update_progress(Progress(state="error"))
+                self.on_update_progress(
+                    Progress(
+                        state="error",
+                        num_requests_sent=0,
+                        num_requests_to_send=0,
+                        num_results_discovered=0,
+                        backend_source=self.ticket.backend_source,
+                        estimate_seconds_to_completion=0,
+                        random_paper="",
+                        random_text="",
+                    )
+                )
 
     def set_no_records(self):
         self.state = "no_records"
