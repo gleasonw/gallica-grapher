@@ -71,10 +71,14 @@ export const InputForm: React.FC<InputFormProps> = ({
     throw new Error("No graph state dispatch found");
   const { searchYearRange, source, linkTerm, grouping, smoothing } = graphState;
 
-  async function setSearchRange(
-    newRange: [number | undefined, number | undefined]
-  ) {
-    const [newLow, newHigh] = newRange;
+  async function setSearchRange(newRange?: [number?, number?]) {
+    let newLow: number | undefined, newHigh: number | undefined;
+    if (newRange) {
+      [newLow, newHigh] = newRange;
+    } else {
+      newLow = undefined;
+      newHigh = undefined;
+    }
     let [low, high] = searchYearRange;
     if (!low) {
       low = 1789;
@@ -114,7 +118,7 @@ export const InputForm: React.FC<InputFormProps> = ({
     }
     graphStateDispatch!({
       type: "set_search_range",
-      payload: newRange,
+      payload: [newLow, newHigh],
     });
   }
 
