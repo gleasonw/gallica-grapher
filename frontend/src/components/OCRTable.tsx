@@ -92,7 +92,7 @@ export function OCRTable(props: TableProps) {
       download_csv: "Download CSV page",
     },
   };
-  const charLimit = 80;
+  const charLimit = 70;
 
   React.useEffect(() => {
     setSelectedPage(1);
@@ -333,7 +333,7 @@ export function OCRTable(props: TableProps) {
             {pagination}
             <Spinner isFetching={isFetching} />
           </div>
-          <div className={"pl-5 pr-5"}>
+          <div>
             <DesktopTable tableInstance={tableInstance} />
             <MobileTable tableInstance={tableInstance} />
           </div>
