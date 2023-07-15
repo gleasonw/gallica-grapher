@@ -11,7 +11,7 @@ import { CursorInput } from "./CursorInput";
 
 async function fetchImages(args: APIargs) {
   const url = addQueryParamsIfExist(
-    "http://localhost:8000/api/gallicaRecords",
+    "https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords",
     { ...args, row_split: true }
   );
   const response = await fetch(url);
