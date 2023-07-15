@@ -319,7 +319,7 @@ export function OCRTable(props: TableProps) {
         key={selectedPage}
       />
       <p className={"ml-3 md:ml-5 lg:ml-5"}>
-        {lang === "fr" ? "de" : "of"} {(cursorMax + 1).toLocaleString()}
+        / {(cursorMax + 1).toLocaleString()}
       </p>
     </QueryPagination>
   );
