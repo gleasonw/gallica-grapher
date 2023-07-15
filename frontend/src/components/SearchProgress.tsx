@@ -8,6 +8,7 @@ export const SearchProgress: React.FC<{
   batchTicket: GraphTicket[];
   onFetchComplete: () => void;
   onNoRecordsFound: () => void;
+  onError: () => void;
 }> = (props) => {
   async function fetchProgress(id: number) {
     const response = await fetch(`${apiURL}/poll/progress/${id}`);
@@ -20,7 +21,12 @@ export const SearchProgress: React.FC<{
       queryFn: () => fetchProgress(ticket.id),
       //@ts-ignore
       refetchInterval: (data) => {
-        if (data && data.state === "completed") {
+        if (
+          data &&
+          (data.state === "completed" ||
+            data.state === "no_records" ||
+            data.state === "error")
+        ) {
           return false;
         } else {
           return 1000;
@@ -34,6 +40,8 @@ export const SearchProgress: React.FC<{
       props.onFetchComplete();
     } else if (data.every((ticket) => ticket?.data?.state === "no_records")) {
       props.onNoRecordsFound();
+    } else if (data.every((ticket) => ticket?.data?.state === "error")) {
+      props.onError();
     }
   }
 

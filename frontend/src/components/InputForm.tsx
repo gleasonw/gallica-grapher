@@ -238,6 +238,12 @@ export const InputForm: React.FC<InputFormProps> = ({
             reset();
             alert(translation.no_records_found);
           }}
+          onError={() => {
+            reset();
+            alert(
+              "Probleme de connexion avec Gallicagram... Veuillez réessayer plus tard !"
+            );
+          }}
         />
       )}
       <TicketRow
