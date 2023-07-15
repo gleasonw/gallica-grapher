@@ -1,4 +1,6 @@
 from io import StringIO
+
+from fastapi import HTTPException
 from www.models import Ticket
 import aiohttp
 from gallicaGetter.utils.date import Date
@@ -82,6 +84,10 @@ async def get_contain_data(
                 "to": fin,
             },
         ) as response:
+            if response.status != 200:
+                raise HTTPException(
+                    status_code=503, detail="Could not connect to Gallicagram! Egads!"
+                )
             return await parse_df(
                 response=response, resolution=resolution, corpus=corpus
             )
@@ -104,6 +110,10 @@ async def get_gram_data(
                 "to": fin,
             },
         ) as response:
+            if response.status != 200:
+                raise HTTPException(
+                    status_code=503, detail="Could not connect to Gallicagram! Egads!"
+                )
             return await parse_df(
                 response=response, resolution=resolution, corpus=corpus
             )

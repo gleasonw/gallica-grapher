@@ -94,7 +94,6 @@ export const InputForm: React.FC<InputFormProps> = ({
         const highUnix = ticketData.data[ticketData.data.length - 1][0];
         const lowYear = new Date(lowUnix).getFullYear() - 1;
         const highYear = new Date(highUnix).getFullYear() + 1;
-        console.log(lowYear, highYear);
         if ((newLow && newLow < lowYear) || (newHigh && newHigh > highYear)) {
           const ticketsWithNewRange: TicketToPost[] | undefined = tickets?.map(
             (ticket) => ({

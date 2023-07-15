@@ -36,7 +36,6 @@ async def graph_request(ticket: Ticket, id: int):
     global request_progress
 
     def handle_update_progress(progress: Progress):
-        print(progress, id)
         request_progress[id] = progress
 
     request = Request(
@@ -58,7 +57,6 @@ def init(ticket: Ticket, background_tasks: BackgroundTasks):
 @app.get("/poll/progress/{request_id}")
 def poll_request_state(request_id: int):
     global request_progress
-    print(request_progress)
     current_progress = request_progress.get(int(request_id))
     if current_progress and current_progress.state == "completed":
         del request_progress[int(request_id)]
@@ -162,25 +160,6 @@ def graph_data(
             average_window=average_window,
             conn=conn,
         )
-
-
-@app.get("/api/imageSnippet")
-async def image_snippet(ark: str, term: str, page: int):
-    url = "https://rapportgallica.bnf.fr/api/snippet"
-    headers = {"Content-Type": "application/json"}
-    data = {
-        "ark": ark,
-        "isPeriodique": True,
-        "pages": [page],
-        "query": f'(gallica any "{term}")',
-        "limitSnippets": 1,
-    }
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, headers=headers, json=data) as resp:
-            if resp.status != 200:
-                return {"error": "error"}
-            result = await resp.json()
-            return result[0]["snippetBeans"][0]["content"]
 
 
 if __name__ == "__main__":

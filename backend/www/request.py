@@ -1,5 +1,7 @@
 import threading
 import io
+
+from fastapi import HTTPException
 from www.models import Ticket, Progress
 from www.database.connContext import build_db_conn
 from typing import Callable, Literal
@@ -32,39 +34,42 @@ class Request:
     async def run(self):
         """Fetch records for user from Pyllica and insert to DB for graphing"""
         with build_db_conn() as db_conn:
-            if pyllica_records := await pyllica_wrapper.get(
-                self.ticket, on_no_records_found=self.set_no_records
-            ):
-                with db_conn.cursor() as curs:
-                    curs.executemany(
-                        """INSERT INTO groupcounts (year, month, searchterm, requestid, count)
-                    VALUES (%s, %s, %s, %s, %s)""",
-                        [
-                            (
-                                record.year,
-                                record.month,
-                                record.term,
-                                self.id,
-                                record.count,
-                            )
-                            for record in pyllica_records
-                        ],
-                    )
+            try:
+                if pyllica_records := await pyllica_wrapper.get(
+                    self.ticket, on_no_records_found=self.set_no_records
+                ):
+                    with db_conn.cursor() as curs:
+                        curs.executemany(
+                            """INSERT INTO groupcounts (year, month, searchterm, requestid, count)
+                        VALUES (%s, %s, %s, %s, %s)""",
+                            [
+                                (
+                                    record.year,
+                                    record.month,
+                                    record.term,
+                                    self.id,
+                                    record.count,
+                                )
+                                for record in pyllica_records
+                            ],
+                        )
 
-            if self.state not in ["too_many_records", "no_records"]:
-                self.state = "completed"
-            self.on_update_progress(
-                Progress(
-                    num_results_discovered=self.num_records,
-                    num_requests_to_send=self.total_requests,
-                    num_requests_sent=self.num_requests_sent,
-                    backend_source=self.ticket.backend_source,
-                    estimate_seconds_to_completion=self.estimate_seconds_to_completion,
-                    random_paper=self.random_paper_for_progress,
-                    state=self.state,
-                    random_text="",
+                if self.state not in ["too_many_records", "no_records"]:
+                    self.state = "completed"
+                self.on_update_progress(
+                    Progress(
+                        num_results_discovered=self.num_records,
+                        num_requests_to_send=self.total_requests,
+                        num_requests_sent=self.num_requests_sent,
+                        backend_source=self.ticket.backend_source,
+                        estimate_seconds_to_completion=self.estimate_seconds_to_completion,
+                        random_paper=self.random_paper_for_progress,
+                        state=self.state,
+                        random_text="",
+                    )
                 )
-            )
+            except HTTPException:
+                self.on_update_progress(Progress(state="error"))
 
     def set_no_records(self):
         self.state = "no_records"

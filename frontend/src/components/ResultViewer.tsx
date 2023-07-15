@@ -1,13 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { LangContext } from "./LangContext";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { InputLabel } from "./InputLabel";
 import { SelectInput } from "./SelectInput";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { TicketResultTable } from "./TicketResultTable";
 import { apiURL } from "./apiURL";
-import { FrequentTerm, GallicaResponse, GraphData } from "../models/dbStructs";
+import { FrequentTerm, GraphData, Paper } from "../models/dbStructs";
 import { makeOptions } from "./utils/makeHighcharts";
 import {
   GraphPageDispatchContext,
@@ -16,6 +15,10 @@ import {
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import allAinB from "./utils/objectsEqual";
 import { StaticPropContext } from "./StaticPropContext";
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import { ImageTable } from "./ImageTable";
+import { PaperDropdown } from "./PaperDropdown";
+import { OCRTable, TableProps } from "./OCRTable";
 
 export async function getTicketData(
   id: number,
@@ -112,6 +115,8 @@ export function ResultViewer() {
   } = graphState;
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
+
+  const [contextType, setContextType] = useState<"ocr" | "image">("image");
 
   const staticData = useContext(StaticPropContext);
   const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
@@ -245,6 +250,93 @@ export function ResultViewer() {
     ticketData
   );
 
+  const thereAreTickets = tickets && tickets.length > 0;
+  const [selectedPapers, setSelectedPapers] = React.useState<
+    Paper[] | undefined
+  >();
+
+  const tableProps: TableProps = {
+    terms:
+      (thereAreTickets &&
+        tickets!.filter((t) => t.id === selectedTicket)[0]?.terms) ||
+      [],
+    link_term: thereAreTickets
+      ? tickets?.find((t) => t.id === selectedTicket)?.linkTerm
+      : undefined,
+    link_distance: 3,
+    codes: selectedPapers?.map((p) => p.code) || [],
+    month,
+    yearRange,
+    source: "periodical",
+  };
+
+  const tableFilters = (
+    <>
+      <div className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}>
+        <InputLabel label={lang === "fr" ? "Année" : "Year"}>
+          <input
+            type={"number"}
+            className={"border rounded-lg bg-white p-3"}
+            value={yearRange![0] || ""}
+            onChange={(e) =>
+              setYearRange([parseInt(e.target.value), undefined])
+            }
+          />
+        </InputLabel>
+        <InputLabel label={lang === "fr" ? "Mois" : "Month"}>
+          <SelectInput
+            options={Array.from(Array(12).keys()).map((i) => String(i))}
+            onChange={(value) => setMonth(parseInt(value))}
+            value={month ? String(month) : undefined}
+          />
+        </InputLabel>
+        <InputLabel label={"Ticket"}>
+          <select
+            onChange={(e) => {
+              setSelectedTicket(parseInt(e.target.value));
+            }}
+            className={"border rounded-lg  bg-white p-3"}
+            value={selectedTicket || ""}
+          >
+            {tickets?.map((ticket) => (
+              <option key={ticket.id} value={ticket.id}>
+                {ticket.terms}
+              </option>
+            ))}
+          </select>
+        </InputLabel>
+        <InputLabel label={lang === "fr" ? "Périodique" : "Periodical"}>
+          <PaperDropdown
+            onClick={(paper) => {
+              if (selectedPapers) {
+                setSelectedPapers([...selectedPapers, paper]);
+              } else {
+                setSelectedPapers([paper]);
+              }
+            }}
+          />
+        </InputLabel>
+      </div>
+      <div className={"flex flex-row flex-wrap"}>
+        {selectedPapers?.map((paper) => (
+          <button
+            onClick={() => {
+              if (selectedPapers) {
+                setSelectedPapers(
+                  selectedPapers.filter((p) => p.code !== paper.code)
+                );
+              }
+            }}
+            key={paper.code}
+            className={"m-5 ml-0 mb-0 border p-5 hover:bg-zinc-100"}
+          >
+            {paper.title}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+
   return (
     <div className={"h-full w-full bg-white"}>
       <div className={"relative"}>
@@ -307,16 +399,37 @@ export function ResultViewer() {
           />
         </div>
       </div>
-      <TicketResultTable
-        tickets={tickets}
-        month={month}
-        yearRange={yearRange}
-        onSelectYear={(year) => setYearRange([year, undefined])}
-        onSelectMonth={(month) => setMonth(month)}
-        onSelectTicket={(ticket) => setSelectedTicket(ticket)}
-        selectedTicket={selectedTicket}
-        limit={10}
-      />
+      <ToggleGroup.Root
+        type="single"
+        value={contextType}
+        onValueChange={(value) => setContextType(value as "ocr" | "image")}
+        className={
+          "flex ml-5 mr-5 mt-2 border border-gray-300 shadow-md w-fit rounded-lg"
+        }
+      >
+        <ToggleGroup.Item
+          value="ocr"
+          className={`p-5 hover:bg-gray-200 transition-colors ${
+            contextType === "ocr" ? "bg-gray-200" : ""
+          }`}
+        >
+          OCR
+        </ToggleGroup.Item>
+        <span className={"border-l border-gray-300"} />
+        <ToggleGroup.Item
+          value="image"
+          className={`p-5 hover:bg-gray-200 transition-colors ${
+            contextType === "image" ? "bg-gray-200" : ""
+          }`}
+        >
+          Image
+        </ToggleGroup.Item>
+      </ToggleGroup.Root>
+      {contextType === "ocr" ? (
+        <OCRTable {...tableProps}>{tableFilters}</OCRTable>
+      ) : (
+        <ImageTable {...tableProps}>{tableFilters}</ImageTable>
+      )}
     </div>
   );
 }
@@ -342,48 +455,6 @@ function ActiveFilters(props: {
           );
         }
       })}
-    </div>
-  );
-}
-
-function FrequencyContext(props: {
-  yearRange: [number | undefined, number | undefined];
-  month?: number;
-  term?: string;
-}) {
-  async function getFrequencyData(
-    yearRange: [number | undefined, number | undefined],
-    month?: number,
-    term?: string
-  ) {
-    const [start, end] = yearRange;
-    const url = addQueryParamsIfExist(`${apiURL}/api/mostFrequentTerms`, {
-      start_year: start,
-      start_month: month,
-      end_year: end,
-      end_month: month,
-      root_gram: term,
-      sample_size: 30,
-    });
-    const response = await fetch(url);
-    return (await response.json()) as FrequentTerm[];
-  }
-
-  const { data, isFetching } = useQuery(
-    ["frequency", props.yearRange, props.month, props.term],
-    () => getFrequencyData(props.yearRange, props.month, props.term)
-  );
-
-  if (isFetching) return <div>Loading...</div>;
-  if (!data) return <div>No data</div>;
-  return (
-    <div className={"flex gap-10 flex-wrap"}>
-      {data.map((term) => (
-        <div className={"flex flex-col gap-2"} key={term.term}>
-          <div className={"text-xl"}>{term.term}</div>
-          <div className={"text-sm"}>{term.count}</div>
-        </div>
-      ))}
     </div>
   );
 }

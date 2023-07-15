@@ -1,5 +1,5 @@
 import { Paper } from "../models/dbStructs";
-import { TableProps } from "./ResultsTable";
+import { TableProps } from "./OCRTable";
 
 export interface SearchPageState {
   terms: string;
@@ -7,8 +7,8 @@ export interface SearchPageState {
   source?: "book" | "periodical" | "all";
   limit?: number;
   cursor?: number;
-  yearRange?: [number | undefined, number | undefined]; 
-  month?: number; 
+  yearRange?: [number | undefined, number | undefined];
+  month?: number;
   sort?: "date" | "relevance";
   link_term?: string;
   link_distance?: number;

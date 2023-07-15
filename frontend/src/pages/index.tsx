@@ -19,7 +19,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { GallicaResponse, GraphData } from "../models/dbStructs";
-import { TableProps, fetchContext } from "../components/ResultsTable";
+import { TableProps, fetchContext } from "../components/OCRTable";
 import { StaticPropContext } from "../components/StaticPropContext";
 import { Spinner } from "../components/Spinner";
 import { AnimatePresence, motion } from "framer-motion";
@@ -146,7 +146,7 @@ export default function Home({
   );
 }
 
-type InitTicket = GraphTicket & { start_date: number, end_date: number };
+type InitTicket = GraphTicket & { start_date: number; end_date: number };
 
 function LoadGraphStateFromRemoteTicket(props: {
   urlState: typeof graphStateURL._output;
@@ -248,7 +248,11 @@ function GraphAndTable() {
         {" "}
         {translation.description}{" "}
       </div>
-      <InputForm
+      <h3 className={"text-3xl text-center"}>
+        Le graph est en cours de maintenance. A bientot avec de nouvelles
+        fonctionnalités !
+      </h3>
+      {/* <InputForm
         onCreateTicket={(ticket) =>
           graphStateDispatch({
             type: "add_ticket",
@@ -279,7 +283,7 @@ function GraphAndTable() {
             <ResultViewer />
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </div>
   );
 }
@@ -306,67 +310,61 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
           {lang === "fr" ? "Années" : "Years"}
         </label>
       )}
-      {
-        expanded && (
-          <div
-            className={"flex flex-col text-md max-w-md items-center gap-5 p-3 border rounded-lg absolute top-0 -left-10 bg-white z-40"}
-            id={"year-range"}
-          >
-            <div className={"flex gap-5 items-center"}>
-              <input
-                className="w-20 border p-3  rounded-md"
-                type="number"
-                value={localValue?.[0] || ""}
-                onChange={(e) => {
-                  const newValue = parseInt(e.target.value);
-                  if (typeof newValue === "number") {
-                    setLocalValue([newValue, localValue?.[1]]);
-                  }
-                }}
-                placeholder={props.placeholder?.[0].toString()}
-              />
-              {lang === "fr" ? "à" : "to"}
-              <input
-                className="w-20 p-3 rounded-md border"
-                type="number"
-                value={localValue?.[1] || ""}
-                onChange={(e) => {
-                  const newValue = parseInt(e.target.value);
-                  if (typeof newValue === "number") {
-                    setLocalValue([localValue?.[0], newValue]);
-                  }
-                }}
-                placeholder={props.placeholder?.[1].toString()}
-              />
-
-            </div>
-            <div className={"flex gap-5 items-center"}>
-              <button
-                className={
-                  "p-2 text-blue-500"
+      {expanded && (
+        <div
+          className={
+            "flex flex-col text-md max-w-md items-center gap-5 p-3 border rounded-lg absolute top-0 -left-10 bg-white z-40"
+          }
+          id={"year-range"}
+        >
+          <div className={"flex gap-5 items-center"}>
+            <input
+              className="w-20 border p-3  rounded-md"
+              type="number"
+              value={localValue?.[0] || ""}
+              onChange={(e) => {
+                const newValue = parseInt(e.target.value);
+                if (typeof newValue === "number") {
+                  setLocalValue([newValue, localValue?.[1]]);
                 }
-                onClick={() => {
-                  setExpanded(false);
-                }}
-              >
-                {lang === "fr" ? "Annuler" : "Cancel"}
-              </button>
-              <button
-                className={
-                  "border p-2 hover:bg-blue-100 rounded-md"
+              }}
+              placeholder={props.placeholder?.[0].toString()}
+            />
+            {lang === "fr" ? "à" : "to"}
+            <input
+              className="w-20 p-3 rounded-md border"
+              type="number"
+              value={localValue?.[1] || ""}
+              onChange={(e) => {
+                const newValue = parseInt(e.target.value);
+                if (typeof newValue === "number") {
+                  setLocalValue([localValue?.[0], newValue]);
                 }
-                onClick={() => {
-                  props.onChange(localValue || [undefined, undefined]);
-                  setExpanded(false);
-                }}
-              >
-                Apply
-              </button>
-            </div>
-
+              }}
+              placeholder={props.placeholder?.[1].toString()}
+            />
           </div>
-        )
-      }
+          <div className={"flex gap-5 items-center"}>
+            <button
+              className={"p-2 text-blue-500"}
+              onClick={() => {
+                setExpanded(false);
+              }}
+            >
+              {lang === "fr" ? "Annuler" : "Cancel"}
+            </button>
+            <button
+              className={"border p-2 hover:bg-blue-100 rounded-md"}
+              onClick={() => {
+                props.onChange(localValue || [undefined, undefined]);
+                setExpanded(false);
+              }}
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      )}
       <div
         className={
           "flex flex-row text-md items-center gap-5 p-3 cursor-pointer bg-blue-100 rounded-xl"
@@ -374,13 +372,9 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
         id={"year-range"}
         onClick={() => setExpanded(true)}
       >
-        <span className={""}>
-          {props.value?.[0] || props.placeholder?.[0]}
-        </span>
+        <span className={""}>{props.value?.[0] || props.placeholder?.[0]}</span>
         <span className={""}>to</span>
-        <span className={""}>
-          {props.value?.[1] || props.placeholder?.[1]}
-        </span>
+        <span className={""}>{props.value?.[1] || props.placeholder?.[1]}</span>
         ⌄
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { ResultsTable, TableProps } from "../../components/ResultsTable";
+import { OCRTable, TableProps } from "../../components/OCRTable";
 import React from "react";
 import { YearRangeInput } from "..";
 import DashboardLayout from "../../components/DashboardLayout";
@@ -176,7 +176,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
       source,
       terms: [term],
       yearRange,
-      month
+      month,
     };
     searchStateDispatch!({
       type: "set_table_props",
@@ -288,10 +288,10 @@ function SearchableContext(props: { initParams: SearchPageState }) {
           </div>
         </DashboardLayout>
         {tableFetchParams ? (
-          <ResultsTable {...{ ...tableFetchParams, all_context: true }} />
+          <OCRTable {...{ ...tableFetchParams, all_context: true }} />
         ) : (
           props.initParams.terms !== "" && (
-            <ResultsTable
+            <OCRTable
               {...{
                 ...props.initParams,
                 terms: [props.initParams.terms],

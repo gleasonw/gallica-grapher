@@ -4,6 +4,23 @@ export interface GallicaResponse {
   origin_urls: string[];
 }
 
+export interface GallicaImageResponse {
+  records: ImageRecord[];
+  num_results: string;
+  origin_urls: string[];
+}
+
+export type ImageRecord = Omit<VolumeRecord, "context"> & {
+  context: ImageContextRow[];
+};
+
+export interface ImageContextRow {
+  arg: string;
+  page: string;
+  image: string;
+  term: string;
+}
+
 export interface VolumeRecord {
   paper_title: string;
   paper_code: string;
