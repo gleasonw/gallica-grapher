@@ -140,11 +140,14 @@ function ImageSnippet(props: { ark: string; term: string; url: string }) {
   const page = page_sec?.slice(1);
 
   async function doFetch() {
-    const url = addQueryParamsIfExist(`http://localhost:8000/api/image`, {
-      ark: props.ark,
-      term: props.term,
-      page: page,
-    });
+    const url = addQueryParamsIfExist(
+      `https://gallica-grapher-production.up.railway.app/api/image`,
+      {
+        ark: props.ark,
+        term: props.term,
+        page: page,
+      }
+    );
     const response = await fetch(url);
     const imgString = (await response.json()) as { image: string };
     return imgString;
