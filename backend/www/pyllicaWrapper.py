@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from fastapi import HTTPException
 from www.models import Ticket
 import aiohttp
-from date import Date
+from www.date import Date
 from typing import Callable, Literal
 from urllib.error import HTTPError
 import pandas as pd
