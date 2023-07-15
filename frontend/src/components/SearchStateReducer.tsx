@@ -1,5 +1,5 @@
 import { Paper } from "../models/dbStructs";
-import { TableProps } from "./OCRTable";
+import { ContextProps } from "./OccurrenceContext";
 
 export interface SearchPageState {
   terms: string;
@@ -7,12 +7,12 @@ export interface SearchPageState {
   source?: "book" | "periodical" | "all";
   limit?: number;
   cursor?: number;
-  yearRange?: [number | undefined, number | undefined];
+  yearRange?: [number?, number?];
   month?: number;
   sort?: "date" | "relevance";
   link_term?: string;
   link_distance?: number;
-  tableFetchParams?: TableProps;
+  tableFetchParams?: ContextProps;
 }
 export interface AddPaperAction {
   type: "add_paper";

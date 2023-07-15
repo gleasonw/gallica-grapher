@@ -19,10 +19,11 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { GallicaResponse, GraphData } from "../models/dbStructs";
-import { TableProps, fetchContext } from "../components/OCRTable";
+import { fetchContext } from "../components/OCRTable";
 import { StaticPropContext } from "../components/StaticPropContext";
 import { Spinner } from "../components/Spinner";
 import { AnimatePresence, motion } from "framer-motion";
+import { ContextProps } from "../components/OccurrenceContext";
 
 const strings = {
   fr: {
@@ -79,7 +80,7 @@ const initTickets = [
 export const getStaticProps: GetStaticProps<{
   staticRecords: GallicaResponse;
   staticSeries: GraphData[];
-  staticRecordParams: TableProps;
+  staticRecordParams: ContextProps;
   staticSeriesParams: {
     id: number;
     grouping: string;
@@ -287,9 +288,9 @@ function GraphAndTable() {
 interface YearRangeInputProps {
   min: number;
   max: number;
-  value?: [number | undefined, number | undefined];
+  value?: [number?, number?];
   placeholder?: [number, number];
-  onChange: (value: [number | undefined, number | undefined]) => void;
+  onChange: (value?: [number?, number?]) => void;
   showLabel?: boolean;
 }
 export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
@@ -352,7 +353,7 @@ export const YearRangeInput: React.FC<YearRangeInputProps> = (props) => {
             <button
               className={"border p-2 hover:bg-blue-100 rounded-md"}
               onClick={() => {
-                props.onChange(localValue || [undefined, undefined]);
+                props.onChange(localValue);
                 setExpanded(false);
               }}
             >

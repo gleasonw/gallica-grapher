@@ -4,17 +4,18 @@ import { OCRTable } from "./OCRTable";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 
 export type ContextProps = {
-  terms: string[];
+  terms?: string[];
   link_term?: string;
-  link_distance: number;
-  codes: string[];
-  month: string;
-  yearRange: [number?, number?];
-  source: "periodical";
+  link_distance?: number;
+  codes?: string[];
+  month?: number;
+  yearRange?: [number?, number?];
+  source?: "periodical" | "book" | "all";
+  all_context?: boolean;
 };
 
 export function OccurrenceContext(
-  props: ContextProps & { children: React.ReactNode }
+  props: ContextProps & { children?: React.ReactNode }
 ) {
   const [contextType, setContextType] = useState<"ocr" | "image">("image");
   const [selectedPage, setSelectedPage] = useState(1);

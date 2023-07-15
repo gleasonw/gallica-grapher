@@ -1,12 +1,12 @@
 import React from "react";
-import { GallicaImageResponse, GallicaResponse } from "../models/dbStructs";
+import { GallicaResponse } from "../models/dbStructs";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import { TableProps } from "./OCRTable";
 import { APIargs } from "./OCRTable";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import Image from "next/image";
 import { QueryPagination } from "./QueryPagination";
+import { ContextProps } from "./OccurrenceContext";
 
 async function fetchImages(args: APIargs) {
   const url = addQueryParamsIfExist(
@@ -22,14 +22,15 @@ export function ImageTable({
   terms,
   yearRange,
   month,
-  day,
   source,
   link_term,
   link_distance,
-  sort,
   selectedPage,
   onSelectedPageChange,
-}: TableProps) {
+}: ContextProps & {
+  selectedPage: number;
+  onSelectedPageChange: (page: number) => void;
+}) {
   const limit = 10;
   const { data, isLoading, isRefetching } = useQuery({
     queryKey: [
@@ -37,13 +38,11 @@ export function ImageTable({
       {
         yearRange,
         month,
-        day,
         codes,
         terms,
         source,
         link_term,
         link_distance,
-        sort,
         selectedPage,
       },
     ],
@@ -55,17 +54,14 @@ export function ImageTable({
         source,
         link_term,
         link_distance,
-        sort,
         cursor: (selectedPage - 1) * (limit ? limit : 10),
-        limit: limit,
-        year: yearRange?.[0],
+        yearRange,
         end_year: month ? undefined : yearRange?.[1],
       }),
     keepPreviousData: true,
     staleTime: Infinity,
   });
 
-  console.log(data);
   const total_results = Number(data?.num_results) ?? 0;
   const cursorMax = Math.floor(total_results / 10);
 

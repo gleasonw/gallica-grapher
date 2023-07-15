@@ -1,4 +1,3 @@
-import { TableProps } from "../../components/OCRTable";
 import React from "react";
 import { YearRangeInput } from "..";
 import DashboardLayout from "../../components/DashboardLayout";
@@ -17,7 +16,10 @@ import { z } from "zod";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { ProximitySearchInput } from "../../components/ProximitySearchInput";
-import { OccurrenceContext } from "../../components/OccurrenceContext";
+import {
+  ContextProps,
+  OccurrenceContext,
+} from "../../components/OccurrenceContext";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -165,12 +167,10 @@ function SearchableContext(props: { initParams: SearchPageState }) {
       "",
       `${window.location.pathname}?${params.toString()}`
     );
-    const newProps: TableProps = {
-      limit,
+    const newProps: ContextProps = {
       codes: papers?.map((paper) => paper.code),
       link_distance: linkDistance,
       link_term: linkTerm,
-      sort,
       source,
       terms: [term],
       yearRange,
@@ -182,7 +182,7 @@ function SearchableContext(props: { initParams: SearchPageState }) {
     });
   }
 
-  let contextParams: TableProps = {};
+  let contextParams: ContextProps = {} as ContextProps;
   if (props.initParams.terms && !tableFetchParams?.terms) {
     contextParams = {
       ...props.initParams,
