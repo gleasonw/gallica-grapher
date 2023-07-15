@@ -155,7 +155,6 @@ export const InputForm: React.FC<InputFormProps> = ({
 
   function handleSubmit() {
     if (!word) return;
-    onDeleteExampleTickets();
     setSubmitted(true);
     setWord("");
     handlePost([ticketInForm]);
@@ -232,6 +231,7 @@ export const InputForm: React.FC<InputFormProps> = ({
               }
               onCreateTicket(ticket);
             }
+            onDeleteExampleTickets();
             reset();
           }}
           onNoRecordsFound={() => {
