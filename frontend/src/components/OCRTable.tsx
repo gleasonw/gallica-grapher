@@ -301,35 +301,31 @@ export function OCRTable(props: TableProps) {
   const total_results = Number(data?.num_results) ?? 0;
   const cursorMax = Math.floor(total_results / limit);
 
-  const pagination = currentPage && (
-    <QueryPagination
-      onPageIncrement={() => setSelectedPage(selectedPage + 1)}
-      onPageDecrement={() => setSelectedPage(selectedPage - 1)}
-      selectedPage={selectedPage}
-      cursorMax={cursorMax}
-      onLastPage={() => setSelectedPage(cursorMax + 1)}
-      onFirstPage={() => setSelectedPage(1)}
-    >
-      <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
-      <CursorInput
-        cursor={selectedPage}
-        cursorMax={cursorMax}
-        onCursorIncrement={setSelectedPage}
-        onCursorDecrement={setSelectedPage}
-        key={selectedPage}
-      />
-      <p className={"ml-3 md:ml-5 lg:ml-5"}>
-        / {(cursorMax + 1).toLocaleString()}
-      </p>
-    </QueryPagination>
-  );
-
   return (
     <div className={" flex flex-col justify-center mb-20"}>
       {tableInstance.data.length > 0 ? (
         <div>
           <div className={"ml-5 flex flex-col mb-2"}>
-            {pagination}
+            <QueryPagination
+              onPageIncrement={() => setSelectedPage(selectedPage + 1)}
+              onPageDecrement={() => setSelectedPage(selectedPage - 1)}
+              selectedPage={selectedPage}
+              cursorMax={cursorMax}
+              onLastPage={() => setSelectedPage(cursorMax + 1)}
+              onFirstPage={() => setSelectedPage(1)}
+            >
+              <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
+              <CursorInput
+                cursor={selectedPage}
+                cursorMax={cursorMax}
+                onCursorIncrement={setSelectedPage}
+                onCursorDecrement={setSelectedPage}
+                key={selectedPage}
+              />
+              <p className={"ml-3 md:ml-5 lg:ml-5"}>
+                / {(cursorMax + 1).toLocaleString()}
+              </p>
+            </QueryPagination>
             <Spinner isFetching={isFetching} />
           </div>
           <div>
