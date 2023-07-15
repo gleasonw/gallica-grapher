@@ -11,24 +11,13 @@ def build_db_conn():
 
 class MySQL:
     def __init__(self):
-        if os.environ.get("IS_DEV"):
-            self.conn = pymysql.connect(
-                host=os.environ.get("HOST"),
-                user=os.environ.get("DB_USER"),
-                port=int(os.environ.get("PORT")),
-                password=os.environ.get("PASSWORD"),
-                database=os.environ.get("DATABASE"),
-            )
-        else:
-            # prod
-            print("connecting to prod")
-            self.conn = pymysql.connect(
-                host=os.environ.get("HOST"),
-                user=os.environ.get("DB_USER"),
-                password=os.environ.get("PASSWORD"),
-                database=os.environ.get("DATABASE"),
-                ssl={"ca": "/etc/ssl/certs/ca-certificates.crt"},
-            )
+        self.conn = pymysql.connect(
+            host=os.environ.get("HOST"),
+            user=os.environ.get("USERNAME"),
+            password=os.environ.get("PASSWORD"),
+            database=os.environ.get("DATABASE"),
+            ssl={"ca": "/etc/ssl/certs/ca-certificates.crt"},
+        )
 
     def __enter__(self):
         return self.conn
