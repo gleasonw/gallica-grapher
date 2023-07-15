@@ -1,14 +1,33 @@
 from io import StringIO
+from dataclasses import dataclass
 
 from fastapi import HTTPException
 from www.models import Ticket
 import aiohttp
-from gallicaGetter.utils.date import Date
-from gallicaGetter.periodOccurrence import PeriodRecord
+from date import Date
 from typing import Callable, Literal
 from urllib.error import HTTPError
 import pandas as pd
 from urllib.parse import quote
+
+
+@dataclass(slots=True)
+class PeriodRecord:
+    _date: Date
+    count: float
+    term: str
+
+    @property
+    def year(self):
+        return self._date.year
+
+    @property
+    def month(self):
+        return self._date.month
+
+    @property
+    def day(self):
+        return self._date.day
 
 
 async def get(args: Ticket, on_no_records_found: Callable):
