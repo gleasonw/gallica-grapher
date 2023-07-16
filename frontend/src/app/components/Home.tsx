@@ -309,7 +309,7 @@ export function Home() {
         };
       }) ?? [],
   });
-
+  ``;
   const highchartsOpts = makeOptions(
     handleSetExtremes,
     handleSeriesClick,

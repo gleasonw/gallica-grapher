@@ -72,7 +72,6 @@ export function OCRTable({
         end_year: month ? undefined : yearRange?.[1],
       }),
     staleTime: Infinity,
-    keepPreviousData: true,
   });
 
   const tableData = React.useMemo(
