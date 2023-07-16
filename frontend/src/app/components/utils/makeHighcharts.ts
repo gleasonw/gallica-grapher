@@ -1,5 +1,5 @@
 import { UseQueryResult } from "@tanstack/react-query";
-import { GraphData } from "../../models/dbStructs";
+import { GraphData } from "../models/dbStructs";
 
 export const seriesColors = [
   "#7cb5ec",
