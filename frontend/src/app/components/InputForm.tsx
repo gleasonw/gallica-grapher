@@ -15,7 +15,7 @@ import {
   GraphPageStateContext,
 } from "./GraphContext";
 import { SelectInput } from "./SelectInput";
-import { GraphData } from "../models/dbStructs";
+import { GraphData } from "./models/dbStructs";
 
 export interface InputFormProps {
   onCreateTicket: (ticket: GraphTicket) => void;
