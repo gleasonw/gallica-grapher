@@ -21,7 +21,7 @@ import { PaperDropdown } from "../components/PaperDropdown";
 import { SelectInput } from "../components/SelectInput";
 import { apiURL } from "../components/apiURL";
 import { makeOptions } from "../components/utils/makeHighcharts";
-import { Paper, GraphData } from "../models/dbStructs";
+import { Paper, GraphData } from "./models/dbStructs";
 
 const gallica_plug = (
   <a
@@ -126,11 +126,9 @@ const initTickets = [
   },
 ];
 
-export default function Home() {
+export function Home() {
   const [graphState, graphStateDispatch] = React.useReducer(graphStateReducer, {
     tickets: initTickets,
-    contextFrom: undefined,
-    contextTo: undefined,
     searchFrom: undefined,
     searchTo: undefined,
     month: undefined,
@@ -145,8 +143,6 @@ export default function Home() {
   const translation = strings[lang];
   const {
     tickets,
-    contextFrom,
-    contextTo,
     selectedTicket,
     grouping,
     smoothing,

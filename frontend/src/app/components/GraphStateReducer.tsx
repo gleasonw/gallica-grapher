@@ -100,8 +100,6 @@ export function graphStateReducer(
     | RemoveExampleTicketsAction
     | SetSearchFromAction
     | SetSearchToAction
-    | SetContextFromAction
-    | SetContextToAction
     | SetSource
     | SetLinkTermAction
 ): GraphPageState {
@@ -157,16 +155,6 @@ export function graphStateReducer(
       return {
         ...state,
         searchTo: action.payload,
-      };
-    case "set_context_from":
-      return {
-        ...state,
-        contextFrom: action.payload,
-      };
-    case "set_context_to":
-      return {
-        ...state,
-        contextTo: action.payload,
       };
     case "set_source":
       return {
