@@ -9,7 +9,7 @@ import { LangContext } from "./LangContext";
 import { Spinner } from "./Spinner";
 import InputBubble from "./InputBubble";
 import DashboardLayout from "./DashboardLayout";
-import { YearRangeInput } from "../pages/YearRangeInput";
+import { YearRangeInput } from "./YearRangeInput";
 import {
   GraphPageDispatchContext,
   GraphPageStateContext,

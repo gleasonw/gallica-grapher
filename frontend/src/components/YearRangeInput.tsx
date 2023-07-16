@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { LangContext } from "../components/LangContext";
+import { LangContext } from "./LangContext";
 
 export interface YearRangeInputProps {
   min: number;
