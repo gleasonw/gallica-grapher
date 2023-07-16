@@ -76,7 +76,7 @@ export default function Context() {
       ) : (
         <SearchableContext
           initParams={{
-            terms: "",
+            terms: "revolution",
             papers: undefined,
             source: "all",
             limit: undefined,
