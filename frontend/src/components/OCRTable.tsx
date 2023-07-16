@@ -10,7 +10,6 @@ import {
 } from "react-table";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
-import allAinB from "./utils/objectsEqual";
 import { Spinner } from "./Spinner";
 import { StaticPropContext } from "./StaticPropContext";
 import { QueryPagination } from "./QueryPagination";
