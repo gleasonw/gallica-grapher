@@ -123,7 +123,7 @@ export const InputForm: React.FC<InputFormProps> = ({
     return { ...ticket, id: data.requestid };
   }
 
-  const mutation = useMutation(postTicket);
+  const mutation = useMutation({ mutationFn: postTicket });
 
   async function handlePost(ticketBatch: TicketToPost[]) {
     const responseTickets = await Promise.all(
