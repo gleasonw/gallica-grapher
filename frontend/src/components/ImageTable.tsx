@@ -1,21 +1,12 @@
 import React from "react";
 import { GallicaResponse } from "../models/dbStructs";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import { APIargs } from "./OCRTable";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import Image from "next/image";
 import { QueryPagination } from "./QueryPagination";
 import { ContextProps } from "./OccurrenceContext";
-
-async function fetchImages(args: APIargs) {
-  const url = addQueryParamsIfExist(
-    "https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords",
-    { ...args, row_split: true }
-  );
-  const response = await fetch(url);
-  return (await response.json()) as GallicaResponse;
-}
+import { fetchContext } from "./fetchContext";
 
 export function ImageTable({
   codes,
@@ -47,15 +38,15 @@ export function ImageTable({
       },
     ],
     queryFn: () =>
-      fetchImages({
-        terms,
+      fetchContext({
+        terms: terms ?? [],
         codes,
         month,
         source,
         link_term,
         link_distance,
         cursor: (selectedPage - 1) * (limit ? limit : 10),
-        yearRange,
+        year: yearRange?.[0],
         end_year: month ? undefined : yearRange?.[1],
       }),
     keepPreviousData: true,

@@ -8,8 +8,6 @@ import {
   useGroupBy,
   useTable,
 } from "react-table";
-import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import { GallicaResponse } from "../models/dbStructs";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
 import allAinB from "./utils/objectsEqual";
@@ -17,34 +15,7 @@ import { Spinner } from "./Spinner";
 import { StaticPropContext } from "./StaticPropContext";
 import { QueryPagination } from "./QueryPagination";
 import { ContextProps } from "./OccurrenceContext";
-
-export type APIargs = ContextProps & {
-  cursor?: number;
-  end_year?: number;
-};
-
-export async function fetchContext(args: APIargs) {
-  let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
-  let url = addQueryParamsIfExist(baseUrl, {
-    ...args,
-    all_context: true,
-    row_split: true,
-    limit: 10,
-    year: args.yearRange?.[0],
-  });
-  const response = await fetch(url);
-  return (await response.json()) as GallicaResponse;
-}
-
-async function fetchCustomWindowContext(args: APIargs, window: number) {
-  let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/customWindowGallicaRecords`;
-  let url = addQueryParamsIfExist(baseUrl, {
-    ...args,
-    window_size: window,
-  });
-  const response = await fetch(url);
-  return (await response.json()) as GallicaResponse;
-}
+import { fetchContext } from "./fetchContext";
 
 export function OCRTable({
   codes,
@@ -94,23 +65,18 @@ export function OCRTable({
       limit,
       customWindow,
     ],
-    queryFn: () => {
-      const apiArgs: APIargs = {
-        terms,
+    queryFn: () =>
+      fetchContext({
+        terms: terms ?? [],
         codes,
         month,
-        source,
+        source: source ?? "all",
         link_term,
         link_distance,
         cursor: (selectedPage - 1) * (limit ? limit : 10),
-        yearRange,
+        year: yearRange?.[0],
         end_year: month ? undefined : yearRange?.[1],
-      };
-      if (customWindow) {
-        return fetchCustomWindowContext(apiArgs, customWindow);
-      }
-      return fetchContext(apiArgs);
-    },
+      }),
     staleTime: Infinity,
     keepPreviousData: true,
     initialData: () =>

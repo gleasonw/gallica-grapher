@@ -19,7 +19,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { GallicaResponse, GraphData } from "../models/dbStructs";
-import { fetchContext } from "../components/OCRTable";
+import { fetchContext } from "../components/fetchContext";
 import { StaticPropContext } from "../components/StaticPropContext";
 import { Spinner } from "../components/Spinner";
 import { AnimatePresence, motion } from "framer-motion";
