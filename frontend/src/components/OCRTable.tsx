@@ -11,7 +11,6 @@ import {
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
 import { Spinner } from "./Spinner";
-import { StaticPropContext } from "./StaticPropContext";
 import { QueryPagination } from "./QueryPagination";
 import { ContextProps } from "./OccurrenceContext";
 import { fetchContext } from "./fetchContext";
@@ -47,7 +46,6 @@ export function OCRTable({
     limit,
   };
 
-  const staticData = useContext(StaticPropContext);
   const { isFetching, data } = useQuery({
     queryKey: [
       "context",
