@@ -120,7 +120,7 @@ function ImageSnippet({
 
   async function doFetch() {
     const url = addQueryParamsIfExist(
-      `https://gallica-grapher-production.up.railway.app/api/image`,
+      `https://gallica-grapher.ew.r.appspot.com/api/image`,
       {
         ark: ark,
         term: term,
