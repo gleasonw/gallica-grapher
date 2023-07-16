@@ -20,6 +20,7 @@ import {
   ContextProps,
   OccurrenceContext,
 } from "../../components/OccurrenceContext";
+import { addQueryParamsIfExist } from "../../utils/addQueryParamsIfExist";
 
 const searchPageState = z.object({
   terms: z.string(),
@@ -134,39 +135,19 @@ function SearchableContext(props: { initParams: SearchPageState }) {
     if (!term || !searchState) {
       return;
     }
-    const params = new URLSearchParams();
-    const searchStateKeys = Object.keys(searchState) as Array<
-      keyof SearchPageState
-    >;
-    for (const key of searchStateKeys) {
-      if (
-        key === "papers" ||
-        key === "yearRange" ||
-        key === "tableFetchParams"
-      ) {
-        continue;
-      }
-      if (searchState[key] !== "" && searchState[key] !== undefined) {
-        const stringified = searchState[key]?.toString();
-        if (stringified) {
-          params.append(key, stringified);
-        }
-      }
-    }
-    if (searchState.yearRange) {
-      const [start, end] = searchState.yearRange;
-      if (start) {
-        params.append("year", start.toString());
-      }
-      if (end) {
-        params.append("end_year", end.toString());
-      }
-    }
-    window.history.replaceState(
-      {},
-      "",
-      `${window.location.pathname}?${params.toString()}`
-    );
+    const baseUrl = `${window.location.pathname}`;
+    const url = addQueryParamsIfExist(baseUrl, {
+      terms: term,
+      year: yearRange?.[0],
+      end_year: yearRange?.[1],
+      month,
+      source,
+      link_term: linkTerm,
+      link_distance: linkDistance,
+      sort,
+      limit,
+    });
+    window.history.replaceState({}, "", url);
     const newProps: ContextProps = {
       codes: papers?.map((paper) => paper.code),
       link_distance: linkDistance,
