@@ -3,8 +3,10 @@ import { GraphTicket } from "./GraphTicket";
 
 export interface GraphPageState {
   tickets?: GraphTicket[];
-  contextYearRange: [number | undefined, number | undefined];
-  searchYearRange: [number | undefined, number | undefined];
+  searchFrom?: number;
+  searchTo?: number;
+  contextFrom?: number;
+  contextTo?: number;
   month?: number;
   grouping: "year" | "month";
   smoothing: number;
@@ -36,14 +38,24 @@ export interface RemoveExampleTicketsAction {
   type: "remove_example_tickets";
 }
 
-export interface SetContextYearRangeAction {
-  type: "set_context_range";
-  payload: GraphPageState["contextYearRange"];
+export interface SetSearchFromAction {
+  type: "set_search_from";
+  payload: GraphPageState["searchFrom"];
 }
 
-export interface SetSearchYearRangeAction {
-  type: "set_search_range";
-  payload: GraphPageState["contextYearRange"];
+export interface SetSearchToAction {
+  type: "set_search_to";
+  payload: GraphPageState["searchTo"];
+}
+
+export interface SetContextFromAction {
+  type: "set_context_from";
+  payload: GraphPageState["contextFrom"];
+}
+
+export interface SetContextToAction {
+  type: "set_context_to";
+  payload: GraphPageState["contextTo"];
 }
 
 export interface SetMonthAction {
@@ -81,13 +93,15 @@ export function graphStateReducer(
   action:
     | AddTicketAction
     | RemoveTicketAction
-    | SetContextYearRangeAction
     | SetMonthAction
     | SetGroupingAction
     | SetSmoothingAction
     | SetSelectedTicketAction
     | RemoveExampleTicketsAction
-    | SetSearchYearRangeAction
+    | SetSearchFromAction
+    | SetSearchToAction
+    | SetContextFromAction
+    | SetContextToAction
     | SetSource
     | SetLinkTermAction
 ): GraphPageState {
@@ -108,11 +122,6 @@ export function graphStateReducer(
         tickets: state.tickets?.filter(
           (ticket) => ticket.id !== action.payload
         ),
-      };
-    case "set_context_range":
-      return {
-        ...state,
-        contextYearRange: action.payload,
       };
     case "set_month":
       return {
@@ -139,10 +148,25 @@ export function graphStateReducer(
         ...state,
         tickets: state.tickets?.filter((ticket) => !ticket.example),
       };
-    case "set_search_range":
+    case "set_search_from":
       return {
         ...state,
-        searchYearRange: action.payload,
+        searchFrom: action.payload,
+      };
+    case "set_search_to":
+      return {
+        ...state,
+        searchTo: action.payload,
+      };
+    case "set_context_from":
+      return {
+        ...state,
+        contextFrom: action.payload,
+      };
+    case "set_context_to":
+      return {
+        ...state,
+        contextTo: action.payload,
       };
     case "set_source":
       return {

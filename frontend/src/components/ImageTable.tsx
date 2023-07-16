@@ -1,5 +1,4 @@
 import React from "react";
-import { GallicaResponse } from "../models/dbStructs";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";

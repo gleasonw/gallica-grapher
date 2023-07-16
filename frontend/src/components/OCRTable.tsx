@@ -31,7 +31,6 @@ export function OCRTable({
   selectedPage: number;
   onSelectedPageChange: (page: number) => void;
 }) {
-  const [customWindow, setCustomWindow] = React.useState<number>(0);
   const { lang } = useContext(LangContext);
   const charLimit = 70;
   const limit = 10;
@@ -47,7 +46,6 @@ export function OCRTable({
     link_distance,
     selectedPage,
     limit,
-    customWindow,
   };
 
   const staticData = useContext(StaticPropContext);
@@ -63,7 +61,6 @@ export function OCRTable({
       link_distance,
       selectedPage,
       limit,
-      customWindow,
     ],
     queryFn: () =>
       fetchContext({
@@ -79,16 +76,11 @@ export function OCRTable({
       }),
     staleTime: Infinity,
     keepPreviousData: true,
-    initialData: () =>
-      allAinB(currentFetchParams, staticData?.staticRecordParams)
-        ? staticData?.staticRecords
-        : undefined,
   });
 
-  const currentPage = data;
   const tableData = React.useMemo(
     () =>
-      currentPage?.records
+      data?.records
         ?.map((record) => {
           const documentMeta = {
             document: `${record.paper_title}||${record.date}||${record.url}`,
@@ -128,23 +120,17 @@ export function OCRTable({
                 </a>
               </div>
             ),
-            left_context:
-              customWindow === 0
-                ? contextRow.left_context.slice(-charLimit)
-                : contextRow.left_context,
+            left_context: contextRow.left_context,
             pivot: (
               <span className={"text-blue-500 font-medium"}>
                 {contextRow.pivot}
               </span>
             ),
-            right_context:
-              customWindow === 0
-                ? contextRow.right_context.slice(0, charLimit)
-                : contextRow.right_context,
+            right_context: contextRow.right_context,
           }));
         })
         .flat() ?? [],
-    [currentPage, charLimit, customWindow]
+    [data]
   );
 
   function showFirstWhenAggregated({ value }: { value: string[] }) {

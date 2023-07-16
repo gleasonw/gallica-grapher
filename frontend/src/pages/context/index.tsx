@@ -1,5 +1,5 @@
 import React from "react";
-import { YearRangeInput } from "..";
+import { YearRangeInput } from "../YearRangeInput";
 import DashboardLayout from "../../components/DashboardLayout";
 import InputBubble from "../../components/InputBubble";
 import { SelectInput } from "../../components/SelectInput";

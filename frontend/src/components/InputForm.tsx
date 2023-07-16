@@ -2,19 +2,14 @@ import React, { useState } from "react";
 import { GraphTicket } from "./GraphTicket";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./utils/makeHighcharts";
-import {
-  useMutation,
-  useQueries,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
 import { Spinner } from "./Spinner";
 import InputBubble from "./InputBubble";
 import DashboardLayout from "./DashboardLayout";
-import { YearRangeInput } from "../pages";
+import { YearRangeInput } from "../pages/YearRangeInput";
 import {
   GraphPageDispatchContext,
   GraphPageStateContext,
@@ -69,24 +64,14 @@ export const InputForm: React.FC<InputFormProps> = ({
   const graphState = React.useContext(GraphPageStateContext);
   if (!graphStateDispatch || !graphState)
     throw new Error("No graph state dispatch found");
-  const { searchYearRange, source, linkTerm, grouping, smoothing } = graphState;
+  const { searchFrom, searchTo, source, linkTerm, grouping, smoothing } =
+    graphState;
 
   async function setSearchRange(newRange?: [number?, number?]) {
-    let newLow: number | undefined, newHigh: number | undefined;
-    if (newRange) {
-      [newLow, newHigh] = newRange;
-    } else {
-      newLow = undefined;
-      newHigh = undefined;
-    }
-    let [low, high] = searchYearRange;
-    if (!low) {
-      low = 1789;
-    }
-    if (!high) {
-      high = 1950;
-    }
-    if ((newLow && newLow < low) || (newHigh && newHigh > high)) {
+    let [newLow, newHigh] = newRange ?? [];
+    let fromBound = searchFrom ?? 1789;
+    let toBound = searchTo ?? 1950;
+    if ((newLow && newLow < fromBound) || (newHigh && newHigh > toBound)) {
       // check if the current tickets have the data already
       // prevents refetching data if we're just changing the zoom
       const ticketData = queryClient.getQueryData([
@@ -117,8 +102,12 @@ export const InputForm: React.FC<InputFormProps> = ({
       }
     }
     graphStateDispatch!({
-      type: "set_search_range",
-      payload: [newLow, newHigh],
+      type: "set_search_from",
+      payload: newLow,
+    });
+    graphStateDispatch!({
+      type: "set_search_to",
+      payload: newHigh,
     });
   }
 
@@ -151,8 +140,8 @@ export const InputForm: React.FC<InputFormProps> = ({
 
   const ticketInForm: TicketToPost = {
     terms: [word],
-    start_date: searchYearRange[0],
-    end_date: searchYearRange[1],
+    start_date: searchFrom,
+    end_date: searchTo,
     source,
     linkTerm,
   };
@@ -189,7 +178,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           <YearRangeInput
             max={2021}
             min={1500}
-            value={searchYearRange}
+            value={[searchFrom, searchTo]}
             onChange={setSearchRange}
             placeholder={[1789, 1950]}
           />

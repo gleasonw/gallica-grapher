@@ -21,7 +21,6 @@ export type QueryParams = {
 
 export async function fetchContext(args: QueryParams) {
   let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
-  console.log(args);
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
     all_context: true,
