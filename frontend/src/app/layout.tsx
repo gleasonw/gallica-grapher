@@ -1,5 +1,6 @@
 import Head from "next/head";
-import NavBar from "./components/NavBar";
+import "./globals.css";
+import { Providers } from "./components/Providers";
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -17,7 +18,9 @@ export default function RootLayout({
           content="Gallica Context"
         />
       </Head>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

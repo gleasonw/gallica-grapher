@@ -17,8 +17,15 @@ export default function NavBar() {
   const [showSidebar, setShowSidebar] = React.useState(false);
   const menuRef = React.useRef<HTMLElement | null>(null);
   const [listening, setListening] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState<urlPage>("");
+
+  React.useEffect(() => {
+    listenForOutsideClicks(listening, setListening, menuRef, setShowSidebar);
+    setCurrentPage(window.location.pathname.slice(1) as urlPage);
+  }, [listening, menuRef, setShowSidebar]);
+
   const router = useRouter();
-  const currentPage = window.location.pathname.split("/")[1] as urlPage;
+
   const linkStyle = "p-5 hover:cursor-pointer";
   let homeLinkStyle = linkStyle;
   let exploreLinkStyle = linkStyle;
@@ -31,10 +38,6 @@ export default function NavBar() {
   } else if (currentPage === "info") {
     infoLinkStyle += borderBottomFocus;
   }
-
-  React.useEffect(() => {
-    listenForOutsideClicks(listening, setListening, menuRef, setShowSidebar);
-  }, [listening, menuRef, setShowSidebar]);
 
   const styleMap = {
     "": homeLinkStyle,

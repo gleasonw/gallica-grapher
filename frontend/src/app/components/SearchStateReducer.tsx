@@ -1,8 +1,7 @@
-import { Paper } from "../models/dbStructs";
 import { ContextProps } from "./OccurrenceContext";
-
+import { Paper } from "./models/dbStructs";
 export interface SearchPageState {
-  terms: string;
+  terms?: string;
   papers?: Paper[];
   source?: "book" | "periodical" | "all";
   limit?: number;

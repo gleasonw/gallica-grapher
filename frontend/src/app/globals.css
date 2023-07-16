@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 body {
-    @apply text-zinc-800 bg-white;
+  @apply text-zinc-800 bg-white;
 }
 
 .highlight {
-    @apply bg-yellow-300
+  @apply bg-yellow-300;
 }
