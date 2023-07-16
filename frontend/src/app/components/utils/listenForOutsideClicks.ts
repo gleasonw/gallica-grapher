@@ -5,7 +5,6 @@ export function listenForOutsideClicks(
   setIsOpen: (value: boolean) => void
 ) {
   return () => {
-    console.log("hello")
     if (listening) return;
     if (!menuRef.current) return;
     setListening(true);

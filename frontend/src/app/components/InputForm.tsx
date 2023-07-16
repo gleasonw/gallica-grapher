@@ -186,16 +186,10 @@ export const InputForm: React.FC<InputFormProps> = ({
             options={corpusOptions}
             value={source}
             onChange={(new_source) => {
-              if (
-                new_source === "presse" ||
-                new_source === "livres" ||
-                new_source === "lemonde"
-              ) {
-                graphStateDispatch({
-                  type: "set_source",
-                  payload: new_source,
-                });
-              }
+              graphStateDispatch({
+                type: "set_source",
+                payload: new_source as GraphTicket["source"],
+              });
             }}
           />
           <input

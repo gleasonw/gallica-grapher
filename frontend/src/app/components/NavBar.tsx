@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { listenForOutsideClicks } from "./utils/listenForOutsideClicks";
 
 const pages = {
@@ -17,9 +17,8 @@ export default function NavBar() {
   const [showSidebar, setShowSidebar] = React.useState(false);
   const menuRef = React.useRef<HTMLElement | null>(null);
   const [listening, setListening] = React.useState(false);
-  const [lang, setLang] = React.useState<"fr" | "en">("fr");
   const router = useRouter();
-  const currentPage = router.pathname.split("/")[1] as urlPage;
+  const currentPage = window.location.pathname.split("/")[1] as urlPage;
   const linkStyle = "p-5 hover:cursor-pointer";
   let homeLinkStyle = linkStyle;
   let exploreLinkStyle = linkStyle;
