@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RevealButton } from "./RevealButton";
 import { PaperDropdown } from "./PaperDropdown";
-import { Paper } from "../models/dbStructs";
+import { Paper } from "./models/dbStructs";
 import { apiURL } from "./apiURL";
 import { useQuery } from "@tanstack/react-query";
 

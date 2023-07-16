@@ -1,5 +1,4 @@
-import { Paper } from "../models/dbStructs";
-
+import { Paper } from "./models/dbStructs";
 
 export interface GraphTicket {
   id: number;

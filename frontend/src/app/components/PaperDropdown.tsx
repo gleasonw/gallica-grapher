@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { LangContext } from "./LangContext";
 import { apiURL } from "./apiURL";
 import { useQuery } from "@tanstack/react-query";
-import { Paper } from "../models/dbStructs";
+import { Paper } from "./models/dbStructs";
 
 export const PaperDropdown: React.FC<{
   onClick: (paper: Paper) => void;
@@ -20,13 +20,14 @@ export const PaperDropdown: React.FC<{
     queryKey: ["papers", periodical],
     queryFn: () => fetchPapers(periodical || ""),
     staleTime: Infinity,
-    keepPreviousData: true,
   });
   const { lang } = useContext(LangContext);
   return (
     <div>
       <input
-        placeholder={lang === "fr" ? "rechercher un périodique" : "search for a paper"}
+        placeholder={
+          lang === "fr" ? "rechercher un périodique" : "search for a paper"
+        }
         value={periodical}
         className={"relative max-w-full border rounded-lg bg-white p-3"}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -45,7 +46,9 @@ export const PaperDropdown: React.FC<{
               }}
             >
               {paper.title}
-              <span className={"text-zinc-500"}>{paper.start_date} - {paper.end_date}</span>
+              <span className={"text-zinc-500"}>
+                {paper.start_date} - {paper.end_date}
+              </span>
             </li>
           ))}
         </ul>

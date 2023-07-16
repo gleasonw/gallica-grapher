@@ -1,5 +1,5 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import { GallicaResponse } from "../models/dbStructs";
+import { GallicaResponse } from "./models/dbStructs";
 
 export type QueryParams = {
   terms: string[];
