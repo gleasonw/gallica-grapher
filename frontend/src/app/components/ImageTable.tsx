@@ -48,7 +48,6 @@ export function ImageTable({
         year: yearRange?.[0],
         end_year: month ? undefined : yearRange?.[1],
       }),
-    keepPreviousData: true,
     staleTime: Infinity,
   });
 
@@ -135,7 +134,6 @@ function ImageSnippet({
   const { data, isLoading } = useQuery({
     queryKey: ["imageSnippet", { ark: ark, term: term }],
     queryFn: doFetch,
-    keepPreviousData: true,
     staleTime: Infinity,
   });
 
