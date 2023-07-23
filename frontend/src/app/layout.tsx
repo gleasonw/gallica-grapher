@@ -1,6 +1,5 @@
-import Head from "next/head";
 import "./globals.css";
-import { Providers } from "./components/Providers";
+import NavBar from "./components/NavBar";
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -11,15 +10,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Head>
-        <title>Gallica Context</title>
-        <meta
-          name="View context surrounding occurrences of words in the French national archive."
-          content="Gallica Context"
-        />
-      </Head>
       <body>
-        <Providers>{children}</Providers>
+        <NavBar />
+        {children}
       </body>
     </html>
   );

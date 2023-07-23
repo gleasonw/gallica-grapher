@@ -1,5 +1,4 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
 import {
   Cell,
   Row,
@@ -8,71 +7,10 @@ import {
   useGroupBy,
   useTable,
 } from "react-table";
-import { useContext } from "react";
-import { LangContext } from "./LangContext";
-import { Spinner } from "./Spinner";
-import { QueryPagination } from "./QueryPagination";
-import { ContextProps } from "./OccurrenceContext";
-import { fetchContext } from "./fetchContext";
+import { ContextQueryParams, fetchContext } from "./fetchContext";
 
-export function OCRTable({
-  codes,
-  terms,
-  yearRange,
-  month,
-  source,
-  link_term,
-  link_distance,
-  selectedPage,
-  onSelectedPageChange,
-}: ContextProps & {
-  selectedPage: number;
-  onSelectedPageChange: (page: number) => void;
-}) {
-  const { lang } = useContext(LangContext);
-  const charLimit = 70;
-  const limit = 10;
-
-  // this will be used to check if we can use ssr data... maybe a better way?
-  const currentFetchParams = {
-    yearRange,
-    month,
-    codes,
-    terms,
-    source,
-    link_term,
-    link_distance,
-    selectedPage,
-    limit,
-  };
-
-  const { isFetching, data } = useQuery({
-    queryKey: [
-      "context",
-      yearRange,
-      month,
-      codes,
-      terms,
-      source,
-      link_term,
-      link_distance,
-      selectedPage,
-      limit,
-    ],
-    queryFn: () =>
-      fetchContext({
-        terms: terms ?? [],
-        codes,
-        month,
-        source: source ?? "all",
-        link_term,
-        link_distance,
-        cursor: (selectedPage - 1) * (limit ? limit : 10),
-        year: yearRange?.[0],
-        end_year: month ? undefined : yearRange?.[1],
-      }),
-    staleTime: Infinity,
-  });
+export async function OCRTable({ params }: { params: ContextQueryParams }) {
+  const data = await fetchContext(params);
 
   const tableData = React.useMemo(
     () =>
@@ -162,7 +100,7 @@ export function OCRTable({
         Aggregated: showFirstWhenAggregated,
       } as const,
       {
-        Header: lang === "fr" ? "Contexte gauche" : "Left context",
+        Header: "Contexte gauche",
         accessor: "left_context" as const,
         aggregate: "unique",
         Aggregated: showFirstWhenAggregated,
@@ -174,13 +112,13 @@ export function OCRTable({
         Aggregated: showFirstWhenAggregated,
       } as const,
       {
-        Header: lang === "fr" ? "Contexte droit" : "Right context",
+        Header: "Contexte droite",
         accessor: "right_context",
         aggregate: "unique",
         Aggregated: showFirstWhenAggregated,
       } as const,
     ],
-    [lang]
+    []
   );
 
   const tableInstance = useTable(
@@ -193,36 +131,14 @@ export function OCRTable({
     useGroupBy,
     useExpanded
   );
-  const total_results = Number(data?.num_results) ?? 0;
-  const cursorMax = Math.floor(total_results / limit);
 
   return (
     <div className={" flex flex-col justify-center mb-20"}>
-      {tableInstance.data.length > 0 ? (
-        <div>
-          <div className={"ml-5 flex flex-col mb-2"}>
-            <QueryPagination
-              selectedPage={selectedPage}
-              cursorMax={cursorMax}
-              onChange={onSelectedPageChange}
-            />
-            <Spinner isFetching={isFetching} />
-          </div>
-          <div>
-            <DesktopTable tableInstance={tableInstance} />
-            <MobileTable tableInstance={tableInstance} />
-          </div>
-        </div>
-      ) : isFetching ? (
-        <div
-          className={
-            "bg-gray-400 h-96 rounded w-full mb-4 animate-pulse border m-10"
-          }
-        />
-      ) : (
-        <p className={"text-center"}>
-          No results for these params (or unable to connect to Gallica)
-        </p>
+      {tableInstance.data.length > 0 && (
+        <>
+          <DesktopTable tableInstance={tableInstance} />
+          <MobileTable tableInstance={tableInstance} />
+        </>
       )}
     </div>
   );
@@ -230,7 +146,7 @@ export function OCRTable({
 
 function MobileTable(props: { tableInstance: TableInstance<any> }) {
   return (
-    <div className={"flex flex-col gap-10 md:hidden lg:hidden"}>
+    <div className={"flex flex-col gap-10 md:hidden"}>
       {props.tableInstance.rows.map((row, index) => {
         props.tableInstance.prepareRow(row);
         return (
@@ -263,7 +179,7 @@ function DesktopTable(props: { tableInstance: TableInstance<any> }) {
   return (
     <table
       className={
-        "shadow-xl rounded-xl border hidden md:table lg:table xl:table transition-all duration-300 max-w-full table-auto w-full"
+        "shadow-xl rounded-xl border hidden md:table transition-all duration-300 max-w-full table-auto w-full"
       }
     >
       <thead>

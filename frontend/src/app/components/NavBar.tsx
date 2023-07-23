@@ -1,3 +1,5 @@
+"use client";
+
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,16 +17,7 @@ type urlPage = keyof typeof pages;
 
 export default function NavBar() {
   const [showSidebar, setShowSidebar] = React.useState(false);
-  const menuRef = React.useRef<HTMLElement | null>(null);
-  const [listening, setListening] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState<urlPage>("");
-
-  React.useEffect(() => {
-    listenForOutsideClicks(listening, setListening, menuRef, setShowSidebar);
-    setCurrentPage(window.location.pathname.slice(1) as urlPage);
-  }, [listening, menuRef, setShowSidebar]);
-
-  const router = useRouter();
 
   const linkStyle = "p-5 hover:cursor-pointer";
   let homeLinkStyle = linkStyle;

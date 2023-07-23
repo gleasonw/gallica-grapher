@@ -16,7 +16,6 @@ import { useQueries } from "@tanstack/react-query";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { InputLabel } from "../components/InputLabel";
-import { OccurrenceContext } from "../components/OccurrenceContext";
 import { PaperDropdown } from "../components/PaperDropdown";
 import { SelectInput } from "../components/SelectInput";
 import { apiURL } from "../components/apiURL";
@@ -442,7 +441,7 @@ export function Home() {
                       />
                     </div>
                   </div>
-                  <OccurrenceContext
+                  {/* <OccurrenceContext
                     terms={
                       (thereAreTickets &&
                         tickets!.filter((t) => t.id === selectedTicket)[0]
@@ -541,7 +540,7 @@ export function Home() {
                         </button>
                       ))}
                     </div>
-                  </OccurrenceContext>
+                  </OccurrenceContext> */}
                 </div>
               </motion.div>
             )}

@@ -1,25 +1,25 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse } from "./models/dbStructs";
 
-export type QueryParams = {
-  terms: string[];
+export type ContextQueryParams = {
+  terms: string;
   year?: number;
   end_year?: number;
   month?: number;
   end_month?: number;
-  codes?: string[] | null;
-  cursor?: number | null;
-  limit?: number | null;
-  link_term?: string | null;
-  link_distance?: number | null;
+  codes?: string[];
+  cursor?: number;
+  limit?: number;
+  link_term?: string;
+  link_distance?: number;
   source?: "book" | "periodical" | "all";
   sort?: "date" | "relevance";
-  row_split?: boolean | null;
-  include_page_text?: boolean | null;
-  all_context?: boolean | null;
+  row_split?: boolean;
+  include_page_text?: boolean;
+  all_context?: boolean;
 };
 
-export async function fetchContext(args: QueryParams) {
+export async function fetchContext(args: ContextQueryParams) {
   let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
