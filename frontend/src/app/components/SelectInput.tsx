@@ -10,6 +10,7 @@ interface SelectInputProps<T extends SelectOptions> {
   value?: Option<T>;
   label?: string;
 }
+
 export function SelectInput<T extends SelectOptions>({
   options,
   onChange,
@@ -22,7 +23,7 @@ export function SelectInput<T extends SelectOptions>({
         {label}
       </label>
       <select
-        className={"border rounded-lg bg-white p-3 hover:cursor-pointer"}
+        className={"shadow-md rounded-lg bg-white p-3 hover:cursor-pointer"}
         onChange={(e) => {
           if (typeof options[0] === "number") {
             onChange(parseInt(e.target.value) as Option<T>);

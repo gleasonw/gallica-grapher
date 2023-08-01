@@ -331,7 +331,6 @@ export function Home() {
           />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <NavBar />
         <div className={"flex flex-col"}>
           <title>{translation.title}</title>
           <div className="m-10 mt-20 text-center text-4xl">

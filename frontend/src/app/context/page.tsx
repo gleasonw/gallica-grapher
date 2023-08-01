@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { z } from "zod";
 import { OCRTable } from "../components/OCRTable";
 import { ImageTable } from "../components/ImageTable";
+import { ContextInputForm } from "./components/ContextInputForm";
 
 const searchPageState = z.object({
   terms: z.string().optional(),
@@ -19,8 +20,7 @@ const searchPageState = z.object({
   codes: z.string().array().optional(),
   limit: z.coerce.number().optional(),
   sort: z.literal("date").or(z.literal("relevance")).optional(),
-  cursor: z.number().optional(),
-  contextType: z.literal("ocr").or(z.literal("image")).optional(),
+  cursor: z.coerce.number().optional(),
 });
 
 export default async function Page({ searchParams }: { searchParams: any }) {
@@ -29,7 +29,20 @@ export default async function Page({ searchParams }: { searchParams: any }) {
     return <div>Invalid search params: {result.error.message}</div>;
   }
 
-  const loadingSkeleton = (
+  const params = result.data;
+  const contextParams = { ...params, terms: params.terms ?? "" };
+
+  return (
+    <ContextInputForm num_results={1000} params={contextParams}>
+      <Suspense fallback={<ContextLoadingSkeleton />}>
+        <ImageTable params={contextParams} />
+      </Suspense>
+    </ContextInputForm>
+  );
+}
+
+export function ContextLoadingSkeleton() {
+  return (
     <div className={"flex flex-col gap-20 md:m-5"}>
       {[...Array(10)].map((_, i) => (
         <div
@@ -46,21 +59,4 @@ export default async function Page({ searchParams }: { searchParams: any }) {
       ))}
     </div>
   );
-
-  const params = result.data;
-  const contextParams = { ...params, terms: params.terms ?? "choucroute" };
-
-  if (!params.contextType || params.contextType === "image") {
-    return (
-      <Suspense fallback={loadingSkeleton}>
-        <ImageTable params={contextParams} />
-      </Suspense>
-    );
-  } else {
-    return (
-      <Suspense fallback={<div>Loading...</div>}>
-        <OCRTable params={contextParams} />
-      </Suspense>
-    );
-  }
 }

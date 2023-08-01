@@ -1,6 +1,7 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import Link from "next/link";
 import Image from "next/image";
+import * as Dialog from "@radix-ui/react-dialog";
 
 export async function ImageSnippet({
   ark,
@@ -35,12 +36,12 @@ export async function ImageSnippet({
   const data = await doFetch();
 
   return (
-    <Link href={url} target={"_blank"}>
+    <div className={"relative w-full h-full"}>
       {data?.image ? (
-        <Image src={data.image} alt={term} width={700} height={80} />
+        <Image src={data.image} alt={term} fill={true} objectFit="contain" />
       ) : (
         <div>aucune image disponible 😔</div>
       )}
-    </Link>
+    </div>
   );
 }

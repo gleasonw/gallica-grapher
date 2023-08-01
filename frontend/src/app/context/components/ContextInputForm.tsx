@@ -11,6 +11,7 @@ import { addQueryParamsIfExist } from "../../utils/addQueryParamsIfExist";
 import { ContextQueryParams } from "../../components/fetchContext";
 import { ToggleOptions } from "../../components/ToggleOptions";
 import { QueryPagination } from "../../components/QueryPagination";
+import { ContextLoadingSkeleton } from "../page";
 
 export const strings = {
   fr: {
@@ -31,12 +32,14 @@ export const strings = {
 export type ContextInputFormProps = {
   params: ContextQueryParams & { contextType?: "image" | "ocr" };
   num_results: number;
+  children: React.ReactNode;
 };
 
+type FormState = Partial<ContextQueryParams & { contextType: "image" | "ocr" }>;
+
 export function ContextInputForm(props: ContextInputFormProps) {
-  const [contextParams, setContextParams] = useState<
-    Partial<ContextQueryParams & { contextType: "image" | "ocr" }>
-  >(props.params);
+  const [contextParams, setContextParams] = useState<FormState>(props.params);
+  const [isPending, startTransition] = React.useTransition();
 
   const translation = strings.fr;
 
@@ -44,7 +47,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
   function handleSubmit() {
     const url = addQueryParamsIfExist("/context", contextParams);
-    router.push(url);
+    startTransition(() => router.push(url));
   }
 
   const params = props.params;
@@ -60,6 +63,16 @@ export function ContextInputForm(props: ContextInputFormProps) {
     });
   }
 
+  function handleUpdateParams<T extends keyof FormState>(
+    key: T,
+    value: FormState[T]
+  ) {
+    setContextParams({
+      ...contextParams,
+      [key]: value,
+    });
+  }
+
   return (
     <div
       className={
@@ -68,9 +81,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
     >
       <InputBubble
         word={contextParams.terms ?? ""}
-        onWordChange={(word) =>
-          setContextParams({ ...contextParams, terms: word })
-        }
+        onWordChange={(word) => handleUpdateParams("terms", word)}
         onSubmit={handleSubmit}
       >
         <button
@@ -99,10 +110,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           options={["book", "periodical", "all"] as const}
           value={contextParams.source}
           onChange={(new_source) => {
-            setContextParams({
-              ...contextParams,
-              source: new_source,
-            });
+            handleUpdateParams("source", new_source);
           }}
         />
         <SelectInput
@@ -120,7 +128,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           label={"limit"}
           value={contextParams.limit}
           options={[10, 20, 50]}
-          onChange={(limit) => setContextParams({ ...contextParams, limit })}
+          onChange={(limit) => handleUpdateParams("limit", limit)}
         />
       </div>
       <div className="flex flex-wrap gap-5 items-center">
@@ -128,7 +136,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           type="text"
           value={contextParams.link_term || ""}
           onChange={(e) =>
-            setContextParams({ ...contextParams, link_term: e.target.value })
+            handleUpdateParams("link_term", e.target.value || undefined)
           }
           className={"border p-2 rounded-lg shadow-sm"}
           placeholder={translation.linkTerm}
@@ -140,30 +148,25 @@ export function ContextInputForm(props: ContextInputFormProps) {
           onChange={(e) => {
             const numVal = parseInt(e.target.value);
             if (typeof numVal === "number" && !isNaN(numVal) && numVal >= 0) {
-              setContextParams({ ...contextParams, link_distance: numVal });
+              handleUpdateParams("link_distance", numVal);
             } else if (e.target.value === "") {
-              setContextParams({
-                ...contextParams,
-                link_distance: undefined,
-              });
+              handleUpdateParams("link_distance", undefined);
             }
           }}
           className={"border p-2 rounded-lg shadow-sm"}
           placeholder={translation.linkDistance}
         />
       </div>
-      <ToggleOptions
-        options={["image", "ocr"] as const}
-        value={contextParams.contextType ?? "image"}
-        onChange={(value) =>
-          setContextParams({ ...contextParams, contextType: value })
-        }
-      />
+
       <QueryPagination
         cursorMax={totalPages}
         selectedPage={currentPage}
         onChange={setNewPage}
       />
+      {
+        // a suspense workaround since next router.push() is buggy and doesn't navigate immediately
+        isPending ? <ContextLoadingSkeleton /> : props.children
+      }
     </div>
   );
 }
