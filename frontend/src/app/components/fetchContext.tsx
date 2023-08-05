@@ -1,5 +1,5 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import { GallicaResponse } from "./models/dbStructs";
+import { GallicaResponse, VolumeRecord } from "./models/dbStructs";
 
 export type ContextQueryParams = {
   terms: string;
@@ -20,13 +20,45 @@ export type ContextQueryParams = {
 };
 
 export async function fetchContext(args: ContextQueryParams) {
-  let baseUrl = `https://gallica-grapher.ew.r.appspot.com/api/gallicaRecords`;
+  let baseUrl = `https://gallica-grapher-production.up.railway.app/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
-    all_context: true,
+    all_context: false,
     row_split: true,
     limit: 10,
   });
   const response = await fetch(url);
   return (await response.json()) as GallicaResponse;
+}
+
+export async function fetchSRU(args: ContextQueryParams) {
+  let baseUrl = `https://gallica-grapher-production.up.railway.app/api/sru`;
+  let url = addQueryParamsIfExist(baseUrl, {
+    ...args,
+  });
+  const response = await fetch(url);
+  return (await response.json()) as {
+    records: VolumeRecord[];
+    total_records: number;
+    origin_urls: string[];
+  };
+}
+
+export async function fetchVolumeContext({
+  ark,
+  term,
+}: {
+  ark: string;
+  term: string;
+}) {
+  const response = await fetch(
+    `https://gallica-grapher-production.up.railway.app/api/volume?term=${term}&ark=${ark}`
+  );
+  const data = (await response.json()) as {
+    pivot: string;
+    right_context: string;
+    left_context: string;
+    page_num: number;
+  }[];
+  return data;
 }

@@ -1,8 +1,15 @@
 import React, { Suspense } from "react";
 import { z } from "zod";
-import { OCRTable } from "../components/OCRTable";
-import { ImageTable } from "../components/ImageTable";
 import { ContextInputForm } from "./components/ContextInputForm";
+import {
+  fetchContext,
+  fetchSRU,
+  fetchVolumeContext,
+} from "../components/fetchContext";
+import { OCRTable } from "../components/OCRTable";
+import { ImageSnippet } from "../components/ImageSnippet";
+import { VolumeRecord } from "../components/models/dbStructs";
+import ContextViewer from "../components/ContextViewer";
 
 const searchPageState = z.object({
   terms: z.string().optional(),
@@ -31,13 +38,55 @@ export default async function Page({ searchParams }: { searchParams: any }) {
 
   const params = result.data;
   const contextParams = { ...params, terms: params.terms ?? "" };
+  const data = await fetchSRU(contextParams);
+
+  const maybeNumberResults = data.total_records;
+  let numResults = 0;
+  if (!isNaN(maybeNumberResults) && maybeNumberResults > 0) {
+    numResults = maybeNumberResults;
+  }
 
   return (
-    <ContextInputForm num_results={1000} params={contextParams}>
-      <Suspense fallback={<ContextLoadingSkeleton />}>
-        <ImageTable params={contextParams} />
-      </Suspense>
+    <ContextInputForm params={contextParams} num_results={numResults}>
+      <div className={"flex flex-col gap-20 md:m-5"}>
+        {data.records?.map((record) => (
+          <div
+            key={record.ark}
+            className={
+              "border-gray-400 border md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5 items-center w-full"
+            }
+          >
+            <Suspense fallback={<div>Loading OCR</div>}>
+              <h1 className={"text-xl pb-5 font-bold"}>{record.paper_title}</h1>
+              <h2 className={"text-lg pb-3"}>{record.date}</h2>
+              <h3>{record.author}</h3>
+              <VolumeContext ark={record.ark} term={record.terms[0]} />
+            </Suspense>
+          </div>
+        ))}
+      </div>
     </ContextInputForm>
+  );
+}
+
+export async function VolumeContext({
+  ark,
+  term,
+}: {
+  ark: string;
+  term: string;
+}) {
+  const volumeData = await fetchVolumeContext({ ark, term });
+  return (
+    <ContextViewer data={volumeData}>
+      <Suspense fallback={<div>Loading image</div>} key={ark}>
+        <ImageSnippet
+          ark={ark}
+          term={term}
+          pageNumber={volumeData[0].page_num}
+        />
+      </Suspense>
+    </ContextViewer>
   );
 }
 
@@ -48,7 +97,7 @@ export function ContextLoadingSkeleton() {
         <div
           key={i}
           className={
-            "animate-pulse md:border border-gray-400 md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5 items-center"
+            "animate-pulse md:border border-gray-400 md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5 items-center w-full"
           }
         >
           <div className={"text-lg bg-gray-400 rounded h-6 w-3/4 mb-4"}></div>
