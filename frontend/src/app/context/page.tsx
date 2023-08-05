@@ -6,9 +6,7 @@ import {
   fetchSRU,
   fetchVolumeContext,
 } from "../components/fetchContext";
-import { OCRTable } from "../components/OCRTable";
 import { ImageSnippet } from "../components/ImageSnippet";
-import { VolumeRecord } from "../components/models/dbStructs";
 import ContextViewer from "../components/ContextViewer";
 
 const searchPageState = z.object({
@@ -30,7 +28,11 @@ const searchPageState = z.object({
   cursor: z.coerce.number().optional(),
 });
 
-export default async function Page({ searchParams }: { searchParams: any }) {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string, any>;
+}) {
   const result = searchPageState.safeParse(searchParams);
   if (!result.success) {
     return <div>Invalid search params: {result.error.message}</div>;
@@ -44,6 +46,13 @@ export default async function Page({ searchParams }: { searchParams: any }) {
   let numResults = 0;
   if (!isNaN(maybeNumberResults) && maybeNumberResults > 0) {
     numResults = maybeNumberResults;
+  }
+  console.log(searchParams);
+
+  function getArkImageFromParams(ark: string) {
+    if (Object.keys(searchParams)?.includes(`arkPage${ark}`)) {
+      return searchParams[`arkPage${ark}`];
+    }
   }
 
   return (
@@ -60,7 +69,11 @@ export default async function Page({ searchParams }: { searchParams: any }) {
               <h1 className={"text-xl pb-5 font-bold"}>{record.paper_title}</h1>
               <h2 className={"text-lg pb-3"}>{record.date}</h2>
               <h3>{record.author}</h3>
-              <VolumeContext ark={record.ark} term={record.terms[0]} />
+              <VolumeContext
+                ark={record.ark}
+                term={record.terms[0]}
+                pageNum={getArkImageFromParams(record.ark)}
+              />
             </Suspense>
           </div>
         ))}
@@ -72,18 +85,21 @@ export default async function Page({ searchParams }: { searchParams: any }) {
 export async function VolumeContext({
   ark,
   term,
+  pageNum,
 }: {
   ark: string;
   term: string;
+  pageNum?: number;
 }) {
   const volumeData = await fetchVolumeContext({ ark, term });
+  console.log("page num!", pageNum);
   return (
-    <ContextViewer data={volumeData}>
+    <ContextViewer data={volumeData} ark={ark}>
       <Suspense fallback={<div>Loading image</div>} key={ark}>
         <ImageSnippet
           ark={ark}
           term={term}
-          pageNumber={volumeData[0].page_num}
+          pageNumber={pageNum ?? volumeData[0].page_num}
         />
       </Suspense>
     </ContextViewer>
