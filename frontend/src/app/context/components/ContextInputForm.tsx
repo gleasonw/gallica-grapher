@@ -9,7 +9,7 @@ import { SelectInput } from "../../components/SelectInput";
 import { useRouter } from "next/navigation";
 import { addQueryParamsIfExist } from "../../utils/addQueryParamsIfExist";
 import { ContextQueryParams } from "../../components/fetchContext";
-import { ToggleOptions } from "../../components/ToggleOptions";
+import { ToggleOptions } from "../../design_system/ToggleOptions";
 import { QueryPagination } from "../../components/QueryPagination";
 import { ContextLoadingSkeleton } from "../page";
 
@@ -38,6 +38,9 @@ export type ContextInputFormProps = {
 type FormState = Partial<ContextQueryParams & { contextType: "image" | "ocr" }>;
 
 export function ContextInputForm(props: ContextInputFormProps) {
+  const [locallySelectedPage, setLocallySelectedPage] = React.useState<
+    number | null
+  >(null);
   const [contextParams, setContextParams] = useState<FormState>(props.params);
   const [isPending, startTransition] = React.useTransition();
 
@@ -45,19 +48,21 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
   const router = useRouter();
 
-  function handleSubmit() {
-    const url = addQueryParamsIfExist("/context", contextParams);
+  function handleSubmit(params: FormState) {
+    const url = addQueryParamsIfExist("/context", params);
     startTransition(() => router.push(url));
   }
 
   const params = props.params;
 
-  const currentPage = Math.ceil((params.cursor ?? 0) / (params.limit ?? 10));
+  const currentPage = Math.floor((params.cursor ?? 0) / 10) + 1;
 
-  const totalPages = Math.ceil((props.num_results ?? 0) / (params.limit ?? 10));
+  const totalPages = Math.floor((props.num_results ?? 0) / 10);
 
   function setNewPage(newPage: number) {
-    setContextParams({
+    console.log("newPage", newPage);
+    setLocallySelectedPage(newPage);
+    handleSubmit({
       ...contextParams,
       cursor: (newPage - 1) * (params.limit ?? 10),
     });
@@ -73,6 +78,8 @@ export function ContextInputForm(props: ContextInputFormProps) {
     });
   }
 
+  const referencePage = isPending ? locallySelectedPage : currentPage;
+
   return (
     <>
       <div
@@ -83,10 +90,10 @@ export function ContextInputForm(props: ContextInputFormProps) {
         <InputBubble
           word={contextParams.terms ?? ""}
           onWordChange={(word) => handleUpdateParams("terms", word)}
-          onSubmit={handleSubmit}
+          onSubmit={() => handleSubmit(contextParams)}
         >
           <button
-            onSubmit={handleSubmit}
+            onSubmit={() => handleSubmit(contextParams)}
             className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md"
           >
             Explore
@@ -161,7 +168,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
         <QueryPagination
           cursorMax={totalPages}
-          selectedPage={currentPage}
+          selectedPage={referencePage ?? 1}
           onChange={setNewPage}
         />
       </div>

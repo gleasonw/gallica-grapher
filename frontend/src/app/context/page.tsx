@@ -47,7 +47,6 @@ export default async function Page({
   if (!isNaN(maybeNumberResults) && maybeNumberResults > 0) {
     numResults = maybeNumberResults;
   }
-  console.log(searchParams);
 
   function getArkImageFromParams(ark: string) {
     if (Object.keys(searchParams)?.includes(`arkPage${ark}`)) {
@@ -62,13 +61,17 @@ export default async function Page({
           <div
             key={record.ark}
             className={
-              "border-gray-400 border md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5 items-center w-full"
+              "border-gray-400 border md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5  w-full"
             }
           >
             <Suspense fallback={<div>Loading OCR</div>}>
-              <h1 className={"text-xl pb-5 font-bold"}>{record.paper_title}</h1>
-              <h2 className={"text-lg pb-3"}>{record.date}</h2>
-              <h3>{record.author}</h3>
+              <h1 className={"flex flex-col gap-5 flex-wrap"}>
+                <span className={"text-lg font-bold"}>
+                  {record.paper_title}
+                </span>
+                <span>{record.date}</span>
+                <span>{record.author}</span>
+              </h1>
               <VolumeContext
                 ark={record.ark}
                 term={record.terms[0]}
@@ -92,10 +95,14 @@ export async function VolumeContext({
   pageNum?: number;
 }) {
   const volumeData = await fetchVolumeContext({ ark, term });
-  console.log("page num!", pageNum);
   return (
     <ContextViewer data={volumeData} ark={ark}>
-      <Suspense fallback={<div>Loading image</div>} key={ark}>
+      <Suspense
+        fallback={
+          <div className={"bg-gray-400 rounded h-80 w-full mb-4"}></div>
+        }
+        key={ark}
+      >
         <ImageSnippet
           ark={ark}
           term={term}
