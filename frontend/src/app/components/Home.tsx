@@ -1,5 +1,5 @@
 import React from "react";
-import { InputForm } from "../components/InputForm";
+import { GraphSeriesForm } from "../components/InputForm";
 import {
   graphStateReducer,
   GraphPageState,
@@ -337,7 +337,7 @@ export function Home() {
             {" "}
             {translation.description}{" "}
           </div>
-          <InputForm
+          <GraphSeriesForm
             onCreateTicket={(ticket) =>
               graphStateDispatch({
                 type: "add_ticket",

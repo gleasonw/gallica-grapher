@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { GraphTicket } from "./GraphTicket";
 import { SearchProgress } from "./SearchProgress";
@@ -16,13 +18,6 @@ import {
 } from "./GraphContext";
 import { SelectInput } from "./SelectInput";
 import { GraphData } from "./models/dbStructs";
-
-export interface InputFormProps {
-  onCreateTicket: (ticket: GraphTicket) => void;
-  onDeleteTicket: (ticketID: number) => void;
-  onDeleteExampleTickets: () => void;
-  tickets?: GraphTicket[];
-}
 
 const strings = {
   fr: {
@@ -44,12 +39,7 @@ interface FetchingTicket extends GraphTicket {
   replacingTicketID?: number;
 }
 
-export const InputForm: React.FC<InputFormProps> = ({
-  onCreateTicket,
-  onDeleteTicket,
-  tickets,
-  onDeleteExampleTickets,
-}) => {
+export function GraphSeriesForm() {
   const [word, setWord] = useState<string>("");
 
   const [fetchingTickets, setFetchingTickets] = useState<FetchingTicket[]>([]);
@@ -242,7 +232,7 @@ export const InputForm: React.FC<InputFormProps> = ({
       <div className={"m-2"} />
     </DashboardLayout>
   );
-};
+}
 
 function TicketRow(props: {
   tickets?: GraphTicket[];
@@ -307,12 +297,7 @@ interface TicketProps {
   refetching?: boolean;
 }
 
-const TicketCard: React.FC<TicketProps> = ({
-  ticket,
-  onClick,
-  color,
-  refetching,
-}) => {
+const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
   return (
     <button
       onClick={() => onClick(ticket.id)}

@@ -9,31 +9,12 @@ import {
 import { ImageSnippet } from "../components/ImageSnippet";
 import ContextViewer from "../components/ContextViewer";
 
-const searchPageState = z.object({
-  terms: z.string().optional(),
-  year: z.coerce.number().optional(),
-  end_year: z.coerce.number().optional(),
-  month: z.coerce.number().optional(),
-  day: z.coerce.number().optional(),
-  source: z
-    .literal("book")
-    .or(z.literal("periodical"))
-    .or(z.literal("all"))
-    .optional(),
-  link_term: z.string().optional(),
-  link_distance: z.coerce.number().optional(),
-  codes: z.string().array().optional(),
-  limit: z.coerce.number().optional(),
-  sort: z.literal("date").or(z.literal("relevance")).optional(),
-  cursor: z.coerce.number().optional(),
-});
-
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string, any>;
 }) {
-  const result = searchPageState.safeParse(searchParams);
+  const result = searchState.safeParse(searchParams);
   if (!result.success) {
     return <div>Invalid search params: {result.error.message}</div>;
   }
