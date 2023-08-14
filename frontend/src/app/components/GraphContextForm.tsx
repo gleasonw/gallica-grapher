@@ -1,6 +1,7 @@
 "use client";
 
 import { InputLabel } from "./InputLabel";
+import { QueryPagination } from "./QueryPagination";
 import { SelectInput } from "./SelectInput";
 
 const gallica_plug = (
@@ -150,34 +151,7 @@ export default function GraphContextForm({
             ))}
           </select>
         </InputLabel>
-        <InputLabel label={lang === "fr" ? "Périodique" : "Periodical"}>
-          <PaperDropdown
-            onClick={(paper) => {
-              if (selectedPapers) {
-                setSelectedPapers([...selectedPapers, paper]);
-              } else {
-                setSelectedPapers([paper]);
-              }
-            }}
-          />
-        </InputLabel>
-      </div>
-      <div className={"flex flex-row flex-wrap"}>
-        {selectedPapers?.map((paper) => (
-          <button
-            onClick={() => {
-              if (selectedPapers) {
-                setSelectedPapers(
-                  selectedPapers.filter((p) => p.code !== paper.code)
-                );
-              }
-            }}
-            key={paper.code}
-            className={"m-5 ml-0 mb-0 border p-5 hover:bg-zinc-100"}
-          >
-            {paper.title}
-          </button>
-        ))}
+        <QueryPagination numResults={numResults} />
       </div>
     </>
   );
