@@ -66,7 +66,7 @@ export default function ContextViewer({
       </div>
       <div className={"flex flex-col gap-5"}>
         {data
-          ?.filter((page) => page.page_num === pageNumber)
+          ?.filter((page) => page.page_num === referencePage)
           .map((page) => (
             <span
               key={`${page.left_context}${page.page_num}${page.right_context}`}

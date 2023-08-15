@@ -2,7 +2,7 @@ import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { GallicaResponse, VolumeRecord } from "./models/dbStructs";
 
 export type ContextQueryParams = {
-  terms: string;
+  terms: string[];
   year?: number;
   end_year?: number;
   month?: number;

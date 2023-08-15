@@ -1,11 +1,6 @@
 import React, { Suspense } from "react";
-import { z } from "zod";
 import { ContextInputForm } from "./components/ContextInputForm";
-import {
-  fetchContext,
-  fetchSRU,
-  fetchVolumeContext,
-} from "../components/fetchContext";
+import { fetchSRU, fetchVolumeContext } from "../components/fetchContext";
 import { ImageSnippet } from "../components/ImageSnippet";
 import ContextViewer from "../components/ContextViewer";
 import { getSearchStateFromURL } from "../utils/getSearchStateFromURL";
@@ -15,11 +10,8 @@ export default async function Page({
 }: {
   searchParams: Record<string, any>;
 }) {
-  const { searchState: params, error } = getSearchStateFromURL(searchParams);
-  if (error) {
-    return <div>{error}</div>;
-  }
-  const contextParams = { ...params, terms: params?.terms ?? "" };
+  const params = getSearchStateFromURL(searchParams);
+  const contextParams = { ...params, terms: params?.terms ?? [] };
   const data = await fetchSRU(contextParams);
 
   const maybeNumberResults = data.total_records;

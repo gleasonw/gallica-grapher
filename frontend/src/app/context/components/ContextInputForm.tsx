@@ -9,7 +9,6 @@ import { SelectInput } from "../../components/SelectInput";
 import { useRouter } from "next/navigation";
 import { addQueryParamsIfExist } from "../../utils/addQueryParamsIfExist";
 import { ContextQueryParams } from "../../components/fetchContext";
-import { ToggleOptions } from "../../design_system/ToggleOptions";
 import { QueryPagination } from "../../components/QueryPagination";
 import { ContextLoadingSkeleton } from "../page";
 
@@ -88,12 +87,12 @@ export function ContextInputForm(props: ContextInputFormProps) {
         }
       >
         <InputBubble
-          word={contextParams.terms ?? ""}
-          onWordChange={(word) => handleUpdateParams("terms", word)}
+          word={contextParams.terms?.[0] ?? ""}
+          onWordChange={(word) => handleUpdateParams("terms", [word])}
           onSubmit={() => handleSubmit(contextParams)}
         >
           <button
-            onSubmit={() => handleSubmit(contextParams)}
+            onClick={() => handleSubmit(contextParams)}
             className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md"
           >
             Explore

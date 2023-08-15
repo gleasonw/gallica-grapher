@@ -12,7 +12,7 @@ export function QueryPagination({
   return (
     <div
       className={
-        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl "
+        "flex flex-row justify-center items-center text-lg md:text-xl lg:text-xl "
       }
     >
       <div
@@ -104,7 +104,7 @@ export function CursorInput({ cursor, cursorMax, onChange }: CursorInputProps) {
       type={"number"}
       value={localCursor}
       onChange={(e) => setLocalCursor(e.target.valueAsNumber)}
-      className={"w-full max-w-max border rounded-md"}
+      className={"w-24 border rounded-md"}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
