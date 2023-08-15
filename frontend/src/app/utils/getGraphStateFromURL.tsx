@@ -7,13 +7,10 @@ export const graphState = z.object({
 
 export type GraphState = z.infer<typeof graphState>;
 
-export function getGraphStateFromURL(params: Record<string, any>): {
-  graphState?: z.infer<typeof graphState>;
-  error?: string;
-} {
+export function getGraphStateFromURL(params: Record<string, any>) {
   const result = graphState.safeParse(params);
   if (!result.success) {
-    return { error: result.error.message };
+    return {};
   }
-  return { graphState: result.data };
+  return result.data;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { GraphSeriesForm } from "../components/InputForm";
+import { GraphSeriesForm } from "./GraphSeriesForm";
 import {
   graphStateReducer,
   GraphPageState,

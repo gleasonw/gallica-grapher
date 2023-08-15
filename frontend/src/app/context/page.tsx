@@ -8,19 +8,18 @@ import {
 } from "../components/fetchContext";
 import { ImageSnippet } from "../components/ImageSnippet";
 import ContextViewer from "../components/ContextViewer";
+import { getSearchStateFromURL } from "../utils/getSearchStateFromURL";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string, any>;
 }) {
-  const result = searchState.safeParse(searchParams);
-  if (!result.success) {
-    return <div>Invalid search params: {result.error.message}</div>;
+  const { searchState: params, error } = getSearchStateFromURL(searchParams);
+  if (error) {
+    return <div>{error}</div>;
   }
-
-  const params = result.data;
-  const contextParams = { ...params, terms: params.terms ?? "" };
+  const contextParams = { ...params, terms: params?.terms ?? "" };
   const data = await fetchSRU(contextParams);
 
   const maybeNumberResults = data.total_records;

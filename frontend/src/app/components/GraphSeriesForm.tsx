@@ -235,9 +235,7 @@ export function GraphSeriesForm() {
 }
 
 function TicketRow(props: {
-  tickets?: GraphTicket[];
   children?: React.ReactNode;
-  onGraphedTicketCardClick: (ticketID: number) => void;
   submitted: boolean;
   refetching: boolean;
 }) {
@@ -253,13 +251,18 @@ function TicketRow(props: {
               <Spinner isFetching />
             </ColorBubble>
           ) : (
-            <TicketCard
-              key={ticket.id}
-              ticket={ticket}
-              onClick={props.onGraphedTicketCardClick}
-              color={seriesColors[index % seriesColors.length]}
-              refetching={props.refetching}
-            />
+            <button
+              onClick={() => onClick(ticket.id)}
+              className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
+              style={{ borderColor: seriesColors[index % seriesColors.length] }}
+            >
+              <div className={`relative h-full w-full flex flex-col`}>
+                <div className={"flex flex-row gap-10"}>
+                  <p>{ticket.terms.join(", ")}</p>
+                  <p className={"text-zinc-600"}>x</p>
+                </div>
+              </div>
+            </button>
           )
         )}
         {props.submitted && (
@@ -289,27 +292,3 @@ function ColorBubble(props: { color: string; children: React.ReactNode }) {
     </div>
   );
 }
-
-interface TicketProps {
-  ticket: GraphTicket;
-  onClick: (ticketID: number) => void;
-  color?: string;
-  refetching?: boolean;
-}
-
-const TicketCard: React.FC<TicketProps> = ({ ticket, onClick, color }) => {
-  return (
-    <button
-      onClick={() => onClick(ticket.id)}
-      className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
-      style={{ borderColor: color }}
-    >
-      <div className={`relative h-full w-full flex flex-col`}>
-        <div className={"flex flex-row gap-10"}>
-          <p>{ticket.terms.join(", ")}</p>
-          <p className={"text-zinc-600"}>x</p>
-        </div>
-      </div>
-    </button>
-  );
-};

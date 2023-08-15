@@ -1,13 +1,15 @@
 import React from "react";
-import { GraphSeriesForm } from "./components/InputForm";
+import { GraphSeriesForm } from "./components/GraphSeriesForm";
 import Head from "next/head";
 import { apiURL } from "./components/apiURL";
 import { GraphData } from "./components/models/dbStructs";
 import { Chart } from "./components/Chart";
 import GraphContextForm from "./components/GraphContextForm";
-import { getSearchStateFromURL } from "./utils/getSearchStateFromURL";
+import {
+  SearchState,
+  getSearchStateFromURL,
+} from "./utils/getSearchStateFromURL";
 import { GraphState, getGraphStateFromURL } from "./utils/getGraphStateFromURL";
-import { SearchPageState } from "./components/SearchStateReducer";
 import { addQueryParamsIfExist } from "./utils/addQueryParamsIfExist";
 import { fetchSRU } from "./components/fetchContext";
 
@@ -21,24 +23,23 @@ const strings = {
   },
 };
 
-async function getPreexistingSeries(args: SearchPageState & GraphState) {
+async function getPreexistingSeries(args: SearchState & GraphState) {
   const ticketSeries = await fetch(
     addQueryParamsIfExist(`${apiURL}/api/graphData`, args)
   );
   return (await ticketSeries.json()) as GraphData;
 }
 
-export default async function Page(searchParams: Record<string, any>) {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string, any>;
+}) {
   const translation = strings["fr"];
 
-  const { searchState, error: searchError } =
-    getSearchStateFromURL(searchParams);
+  const searchState = getSearchStateFromURL(searchParams);
 
-  const { graphState, error: graphError } = getGraphStateFromURL(searchParams);
-
-  if (searchError || graphError) {
-    console.log(searchError, graphError);
-  }
+  const graphState = getGraphStateFromURL(searchParams);
 
   let numResults: undefined | number = undefined;
   let seriesData: undefined | GraphData = undefined;
@@ -46,7 +47,7 @@ export default async function Page(searchParams: Record<string, any>) {
   if (searchState) {
     const data = await fetchSRU({
       ...searchState,
-      terms: searchState.terms ?? "",
+      terms: searchState.terms?.[0] ?? "",
     });
     numResults = data.total_records;
     seriesData = await getPreexistingSeries({
@@ -71,8 +72,8 @@ export default async function Page(searchParams: Record<string, any>) {
           {" "}
           {translation.description}{" "}
         </div>
-        <GraphSeriesForm />
-        <Chart series={seriesData} />
+        {/* <GraphSeriesForm />
+        <Chart series={seriesData} /> */}
         <GraphContextForm numResults={numResults} />
       </div>
     </>

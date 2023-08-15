@@ -1,7 +1,7 @@
 "use client";
 
+import { useSearchState } from "../composables/useSearchState";
 import { InputLabel } from "./InputLabel";
-import { QueryPagination } from "./QueryPagination";
 import { SelectInput } from "./SelectInput";
 
 const gallica_plug = (
@@ -87,71 +87,59 @@ export default function GraphContextForm({
   numResults?: number;
 }) {
   const translation = strings["fr"];
+  const { terms, selected_term, year, end_year, month } = useSearchState();
+  console.log(terms);
+
   return (
     <>
       <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
         {translation.gallicagram_plug}
         <div className={"flex wrap gap-10"}>
           <SelectInput
-            options={tickets?.map((ticket) => ticket.terms[0]) ?? []}
-            onChange={(value: string) =>
-              setSelectedTicket(
-                tickets?.filter((t) => t.terms[0] === value)[0].id
-              )
-            }
-            value={
-              tickets?.filter((t) => t.id === selectedTicket)?.[0]?.terms[0]
-            }
+            options={terms?.map((term) => term) ?? []}
+            onChange={(value: string) => console.log(value)}
+            value={terms?.find((t) => t === selected_term)}
           />
           <ContextFilter
-            label={
-              searchFrom && searchTo ? `${searchFrom} - ${searchTo}` : undefined
-            }
+            onClick={() => console.log("clear year")}
+            label={year && end_year ? `${year} - ${end_year}` : undefined}
           />
           <ContextFilter
             label={month ? translation.months[month - 1] : undefined}
-            onClick={() => setMonth(undefined)}
+            onClick={() => console.log("clear month")}
           />
         </div>
       </div>
 
       <div className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}>
-        <InputLabel label={lang === "fr" ? "Année" : "Year"}>
+        <InputLabel label={"Année"}>
           <input
             type={"number"}
             className={"border rounded-lg bg-white p-3"}
-            value={searchFrom || ""}
-            onChange={(e) => {
-              setSearchFrom(parseInt(e.target.value));
-              if (searchTo && parseInt(e.target.value) > searchTo) {
-                setSearchTo(parseInt(e.target.value));
-              }
-            }}
+            value={year || ""}
+            onChange={(e) => console.log(e)}
           />
         </InputLabel>
-        <InputLabel label={lang === "fr" ? "Mois" : "Month"}>
+        <InputLabel label={"Mois"}>
           <SelectInput
             options={Array.from(Array(12).keys()).map((i) => String(i))}
-            onChange={(value) => setMonth(parseInt(value))}
+            onChange={() => console.log("month!")}
             value={month ? String(month) : undefined}
           />
         </InputLabel>
         <InputLabel label={"Ticket"}>
           <select
-            onChange={(e) => {
-              setSelectedTicket(parseInt(e.target.value));
-            }}
+            onChange={() => console.log("change selected term")}
             className={"border rounded-lg  bg-white p-3"}
-            value={selectedTicket || ""}
+            value={selected_term}
           >
-            {tickets?.map((ticket) => (
-              <option key={ticket.id} value={ticket.id}>
-                {ticket.terms}
+            {terms?.map((term) => (
+              <option key={term} value={term}>
+                {term}
               </option>
             ))}
           </select>
         </InputLabel>
-        <QueryPagination numResults={numResults} />
       </div>
     </>
   );
