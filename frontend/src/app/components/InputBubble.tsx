@@ -1,9 +1,7 @@
-export default function InputBubble({
-  word,
-  onWordChange,
-  onSubmit,
-  children,
-}: {
+import Image from "next/image";
+import glassIcon from "./assets/glass.svg";
+
+export default function InputBubble(props: {
   word: string;
   onWordChange: (word: string) => void;
   onSubmit?: () => void;
@@ -14,18 +12,18 @@ export default function InputBubble({
       <input
         className={"p-5 w-full rounded-3xl border-2 shadow-lg "}
         placeholder={"rechercher un mot"}
-        value={word || ""}
+        value={props.word || ""}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onWordChange(e.target.value)
+          props.onWordChange(e.target.value)
         }
         onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-          if (e.key === "Enter") {
-            onSubmit?.();
+          if (e.key === "Enter" && props.onSubmit) {
+            props.onSubmit();
           }
         }}
       />
       <div className={"m-5"}></div>
-      {children}
+      {props.children}
     </div>
   );
 }

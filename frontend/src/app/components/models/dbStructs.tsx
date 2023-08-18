@@ -38,7 +38,7 @@ export interface ContextRow {
   left_context: string;
   right_context: string;
   page_url: string;
-  page_num: number | null;
+  page: number | null;
 }
 
 export interface Paper {

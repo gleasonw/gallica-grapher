@@ -1,6 +1,5 @@
-"use client";
-
-import { fetchContext } from "./fetchContext";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Cell,
   Row,
@@ -9,22 +8,88 @@ import {
   useGroupBy,
   useTable,
 } from "react-table";
-import React, { Suspense } from "react";
-import { ImageSnippet } from "./ImageSnippet";
+import { useContext } from "react";
+import { LangContext } from "./LangContext";
+import { Spinner } from "./Spinner";
+import { QueryPagination } from "./QueryPagination";
+import { fetchContext } from "./fetchContext";
+
+export type ContextProps = {
+  terms?: string[];
+  link_term?: string;
+  link_distance?: number;
+  codes?: string[];
+  month?: number;
+  yearRange?: [number?, number?];
+  source?: "periodical" | "book" | "all";
+  all_context?: boolean;
+  children: React.ReactNode;
+};
 
 export function OCRTable({
-  data,
-  children,
-}: {
-  data: Awaited<ReturnType<typeof fetchContext>>;
-  children: React.ReactNode[];
+  codes,
+  terms,
+  yearRange,
+  month,
+  source,
+  link_term,
+  link_distance,
+  selectedPage,
+  onSelectedPageChange,
+}: ContextProps & {
+  selectedPage: number;
+  onSelectedPageChange: (page: number) => void;
+  children: React.ReactNode;
 }) {
-  const lang = "fr";
+  const { lang } = useContext(LangContext);
+  const charLimit = 70;
+  const limit = 10;
+
+  // this will be used to check if we can use ssr data... maybe a better way?
+  const currentFetchParams = {
+    yearRange,
+    month,
+    codes,
+    terms,
+    source,
+    link_term,
+    link_distance,
+    selectedPage,
+    limit,
+  };
+
+  const { isFetching, data } = useQuery({
+    queryKey: [
+      "context",
+      yearRange,
+      month,
+      codes,
+      terms,
+      source,
+      link_term,
+      link_distance,
+      selectedPage,
+      limit,
+    ],
+    queryFn: () =>
+      fetchContext({
+        terms: terms ?? [],
+        codes,
+        month,
+        source: source ?? "all",
+        link_term,
+        link_distance,
+        cursor: (selectedPage - 1) * (limit ? limit : 10),
+        year: yearRange?.[0],
+        end_year: month ? undefined : yearRange?.[1],
+      }),
+    staleTime: Infinity,
+  });
 
   const tableData = React.useMemo(
     () =>
       data?.records
-        ?.map((record, recordIndex) => {
+        ?.map((record) => {
           const documentMeta = {
             document: `${record.paper_title}||${record.date}||${record.url}`,
             date: record.date,
@@ -49,7 +114,7 @@ export function OCRTable({
               },
             ];
           }
-          return record.context.map((contextRow, index) => ({
+          return record.context.map((contextRow) => ({
             ...documentMeta,
             page: (
               <div className={"flex"}>
@@ -59,7 +124,7 @@ export function OCRTable({
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {index === 0 && children?.[recordIndex]}
+                  Image
                 </a>
               </div>
             ),
@@ -73,7 +138,7 @@ export function OCRTable({
           }));
         })
         .flat() ?? [],
-    [data, children]
+    [data]
   );
 
   function showFirstWhenAggregated({ value }: { value: string[] }) {
@@ -141,17 +206,35 @@ export function OCRTable({
     useExpanded
   );
   const total_results = Number(data?.num_results) ?? 0;
-  const cursorMax = Math.floor(total_results / 10);
+  const cursorMax = Math.floor(total_results / limit);
 
   return (
     <div className={" flex flex-col justify-center mb-20"}>
-      {tableInstance.data.length > 0 && (
+      {tableInstance.data.length > 0 ? (
         <div>
+          <div className={"ml-5 flex flex-col mb-2"}>
+            <QueryPagination
+              selectedPage={selectedPage}
+              cursorMax={cursorMax}
+              onChange={onSelectedPageChange}
+            />
+            <Spinner isFetching={isFetching} />
+          </div>
           <div>
             <DesktopTable tableInstance={tableInstance} />
             <MobileTable tableInstance={tableInstance} />
           </div>
         </div>
+      ) : isFetching ? (
+        <div
+          className={
+            "bg-gray-400 h-96 rounded w-full mb-4 animate-pulse border m-10"
+          }
+        />
+      ) : (
+        <p className={"text-center"}>
+          No results for these params (or unable to connect to Gallica)
+        </p>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { GraphSeriesForm } from "./GraphSeriesForm";
+import { InputForm } from "../components/InputForm";
 import {
   graphStateReducer,
   GraphPageState,
@@ -9,7 +9,6 @@ import {
   GraphPageStateContext,
 } from "../components/GraphContext";
 import { LangContext } from "../components/LangContext";
-import NavBar from "../components/NavBar";
 import Head from "next/head";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueries } from "@tanstack/react-query";
@@ -21,6 +20,7 @@ import { SelectInput } from "../components/SelectInput";
 import { apiURL } from "../components/apiURL";
 import { makeOptions } from "../components/utils/makeHighcharts";
 import { Paper, GraphData } from "./models/dbStructs";
+import { OCRTable } from "./OCRTable";
 
 const gallica_plug = (
   <a
@@ -137,6 +137,7 @@ export function Home() {
     source: "presse",
     linkTerm: undefined,
   } as GraphPageState);
+  const [selectedPage, setSelectedPage] = React.useState(0);
 
   const { lang } = React.useContext(LangContext);
   const translation = strings[lang];
@@ -173,6 +174,7 @@ export function Home() {
     function updateExtremes(from: number, to: number) {
       const chart = chartComponentRef.current?.chart;
       chart?.xAxis[0].setExtremes(Date.UTC(from, 0, 1), Date.UTC(to, 11, 31));
+      chart?.showResetZoom();
     }
     if (chartComponentRef.current) {
       const chart = chartComponentRef.current.chart;
@@ -315,6 +317,8 @@ export function Home() {
     ticketData
   );
 
+  console.log({ highchartsOpts });
+
   function resetSearchRange() {
     setSearchFrom(undefined);
     setSearchTo(undefined);
@@ -337,7 +341,7 @@ export function Home() {
             {" "}
             {translation.description}{" "}
           </div>
-          <GraphSeriesForm
+          <InputForm
             onCreateTicket={(ticket) =>
               graphStateDispatch({
                 type: "add_ticket",
@@ -358,7 +362,7 @@ export function Home() {
             }
           />
           <AnimatePresence>
-            {tickets && tickets.length > 0 && (
+            {highchartsOpts.series && (
               <motion.div
                 key={"graph"}
                 initial={{ opacity: 0 }}
@@ -440,7 +444,9 @@ export function Home() {
                       />
                     </div>
                   </div>
-                  {/* <OccurrenceContext
+                  <OCRTable
+                    selectedPage={selectedPage}
+                    onSelectedPageChange={setSelectedPage}
                     terms={
                       (thereAreTickets &&
                         tickets!.filter((t) => t.id === selectedTicket)[0]
@@ -539,7 +545,7 @@ export function Home() {
                         </button>
                       ))}
                     </div>
-                  </OccurrenceContext> */}
+                  </OCRTable>
                 </div>
               </motion.div>
             )}

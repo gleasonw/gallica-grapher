@@ -4,6 +4,7 @@ import React from "react";
 import { fetchVolumeContext } from "./fetchContext";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GallicaButton } from "../design_system/GallicaButton";
+import Link from "next/link";
 
 export default function ContextViewer({
   data,
@@ -15,9 +16,7 @@ export default function ContextViewer({
   ark: string;
 }) {
   const [isPending, startTransition] = React.useTransition();
-  const [locallySelectedPage, setLocallySelectedPage] = React.useState<
-    number | null
-  >(null);
+
   const [numShownPages, setNumShownPages] = React.useState(10);
   const pageNumbers = data?.map((page) => page.page_num);
   const uniqueFiltered = pageNumbers
@@ -32,11 +31,18 @@ export default function ContextViewer({
   if (maybePageNumber && !isNaN(parseInt(maybePageNumber))) {
     pageNumber = parseInt(maybePageNumber);
   }
+  const showImage = searchParams.get(`${ark}-withImage`) === "true";
+  const [locallySelectedPage, setLocallySelectedPage] =
+    React.useState(pageNumber);
 
   function handleSetPageNumber(newPageNumber: number) {
     setLocallySelectedPage(newPageNumber);
+    return appendKeyValAndPush(`arkPage${ark}`, newPageNumber.toString());
+  }
+
+  function appendKeyValAndPush(key: string, val: string) {
     const searchParamsCopy = new URLSearchParams(searchParams.toString());
-    searchParamsCopy.set(`arkPage${ark}`, newPageNumber.toString());
+    searchParamsCopy.set(key, val);
     return startTransition(() =>
       router.push(pathName + "?" + searchParamsCopy, { scroll: false })
     );
@@ -60,16 +66,17 @@ export default function ContextViewer({
         ))}
         {numShownPages < uniqueFiltered?.length && (
           <GallicaButton onClick={() => setNumShownPages(numShownPages + 10)}>
-            Show 10 more (out of {uniqueFiltered?.length - numShownPages})
+            Afficher 10 pages supplémentaires (sur{" "}
+            {uniqueFiltered?.length - numShownPages})
           </GallicaButton>
         )}
       </div>
       <div className={"flex flex-col gap-5"}>
         {data
           ?.filter((page) => page.page_num === referencePage)
-          .map((page) => (
+          .map((page, index) => (
             <span
-              key={`${page.left_context}${page.page_num}${page.right_context}`}
+              key={`${page.left_context}${page.page_num}${page.right_context}${index}`}
             >
               {page.left_context}{" "}
               <span className={"text-blue-500 font-medium pl-5 pr-5"}>
@@ -80,11 +87,23 @@ export default function ContextViewer({
           ))}
       </div>
       <div className={"w-full border"} />
-      {isPending ? (
-        <div className={"bg-gray-400 rounded h-80 w-full mb-4"} />
-      ) : (
-        children
-      )}
+      <div className={`transition-all ${isPending && "opacity-50"}`}>
+        {children}
+        {!showImage && (
+          <GallicaButton
+            onClick={() => appendKeyValAndPush(`${ark}-withImage`, "true")}
+          >
+            {"Afficher une image de la page "}
+          </GallicaButton>
+        )}
+      </div>
+      <Link
+        href={`https://gallica.bnf.fr/ark:/12148/${ark}/f${pageNumber}.item`}
+        className={"underline text-blue-500"}
+        target={"_blank"}
+      >
+        Afficher sur Gallica
+      </Link>
     </div>
   );
 }

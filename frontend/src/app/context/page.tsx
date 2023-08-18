@@ -1,9 +1,10 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { ContextInputForm } from "./components/ContextInputForm";
 import { fetchSRU, fetchVolumeContext } from "../components/fetchContext";
 import { ImageSnippet } from "../components/ImageSnippet";
 import ContextViewer from "../components/ContextViewer";
 import { getSearchStateFromURL } from "../utils/getSearchStateFromURL";
+import { VolumeContext } from "../components/VolumeContext";
 
 export default async function Page({
   searchParams,
@@ -26,81 +27,36 @@ export default async function Page({
     }
   }
 
+  function getImageStatusFromParams(ark: string) {
+    if (Object.keys(searchParams)?.includes(`${ark}-withImage`)) {
+      return searchParams[`${ark}-withImage`] === "true";
+    }
+  }
+
   return (
     <ContextInputForm params={contextParams} num_results={numResults}>
       <div className={"flex flex-col gap-20 md:m-5"}>
-        {data.records?.map((record) => (
+        {data.records?.map((record, index) => (
           <div
-            key={record.ark}
+            key={`${record.ark}-${record.terms}-${index}`}
             className={
               "border-gray-400 border md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5  w-full"
             }
           >
-            <Suspense fallback={<div>Loading OCR</div>}>
-              <h1 className={"flex flex-col gap-5 flex-wrap"}>
-                <span className={"text-lg font-bold"}>
-                  {record.paper_title}
-                </span>
-                <span>{record.date}</span>
-                <span>{record.author}</span>
-              </h1>
-              <VolumeContext
-                ark={record.ark}
-                term={record.terms[0]}
-                pageNum={getArkImageFromParams(record.ark)}
-              />
-            </Suspense>
+            <h1 className={"flex flex-col gap-5 flex-wrap"}>
+              <span className={"text-lg font-bold"}>{record.paper_title}</span>
+              <span>{record.date}</span>
+              <span>{record.author}</span>
+            </h1>
+            <VolumeContext
+              ark={record.ark}
+              term={record.terms[0]}
+              pageNum={getArkImageFromParams(record.ark)}
+              showImage={getImageStatusFromParams(record.ark)}
+            />
           </div>
         ))}
       </div>
     </ContextInputForm>
-  );
-}
-
-export async function VolumeContext({
-  ark,
-  term,
-  pageNum,
-}: {
-  ark: string;
-  term: string;
-  pageNum?: number;
-}) {
-  const volumeData = await fetchVolumeContext({ ark, term });
-  return (
-    <ContextViewer data={volumeData} ark={ark}>
-      <Suspense
-        fallback={
-          <div className={"bg-gray-400 rounded h-80 w-full mb-4"}></div>
-        }
-        key={ark}
-      >
-        <ImageSnippet
-          ark={ark}
-          term={term}
-          pageNumber={pageNum ?? volumeData[0].page_num}
-        />
-      </Suspense>
-    </ContextViewer>
-  );
-}
-
-export function ContextLoadingSkeleton() {
-  return (
-    <div className={"flex flex-col gap-20 md:m-5"}>
-      {[...Array(10)].map((_, i) => (
-        <div
-          key={i}
-          className={
-            "animate-pulse md:border border-gray-400 md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5 items-center w-full"
-          }
-        >
-          <div className={"text-lg bg-gray-400 rounded h-6 w-3/4 mb-4"}></div>
-          <div className={"bg-gray-400 rounded h-4 w-1/2 mb-4"}></div>
-          <div className={"bg-gray-400 rounded h-4 w-1/4 mb-4"}></div>
-          <div className={"bg-gray-400 rounded h-80 w-full mb-4"}></div>
-        </div>
-      ))}
-    </div>
   );
 }

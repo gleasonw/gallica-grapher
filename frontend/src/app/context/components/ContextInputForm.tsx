@@ -10,7 +10,8 @@ import { useRouter } from "next/navigation";
 import { addQueryParamsIfExist } from "../../utils/addQueryParamsIfExist";
 import { ContextQueryParams } from "../../components/fetchContext";
 import { QueryPagination } from "../../components/QueryPagination";
-import { ContextLoadingSkeleton } from "../page";
+import { ContextLoadingSkeleton } from "../../components/ContextLoadingSkeleton";
+import { Spinner } from "../../components/Spinner";
 
 export const strings = {
   fr: {
@@ -49,7 +50,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
   function handleSubmit(params: FormState) {
     const url = addQueryParamsIfExist("/context", params);
-    startTransition(() => router.push(url));
+    startTransition(() => router.push(url, { scroll: false }));
   }
 
   const params = props.params;
@@ -95,7 +96,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
             onClick={() => handleSubmit(contextParams)}
             className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md"
           >
-            Explore
+            {isPending ? <Spinner isFetching /> : "Explore"}
           </button>
         </InputBubble>
         <div className={"flex flex-wrap gap-10 justify-center"}>
@@ -114,7 +115,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           />
           <SelectInput
             label={"corpus"}
-            options={["book", "periodical", "all"] as const}
+            options={["all", "book", "periodical"] as const}
             value={contextParams.source}
             onChange={(new_source) => {
               handleUpdateParams("source", new_source);
@@ -171,10 +172,9 @@ export function ContextInputForm(props: ContextInputFormProps) {
           onChange={setNewPage}
         />
       </div>
-      {
-        // a suspense workaround since next router.push() is buggy and doesn't navigate immediately
-        isPending ? <ContextLoadingSkeleton /> : props.children
-      }
+      <div className={`transition-all ${isPending && "opacity-50"}`}>
+        {props.children}
+      </div>
     </>
   );
 }

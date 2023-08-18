@@ -50,6 +50,7 @@ export function makeOptions(
     plotOptions: {
       series: {
         cursor: "pointer",
+        lineWidth: 2,
         marker: {
           enabled: false,
           states: {
@@ -68,7 +69,7 @@ export function makeOptions(
     // @ts-ignore
     series: ticketData.map((ticket, i) => ({
       name: ticket?.data?.name,
-      data: ticket?.data?.data,
+      data: ticket?.data?.data ?? [],
       color: seriesColors[i],
       point: {
         events: {

@@ -4,31 +4,28 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
-import { useRouter } from "next/navigation";
-import { listenForOutsideClicks } from "./utils/listenForOutsideClicks";
+import { usePathname } from "next/navigation";
 
 const pages = {
   "": "Graph",
   context: "Context",
-  info: "Info",
 };
-
-type urlPage = keyof typeof pages;
 
 export default function NavBar() {
   const [showSidebar, setShowSidebar] = React.useState(false);
-  const [currentPage, setCurrentPage] = React.useState<urlPage>("");
+  const currentPage = usePathname();
 
-  const linkStyle = "p-5 hover:cursor-pointer";
+  const linkStyle = "p-5 hover:cursor-pointer hover:bg-blue-100 ";
   let homeLinkStyle = linkStyle;
   let exploreLinkStyle = linkStyle;
   let infoLinkStyle = linkStyle;
   const borderBottomFocus = " border-b border-blue-500 border-b-4";
-  if (currentPage === "") {
+
+  if (currentPage === "/") {
     homeLinkStyle += borderBottomFocus;
-  } else if (currentPage === "context") {
+  } else if (currentPage === "/context") {
     exploreLinkStyle += borderBottomFocus;
-  } else if (currentPage === "info") {
+  } else if (currentPage === "/info") {
     infoLinkStyle += borderBottomFocus;
   }
 
