@@ -2,16 +2,14 @@ import React from "react";
 import { GraphSeriesForm } from "./components/GraphSeriesForm";
 import Head from "next/head";
 import { apiURL } from "./components/apiURL";
-import { GraphData } from "./components/models/dbStructs";
+import { GallicaResponse, GraphData } from "./components/models/dbStructs";
 import { Chart } from "./components/Chart";
 import GraphContextForm from "./components/GraphContextForm";
-import {
-  SearchState,
-  getSearchStateFromURL,
-} from "./utils/getSearchStateFromURL";
+import { SearchState, getSearchStateFromURL } from "./utils/searchState";
 import { GraphState, getGraphStateFromURL } from "./utils/getGraphStateFromURL";
 import { addQueryParamsIfExist } from "./utils/addQueryParamsIfExist";
 import { fetchSRU } from "./components/fetchContext";
+import { VolumeContext } from "./components/VolumeContext";
 
 const strings = {
   fr: {
@@ -23,7 +21,7 @@ const strings = {
   },
 };
 
-async function getPreexistingSeries(args: SearchState & GraphState) {
+async function getOccurrenceSeries(args: SearchState & GraphState) {
   const ticketSeries = await fetch(
     addQueryParamsIfExist(`${apiURL}/api/graphData`, args)
   );
@@ -43,17 +41,32 @@ export default async function Page({
 
   let numResults: undefined | number = undefined;
   let seriesData: undefined | GraphData = undefined;
+  let data: Awaited<ReturnType<typeof fetchSRU>> | undefined = undefined;
 
   if (searchState) {
-    const data = await fetchSRU({
+    data = await fetchSRU({
       ...searchState,
-      terms: searchState.terms?.[0] ?? "",
+      terms: searchState.selected_term
+        ? [searchState.selected_term]
+        : searchState.terms?.slice(0) ?? [],
     });
     numResults = data.total_records;
-    seriesData = await getPreexistingSeries({
+    seriesData = await getOccurrenceSeries({
       ...searchState,
       ...graphState,
     });
+  }
+
+  function getArkImageFromParams(ark: string) {
+    if (Object.keys(searchParams)?.includes(`arkPage${ark}`)) {
+      return searchParams[`arkPage${ark}`];
+    }
+  }
+
+  function getImageStatusFromParams(ark: string) {
+    if (Object.keys(searchParams)?.includes(`${ark}-withImage`)) {
+      return searchParams[`${ark}-withImage`] === "true";
+    }
   }
 
   return (
@@ -72,9 +85,34 @@ export default async function Page({
           {" "}
           {translation.description}{" "}
         </div>
-        {/* <GraphSeriesForm />
-        <Chart series={seriesData} /> */}
-        <GraphContextForm numResults={numResults} />
+        <GraphSeriesForm />
+        <Chart series={seriesData} />
+        <GraphContextForm numResults={numResults}>
+          <div className={"flex flex-col gap-20 md:m-5"}>
+            {data?.records?.map((record, index) => (
+              <div
+                key={`${record.ark}-${record.terms}-${index}`}
+                className={
+                  "border-gray-400 border md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5  w-full"
+                }
+              >
+                <h1 className={"flex flex-col gap-5 flex-wrap"}>
+                  <span className={"text-lg font-bold"}>
+                    {record.paper_title}
+                  </span>
+                  <span>{record.date}</span>
+                  <span>{record.author}</span>
+                </h1>
+                <VolumeContext
+                  ark={record.ark}
+                  term={record.terms[0]}
+                  pageNum={getArkImageFromParams(record.ark)}
+                  showImage={getImageStatusFromParams(record.ark)}
+                />
+              </div>
+            ))}
+          </div>
+        </GraphContextForm>
       </div>
     </>
   );

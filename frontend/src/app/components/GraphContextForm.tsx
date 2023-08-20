@@ -1,8 +1,12 @@
 "use client";
 
+import React from "react";
 import { useSearchState } from "../composables/useSearchState";
-import { InputLabel } from "./InputLabel";
+import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { SelectInput } from "./SelectInput";
+import { useRouter } from "next/navigation";
+import { QueryPagination } from "./QueryPagination";
+import { SearchState } from "../utils/searchState";
 
 const gallica_plug = (
   <a
@@ -83,12 +87,39 @@ const strings = {
 
 export default function GraphContextForm({
   numResults,
+  children,
 }: {
   numResults?: number;
+  children?: React.ReactNode;
 }) {
+  const [isPending, startTransition] = React.useTransition();
+  const [locallySelectedPage, setLocallySelectedPage] =
+    React.useState<number>(1);
   const translation = strings["fr"];
-  const { terms, selected_term, year, end_year, month } = useSearchState();
-  console.log(terms);
+  const searchState = useSearchState();
+  const { terms, selected_term, year, end_year, month, cursor } = searchState;
+  const router = useRouter();
+
+  const currentPage = Math.floor((cursor ?? 0) / 10) + 1;
+
+  const totalPages = Math.floor((numResults ?? 0) / 10);
+
+  function handleSubmit(params: SearchState) {
+    const url = addQueryParamsIfExist("/", {
+      ...searchState,
+      ...params,
+    });
+    startTransition(() => router.push(url, { scroll: false }));
+  }
+
+  function setNewPage(newPage: number) {
+    setLocallySelectedPage(newPage);
+    handleSubmit({
+      cursor: (newPage - 1) * 10,
+    });
+  }
+
+  const referencePage = isPending ? locallySelectedPage : currentPage;
 
   return (
     <>
@@ -97,50 +128,27 @@ export default function GraphContextForm({
         <div className={"flex wrap gap-10"}>
           <SelectInput
             options={terms?.map((term) => term) ?? []}
-            onChange={(value: string) => console.log(value)}
+            onChange={(value: string) => handleSubmit({ selected_term: value })}
             value={terms?.find((t) => t === selected_term)}
           />
           <ContextFilter
-            onClick={() => console.log("clear year")}
+            onClick={() =>
+              handleSubmit({ year: undefined, end_year: undefined })
+            }
             label={year && end_year ? `${year} - ${end_year}` : undefined}
           />
           <ContextFilter
             label={month ? translation.months[month - 1] : undefined}
-            onClick={() => console.log("clear month")}
+            onClick={() => handleSubmit({ month: undefined })}
           />
         </div>
       </div>
-
-      <div className={"flex flex-row flex-wrap gap-5 md:gap-10 lg:gap-10"}>
-        <InputLabel label={"Année"}>
-          <input
-            type={"number"}
-            className={"border rounded-lg bg-white p-3"}
-            value={year || ""}
-            onChange={(e) => console.log(e)}
-          />
-        </InputLabel>
-        <InputLabel label={"Mois"}>
-          <SelectInput
-            options={Array.from(Array(12).keys()).map((i) => String(i))}
-            onChange={() => console.log("month!")}
-            value={month ? String(month) : undefined}
-          />
-        </InputLabel>
-        <InputLabel label={"Ticket"}>
-          <select
-            onChange={() => console.log("change selected term")}
-            className={"border rounded-lg  bg-white p-3"}
-            value={selected_term}
-          >
-            {terms?.map((term) => (
-              <option key={term} value={term}>
-                {term}
-              </option>
-            ))}
-          </select>
-        </InputLabel>
-      </div>
+      <QueryPagination
+        cursorMax={totalPages}
+        selectedPage={referencePage ?? 1}
+        onChange={setNewPage}
+      />
+      {children}
     </>
   );
 }

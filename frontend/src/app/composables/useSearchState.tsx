@@ -1,5 +1,5 @@
 import { useSearchParams } from "next/navigation";
-import { getSearchStateFromURL } from "../utils/getSearchStateFromURL";
+import { getSearchStateFromURL } from "../utils/searchState";
 
 export function useSearchState() {
   const currentParams = useSearchParams();

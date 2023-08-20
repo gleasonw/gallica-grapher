@@ -30,12 +30,12 @@ export const strings = {
 };
 
 export type ContextInputFormProps = {
-  params: ContextQueryParams & { contextType?: "image" | "ocr" };
+  params: ContextQueryParams;
   num_results: number;
   children: React.ReactNode;
 };
 
-type FormState = Partial<ContextQueryParams & { contextType: "image" | "ocr" }>;
+type FormState = Partial<ContextQueryParams>;
 
 export function ContextInputForm(props: ContextInputFormProps) {
   const [locallySelectedPage, setLocallySelectedPage] = React.useState<
@@ -60,7 +60,6 @@ export function ContextInputForm(props: ContextInputFormProps) {
   const totalPages = Math.floor((props.num_results ?? 0) / 10);
 
   function setNewPage(newPage: number) {
-    console.log("newPage", newPage);
     setLocallySelectedPage(newPage);
     handleSubmit({
       ...contextParams,

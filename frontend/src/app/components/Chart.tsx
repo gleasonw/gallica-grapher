@@ -1,28 +1,38 @@
+"use client";
+
 import { makeOptions } from "./utils/makeHighcharts";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import React from "react";
 import { GraphData } from "./models/dbStructs";
+import { useSearchState } from "../composables/useSearchState";
+import { SearchState } from "../utils/searchState";
+import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
+import { useRouter } from "next/navigation";
+import {
+  GraphState,
+  getGraphStateFromURL,
+} from "../utils/getGraphStateFromURL";
+import { useGraphState } from "../composables/useGraphState";
+import { SelectInput } from "./SelectInput";
+import { InputLabel } from "./InputLabel";
 
 export function Chart({ series }: { series?: GraphData }) {
   const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
+  const [isPending, startTransition] = React.useTransition();
 
-  React.useEffect(() => {
-    if (graphState.tickets?.some((ticket) => ticket.example)) {
-      return;
-    }
-    const params = new URLSearchParams();
-    if (graphState.tickets) {
-      for (const ticket of graphState.tickets) {
-        params.append("ticket_id", ticket.id.toString());
-      }
-    }
-    window.history.replaceState(
-      {},
-      "",
-      `${window.location.pathname.split("/")[0]}?${params.toString()}`
-    );
-  }, [graphState]);
+  const searchState = useSearchState();
+  const { grouping, smoothing } = useGraphState();
+  const router = useRouter();
+  const { year, end_year, terms } = searchState;
+
+  function handleSubmit(params: SearchState & GraphState) {
+    const url = addQueryParamsIfExist("/", {
+      ...searchState,
+      ...params,
+    });
+    startTransition(() => router.push(url, { scroll: false }));
+  }
 
   React.useEffect(() => {
     function updateExtremes(from: number, to: number) {
@@ -32,60 +42,62 @@ export function Chart({ series }: { series?: GraphData }) {
     if (chartComponentRef.current) {
       const chart = chartComponentRef.current.chart;
       if (chart) {
-        if (searchFrom && searchTo) {
-          updateExtremes(searchFrom, searchTo);
-        } else if (searchFrom) {
-          updateExtremes(searchFrom, 1950);
-        } else if (searchTo) {
-          updateExtremes(1789, searchTo);
+        if (year && end_year) {
+          updateExtremes(year, end_year);
+        } else if (year) {
+          updateExtremes(year, 1950);
+        } else if (end_year) {
+          updateExtremes(1789, end_year);
         } else {
           chart.xAxis[0].setExtremes(undefined, undefined);
         }
       }
     }
-  }, [searchFrom, searchTo]);
+  }, [year, end_year]);
 
   function handleSeriesClick(point: Highcharts.Point) {
-    if (!graphStateDispatch) return;
-    const correspondingTicket = tickets?.find(
-      (t) => t.terms[0] === point.series.name
-    );
-    if (correspondingTicket) {
-      setSelectedTicket(correspondingTicket.id);
+    const correspondingTerm = terms?.find((t) => t === point.series.name);
+    if (correspondingTerm) {
+      handleSubmit({ selected_term: correspondingTerm });
     }
     const date = new Date(point.category);
     if (grouping === "year") {
-      setMonth(undefined);
+      handleSubmit({ month: undefined });
     } else {
-      setMonth(date.getUTCMonth() + 1);
+      handleSubmit({ month: date.getUTCMonth() + 1 });
     }
-    setSearchFrom(date.getUTCFullYear());
-    setSearchTo(date.getUTCFullYear() + 1);
+    handleSubmit({
+      year: date.getUTCFullYear(),
+      end_year: date.getUTCFullYear() + 1,
+    });
   }
 
   function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
-    if (!graphStateDispatch) return;
     if (e.trigger === "zoom") {
       const minDate = new Date(e.min);
       const maxDate = new Date(e.max);
       if (minDate.toString() === "Invalid Date") {
-        setMonth(undefined);
-        setSearchFrom(undefined);
-        setSearchTo(undefined);
+        handleSubmit({
+          year: undefined,
+          end_year: undefined,
+          month: undefined,
+        });
         return;
       }
       if (grouping === "month") {
-        setMonth(minDate.getUTCMonth() + 1);
+        handleSubmit({ month: minDate.getUTCMonth() + 1 });
       }
-      setSearchFrom(minDate.getUTCFullYear());
-      setSearchTo(maxDate.getUTCFullYear());
+      handleSubmit({
+        year: minDate.getUTCFullYear(),
+        end_year: maxDate.getUTCFullYear(),
+      });
     }
   }
 
   const highchartsOpts = makeOptions(
     handleSetExtremes,
     handleSeriesClick,
-    ticketData
+    series
   );
 
   return (
@@ -100,18 +112,22 @@ export function Chart({ series }: { series?: GraphData }) {
           "ml-10 absolute -top-20 right-2 z-40 mb-5 flex flex-row gap-5"
         }
       >
-        <InputLabel label={translation.grouping}>
+        <InputLabel label={"Grouping"}>
           <SelectInput
             options={["year", "month"]}
-            onChange={(value: string) => setGrouping(value as "year" | "month")}
+            onChange={(value: string) =>
+              handleSubmit({ grouping: value as "year" | "month" })
+            }
             value={grouping}
           />
         </InputLabel>
-        <InputLabel label={translation.smoothing}>
+        <InputLabel label={"Smoothing"}>
           <SelectInput
             options={["0", "1", "2", "3", "4", "5", "10", "20", "50"]}
-            onChange={(value: string) => setSmoothing(parseInt(value))}
-            value={smoothing.toString()}
+            onChange={(value: string) =>
+              handleSubmit({ smoothing: parseInt(value) })
+            }
+            value={smoothing?.toString()}
           />
         </InputLabel>
       </div>

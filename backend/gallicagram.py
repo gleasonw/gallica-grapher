@@ -2,50 +2,28 @@ from io import StringIO
 from dataclasses import dataclass
 
 from fastapi import HTTPException
-from www.models import Ticket
+from models import PeriodRecord, Ticket
 import aiohttp
-from www.date import Date
+from date import Date
 from typing import Callable, Literal
 from urllib.error import HTTPError
 import pandas as pd
-from urllib.parse import quote
-
-
-@dataclass(slots=True)
-class PeriodRecord:
-    _date: Date
-    count: float
-    term: str
-
-    @property
-    def year(self):
-        return self._date.year
-
-    @property
-    def month(self):
-        return self._date.month
-
-    @property
-    def day(self):
-        return self._date.day
 
 
 async def get(args: Ticket, on_no_records_found: Callable):
     """Get records from Pyllica. Interpret 500 error as no records found."""
-    if len(args.terms) > 1:
-        raise ValueError("Only one term at a time for Pyllica, for now")
-    if args.start_date is None:
+    if args.year is None:
         debut = 1789
     else:
-        debut = int(Date(args.start_date).year)
-    if args.end_date is None:
+        debut = int(Date(args.year).year)
+    if args.end_year is None:
         fin = 1950
     else:
-        fin = int(Date(args.end_date).year)
+        fin = int(Date(args.end_year).year)
     try:
         if args.link_term:
             periods = await get_contain_data(
-                mot1=args.terms[0],
+                mot1=args.term,
                 mot2=args.link_term,
                 corpus=args.source,
                 resolution="mois",
@@ -54,7 +32,7 @@ async def get(args: Ticket, on_no_records_found: Callable):
             )
         else:
             periods = await get_gram_data(
-                gram=args.terms[0],
+                gram=args.term,
                 corpus=args.source,
                 resolution="mois",
                 debut=debut,

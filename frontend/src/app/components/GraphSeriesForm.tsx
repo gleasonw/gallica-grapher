@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { GraphTicket } from "./GraphTicket";
 import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./utils/makeHighcharts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiURL } from "./apiURL";
 import { useContext } from "react";
 import { LangContext } from "./LangContext";
@@ -18,6 +17,8 @@ import {
 } from "./GraphContext";
 import { SelectInput } from "./SelectInput";
 import { GraphData } from "./models/dbStructs";
+import { useSearchState } from "../composables/useSearchState";
+import { useGraphState } from "../composables/useGraphState";
 
 const strings = {
   fr: {
@@ -48,58 +49,53 @@ export function GraphSeriesForm() {
   const { lang } = useContext(LangContext);
   const translation = strings[lang];
 
-  const queryClient = useQueryClient();
+  const { end_year, year, source, link_term } = useSearchState();
 
-  const graphStateDispatch = React.useContext(GraphPageDispatchContext);
-  const graphState = React.useContext(GraphPageStateContext);
-  if (!graphStateDispatch || !graphState)
-    throw new Error("No graph state dispatch found");
-  const { searchFrom, searchTo, source, linkTerm, grouping, smoothing } =
-    graphState;
+  const { grouping, smoothing } = useGraphState();
 
-  async function setSearchRange(newRange?: [number?, number?]) {
-    let [newLow, newHigh] = newRange ?? [];
-    let fromBound = searchFrom ?? 1789;
-    let toBound = searchTo ?? 1950;
-    if ((newLow && newLow < fromBound) || (newHigh && newHigh > toBound)) {
-      // check if the current tickets have the data already
-      // prevents refetching data if we're just changing the zoom
-      const ticketData = queryClient.getQueryData([
-        "ticket",
-        { id: tickets?.[0]?.id, grouping, smoothing },
-      ]) as GraphData;
-      if (ticketData) {
-        const lowUnix = ticketData.data[0][0];
-        const highUnix = ticketData.data[ticketData.data.length - 1][0];
-        const lowYear = new Date(lowUnix).getFullYear() - 1;
-        const highYear = new Date(highUnix).getFullYear() + 1;
-        if ((newLow && newLow < lowYear) || (newHigh && newHigh > highYear)) {
-          const ticketsWithNewRange: TicketToPost[] | undefined = tickets?.map(
-            (ticket) => ({
-              ...ticket,
-              id: undefined,
-              replacingTicketID: ticket.id,
-              start_date: newLow || ticket.start_date,
-              end_date: newHigh || ticket.end_date,
-            })
-          );
+  // async function setSearchRange(newRange?: [number?, number?]) {
+  //   let [newLow, newHigh] = newRange ?? [];
+  //   let fromBound = searchFrom ?? 1789;
+  //   let toBound = searchTo ?? 1950;
+  //   if ((newLow && newLow < fromBound) || (newHigh && newHigh > toBound)) {
+  //     // check if the current tickets have the data already
+  //     // prevents refetching data if we're just changing the zoom
+  //     const ticketData = queryClient.getQueryData([
+  //       "ticket",
+  //       { id: tickets?.[0]?.id, grouping, smoothing },
+  //     ]) as GraphData;
+  //     if (ticketData) {
+  //       const lowUnix = ticketData.data[0][0];
+  //       const highUnix = ticketData.data[ticketData.data.length - 1][0];
+  //       const lowYear = new Date(lowUnix).getFullYear() - 1;
+  //       const highYear = new Date(highUnix).getFullYear() + 1;
+  //       if ((newLow && newLow < lowYear) || (newHigh && newHigh > highYear)) {
+  //         const ticketsWithNewRange: TicketToPost[] | undefined = tickets?.map(
+  //           (ticket) => ({
+  //             ...ticket,
+  //             id: undefined,
+  //             replacingTicketID: ticket.id,
+  //             start_date: newLow || ticket.start_date,
+  //             end_date: newHigh || ticket.end_date,
+  //           })
+  //         );
 
-          if (ticketsWithNewRange) {
-            setRefetching(true);
-            handlePost(ticketsWithNewRange);
-          }
-        }
-      }
-    }
-    graphStateDispatch!({
-      type: "set_search_from",
-      payload: newLow,
-    });
-    graphStateDispatch!({
-      type: "set_search_to",
-      payload: newHigh,
-    });
-  }
+  //         if (ticketsWithNewRange) {
+  //           setRefetching(true);
+  //           handlePost(ticketsWithNewRange);
+  //         }
+  //       }
+  //     }
+  //   }
+  //   graphStateDispatch!({
+  //     type: "set_search_from",
+  //     payload: newLow,
+  //   });
+  //   graphStateDispatch!({
+  //     type: "set_search_to",
+  //     payload: newHigh,
+  //   });
+  // }
 
   async function postTicket(ticket: TicketToPost): Promise<FetchingTicket> {
     const response = await fetch(`${apiURL}/api/init`, {
@@ -113,14 +109,14 @@ export function GraphSeriesForm() {
     return { ...ticket, id: data.requestid };
   }
 
-  const mutation = useMutation({ mutationFn: postTicket });
+  // const mutation = useMutation({ mutationFn: postTicket });
 
-  async function handlePost(ticketBatch: TicketToPost[]) {
-    const responseTickets = await Promise.all(
-      ticketBatch?.map((ticket) => mutation.mutateAsync(ticket)) || []
-    );
-    setFetchingTickets(responseTickets);
-  }
+  // async function handlePost(ticketBatch: TicketToPost[]) {
+  //   const responseTickets = await Promise.all(
+  //     ticketBatch?.map((ticket) => mutation.mutateAsync(ticket)) || []
+  //   );
+  //   setFetchingTickets(responseTickets);
+  // }
 
   function reset() {
     setRefetching(false);
@@ -130,17 +126,17 @@ export function GraphSeriesForm() {
 
   const ticketInForm: TicketToPost = {
     terms: [word],
-    start_date: searchFrom,
-    end_date: searchTo,
+    start_date: year,
+    end_date: end_year,
     source,
-    linkTerm,
+    link_term,
   };
 
   function handleSubmit() {
     if (!word) return;
     setSubmitted(true);
     setWord("");
-    handlePost([ticketInForm]);
+    // handlePost([ticketInForm]);
   }
 
   const corpusOptions: GraphTicket["source"][] = ["presse", "livres"];
@@ -168,31 +164,23 @@ export function GraphSeriesForm() {
           <YearRangeInput
             max={2021}
             min={1500}
-            value={[searchFrom, searchTo]}
-            onChange={setSearchRange}
+            value={[year, end_year]}
+            onChange={() => console.log([year, end_year])}
             placeholder={[1789, 1950]}
           />
           <SelectInput
             options={corpusOptions}
             value={source}
             onChange={(new_source) => {
-              graphStateDispatch({
-                type: "set_source",
-                payload: new_source as GraphTicket["source"],
-              });
+              console.log(new_source);
             }}
           />
           <input
             type="text"
             className={"border p-2 rounded-lg shadow-sm"}
-            value={linkTerm}
+            value={link_term}
             placeholder={"Proximité (3)"}
-            onChange={(e) =>
-              graphStateDispatch({
-                type: "set_link_term",
-                payload: e.target.value,
-              })
-            }
+            onChange={(e) => console.log(e.target.value)}
           />
         </div>
       </div>
@@ -204,11 +192,11 @@ export function GraphSeriesForm() {
             for (let i = 0; i < fetchingTickets.length; i++) {
               const ticket = fetchingTickets[i];
               if (ticket.replacingTicketID) {
-                onDeleteTicket(ticket.replacingTicketID);
+                console.log("replacing ticket");
               }
-              onCreateTicket(ticket);
+              console.log("adding ticket");
             }
-            onDeleteExampleTickets();
+            console.log("done");
             reset();
           }}
           onNoRecordsFound={() => {
@@ -223,12 +211,7 @@ export function GraphSeriesForm() {
           }}
         />
       )}
-      <TicketRow
-        tickets={tickets}
-        refetching={refetching}
-        submitted={submitted}
-        onGraphedTicketCardClick={onDeleteTicket}
-      />
+      <TicketRow refetching={refetching} submitted={submitted} />
       <div className={"m-2"} />
     </DashboardLayout>
   );
@@ -239,40 +222,33 @@ function TicketRow(props: {
   submitted: boolean;
   refetching: boolean;
 }) {
+  const { terms } = useSearchState();
   return (
     <div className={"z-0 flex self-start"}>
       <div className={"flex flex-wrap gap-10"}>
-        {props.tickets?.map((ticket, index) =>
+        {terms?.map((term, index) =>
           props.refetching ? (
             <ColorBubble
-              key={ticket.id}
+              key={term}
               color={seriesColors[index % seriesColors.length]}
             >
               <Spinner isFetching />
             </ColorBubble>
           ) : (
             <button
-              onClick={() => onClick(ticket.id)}
+              onClick={() => console.log("delete series")}
               className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
               style={{ borderColor: seriesColors[index % seriesColors.length] }}
+              key={term}
             >
               <div className={`relative h-full w-full flex flex-col`}>
                 <div className={"flex flex-row gap-10"}>
-                  <p>{ticket.terms.join(", ")}</p>
+                  <p>{term}</p>
                   <p className={"text-zinc-600"}>x</p>
                 </div>
               </div>
             </button>
           )
-        )}
-        {props.submitted && (
-          <ColorBubble
-            color={
-              seriesColors[props.tickets?.length || 0 % seriesColors.length]
-            }
-          >
-            <Spinner isFetching />
-          </ColorBubble>
         )}
       </div>
       {props.children}
