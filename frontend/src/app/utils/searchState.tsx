@@ -30,7 +30,6 @@ export function getSearchStateFromURL(
     terms: Array.isArray(params.terms) ? params.terms : [params.terms],
   });
   if (!result.success) {
-    console.log(result.error);
     return {};
   }
   return result.data;

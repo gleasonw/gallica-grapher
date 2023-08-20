@@ -10,6 +10,7 @@ import { GraphState, getGraphStateFromURL } from "./utils/getGraphStateFromURL";
 import { addQueryParamsIfExist } from "./utils/addQueryParamsIfExist";
 import { fetchSRU } from "./components/fetchContext";
 import { VolumeContext } from "./components/VolumeContext";
+import { getSeries } from "./gallicagram";
 
 const strings = {
   fr: {
@@ -20,13 +21,6 @@ const strings = {
     description: "Explore word occurrences in archived Gallica periodicals.",
   },
 };
-
-async function getOccurrenceSeries(args: SearchState & GraphState) {
-  const ticketSeries = await fetch(
-    addQueryParamsIfExist(`${apiURL}/api/graphData`, args)
-  );
-  return (await ticketSeries.json()) as GraphData;
-}
 
 export default async function Page({
   searchParams,
@@ -40,7 +34,7 @@ export default async function Page({
   const graphState = getGraphStateFromURL(searchParams);
 
   let numResults: undefined | number = undefined;
-  let seriesData: undefined | GraphData = undefined;
+  let seriesData: undefined | GraphData[] = undefined;
   let data: Awaited<ReturnType<typeof fetchSRU>> | undefined = undefined;
 
   if (searchState) {
@@ -51,10 +45,25 @@ export default async function Page({
         : searchState.terms?.slice(0) ?? [],
     });
     numResults = data.total_records;
-    seriesData = await getOccurrenceSeries({
-      ...searchState,
-      ...graphState,
-    });
+    const response = await Promise.allSettled(
+      searchState.terms?.map(
+        async (term) =>
+          await getSeries(
+            {
+              term: term,
+              year: searchState.year,
+              end_year: searchState.end_year,
+              grouping: "mois",
+              smoothing: graphState.smoothing,
+              source: "presse",
+            },
+            () => console.log("test")
+          )
+      ) ?? []
+    );
+    seriesData = response
+      .map((r) => (r.status === "fulfilled" ? r.value : undefined))
+      .filter((r) => r !== undefined) as GraphData[];
   }
 
   function getArkImageFromParams(ark: string) {

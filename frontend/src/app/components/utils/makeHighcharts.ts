@@ -1,4 +1,3 @@
-import { UseQueryResult } from "@tanstack/react-query";
 import { GraphData } from "../models/dbStructs";
 
 export const seriesColors = [
@@ -17,7 +16,7 @@ export const seriesColors = [
 export function makeOptions(
   onSetExtremes: (e: any) => void,
   onSeriesClick: (e: any) => void,
-  ticketData: UseQueryResult<GraphData, unknown>[]
+  ticketData: GraphData
 ): Highcharts.Options {
   return {
     chart: {
@@ -68,8 +67,8 @@ export function makeOptions(
     },
     // @ts-ignore
     series: ticketData?.map((ticket, i) => ({
-      name: ticket?.data?.name,
-      data: ticket?.data?.data ?? [],
+      name: ticket?.name,
+      data: ticket?.data ?? [],
       color: seriesColors[i],
       point: {
         events: {

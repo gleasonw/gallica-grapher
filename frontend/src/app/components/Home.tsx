@@ -317,8 +317,6 @@ export function Home() {
     ticketData
   );
 
-  console.log({ highchartsOpts });
-
   function resetSearchRange() {
     setSearchFrom(undefined);
     setSearchTo(undefined);

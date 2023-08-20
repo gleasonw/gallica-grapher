@@ -17,7 +17,7 @@ import { useGraphState } from "../composables/useGraphState";
 import { SelectInput } from "./SelectInput";
 import { InputLabel } from "./InputLabel";
 
-export function Chart({ series }: { series?: GraphData }) {
+export function Chart({ series }: { series?: GraphData[] }) {
   const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
   const [isPending, startTransition] = React.useTransition();
 
@@ -82,6 +82,7 @@ export function Chart({ series }: { series?: GraphData }) {
           end_year: undefined,
           month: undefined,
         });
+
         return;
       }
       if (grouping === "month") {

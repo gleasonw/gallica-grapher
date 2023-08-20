@@ -65,7 +65,6 @@ export interface FrequentTerm {
 }
 
 export interface GraphData {
-  request_id: number;
   data: [number, number][];
   name: string;
 }
