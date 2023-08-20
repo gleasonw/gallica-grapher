@@ -1,4 +1,0 @@
-*.yaml
-./app.yaml
-.gcloudignore
-.env
