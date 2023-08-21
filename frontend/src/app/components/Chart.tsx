@@ -12,6 +12,7 @@ import { InputLabel } from "./InputLabel";
 import { useSubmit } from "./LoadingProvider";
 
 export function Chart({ series }: { series?: GraphData[] }) {
+  //@ts-ignore
   const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
   const searchState = useSearchState();
   const { grouping } = useGraphState();
