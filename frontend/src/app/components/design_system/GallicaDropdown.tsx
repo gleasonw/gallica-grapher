@@ -1,7 +1,6 @@
 import React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ArrowDownIcon } from "@radix-ui/react-icons";
-import { GallicaButton } from "./GallicaButton";
 
 export function GallicaDropdown<T extends string | number>({
   itemsToDisplay,

@@ -3,7 +3,7 @@
 import React from "react";
 import { fetchVolumeContext } from "./fetchContext";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { GallicaButton } from "../design_system/GallicaButton";
+import { GallicaButton } from "./design_system/GallicaButton";
 import Link from "next/link";
 
 export default function ContextViewer({
