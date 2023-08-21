@@ -6,33 +6,18 @@ import Highcharts from "highcharts";
 import React from "react";
 import { GraphData } from "./models/dbStructs";
 import { useSearchState } from "../composables/useSearchState";
-import { SearchState } from "../utils/searchState";
-import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import { useRouter } from "next/navigation";
-import {
-  GraphState,
-  getGraphStateFromURL,
-} from "../utils/getGraphStateFromURL";
 import { useGraphState } from "../composables/useGraphState";
 import { SelectInput } from "./SelectInput";
 import { InputLabel } from "./InputLabel";
+import { useSubmit } from "./LoadingProvider";
 
 export function Chart({ series }: { series?: GraphData[] }) {
   const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
-  const [isPending, startTransition] = React.useTransition();
-
   const searchState = useSearchState();
-  const { grouping, smoothing } = useGraphState();
-  const router = useRouter();
+  const { grouping } = useGraphState();
   const { year, end_year, terms } = searchState;
 
-  function handleSubmit(params: SearchState & GraphState) {
-    const url = addQueryParamsIfExist("/", {
-      ...searchState,
-      ...params,
-    });
-    startTransition(() => router.push(url, { scroll: false }));
-  }
+  const { handleSubmit } = useSubmit();
 
   React.useEffect(() => {
     function updateExtremes(from: number, to: number) {
@@ -62,14 +47,13 @@ export function Chart({ series }: { series?: GraphData[] }) {
     }
     const date = new Date(point.category);
     if (grouping === "year") {
-      handleSubmit({ month: undefined });
+      handleSubmit({ month: undefined, context_year: date.getUTCFullYear() });
     } else {
-      handleSubmit({ month: date.getUTCMonth() + 1 });
+      handleSubmit({
+        month: date.getUTCMonth() + 1,
+        context_year: date.getUTCFullYear(),
+      });
     }
-    handleSubmit({
-      year: date.getUTCFullYear(),
-      end_year: date.getUTCFullYear() + 1,
-    });
   }
 
   function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
@@ -115,20 +99,9 @@ export function Chart({ series }: { series?: GraphData[] }) {
       >
         <InputLabel label={"Grouping"}>
           <SelectInput
-            options={["year", "month"]}
-            onChange={(value: string) =>
-              handleSubmit({ grouping: value as "year" | "month" })
-            }
-            value={grouping}
-          />
-        </InputLabel>
-        <InputLabel label={"Smoothing"}>
-          <SelectInput
-            options={["0", "1", "2", "3", "4", "5", "10", "20", "50"]}
-            onChange={(value: string) =>
-              handleSubmit({ smoothing: parseInt(value) })
-            }
-            value={smoothing?.toString()}
+            options={["year", "month"] as const}
+            onChange={(value) => handleSubmit({ grouping: value })}
+            value={grouping ?? "month"}
           />
         </InputLabel>
       </div>

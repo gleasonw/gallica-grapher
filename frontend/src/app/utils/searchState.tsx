@@ -18,6 +18,7 @@ export const searchState = z.object({
   sort: z.literal("date").or(z.literal("relevance")).optional(),
   cursor: z.coerce.number().optional(),
   selected_term: z.string().optional(),
+  context_year: z.coerce.number().optional(),
 });
 
 export type SearchState = z.infer<typeof searchState>;

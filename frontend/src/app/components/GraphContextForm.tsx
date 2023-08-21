@@ -2,11 +2,9 @@
 
 import React from "react";
 import { useSearchState } from "../composables/useSearchState";
-import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { SelectInput } from "./SelectInput";
-import { useRouter } from "next/navigation";
 import { QueryPagination } from "./QueryPagination";
-import { SearchState } from "../utils/searchState";
+import { useSubmit } from "./LoadingProvider";
 
 const gallica_plug = (
   <a
@@ -92,25 +90,17 @@ export default function GraphContextForm({
   numResults?: number;
   children?: React.ReactNode;
 }) {
-  const [isPending, startTransition] = React.useTransition();
   const [locallySelectedPage, setLocallySelectedPage] =
     React.useState<number>(1);
   const translation = strings["fr"];
   const searchState = useSearchState();
   const { terms, selected_term, year, end_year, month, cursor } = searchState;
-  const router = useRouter();
 
   const currentPage = Math.floor((cursor ?? 0) / 10) + 1;
 
   const totalPages = Math.floor((numResults ?? 0) / 10);
 
-  function handleSubmit(params: SearchState) {
-    const url = addQueryParamsIfExist("/", {
-      ...searchState,
-      ...params,
-    });
-    startTransition(() => router.push(url, { scroll: false }));
-  }
+  const { handleSubmit, isPending } = useSubmit();
 
   function setNewPage(newPage: number) {
     setLocallySelectedPage(newPage);
@@ -148,7 +138,7 @@ export default function GraphContextForm({
         selectedPage={referencePage ?? 1}
         onChange={setNewPage}
       />
-      {children}
+      <div className={isPending ? "opacity-50" : ""}>{children}</div>
     </>
   );
 }

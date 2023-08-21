@@ -1,18 +1,17 @@
 import React, { useContext } from "react";
-import { LangContext } from "./LangContext";
 import * as Popover from "@radix-ui/react-popover";
 
 export interface YearRangeInputProps {
   min: number;
   max: number;
-  value?: [number?, number?];
+  value: [number?, number?];
   placeholder?: [number, number];
-  onChange: (value?: [number?, number?]) => void;
+  onChange: (value: [number?, number?]) => void;
   showLabel?: boolean;
 }
 
 export function YearRangeInput(props: YearRangeInputProps) {
-  const { lang } = useContext(LangContext);
+  const lang = "fr";
   const [localValue, setLocalValue] = React.useState(props.value);
   return (
     <Popover.Root>

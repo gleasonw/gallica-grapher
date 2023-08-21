@@ -1,162 +1,72 @@
 "use client";
 
 import React, { useState } from "react";
-import { GraphTicket } from "./GraphTicket";
-import { SearchProgress } from "./SearchProgress";
 import { seriesColors } from "./utils/makeHighcharts";
-import { apiURL } from "./apiURL";
-import { useContext } from "react";
-import { LangContext } from "./LangContext";
-import { Spinner } from "./Spinner";
 import InputBubble from "./InputBubble";
-import DashboardLayout from "./DashboardLayout";
 import { YearRangeInput } from "./YearRangeInput";
-import {
-  GraphPageDispatchContext,
-  GraphPageStateContext,
-} from "./GraphContext";
 import { SelectInput } from "./SelectInput";
-import { GraphData } from "./models/dbStructs";
 import { useSearchState } from "../composables/useSearchState";
-import { useGraphState } from "../composables/useGraphState";
+import { useSubmit } from "./LoadingProvider";
 
-const strings = {
-  fr: {
-    no_records_found: "Aucun résultat trouvé",
-    search_for_word: "Rechercher un mot",
-  },
-  en: {
-    no_records_found: "No records found",
-    search_for_word: "Search for a word",
-  },
+type GraphFormState = {
+  word: string;
+  source: "presse" | "livres" | "tout";
+  link_term: string;
+  year?: number;
+  end_year?: number;
 };
 
-interface TicketToPost extends Omit<GraphTicket, "id"> {
-  id?: number;
-  replacingTicketID?: number;
-}
+export function GraphSeriesForm({ children }: { children: React.ReactNode }) {
+  const [graphFormState, setGraphFormState] = useState<GraphFormState>({
+    word: "",
+    source: "presse",
+    link_term: "",
+    year: 1789,
+    end_year: 1950,
+  });
 
-interface FetchingTicket extends GraphTicket {
-  replacingTicketID?: number;
-}
+  const { word, source, link_term, year, end_year } = graphFormState;
+  const { terms } = useSearchState();
 
-export function GraphSeriesForm() {
-  const [word, setWord] = useState<string>("");
+  const { handleSubmit, isPending } = useSubmit();
 
-  const [fetchingTickets, setFetchingTickets] = useState<FetchingTicket[]>([]);
-  const [refetching, setRefetching] = useState<boolean>(false);
-  const [submitted, setSubmitted] = useState<boolean>(false);
-  const { lang } = useContext(LangContext);
-  const translation = strings[lang];
+  const sourceOptions = ["presse", "livres", "tout"] as const;
 
-  const { end_year, year, source, link_term } = useSearchState();
-
-  const { grouping, smoothing } = useGraphState();
-
-  // async function setSearchRange(newRange?: [number?, number?]) {
-  //   let [newLow, newHigh] = newRange ?? [];
-  //   let fromBound = searchFrom ?? 1789;
-  //   let toBound = searchTo ?? 1950;
-  //   if ((newLow && newLow < fromBound) || (newHigh && newHigh > toBound)) {
-  //     // check if the current tickets have the data already
-  //     // prevents refetching data if we're just changing the zoom
-  //     const ticketData = queryClient.getQueryData([
-  //       "ticket",
-  //       { id: tickets?.[0]?.id, grouping, smoothing },
-  //     ]) as GraphData;
-  //     if (ticketData) {
-  //       const lowUnix = ticketData.data[0][0];
-  //       const highUnix = ticketData.data[ticketData.data.length - 1][0];
-  //       const lowYear = new Date(lowUnix).getFullYear() - 1;
-  //       const highYear = new Date(highUnix).getFullYear() + 1;
-  //       if ((newLow && newLow < lowYear) || (newHigh && newHigh > highYear)) {
-  //         const ticketsWithNewRange: TicketToPost[] | undefined = tickets?.map(
-  //           (ticket) => ({
-  //             ...ticket,
-  //             id: undefined,
-  //             replacingTicketID: ticket.id,
-  //             start_date: newLow || ticket.start_date,
-  //             end_date: newHigh || ticket.end_date,
-  //           })
-  //         );
-
-  //         if (ticketsWithNewRange) {
-  //           setRefetching(true);
-  //           handlePost(ticketsWithNewRange);
-  //         }
-  //       }
-  //     }
-  //   }
-  //   graphStateDispatch!({
-  //     type: "set_search_from",
-  //     payload: newLow,
-  //   });
-  //   graphStateDispatch!({
-  //     type: "set_search_to",
-  //     payload: newHigh,
-  //   });
-  // }
-
-  async function postTicket(ticket: TicketToPost): Promise<FetchingTicket> {
-    const response = await fetch(`${apiURL}/api/init`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...ticket, link_term: ticket.linkTerm }),
-    });
-    const data = (await response.json()) as { requestid: number };
-    return { ...ticket, id: data.requestid };
+  function translateSource(source: (typeof sourceOptions)[number]) {
+    switch (source) {
+      case "presse":
+        return "periodical";
+      case "livres":
+        return "book";
+      case "tout":
+        return "all";
+    }
   }
-
-  // const mutation = useMutation({ mutationFn: postTicket });
-
-  // async function handlePost(ticketBatch: TicketToPost[]) {
-  //   const responseTickets = await Promise.all(
-  //     ticketBatch?.map((ticket) => mutation.mutateAsync(ticket)) || []
-  //   );
-  //   setFetchingTickets(responseTickets);
-  // }
-
-  function reset() {
-    setRefetching(false);
-    setSubmitted(false);
-    setFetchingTickets([]);
-  }
-
-  const ticketInForm: TicketToPost = {
-    terms: [word],
-    start_date: year,
-    end_date: end_year,
-    source,
-    link_term,
-  };
-
-  function handleSubmit() {
-    if (!word) return;
-    setSubmitted(true);
-    setWord("");
-    // handlePost([ticketInForm]);
-  }
-
-  const corpusOptions: GraphTicket["source"][] = ["presse", "livres"];
 
   return (
-    <DashboardLayout>
-      <div
+    <>
+      <form
         className={
           "w-full flex flex-col justify-center items-center rounded-full gap-5"
         }
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit({
+            terms: terms ? [...terms, word] : [word],
+            link_term,
+            end_year,
+            year,
+            source: translateSource(source),
+          });
+        }}
       >
         <InputBubble
           word={word}
-          onWordChange={submitted ? () => undefined : setWord}
-          onSubmit={handleSubmit}
+          onWordChange={(word) =>
+            setGraphFormState({ ...graphFormState, word })
+          }
         >
-          <button
-            className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md"
-            onClick={handleSubmit}
-          >
+          <button className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md">
             Explore
           </button>
         </InputBubble>
@@ -165,105 +75,68 @@ export function GraphSeriesForm() {
             max={2021}
             min={1500}
             value={[year, end_year]}
-            onChange={() => console.log([year, end_year])}
+            onChange={([newYear, newEndYear]) =>
+              setGraphFormState({
+                ...graphFormState,
+                year: newYear,
+                end_year: newEndYear,
+              })
+            }
             placeholder={[1789, 1950]}
           />
           <SelectInput
-            options={corpusOptions}
+            options={["presse", "livres", "tout"] as const}
             value={source}
-            onChange={(new_source) => {
-              console.log(new_source);
-            }}
+            onChange={(newValue) =>
+              setGraphFormState({ ...graphFormState, source: newValue })
+            }
           />
           <input
             type="text"
             className={"border p-2 rounded-lg shadow-sm"}
             value={link_term}
             placeholder={"Proximité (3)"}
-            onChange={(e) => console.log(e.target.value)}
+            onChange={(e) =>
+              setGraphFormState({
+                ...graphFormState,
+                link_term: e.target.value,
+              })
+            }
           />
         </div>
-      </div>
+      </form>
       <div className={"m-2"} />
-      {fetchingTickets && fetchingTickets.length > 0 && (
-        <SearchProgress
-          batchTicket={fetchingTickets}
-          onFetchComplete={() => {
-            for (let i = 0; i < fetchingTickets.length; i++) {
-              const ticket = fetchingTickets[i];
-              if (ticket.replacingTicketID) {
-                console.log("replacing ticket");
-              }
-              console.log("adding ticket");
-            }
-            console.log("done");
-            reset();
-          }}
-          onNoRecordsFound={() => {
-            reset();
-            alert(translation.no_records_found);
-          }}
-          onError={() => {
-            reset();
-            alert(
-              "Probleme de connexion avec Gallicagram... Veuillez réessayer plus tard !"
-            );
-          }}
-        />
-      )}
-      <TicketRow refetching={refetching} submitted={submitted} />
+      <TicketRow />
       <div className={"m-2"} />
-    </DashboardLayout>
+      <div className={isPending ? "opacity-50" : ""}>{children}</div>
+    </>
   );
 }
 
-function TicketRow(props: {
-  children?: React.ReactNode;
-  submitted: boolean;
-  refetching: boolean;
-}) {
+function TicketRow(props: { children?: React.ReactNode }) {
   const { terms } = useSearchState();
+  const { handleSubmit } = useSubmit();
   return (
-    <div className={"z-0 flex self-start"}>
+    <div className={"z-0 flex self-start m-5"}>
       <div className={"flex flex-wrap gap-10"}>
-        {terms?.map((term, index) =>
-          props.refetching ? (
-            <ColorBubble
-              key={term}
-              color={seriesColors[index % seriesColors.length]}
-            >
-              <Spinner isFetching />
-            </ColorBubble>
-          ) : (
-            <button
-              onClick={() => console.log("delete series")}
-              className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
-              style={{ borderColor: seriesColors[index % seriesColors.length] }}
-              key={term}
-            >
-              <div className={`relative h-full w-full flex flex-col`}>
-                <div className={"flex flex-row gap-10"}>
-                  <p>{term}</p>
-                  <p className={"text-zinc-600"}>x</p>
-                </div>
+        {terms?.map((term, index) => (
+          <button
+            onClick={() =>
+              handleSubmit({ terms: terms.filter((t) => t !== term) })
+            }
+            className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
+            style={{ borderColor: seriesColors[index % seriesColors.length] }}
+            key={term}
+          >
+            <div className={`relative h-full w-full flex flex-col`}>
+              <div className={"flex flex-row gap-10"}>
+                <p>{term}</p>
+                <p className={"text-zinc-600"}>x</p>
               </div>
-            </button>
-          )
-        )}
+            </div>
+          </button>
+        ))}
       </div>
-      {props.children}
-    </div>
-  );
-}
-
-function ColorBubble(props: { color: string; children: React.ReactNode }) {
-  return (
-    <div
-      className={"rounded-lg border-2 bg-white p-3 text-xl shadow-md"}
-      style={{
-        borderColor: props.color,
-      }}
-    >
       {props.children}
     </div>
   );

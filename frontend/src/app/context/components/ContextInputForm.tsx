@@ -6,12 +6,10 @@ import React from "react";
 import { YearRangeInput } from "../../components/YearRangeInput";
 import InputBubble from "../../components/InputBubble";
 import { SelectInput } from "../../components/SelectInput";
-import { useRouter } from "next/navigation";
-import { addQueryParamsIfExist } from "../../utils/addQueryParamsIfExist";
 import { ContextQueryParams } from "../../components/fetchContext";
 import { QueryPagination } from "../../components/QueryPagination";
-import { ContextLoadingSkeleton } from "../../components/ContextLoadingSkeleton";
 import { Spinner } from "../../components/Spinner";
+import { useSubmit } from "../../components/LoadingProvider";
 
 export const strings = {
   fr: {
@@ -35,23 +33,19 @@ export type ContextInputFormProps = {
   children: React.ReactNode;
 };
 
-type FormState = Partial<ContextQueryParams>;
+type ContextFormState = Partial<ContextQueryParams>;
 
 export function ContextInputForm(props: ContextInputFormProps) {
   const [locallySelectedPage, setLocallySelectedPage] = React.useState<
     number | null
   >(null);
-  const [contextParams, setContextParams] = useState<FormState>(props.params);
-  const [isPending, startTransition] = React.useTransition();
+  const [contextForm, setContextParams] = useState<ContextFormState>(
+    props.params
+  );
 
   const translation = strings.fr;
 
-  const router = useRouter();
-
-  function handleSubmit(params: FormState) {
-    const url = addQueryParamsIfExist("/context", params);
-    startTransition(() => router.push(url, { scroll: false }));
-  }
+  const { handleSubmit, isPending } = useSubmit();
 
   const params = props.params;
 
@@ -62,17 +56,17 @@ export function ContextInputForm(props: ContextInputFormProps) {
   function setNewPage(newPage: number) {
     setLocallySelectedPage(newPage);
     handleSubmit({
-      ...contextParams,
+      ...contextForm,
       cursor: (newPage - 1) * (params.limit ?? 10),
     });
   }
 
-  function handleUpdateParams<T extends keyof FormState>(
+  function handleUpdateParams<T extends keyof ContextFormState>(
     key: T,
-    value: FormState[T]
+    value: ContextFormState[T]
   ) {
     setContextParams({
-      ...contextParams,
+      ...contextForm,
       [key]: value,
     });
   }
@@ -81,20 +75,20 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
   return (
     <>
-      <div
+      <form
         className={
           "w-full flex flex-col justify-center gap-10 items-center rounded-lg pt-5 pb-5"
         }
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(contextForm);
+        }}
       >
         <InputBubble
-          word={contextParams.terms?.[0] ?? ""}
+          word={contextForm.terms?.[0] ?? ""}
           onWordChange={(word) => handleUpdateParams("terms", [word])}
-          onSubmit={() => handleSubmit(contextParams)}
         >
-          <button
-            onClick={() => handleSubmit(contextParams)}
-            className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md"
-          >
+          <button className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md">
             {isPending ? <Spinner isFetching /> : "Explore"}
           </button>
         </InputBubble>
@@ -102,38 +96,38 @@ export function ContextInputForm(props: ContextInputFormProps) {
           <YearRangeInput
             min={1500}
             max={2023}
-            value={[contextParams.year, contextParams.end_year]}
+            value={[contextForm.year, contextForm.end_year]}
             showLabel={true}
             onChange={(value) => {
               setContextParams({
-                ...contextParams,
-                year: value ? value[0] : contextParams.year,
-                end_year: value ? value[1] : contextParams.end_year,
+                ...contextForm,
+                year: value ? value[0] : contextForm.year,
+                end_year: value ? value[1] : contextForm.end_year,
               });
             }}
           />
           <SelectInput
             label={"corpus"}
             options={["all", "book", "periodical"] as const}
-            value={contextParams.source}
+            value={contextForm.source}
             onChange={(new_source) => {
               handleUpdateParams("source", new_source);
             }}
           />
           <SelectInput
             label={"sort"}
-            value={contextParams.sort}
+            value={contextForm.sort}
             options={["date", "relevance"] as const}
             onChange={(sort) =>
               setContextParams({
-                ...contextParams,
+                ...contextForm,
                 sort: sort,
               })
             }
           />
           <SelectInput
             label={"limit"}
-            value={contextParams.limit}
+            value={contextForm.limit}
             options={[10, 20, 50]}
             onChange={(limit) => handleUpdateParams("limit", limit)}
           />
@@ -141,7 +135,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
         <div className="flex flex-wrap gap-5 items-center">
           <input
             type="text"
-            value={contextParams.link_term || ""}
+            value={contextForm.link_term || ""}
             onChange={(e) =>
               handleUpdateParams("link_term", e.target.value || undefined)
             }
@@ -151,7 +145,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           <Link1Icon className="w-6 h-6" />
           <input
             type="number"
-            value={contextParams.link_distance}
+            value={contextForm.link_distance}
             onChange={(e) => {
               const numVal = parseInt(e.target.value);
               if (typeof numVal === "number" && !isNaN(numVal) && numVal >= 0) {
@@ -170,7 +164,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           selectedPage={referencePage ?? 1}
           onChange={setNewPage}
         />
-      </div>
+      </form>
       <div className={`transition-all ${isPending && "opacity-50"}`}>
         {props.children}
       </div>

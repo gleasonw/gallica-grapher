@@ -15,7 +15,7 @@ export default function NavBar() {
   const [showSidebar, setShowSidebar] = React.useState(false);
   const currentPage = usePathname();
 
-  const linkStyle = "p-5 hover:cursor-pointer hover:bg-blue-100 ";
+  const linkStyle = "p-5 hover:cursor-pointer ";
   let homeLinkStyle = linkStyle;
   let exploreLinkStyle = linkStyle;
   let infoLinkStyle = linkStyle;
