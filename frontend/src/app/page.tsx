@@ -9,10 +9,10 @@ import { fetchSRU } from "./components/fetchContext";
 import { VolumeContext } from "./components/VolumeContext";
 import { LoadingProvider } from "./components/LoadingProvider";
 import { DataFrame, toJSON } from "danfojs-node";
+//@ts-ignore
 import * as Papa from "papaparse";
 import { GraphData } from "./components/models/dbStructs";
 import { addQueryParamsIfExist } from "./utils/addQueryParamsIfExist";
-import { string } from "zod";
 
 const strings = {
   fr: {
@@ -76,17 +76,17 @@ export async function getSeries(
     );
     const stringResponse = await response.text();
     const parsedCSV = Papa.parse(stringResponse, { header: true });
-    let dataFrame = new DataFrame(parsedCSV.data, {
-      columns: ["n", "gram", "annee", "mois", "total"],
-    });
-    let groupedFrame: DataFrame | null = null;
-    if (grouping === "mois" && source !== "livres") {
+    let dataFrame = new DataFrame(parsedCSV.data);
+    let groupedFrame: DataFrame = dataFrame;
+    if (resolution === "mois" && corpus !== "livres") {
+      //@ts-ignore
       groupedFrame = dataFrame
         .groupby(["annee", "mois", "gram"])
         .agg({ n: "sum", total: "sum" })
         .resetIndex();
     }
-    if (grouping === "annee") {
+    if (resolution === "annee") {
+      //@ts-ignore
       groupedFrame = dataFrame
         .groupby(["annee", "gram"])
         .agg({ n: "sum", total: "sum" })
@@ -99,7 +99,9 @@ export async function getSeries(
     }));
     return {
       data: rows.map((row) => [
-        new Date(parseInt(row.annee), parseInt(row.mois) - 1).getTime(),
+        row.mois
+          ? new Date(parseInt(row.annee), parseInt(row.mois) - 1).getTime()
+          : new Date(parseInt(row.annee), 0).getTime(),
         row.ratio,
       ]),
       name: term,
@@ -137,7 +139,7 @@ export default async function Page({
       ...searchState,
       terms: searchState.selected_term
         ? [searchState.selected_term]
-        : searchState.terms?.slice(0) ?? [],
+        : searchState.terms?.slice(0, 1) ?? [],
       year: searchState.context_year ?? searchState.year,
       end_year: searchState.context_year ? undefined : searchState.end_year,
     });

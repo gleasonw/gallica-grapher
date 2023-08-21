@@ -76,15 +76,14 @@ export function GraphSeriesForm({ children }: { children: React.ReactNode }) {
             min={1500}
             value={[year, end_year]}
             onChange={([newYear, newEndYear]) =>
-              setGraphFormState({
-                ...graphFormState,
+              handleSubmit({
                 year: newYear,
                 end_year: newEndYear,
               })
             }
             placeholder={[1789, 1950]}
           />
-          <SelectInput
+          {/* <SelectInput
             options={["presse", "livres", "tout"] as const}
             value={source}
             onChange={(newValue) =>
@@ -102,13 +101,15 @@ export function GraphSeriesForm({ children }: { children: React.ReactNode }) {
                 link_term: e.target.value,
               })
             }
-          />
+          /> */}
         </div>
       </form>
       <div className={"m-2"} />
       <TicketRow />
       <div className={"m-2"} />
-      <div className={isPending ? "opacity-50" : ""}>{children}</div>
+      <div className={isPending ? "opacity-50 transition-all" : ""}>
+        {children}
+      </div>
     </>
   );
 }

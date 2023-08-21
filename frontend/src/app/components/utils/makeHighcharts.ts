@@ -16,7 +16,7 @@ export const seriesColors = [
 export function makeOptions(
   onSetExtremes: (e: any) => void,
   onSeriesClick: (e: any) => void,
-  ticketData: GraphData
+  ticketData: GraphData[]
 ): Highcharts.Options {
   return {
     chart: {
@@ -72,7 +72,7 @@ export function makeOptions(
       color: seriesColors[i],
       point: {
         events: {
-          click: (e) => {
+          click: (e: any) => {
             onSeriesClick(e.point);
           },
         },

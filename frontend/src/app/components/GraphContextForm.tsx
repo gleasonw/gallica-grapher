@@ -5,6 +5,7 @@ import { useSearchState } from "../composables/useSearchState";
 import { SelectInput } from "./SelectInput";
 import { QueryPagination } from "./QueryPagination";
 import { useSubmit } from "./LoadingProvider";
+import * as Tabs from "@radix-ui/react-tabs";
 
 const gallica_plug = (
   <a
@@ -95,6 +96,9 @@ export default function GraphContextForm({
   const translation = strings["fr"];
   const searchState = useSearchState();
   const { terms, selected_term, year, end_year, month, cursor } = searchState;
+  const [selectedTab, setSelectedTab] = React.useState<string | undefined>(
+    terms?.[0]
+  );
 
   const currentPage = Math.floor((cursor ?? 0) / 10) + 1;
 
@@ -116,11 +120,6 @@ export default function GraphContextForm({
       <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
         {translation.gallicagram_plug}
         <div className={"flex wrap gap-10"}>
-          <SelectInput
-            options={terms?.map((term) => term) ?? []}
-            onChange={(value: string) => handleSubmit({ selected_term: value })}
-            value={terms?.find((t) => t === selected_term)}
-          />
           <ContextFilter
             onClick={() =>
               handleSubmit({ year: undefined, end_year: undefined })
@@ -133,12 +132,42 @@ export default function GraphContextForm({
           />
         </div>
       </div>
-      <QueryPagination
-        cursorMax={totalPages}
-        selectedPage={referencePage ?? 1}
-        onChange={setNewPage}
-      />
-      <div className={isPending ? "opacity-50" : ""}>{children}</div>
+      <Tabs.Root
+        value={selectedTab}
+        onValueChange={(value) => {
+          setSelectedTab(value);
+          handleSubmit({ selected_term: value });
+        }}
+      >
+        <Tabs.List className={"flex flex-row gap-3 w-full border-b pl-2"}>
+          {terms?.map((term) => (
+            <Tabs.Trigger
+              value={term}
+              key={term}
+              className={`p-5 transition-all ${
+                selectedTab === term && "border-b-2 border-blue-500"
+              }`}
+            >
+              {term}
+            </Tabs.Trigger>
+          ))}
+        </Tabs.List>
+
+        <QueryPagination
+          cursorMax={totalPages}
+          selectedPage={referencePage ?? 1}
+          onChange={setNewPage}
+        />
+        {terms?.map((term) => (
+          <Tabs.Content
+            value={term}
+            key={term}
+            className={isPending ? "opacity-50 transition-all" : ""}
+          >
+            {children}
+          </Tabs.Content>
+        ))}
+      </Tabs.Root>
     </>
   );
 }

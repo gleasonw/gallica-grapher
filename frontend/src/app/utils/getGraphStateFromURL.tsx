@@ -9,6 +9,7 @@ export type GraphState = z.infer<typeof graphState>;
 
 export function getGraphStateFromURL(params: Record<string, any>) {
   const result = graphState.safeParse(params);
+  console.log(params, result);
   if (!result.success) {
     return {};
   }

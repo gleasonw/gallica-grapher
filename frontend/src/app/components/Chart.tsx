@@ -59,7 +59,6 @@ export function Chart({ series }: { series?: GraphData[] }) {
   function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
     if (e.trigger === "zoom") {
       const minDate = new Date(e.min);
-      const maxDate = new Date(e.max);
       if (minDate.toString() === "Invalid Date") {
         handleSubmit({
           year: undefined,
@@ -73,8 +72,7 @@ export function Chart({ series }: { series?: GraphData[] }) {
         handleSubmit({ month: minDate.getUTCMonth() + 1 });
       }
       handleSubmit({
-        year: minDate.getUTCFullYear(),
-        end_year: maxDate.getUTCFullYear(),
+        context_year: minDate.getUTCFullYear(),
       });
     }
   }
@@ -82,7 +80,7 @@ export function Chart({ series }: { series?: GraphData[] }) {
   const highchartsOpts = makeOptions(
     handleSetExtremes,
     handleSeriesClick,
-    series
+    series ?? []
   );
 
   return (

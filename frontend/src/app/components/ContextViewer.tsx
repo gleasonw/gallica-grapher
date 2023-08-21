@@ -87,7 +87,9 @@ export default function ContextViewer({
           ))}
       </div>
       <div className={"w-full border"} />
-      <div className={`transition-all ${isPending && "opacity-50"}`}>
+      <div
+        className={`transition-all ${isPending && "opacity-50 transition-all"}`}
+      >
         {children}
         {!showImage && (
           <GallicaButton
