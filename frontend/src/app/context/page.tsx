@@ -1,5 +1,5 @@
 import React from "react";
-import { ContextInputForm } from "./components/ContextInputForm";
+import { ContextInputForm } from "../components/ContextInputForm";
 import { fetchSRU } from "../components/fetchContext";
 import { getSearchStateFromURL } from "../utils/searchState";
 import { VolumeContext } from "../components/VolumeContext";
