@@ -34,7 +34,10 @@ export default async function Context({
   }
 
   const params = result.data;
-  const contextParams = { ...params, terms: params.terms ?? "" };
+  const contextParams = {
+    ...params,
+    terms: params.terms ? [params.terms] : [],
+  };
   const data = await fetchSRU(contextParams);
 
   const maybeNumberResults = data.total_records;
