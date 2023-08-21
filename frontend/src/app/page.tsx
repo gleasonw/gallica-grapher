@@ -46,7 +46,7 @@ type GallicaGramRow = {
   ratio: number;
 };
 
-export async function getSeries(
+async function getSeries(
   { term, year, end_year, grouping, source }: Ticket,
   onNoRecordsFound: () => void
 ): Promise<GraphData | undefined> {
