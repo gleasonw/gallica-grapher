@@ -48,11 +48,16 @@ export function Chart({ series }: { series?: GraphData[] }) {
     }
     const date = new Date(point.category);
     if (grouping === "year") {
-      handleSubmit({ month: undefined, context_year: date.getUTCFullYear() });
+      handleSubmit({
+        month: undefined,
+        context_year: date.getUTCFullYear(),
+        cursor: 0,
+      });
     } else {
       handleSubmit({
         month: date.getUTCMonth() + 1,
         context_year: date.getUTCFullYear(),
+        cursor: 0,
       });
     }
   }
@@ -65,15 +70,17 @@ export function Chart({ series }: { series?: GraphData[] }) {
           year: undefined,
           end_year: undefined,
           month: undefined,
+          cursor: 0,
         });
 
         return;
       }
       if (grouping === "month") {
-        handleSubmit({ month: minDate.getUTCMonth() + 1 });
+        handleSubmit({ month: minDate.getUTCMonth() + 1, cursor: 0 });
       }
       handleSubmit({
         context_year: minDate.getUTCFullYear(),
+        cursor: 0,
       });
     }
   }

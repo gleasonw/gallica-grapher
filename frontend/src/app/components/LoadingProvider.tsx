@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import React, { createContext, useTransition } from "react";
+import React, { useCallback, useTransition } from "react";
 import { useSearchState } from "../composables/useSearchState";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { SearchState } from "../utils/searchState";
@@ -28,13 +28,16 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const [isPending, startTransition] = useTransition();
   const searchState = useSearchState();
 
-  function handleSubmit(localParams: URLState) {
-    const url = addQueryParamsIfExist(path, {
-      ...searchState,
-      ...localParams,
-    });
-    startTransition(() => router.push(url, { scroll: false }));
-  }
+  const handleSubmit = useCallback(
+    (localParams: URLState) => {
+      const url = addQueryParamsIfExist(path, {
+        ...searchState,
+        ...localParams,
+      });
+      startTransition(() => router.push(url, { scroll: false }));
+    },
+    [path, router, searchState, startTransition]
+  );
 
   return (
     <LoadingContext.Provider value={{ handleSubmit, isPending }}>

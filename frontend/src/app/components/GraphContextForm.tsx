@@ -96,8 +96,11 @@ export default function GraphContextForm({
   const translation = strings["fr"];
   const searchState = useSearchState();
   const { terms, selected_term, year, end_year, month, cursor } = searchState;
-  const [selectedTab, setSelectedTab] = React.useState<string | undefined>(
-    terms?.[0]
+
+  const displayBrazzaIfTermsUndefined = terms ?? ["brazza"];
+
+  const [localTab, setLocalTab] = React.useState<string | undefined>(
+    selected_term || displayBrazzaIfTermsUndefined?.[0]
   );
 
   const currentPage = Math.floor((cursor ?? 0) / 10) + 1;
@@ -105,6 +108,10 @@ export default function GraphContextForm({
   const totalPages = Math.floor((numResults ?? 0) / 10);
 
   const { handleSubmit, isPending } = useSubmit();
+
+  const referenceTab = isPending
+    ? localTab
+    : selected_term || displayBrazzaIfTermsUndefined?.[0];
 
   function setNewPage(newPage: number) {
     setLocallySelectedPage(newPage);
@@ -115,37 +122,50 @@ export default function GraphContextForm({
 
   const referencePage = isPending ? locallySelectedPage : currentPage;
 
+  if (!isPending && referenceTab !== localTab) {
+    setLocalTab(referenceTab);
+  }
+
+  if (!isPending && referencePage !== currentPage) {
+    setLocallySelectedPage(currentPage);
+  }
+
   return (
     <>
       <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
         {translation.gallicagram_plug}
         <div className={"flex wrap gap-10"}>
           <ContextFilter
-            onClick={() =>
-              handleSubmit({ year: undefined, end_year: undefined })
-            }
+            onClick={() => {
+              setLocallySelectedPage(1);
+              handleSubmit({ year: undefined, end_year: undefined, cursor: 0 });
+            }}
             label={year && end_year ? `${year} - ${end_year}` : undefined}
           />
           <ContextFilter
             label={month ? translation.months[month - 1] : undefined}
-            onClick={() => handleSubmit({ month: undefined })}
+            onClick={() => {
+              setLocallySelectedPage(1);
+              handleSubmit({ month: undefined, cursor: 0 });
+            }}
           />
         </div>
       </div>
       <Tabs.Root
-        value={selectedTab}
+        value={referenceTab}
         onValueChange={(value) => {
-          setSelectedTab(value);
-          handleSubmit({ selected_term: value });
+          setLocallySelectedPage(1);
+          setLocalTab(value);
+          handleSubmit({ selected_term: value, cursor: 0 });
         }}
       >
         <Tabs.List className={"flex flex-row gap-3 w-full border-b pl-2"}>
-          {terms?.map((term) => (
+          {displayBrazzaIfTermsUndefined?.map((term) => (
             <Tabs.Trigger
               value={term}
               key={term}
               className={`p-5 transition-all ${
-                selectedTab === term && "border-b-2 border-blue-500"
+                referenceTab === term && "border-b-2 border-blue-500"
               }`}
             >
               {term}
@@ -158,7 +178,7 @@ export default function GraphContextForm({
           selectedPage={referencePage ?? 1}
           onChange={setNewPage}
         />
-        {terms?.map((term) => (
+        {displayBrazzaIfTermsUndefined?.map((term) => (
           <Tabs.Content
             value={term}
             key={term}

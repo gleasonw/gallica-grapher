@@ -7,6 +7,7 @@ import { YearRangeInput } from "./YearRangeInput";
 import { SelectInput } from "./SelectInput";
 import { useSearchState } from "../composables/useSearchState";
 import { useSubmit } from "./LoadingProvider";
+import { Spinner } from "./Spinner";
 
 type GraphFormState = {
   word: string;
@@ -51,6 +52,10 @@ export function GraphSeriesForm({ children }: { children: React.ReactNode }) {
         }
         onSubmit={(e) => {
           e.preventDefault();
+          setGraphFormState({
+            ...graphFormState,
+            word: "",
+          });
           handleSubmit({
             terms: terms ? [...terms, word] : [word],
             link_term,
@@ -67,7 +72,7 @@ export function GraphSeriesForm({ children }: { children: React.ReactNode }) {
           }
         >
           <button className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md">
-            Explore
+            {isPending ? <Spinner isFetching /> : "Explore"}
           </button>
         </InputBubble>
         <div className={"flex flex-wrap gap-10 items-center justify-center"}>
@@ -107,9 +112,7 @@ export function GraphSeriesForm({ children }: { children: React.ReactNode }) {
       <div className={"m-2"} />
       <TicketRow />
       <div className={"m-2"} />
-      <div className={isPending ? "opacity-50 transition-all" : ""}>
-        {children}
-      </div>
+      {children}
     </>
   );
 }
@@ -117,13 +120,17 @@ export function GraphSeriesForm({ children }: { children: React.ReactNode }) {
 function TicketRow(props: { children?: React.ReactNode }) {
   const { terms } = useSearchState();
   const { handleSubmit } = useSubmit();
+  const displayTerms = terms ?? ["brazza"];
   return (
     <div className={"z-0 flex self-start m-5"}>
       <div className={"flex flex-wrap gap-10"}>
-        {terms?.map((term, index) => (
+        {displayTerms?.map((term, index) => (
           <button
             onClick={() =>
-              handleSubmit({ terms: terms.filter((t) => t !== term) })
+              handleSubmit({
+                terms: terms?.filter((t) => t !== term),
+                selected_term: undefined,
+              })
             }
             className={`rounded-lg border-2 bg-white p-3 text-xl shadow-md transition duration-150 hover:bg-zinc-500 hover:ease-in`}
             style={{ borderColor: seriesColors[index % seriesColors.length] }}

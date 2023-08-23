@@ -26,11 +26,16 @@ export type SearchState = z.infer<typeof searchState>;
 export function getSearchStateFromURL(
   params: Record<string, any>
 ): SearchState {
-  const result = searchState.safeParse({
-    ...params,
-    terms: Array.isArray(params.terms) ? params.terms : [params.terms],
+  Object.entries(params).forEach(([key, value]) => {
+    if (key === "codes" || key === "terms") {
+      if (!Array.isArray(value)) {
+        params[key] = [value];
+      }
+    }
   });
+  const result = searchState.safeParse(params);
   if (!result.success) {
+    console.log(result.error);
     return {};
   }
   return result.data;

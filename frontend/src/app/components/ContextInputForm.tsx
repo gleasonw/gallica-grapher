@@ -103,6 +103,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
                 ...contextForm,
                 year: value ? value[0] : contextForm.year,
                 end_year: value ? value[1] : contextForm.end_year,
+                cursor: 0,
               });
             }}
           />

@@ -134,18 +134,18 @@ export default async function Page({
   let seriesData: undefined | GraphData[] = undefined;
   let data: Awaited<ReturnType<typeof fetchSRU>> | undefined = undefined;
 
+  const terms = searchState?.terms ?? ["brazza"];
+
   if (searchState) {
     data = await fetchSRU({
       ...searchState,
-      terms: searchState.selected_term
-        ? [searchState.selected_term]
-        : searchState.terms?.slice(0, 1) ?? [],
+      terms: searchState.selected_term ? [searchState.selected_term] : terms,
       year: searchState.context_year ?? searchState.year,
       end_year: searchState.context_year ? undefined : searchState.end_year,
     });
     numResults = data.total_records;
     const response = await Promise.allSettled(
-      searchState.terms?.map(
+      terms?.map(
         async (term) =>
           await getSeries(
             {
