@@ -164,7 +164,7 @@ export default function GraphContextForm({
             <Tabs.Trigger
               value={term}
               key={term}
-              className={`p-5 transition-all ${
+              className={`p-5 transition-all focus:outline-1 ${
                 referenceTab === term && "border-b-2 border-blue-500"
               }`}
             >
