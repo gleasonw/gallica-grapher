@@ -43,7 +43,8 @@ export function Chart({ series }: { series?: GraphData[] }) {
 
   function handleSeriesClick(point: Highcharts.Point) {
     const chart = chartComponentRef.current?.chart;
-    if (chart.xAxis[0].plotLinesAndBands.length > 0) {
+    // @ts-ignore
+    if (chart && chart.xAxis[0].plotLinesAndBands.length > 0) {
       chart.xAxis[0].removePlotLine("selectedLine");
     }
     chart.xAxis[0].addPlotLine({
