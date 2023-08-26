@@ -6,6 +6,7 @@ import { SelectInput } from "./SelectInput";
 import { QueryPagination } from "./QueryPagination";
 import { useSubmit } from "./LoadingProvider";
 import * as Tabs from "@radix-ui/react-tabs";
+import { useSelectedTerm } from "../composables/useSelectedTerm";
 
 const gallica_plug = (
   <a
@@ -95,12 +96,12 @@ export default function GraphContextForm({
     React.useState<number>(1);
   const translation = strings["fr"];
   const searchState = useSearchState();
-  const { terms, selected_term, year, end_year, month, cursor } = searchState;
+  const { terms, year, end_year, month, cursor, context_year } = searchState;
 
-  const displayBrazzaIfTermsUndefined = terms ?? ["brazza"];
+  const selectedTerm = useSelectedTerm();
 
   const [localTab, setLocalTab] = React.useState<string | undefined>(
-    selected_term || displayBrazzaIfTermsUndefined?.[0]
+    selectedTerm
   );
 
   const currentPage = Math.floor((cursor ?? 0) / 10) + 1;
@@ -109,9 +110,7 @@ export default function GraphContextForm({
 
   const { handleSubmit, isPending } = useSubmit();
 
-  const referenceTab = isPending
-    ? localTab
-    : selected_term || displayBrazzaIfTermsUndefined?.[0];
+  const referenceTab = isPending ? localTab : selectedTerm;
 
   function setNewPage(newPage: number) {
     setLocallySelectedPage(newPage);
@@ -133,14 +132,24 @@ export default function GraphContextForm({
   return (
     <>
       <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
-        {translation.gallicagram_plug}
         <div className={"flex wrap gap-10"}>
           <ContextFilter
             onClick={() => {
               setLocallySelectedPage(1);
-              handleSubmit({ year: undefined, end_year: undefined, cursor: 0 });
+              handleSubmit({
+                year: undefined,
+                end_year: undefined,
+                context_year: undefined,
+                cursor: 0,
+              });
             }}
-            label={year && end_year ? `${year} - ${end_year}` : undefined}
+            label={
+              context_year
+                ? `${context_year}`
+                : year && end_year
+                ? `${year} - ${end_year}`
+                : undefined
+            }
           />
           <ContextFilter
             label={month ? translation.months[month - 1] : undefined}
@@ -160,7 +169,7 @@ export default function GraphContextForm({
         }}
       >
         <Tabs.List className={"flex flex-row gap-3 w-full border-b pl-2"}>
-          {displayBrazzaIfTermsUndefined?.map((term) => (
+          {(terms ?? ["brazza"])?.map((term) => (
             <Tabs.Trigger
               value={term}
               key={term}
@@ -178,7 +187,7 @@ export default function GraphContextForm({
           selectedPage={referencePage ?? 1}
           onChange={setNewPage}
         />
-        {displayBrazzaIfTermsUndefined?.map((term) => (
+        {(terms ?? ["brazza"])?.map((term) => (
           <Tabs.Content
             value={term}
             key={term}

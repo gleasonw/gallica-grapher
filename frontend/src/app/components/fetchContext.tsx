@@ -32,7 +32,6 @@ export async function fetchContext(args: ContextQueryParams) {
 }
 
 export async function fetchSRU(args: ContextQueryParams) {
-  console.log({ args });
   let baseUrl = `https://gallica-grapher-production.up.railway.app/api/sru`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,

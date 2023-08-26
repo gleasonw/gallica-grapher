@@ -9,10 +9,10 @@ import { fetchSRU } from "./components/fetchContext";
 import { VolumeContext } from "./components/VolumeContext";
 import { LoadingProvider } from "./components/LoadingProvider";
 import { DataFrame, toJSON } from "danfojs-node";
-//@ts-ignore
 import * as Papa from "papaparse";
 import { GraphData } from "./components/models/dbStructs";
 import { addQueryParamsIfExist } from "./utils/addQueryParamsIfExist";
+import { NearbyTerms } from "./components/NearbyTerms";
 
 const strings = {
   fr: {
@@ -48,7 +48,7 @@ type GallicaGramRow = {
 
 async function getSeries(
   { term, year, end_year, grouping, source }: Ticket,
-  onNoRecordsFound: () => void
+  onNoRecordsFound: (error: any) => void
 ): Promise<GraphData | undefined> {
   if (!term) {
     return;
@@ -107,7 +107,7 @@ async function getSeries(
       name: term,
     };
   } catch (error) {
-    onNoRecordsFound();
+    onNoRecordsFound(error);
     throw error;
   }
 }
@@ -156,7 +156,7 @@ export default async function Page({
               smoothing: graphState.smoothing,
               source: searchState.source,
             },
-            () => console.log("test")
+            (error) => console.error(error)
           )
       ) ?? []
     );
@@ -194,9 +194,10 @@ export default async function Page({
           {translation.description}{" "}
         </div>
         <LoadingProvider>
-          <GraphSeriesForm>
-            <Chart series={seriesData} />
-          </GraphSeriesForm>
+          <GraphSeriesForm
+            lineChart={<Chart series={seriesData} />}
+            proximityBar={<NearbyTerms params={searchParams} />}
+          />
           <GraphContextForm numResults={numResults}>
             <div className={"flex flex-col gap-20 md:m-5"}>
               {data?.records?.map((record, index) => (

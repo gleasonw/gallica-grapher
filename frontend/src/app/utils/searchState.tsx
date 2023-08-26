@@ -35,7 +35,6 @@ export function getSearchStateFromURL(
   });
   const result = searchState.safeParse(params);
   if (!result.success) {
-    console.log(result.error);
     return {};
   }
   return result.data;

@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.4.2",
+    "@types/papaparse": "^5.3.8",
     "autoprefixer": "^10.4.15",
     "eslint": "8.47.0",
     "eslint-plugin-react": "^7.33.2",

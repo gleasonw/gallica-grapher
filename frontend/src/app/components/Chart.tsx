@@ -42,6 +42,16 @@ export function Chart({ series }: { series?: GraphData[] }) {
   }, [year, end_year]);
 
   function handleSeriesClick(point: Highcharts.Point) {
+    const chart = chartComponentRef.current?.chart;
+    if (chart.xAxis[0].plotLinesAndBands.length > 0) {
+      chart.xAxis[0].removePlotLine("selectedLine");
+    }
+    chart.xAxis[0].addPlotLine({
+      value: point.x,
+      color: "red",
+      width: 2,
+      id: "selectedLine",
+    });
     const correspondingTerm = terms?.find((t) => t === point.series.name);
     if (correspondingTerm) {
       handleSubmit({ selected_term: correspondingTerm });
