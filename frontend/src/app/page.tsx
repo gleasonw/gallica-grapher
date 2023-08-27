@@ -12,7 +12,7 @@ import { DataFrame, toJSON } from "danfojs-node";
 import * as Papa from "papaparse";
 import { GraphData } from "./components/models/dbStructs";
 import { addQueryParamsIfExist } from "./utils/addQueryParamsIfExist";
-import { NearbyTerms } from "./components/NearbyTerms";
+import { NearbyTermsChart } from "./components/NearbyTermsChart";
 
 const strings = {
   fr: {
@@ -194,7 +194,10 @@ export default async function Page({
           {translation.description}{" "}
         </div>
         <LoadingProvider>
-          <GraphSeriesForm lineChart={<Chart series={seriesData} />} />
+          <GraphSeriesForm>
+            <Chart series={seriesData} />
+            <NearbyTermsChart />
+          </GraphSeriesForm>
           <GraphContextForm numResults={numResults}>
             <div className={"flex flex-col gap-20 md:m-5"}>
               {data?.records?.map((record, index) => (

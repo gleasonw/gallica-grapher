@@ -6,6 +6,7 @@ import { useSearchState } from "../composables/useSearchState";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { SearchState } from "../utils/searchState";
 import { GraphState } from "../utils/getGraphStateFromURL";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 export type URLState = SearchState & GraphState;
 
@@ -27,6 +28,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const [isPending, startTransition] = useTransition();
   const searchState = useSearchState();
+  const queryClient = React.useMemo(() => new QueryClient(), []);
 
   const handleSubmit = useCallback(
     (localParams: URLState) => {
@@ -40,8 +42,10 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <LoadingContext.Provider value={{ handleSubmit, isPending }}>
-      {children}
-    </LoadingContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <LoadingContext.Provider value={{ handleSubmit, isPending }}>
+        {children}
+      </LoadingContext.Provider>
+    </QueryClientProvider>
   );
 }

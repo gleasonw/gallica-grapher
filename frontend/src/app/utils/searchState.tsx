@@ -19,6 +19,8 @@ export const searchState = z.object({
   cursor: z.coerce.number().optional(),
   selected_term: z.string().optional(),
   context_year: z.coerce.number().optional(),
+  max_n: z.coerce.number().optional(),
+  sample_size: z.coerce.number().optional(),
 });
 
 export type SearchState = z.infer<typeof searchState>;

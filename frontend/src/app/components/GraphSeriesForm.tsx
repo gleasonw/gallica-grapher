@@ -17,15 +17,7 @@ type GraphFormState = {
   end_year?: number;
 };
 
-export function GraphSeriesForm({
-  children,
-  lineChart,
-  proximityBar,
-}: {
-  children?: React.ReactNode;
-  lineChart: React.ReactNode;
-  proximityBar?: React.ReactNode;
-}) {
+export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
   const [graphFormState, setGraphFormState] = useState<GraphFormState>({
     word: "",
     source: "presse",
@@ -102,49 +94,8 @@ export function GraphSeriesForm({
       <div className={"m-2"} />
       <TicketRow />
       <div className={"m-2"} />
-
-      <Suspense
-        key={terms && [...terms, year, end_year].join("-")}
-        fallback={<div>Chargement du graphe...</div>}
-      >
-        {lineChart}
-      </Suspense>
-      <p className={"m-2"}>
-        Données de graph fournies par{" "}
-        <a
-          href="https://shiny.ens-paris-saclay.fr/app/gallicagram"
-          target="_blank"
-          rel="noreferrer"
-          className="text-blue-500 underline"
-        >
-          Gallicagram
-        </a>
-        , un projet de Benjamin Azoulay et Benoît de Courson.
-      </p>
-      {proximityBar && (
-        <Suspense
-          key={`${selectedTerm}-${context_year}-${terms?.join("-")}-${month}`}
-          fallback={<BarSkeleton />}
-        >
-          {proximityBar}
-        </Suspense>
-      )}
-
       {children}
     </>
-  );
-}
-
-function BarSkeleton() {
-  return (
-    <div className="p-6 space-y-4 flex flex-col">
-      <div className="w-10/12 h-4 bg-gray-200 rounded animate-pulse" />
-      <div className="w-7/12 h-4 bg-gray-200 rounded animate-pulse" />
-      <div className="w-6/12 h-4 bg-gray-200 rounded animate-pulse" />
-      <div className="w-4/12 h-4 bg-gray-200 rounded animate-pulse" />
-      <div className="w-3/12 h-4 bg-gray-200 rounded animate-pulse" />
-      <div className="w-2/12 h-4 bg-gray-200 rounded animate-pulse" />
-    </div>
   );
 }
 
