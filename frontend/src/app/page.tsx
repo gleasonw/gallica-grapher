@@ -194,10 +194,7 @@ export default async function Page({
           {translation.description}{" "}
         </div>
         <LoadingProvider>
-          <GraphSeriesForm
-            lineChart={<Chart series={seriesData} />}
-            proximityBar={<NearbyTerms params={searchParams} />}
-          />
+          <GraphSeriesForm lineChart={<Chart series={seriesData} />} />
           <GraphContextForm numResults={numResults}>
             <div className={"flex flex-col gap-20 md:m-5"}>
               {data?.records?.map((record, index) => (

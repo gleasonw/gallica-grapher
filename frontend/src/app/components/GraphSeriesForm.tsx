@@ -24,7 +24,7 @@ export function GraphSeriesForm({
 }: {
   children?: React.ReactNode;
   lineChart: React.ReactNode;
-  proximityBar: React.ReactNode;
+  proximityBar?: React.ReactNode;
 }) {
   const [graphFormState, setGraphFormState] = useState<GraphFormState>({
     word: "",
@@ -121,12 +121,15 @@ export function GraphSeriesForm({
         </a>
         , un projet de Benjamin Azoulay et Benoît de Courson.
       </p>
-      <Suspense
-        key={`${selectedTerm}-${context_year}-${terms?.join("-")}-${month}`}
-        fallback={<BarSkeleton />}
-      >
-        {proximityBar}
-      </Suspense>
+      {proximityBar && (
+        <Suspense
+          key={`${selectedTerm}-${context_year}-${terms?.join("-")}-${month}`}
+          fallback={<BarSkeleton />}
+        >
+          {proximityBar}
+        </Suspense>
+      )}
+
       {children}
     </>
   );
