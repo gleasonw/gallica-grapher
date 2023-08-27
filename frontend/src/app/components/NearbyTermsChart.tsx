@@ -44,7 +44,7 @@ export function NearbyTermsChart({ data }: { data?: NearbyData }) {
       {data && data.length > 0 && selectedTerm ? (
         <div className={"flex flex-col gap-5 m-2"}>
           <h1 className={"text-xl"}>
-            Terms en proximité de {selectedTerm} en {context_year}
+            Terms en proximité de {selectedTerm} en {context_year ?? 1882}
           </h1>
           <h2 className={"text-lg"}>
             {"Pris d'un échantillon de 50 occurrences"}
