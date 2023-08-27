@@ -1,7 +1,7 @@
 "use client";
 
 import { HighchartsReact } from "highcharts-react-official";
-import Highcharts, { SeriesBarOptions } from "highcharts";
+import Highcharts from "highcharts";
 import { useSearchState } from "../composables/useSearchState";
 import { useSelectedTerm } from "../composables/useSelectedTerm";
 

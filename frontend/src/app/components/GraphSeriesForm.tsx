@@ -97,25 +97,6 @@ export function GraphSeriesForm({
             }
             placeholder={[1789, 1950]}
           />
-          {/* <SelectInput
-            options={["presse", "livres", "tout"] as const}
-            value={source}
-            onChange={(newValue) =>
-              setGraphFormState({ ...graphFormState, source: newValue })
-            }
-          />
-          <input
-            type="text"
-            className={"border p-2 rounded-lg shadow-sm"}
-            value={link_term}
-            placeholder={"Proximité (3)"}
-            onChange={(e) =>
-              setGraphFormState({
-                ...graphFormState,
-                link_term: e.target.value,
-              })
-            }
-          /> */}
         </div>
       </form>
       <div className={"m-2"} />
@@ -163,8 +144,6 @@ function BarSkeleton() {
     </div>
   );
 }
-
-// add key to suspense?
 
 function TicketRow(props: { children?: React.ReactNode }) {
   const { terms } = useSearchState();
