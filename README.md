@@ -8,12 +8,6 @@ This app relies on the [Gallica API](https://api.bnf.fr/fr/api-document-de-galli
 
 ### Important files:
 
-[main.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/main.py)
-* api routes for the frontend marked by the @app FastAPI decorator
-
-[request.py](https://github.com/gleasonw/gallica-grapher/blob/main/backend/www/request.py)
-* The Request class, a thread that spawns for each user and calls the core fetch --> parse --> store to database logic
-
 [Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/components)
 * Contains the React components for the graph, table, paper dropdown, and every UI component. 
 * The long className strings in the html elements are [Tailwind](https://tailwindcss.com/) CSS utility classes.
