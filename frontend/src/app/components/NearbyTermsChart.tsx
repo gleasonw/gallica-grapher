@@ -29,7 +29,6 @@ async function fetchNearby({
     max_n,
     sample_size,
   });
-  console.log(url);
 
   const response = await fetch(url);
 

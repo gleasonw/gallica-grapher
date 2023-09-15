@@ -36,6 +36,7 @@ export async function fetchSRU(args: ContextQueryParams) {
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
   });
+  console.log("fetching from sru");
   const response = await fetch(url);
   return (await response.json()) as {
     records: VolumeRecord[];

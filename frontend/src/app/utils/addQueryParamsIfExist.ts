@@ -3,7 +3,6 @@ export function addQueryParamsIfExist(
   params: Record<string, any>
 ) {
   const urlParams = new URLSearchParams();
-  console.log({ params });
   Object.entries(params).forEach(([key, value]) => {
     if (
       value !== undefined &&

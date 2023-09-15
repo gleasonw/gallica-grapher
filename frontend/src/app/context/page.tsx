@@ -12,7 +12,10 @@ export default async function Page({
 }) {
   const params = getSearchStateFromURL(searchParams);
   const contextParams = { ...params, terms: params?.terms ?? [] };
-  const data = await fetchSRU(contextParams);
+  const data =
+    params.terms && params.terms.length > 0
+      ? await fetchSRU(contextParams)
+      : { records: [], total_records: 0 };
 
   const maybeNumberResults = data.total_records;
   let numResults = 0;
