@@ -1,5 +1,6 @@
 import "./globals.css";
 import NavBar from "./components/NavBar";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -12,6 +13,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <NavBar />
+        <Analytics />
         {children}
       </body>
     </html>
