@@ -1,5 +1,6 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import Image from "next/image";
+import { apiURL } from "./apiURL";
 
 export async function ImageSnippet({
   ark,
@@ -11,14 +12,11 @@ export async function ImageSnippet({
   pageNumber: number;
 }) {
   async function doFetch() {
-    const url = addQueryParamsIfExist(
-      `https://gallica-grapher-production.up.railway.app/api/image`,
-      {
-        ark: ark,
-        term: term,
-        page: pageNumber,
-      }
-    );
+    const url = addQueryParamsIfExist(`${apiURL}/api/image`, {
+      ark: ark,
+      term: term,
+      page: pageNumber,
+    });
     const response = await fetch(url);
     if (response.status !== 200) {
       return { image: "" };
