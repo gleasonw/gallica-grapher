@@ -6,7 +6,7 @@ If you have an idea, suggestion, or question about the code, don't hesitate to m
 
 This app relies on the [Gallica API](https://api.bnf.fr/fr/api-document-de-gallica) and [Pyllicagram](https://github.com/regicid/pyllicagram). You can find the Gallica JSON API I built in the [gallica-getter](https://github.com/gleasonw/gallica-getter) repository.
 
-This project used to have an API until I started using [React server components](https://nextjs.org/docs/app/building-your-application/rendering/server-components). I now fetch gram data directly from Gallicagram, in the [relevant home component](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/app/page.tsx). 
+This project used to have an API and a database until I started using [React server components](https://nextjs.org/docs/app/building-your-application/rendering/server-components). I now fetch gram data directly from Gallicagram, in the [relevant home component](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/app/page.tsx). The Next.js fetch cache prevents over-fetching from Gallicagram, removing the need for a database. 
 
 ### Important files:
 
