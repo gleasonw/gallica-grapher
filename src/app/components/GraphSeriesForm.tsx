@@ -1,48 +1,26 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React from "react";
 import { seriesColors } from "./utils/makeHighcharts";
 import InputBubble from "./InputBubble";
 import { YearRangeInput } from "./YearRangeInput";
 import { useSearchState } from "../composables/useSearchState";
 import { useSubmit } from "./LoadingProvider";
 import { Spinner } from "./Spinner";
-import { useSelectedTerm } from "../composables/useSelectedTerm";
-
-type GraphFormState = {
-  word: string;
-  source: "presse" | "livres" | "tout";
-  link_term: string;
-  year?: number;
-  end_year?: number;
-};
+import { SearchState } from "../utils/searchState";
 
 export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
-  const [graphFormState, setGraphFormState] = useState<GraphFormState>({
-    word: "",
-    source: "presse",
-    link_term: "",
-    year: 1789,
-    end_year: 1950,
-  });
-
-  const { word, source, link_term, year, end_year } = graphFormState;
-  const { terms, context_year, month } = useSearchState();
-  const selectedTerm = useSelectedTerm();
+  const { terms, year, end_year } = useSearchState();
+  const [localTerm, setLocalTerm] = React.useState<string>("");
 
   const { handleSubmit, isPending } = useSubmit();
 
-  const sourceOptions = ["presse", "livres", "tout"] as const;
-
-  function translateSource(source: (typeof sourceOptions)[number]) {
-    switch (source) {
-      case "presse":
-        return "periodical";
-      case "livres":
-        return "book";
-      case "tout":
-        return "all";
-    }
+  function submitForm(args?: unknown) {
+    if (typeof args === "object")
+      handleSubmit({
+        ...args,
+        terms: terms ? [...terms, localTerm] : [localTerm],
+      });
   }
 
   return (
@@ -53,24 +31,12 @@ export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
         }
         onSubmit={(e) => {
           e.preventDefault();
-          setGraphFormState({
-            ...graphFormState,
-            word: "",
-          });
-          handleSubmit({
-            terms: terms ? [...terms, word] : [word],
-            link_term,
-            end_year,
-            year,
-            source: translateSource(source),
-          });
+          submitForm();
         }}
       >
         <InputBubble
-          word={word}
-          onWordChange={(word) =>
-            setGraphFormState({ ...graphFormState, word })
-          }
+          word={localTerm}
+          onWordChange={(word) => setLocalTerm(word)}
         >
           <button className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md">
             {isPending ? <Spinner isFetching /> : "Explore"}
@@ -82,7 +48,7 @@ export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
             min={1500}
             value={[year, end_year]}
             onChange={([newYear, newEndYear]) =>
-              handleSubmit({
+              submitForm({
                 year: newYear,
                 end_year: newEndYear,
               })

@@ -84,7 +84,7 @@ export function NearbyTermsChart() {
 
   return (
     <>
-      {isLoading && <BarSkeleton />}
+      {isLoading ? <BarSkeleton /> : null}
       {data && data.length > 0 && selectedTerm ? (
         <div className={"flex flex-col gap-5 m-2"}>
           <h1 className={"text-xl"}>

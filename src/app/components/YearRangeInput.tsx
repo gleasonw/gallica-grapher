@@ -79,9 +79,7 @@ export function YearRangeInput(props: YearRangeInputProps) {
               <div className={"flex gap-5 items-center"}>
                 <button
                   className={"border p-2 hover:bg-blue-100 rounded-md"}
-                  onClick={() => {
-                    props.onChange(localValue);
-                  }}
+                  onClick={() => props.onChange(localValue)}
                 >
                   Apply
                 </button>
