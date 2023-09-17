@@ -16,11 +16,16 @@ export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
   const { handleSubmit, isPending } = useSubmit();
 
   function submitForm(args?: unknown) {
-    if (typeof args === "object")
+    if (typeof args === "object") {
       handleSubmit({
         ...args,
         terms: terms ? [...terms, localTerm] : [localTerm],
       });
+    } else {
+      handleSubmit({
+        terms: terms ? [...terms, localTerm] : [localTerm],
+      });
+    }
   }
 
   return (
