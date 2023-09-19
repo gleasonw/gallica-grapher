@@ -55,10 +55,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
   function setNewPage(newPage: number) {
     setLocallySelectedPage(newPage);
-    handleSubmit({
-      ...contextForm,
-      cursor: (newPage - 1) * (params.limit ?? 10),
-    });
+    handleSubmit({ cursor: (newPage - 1) * 10 });
   }
 
   function handleUpdateParams<T extends keyof ContextFormState>(
@@ -159,13 +156,12 @@ export function ContextInputForm(props: ContextInputFormProps) {
             placeholder={translation.linkDistance}
           />
         </div>
-
-        <QueryPagination
-          cursorMax={totalPages}
-          selectedPage={referencePage ?? 1}
-          onChange={setNewPage}
-        />
       </form>
+      <QueryPagination
+        cursorMax={totalPages}
+        selectedPage={referencePage ?? 1}
+        onChange={setNewPage}
+      />
       <div className={`transition-all ${isPending && "opacity-50"}`}>
         {props.children}
       </div>
