@@ -1,4 +1,5 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
+import { apiURL } from "./apiURL";
 import { GallicaResponse, VolumeRecord } from "./models/dbStructs";
 
 export type ContextQueryParams = {
@@ -20,7 +21,7 @@ export type ContextQueryParams = {
 };
 
 export async function fetchContext(args: ContextQueryParams) {
-  let baseUrl = `https://gallica-grapher-production.up.railway.app/api/gallicaRecords`;
+  let baseUrl = `${apiURL}/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
     all_context: false,
@@ -32,7 +33,7 @@ export async function fetchContext(args: ContextQueryParams) {
 }
 
 export async function fetchSRU(args: ContextQueryParams) {
-  let baseUrl = `https://gallica-grapher-production.up.railway.app/api/sru`;
+  let baseUrl = `${apiURL}/api/sru`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
   });
@@ -52,9 +53,7 @@ export async function fetchVolumeContext({
   ark: string;
   term: string;
 }) {
-  const response = await fetch(
-    `https://gallica-grapher-production.up.railway.app/api/volume?term=${term}&ark=${ark}`
-  );
+  const response = await fetch(`${apiURL}/api/volume?term=${term}&ark=${ark}`);
   const data = (await response.json()) as {
     pivot: string;
     right_context: string;

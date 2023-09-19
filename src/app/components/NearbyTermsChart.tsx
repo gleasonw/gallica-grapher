@@ -6,6 +6,7 @@ import { useSearchState } from "../composables/useSearchState";
 import { useSelectedTerm } from "../composables/useSelectedTerm";
 import { useQuery } from "react-query";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
+import { apiURL } from "./apiURL";
 
 export type NearbyData = [string, number][];
 
@@ -22,7 +23,7 @@ async function fetchNearby({
   max_n?: number;
   sample_size?: number;
 }) {
-  let baseUrl = `https://gallica-grapher-production.up.railway.app/api/mostTermsAtTime`;
+  let baseUrl = `${apiURL}/api/mostTermsAtTime`;
   let url = addQueryParamsIfExist(baseUrl, {
     term,
     year,
@@ -83,7 +84,7 @@ export function NearbyTermsChart() {
 
   return (
     <>
-      {isLoading && <BarSkeleton />}
+      {isLoading ? <BarSkeleton /> : null}
       {data && data.length > 0 && selectedTerm ? (
         <div className={"flex flex-col gap-5 m-2"}>
           <h1 className={"text-xl"}>
