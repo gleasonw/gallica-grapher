@@ -196,7 +196,6 @@ export default async function Page({
         <LoadingProvider>
           <GraphSeriesForm>
             <Chart series={seriesData} />
-            <NearbyTermsChart />
           </GraphSeriesForm>
           <GraphContextForm numResults={numResults}>
             <div className={"flex flex-col gap-20 md:m-5"}>
@@ -224,6 +223,7 @@ export default async function Page({
               ))}
             </div>
           </GraphContextForm>
+          <NearbyTermsChart />
         </LoadingProvider>
       </div>
     </>
