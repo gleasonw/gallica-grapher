@@ -4,7 +4,8 @@ from io import StringIO
 import os
 import aiohttp.client_exceptions
 import uvicorn
-from typing import Any, Callable, Dict, List, Literal, Optional
+from typing import List, Literal, Optional, Tuple
+from datetime import date as Date
 from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import aiohttp
@@ -22,10 +23,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Point(BaseModel):
-    date: str
-    count: float
-    term: str
+
+class Series(BaseModel):
+    data: List[Tuple[int, float]]
+    name: str
+
 
 @app.get("/series")
 async def get(
@@ -34,7 +36,7 @@ async def get(
     end_date: Optional[int] = None,
     grouping: Literal["mois", "annee"] = "mois",
     source: Literal["livres", "presse", "lemonde"] = "presse",
-    link_term: Optional[str] = None
+    link_term: Optional[str] = None,
 ):
     """Get records from Pyllica. Interpret 500 error as no records found."""
     debut = start_date or 1789
@@ -58,17 +60,21 @@ async def get(
         )
     if all(periods.ratio == 0):
         raise HTTPException(status_code=404, detail="No records found")
-    if "mois" not in periods.columns:
-        dates = periods.annee
-    else:
-        dates = periods.apply(lambda row: f"{row.annee}-{row.mois:02}", axis=1)
-    return (
-        Point(
-            date=str(date),
-            count=count,
-            term=term,
-        )
-        for date, count, term in zip(dates, periods.ratio, periods.gram)
+
+    def get_unix_timestamp(row) -> int:
+        year = int(row.get("annee", 0))
+        month = int(row.get("mois", 0)) - 1 if row.get("mois") else 0
+
+        dt = Date(year, month + 1, 1) if month >= 0 else Date(year, 1, 1)
+        return int((dt - Date(1970, 1, 1)).total_seconds())
+
+    data = periods.apply(
+        lambda row: (get_unix_timestamp(row), row["ratio"]), axis=1
+    ).tolist()
+
+    return Series(
+        data=data,
+        name=term,
     )
 
 
@@ -152,7 +158,6 @@ async def parse_df(
 
     df["ratio"] = df.apply(lambda row: calc_ratio(row), axis=1)
     return df
-
 
 
 if __name__ == "__main__":
