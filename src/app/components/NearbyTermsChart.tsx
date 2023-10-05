@@ -19,9 +19,9 @@ async function fetchNearby({
 }: {
   term: string;
   year: number;
-  month?: number;
-  max_n?: number;
-  sample_size?: number;
+  month?: number | null;
+  max_n?: number | null;
+  sample_size?: number | null;
 }) {
   let baseUrl = `${apiURL}/api/mostTermsAtTime`;
   let url = addQueryParamsIfExist(baseUrl, {
