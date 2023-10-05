@@ -1,6 +1,7 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { apiURL } from "./apiURL";
-import { GallicaResponse, VolumeRecord } from "./models/dbStructs";
+import { VolumeRecord } from "./models/dbStructs";
+import { components } from "../types";
 
 export type ContextQueryParams = {
   terms: string[];
@@ -20,6 +21,8 @@ export type ContextQueryParams = {
   all_context?: boolean;
 };
 
+export type RowRecordResponse = components["schemas"]["RowRecordResponse"];
+
 export async function fetchContext(args: ContextQueryParams) {
   let baseUrl = `${apiURL}/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
@@ -29,7 +32,10 @@ export async function fetchContext(args: ContextQueryParams) {
     limit: 10,
   });
   const response = await fetch(url);
-  return (await response.json()) as GallicaResponse;
+  if (response.status !== 200) {
+    throw new Error("Error fetching context");
+  }
+  return (await response.json()) as RowRecordResponse;
 }
 
 export async function fetchSRU(args: ContextQueryParams) {

@@ -5,7 +5,7 @@ import { Chart } from "./components/Chart";
 import GraphContextForm from "./components/GraphContextForm";
 import { SearchState, getSearchStateFromURL } from "./utils/searchState";
 import { GraphState, getGraphStateFromURL } from "./utils/getGraphStateFromURL";
-import { fetchSRU } from "./components/fetchContext";
+import { fetchContext, fetchSRU } from "./components/fetchContext";
 import { VolumeContext } from "./components/VolumeContext";
 import { LoadingProvider } from "./components/LoadingProvider";
 import { DataFrame, toJSON } from "danfojs-node";
@@ -13,6 +13,8 @@ import * as Papa from "papaparse";
 import { GraphData } from "./components/models/dbStructs";
 import { addQueryParamsIfExist } from "./utils/addQueryParamsIfExist";
 import { NearbyTermsChart } from "./components/NearbyTermsChart";
+import ContextViewer from "./components/ContextViewer";
+import { ImageSnippet } from "./components/ImageSnippet";
 
 const strings = {
   fr: {
@@ -132,18 +134,18 @@ export default async function Page({
 
   let numResults: undefined | number = undefined;
   let seriesData: undefined | GraphData[] = undefined;
-  let data: Awaited<ReturnType<typeof fetchSRU>> | undefined = undefined;
+  let data: Awaited<ReturnType<typeof fetchContext>> | undefined = undefined;
 
   const terms = searchState?.terms ?? ["brazza"];
 
   if (searchState) {
-    data = await fetchSRU({
+    data = await fetchContext({
       ...searchState,
       terms: searchState.selected_term ? [searchState.selected_term] : terms,
       year: searchState.context_year ?? searchState.year,
       end_year: searchState.context_year ? undefined : searchState.end_year,
     });
-    numResults = data.total_records;
+    numResults = data.num_results;
     const response = await Promise.allSettled(
       terms?.map(
         async (term) =>
@@ -213,12 +215,18 @@ export default async function Page({
                     <span>{record.date}</span>
                     <span>{record.author}</span>
                   </h1>
-                  <VolumeContext
-                    ark={record.ark}
-                    term={record.terms[0]}
-                    pageNum={getArkImageFromParams(record.ark)}
-                    showImage={getImageStatusFromParams(record.ark)}
-                  />
+                  <ContextViewer data={record.context} ark={record.ark}>
+                    {getImageStatusFromParams(record.ark) && (
+                      <ImageSnippet
+                        ark={record.ark}
+                        term={record.terms[0]}
+                        pageNumber={
+                          getArkImageFromParams(record.ark) ??
+                          record.context[0].page_num
+                        }
+                      />
+                    )}
+                  </ContextViewer>
                 </div>
               ))}
             </div>

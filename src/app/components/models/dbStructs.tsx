@@ -1,6 +1,6 @@
 export interface GallicaResponse {
   records: VolumeRecord[];
-  num_results: string;
+  num_results: number;
   origin_urls: string[];
 }
 

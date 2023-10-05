@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { fetchVolumeContext } from "./fetchContext";
+import { RowRecordResponse, fetchVolumeContext } from "./fetchContext";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GallicaButton } from "./design_system/GallicaButton";
 import Link from "next/link";
@@ -11,7 +11,7 @@ export default function ContextViewer({
   children,
   ark,
 }: {
-  data: Awaited<ReturnType<typeof fetchVolumeContext>>;
+  data: RowRecordResponse["records"][0]["context"];
   children: React.ReactNode;
   ark: string;
 }) {
@@ -21,7 +21,12 @@ export default function ContextViewer({
   const pageNumbers = data?.map((page) => page.page_num);
   const uniqueFiltered = pageNumbers
     .filter((page, index) => pageNumbers.indexOf(page) === index)
-    .sort((a, b) => a - b);
+    .sort((a, b) => {
+      if (a === null || b === null) {
+        return 0;
+      }
+      return a - b;
+    });
 
   const pathName = usePathname();
   const searchParams = useSearchParams();
@@ -35,7 +40,10 @@ export default function ContextViewer({
   const [locallySelectedPage, setLocallySelectedPage] =
     React.useState(pageNumber);
 
-  function handleSetPageNumber(newPageNumber: number) {
+  function handleSetPageNumber(newPageNumber: number | null) {
+    if (newPageNumber === null) {
+      return;
+    }
     setLocallySelectedPage(newPageNumber);
     return appendKeyValAndPush(`arkPage${ark}`, newPageNumber.toString());
   }
