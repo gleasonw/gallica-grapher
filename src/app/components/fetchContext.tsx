@@ -1,25 +1,10 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { apiURL } from "./apiURL";
 import { VolumeRecord } from "./models/dbStructs";
-import { components } from "../types";
+import { components, paths } from "../types";
 
-export type ContextQueryParams = {
-  terms: string[];
-  year?: number;
-  end_year?: number;
-  month?: number;
-  end_month?: number;
-  codes?: string[];
-  cursor?: number;
-  limit?: number;
-  link_term?: string;
-  link_distance?: number;
-  source?: "book" | "periodical" | "all";
-  sort?: "date" | "relevance";
-  row_split?: boolean;
-  include_page_text?: boolean;
-  all_context?: boolean;
-};
+export type ContextQueryParams =
+  paths["/api/gallicaRecords"]["get"]["parameters"]["query"];
 
 export type RowRecordResponse = components["schemas"]["RowRecordResponse"];
 
@@ -27,9 +12,8 @@ export async function fetchContext(args: ContextQueryParams) {
   let baseUrl = `${apiURL}/api/gallicaRecords`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
-    all_context: false,
-    row_split: true,
-    limit: 10,
+    all_context: args.all_context ?? false,
+    limit: args.limit ?? 10,
   });
   const response = await fetch(url);
   if (response.status !== 200) {

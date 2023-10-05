@@ -1,9 +1,10 @@
 import React from "react";
 import { ContextInputForm } from "../components/ContextInputForm";
-import { fetchSRU } from "../components/fetchContext";
+import { fetchContext, fetchSRU } from "../components/fetchContext";
 import { getSearchStateFromURL } from "../utils/searchState";
-import { VolumeContext } from "../components/VolumeContext";
 import { LoadingProvider } from "../components/LoadingProvider";
+import ContextViewer from "../components/ContextViewer";
+import { ImageSnippet } from "../components/ImageSnippet";
 
 export default async function Page({
   searchParams,
@@ -11,13 +12,17 @@ export default async function Page({
   searchParams: Record<string, any>;
 }) {
   const params = getSearchStateFromURL(searchParams);
-  const contextParams = { ...params, terms: params?.terms ?? [] };
+  const contextParams = {
+    ...params,
+    terms: params?.terms ?? [],
+    all_context: true,
+  };
   console.log({ params });
   const data = params.terms?.some((term) => !!term)
-    ? await fetchSRU(contextParams)
-    : { records: [], total_records: 0 };
+    ? await fetchContext(contextParams)
+    : { records: [], num_results: 0 };
 
-  const maybeNumberResults = data.total_records;
+  const maybeNumberResults = data.num_results;
   let numResults = 0;
   if (!isNaN(maybeNumberResults) && maybeNumberResults > 0) {
     numResults = maybeNumberResults;
@@ -53,12 +58,18 @@ export default async function Page({
                 <span>{record.date}</span>
                 <span>{record.author}</span>
               </h1>
-              <VolumeContext
-                ark={record.ark}
-                term={record.terms[0]}
-                pageNum={getArkImageFromParams(record.ark)}
-                showImage={getImageStatusFromParams(record.ark)}
-              />
+              <ContextViewer data={record.context} ark={record.ark}>
+                {getImageStatusFromParams(record.ark) && (
+                  <ImageSnippet
+                    ark={record.ark}
+                    term={record.terms[0]}
+                    pageNumber={
+                      getArkImageFromParams(record.ark) ??
+                      record.context[0].page_num
+                    }
+                  />
+                )}
+              </ContextViewer>
             </div>
           ))}
         </div>
