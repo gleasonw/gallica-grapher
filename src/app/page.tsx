@@ -6,7 +6,6 @@ import GraphContextForm from "./components/GraphContextForm";
 import { SearchState, getSearchStateFromURL } from "./utils/searchState";
 import { GraphState, getGraphStateFromURL } from "./utils/getGraphStateFromURL";
 import { fetchContext, fetchSRU } from "./components/fetchContext";
-import { VolumeContext } from "./components/VolumeContext";
 import { LoadingProvider } from "./components/LoadingProvider";
 import { DataFrame, toJSON } from "danfojs-node";
 import * as Papa from "papaparse";
