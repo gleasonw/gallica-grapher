@@ -10,6 +10,8 @@ import { ContextQueryParams } from "./fetchContext";
 import { QueryPagination } from "./QueryPagination";
 import { Spinner } from "./Spinner";
 import { useSubmit } from "./LoadingProvider";
+import Link from "next/link";
+import { Email } from "./email";
 
 export const strings = {
   fr: {
@@ -70,7 +72,20 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
   return (
     <>
-      sdf
+      <div className={"flex justify-center m-10"}>
+        <span className={"p-5 border "}>
+          Comment puis-je améliorer cet outil ? Laissez-moi un message sur
+          <Link
+            target="_blank"
+            href="https://twitter.com/WillGleason9"
+            className={"underline"}
+          >
+            {" "}
+            Twitter (X){" "}
+          </Link>{" "}
+          ou par <Email />
+        </span>
+      </div>
       <form
         className={
           "w-full flex flex-col justify-center gap-10 items-center rounded-lg pt-5 pb-5"

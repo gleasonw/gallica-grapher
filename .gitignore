@@ -18,6 +18,7 @@ node_modules/
 ../.vscode/
 .idea/
 .idea
+.env.local
 
 backend/gallicaGetter
 # Distribution / packaging

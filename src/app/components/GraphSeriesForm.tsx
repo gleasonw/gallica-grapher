@@ -51,7 +51,7 @@ export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
           <YearRangeInput
             max={2021}
             min={1500}
-            value={[year, end_year]}
+            value={[year ?? 1789, end_year ?? 1950]}
             onChange={([newYear, newEndYear]) =>
               submitForm({
                 year: newYear,
