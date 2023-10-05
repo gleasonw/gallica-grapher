@@ -72,8 +72,8 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
   return (
     <>
-      <div className={"flex justify-center m-10"}>
-        <span className={"p-5 border "}>
+      <div className={"flex justify-center"}>
+        <span className={"p-10"}>
           Comment puis-je améliorer cet outil ? Laissez-moi un message sur{" "}
           <Link
             target="_blank"
