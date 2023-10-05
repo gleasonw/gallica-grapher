@@ -74,14 +74,13 @@ export function ContextInputForm(props: ContextInputFormProps) {
     <>
       <div className={"flex justify-center m-10"}>
         <span className={"p-5 border "}>
-          Comment puis-je améliorer cet outil ? Laissez-moi un message sur
+          Comment puis-je améliorer cet outil ? Laissez-moi un message sur{" "}
           <Link
             target="_blank"
             href="https://twitter.com/WillGleason9"
             className={"underline"}
           >
-            {" "}
-            Twitter (X){" "}
+            Twitter (X)
           </Link>{" "}
           ou par <Email />
         </span>
