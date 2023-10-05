@@ -30,8 +30,8 @@ type ResolutionType = "default" | "annee" | "mois";
 
 type Ticket = {
   term: string;
-  year?: number;
-  end_year?: number;
+  year?: number | null;
+  end_year?: number | null;
   codes?: string[];
   source: SearchState["source"];
   grouping?: GraphState["grouping"];

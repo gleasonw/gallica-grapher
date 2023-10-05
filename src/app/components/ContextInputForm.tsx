@@ -33,13 +33,11 @@ export type ContextInputFormProps = {
   children: React.ReactNode;
 };
 
-type ContextFormState = Partial<ContextQueryParams>;
-
 export function ContextInputForm(props: ContextInputFormProps) {
   const [locallySelectedPage, setLocallySelectedPage] = React.useState<
     number | null
   >(null);
-  const [contextForm, setContextParams] = useState<ContextFormState>(
+  const [contextForm, setContextParams] = useState<ContextQueryParams>(
     props.params
   );
 
@@ -58,9 +56,9 @@ export function ContextInputForm(props: ContextInputFormProps) {
     handleSubmit({ cursor: (newPage - 1) * 10 });
   }
 
-  function handleUpdateParams<T extends keyof ContextFormState>(
+  function handleUpdateParams<T extends keyof ContextQueryParams>(
     key: T,
-    value: ContextFormState[T]
+    value: ContextQueryParams[T]
   ) {
     setContextParams({
       ...contextForm,
@@ -72,6 +70,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
 
   return (
     <>
+      sdf
       <form
         className={
           "w-full flex flex-col justify-center gap-10 items-center rounded-lg pt-5 pb-5"
@@ -93,7 +92,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           <YearRangeInput
             min={1500}
             max={2023}
-            value={[contextForm.year, contextForm.end_year]}
+            value={[contextForm.year ?? 1789, contextForm.end_year ?? 1950]}
             showLabel={true}
             onChange={(value) => {
               setContextParams({
@@ -125,7 +124,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           />
           <SelectInput
             label={"limit"}
-            value={contextForm.limit}
+            value={contextForm.limit ?? 10}
             options={[10, 20, 50]}
             onChange={(limit) => handleUpdateParams("limit", limit)}
           />
@@ -143,7 +142,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           <Link1Icon className="w-6 h-6" />
           <input
             type="number"
-            value={contextForm.link_distance}
+            value={contextForm.link_distance ?? ""}
             onChange={(e) => {
               const numVal = parseInt(e.target.value);
               if (typeof numVal === "number" && !isNaN(numVal) && numVal >= 0) {
