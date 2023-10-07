@@ -33,7 +33,6 @@ export default function Chart() {
       return seriesData;
     },
     queryKey: ["series", terms, grouping, year, end_year],
-    keepPreviousData: true,
   });
 
   return <InteractiveChart series={seriesData} />;
