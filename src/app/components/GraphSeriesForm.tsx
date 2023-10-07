@@ -47,20 +47,6 @@ export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
             {isPending ? <Spinner isFetching /> : "Explore"}
           </button>
         </InputBubble>
-        <div className={"flex flex-wrap gap-10 items-center justify-center"}>
-          <YearRangeInput
-            max={2021}
-            min={1500}
-            value={[year ?? 1789, end_year ?? 1950]}
-            onChange={([newYear, newEndYear]) =>
-              submitForm({
-                year: newYear,
-                end_year: newEndYear,
-              })
-            }
-            placeholder={[1789, 1950]}
-          />
-        </div>
       </form>
       <div className={"m-2"} />
       <TicketRow />
