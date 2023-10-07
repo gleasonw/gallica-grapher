@@ -9,7 +9,7 @@ export default function GraphPage({
 }) {
   return (
     <LoadingProvider>
-      <Dashboard serverChartComponent={<Chart searchParams={searchParams} />} />
+      <Dashboard />
     </LoadingProvider>
   );
 }

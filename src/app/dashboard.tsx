@@ -12,6 +12,7 @@ import { useSearchState } from "./composables/useSearchState";
 import { useGraphState } from "./composables/useGraphState";
 import { useQuery } from "react-query";
 import { useSearchParams } from "next/navigation";
+import Chart from "./components/Chart";
 
 const strings = {
   fr: {
@@ -23,11 +24,7 @@ const strings = {
   },
 };
 
-export function Dashboard({
-  serverChartComponent,
-}: {
-  serverChartComponent: React.ReactNode;
-}) {
+export function Dashboard() {
   const translation = strings["fr"];
 
   const searchState = useSearchState();
@@ -108,7 +105,9 @@ export function Dashboard({
           {" "}
           {translation.description}{" "}
         </div>
-        <GraphSeriesForm>{serverChartComponent}</GraphSeriesForm>
+        <GraphSeriesForm>
+          <Chart />
+        </GraphSeriesForm>
         <GraphContextForm numResults={contextData?.num_results}>
           <div className={"flex flex-col gap-20 md:m-5"}>
             {contextData?.records?.map((record, index) => (
