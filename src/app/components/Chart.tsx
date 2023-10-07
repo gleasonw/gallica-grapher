@@ -10,8 +10,10 @@ export default async function Chart({
 }) {
   const { terms, year, end_year } = getSearchStateFromURL(searchParams);
   const { grouping } = getGraphStateFromURL(searchParams);
+
+  const termsWithAtLeastOneElement = terms?.length ? terms : ["brazza"];
   const response = await Promise.allSettled(
-    terms?.map(
+    termsWithAtLeastOneElement?.map(
       async (term) =>
         await fetchSeries({
           term: term,
