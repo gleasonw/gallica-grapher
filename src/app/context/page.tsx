@@ -1,6 +1,6 @@
 import React from "react";
 import { ContextInputForm } from "../components/ContextInputForm";
-import { fetchContext, fetchSRU } from "../components/fetchContext";
+import { fetchContext } from "../components/fetchContext";
 import { getSearchStateFromURL } from "../utils/searchState";
 import { LoadingProvider } from "../components/LoadingProvider";
 import ContextViewer from "../components/ContextViewer";
@@ -17,7 +17,6 @@ export default async function Page({
     terms: params?.terms ?? [],
     all_context: true,
   };
-  console.log({ params });
   const data = params.terms?.some((term) => !!term)
     ? await fetchContext(contextParams)
     : { records: [], num_results: 0 };

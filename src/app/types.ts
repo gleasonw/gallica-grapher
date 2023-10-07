@@ -44,6 +44,10 @@ export interface paths {
     /** Fetch Records From Gallica */
     get: operations["fetch_records_from_gallica_api_gallicaRecords_get"];
   };
+  "/api/series": {
+    /** Get */
+    get: operations["get_api_series_get"];
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -59,9 +63,9 @@ export interface components {
       /** Right Context */
       right_context: string;
       /** Page Url */
-      page_url: string | null;
+      page_url?: string;
       /** Page Num */
-      page_num: number | null;
+      page_num?: number;
     };
     /** GallicaRowContext */
     GallicaRowContext: {
@@ -124,7 +128,7 @@ export interface components {
       /** Title */
       title: string;
       /** Publisher */
-      publisher: string | null;
+      publisher?: string;
     };
     /** RowRecordResponse */
     RowRecordResponse: {
@@ -143,6 +147,13 @@ export interface components {
       total_records: number;
       /** Origin Urls */
       origin_urls: string[];
+    };
+    /** Series */
+    Series: {
+      /** Data */
+      data: [number, number][];
+      /** Name */
+      name: string;
     };
     /** TopCity */
     TopCity: {
@@ -173,7 +184,10 @@ export interface components {
       /** Error Type */
       type: string;
     };
-    /** VolumeRecord */
+    /**
+     * VolumeRecord
+     * @description VolumeRecord(paper_title: str, paper_code: str, ocr_quality: float, author: str, url: str, date: str, terms: List[str], publisher: Optional[str] = None)
+     */
     VolumeRecord: {
       /** Paper Title */
       paper_title: string;
@@ -190,7 +204,7 @@ export interface components {
       /** Terms */
       terms: string[];
       /** Publisher */
-      publisher: string | null;
+      publisher: string;
     };
   };
   responses: never;
@@ -225,7 +239,7 @@ export interface operations {
     parameters: {
       query: {
         ark: string;
-        page?: number | null;
+        page?: number;
       };
     };
     responses: {
@@ -249,10 +263,10 @@ export interface operations {
       query: {
         term: string[];
         limit?: number;
-        year?: number | null;
-        month?: number | null;
-        end_year?: number | null;
-        end_month?: number | null;
+        year?: number;
+        month?: number;
+        end_year?: number;
+        end_month?: number;
       };
     };
     responses: {
@@ -328,7 +342,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["PaginationData"] | null;
+          "application/json": components["schemas"]["PaginationData"];
         };
       };
       /** @description Validation Error */
@@ -345,7 +359,7 @@ export interface operations {
       query: {
         term: string;
         year: number;
-        month?: number | null;
+        month?: number;
         max_n?: number;
         sample_size?: number;
       };
@@ -370,17 +384,17 @@ export interface operations {
     parameters: {
       query: {
         terms: string[];
-        codes?: string[] | null;
-        cursor?: number | null;
-        limit?: number | null;
-        link_term?: string | null;
-        link_distance?: number | null;
+        codes?: string[];
+        cursor?: number;
+        limit?: number;
+        link_term?: string;
+        link_distance?: number;
         source?: "book" | "periodical" | "all";
         sort?: "date" | "relevance";
-        year?: number | null;
-        month?: number | null;
-        end_year?: number | null;
-        end_month?: number | null;
+        year?: number;
+        month?: number;
+        end_year?: number;
+        end_month?: number;
       };
     };
     responses: {
@@ -402,19 +416,19 @@ export interface operations {
   fetch_records_from_gallica_api_gallicaRecords_get: {
     parameters: {
       query: {
-        all_context?: boolean | null;
+        all_context?: boolean;
         terms: string[];
-        codes?: string[] | null;
-        cursor?: number | null;
-        limit?: number | null;
-        link_term?: string | null;
-        link_distance?: number | null;
+        codes?: string[];
+        cursor?: number;
+        limit?: number;
+        link_term?: string;
+        link_distance?: number;
         source?: "book" | "periodical" | "all";
         sort?: "date" | "relevance";
-        year?: number | null;
-        month?: number | null;
-        end_year?: number | null;
-        end_month?: number | null;
+        year?: number;
+        month?: number;
+        end_year?: number;
+        end_month?: number;
       };
     };
     responses: {
@@ -422,6 +436,33 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["RowRecordResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get */
+  get_api_series_get: {
+    parameters: {
+      query: {
+        term: string;
+        start_date?: number;
+        end_date?: number;
+        grouping?: "mois" | "annee";
+        source?: "livres" | "presse" | "lemonde";
+        link_term?: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Series"];
         };
       };
       /** @description Validation Error */

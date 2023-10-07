@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { RowRecordResponse, fetchVolumeContext } from "./fetchContext";
+import { RowRecordResponse } from "./fetchContext";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GallicaButton } from "./design_system/GallicaButton";
 import Link from "next/link";
@@ -10,10 +10,12 @@ export default function ContextViewer({
   data,
   children,
   ark,
+  isLoading,
 }: {
   data: RowRecordResponse["records"][0]["context"];
   children: React.ReactNode;
   ark: string;
+  isLoading?: boolean;
 }) {
   const [isPending, startTransition] = React.useTransition();
 
@@ -22,7 +24,7 @@ export default function ContextViewer({
   const uniqueFiltered = pageNumbers
     .filter((page, index) => pageNumbers.indexOf(page) === index)
     .sort((a, b) => {
-      if (a === null || b === null) {
+      if (a === undefined || b === undefined) {
         return 0;
       }
       return a - b;
@@ -37,15 +39,18 @@ export default function ContextViewer({
     pageNumber = parseInt(maybePageNumber);
   }
   const showImage = searchParams.get(`${ark}-withImage`) === "true";
-  const [locallySelectedPage, setLocallySelectedPage] =
-    React.useState(pageNumber);
+  const [locallySelectedPage, setLocallySelectedPage] = React.useState<
+    number | undefined
+  >(pageNumber);
 
-  function handleSetPageNumber(newPageNumber: number | null) {
+  function handleSetPageNumber(newPageNumber: number | undefined) {
     if (newPageNumber === null) {
       return;
     }
     setLocallySelectedPage(newPageNumber);
-    return appendKeyValAndPush(`arkPage${ark}`, newPageNumber.toString());
+    if (newPageNumber) {
+      return appendKeyValAndPush(`arkPage${ark}`, newPageNumber.toString());
+    }
   }
 
   function appendKeyValAndPush(key: string, val: string) {
@@ -96,7 +101,9 @@ export default function ContextViewer({
       </div>
       <div className={"w-full border"} />
       <div
-        className={`transition-all ${isPending && "opacity-50 transition-all"}`}
+        className={`transition-all ${
+          (isPending || isLoading) && "opacity-50 transition-all"
+        }`}
       >
         {children}
         {!showImage && (

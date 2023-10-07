@@ -6,6 +6,9 @@ import { components, paths } from "../types";
 export type ContextQueryParams =
   paths["/api/gallicaRecords"]["get"]["parameters"]["query"];
 
+export type SeriesParams = paths["/api/series"]["get"]["parameters"]["query"];
+export type SeriesResponse = components["schemas"]["Series"];
+
 export type RowRecordResponse = components["schemas"]["RowRecordResponse"];
 
 export async function fetchContext(args: ContextQueryParams) {
@@ -22,33 +25,12 @@ export async function fetchContext(args: ContextQueryParams) {
   return (await response.json()) as RowRecordResponse;
 }
 
-export async function fetchSRU(args: ContextQueryParams) {
-  let baseUrl = `${apiURL}/api/sru`;
+export async function fetchSeries(args: SeriesParams): Promise<SeriesResponse> {
+  let baseUrl = `${apiURL}/api/series`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
   });
-  console.log("fetching from sru", url);
   const response = await fetch(url);
-  return (await response.json()) as {
-    records: VolumeRecord[];
-    total_records: number;
-    origin_urls: string[];
-  };
-}
-
-export async function fetchVolumeContext({
-  ark,
-  term,
-}: {
-  ark: string;
-  term: string;
-}) {
-  const response = await fetch(`${apiURL}/api/volume?term=${term}&ark=${ark}`);
-  const data = (await response.json()) as {
-    pivot: string;
-    right_context: string;
-    left_context: string;
-    page_num: number;
-  }[];
+  const data = (await response.json()) as SeriesResponse;
   return data;
 }

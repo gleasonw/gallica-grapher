@@ -2,25 +2,25 @@ import { z } from "zod";
 
 export const searchState = z.object({
   terms: z.string().array().nullish(),
-  year: z.coerce.number().nullish(),
-  end_year: z.coerce.number().nullish(),
-  month: z.coerce.number().nullish(),
-  day: z.coerce.number().nullish(),
+  year: z.coerce.number().optional(),
+  end_year: z.coerce.number().optional(),
+  month: z.coerce.number().optional(),
+  day: z.coerce.number().optional(),
   source: z
     .literal("book")
     .or(z.literal("periodical"))
     .or(z.literal("all"))
     .optional(),
-  link_term: z.string().nullish(),
-  link_distance: z.coerce.number().nullish(),
-  codes: z.string().array().nullish(),
-  limit: z.coerce.number().nullish(),
+  link_term: z.string().optional(),
+  link_distance: z.coerce.number().optional(),
+  codes: z.string().array().optional(),
+  limit: z.coerce.number().optional(),
   sort: z.literal("date").or(z.literal("relevance")).optional(),
-  cursor: z.coerce.number().nullish(),
+  cursor: z.coerce.number().optional(),
   selected_term: z.string().nullish(),
-  context_year: z.coerce.number().nullish(),
-  max_n: z.coerce.number().nullish(),
-  sample_size: z.coerce.number().nullish(),
+  context_year: z.coerce.number().optional(),
+  max_n: z.coerce.number().optional(),
+  sample_size: z.coerce.number().optional(),
 });
 
 export type SearchState = z.infer<typeof searchState>;

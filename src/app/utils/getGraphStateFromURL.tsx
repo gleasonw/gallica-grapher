@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const graphState = z.object({
-  grouping: z.literal("year").or(z.literal("month")).optional(),
+  grouping: z.literal("annee").or(z.literal("mois")).optional(),
   smoothing: z.number().optional(),
 });
 
