@@ -8,6 +8,6 @@ This app relies on the [Gallica API](https://api.bnf.fr/fr/api-document-de-galli
 
 ### Important files:
 
-[Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/frontend/src/app/components)
+[Component directory](https://github.com/gleasonw/gallica-grapher/tree/main/src/app/components)
 * Contains the React components for the graph, table, paper dropdown, and every UI component. 
 * The long className strings in the html elements are [Tailwind](https://tailwindcss.com/) CSS utility classes.
