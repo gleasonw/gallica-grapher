@@ -157,19 +157,6 @@ export function ContextInputForm(props: ContextInputFormProps) {
           />
         </div>
       </form>
-      <div className={"flex justify-center"}>
-        <span className={"p-10"}>
-          Comment puis-je améliorer cet outil ? Laissez-moi un message sur{" "}
-          <Link
-            target="_blank"
-            href="https://twitter.com/WillGleason9"
-            className={"underline"}
-          >
-            Twitter (X)
-          </Link>{" "}
-          ou par <Email />
-        </span>
-      </div>
       <QueryPagination
         cursorMax={totalPages}
         selectedPage={referencePage ?? 1}
