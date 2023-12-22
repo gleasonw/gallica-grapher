@@ -1,4 +1,6 @@
 import React from "react";
+import { Button } from "./design_system/button";
+import { NumberInput } from "./number-input";
 
 export function QueryPagination({
   selectedPage,
@@ -10,59 +12,71 @@ export function QueryPagination({
   onChange: (page: number) => void;
 }) {
   return (
-    <div
-      className={
-        "flex flex-row justify-center items-center text-xl md:text-2xl lg:text-2xl "
-      }
-    >
-      <div
-        className={
-          "flex flex-row justify-between " +
-          (selectedPage > 1 ? "opacity-100" : "opacity-0")
-        }
-      >
-        <button onClick={() => onChange(1)} className={"p-3"}>
-          {"<<"}
-        </button>
-        <button
-          className={"p-4"}
-          onClick={
-            selectedPage > 1 ? () => onChange(selectedPage - 1) : undefined
+    <div className="flex w-full justify-between items-center mb-4 px-5">
+      <section className=" flex gap-2">
+        Page
+        <strong>{selectedPage}</strong>/ {cursorMax}
+      </section>
+      <section className="flex flex-row justify-between items-center gap-3">
+        <div
+          className={
+            "flex flex-row justify-between " +
+            (selectedPage > 1 ? "opacity-100" : "opacity-0")
           }
         >
-          {"<"}
-        </button>
-      </div>
-      <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
-      <CursorInput
-        cursor={selectedPage}
-        cursorMax={cursorMax}
-        onChange={onChange}
-        key={selectedPage}
-      />
-      <p className={"ml-3 md:ml-5 lg:ml-5"}>
-        / {(cursorMax + 1).toLocaleString()}
-      </p>
-      <div
-        className={
-          "flex flex-row justify-between " +
-          (selectedPage <= cursorMax ? "opacity-100" : "opacity-0")
-        }
-      >
-        <button
-          className={"p-4"}
-          onClick={
-            selectedPage <= cursorMax
-              ? () => onChange(selectedPage + 1)
-              : undefined
+          <Button
+            variant="outline"
+            onClick={() => onChange(1)}
+            className={"p-3"}
+          >
+            {"<<"}
+          </Button>
+          <Button
+            variant="outline"
+            className={"p-4"}
+            onClick={
+              selectedPage > 1 ? () => onChange(selectedPage - 1) : undefined
+            }
+          >
+            {"<"}
+          </Button>
+        </div>
+        <p className={"mr-3 md:mr-5 lg:mr-5"}>Page</p>
+        <CursorInput
+          cursor={selectedPage}
+          cursorMax={cursorMax}
+          onChange={onChange}
+          key={selectedPage}
+        />
+        <p className={"ml-3 md:ml-5 lg:ml-5"}>
+          / {(cursorMax + 1).toLocaleString()}
+        </p>
+        <div
+          className={
+            "flex flex-row justify-between " +
+            (selectedPage <= cursorMax ? "opacity-100" : "opacity-0")
           }
         >
-          {">"}
-        </button>
-        <button onClick={() => onChange(cursorMax + 1)} className={"p-3"}>
-          {">>"}
-        </button>
-      </div>
+          <Button
+            className={"p-4"}
+            variant="outline"
+            onClick={
+              selectedPage <= cursorMax
+                ? () => onChange(selectedPage + 1)
+                : undefined
+            }
+          >
+            {">"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onChange(cursorMax + 1)}
+            className={"p-3"}
+          >
+            {">>"}
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
@@ -100,11 +114,10 @@ export function CursorInput({ cursor, cursorMax, onChange }: CursorInputProps) {
   };
 
   return (
-    <input
-      type={"number"}
+    <NumberInput
+      className="w-20"
       value={localCursor}
-      onChange={(e) => setLocalCursor(e.target.valueAsNumber)}
-      className={"w-full max-w-max border rounded-md"}
+      onValueChange={(cursor) => setLocalCursor(cursor)}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();

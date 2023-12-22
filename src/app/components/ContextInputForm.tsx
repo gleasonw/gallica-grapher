@@ -10,6 +10,7 @@ import { Input } from "./design_system/input";
 import { Button } from "./design_system/button";
 import { Label } from "./design_system/label";
 import { NumberInput } from "./number-input";
+import { QueryPagination } from "./QueryPagination";
 
 export const strings = {
   fr: {
@@ -55,7 +56,6 @@ export function ContextInputForm(props: ContextInputFormProps) {
     setLocallySelectedPage(newPage);
     handleSubmit({ cursor: (newPage - 1) * 10 });
   }
-
   function handleUpdateParams<T extends keyof ContextQueryParams>(
     key: T,
     value: ContextQueryParams[T]
@@ -66,7 +66,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
     });
   }
 
-  const referencePage = isPending ? locallySelectedPage : currentPage;
+  const referencePage = isPending ? locallySelectedPage ?? 1 : currentPage;
 
   return (
     <div className="flex flex-col items-center mt-6 gap-6">
@@ -119,15 +119,15 @@ export function ContextInputForm(props: ContextInputFormProps) {
             trigger={<SelectValue placeholder="All" />}
           >
             <SelectItem value="all">All</SelectItem>
-            <SelectItem value="newspapers">Newspapers</SelectItem>
-            <SelectItem value="magazines">Magazines</SelectItem>
+            <SelectItem value="periodical">Periodicals</SelectItem>
+            <SelectItem value="book">Books</SelectItem>
           </SelectBase>
 
           <SelectBase
             label="Sort"
             value={contextForm.sort}
             onChange={(value) => handleUpdateParams("sort", value as any)}
-            trigger={<SelectValue placeholder="Date" />}
+            trigger={<SelectValue placeholder="Relevance" />}
           >
             <SelectItem value="date">Date</SelectItem>
             <SelectItem value="relevance">Relevance</SelectItem>
@@ -146,6 +146,11 @@ export function ContextInputForm(props: ContextInputFormProps) {
         </section>
         <Button className="whitespace-nowrap">Explore</Button>
       </form>
+      <QueryPagination
+        selectedPage={referencePage}
+        cursorMax={totalPages}
+        onChange={(newPage) => setNewPage(newPage)}
+      />
       <div className={`transition-all ${isPending && "opacity-50"}`}>
         {props.children}
       </div>
