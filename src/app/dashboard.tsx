@@ -108,7 +108,6 @@ export function Dashboard() {
             ))}
           </div>
         </GraphContextForm>
-        <NearbyTermsChart />
       </div>
     </>
   );
