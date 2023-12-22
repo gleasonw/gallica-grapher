@@ -12,6 +12,12 @@ import { Spinner } from "./Spinner";
 import { useSubmit } from "./LoadingProvider";
 import Link from "next/link";
 import { Email } from "./email";
+import { SelectBase } from "./select";
+import { SelectItem, SelectValue } from "../../@/components/ui/select";
+import { Input } from "../../@/components/ui/input";
+import { Button } from "../../@/components/ui/button";
+import { Label } from "../../@/components/ui/label";
+import { NumberInput } from "./number-input";
 
 export const strings = {
   fr: {
@@ -71,100 +77,86 @@ export function ContextInputForm(props: ContextInputFormProps) {
   const referencePage = isPending ? locallySelectedPage : currentPage;
 
   return (
-    <>
+    <div className="flex flex-col items-center mt-6 gap-6">
       <form
-        className={
-          "w-full flex flex-col justify-center gap-10 items-center rounded-lg pt-5 pb-5"
-        }
+        className={"flex flex-col gap-6 mb-6 max-w-3xl"}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit(contextForm);
         }}
       >
-        <InputBubble
-          word={contextForm.terms?.[0] ?? ""}
-          onWordChange={(word) => handleUpdateParams("terms", [word])}
-        >
-          <button className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md">
-            {isPending ? <Spinner isFetching /> : "Explore"}
-          </button>
-        </InputBubble>
-        <div className={"flex flex-wrap gap-10 justify-center"}>
-          <YearRangeInput
-            min={1500}
-            max={2023}
-            value={[contextForm.year ?? 1789, contextForm.end_year ?? 1950]}
-            showLabel={true}
-            onChange={(value) => {
-              setContextParams({
-                ...contextForm,
-                year: value ? value[0] : contextForm.year,
-                end_year: value ? value[1] : contextForm.end_year,
-                cursor: 0,
-              });
-            }}
+        <section className="flex gap-4 items-center">
+          <Input
+            id="search"
+            className="text-3xl p-5 py-10 shadow-md"
+            placeholder="Search for a term"
+            value={contextForm.terms[0]}
+            onChange={(e) => handleUpdateParams("terms", [e.target.value])}
           />
-          <SelectInput
-            label={"corpus"}
-            options={["all", "book", "periodical"] as const}
+        </section>
+
+        <section className="flex gap-4 items-center">
+          <div className="flex gap-2 flex-col">
+            <Label htmlFor="year">Year</Label>
+            <NumberInput
+              value={contextForm.year ?? 1789}
+              onValueChange={(year) => handleUpdateParams("year", year)}
+              className="flex-1"
+              id="year"
+              placeholder="YYYY"
+              type="number"
+            />
+          </div>
+
+          <div className="flex gap-2 flex-col">
+            <Label htmlFor="end_year">End Year</Label>
+            <NumberInput
+              value={contextForm.end_year ?? 1950}
+              onValueChange={(year) => handleUpdateParams("end_year", year)}
+              className="flex-1"
+              id="end_year"
+              type="number"
+              placeholder="YYYY"
+            />
+          </div>
+
+          <SelectBase
+            label="Source"
             value={contextForm.source}
-            onChange={(new_source) => {
-              handleUpdateParams("source", new_source);
-            }}
-          />
-          <SelectInput
-            label={"sort"}
+            onChange={(value) => handleUpdateParams("source", value as any)}
+            trigger={<SelectValue placeholder="All" />}
+          >
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="newspapers">Newspapers</SelectItem>
+            <SelectItem value="magazines">Magazines</SelectItem>
+          </SelectBase>
+
+          <SelectBase
+            label="Sort"
             value={contextForm.sort}
-            options={["date", "relevance"] as const}
-            onChange={(sort) =>
-              setContextParams({
-                ...contextForm,
-                sort: sort,
-              })
-            }
-          />
-          <SelectInput
-            label={"limit"}
-            value={contextForm.limit ?? 10}
-            options={[10, 20, 50]}
-            onChange={(limit) => handleUpdateParams("limit", limit)}
-          />
-        </div>
-        <div className="flex flex-wrap gap-5 items-center">
-          <input
-            type="text"
-            value={contextForm.link_term || ""}
-            onChange={(e) =>
-              handleUpdateParams("link_term", e.target.value || undefined)
-            }
-            className={"border p-2 rounded-lg shadow-sm"}
-            placeholder={translation.linkTerm}
-          />
-          <Link1Icon className="w-6 h-6" />
-          <input
-            type="number"
-            value={contextForm.link_distance ?? ""}
-            onChange={(e) => {
-              const numVal = parseInt(e.target.value);
-              if (typeof numVal === "number" && !isNaN(numVal) && numVal >= 0) {
-                handleUpdateParams("link_distance", numVal);
-              } else if (e.target.value === "") {
-                handleUpdateParams("link_distance", undefined);
-              }
-            }}
-            className={"border p-2 rounded-lg shadow-sm"}
-            placeholder={translation.linkDistance}
-          />
-        </div>
+            onChange={(value) => handleUpdateParams("sort", value as any)}
+            trigger={<SelectValue placeholder="Date" />}
+          >
+            <SelectItem value="date">Date</SelectItem>
+            <SelectItem value="relevance">Relevance</SelectItem>
+          </SelectBase>
+
+          <SelectBase
+            label="Limit"
+            trigger={<SelectValue placeholder="10" />}
+            value={contextForm.limit?.toString()}
+            onChange={(value) => handleUpdateParams("limit", parseInt(value))}
+          >
+            <SelectItem value="10">10</SelectItem>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+          </SelectBase>
+        </section>
+        <Button className="whitespace-nowrap">Explore</Button>
       </form>
-      <QueryPagination
-        cursorMax={totalPages}
-        selectedPage={referencePage ?? 1}
-        onChange={setNewPage}
-      />
       <div className={`transition-all ${isPending && "opacity-50"}`}>
         {props.children}
       </div>
-    </>
+    </div>
   );
 }

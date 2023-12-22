@@ -8,6 +8,7 @@ import { useSearchState } from "../composables/useSearchState";
 import { useSubmit } from "./LoadingProvider";
 import { Spinner } from "./Spinner";
 import { SearchState } from "../utils/searchState";
+import { Button } from "../../@/components/ui/button";
 
 export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
   const { terms, year, end_year } = useSearchState();
@@ -43,9 +44,9 @@ export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
           word={localTerm}
           onWordChange={(word) => setLocalTerm(word)}
         >
-          <button className="bg-blue-700 text-sm pl-5 pr-5 hover:bg-blue-500 text-white absolute top-4 right-5 rounded-full p-3 shadow-md">
+          <Button className="absolute top-4 right-5 rounded-full">
             {isPending ? <Spinner isFetching /> : "Explore"}
-          </button>
+          </Button>
         </InputBubble>
       </form>
       <div className={"m-2"} />

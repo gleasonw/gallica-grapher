@@ -5,6 +5,12 @@ import { getSearchStateFromURL } from "../utils/searchState";
 import { LoadingProvider } from "../components/LoadingProvider";
 import ContextViewer from "../components/ContextViewer";
 import { ImageSnippet } from "../components/ImageSnippet";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../@/components/ui/card";
 
 export default async function Page({
   searchParams,
@@ -44,19 +50,11 @@ export default async function Page({
       <ContextInputForm params={contextParams} num_results={numResults}>
         <div className={"flex flex-col gap-20 md:m-5"}>
           {data.records?.map((record, index) => (
-            <div
-              key={`${record.ark}-${record.terms}-${index}`}
-              className={
-                "border-gray-400 border md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5  w-full"
-              }
-            >
-              <h1 className={"flex flex-col gap-5 flex-wrap"}>
-                <span className={"text-lg font-bold"}>
-                  {record.paper_title}
-                </span>
-                <span>{record.date}</span>
-                <span>{record.author}</span>
-              </h1>
+            <Card key={`${record.ark}-${record.terms}-${index}`}>
+              <CardHeader>
+                <CardTitle>{record.paper_title}</CardTitle>
+                <CardDescription>{record.date}</CardDescription>
+              </CardHeader>
               <ContextViewer data={record.context} ark={record.ark}>
                 {getImageStatusFromParams(record.ark) && (
                   <ImageSnippet
@@ -69,7 +67,7 @@ export default async function Page({
                   />
                 )}
               </ContextViewer>
-            </div>
+            </Card>
           ))}
         </div>
       </ContextInputForm>

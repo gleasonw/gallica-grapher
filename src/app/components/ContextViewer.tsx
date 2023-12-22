@@ -5,6 +5,8 @@ import { RowRecordResponse } from "./fetchContext";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GallicaButton } from "./design_system/GallicaButton";
 import Link from "next/link";
+import { Button } from "../../@/components/ui/button";
+import { CardContent } from "../../@/components/ui/card";
 
 export default function ContextViewer({
   data,
@@ -64,10 +66,11 @@ export default function ContextViewer({
   const referencePage = isPending ? locallySelectedPage : pageNumber;
 
   return (
-    <div className={"flex flex-col gap-5 w-full"}>
+    <CardContent className={"flex flex-col gap-5 w-full"}>
       <div className={"flex flex-wrap gap-10"}>
         {uniqueFiltered?.slice(0, numShownPages).map((currentPage) => (
-          <GallicaButton
+          <Button
+            variant="outline"
             key={currentPage}
             onClick={() => handleSetPageNumber(currentPage)}
             className={
@@ -75,13 +78,16 @@ export default function ContextViewer({
             }
           >
             {currentPage}
-          </GallicaButton>
+          </Button>
         ))}
         {numShownPages < uniqueFiltered?.length && (
-          <GallicaButton onClick={() => setNumShownPages(numShownPages + 10)}>
+          <Button
+            variant="outline"
+            onClick={() => setNumShownPages(numShownPages + 10)}
+          >
             Afficher 10 pages supplémentaires (sur{" "}
             {uniqueFiltered?.length - numShownPages})
-          </GallicaButton>
+          </Button>
         )}
       </div>
       <div className={"flex flex-col gap-5"}>
@@ -92,35 +98,35 @@ export default function ContextViewer({
               key={`${page.left_context}${page.page_num}${page.right_context}${index}`}
             >
               {page.left_context}{" "}
-              <span className={"text-blue-500 font-medium pl-5 pr-5"}>
-                {page.pivot}
-              </span>{" "}
+              <span className={" font-bold px-8"}>{page.pivot}</span>{" "}
               {page.right_context}
             </span>
           ))}
       </div>
       <div className={"w-full border"} />
-      <div
-        className={`transition-all ${
-          (isPending || isLoading) && "opacity-50 transition-all"
-        }`}
-      >
-        {children}
-        {!showImage && (
-          <GallicaButton
-            onClick={() => appendKeyValAndPush(`${ark}-withImage`, "true")}
-          >
-            {"Afficher une image de la page "}
-          </GallicaButton>
-        )}
+      {children}
+      <div className="flex gap-4">
+        <div
+          className={`transition-all ${
+            (isPending || isLoading) && "opacity-50 transition-all"
+          }`}
+        >
+          {!showImage && (
+            <Button
+              onClick={() => appendKeyValAndPush(`${ark}-withImage`, "true")}
+              variant="outline"
+            >
+              Afficher une image de la page
+            </Button>
+          )}
+        </div>
+        <Link
+          href={`https://gallica.bnf.fr/ark:/12148/${ark}/f${pageNumber}.item`}
+          target={"_blank"}
+        >
+          <Button variant="outline">Afficher sur Gallica</Button>
+        </Link>
       </div>
-      <Link
-        href={`https://gallica.bnf.fr/ark:/12148/${ark}/f${pageNumber}.item`}
-        className={"underline text-blue-500"}
-        target={"_blank"}
-      >
-        Afficher sur Gallica
-      </Link>
-    </div>
+    </CardContent>
   );
 }
