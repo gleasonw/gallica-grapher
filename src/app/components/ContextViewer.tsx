@@ -7,15 +7,16 @@ import { GallicaButton } from "./design_system/GallicaButton";
 import Link from "next/link";
 import { Button } from "./design_system/button";
 import { CardContent } from "./design_system/card";
+import { imagePageKey } from "./utils";
 
 export default function ContextViewer({
   data,
-  children,
+  image,
   ark,
   isLoading,
 }: {
   data: RowRecordResponse["records"][0]["context"];
-  children: React.ReactNode;
+  image: React.ReactNode;
   ark: string;
   isLoading?: boolean;
 }) {
@@ -40,7 +41,7 @@ export default function ContextViewer({
   if (maybePageNumber && !isNaN(parseInt(maybePageNumber))) {
     pageNumber = parseInt(maybePageNumber);
   }
-  const showImage = searchParams.get(`${ark}-withImage`) === "true";
+  const showImage = searchParams.get(imagePageKey(pageNumber, ark)) === "true";
   const [locallySelectedPage, setLocallySelectedPage] = React.useState<
     number | undefined
   >(pageNumber);
@@ -103,7 +104,7 @@ export default function ContextViewer({
             </span>
           ))}
       </div>
-      {children}
+      {showImage && image}
       <div className="flex gap-4">
         <div
           className={`transition-all ${
@@ -112,7 +113,9 @@ export default function ContextViewer({
         >
           {!showImage && (
             <Button
-              onClick={() => appendKeyValAndPush(`${ark}-withImage`, "true")}
+              onClick={() =>
+                appendKeyValAndPush(imagePageKey(pageNumber, ark), "true")
+              }
               variant="outline"
             >
               Afficher une image de la page

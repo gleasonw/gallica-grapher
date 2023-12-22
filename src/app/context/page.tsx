@@ -33,15 +33,9 @@ export default async function Page({
     numResults = maybeNumberResults;
   }
 
-  function getArkImageFromParams(ark: string) {
+  function getPageNumberFromParams(ark: string) {
     if (Object.keys(searchParams)?.includes(`arkPage${ark}`)) {
       return searchParams[`arkPage${ark}`];
-    }
-  }
-
-  function getImageStatusFromParams(ark: string) {
-    if (Object.keys(searchParams)?.includes(`${ark}-withImage`)) {
-      return searchParams[`${ark}-withImage`] === "true";
     }
   }
 
@@ -55,18 +49,20 @@ export default async function Page({
                 <CardTitle>{record.paper_title}</CardTitle>
                 <CardDescription>{record.date}</CardDescription>
               </CardHeader>
-              <ContextViewer data={record.context} ark={record.ark}>
-                {getImageStatusFromParams(record.ark) && (
+              <ContextViewer
+                data={record.context}
+                ark={record.ark}
+                image={
                   <ImageSnippet
                     ark={record.ark}
                     term={record.terms[0]}
                     pageNumber={
-                      getArkImageFromParams(record.ark) ??
+                      getPageNumberFromParams(record.ark) ??
                       record.context[0].page_num
                     }
                   />
-                )}
-              </ContextViewer>
+                }
+              ></ContextViewer>
             </Card>
           ))}
         </div>

@@ -13,6 +13,12 @@ import { useGraphState } from "./composables/useGraphState";
 import { useQuery } from "react-query";
 import { useSearchParams } from "next/navigation";
 import Chart from "./components/Chart";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./components/design_system/card";
 
 const strings = {
   fr: {
@@ -45,33 +51,6 @@ export function Dashboard() {
     keepPreviousData: true,
   });
 
-  const { data: seriesData, isLoading: isLoadingSeries } = useQuery({
-    queryFn: async () => {
-      const response = await Promise.allSettled(
-        terms?.map(
-          async (term) =>
-            await fetchSeries({
-              term: term,
-              start_date: searchState.year,
-              end_date: searchState.end_year,
-              grouping: graphState.grouping,
-            })
-        ) ?? []
-      );
-      return response
-        .map((r) => (r.status === "fulfilled" ? r.value : undefined))
-        .filter((r) => r !== undefined);
-    },
-    queryKey: [
-      "series",
-      searchState.terms,
-      graphState.grouping,
-      searchState.year,
-      searchState.end_year,
-    ],
-    keepPreviousData: true,
-  });
-
   const searchParams = useSearchParams();
 
   function getDocumentPageFromParams(ark: string): number | undefined {
@@ -80,12 +59,6 @@ export function Dashboard() {
       if (possibleNumber && !isNaN(parseInt(possibleNumber))) {
         return parseInt(possibleNumber);
       }
-    }
-  }
-
-  function getImageStatusFromParams(ark: string) {
-    if (Object.keys(searchParams)?.includes(`${ark}-withImage`)) {
-      return searchParams.get(`${ark}-withImage`) === "true";
     }
   }
 
@@ -111,25 +84,15 @@ export function Dashboard() {
         <GraphContextForm numResults={contextData?.num_results}>
           <div className={"flex flex-col gap-20 md:m-5"}>
             {contextData?.records?.map((record, index) => (
-              <div
-                key={`${record.ark}-${record.terms}-${index}`}
-                className={
-                  "border-gray-400 border md:shadow-lg md:rounded-lg md:p-10 flex flex-col gap-5  w-full"
-                }
-              >
-                <h1 className={"flex flex-col gap-5 flex-wrap"}>
-                  <span className={"text-lg font-bold"}>
-                    {record.paper_title}
-                  </span>
-                  <span>{record.date}</span>
-                  <span>{record.author}</span>
-                </h1>
+              <Card key={`${record.ark}-${record.terms}-${index}`}>
+                <CardHeader>
+                  <CardTitle>{record.paper_title}</CardTitle>
+                  <CardDescription>{record.date}</CardDescription>
+                </CardHeader>
                 <ContextViewer
                   data={record.context}
                   ark={record.ark}
-                  isLoading={isLoadingContext}
-                >
-                  {getImageStatusFromParams(record.ark) && (
+                  image={
                     <ImageSnippet
                       ark={record.ark}
                       term={record.terms[0]}
@@ -139,9 +102,9 @@ export function Dashboard() {
                         1
                       }
                     />
-                  )}
-                </ContextViewer>
-              </div>
+                  }
+                ></ContextViewer>
+              </Card>
             ))}
           </div>
         </GraphContextForm>
