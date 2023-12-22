@@ -103,7 +103,6 @@ export default function ContextViewer({
             </span>
           ))}
       </div>
-      <div className={"w-full border"} />
       {children}
       <div className="flex gap-4">
         <div
