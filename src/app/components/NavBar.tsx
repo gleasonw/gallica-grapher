@@ -9,7 +9,6 @@ import { usePathname } from "next/navigation";
 const pages = {
   "": "Graph",
   context: "Context",
-  explorer: "Explorer",
 };
 
 export default function NavBar() {
@@ -19,7 +18,6 @@ export default function NavBar() {
   const linkStyle = "p-5 hover:cursor-pointer ";
   let homeLinkStyle = linkStyle;
   let contextLinkStyle = linkStyle;
-  let explorerLinkStyle = linkStyle;
   let infoLinkStyle = linkStyle;
   const borderBottomFocus = " border-b border-primary border-b-4";
 
@@ -29,15 +27,12 @@ export default function NavBar() {
     contextLinkStyle += borderBottomFocus;
   } else if (currentPage === "/info") {
     infoLinkStyle += borderBottomFocus;
-  } else if (currentPage === "/explorer") {
-    explorerLinkStyle += borderBottomFocus;
   }
 
   const styleMap = {
     "": homeLinkStyle,
     context: contextLinkStyle,
     info: infoLinkStyle,
-    explorer: explorerLinkStyle,
   };
 
   return (
