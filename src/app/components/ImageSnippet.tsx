@@ -30,7 +30,7 @@ export async function ImageSnippet({
   return (
     <div className={"relative w-full h-full"}>
       {data?.image ? (
-        <Image src={data.image} alt={term} width={900} height={200} />
+        <img src={data.image} alt={term} />
       ) : (
         <div>aucune image disponible 😔</div>
       )}
