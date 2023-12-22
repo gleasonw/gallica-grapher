@@ -16,7 +16,7 @@ export default function ContextViewer({
   isLoading,
 }: {
   data: RowRecordResponse["records"][0]["context"];
-  image: React.ReactNode;
+  image?: React.ReactNode;
   ark: string;
   isLoading?: boolean;
 }) {
@@ -111,7 +111,7 @@ export default function ContextViewer({
             (isPending || isLoading) && "opacity-50 transition-all"
           }`}
         >
-          {!showImage && (
+          {!showImage && image && (
             <Button
               onClick={() =>
                 appendKeyValAndPush(imagePageKey(pageNumber, ark), "true")

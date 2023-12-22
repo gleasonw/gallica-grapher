@@ -89,21 +89,7 @@ export function Dashboard() {
                   <CardTitle>{record.paper_title}</CardTitle>
                   <CardDescription>{record.date}</CardDescription>
                 </CardHeader>
-                <ContextViewer
-                  data={record.context}
-                  ark={record.ark}
-                  image={
-                    <ImageSnippet
-                      ark={record.ark}
-                      term={record.terms[0]}
-                      pageNumber={
-                        getDocumentPageFromParams(record.ark) ??
-                        record.context[0].page_num ??
-                        1
-                      }
-                    />
-                  }
-                ></ContextViewer>
+                <ContextViewer data={record.context} ark={record.ark} />
               </Card>
             ))}
           </div>
