@@ -1,5 +1,5 @@
 import React from "react";
-import { Input, InputProps } from "../../@/components/ui/input";
+import { Input, InputProps } from "./design_system/input";
 
 export interface NumberInputProps extends InputProps {
   children?: React.ReactNode;

@@ -5,8 +5,8 @@ import { RowRecordResponse } from "./fetchContext";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GallicaButton } from "./design_system/GallicaButton";
 import Link from "next/link";
-import { Button } from "../../@/components/ui/button";
-import { CardContent } from "../../@/components/ui/card";
+import { Button } from "./design_system/button";
+import { CardContent } from "./design_system/card";
 
 export default function ContextViewer({
   data,

@@ -10,7 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../@/components/ui/card";
+} from "../components/design_system/card";
 
 export default async function Page({
   searchParams,

@@ -8,7 +8,7 @@ import { useSearchState } from "../composables/useSearchState";
 import { useSubmit } from "./LoadingProvider";
 import { Spinner } from "./Spinner";
 import { SearchState } from "../utils/searchState";
-import { Button } from "../../@/components/ui/button";
+import { Button } from "./design_system/button";
 
 export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
   const { terms, year, end_year } = useSearchState();

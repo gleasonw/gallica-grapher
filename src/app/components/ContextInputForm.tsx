@@ -1,22 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Link1Icon } from "@radix-ui/react-icons";
 import React from "react";
-import { YearRangeInput } from "./YearRangeInput";
-import InputBubble from "./InputBubble";
-import { SelectInput } from "./SelectInput";
 import { ContextQueryParams } from "./fetchContext";
-import { QueryPagination } from "./QueryPagination";
-import { Spinner } from "./Spinner";
 import { useSubmit } from "./LoadingProvider";
-import Link from "next/link";
-import { Email } from "./email";
 import { SelectBase } from "./select";
-import { SelectItem, SelectValue } from "../../@/components/ui/select";
-import { Input } from "../../@/components/ui/input";
-import { Button } from "../../@/components/ui/button";
-import { Label } from "../../@/components/ui/label";
+import { SelectItem, SelectValue } from "./design_system/select";
+import { Input } from "./design_system/input";
+import { Button } from "./design_system/button";
+import { Label } from "./design_system/label";
 import { NumberInput } from "./number-input";
 
 export const strings = {

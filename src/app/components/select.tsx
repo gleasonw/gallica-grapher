@@ -5,8 +5,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../@/components/ui/select";
-import { Label } from "../../@/components/ui/label";
+} from "./design_system/select";
+import { Label } from "./design_system/label";
 
 export interface SelectBaseProps {
   children?: React.ReactNode;
