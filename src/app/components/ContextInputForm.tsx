@@ -11,6 +11,7 @@ import { Button } from "./design_system/button";
 import { Label } from "./design_system/label";
 import { NumberInput } from "./number-input";
 import { QueryPagination } from "./QueryPagination";
+import { Spinner } from "./Spinner";
 
 export const strings = {
   fr: {
@@ -41,8 +42,6 @@ export function ContextInputForm(props: ContextInputFormProps) {
   const [contextForm, setContextParams] = useState<ContextQueryParams>(
     props.params
   );
-
-  const translation = strings.fr;
 
   const { handleSubmit, isPending } = useSubmit();
 
@@ -144,7 +143,9 @@ export function ContextInputForm(props: ContextInputFormProps) {
             <SelectItem value="50">50</SelectItem>
           </SelectBase>
         </section>
-        <Button className="whitespace-nowrap">Explore</Button>
+        <Button className="whitespace-nowrap">
+          {isPending ? <Spinner isFetching={true} /> : "Explore"}
+        </Button>
       </form>
       <QueryPagination
         selectedPage={referencePage}
