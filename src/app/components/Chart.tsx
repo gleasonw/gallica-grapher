@@ -35,5 +35,13 @@ export default function Chart() {
     queryKey: ["series", terms, grouping, year, end_year],
   });
 
+  if (isLoadingSeries) {
+    return (
+      <div className="aspect-video h-full flex justify-center items-center">
+        En train de communiquer avec Gallicagram...{" "}
+      </div>
+    );
+  }
+
   return <InteractiveChart series={seriesData} />;
 }
