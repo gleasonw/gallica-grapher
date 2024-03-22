@@ -1,6 +1,10 @@
 import React from "react";
 import { ContextInputForm } from "../components/ContextInputForm";
-import { fetchContext } from "../components/fetchContext";
+import {
+  GallicaRecord,
+  fetchContext,
+  fetchFullText,
+} from "../components/fetchContext";
 import { getSearchStateFromURL } from "../utils/searchState";
 import { LoadingProvider } from "../components/LoadingProvider";
 import ContextViewer from "../components/ContextViewer";
@@ -11,6 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/design_system/card";
+import { Sparkles } from "lucide-react";
+import { Button } from "../components/design_system/button";
+import OpenAI from "openai";
+import fs from "fs";
+
+const openai = new OpenAI();
 
 export default async function Page({
   searchParams,
@@ -45,10 +55,13 @@ export default async function Page({
         <div className={"flex flex-col gap-20 md:m-5"}>
           {data.records?.map((record, index) => (
             <Card key={`${record.ark}-${record.terms}-${index}`}>
-              <CardHeader>
-                <CardTitle>{record.paper_title}</CardTitle>
-                <CardDescription>{record.date}</CardDescription>
-              </CardHeader>
+              <h1 className="flex justify-between">
+                <CardHeader>
+                  <CardTitle>{record.paper_title}</CardTitle>
+                  <CardDescription>{record.date}</CardDescription>
+                </CardHeader>
+                <DocumentConversation ark={record.ark} />
+              </h1>
               <ContextViewer
                 data={record.context}
                 ark={record.ark}
@@ -62,11 +75,62 @@ export default async function Page({
                     }
                   />
                 }
-              ></ContextViewer>
+              />
             </Card>
           ))}
         </div>
       </ContextInputForm>
     </LoadingProvider>
+  );
+}
+
+function DocumentConversation({ ark }: { ark: string }) {
+  async function initiateConversation() {
+    "use server";
+    const fullText = await fetchFullText({ ark });
+
+    // create json file from fullText
+    const jsonString = JSON.stringify(fullText);
+    fs.writeFileSync("output.json", jsonString, "utf8");
+    const file = await openai.files.create({
+      file: fs.createReadStream("output.json"),
+      purpose: "assistants",
+    });
+    const assistant = await openai.beta.assistants.create({
+      name: "Newspaper analyst",
+      instructions:
+        "You are a personal newspaper analyst. Read the text to draw conclusions and highlight important citations, with page numbers.",
+      model: "gpt-4-1106-preview",
+      file_ids: [file.id],
+      tools: [{ type: "retrieval" }],
+    });
+    const thread = await openai.beta.threads.create({
+      messages: [
+        { content: "What can you tell me about this newspaper?", role: "user" },
+      ],
+    });
+    const run = await openai.beta.threads.runs.create(thread.id, {
+      assistant_id: assistant.id,
+    });
+    while (true) {
+      console.log("waiting for run to complete");
+      const polledRun = await openai.beta.threads.runs.retrieve(
+        thread.id,
+        run.id
+      );
+      if (polledRun.status === "completed") {
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    const messages = await openai.beta.threads.messages.list(thread.id);
+  }
+
+  return (
+    <form action={initiateConversation}>
+      <Button variant="ghost">
+        <Sparkles />
+      </Button>
+    </form>
   );
 }
