@@ -1,16 +1,6 @@
 import React from "react";
-import { ContextInputForm } from "../components/ContextInputForm";
-import { fetchContext } from "../components/fetchContext";
 import { getSearchStateFromURL } from "../utils/searchState";
-import { LoadingProvider } from "../components/LoadingProvider";
-import ContextViewer from "../components/ContextViewer";
-import { ImageSnippet } from "../components/ImageSnippet";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/design_system/card";
+import { ClientContextFetch } from "./client-fetch-context";
 
 export default async function Page({
   searchParams,
@@ -18,55 +8,6 @@ export default async function Page({
   searchParams: Record<string, any>;
 }) {
   const params = getSearchStateFromURL(searchParams);
-  const contextParams = {
-    ...params,
-    terms: params?.terms ?? [],
-    all_context: true,
-  };
-  const data = params.terms?.some((term) => !!term)
-    ? await fetchContext(contextParams)
-    : { records: [], num_results: 0 };
 
-  const maybeNumberResults = data.num_results;
-  let numResults = 0;
-  if (!isNaN(maybeNumberResults) && maybeNumberResults > 0) {
-    numResults = maybeNumberResults;
-  }
-
-  function getPageNumberFromParams(ark: string) {
-    if (Object.keys(searchParams)?.includes(`arkPage${ark}`)) {
-      return searchParams[`arkPage${ark}`];
-    }
-  }
-
-  return (
-    <LoadingProvider>
-      <ContextInputForm params={contextParams} num_results={numResults}>
-        <div className={"flex flex-col gap-20 md:m-5"}>
-          {data.records?.map((record, index) => (
-            <Card key={`${record.ark}-${record.terms}-${index}`}>
-              <CardHeader>
-                <CardTitle>{record.paper_title}</CardTitle>
-                <CardDescription>{record.date}</CardDescription>
-              </CardHeader>
-              <ContextViewer
-                data={record.context}
-                ark={record.ark}
-                image={
-                  <ImageSnippet
-                    ark={record.ark}
-                    term={record.terms[0]}
-                    pageNumber={
-                      getPageNumberFromParams(record.ark) ??
-                      record.context[0].page_num
-                    }
-                  />
-                }
-              ></ContextViewer>
-            </Card>
-          ))}
-        </div>
-      </ContextInputForm>
-    </LoadingProvider>
-  );
+  return <ClientContextFetch fetchParams={params} />;
 }

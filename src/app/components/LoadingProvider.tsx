@@ -28,7 +28,6 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const [isPending, startTransition] = useTransition();
   const searchState = useSearchState();
-  const queryClient = React.useMemo(() => new QueryClient(), []);
 
   const handleSubmit = useCallback(
     (localParams: URLState) => {
@@ -42,10 +41,8 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <LoadingContext.Provider value={{ handleSubmit, isPending }}>
-        {children}
-      </LoadingContext.Provider>
-    </QueryClientProvider>
+    <LoadingContext.Provider value={{ handleSubmit, isPending }}>
+      {children}
+    </LoadingContext.Provider>
   );
 }
