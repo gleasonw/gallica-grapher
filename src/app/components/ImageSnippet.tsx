@@ -1,8 +1,9 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import Image from "next/image";
 import { apiURL } from "./apiURL";
+import { useQuery } from "react-query";
 
-export async function ImageSnippet({
+export function ImageSnippet({
   ark,
   term,
   pageNumber,
@@ -11,21 +12,29 @@ export async function ImageSnippet({
   term: string;
   pageNumber: number;
 }) {
-  async function doFetch() {
-    const url = addQueryParamsIfExist(`${apiURL}/api/image`, {
-      ark: ark,
-      term: term,
-      page: pageNumber,
-    });
-    const response = await fetch(url);
-    if (response.status !== 200) {
-      return { image: "" };
-    }
-    const imgString = (await response.json()) as { image: string };
-    return imgString;
-  }
+  const { data, isLoading } = useQuery({
+    queryFn: async () => {
+      const url = addQueryParamsIfExist(`${apiURL}/api/image`, {
+        ark: ark,
+        term: term,
+        page: pageNumber,
+      });
+      const response = await fetch(url);
+      if (response.status !== 200) {
+        return { image: "" };
+      }
+      const imgString = (await response.json()) as { image: string };
+      return imgString;
+    },
+    queryKey: ["image", ark, term, pageNumber],
+    keepPreviousData: true,
+  });
 
-  const data = await doFetch();
+  console.log(data);
+
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  }
 
   return (
     <div className={"relative w-full h-full"}>

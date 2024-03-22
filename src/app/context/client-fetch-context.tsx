@@ -103,14 +103,15 @@ export function DataViewer({ data, isLoading }: DataViewerProps) {
             ark={record.ark}
             isLoading={isLoading}
             image={
-              <ImageSnippet
-                ark={record.ark}
-                term={record.terms[0]}
-                pageNumber={
-                  getPageNumberFromParams(record.ark) ??
-                  record.context[0].page_num
-                }
-              />
+              <div>{`Pas d'images pour l'instant... j'ai cassé quelque chose`}</div>
+              // <ImageSnippet
+              //   ark={record.ark}
+              //   term={record.terms[0]}
+              //   pageNumber={
+              //     getPageNumberFromParams(record.ark) ??
+              //     record.context[0].page_num
+              //   }
+              // />
             }
           />
         </Card>
