@@ -30,8 +30,6 @@ export function ImageSnippet({
     keepPreviousData: true,
   });
 
-  console.log(data);
-
   if (isLoading) {
     return <div>Chargement...</div>;
   }

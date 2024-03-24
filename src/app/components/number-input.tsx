@@ -3,7 +3,7 @@ import { Input, InputProps } from "./design_system/input";
 
 export interface NumberInputProps extends InputProps {
   children?: React.ReactNode;
-  value: number;
+  value?: number;
   onValueChange: (value: number) => void;
 }
 

@@ -90,7 +90,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           <div className="flex gap-2 flex-col">
             <Label htmlFor="year">Year</Label>
             <NumberInput
-              value={contextForm.year ?? 1789}
+              value={contextForm.year}
               onValueChange={(year) => handleUpdateParams("year", year)}
               className="flex-1"
               id="year"
@@ -102,7 +102,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
           <div className="flex gap-2 flex-col">
             <Label htmlFor="end_year">End Year</Label>
             <NumberInput
-              value={contextForm.end_year ?? 1950}
+              value={contextForm.end_year}
               onValueChange={(year) => handleUpdateParams("end_year", year)}
               className="flex-1"
               id="end_year"
