@@ -102,17 +102,6 @@ export function DataViewer({ data, isLoading }: DataViewerProps) {
             data={record.context}
             ark={record.ark}
             isLoading={isLoading}
-            image={
-              <div>{`Pas d'images pour l'instant... j'ai cassé quelque chose`}</div>
-              // <ImageSnippet
-              //   ark={record.ark}
-              //   term={record.terms[0]}
-              //   pageNumber={
-              //     getPageNumberFromParams(record.ark) ??
-              //     record.context[0].page_num
-              //   }
-              // />
-            }
           />
         </Card>
       ))}
