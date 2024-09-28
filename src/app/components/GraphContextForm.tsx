@@ -130,7 +130,7 @@ export default function GraphContextForm({
   }
 
   return (
-    <>
+    <div>
       <div className={"flex flex-col gap-5 ml-5 mr-5 mt-2"}>
         <div className={"flex wrap gap-10"}>
           <ContextFilter
@@ -147,8 +147,8 @@ export default function GraphContextForm({
               context_year
                 ? `${context_year}`
                 : year && end_year
-                ? `${year} - ${end_year}`
-                : undefined
+                  ? `${year} - ${end_year}`
+                  : undefined
             }
           />
           <ContextFilter
@@ -197,7 +197,7 @@ export default function GraphContextForm({
           </Tabs.Content>
         ))}
       </Tabs.Root>
-    </>
+    </div>
   );
 }
 

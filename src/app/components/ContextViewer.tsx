@@ -8,22 +8,26 @@ import Link from "next/link";
 import { Button } from "./design_system/button";
 import { CardContent } from "./design_system/card";
 import { imagePageKey } from "./utils";
+import { Check, Copy, Image } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { components } from "@/src/app/types";
+import { ImageSnippet } from "@/src/app/components/ImageSnippet";
 
 export default function ContextViewer({
-  data,
-  image,
-  ark,
-  isLoading,
+  record,
 }: {
-  data: RowRecordResponse["records"][0]["context"];
-  image?: React.ReactNode;
-  ark: string;
-  isLoading?: boolean;
+  record: components["schemas"]["RowRecordResponse"]["records"][0];
 }) {
   const [isPending, startTransition] = React.useTransition();
+  const [hasCopied, setHasCopied] = React.useState(false);
 
   const [numShownPages, setNumShownPages] = React.useState(10);
-  const pageNumbers = data?.map((page) => page.page_num);
+  const pageNumbers = record.context?.map((page) => page.page_num);
   const uniqueFiltered = pageNumbers
     .filter((page, index) => pageNumbers.indexOf(page) === index)
     .sort((a, b) => {
@@ -32,12 +36,13 @@ export default function ContextViewer({
       }
       return a - b;
     });
+  const ark = record.ark;
 
   const pathName = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
   const maybePageNumber = searchParams.get(`arkPage${ark}`);
-  let pageNumber = data?.[0]?.page_num ?? 1;
+  let pageNumber = record.context?.[0]?.page_num ?? 1;
   if (maybePageNumber && !isNaN(parseInt(maybePageNumber))) {
     pageNumber = parseInt(maybePageNumber);
   }
@@ -68,7 +73,7 @@ export default function ContextViewer({
 
   return (
     <CardContent className={"flex flex-col gap-5 w-full"}>
-      <div className={"flex flex-wrap gap-10"}>
+      <div className={"flex gap-5"}>
         {uniqueFiltered?.slice(0, numShownPages).map((currentPage) => (
           <Button
             variant="outline"
@@ -90,9 +95,55 @@ export default function ContextViewer({
             {uniqueFiltered?.length - numShownPages})
           </Button>
         )}
+        <div className="ml-auto flex gap-2">
+          <Link
+            href={`https://gallica.bnf.fr/ark:/12148/${ark}/f${pageNumber}.item`}
+            target={"_blank"}
+          >
+            <Button variant="outline">Afficher sur Gallica</Button>
+          </Link>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `https://gallica.bnf.fr/ark:/12148/${ark}/f${pageNumber}.item`
+                    );
+                    setHasCopied(true);
+                    setTimeout(() => setHasCopied(false), 2000);
+                  }}
+                >
+                  {hasCopied ? <Check /> : <Copy />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Copier l'URL</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <div
+            className={`transition-all ${isPending && "opacity-50 transition-all"}`}
+          >
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={() =>
+                      appendKeyValAndPush(imagePageKey(pageNumber, ark), "true")
+                    }
+                    variant="outline"
+                  >
+                    <Image />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Afficher une image de la page</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
       </div>
-      <div className={"flex flex-col gap-5"}>
-        {data
+      <div className={"flex flex-col gap-5 max-h-48 overflow-auto"}>
+        {record.context
           ?.filter((page) => page.page_num === referencePage)
           .map((page, index) => (
             <span
@@ -104,31 +155,14 @@ export default function ContextViewer({
             </span>
           ))}
       </div>
-      {showImage && image}
-      <div className="flex gap-4">
-        <div
-          className={`transition-all ${
-            (isPending || isLoading) && "opacity-50 transition-all"
-          }`}
-        >
-          {!showImage && image && (
-            <Button
-              onClick={() =>
-                appendKeyValAndPush(imagePageKey(pageNumber, ark), "true")
-              }
-              variant="outline"
-            >
-              Afficher une image de la page
-            </Button>
-          )}
-        </div>
-        <Link
-          href={`https://gallica.bnf.fr/ark:/12148/${ark}/f${pageNumber}.item`}
-          target={"_blank"}
-        >
-          <Button variant="outline">Afficher sur Gallica</Button>
-        </Link>
-      </div>
+
+      {showImage && (
+        <ImageSnippet
+          ark={ark}
+          term={record.terms[0]}
+          pageNumber={pageNumber}
+        />
+      )}
     </CardContent>
   );
 }

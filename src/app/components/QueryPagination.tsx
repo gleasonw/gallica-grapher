@@ -13,7 +13,7 @@ export function QueryPagination({
 }) {
   return (
     <div className="flex w-full justify-between items-center mb-4 px-5">
-      <section className=" flex gap-2">
+      <section className=" flex gap-2 text-nowrap">
         Page
         <strong>{selectedPage}</strong>/ {cursorMax}
       </section>
@@ -48,7 +48,7 @@ export function QueryPagination({
           onChange={onChange}
           key={selectedPage}
         />
-        <p className={"ml-3 md:ml-5 lg:ml-5"}>
+        <p className={"ml-3 md:ml-5 lg:ml-5 text-nowrap"}>
           / {(cursorMax + 1).toLocaleString()}
         </p>
         <div
