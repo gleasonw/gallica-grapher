@@ -98,11 +98,7 @@ export function DataViewer({ data, isLoading }: DataViewerProps) {
             <CardTitle>{record.paper_title}</CardTitle>
             <CardDescription>{record.date}</CardDescription>
           </CardHeader>
-          <ContextViewer
-            data={record.context}
-            ark={record.ark}
-            isLoading={isLoading}
-          />
+          <ContextViewer record={record} isLoading={isLoading} />
         </Card>
       ))}
     </div>

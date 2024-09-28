@@ -20,8 +20,10 @@ import { ImageSnippet } from "@/src/app/components/ImageSnippet";
 
 export default function ContextViewer({
   record,
+  isLoading,
 }: {
   record: components["schemas"]["RowRecordResponse"]["records"][0];
+  isLoading?: boolean;
 }) {
   const [isPending, startTransition] = React.useTransition();
   const [hasCopied, setHasCopied] = React.useState(false);
@@ -69,7 +71,8 @@ export default function ContextViewer({
     );
   }
 
-  const referencePage = isPending ? locallySelectedPage : pageNumber;
+  const referencePage =
+    isPending || isLoading ? locallySelectedPage : pageNumber;
 
   return (
     <CardContent className={"flex flex-col gap-5 w-full"}>
