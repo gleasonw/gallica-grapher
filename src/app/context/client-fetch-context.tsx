@@ -70,7 +70,7 @@ export function DataViewer({ data, isLoading }: DataViewerProps) {
   const originURL = data?.origin_urls?.at(0);
 
   return (
-    <div className={"flex flex-col gap-20 md:m-5"}>
+    <div className={"flex flex-col gap-10 md:m-5"}>
       <OriginURL originURL={originURL} />
       {data?.records?.map((record, index) => (
         <Card key={`${record.ark}-${record.terms}-${index}`}>

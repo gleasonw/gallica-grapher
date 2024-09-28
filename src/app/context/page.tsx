@@ -10,7 +10,9 @@ export default async function Page({
   const params = getSearchStateFromURL(searchParams);
 
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
+    <Suspense
+      fallback={<div className="flex w-full justify-center">Chargement...</div>}
+    >
       <ClientContextFetch fetchParams={params} />
     </Suspense>
   );
