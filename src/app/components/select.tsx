@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./design_system/select";
+import { Select, SelectContent, SelectTrigger } from "./design_system/select";
 import { Label } from "./design_system/label";
 
 export interface SelectBaseProps {
@@ -22,7 +16,6 @@ export function SelectBase({
   trigger,
   value,
   onChange,
-  className,
   label,
 }: SelectBaseProps) {
   return (

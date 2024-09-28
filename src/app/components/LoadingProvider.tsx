@@ -6,7 +6,6 @@ import { useSearchState } from "../composables/useSearchState";
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { SearchState } from "../utils/searchState";
 import { GraphState } from "../utils/getGraphStateFromURL";
-import { QueryClient, QueryClientProvider } from "react-query";
 
 export type URLState = SearchState & GraphState;
 

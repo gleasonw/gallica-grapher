@@ -7,9 +7,7 @@ import GraphContextForm from "./components/GraphContextForm";
 import { fetchContext } from "./components/fetchContext";
 import ContextViewer from "./components/ContextViewer";
 import { useSearchState } from "./composables/useSearchState";
-import { useGraphState } from "./composables/useGraphState";
 import { useQuery } from "react-query";
-import { useSearchParams } from "next/navigation";
 import Chart from "./components/Chart";
 import {
   Card,
@@ -19,9 +17,7 @@ import {
 } from "./components/design_system/card";
 import { useSubmit } from "./components/LoadingProvider";
 import { seriesColors } from "./components/utils/makeHighcharts";
-import { GallicaContext } from "./components/models/dbStructs";
 import { components } from "./types";
-import { ImageSnippet } from "@/src/app/components/ImageSnippet";
 import { OriginURL } from "@/src/app/context/client-fetch-context";
 
 const strings = {
@@ -41,7 +37,7 @@ export function Dashboard() {
 
   const terms = searchState?.terms ?? ["brazza"];
 
-  const { data: contextData, isLoading: isLoadingContext } = useQuery({
+  const { data: contextData } = useQuery({
     queryFn: () =>
       fetchContext({
         ...searchState,
@@ -52,17 +48,6 @@ export function Dashboard() {
     queryKey: ["context", searchState],
     keepPreviousData: true,
   });
-
-  const searchParams = useSearchParams();
-
-  function getDocumentPageFromParams(ark: string): number | undefined {
-    if (Object.keys(searchParams)?.includes(`arkPage${ark}`)) {
-      const possibleNumber = searchParams.get(`arkPage${ark}`);
-      if (possibleNumber && !isNaN(parseInt(possibleNumber))) {
-        return parseInt(possibleNumber);
-      }
-    }
-  }
 
   const firstRecord = contextData?.records?.[0];
   const originURL = contextData?.origin_urls?.at(0);

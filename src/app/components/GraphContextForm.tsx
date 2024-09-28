@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useSearchState } from "../composables/useSearchState";
-import { SelectInput } from "./SelectInput";
 import { QueryPagination } from "./QueryPagination";
 import { useSubmit } from "./LoadingProvider";
 import * as Tabs from "@radix-ui/react-tabs";

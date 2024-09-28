@@ -1,13 +1,10 @@
 "use client";
 
 import React from "react";
-import { seriesColors } from "./utils/makeHighcharts";
 import InputBubble from "./InputBubble";
-import { YearRangeInput } from "./YearRangeInput";
 import { useSearchState } from "../composables/useSearchState";
 import { useSubmit } from "./LoadingProvider";
 import { Spinner } from "./Spinner";
-import { SearchState } from "../utils/searchState";
 import { Button } from "./design_system/button";
 
 export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {

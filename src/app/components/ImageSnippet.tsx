@@ -1,5 +1,4 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
-import Image from "next/image";
 import { apiURL } from "./apiURL";
 import { useQuery } from "react-query";
 

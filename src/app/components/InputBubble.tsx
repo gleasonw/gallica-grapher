@@ -1,6 +1,3 @@
-import Image from "next/image";
-import glassIcon from "./assets/glass.svg";
-
 export default function InputBubble(props: {
   word: string;
   onWordChange: (word: string) => void;

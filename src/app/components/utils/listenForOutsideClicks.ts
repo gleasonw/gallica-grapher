@@ -8,7 +8,7 @@ export function listenForOutsideClicks(
     if (listening) return;
     if (!menuRef.current) return;
     setListening(true);
-    [`click`, `touchstart`].forEach((type) => {
+    [`click`, `touchstart`].forEach(() => {
       document.addEventListener(`click`, (evt) => {
         if (!menuRef.current || !evt.target) {
           return;

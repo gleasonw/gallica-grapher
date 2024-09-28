@@ -2,6 +2,7 @@ import "./globals.css";
 import NavBar from "./components/NavBar";
 import { Analytics } from "@vercel/analytics/react";
 import { Providers } from "./providers";
+import { Suspense } from "react";
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -16,7 +17,7 @@ export default function RootLayout({
         <Providers>
           <NavBar />
           <Analytics />
-          {children}
+          <Suspense fallback={<div>Chargement...</div>}>{children}</Suspense>
         </Providers>
       </body>
     </html>

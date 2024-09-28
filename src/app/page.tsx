@@ -1,15 +1,13 @@
-import Chart from "./components/Chart";
+import { Suspense } from "react";
 import { LoadingProvider } from "./components/LoadingProvider";
 import { Dashboard } from "./dashboard";
 
-export default function GraphPage({
-  searchParams,
-}: {
-  searchParams: Record<string, string>;
-}) {
+export default function GraphPage() {
   return (
     <LoadingProvider>
-      <Dashboard />
+      <Suspense fallback={<div>Chargement...</div>}>
+        <Dashboard />
+      </Suspense>
     </LoadingProvider>
   );
 }

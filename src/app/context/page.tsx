@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { getSearchStateFromURL } from "../utils/searchState";
 import { ClientContextFetch } from "./client-fetch-context";
 
@@ -9,5 +9,9 @@ export default async function Page({
 }) {
   const params = getSearchStateFromURL(searchParams);
 
-  return <ClientContextFetch fetchParams={params} />;
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <ClientContextFetch fetchParams={params} />
+    </Suspense>
+  );
 }

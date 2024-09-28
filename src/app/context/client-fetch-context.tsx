@@ -11,17 +11,11 @@ import {
   CardTitle,
   CardDescription,
 } from "../components/design_system/card";
-import { ImageSnippet } from "../components/ImageSnippet";
 import { LoadingProvider } from "../components/LoadingProvider";
-import { useSearchParams } from "next/navigation";
-import { Feedback } from "@/src/app/dashboard";
 
 export interface ClientContextFetchProps {
   fetchParams: SearchState;
 }
-
-// vercel lambdas were timing out with long requests
-// so I'm just using react query now
 
 export function ClientContextFetch(props: ClientContextFetchProps) {
   const { fetchParams } = props;
@@ -63,8 +57,6 @@ export interface DataViewerProps {
 }
 
 export function DataViewer({ data, isLoading }: DataViewerProps) {
-  const searchParams = useSearchParams();
-
   if (!isLoading && !data) {
     return (
       <div className="aspect-video h-full flex justify-center items-center">

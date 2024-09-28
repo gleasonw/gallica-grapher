@@ -13,7 +13,6 @@ export type NearbyData = [string, number][];
 async function fetchNearby({
   term,
   year,
-  month,
   max_n,
   sample_size,
 }: {

@@ -1,6 +1,5 @@
 import { addQueryParamsIfExist } from "../utils/addQueryParamsIfExist";
 import { apiURL } from "./apiURL";
-import { VolumeRecord } from "./models/dbStructs";
 import { components, paths } from "../types";
 
 export type ContextQueryParams =
