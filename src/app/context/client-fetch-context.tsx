@@ -14,6 +14,7 @@ import {
 import { ImageSnippet } from "../components/ImageSnippet";
 import { LoadingProvider } from "../components/LoadingProvider";
 import { useSearchParams } from "next/navigation";
+import { Feedback } from "@/src/app/dashboard";
 
 export interface ClientContextFetchProps {
   fetchParams: SearchState;
@@ -62,22 +63,6 @@ export interface DataViewerProps {
 }
 
 export function DataViewer({ data, isLoading }: DataViewerProps) {
-  function getPageNumberFromParams(ark: string) {
-    const maybeArkPage = searchParams.get(`arkPage${ark}`);
-
-    if (!maybeArkPage) {
-      return 0;
-    }
-
-    const maybeInt = parseInt(maybeArkPage);
-
-    if (isNaN(maybeInt)) {
-      return 0;
-    }
-
-    return maybeInt;
-  }
-
   const searchParams = useSearchParams();
 
   if (!isLoading && !data) {
@@ -90,8 +75,11 @@ export function DataViewer({ data, isLoading }: DataViewerProps) {
 
   console.log(isLoading);
 
+  const originURL = data?.origin_urls?.at(0);
+
   return (
     <div className={"flex flex-col gap-20 md:m-5"}>
+      <OriginURL originURL={originURL} />
       {data?.records?.map((record, index) => (
         <Card key={`${record.ark}-${record.terms}-${index}`}>
           <CardHeader>
@@ -102,5 +90,18 @@ export function DataViewer({ data, isLoading }: DataViewerProps) {
         </Card>
       ))}
     </div>
+  );
+}
+
+export function OriginURL({ originURL }: { originURL?: string }) {
+  if (!originURL) {
+    return null;
+  }
+
+  const humanReadableQueryString = new URL(originURL).searchParams.get("query");
+  return (
+    <a href={originURL} className="text-blue-500" target="_blank">
+      {humanReadableQueryString}
+    </a>
   );
 }

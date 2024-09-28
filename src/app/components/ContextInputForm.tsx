@@ -12,6 +12,7 @@ import { Label } from "./design_system/label";
 import { NumberInput } from "./number-input";
 import { QueryPagination } from "./QueryPagination";
 import { Spinner } from "./Spinner";
+import { Feedback } from "@/src/app/dashboard";
 
 export const strings = {
   fr: {
@@ -146,6 +147,7 @@ export function ContextInputForm(props: ContextInputFormProps) {
         <Button className="whitespace-nowrap">
           {isPending ? <Spinner isFetching={true} /> : "Explore"}
         </Button>
+        <Feedback />
       </form>
       <QueryPagination
         selectedPage={referencePage}

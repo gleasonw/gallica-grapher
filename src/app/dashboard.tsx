@@ -22,6 +22,7 @@ import { seriesColors } from "./components/utils/makeHighcharts";
 import { GallicaContext } from "./components/models/dbStructs";
 import { components } from "./types";
 import { ImageSnippet } from "@/src/app/components/ImageSnippet";
+import { OriginURL } from "@/src/app/context/client-fetch-context";
 
 const strings = {
   fr: {
@@ -64,6 +65,7 @@ export function Dashboard() {
   }
 
   const firstRecord = contextData?.records?.[0];
+  const originURL = contextData?.origin_urls?.at(0);
 
   return (
     <>
@@ -81,7 +83,11 @@ export function Dashboard() {
           {" "}
           {translation.description}{" "}
         </div>
-        <GraphSeriesForm />
+        <GraphSeriesForm>
+          <div className="flex w-full justify-center">
+            <Feedback />
+          </div>
+        </GraphSeriesForm>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="md:col-span-1">
             <TicketRow />
@@ -90,9 +96,12 @@ export function Dashboard() {
           <div className="md:col-span-1">
             <GraphContextForm numResults={contextData?.num_results}>
               {firstRecord ? (
-                <RecordCard record={firstRecord} />
+                <div className="flex flex-col gap-5">
+                  <OriginURL originURL={originURL} />
+                  <RecordCard record={firstRecord} />
+                </div>
               ) : (
-                <div>Aucune donnée trouvée...</div>
+                <div>Chargement...</div>
               )}
             </GraphContextForm>
           </div>
@@ -159,5 +168,17 @@ function RecordCard(props: {
       </CardHeader>
       <ContextViewer record={record} />
     </Card>
+  );
+}
+
+export function Feedback() {
+  return (
+    <a
+      href="https://github.com/gleasonw/gallica-grapher/issues"
+      target="_blank"
+      className="text-gray-500 underline text-sm"
+    >
+      Un problème ? Une suggestion ? <br />
+    </a>
   );
 }
