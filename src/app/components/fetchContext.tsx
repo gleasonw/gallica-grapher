@@ -24,12 +24,10 @@ export async function fetchContext(args: ContextQueryParams) {
   return (await response.json()) as RowRecordResponse;
 }
 
-export async function fetchSeries(args: SeriesParams): Promise<SeriesResponse> {
+export async function fetchSeries(args: SeriesParams): Promise<Response> {
   let baseUrl = `${apiURL}/api/series`;
   let url = addQueryParamsIfExist(baseUrl, {
     ...args,
   });
-  const response = await fetch(url);
-  const data = (await response.json()) as SeriesResponse;
-  return data;
+  return await fetch(url);
 }

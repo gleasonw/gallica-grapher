@@ -151,7 +151,9 @@ export default function ContextViewer({
               key={`${page.left_context}${page.page_num}${page.right_context}${index}`}
             >
               {page.left_context}{" "}
-              <span className={" font-bold px-8"}>{page.pivot}</span>{" "}
+              <span className={" font-bold px-8 bg-yellow-300"}>
+                {page.pivot}
+              </span>{" "}
               {page.right_context}
             </span>
           ))}

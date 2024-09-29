@@ -18,10 +18,12 @@ export function GraphSeriesForm({ children }: { children?: React.ReactNode }) {
       handleSubmit({
         ...args,
         terms: terms ? [...terms, localTerm] : [localTerm],
+        selected_term: localTerm,
       });
     } else {
       handleSubmit({
         terms: terms ? [...terms, localTerm] : [localTerm],
+        selected_term: localTerm,
       });
     }
   }
