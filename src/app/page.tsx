@@ -17,12 +17,15 @@ import { Suspense } from "react";
 import { ImageStateProvider } from "@/src/app/client-state-providers";
 import { TermSearchInput } from "@/src/app/terms-search";
 import { GallicaGramChart } from "@/src/app/gallicagram-chart";
+import { $path } from "next-typesafe-url";
+import Link from "next/link";
 
 export default async function GallicaGrapher({
   searchParams,
 }: {
   searchParams: Record<string, string>;
 }) {
+  const term = searchParams.term ?? "brazza";
   return (
     <div className="flex flex-col">
       <header className="px-6 py-4 flex flex-col">
@@ -30,18 +33,28 @@ export default async function GallicaGrapher({
           <div className="relative flex-grow">
             <TermSearchInput />
           </div>
-          <Button size="lg" className="px-8">
+          <Button size="lg" className="px-8 shadow-lg">
             Search
           </Button>
           <Filters />
+          <Link
+            href={$path({
+              route: "/",
+            })}
+          >
+            this is a test
+          </Link>
+          ;
         </div>
       </header>
       <main className="flex-1 p-6">
         <div className="w-full h-32">
-          <GallicaGramChart />
+          <Suspense fallback={<div>Loading chart...</div>}>
+            <ChartFetch term={term} />
+          </Suspense>
         </div>
         <Suspense fallback={<div>Loading hits...</div>}>
-          <RecordsScroll term={searchParams.term ?? "brazza"} />
+          <RecordsScroll term={term} />
         </Suspense>
       </main>
     </div>
@@ -54,6 +67,18 @@ const client = createClient<paths>({
       ? "http://localhost:8000"
       : "https://gallica-proxy-production.up.railway.app",
 });
+
+async function ChartFetch({ term }: { term: string }) {
+  const { data, error } = await client.GET("/api/series", {
+    params: { query: { term, grouping: "annee" } },
+  });
+
+  if (error) {
+    return <div>Error: {error.detail?.[0]?.msg}</div>;
+  }
+
+  return <GallicaGramChart series={data} />;
+}
 
 async function RecordsScroll({ term }: { term: string }) {
   const { data, error } = await client.GET("/api/occurrences_no_context", {

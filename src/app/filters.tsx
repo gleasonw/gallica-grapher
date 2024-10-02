@@ -22,7 +22,7 @@ export function Filters() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="lg">
+        <Button variant="outline" size="lg" className="shadow-lg">
           <Filter className="h-4 w-4 mr-2" />
           Filters
         </Button>
