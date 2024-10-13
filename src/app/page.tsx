@@ -35,9 +35,7 @@ import { ChevronLeft } from "lucide-react";
 
 type PageProps = InferPagePropsType<RouteType>;
 
-// TODO:
-
-// french translation
+// Site en français
 
 async function GallicaGrapher({ searchParams }: PageProps) {
   return (
@@ -91,7 +89,7 @@ async function ChartFetch({ terms }: { terms: string[] }) {
   });
 
   if (error) {
-    return <div>Error: {error.detail?.[0]?.msg}</div>;
+    return <div>Erreur : {error.detail?.[0]?.msg}</div>;
   }
 
   return <GallicaGramChart series={data} />;
@@ -120,11 +118,11 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
   });
 
   if (error) {
-    return <div>Error: {error.detail?.[0]?.msg}</div>;
+    return <div>Erreur : {error.detail?.[0]?.msg}</div>;
   }
 
   if (!data) {
-    return <div>No data</div>;
+    return <div>Pas de données</div>;
   }
 
   const numPages = Math.ceil(data?.total_records / (searchParams?.limit ?? 10));
@@ -154,7 +152,7 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
                     })}
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    Previous
+                    Précédent
                   </Link>
                 </Button>
 
@@ -210,7 +208,9 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
                         cursor: (currentPage - 1) * 10 + 10,
                       },
                     })}
-                  />
+                  >
+                    Suivant
+                  </PaginationNext>
                 </Button>
               </PaginationContent>
             </Pagination>
@@ -228,7 +228,7 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
                 <CardDescription>{record.date}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Suspense fallback={<div>Loading context...</div>}>
+                <Suspense fallback={<div>Chargement du contexte...</div>}>
                   <VolumeRecordOccurrences record={record} />
                 </Suspense>
               </CardContent>
@@ -248,7 +248,7 @@ async function VolumeRecordOccurrences({ record }: { record: VolumeRecord }) {
   });
 
   if (error) {
-    return <div>Error: {error.detail?.[0]?.msg}</div>;
+    return <div>Erreur : {error.detail?.[0]?.msg}</div>;
   }
 
   const contextByPageNumber = R.groupBy(data, (c) => c.page_num);
