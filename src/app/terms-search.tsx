@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { useNavigateWithLoading } from "@/src/app/providers";
 import { Route, SearchParams } from "@/src/app/routeType";
 import { Search } from "lucide-react";
+import { $path } from "next-typesafe-url";
 import { useSearchParams } from "next-typesafe-url/app";
+import Link from "next/link";
 import React from "react";
 
 export function TermSearchInput() {
@@ -71,20 +73,18 @@ export function YearInput({ params }: { params: SearchParams }) {
           onChange={(e) => setLocalEnd(e.target.value)}
           className="border-0"
         />
-        <Button
-          onClick={() =>
-            navigate({
-              route: "/",
-              searchParams: {
-                ...params,
-                year: parsedStartYear ?? params.year,
-                end_year: parsedEndYear ?? params.end_year,
-              },
-            })
-          }
+        <Link
+          href={$path({
+            route: "/",
+            searchParams: {
+              ...params,
+              year: parsedStartYear ?? params.year,
+              end_year: parsedEndYear ?? params.end_year,
+            },
+          })}
         >
-          Apply
-        </Button>
+          <Button variant="outline">Apply</Button>
+        </Link>
       </div>
       <div className="absolute bottom-0 bg-white z-10 translate-y-full">
         {parsedStartYear !== null && isNaN(parsedStartYear) ? (

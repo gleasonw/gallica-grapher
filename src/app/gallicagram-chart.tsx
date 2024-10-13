@@ -70,7 +70,7 @@ export function GallicaGramChart({ series }: { series: Series }) {
   ]);
 
   return (
-    <div className={`transition-opacity w-full h-full flex w-full flex-col`}>
+    <div className={`transition-opacity h-full flex w-full flex-col`}>
       <HighchartsReact
         highcharts={Highcharts}
         options={highchartsOpts}
@@ -82,7 +82,8 @@ export function GallicaGramChart({ series }: { series: Series }) {
           target="_blank"
           className="ml-auto underline"
         >
-          Données n-gram de Gallicagram -- Benjamin Azoulay et Benoît de Courson
+          Données n-gram de Gallicagram, par Benjamin Azoulay et Benoît de
+          Courson
         </Link>
       </span>
     </div>

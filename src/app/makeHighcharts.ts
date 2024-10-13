@@ -57,6 +57,7 @@ export function makeOptions(
     },
     tooltip: {
       shared: true,
+      xDateFormat: "%Y",
     },
     plotOptions: {
       series: {
@@ -81,7 +82,7 @@ export function makeOptions(
     series: ticketData?.map((ticket, i) => ({
       name: ticket?.name,
       data: ticket?.data ?? [],
-      color: seriesColors[i],
+      color: "black",
       point: {
         events: {
           click: (e: any) => {
