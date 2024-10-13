@@ -2,7 +2,6 @@
 
 "use client";
 
-import { PageProps } from "@/.next/types/app/page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,15 +17,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigateWithLoading } from "@/src/app/providers";
-import { Route } from "@/src/app/routeType";
-import { Calendar, Filter, Link } from "lucide-react";
+import { Route, SearchParams } from "@/src/app/routeType";
+import { Filter, Link } from "lucide-react";
 import { useSearchParams } from "next-typesafe-url/app";
 import React from "react";
 
 export function Filters() {
   const { data: params } = useSearchParams(Route.searchParams);
   const [filterState, setFilterState] = React.useState<
-    PageProps["searchParams"] | undefined
+    SearchParams | undefined
   >(params);
   const { year, end_year, source, sort, link_term, link_distance } =
     filterState ?? {};
@@ -48,28 +47,36 @@ export function Filters() {
               type="number"
               min={1785}
               max={1945}
-              value={end_year}
+              value={year}
               onChange={(e) =>
                 setFilterState({
                   ...filterState,
-                  end_year: e.target.valueAsNumber,
+                  year: isNaN(e.target.valueAsNumber)
+                    ? undefined
+                    : e.target.valueAsNumber,
                 })
               }
-              placeholder="Année de début"
+              placeholder={
+                filterState?.year ?? params?.year ?? "Année de début"
+              }
             />
             <Input
               id="endYear"
               type="number"
               min={1785}
               max={1945}
-              value={year}
+              value={end_year}
               onChange={(e) =>
                 setFilterState({
                   ...filterState,
-                  year: e.target.valueAsNumber,
+                  end_year: isNaN(e.target.valueAsNumber)
+                    ? undefined
+                    : e.target.valueAsNumber,
                 })
               }
-              placeholder="Année de fin"
+              placeholder={
+                filterState?.end_year ?? params?.end_year ?? "Année de fin"
+              }
             />
           </div>
           <Select
