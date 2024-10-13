@@ -1,3 +1,5 @@
+// Site en français
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +21,7 @@ export function TermSearchInput() {
     <div className="flex relative items-center gap-3">
       <Input
         className="w-full pl-10 pr-4 py-6 text-lg shadow-lg"
-        placeholder={data?.terms ? data.terms[0] : "Search for a term..."}
+        placeholder={data?.terms ? data.terms[0] : "Rechercher un terme..."}
         value={searchTerm}
         onChange={(e) => {
           setSearchTerm(e.target.value);
@@ -38,7 +40,7 @@ export function TermSearchInput() {
           navigate({ route: "/", searchParams: { terms: searchTerm } })
         }
       >
-        {isLoading ? "Searching..." : "Search"}
+        {isLoading ? "Recherche en cours..." : "Rechercher"}
       </Button>
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
     </div>
@@ -56,13 +58,13 @@ export function YearInput({ params }: { params: SearchParams }) {
     <div className="relative">
       <div className="flex gap-2 items-center border">
         <Input
-          placeholder={params.year?.toString() ?? "Start year"}
+          placeholder={params.year?.toString() ?? "Année de début"}
           value={localStart ?? undefined}
           onChange={(e) => setLocalStart(e.target.value)}
           className="border-0"
         />
         <Input
-          placeholder={params.end_year?.toString() ?? "End year"}
+          placeholder={params.end_year?.toString() ?? "Année de fin"}
           value={localEnd ?? undefined}
           onChange={(e) => setLocalEnd(e.target.value)}
           className="border-0"
@@ -77,15 +79,15 @@ export function YearInput({ params }: { params: SearchParams }) {
             },
           })}
         >
-          <Button variant="ghost">Apply</Button>
+          <Button variant="ghost">Appliquer</Button>
         </Link>
       </div>
       <div className="absolute bottom-0 bg-white z-10 translate-y-full">
         {parsedStartYear !== null && isNaN(parsedStartYear) ? (
-          <div>Start year must be a number</div>
+          <div>L'année de début doit être un nombre</div>
         ) : null}
         {parsedEndYear !== null && isNaN(parsedEndYear) ? (
-          <div>End year must be a number</div>
+          <div>L'année de fin doit être un nombre</div>
         ) : null}
       </div>
     </div>
