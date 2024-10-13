@@ -1,50 +1,80 @@
 "use client";
+import { Route } from "@/src/app/routeType";
 import { Series } from "@/src/app/types";
-import { useMemo } from "react";
-import {
-  XAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Bar,
-  BarChart,
-} from "recharts";
-import { firstBy } from "remeda";
+import { useSearchParams } from "next-typesafe-url/app";
+import React from "react";
+import HighchartsReact from "highcharts-react-official";
+import Highcharts from "highcharts";
+import { useNavigateWithLoading } from "@/src/app/providers";
+import { makeOptions } from "@/src/app/makeHighcharts";
 
 export function GallicaGramChart({ series }: { series: Series }) {
-  const minX = firstBy(series.data, (d) => d[0]);
-  const maxX = firstBy(series.data, [(d) => d[0], "desc"]);
-  if (!minX || !maxX) {
-    console.error("No data");
-    return null;
+  //@ts-ignore
+  const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
+  const { data } = useSearchParams(Route.searchParams);
+
+  const { navigate } = useNavigateWithLoading();
+
+  function handleSeriesClick(point: Highcharts.Point) {
+    const chart = chartComponentRef.current?.chart;
+    // @ts-ignore
+    if (chart && chart.xAxis[0].plotLinesAndBands.length > 0) {
+      chart.xAxis[0]?.removePlotLine("selectedLine");
+      chart.xAxis[0]?.addPlotLine({
+        value: point.x,
+        color: "red",
+        width: 2,
+        id: "selectedLine",
+      });
+    }
+    const date = new Date(point.category);
+    navigate({
+      route: "/",
+      searchParams: {
+        ...(data ?? {}),
+        year: date.getUTCFullYear(),
+        end_year: date.getUTCFullYear() + 1,
+        cursor: 0,
+      },
+    });
   }
-  const domain = [minX[0], maxX[0]];
-  const dataInRechartsFormat = useMemo(() => {
-    return series.data.map((d) => ({
-      timeEpochSeconds: d[0],
-      frequency: d[1],
-    }));
-  }, [series.data]);
+
+  function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
+    if (e.trigger === "zoom") {
+      const minDate = new Date(e.min);
+      if (minDate.toString() === "Invalid Date") {
+        return navigate({
+          route: "/",
+          searchParams: {
+            year: undefined,
+            end_year: undefined,
+            month: undefined,
+            cursor: 0,
+          },
+        });
+      }
+      navigate({
+        route: "/",
+        searchParams: {
+          year: minDate.getUTCFullYear(),
+          end_year: minDate.getUTCFullYear() + 1,
+          cursor: 0,
+        },
+      });
+    }
+  }
+
+  const highchartsOpts = makeOptions(handleSetExtremes, handleSeriesClick, [
+    series,
+  ]);
+
   return (
-    <ResponsiveContainer width="100%" height="90%">
-      <BarChart
-        data={dataInRechartsFormat}
-        onClick={(data) => console.log(data)}
-      >
-        <CartesianGrid />
-        <XAxis
-          domain={domain}
-          dataKey="timeEpochSeconds"
-          tickFormatter={(value) => new Date(value).getFullYear().toString()}
-          tickCount={5}
-        />
-        <Tooltip
-          labelFormatter={(epochSeconds) =>
-            new Date(epochSeconds).toLocaleDateString()
-          }
-        />
-        <Bar type="monotone" dataKey="frequency" stroke="#8884d8" />
-      </BarChart>
-    </ResponsiveContainer>
+    <div className={`transition-opacity w-full h-full`}>
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={highchartsOpts}
+        ref={chartComponentRef}
+      />
+    </div>
   );
 }

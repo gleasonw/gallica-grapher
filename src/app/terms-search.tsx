@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigateWithLoading } from "@/src/app/providers";
 import { Route, SearchParams } from "@/src/app/routeType";
-import { Search } from "lucide-react";
+import { Calendar, Search } from "lucide-react";
 import { useSearchParams } from "next-typesafe-url/app";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -55,7 +55,7 @@ export function YearInput({ params }: { params: SearchParams }) {
 
   return (
     <div className="relative">
-      <div className="flex gap-2 p-2">
+      <div className="flex gap-2 p-2 items-center">
         <Input
           placeholder={params.year?.toString() ?? "Start year"}
           value={localStart ?? undefined}

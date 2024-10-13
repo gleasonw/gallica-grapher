@@ -1,9 +1,8 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
 import createClient from "openapi-fetch";
 import "@/src/globals.css";
 
 import { Filters } from "@/src/app/filters";
-import { VolumeRecord } from "@/src/app/types";
+import { Context, VolumeRecord } from "@/src/app/types";
 import { paths } from "@/types";
 import {
   Card,
@@ -13,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Suspense } from "react";
-import { ImageStateProvider } from "@/src/app/client-state-providers";
 import { TermSearchInput, YearInput } from "@/src/app/terms-search";
 import { GallicaGramChart } from "@/src/app/gallicagram-chart";
 import { $path, InferPagePropsType } from "next-typesafe-url";
@@ -28,74 +26,24 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 import { NumberRecords } from "@/src/app/NumberRecords";
+import * as R from "remeda";
 
 import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Copy, Image } from "lucide-react";
-import {
-  RecordContextProvider,
-  RecordContextNavigator,
-  RecordContextPageSelect,
-} from "@/src/app/RecordContext";
+import { ChevronLeft } from "lucide-react";
 
 type PageProps = InferPagePropsType<RouteType>;
 
-const frenchAnimals = [
-  "chien", // dog
-  "chat", // cat
-  "lapin", // rabbit
-  "cheval", // horse
-  "vache", // cow
-  "mouton", // sheep
-  "cochon", // pig
-  "poule", // hen
-  "canard", // duck
-  "oiseau", // bird
-  "poisson", // fish
-  "serpent", // snake
-  "grenouille", // frog
-  "souris", // mouse
-  "chèvre", // goat
-  "renard", // fox
-  "singe", // monkey
-  "ours", // bear
-  "tigre", // tiger
-  "éléphant", // elephant
-  "girafe", // giraffe
-  "lion", // lion
-  "zèbre", // zebra
-  "hippopotame", // hippopotamus
-  "kangourou", // kangaroo
-  "perroquet", // parrot
-  "panda", // panda
-  "léopard", // leopard
-  "pingouin", // penguin
-  "hirondelle", // swallow
-];
-
 // TODO:
 
-// errors screen for gallica
 // french translation
 // click on chart to go to year
 
-function TestScroll() {
-  return (
-    <div className="flex flex-col gap-2 max-h-[100px] overflow-auto">
-      {frenchAnimals.map((a) => (
-        <Link href={$path({ route: "/", searchParams: { terms: [a] } })}>
-          {a}
-        </Link>
-      ))}
-    </div>
-  );
-}
-
 async function GallicaGrapher({ searchParams }: PageProps) {
   return (
-    <div className="flex flex-col">
-      <header className="px-6 py-4 flex flex-col">
+    <div className="flex flex-col h-screen overflow-hidden px-2 pb-2">
+      <header className="py-4 flex flex-col">
         <div className="flex items-center space-x-2">
           <div className="relative flex-grow">
             <TermSearchInput />
@@ -103,32 +51,28 @@ async function GallicaGrapher({ searchParams }: PageProps) {
           <Filters />
         </div>
       </header>
-      <main className="flex-1 p-6">
-        <div className="w-full h-32">
-          <Suspense key={JSON.stringify(searchParams.terms)}>
-            <ChartFetch terms={searchParams.terms} />
-          </Suspense>
-        </div>
+      <div className="w-full h-32 flex">
+        <Suspense key={JSON.stringify(searchParams.terms)}>
+          <ChartFetch terms={searchParams.terms} />
+        </Suspense>
+      </div>
+      <Suspense
+        fallback={
+          <RecordsLayout
+            header={
+              <div className="w-full h-[40px] bg-gray-200 animate-pulse rounded-md" />
+            }
+            records={Array.from({ length: 5 }).map(() => (
+              <div className="h-44 w-full animate-pulse bg-gray-200 rounded-md"></div>
+            ))}
+          />
+        }
+        key={JSON.stringify({
+          searchParams,
+        })}
+      >
         <RecordsScroll searchParams={searchParams} />
-
-        <Suspense
-          fallback={
-            <RecordsLayout
-              header={
-                <div className="w-full h-[40px] bg-gray-200 animate-pulse rounded-md" />
-              }
-              records={Array.from({ length: 5 }).map(() => (
-                <div className="h-44 w-full animate-pulse bg-gray-200 rounded-md"></div>
-              ))}
-            />
-          }
-          key={JSON.stringify({
-            ...searchParams,
-            ark_selected_page: undefined,
-            ark_show_image: undefined,
-          })}
-        ></Suspense>
-      </main>
+      </Suspense>
     </div>
   );
 }
@@ -162,11 +106,11 @@ function RecordsLayout({
   header: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5 pb-2 max-h-full">
       <div className="flex items-center gap-4 justify-between">{header}</div>
-      <ScrollArea className="h-[900px] max-h-screen rounded-md">
-        <div className="gap-4 grid grid-cols-1 ">{records}</div>
-      </ScrollArea>
+      <div className="gap-4 grid grid-cols-2 max-h-full overflow-auto p-0 ">
+        {records}
+      </div>
     </div>
   );
 }
@@ -180,6 +124,10 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
     return <div>Error: {error.detail?.[0]?.msg}</div>;
   }
 
+  if (!data) {
+    return <div>No data</div>;
+  }
+
   const numPages = Math.ceil(data?.total_records / (searchParams?.limit ?? 10));
   const currentPage = Math.floor((searchParams?.cursor ?? 0) / 10) + 1;
   const pagesBeforeToDisplay = Math.min(2, currentPage - 1);
@@ -188,108 +136,105 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
   return (
     <RecordsLayout
       header={
-        <>
-          <span className="text-nowrap font-bold text-2xl">
-            <NumberRecords records={data?.total_records} />
-          </span>
-          <Pagination>
-            <PaginationContent>
-              <Button variant="ghost" disabled={currentPage === 1}>
-                <Link
-                  className="flex gap-2 items-center"
-                  href={$path({
-                    route: "/",
-                    searchParams: {
-                      ...searchParams,
-                      cursor: (currentPage - 1) * 10 - 10,
-                    },
-                  })}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Link>
-              </Button>
-
-              {Array.from({ length: pagesBeforeToDisplay }).map((_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink
+        <div className="w-full flex flex-col gap-3">
+          <div className="flex gap-2 items-center justify-between w-full">
+            <span className="text-nowrap font-bold text-2xl">
+              <NumberRecords records={data?.total_records} />
+            </span>
+            <Pagination>
+              <PaginationContent>
+                <Button variant="ghost" disabled={currentPage === 1}>
+                  <Link
+                    className="flex gap-2 items-center"
                     href={$path({
                       route: "/",
                       searchParams: {
                         ...searchParams,
-                        cursor:
-                          (currentPage - 1) * 10 -
-                          (pagesBeforeToDisplay - i) * 10,
+                        cursor: (currentPage - 1) * 10 - 10,
                       },
                     })}
                   >
-                    {currentPage - pagesBeforeToDisplay + i}
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Link>
+                </Button>
+
+                {Array.from({ length: pagesBeforeToDisplay }).map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink
+                      href={$path({
+                        route: "/",
+                        searchParams: {
+                          ...searchParams,
+                          cursor:
+                            (currentPage - 1) * 10 -
+                            (pagesBeforeToDisplay - i) * 10,
+                        },
+                      })}
+                    >
+                      {currentPage - pagesBeforeToDisplay + i}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationLink
+                    isActive={true}
+                    href={$path({ route: "/", searchParams })}
+                  >
+                    {currentPage}
                   </PaginationLink>
                 </PaginationItem>
-              ))}
 
-              <PaginationItem>
-                <PaginationLink
-                  isActive={true}
-                  href={$path({ route: "/", searchParams })}
-                >
-                  {currentPage}
-                </PaginationLink>
-              </PaginationItem>
+                {Array.from({ length: pagesAfterToDisplay }).map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink
+                      href={$path({
+                        route: "/",
+                        searchParams: {
+                          ...searchParams,
+                          cursor: (currentPage - 1) * 10 + (i + 1) * 10,
+                        },
+                      })}
+                    >
+                      {currentPage + (i + 1)}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
 
-              {Array.from({ length: pagesAfterToDisplay }).map((_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink
+                <Button variant="ghost" disabled={currentPage === numPages}>
+                  <PaginationNext
                     href={$path({
                       route: "/",
                       searchParams: {
                         ...searchParams,
-                        cursor: (currentPage - 1) * 10 + (i + 1) * 10,
+                        cursor: (currentPage - 1) * 10 + 10,
                       },
                     })}
-                  >
-                    {currentPage + (i + 1)}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              <Button variant="ghost" disabled={currentPage === numPages}>
-                <PaginationNext
-                  href={$path({
-                    route: "/",
-                    searchParams: {
-                      ...searchParams,
-                      cursor: (currentPage - 1) * 10 + 10,
-                    },
-                  })}
-                />
-              </Button>
-            </PaginationContent>
-          </Pagination>
-          <YearInput params={searchParams} />
-        </>
+                  />
+                </Button>
+              </PaginationContent>
+            </Pagination>
+            <YearInput params={searchParams} />
+          </div>
+        </div>
       }
       records={
         <SkeletonsWhenLoading
           loadedUI={data.records.map((record) => (
-            <ImageStateProvider>
-              <Card className="h-full">
-                <CardHeader className="">
-                  <CardTitle className="text-sm font-medium">
-                    {record.paper_title}
-                  </CardTitle>
-                  <CardDescription>{record.date}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Suspense fallback={<div>Loading context...</div>}>
-                    <VolumeRecordOccurrences
-                      record={record}
-                      params={searchParams}
-                    />
-                  </Suspense>
-                </CardContent>
-              </Card>
-            </ImageStateProvider>
+            <Card key={record.ark}>
+              <CardHeader className="">
+                <CardTitle className="text-sm font-medium">
+                  {record.paper_title}
+                </CardTitle>
+                <CardDescription>{record.date}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<div>Loading context...</div>}>
+                  <VolumeRecordOccurrences record={record} />
+                </Suspense>
+              </CardContent>
+            </Card>
           ))}
         />
       }
@@ -297,62 +242,57 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
-async function VolumeRecordOccurrences({
-  record,
-  params,
-}: {
-  record: VolumeRecord;
-  params: SearchParams;
-}) {
+function OriginURL({ originURL }: { originURL?: string }) {
+  if (!originURL) {
+    return null;
+  }
+
+  const humanReadableQueryString = new URL(originURL).searchParams.get("query");
+  return (
+    <a href={originURL} className="" target="_blank">
+      {humanReadableQueryString}
+    </a>
+  );
+}
+
+async function VolumeRecordOccurrences({ record }: { record: VolumeRecord }) {
   const { data, error } = await client.GET("/api/context", {
     params: {
       query: { ark: record.ark, terms: record.terms, url: record.url },
     },
   });
 
-  const selectedPageNumber = params?.ark_selected_page?.[record.ark];
-
   if (error) {
     return <div>Error: {error.detail?.[0]?.msg}</div>;
   }
 
-  const pageNumbers = data?.map((page) => page.page_num);
-
-  const uniqueFiltered = Array.from(new Set(pageNumbers))
-    .filter((p) => p !== undefined)
-    .sort((a, b) => {
-      if (a === undefined || b === undefined) {
-        return 0;
-      }
-      return a - b;
-    });
-
-  const selectedPage =
-    uniqueFiltered.find((p) => p === selectedPageNumber) ??
-    uniqueFiltered.at(0);
-
-  if (!selectedPage) {
-    return <div>Logic error trying to find selected page number.</div>;
-  }
-
-  const showImage = params?.ark_show_image?.[record.ark] ?? false;
-
-  const imageData = showImage
-    ? await client.GET("/api/image", {
-        params: {
-          query: {
-            ark: record.ark,
-            page: selectedPage,
-            term: record.terms[0]!,
-          },
-        },
-      })
-    : null;
+  const contextByPageNumber = R.groupBy(data, (c) => c.page_num);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-4">
-        {data.map((c, index) => (
+    <div className="flex flex-col gap-7 overflow-auto max-h-96">
+      {Object.entries(contextByPageNumber).map(([pageNumber, context]) => (
+        <PageContext
+          key={pageNumber}
+          context={context}
+          pageNumber={parseInt(pageNumber)}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PageContext({
+  context,
+  pageNumber,
+}: {
+  context: Context;
+  pageNumber: number;
+}) {
+  return (
+    <div>
+      <h1 className="text-lg font-bold">p. {pageNumber}</h1>
+      <div className="flex flex-col gap-4 text-sm">
+        {context.map((c, index) => (
           <span
             key={`${c.left_context}${c.page_num}${c.right_context}${index}`}
           >
@@ -362,36 +302,6 @@ async function VolumeRecordOccurrences({
           </span>
         ))}
       </div>
-      <div className="flex gap-2 items-center">
-        <Link
-          className="ml-auto"
-          href={$path({
-            route: "/",
-            searchParams: {
-              ...params,
-              ark_show_image: {
-                ...params?.ark_show_image,
-                [record.ark]: true,
-              },
-            },
-          })}
-        >
-          <Button variant="outline">
-            <Image />
-          </Button>
-        </Link>
-
-        <Button variant="outline">
-          <Copy />
-        </Button>
-      </div>
-      <RecordContextNavigator context={data} />
-      {imageData ? (
-        <img
-          src={imageData?.data?.image}
-          alt={`Page of text occurrences from Gallica`}
-        />
-      ) : null}
     </div>
   );
 }
