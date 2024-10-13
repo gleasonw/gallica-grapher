@@ -1,5 +1,6 @@
 "use client";
 
+import { PageProps } from "@/.next/types/app/page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,10 +16,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+import { useNavigateWithLoading } from "@/src/app/providers";
+import { Route } from "@/src/app/routeType";
 import { Filter } from "lucide-react";
+import { useSearchParams } from "next-typesafe-url/app";
+import React from "react";
 
 export function Filters() {
+  const { data: params } = useSearchParams(Route.searchParams);
+  const [filterState, setFilterState] = React.useState<
+    PageProps["searchParams"] | undefined
+  >(params);
+  const { year, end_year, source, sort, link_term, link_distance } =
+    filterState ?? {};
+
+  const { isLoading, navigate } = useNavigateWithLoading();
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -30,24 +42,44 @@ export function Filters() {
       <PopoverContent className="w-80">
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Label htmlFor="startYear">Start Year:</Label>
             <Input
               id="startYear"
               type="number"
               min={1785}
               max={1945}
-              className="w-20"
+              value={end_year}
+              onChange={(e) =>
+                setFilterState({
+                  ...filterState,
+                  end_year: e.target.valueAsNumber,
+                })
+              }
+              placeholder="Start year"
             />
-            <Label htmlFor="endYear">End Year:</Label>
             <Input
               id="endYear"
               type="number"
               min={1785}
               max={1945}
-              className="w-20"
+              value={year}
+              onChange={(e) =>
+                setFilterState({
+                  ...filterState,
+                  year: e.target.valueAsNumber,
+                })
+              }
+              placeholder="End year"
             />
           </div>
-          <Select>
+          <Select
+            value={source}
+            onValueChange={(value) =>
+              setFilterState({
+                ...filterState,
+                source: value as "all" | "book" | "periodical",
+              })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="Source" />
             </SelectTrigger>
@@ -57,7 +89,15 @@ export function Filters() {
               <SelectItem value="periodical">Periodical</SelectItem>
             </SelectContent>
           </Select>
-          <Select>
+          <Select
+            value={sort}
+            onValueChange={(value) =>
+              setFilterState({
+                ...filterState,
+                sort: value as "date" | "relevance",
+              })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
@@ -67,14 +107,44 @@ export function Filters() {
             </SelectContent>
           </Select>
           <div className="space-y-2">
-            <Label>Advanced Filters</Label>
-            <Input placeholder="Codes (comma-separated)" />
-            <Input type="number" placeholder="Limit" />
-            <Input placeholder="Link Term" />
-            <Input type="number" placeholder="Link Distance" />
-            <Label>OCR Quality</Label>
-            <Slider defaultValue={[0.5]} max={1} step={0.1} />
+            <Label className="flex flex-col gap-3">Advanced Filters</Label>
+            <Input
+              placeholder="Link Term"
+              value={link_term}
+              onChange={(e) =>
+                setFilterState({
+                  ...filterState,
+                  link_term: e.target.value,
+                })
+              }
+            />
+            <Input
+              type="number"
+              placeholder="Link Distance"
+              onChange={(e) =>
+                setFilterState({
+                  ...filterState,
+                  link_distance: e.target.valueAsNumber,
+                })
+              }
+              value={link_distance}
+            />
           </div>
+
+          <Button
+            className="w-full"
+            onClick={() =>
+              navigate({
+                route: "/",
+                searchParams: {
+                  ...params,
+                  ...filterState,
+                },
+              })
+            }
+          >
+            {isLoading ? "Applying filters..." : "Apply"}
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

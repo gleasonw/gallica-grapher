@@ -1,9 +1,12 @@
 import { DynamicRoute } from "next-typesafe-url";
-import { z } from "zod";
+import { boolean, z } from "zod";
 
 export const Route = {
   searchParams: z.object({
-    terms: z.array(z.string()).optional(),
+    terms: z
+      .union([z.string().transform((val) => [val]), z.array(z.string())])
+      .optional()
+      .default(["brazza"]),
     codes: z.array(z.string()).optional(),
     cursor: z.number().optional(),
     limit: z.number().optional(),
@@ -20,6 +23,10 @@ export const Route = {
       .optional(),
     sort: z.literal("date").or(z.literal("relevance")).optional(),
     ocrquality: z.number().optional(),
+    ark_selected_page: z.record(z.string(), z.number()).optional(),
+    ark_show_image: z.record(z.string(), boolean()).optional(),
   }),
 } satisfies DynamicRoute;
 export type RouteType = typeof Route;
+
+export type SearchParams = z.infer<(typeof Route)["searchParams"]>;

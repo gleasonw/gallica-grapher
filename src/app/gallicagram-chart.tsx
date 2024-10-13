@@ -3,7 +3,6 @@ import { Series } from "@/src/app/types";
 import { useMemo } from "react";
 import {
   XAxis,
-  YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
@@ -11,8 +10,6 @@ import {
   BarChart,
 } from "recharts";
 import { firstBy } from "remeda";
-
-// TODO: fix weird buckets coming from shiny api proxy
 
 export function GallicaGramChart({ series }: { series: Series }) {
   const minX = firstBy(series.data, (d) => d[0]);
@@ -41,7 +38,6 @@ export function GallicaGramChart({ series }: { series: Series }) {
           tickFormatter={(value) => new Date(value).getFullYear().toString()}
           tickCount={5}
         />
-        <YAxis />
         <Tooltip
           labelFormatter={(epochSeconds) =>
             new Date(epochSeconds).toLocaleDateString()
