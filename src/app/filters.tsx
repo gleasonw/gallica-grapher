@@ -1,3 +1,5 @@
+// Site en français
+
 "use client";
 
 import { PageProps } from "@/.next/types/app/page";
@@ -35,7 +37,7 @@ export function Filters() {
       <PopoverTrigger asChild>
         <Button variant="outline" size="lg" className="shadow-lg">
           <Filter className="h-4 w-4 mr-2" />
-          Filters
+          Filtres
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
@@ -53,7 +55,7 @@ export function Filters() {
                   end_year: e.target.valueAsNumber,
                 })
               }
-              placeholder="Start year"
+              placeholder="Année de début"
             />
             <Input
               id="endYear"
@@ -67,7 +69,7 @@ export function Filters() {
                   year: e.target.valueAsNumber,
                 })
               }
-              placeholder="End year"
+              placeholder="Année de fin"
             />
           </div>
           <Select
@@ -83,9 +85,9 @@ export function Filters() {
               <SelectValue placeholder="Source" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="book">Book</SelectItem>
-              <SelectItem value="periodical">Periodical</SelectItem>
+              <SelectItem value="all">Tous</SelectItem>
+              <SelectItem value="book">Livre</SelectItem>
+              <SelectItem value="periodical">Périodique</SelectItem>
             </SelectContent>
           </Select>
           <Select
@@ -98,10 +100,10 @@ export function Filters() {
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Sort" />
+              <SelectValue placeholder="Tri" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="relevance">Relevance</SelectItem>
+              <SelectItem value="relevance">Pertinence</SelectItem>
               <SelectItem value="date">Date</SelectItem>
             </SelectContent>
           </Select>
@@ -109,7 +111,7 @@ export function Filters() {
             <Link />
             <div className="flex gap-2 flex-col">
               <Input
-                placeholder="Link Term"
+                placeholder="Terme associé"
                 value={link_term}
                 onChange={(e) =>
                   setFilterState({
@@ -120,7 +122,7 @@ export function Filters() {
               />
               <Input
                 type="number"
-                placeholder="Link Distance"
+                placeholder="Distance de lien"
                 onChange={(e) =>
                   setFilterState({
                     ...filterState,
@@ -143,7 +145,7 @@ export function Filters() {
               })
             }
           >
-            {isLoading ? "Applying filters..." : "Apply"}
+            {isLoading ? "Application des filtres..." : "Appliquer"}
           </Button>
         </div>
       </PopoverContent>
