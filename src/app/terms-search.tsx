@@ -30,10 +30,6 @@ export function TermSearchInput() {
           }
         }}
       />
-      <div className="flex items-center gap-2">
-        <Input className="text-xs w-3/4" placeholder="Link term" />
-        <Input className="text-xs w-1/4" placeholder="Distance" />
-      </div>
 
       <Button
         size="lg"
@@ -56,11 +52,9 @@ export function YearInput({ params }: { params: SearchParams }) {
   const parsedStartYear = localStart ? parseInt(localStart) : null;
   const parsedEndYear = localEnd ? parseInt(localEnd) : null;
 
-  const { navigate } = useNavigateWithLoading();
-
   return (
     <div className="relative">
-      <div className="flex gap-2 p-2 items-center">
+      <div className="flex gap-2 items-center border">
         <Input
           placeholder={params.year?.toString() ?? "Start year"}
           value={localStart ?? undefined}
@@ -83,7 +77,7 @@ export function YearInput({ params }: { params: SearchParams }) {
             },
           })}
         >
-          <Button variant="outline">Apply</Button>
+          <Button variant="ghost">Apply</Button>
         </Link>
       </div>
       <div className="absolute bottom-0 bg-white z-10 translate-y-full">

@@ -3,7 +3,6 @@
 import { PageProps } from "@/.next/types/app/page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverTrigger,
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useNavigateWithLoading } from "@/src/app/providers";
 import { Route } from "@/src/app/routeType";
-import { Filter } from "lucide-react";
+import { Calendar, Filter, Link } from "lucide-react";
 import { useSearchParams } from "next-typesafe-url/app";
 import React from "react";
 
@@ -106,31 +105,32 @@ export function Filters() {
               <SelectItem value="date">Date</SelectItem>
             </SelectContent>
           </Select>
-          <div className="space-y-2">
-            <Label className="flex flex-col gap-3">Advanced Filters</Label>
-            <Input
-              placeholder="Link Term"
-              value={link_term}
-              onChange={(e) =>
-                setFilterState({
-                  ...filterState,
-                  link_term: e.target.value,
-                })
-              }
-            />
-            <Input
-              type="number"
-              placeholder="Link Distance"
-              onChange={(e) =>
-                setFilterState({
-                  ...filterState,
-                  link_distance: e.target.valueAsNumber,
-                })
-              }
-              value={link_distance}
-            />
+          <div className="flex w-full justify-between items-center">
+            <Link />
+            <div className="flex gap-2 flex-col">
+              <Input
+                placeholder="Link Term"
+                value={link_term}
+                onChange={(e) =>
+                  setFilterState({
+                    ...filterState,
+                    link_term: e.target.value,
+                  })
+                }
+              />
+              <Input
+                type="number"
+                placeholder="Link Distance"
+                onChange={(e) =>
+                  setFilterState({
+                    ...filterState,
+                    link_distance: e.target.valueAsNumber,
+                  })
+                }
+                value={link_distance}
+              />
+            </div>
           </div>
-
           <Button
             className="w-full"
             onClick={() =>
