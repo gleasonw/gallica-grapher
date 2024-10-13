@@ -38,7 +38,6 @@ type PageProps = InferPagePropsType<RouteType>;
 // TODO:
 
 // french translation
-// click on chart to go to year
 
 async function GallicaGrapher({ searchParams }: PageProps) {
   return (
@@ -106,7 +105,7 @@ function RecordsLayout({
   header: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-5 pb-2 max-h-full">
+    <div className="flex flex-col gap-5 pb-2 max-h-full h-full overflow-hidden">
       <div className="flex items-center gap-4 justify-between">{header}</div>
       <div className="gap-4 grid grid-cols-2 max-h-full overflow-auto p-0 ">
         {records}
@@ -239,19 +238,6 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
         />
       }
     />
-  );
-}
-
-function OriginURL({ originURL }: { originURL?: string }) {
-  if (!originURL) {
-    return null;
-  }
-
-  const humanReadableQueryString = new URL(originURL).searchParams.get("query");
-  return (
-    <a href={originURL} className="" target="_blank">
-      {humanReadableQueryString}
-    </a>
   );
 }
 

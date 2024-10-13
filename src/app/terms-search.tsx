@@ -4,11 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigateWithLoading } from "@/src/app/providers";
 import { Route, SearchParams } from "@/src/app/routeType";
-import { Calendar, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useSearchParams } from "next-typesafe-url/app";
-import { useRouter } from "next/navigation";
 import React from "react";
-import { start } from "repl";
 
 export function TermSearchInput() {
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -30,6 +28,11 @@ export function TermSearchInput() {
           }
         }}
       />
+      <div className="flex items-center gap-2">
+        <Input className="text-xs w-3/4" placeholder="Link term" />
+        <Input className="text-xs w-1/4" placeholder="Distance" />
+      </div>
+
       <Button
         size="lg"
         className="px-8 shadow-lg"
