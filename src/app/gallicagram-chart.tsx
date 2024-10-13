@@ -7,6 +7,7 @@ import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { useNavigateWithLoading } from "@/src/app/providers";
 import { makeOptions } from "@/src/app/makeHighcharts";
+import Link from "next/link";
 
 export function GallicaGramChart({ series }: { series: Series }) {
   //@ts-ignore
@@ -69,12 +70,21 @@ export function GallicaGramChart({ series }: { series: Series }) {
   ]);
 
   return (
-    <div className={`transition-opacity w-full h-full`}>
+    <div className={`transition-opacity w-full h-full flex w-full flex-col`}>
       <HighchartsReact
         highcharts={Highcharts}
         options={highchartsOpts}
         ref={chartComponentRef}
       />
+      <span className="text-xs opacity-50 w-full flex">
+        <Link
+          href={"https://shiny.ens-paris-saclay.fr/app/gallicagram"}
+          target="_blank"
+          className="ml-auto underline"
+        >
+          Données n-gram de Gallicagram -- Benjamin Azoulay et Benoît de Courson
+        </Link>
+      </span>
     </div>
   );
 }

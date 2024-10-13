@@ -28,6 +28,9 @@ export function makeOptions(
       },
       height: "120px",
     },
+    credits: {
+      enabled: false,
+    },
     legend: {
       enabled: false,
     },
@@ -46,7 +49,10 @@ export function makeOptions(
     },
     yAxis: {
       title: {
-        text: "Frequency",
+        text: undefined,
+      },
+      labels: {
+        enabled: false,
       },
     },
     tooltip: {
