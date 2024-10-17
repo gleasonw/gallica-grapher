@@ -95,9 +95,13 @@ export function GallicaGramChart({ series }: { series: Series }) {
           Courson
         </Link>
       </span>
-      <div className="ml-auto">
-        <Feedback />
-      </div>
+      <Link
+        href="https://github.com/gleasonw/gallica-grapher/issues"
+        target="_blank"
+        className="text-gray-500 underline text-xs ml-auto"
+      >
+        Un problème ? Une suggestion ? <br />
+      </Link>
     </div>
   );
 }
