@@ -55,7 +55,7 @@ async function GallicaGrapher({ searchParams }: PageProps) {
           <Filters />
         </div>
       </header>
-      <div className="w-full h-32 flex">
+      <div className="w-full flex">
         <Suspense key={JSON.stringify(searchParams.terms)}>
           <ChartFetch terms={searchParams.terms} />
         </Suspense>
