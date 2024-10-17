@@ -7,40 +7,29 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { usePageState } from "@/src/app/PageContextClientStateProvider";
-import { Check, Copy, Image } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { useState } from "react";
-import { observer } from "mobx-react-lite";
 import { useQuery } from "@tanstack/react-query";
 import { client } from "@/src/app/utils";
+import { forwardRef } from "react";
 
-export function GrapherTooltip({
-  trigger,
-  content,
-}: {
-  trigger: React.ReactElement;
-  content: React.ReactElement;
-}) {
+export const GrapherTooltip = forwardRef(function GrapherTooltip(
+  props: {
+    content: React.ReactNode;
+    trigger: React.ReactNode;
+  },
+  ref
+) {
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>{trigger}</TooltipTrigger>
-        <TooltipContent>{content}</TooltipContent>
+        <TooltipTrigger asChild ref={ref as any}>
+          {props.trigger}
+        </TooltipTrigger>
+        <TooltipContent>{props.content}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
-}
-
-export const PageImageGate = observer(function PageImageGate({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const pageState = usePageState();
-  if (!pageState.isImageShowing) {
-    return null;
-  }
-  return children;
 });
 
 export function PageImage(props: { page: number; ark: string; term: string }) {
@@ -57,24 +46,6 @@ export function PageImage(props: { page: number; ark: string; term: string }) {
   }
   return <img src={data?.data?.image} />;
 }
-
-export const ShowImageButton = observer(function ShowImageButton() {
-  const pageState = usePageState();
-  return (
-    <GrapherTooltip
-      trigger={
-        <Button
-          className="ml-auto text-gray-500"
-          variant="ghost"
-          onClick={() => pageState.showImage()}
-        >
-          <Image />
-        </Button>
-      }
-      content={<div>Charger l'image de la page</div>}
-    />
-  );
-});
 
 export function CopyButton({ text }: { text: string }) {
   const [clicked, setClicked] = useState(false);

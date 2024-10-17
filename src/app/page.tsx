@@ -29,16 +29,23 @@ import * as R from "remeda";
 import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ExternalLink } from "lucide-react";
+import { ChevronLeft, ExternalLink, Image } from "lucide-react";
 import {
   CopyButton,
   GrapherTooltip,
   PageImage,
-  PageImageGate,
-  ShowImageButton,
 } from "@/src/app/GrapherTooltip";
 import { PageContextClientStateProvider } from "@/src/app/PageContextClientStateProvider";
 import { client } from "@/src/app/utils";
+import { PageContextScroller } from "@/src/app/PageContextScroller";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type PageProps = InferPagePropsType<RouteType>;
 
@@ -55,7 +62,7 @@ async function GallicaGrapher({ searchParams }: PageProps) {
           <Filters />
         </div>
       </header>
-      <div className="w-full flex">
+      <div className="w-full h-52">
         <Suspense key={JSON.stringify(searchParams.terms)}>
           <ChartFetch terms={searchParams.terms} />
         </Suspense>
@@ -69,7 +76,7 @@ async function GallicaGrapher({ searchParams }: PageProps) {
             records={Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="h-44 w-full animate-pulse bg-gray-200 rounded-md"
+                className="h-80 w-full animate-pulse bg-gray-200 rounded-md"
               />
             ))}
           />
@@ -108,7 +115,7 @@ function RecordsLayout({
   return (
     <div className="flex flex-col gap-5 pb-2 max-h-full h-full overflow-hidden">
       <div className="flex items-center gap-4 justify-between">{header}</div>
-      <div className="gap-4 grid grid-cols-2 max-h-full overflow-auto p-0 ">
+      <div className="gap-14 grid grid-cols-1 max-h-full overflow-auto px-2 sm:px-20 ">
         {records}
       </div>
     </div>
@@ -138,7 +145,7 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
       header={
         <div className="w-full flex flex-col gap-3">
           <div className="flex gap-2 items-center justify-between w-full">
-            <span className="text-nowrap font-medium text-xl">
+            <span className="text-nowrap font-medium">
               <NumberRecords records={data?.total_records} />
             </span>
             <Pagination>
@@ -225,13 +232,19 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
           loadedUI={data.records.map((record) => (
             <Card key={record.ark}>
               <CardHeader className="">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-md font-medium">
                   {record.paper_title}
                 </CardTitle>
                 <CardDescription>{record.date}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Suspense fallback={<div>Chargement du contexte...</div>}>
+                <Suspense
+                  fallback={
+                    <div className="h-80 flex items-center justify-center">
+                      Chargement du contexte...
+                    </div>
+                  }
+                >
                   <VolumeRecordOccurrences record={record} />
                 </Suspense>
               </CardContent>
@@ -264,24 +277,41 @@ async function VolumeRecordOccurrences({ record }: { record: VolumeRecord }) {
     return <div>Erreur : {error.detail?.[0]?.msg}</div>;
   }
 
+  const firstPage = data.at(0)?.page_num;
+
   const contextByPageNumber = R.groupBy(data, (c) => c.page_num);
+  const firstPageIndex = Object.keys(contextByPageNumber).findIndex(
+    (k) => k === firstPage?.toString()
+  );
+  const sectionChunkSize = 3;
+  const firstSectionToShow = Math.floor(firstPageIndex / sectionChunkSize);
 
   return (
-    <div className="flex flex-col gap-7 overflow-auto max-h-96">
-      {Object.entries(contextByPageNumber).map(([pageNumber, context]) => (
-        <PageContext
-          key={pageNumber}
-          context={context}
-          pageNumber={parseInt(pageNumber)}
-          imageFetcher={
-            <PageImage
-              ark={record.ark}
-              term={record.terms.at(0) ?? ""}
-              page={parseInt(pageNumber)}
+    <div className="flex flex-col gap-7">
+      <PageContextScroller
+        sectionChunkSize={sectionChunkSize}
+        startChunk={firstSectionToShow}
+        pages={Object.entries(contextByPageNumber).map(
+          ([pageNumber, context]) => (
+            <PageContext
+              key={pageNumber}
+              context={context}
+              pageNumber={parseInt(pageNumber)}
+              paperData={{
+                name: record.paper_title,
+                date: record.date,
+              }}
+              imageFetcher={
+                <PageImage
+                  ark={record.ark}
+                  term={record.terms.at(0) ?? ""}
+                  page={parseInt(pageNumber)}
+                />
+              }
             />
-          }
-        />
-      ))}
+          )
+        )}
+      />
     </div>
   );
 }
@@ -290,10 +320,15 @@ function PageContext({
   context,
   pageNumber,
   imageFetcher,
+  paperData,
 }: {
   context: Context;
   pageNumber: number;
   imageFetcher: React.ReactNode;
+  paperData: {
+    name: string;
+    date: string;
+  };
 }) {
   const firstContextSnippet = context?.at(0);
   if (!firstContextSnippet) {
@@ -301,10 +336,36 @@ function PageContext({
   }
   return (
     <PageContextClientStateProvider>
-      <div className="flex gap-2 items-center">
-        <h1 className="text-lg font-bold">p. {pageNumber}</h1>
-        <ShowImageButton />
-
+      <div className="flex items-center">
+        <h1 className="font-medium">p. {pageNumber}</h1>
+        <div className="mx-2" />
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              className=" text-gray-500"
+              variant="ghost"
+              aria-label="Voir l'image de la page"
+            >
+              <Image />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogTitle>{paperData.name}</DialogTitle>
+            <CardDescription>{paperData.date}</CardDescription>
+            <DialogHeader>
+              <Link
+                href={firstContextSnippet.page_url ?? ""}
+                className="underline text-blue-400"
+                target="_blank"
+              >
+                p. {pageNumber}{" "}
+              </Link>
+            </DialogHeader>
+            <DialogHeader>
+              <DialogDescription>{imageFetcher}</DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
         <CopyButton text={firstContextSnippet.page_url ?? ""} />
         <GrapherTooltip
           trigger={
@@ -328,8 +389,6 @@ function PageContext({
           </span>
         ))}
       </div>
-      <PageImageGate>{imageFetcher}</PageImageGate>
-      <div className="w-full border mt-10" />
     </PageContextClientStateProvider>
   );
 }
