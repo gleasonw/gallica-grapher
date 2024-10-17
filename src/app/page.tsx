@@ -81,9 +81,6 @@ async function GallicaGrapher({ searchParams }: PageProps) {
             ))}
           />
         }
-        key={JSON.stringify({
-          searchParams,
-        })}
       >
         <RecordsScroll searchParams={searchParams} />
       </Suspense>
