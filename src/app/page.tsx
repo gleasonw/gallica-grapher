@@ -54,9 +54,6 @@ async function GallicaGrapher({ searchParams }: PageProps) {
           </div>
           <Filters />
         </div>
-        <div className="ml-auto">
-          <Feedback />
-        </div>
       </header>
       <div className="w-full h-32 flex">
         <Suspense key={JSON.stringify(searchParams.terms)}>
