@@ -69,8 +69,11 @@ async function GallicaGrapher({ searchParams }: PageProps) {
             header={
               <div className="w-full h-[40px] bg-gray-200 animate-pulse rounded-md" />
             }
-            records={Array.from({ length: 5 }).map(() => (
-              <div className="h-44 w-full animate-pulse bg-gray-200 rounded-md"></div>
+            records={Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-44 w-full animate-pulse bg-gray-200 rounded-md"
+              />
             ))}
           />
         }
