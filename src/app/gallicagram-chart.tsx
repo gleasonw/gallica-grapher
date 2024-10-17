@@ -95,6 +95,9 @@ export function GallicaGramChart({ series }: { series: Series }) {
           Courson
         </Link>
       </span>
+      <div className="ml-auto">
+        <Feedback />
+      </div>
     </div>
   );
 }
