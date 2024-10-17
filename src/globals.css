@@ -4,6 +4,10 @@
 
 body {
   @apply text-zinc-800 bg-white;
+
+  [data-highcharts-chart] {
+    flex-grow: 1;
+  }
 }
 
 .highlight {

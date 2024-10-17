@@ -27,6 +27,7 @@ export function makeOptions(
         type: "x",
       },
       height: "120px",
+      width: null,
     },
     credits: {
       enabled: false,

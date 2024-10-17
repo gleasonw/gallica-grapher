@@ -138,7 +138,7 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
       header={
         <div className="w-full flex flex-col gap-3">
           <div className="flex gap-2 items-center justify-between w-full">
-            <span className="text-nowrap font-bold text-2xl">
+            <span className="text-nowrap font-medium text-xl">
               <NumberRecords records={data?.total_records} />
             </span>
             <Pagination>

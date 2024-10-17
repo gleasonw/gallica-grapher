@@ -80,11 +80,14 @@ export function GallicaGramChart({ series }: { series: Series }) {
 
   return (
     <div className={`transition-opacity h-full flex w-full flex-col`}>
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={highchartsOpts}
-        ref={chartComponentRef}
-      />
+      <div className="flex w-full">
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={highchartsOpts}
+          ref={chartComponentRef}
+        />
+      </div>
+
       <span className="text-xs text-gray-500 w-full flex">
         <Link
           href={"https://shiny.ens-paris-saclay.fr/app/gallicagram"}
