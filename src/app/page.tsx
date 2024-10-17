@@ -46,7 +46,7 @@ type PageProps = InferPagePropsType<RouteType>;
 
 async function GallicaGrapher({ searchParams }: PageProps) {
   return (
-    <div className="flex flex-col h-screen overflow-hidden px-2 pb-2 gap-4">
+    <div className="flex flex-col h-screen overflow-hidden px-2 pb-2">
       <header className="py-4 flex flex-col gap-2">
         <div className="flex items-center space-x-2">
           <div className="relative flex-grow">
