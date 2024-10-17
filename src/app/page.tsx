@@ -289,6 +289,7 @@ async function VolumeRecordOccurrences({ record }: { record: VolumeRecord }) {
   return (
     <div className="flex flex-col gap-7">
       <PageContextScroller
+        key={firstSectionToShow}
         sectionChunkSize={sectionChunkSize}
         startChunk={firstSectionToShow}
         pages={Object.entries(contextByPageNumber).map(
