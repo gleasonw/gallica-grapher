@@ -327,7 +327,7 @@ function PageContext({
   );
 }
 
-export function Feedback() {
+function Feedback() {
   return (
     <a
       href="https://github.com/gleasonw/gallica-grapher/issues"
