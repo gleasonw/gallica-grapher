@@ -16,6 +16,15 @@ export function GallicaGramChart({ series }: { series: Series }) {
 
   const { navigate } = useNavigateWithLoading();
 
+  if (data?.link_term) {
+    return (
+      <div>
+        Un séries de n-grams avec un term de proximité n'est pas encores
+        implémenté
+      </div>
+    );
+  }
+
   function handleSeriesClick(point: Highcharts.Point) {
     const chart = chartComponentRef.current?.chart;
     // @ts-ignore
@@ -76,7 +85,7 @@ export function GallicaGramChart({ series }: { series: Series }) {
         options={highchartsOpts}
         ref={chartComponentRef}
       />
-      <span className="text-xs opacity-50 w-full flex">
+      <span className="text-xs text-gray-500 w-full flex">
         <Link
           href={"https://shiny.ens-paris-saclay.fr/app/gallicagram"}
           target="_blank"

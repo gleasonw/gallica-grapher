@@ -1,9 +1,7 @@
-import createClient from "openapi-fetch";
 import "@/src/globals.css";
 
 import { Filters } from "@/src/app/filters";
 import { Context, VolumeRecord } from "@/src/app/types";
-import { paths } from "@/types";
 import {
   Card,
   CardContent,
@@ -12,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Suspense } from "react";
-import { TermSearchInput, YearInput } from "@/src/app/terms-search";
+import { TermSearchInput } from "@/src/app/terms-search";
 import { GallicaGramChart } from "@/src/app/gallicagram-chart";
 import { $path, InferPagePropsType } from "next-typesafe-url";
 import { withParamValidation } from "next-typesafe-url/app/hoc";
@@ -31,7 +29,16 @@ import * as R from "remeda";
 import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ExternalLink } from "lucide-react";
+import {
+  CopyButton,
+  GrapherTooltip,
+  PageImage,
+  PageImageGate,
+  ShowImageButton,
+} from "@/src/app/GrapherTooltip";
+import { PageContextClientStateProvider } from "@/src/app/PageContextClientStateProvider";
+import { client } from "@/src/app/utils";
 
 type PageProps = InferPagePropsType<RouteType>;
 
@@ -40,12 +47,15 @@ type PageProps = InferPagePropsType<RouteType>;
 async function GallicaGrapher({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col h-screen overflow-hidden px-2 pb-2 gap-4">
-      <header className="py-4 flex flex-col">
+      <header className="py-4 flex flex-col gap-2">
         <div className="flex items-center space-x-2">
           <div className="relative flex-grow">
             <TermSearchInput />
           </div>
           <Filters />
+        </div>
+        <div className="ml-auto">
+          <Feedback />
         </div>
       </header>
       <div className="w-full h-32 flex">
@@ -75,13 +85,6 @@ async function GallicaGrapher({ searchParams }: PageProps) {
 }
 
 export default withParamValidation(GallicaGrapher, Route);
-
-const client = createClient<paths>({
-  baseUrl:
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:8000"
-      : "https://gallica-proxy-production.up.railway.app",
-});
 
 async function ChartFetch({ terms }: { terms: string[] }) {
   const { data, error } = await client.GET("/api/series", {
@@ -260,6 +263,13 @@ async function VolumeRecordOccurrences({ record }: { record: VolumeRecord }) {
           key={pageNumber}
           context={context}
           pageNumber={parseInt(pageNumber)}
+          imageFetcher={
+            <PageImage
+              ark={record.ark}
+              term={record.terms.at(0) ?? ""}
+              page={parseInt(pageNumber)}
+            />
+          }
         />
       ))}
     </div>
@@ -269,13 +279,34 @@ async function VolumeRecordOccurrences({ record }: { record: VolumeRecord }) {
 function PageContext({
   context,
   pageNumber,
+  imageFetcher,
 }: {
   context: Context;
   pageNumber: number;
+  imageFetcher: React.ReactNode;
 }) {
+  const firstContextSnippet = context?.at(0);
+  if (!firstContextSnippet) {
+    return <div>Aucune contexte trouvée</div>;
+  }
   return (
-    <div>
-      <h1 className="text-lg font-bold">p. {pageNumber}</h1>
+    <PageContextClientStateProvider>
+      <div className="flex gap-2 items-center">
+        <h1 className="text-lg font-bold">p. {pageNumber}</h1>
+        <ShowImageButton />
+
+        <CopyButton text={firstContextSnippet.page_url ?? ""} />
+        <GrapherTooltip
+          trigger={
+            <Link href={firstContextSnippet.page_url ?? ""} target="_blank">
+              <Button variant="ghost" className="text-gray-500">
+                <ExternalLink />
+              </Button>
+            </Link>
+          }
+          content={<div>Voir sur Gallica</div>}
+        />
+      </div>
       <div className="flex flex-col gap-4 text-sm">
         {context.map((c, index) => (
           <span
@@ -287,6 +318,20 @@ function PageContext({
           </span>
         ))}
       </div>
-    </div>
+      <PageImageGate>{imageFetcher}</PageImageGate>
+      <div className="w-full border mt-10" />
+    </PageContextClientStateProvider>
+  );
+}
+
+export function Feedback() {
+  return (
+    <a
+      href="https://github.com/gleasonw/gallica-grapher/issues"
+      target="_blank"
+      className="text-gray-500 underline text-xs"
+    >
+      Un problème ? Une suggestion ? <br />
+    </a>
   );
 }

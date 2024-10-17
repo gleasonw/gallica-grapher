@@ -5,7 +5,7 @@ import { useNavigateWithLoading } from "@/src/app/providers";
 export function SkeletonsWhenLoading({
   loadedUI,
 }: {
-  loadedUI: React.ReactElement;
+  loadedUI: React.ReactElement[];
 }) {
   const { isLoading } = useNavigateWithLoading();
   if (isLoading) {

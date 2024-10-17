@@ -18,14 +18,24 @@ import {
 } from "@/components/ui/select";
 import { useNavigateWithLoading } from "@/src/app/providers";
 import { Route, SearchParams } from "@/src/app/routeType";
-import { Filter, Link } from "lucide-react";
+import { Filter, Link, X } from "lucide-react";
 import { useSearchParams } from "next-typesafe-url/app";
 import React from "react";
 
 export function Filters() {
   const { data: params } = useSearchParams(Route.searchParams);
   const [filterState, setFilterState] = React.useState<
-    SearchParams | undefined
+    | Pick<
+        SearchParams,
+        | "source"
+        | "sort"
+        | "year"
+        | "end_year"
+        | "cursor"
+        | "link_distance"
+        | "link_term"
+      >
+    | undefined
   >(params);
   const { year, end_year, source, sort, link_term, link_distance } =
     filterState ?? {};
@@ -57,7 +67,9 @@ export function Filters() {
                 })
               }
               placeholder={
-                filterState?.year ?? params?.year ?? "Année de début"
+                filterState?.year?.toString() ??
+                params?.year?.toString() ??
+                "Année de début"
               }
             />
             <Input
@@ -75,7 +87,9 @@ export function Filters() {
                 })
               }
               placeholder={
-                filterState?.end_year ?? params?.end_year ?? "Année de fin"
+                filterState?.end_year?.toString() ??
+                params?.end_year?.toString() ??
+                "Année de fin"
               }
             />
           </div>
@@ -133,7 +147,9 @@ export function Filters() {
                 onChange={(e) =>
                   setFilterState({
                     ...filterState,
-                    link_distance: e.target.valueAsNumber,
+                    link_distance: isNaN(e.target.valueAsNumber)
+                      ? undefined
+                      : e.target.valueAsNumber,
                   })
                 }
                 value={link_distance}
@@ -153,6 +169,21 @@ export function Filters() {
             }
           >
             {isLoading ? "Application des filtres..." : "Appliquer"}
+          </Button>
+          <Button
+            className="w-full flex gap-3"
+            variant="outline"
+            onClick={() =>
+              navigate({
+                route: "/",
+                searchParams: {
+                  terms: params?.terms,
+                },
+              })
+            }
+          >
+            <X className="text-gray-500" />
+            Effacer les filtres
           </Button>
         </div>
       </PopoverContent>

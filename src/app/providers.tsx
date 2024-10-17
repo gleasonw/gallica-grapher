@@ -3,11 +3,14 @@
 import React from "react";
 import { $path } from "next-typesafe-url";
 import { useRouter } from "next/navigation";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const LoadingResultsContext = React.createContext<{
   isLoading: boolean;
   navigate: (...args: Parameters<typeof $path>) => void;
 } | null>(null);
+
+const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [isPending, startTransition] = React.useTransition();
@@ -21,13 +24,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div>
+    <QueryClientProvider client={queryClient}>
       <LoadingResultsContext.Provider
         value={{ isLoading: isPending, navigate }}
       >
         {children}
       </LoadingResultsContext.Provider>
-    </div>
+    </QueryClientProvider>
   );
 }
 
