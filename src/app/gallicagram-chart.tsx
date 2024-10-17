@@ -8,6 +8,7 @@ import Highcharts from "highcharts";
 import { useNavigateWithLoading } from "@/src/app/providers";
 import { makeOptions } from "@/src/app/makeHighcharts";
 import Link from "next/link";
+import * as R from "remeda";
 
 export function GallicaGramChart({ series }: { series: Series }) {
   //@ts-ignore
@@ -52,15 +53,10 @@ export function GallicaGramChart({ series }: { series: Series }) {
   function handleSetExtremes(e: Highcharts.AxisSetExtremesEventObject) {
     if (e.trigger === "zoom") {
       const minDate = new Date(e.min);
-      if (minDate.toString() === "Invalid Date") {
+      if (minDate.toString() === "Invalid Date" && data) {
         return navigate({
           route: "/",
-          searchParams: {
-            year: undefined,
-            end_year: undefined,
-            month: undefined,
-            cursor: 0,
-          },
+          searchParams: R.omit(data, ["year", "end_year"]),
         });
       }
       navigate({
