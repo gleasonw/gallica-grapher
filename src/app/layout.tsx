@@ -1,12 +1,6 @@
-import "./globals.css";
-import NavBar from "./components/NavBar";
-import { Analytics } from "@vercel/analytics/react";
-import { Providers } from "./providers";
-import { Suspense } from "react";
+import { Providers } from "@/src/app/providers";
 
 export default function RootLayout({
-  // Layouts must accept a children prop.
-  // This will be populated with nested layouts or pages
   children,
 }: {
   children: React.ReactNode;
@@ -14,11 +8,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>
-          <NavBar />
-          <Analytics />
-          <Suspense fallback={<div>Chargement...</div>}>{children}</Suspense>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
