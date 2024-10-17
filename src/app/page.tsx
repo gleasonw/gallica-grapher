@@ -323,15 +323,3 @@ function PageContext({
     </PageContextClientStateProvider>
   );
 }
-
-function Feedback() {
-  return (
-    <a
-      href="https://github.com/gleasonw/gallica-grapher/issues"
-      target="_blank"
-      className="text-gray-500 underline text-xs"
-    >
-      Un problème ? Une suggestion ? <br />
-    </a>
-  );
-}
