@@ -243,10 +243,20 @@ async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
+function ensureMultiWordIsWrapped(terms: string[]) {
+  return terms.map((t) =>
+    t.trim().split(" ").length > 1 ? `"${t.trim()}"` : t.trim()
+  );
+}
+
 async function VolumeRecordOccurrences({ record }: { record: VolumeRecord }) {
   const { data, error } = await client.GET("/api/context", {
     params: {
-      query: { ark: record.ark, terms: record.terms, url: record.url },
+      query: {
+        ark: record.ark,
+        terms: ensureMultiWordIsWrapped(record.terms),
+        url: record.url,
+      },
     },
   });
 
