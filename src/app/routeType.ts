@@ -6,7 +6,7 @@ export const Route = {
     terms: z
       .union([z.string().transform((val) => [val]), z.array(z.string())])
       .optional()
-      .default(["brazza"]),
+      .default(["Éducation nationale"]),
     codes: z.array(z.string()).optional(),
     cursor: z.number().optional(),
     limit: z.number().optional(),

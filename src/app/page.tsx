@@ -94,8 +94,11 @@ async function GallicaGrapher({ searchParams }: PageProps) {
 export default withParamValidation(GallicaGrapher, Route);
 
 async function ChartFetch({ terms }: { terms: string[] }) {
+  if (!terms[0]) {
+    return <div>No terms! Bug.</div>;
+  }
   const { data, error } = await client.GET("/api/series", {
-    params: { query: { term: terms[0] ?? "brazza", grouping: "annee" } },
+    params: { query: { term: terms[0], grouping: "annee" } },
   });
 
   if (error) {
