@@ -22,9 +22,6 @@ export function PageContextScroller({
   }
   return (
     <div>
-      <div className="flex flex-col gap-3 h-80 overflow-auto">
-        {...showSections as React.ReactNode[]}
-      </div>
       <div className="flex gap-2 items-center">
         <Button
           disabled={currentSection === 0}
@@ -50,6 +47,9 @@ export function PageContextScroller({
         >
           <ChevronRight />
         </Button>
+      </div>
+      <div className="flex flex-col gap-3 overflow-auto">
+        {...showSections as React.ReactNode[]}
       </div>
     </div>
   );

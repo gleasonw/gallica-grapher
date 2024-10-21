@@ -277,6 +277,13 @@ async function VolumeRecordOccurrences({ record }: { record: VolumeRecord }) {
     return <div>Erreur : {error.detail?.[0]?.msg}</div>;
   }
 
+  if (data.length === 0) {
+    console.error(
+      `${record.ark}, ${ensureMultiWordIsWrapped(record.terms)}, ${record.url}`
+    );
+    return <div>Erreur: aucune contexte trouvée...</div>;
+  }
+
   const firstPage = data.at(0)?.page_num;
 
   const contextByPageNumber = R.groupBy(data, (c) => c.page_num);
