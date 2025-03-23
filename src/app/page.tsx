@@ -46,6 +46,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import styles from "@/src/app/context.module.css";
 
 type PageProps = InferPagePropsType<RouteType>;
 
@@ -54,9 +55,9 @@ type PageProps = InferPagePropsType<RouteType>;
 async function GallicaGrapher({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col h-screen overflow-hidden px-2 pb-2">
-      <header className="py-4 flex flex-col gap-2">
-        <div className="flex items-center space-x-2">
-          <div className="relative flex-grow">
+      <header className="py-4 flex flex-col gap-2 justify-center items-center">
+        <div className="flex items-center space-x-2 max-w-[1000px]">
+          <div className="relative flex-grow min-w-[600px]">
             <TermSearchInput />
           </div>
           <Filters />
@@ -115,7 +116,7 @@ function RecordsLayout({
   return (
     <div className="flex flex-col gap-5 pb-2 max-h-full h-full overflow-hidden">
       <div className="flex items-center gap-4 justify-between">{header}</div>
-      <div className="gap-14 grid grid-cols-1 max-h-full overflow-auto px-2 sm:px-20 ">
+      <div className="gap-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 max-h-full overflow-auto px-2 md:px-20 ">
         {records}
       </div>
     </div>
@@ -344,58 +345,60 @@ function PageContext({
   }
   return (
     <PageContextClientStateProvider>
-      <div className="flex items-center">
-        <h1 className="font-medium">p. {pageNumber}</h1>
-        <div className="mx-2" />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              className=" text-gray-500"
-              variant="ghost"
-              aria-label="Voir l'image de la page"
-            >
-              <Image />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogTitle>{paperData.name}</DialogTitle>
-            <CardDescription>{paperData.date}</CardDescription>
-            <DialogHeader>
-              <Link
-                href={firstContextSnippet.page_url ?? ""}
-                className="underline text-blue-400"
-                target="_blank"
+      <div className="flex flex-col py-4">
+        <div className="flex items-center">
+          <h1 className="font-medium">p. {pageNumber}</h1>
+          <div className="mx-2" />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                className=" text-gray-500"
+                variant="ghost"
+                aria-label="Voir l'image de la page"
               >
-                p. {pageNumber}{" "}
-              </Link>
-            </DialogHeader>
-            <DialogHeader>
-              <DialogDescription>{imageFetcher}</DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
-        <CopyButton text={firstContextSnippet.page_url ?? ""} />
-        <GrapherTooltip
-          trigger={
-            <Link href={firstContextSnippet.page_url ?? ""} target="_blank">
-              <Button variant="ghost" className="text-gray-500">
-                <ExternalLink />
+                <Image />
               </Button>
-            </Link>
-          }
-          content={<div>Voir sur Gallica</div>}
-        />
-      </div>
-      <div className="flex flex-col gap-4 text-sm">
-        {context.map((c, index) => (
-          <span
-            key={`${c.left_context}${c.page_num}${c.right_context}${index}`}
-          >
-            {c.left_context}{" "}
-            <span className={" font-bold px-8 bg-yellow-300"}>{c.pivot}</span>{" "}
-            {c.right_context}
-          </span>
-        ))}
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>{paperData.name}</DialogTitle>
+              <CardDescription>{paperData.date}</CardDescription>
+              <DialogHeader>
+                <Link
+                  href={firstContextSnippet.page_url ?? ""}
+                  className="underline text-blue-400"
+                  target="_blank"
+                >
+                  p. {pageNumber}{" "}
+                </Link>
+              </DialogHeader>
+              <DialogHeader>
+                <DialogDescription>{imageFetcher}</DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
+          <CopyButton text={firstContextSnippet.page_url ?? ""} />
+          <GrapherTooltip
+            trigger={
+              <Link href={firstContextSnippet.page_url ?? ""} target="_blank">
+                <Button variant="ghost" className="text-gray-500">
+                  <ExternalLink />
+                </Button>
+              </Link>
+            }
+            content={<div>Voir sur Gallica</div>}
+          />
+        </div>
+        <div className={styles.content}>
+          {context.map((c, index) => (
+            <span
+              key={`${c.left_context}${c.page_num}${c.right_context}${index}`}
+            >
+              {c.left_context}{" "}
+              <span className={" font-bold px-2 bg-yellow-100"}>{c.pivot}</span>{" "}
+              {c.right_context}
+            </span>
+          ))}
+        </div>
       </div>
     </PageContextClientStateProvider>
   );
