@@ -50,20 +50,20 @@ import styles from "@/src/app/context.module.css";
 
 type PageProps = InferPagePropsType<RouteType>;
 
-// Site en français
+//
 
 async function GallicaGrapher({ searchParams }: PageProps) {
   return (
-    <div className="flex flex-col h-screen overflow-hidden px-2 pb-2">
-      <header className="py-4 flex flex-col gap-2 justify-center items-center">
+    <div className="flex flex-col px-2 pb-2">
+      <header className="sticky z-10 top-0 py-4 flex flex-col gap-2 justify-center items-center">
         <div className="flex items-center space-x-2 max-w-[1000px]">
-          <div className="relative flex-grow min-w-[600px]">
+          <div className="flex-grow min-w-[600px]">
             <TermSearchInput />
           </div>
           <Filters />
         </div>
       </header>
-      <div className="w-full h-52">
+      <div className="w-full h-52 max-w-6xl mx-auto">
         <Suspense key={JSON.stringify(searchParams.terms)}>
           <ChartFetch terms={searchParams.terms} />
         </Suspense>
@@ -114,10 +114,10 @@ function RecordsLayout({
   header: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-5 pb-2 max-h-full h-full overflow-hidden">
-      <div className="flex items-center gap-4 justify-between">{header}</div>
-      <div className="gap-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 max-h-full overflow-auto px-2 md:px-20 ">
+    <div className="flex flex-col gap-5 pb-2 max-h-full h-full overflow-hidden ">
+      <div className="gap-5 grid grid-cols-1 max-w-6xl mx-auto max-h-full overflow-auto px-2 md:px-20 ">
         {records}
+        <div className="flex items-center gap-4 justify-between">{header}</div>
       </div>
     </div>
   );
