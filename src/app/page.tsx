@@ -1,6 +1,6 @@
 import "@/src/globals.css";
 
-import { Filters } from "@/src/app/filters";
+import { ActiveFilters, Filters } from "@/src/app/filters";
 import { Context, VolumeRecord } from "@/src/app/types";
 import {
   Card,
@@ -61,6 +61,9 @@ async function GallicaGrapher({ searchParams }: PageProps) {
             <TermSearchInput />
           </div>
           <Filters />
+        </div>
+        <div className="w-full max-w-[1000px]">
+          <ActiveFilters />
         </div>
       </header>
       <div className="w-full h-52 max-w-6xl mx-auto">

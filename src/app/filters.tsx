@@ -190,3 +190,70 @@ export function Filters() {
     </Popover>
   );
 }
+
+type ActiveFilter = {
+  id: keyof SearchParams;
+  label: string;
+};
+
+export function ActiveFilters() {
+  const { data: params } = useSearchParams(Route.searchParams);
+
+  const activeFilters = React.useMemo<ActiveFilter[]>(() => {
+    if (!params) {
+      return [];
+    }
+
+    const filters: ActiveFilter[] = [];
+
+    if (params.year) {
+      filters.push({ id: "year", label: `Début : ${params.year}` });
+    }
+
+    if (params.end_year) {
+      filters.push({ id: "end_year", label: `Fin : ${params.end_year}` });
+    }
+
+    if (params.source && params.source !== "all") {
+      const sourceLabel =
+        params.source === "book"
+          ? "Livre"
+          : params.source === "periodical"
+            ? "Périodique"
+            : "Tous";
+      filters.push({ id: "source", label: `Source : ${sourceLabel}` });
+    }
+
+    if (params.sort) {
+      const sortLabel = params.sort === "date" ? "Date" : "Pertinence";
+      filters.push({ id: "sort", label: `Tri : ${sortLabel}` });
+    }
+
+    if (params.link_term) {
+      filters.push({ id: "link_term", label: `Terme associé : ${params.link_term}` });
+    }
+
+    if (params.link_distance !== undefined) {
+      filters.push({ id: "link_distance", label: `Distance : ${params.link_distance}` });
+    }
+
+    return filters;
+  }, [params]);
+
+  if (activeFilters.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="w-full flex flex-wrap gap-2 px-2 justify-start">
+      {activeFilters.map((filter) => (
+        <span
+          key={`${filter.id}-${filter.label}`}
+          className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-sm text-primary"
+        >
+          {filter.label}
+        </span>
+      ))}
+    </div>
+  );
+}
