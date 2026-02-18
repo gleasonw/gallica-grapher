@@ -41,7 +41,7 @@
     "lucide-react": "^0.299.0",
     "mobx": "^6.13.3",
     "mobx-react-lite": "^4.0.7",
-    "next": "14.2.15",
+    "next": "14.2.35",
     "next-typesafe-url": "^4.1.0",
     "openai": "^4.65.0",
     "openapi-fetch": "^0.12.2",
@@ -67,5 +67,6 @@
     "openapi-typescript": "^6.7.6",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13"
-  }
+  },
+  "packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b"
 }
