@@ -48,66 +48,22 @@ import {
 } from "@/components/ui/dialog";
 import styles from "@/src/app/context.module.css";
 
-type PageProps = InferPagePropsType<RouteType>;
-
 //
 
-async function GallicaGrapher({ searchParams }: PageProps) {
+async function GallicaGrapher() {
   return (
-    <div className="flex flex-col px-2 pb-2">
-      <header className="sticky z-10 top-0 py-4 flex flex-col gap-2 justify-center items-center">
-        <div className="flex items-center space-x-2 max-w-[1000px]">
-          <div className="flex-grow min-w-[600px]">
-            <TermSearchInput />
-          </div>
-          <Filters />
-        </div>
-        <div className="w-full max-w-[1000px]">
-          <ActiveFilters />
-        </div>
-      </header>
-      <div className="w-full h-52 max-w-6xl mx-auto">
-        <Suspense key={JSON.stringify(searchParams.terms)}>
-          <ChartFetch terms={searchParams.terms} />
-        </Suspense>
-      </div>
-      <Suspense
-        fallback={
-          <RecordsLayout
-            header={
-              <div className="w-full h-[40px] bg-gray-200 animate-pulse rounded-md" />
-            }
-            records={Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-80 w-full animate-pulse bg-gray-200 rounded-md"
-              />
-            ))}
-          />
-        }
-      >
-        <RecordsScroll searchParams={searchParams} />
-      </Suspense>
+    <div className="flex flex-col px-2 pb-2 w-full h-60 items-center justify-center">
+      Alas, I don't have the bandwidth to maintain this project as I would like.
+      Please go use the wonderful{" "}
+      <a href="https://www.gallicagram.com/" className="underline">
+        Gallicagram
+      </a>
+      ... perhaps the Gallica Grapher will return one day, in another form!
     </div>
   );
 }
 
 export default withParamValidation(GallicaGrapher, Route);
-
-async function ChartFetch({ terms }: { terms: string[] }) {
-  if (!terms[0]) {
-    return <div>No terms! Bug.</div>;
-  }
-  const { data, error } = await client.GET("/api/series", {
-    params: { query: { term: terms[0], grouping: "annee" } },
-  });
-
-  if (error) {
-    return <div>Erreur : {error.detail?.[0]?.msg}</div>;
-  }
-
-  return <GallicaGramChart series={data} />;
-}
 
 function RecordsLayout({
   records,
