@@ -1,6 +1,5 @@
 import "@/src/globals.css";
 
-import { ActiveFilters, Filters } from "@/src/app/filters";
 import { Context, VolumeRecord } from "@/src/app/types";
 import {
   Card,
@@ -10,11 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Suspense } from "react";
-import { TermSearchInput } from "@/src/app/terms-search";
-import { GallicaGramChart } from "@/src/app/gallicagram-chart";
-import { $path, InferPagePropsType } from "next-typesafe-url";
+import { $path } from "next-typesafe-url";
 import { withParamValidation } from "next-typesafe-url/app/hoc";
-import { type RouteType, Route, SearchParams } from "@/src/app/routeType";
+import { Route, SearchParams } from "@/src/app/routeType";
 import { SkeletonsWhenLoading } from "@/src/app/SkeletonsWhenLoading";
 import {
   Pagination,
@@ -82,6 +79,7 @@ function RecordsLayout({
   );
 }
 
+// @ts-expect-error unused
 async function RecordsScroll({ searchParams }: { searchParams: SearchParams }) {
   const { data, error } = await client.GET("/api/occurrences_no_context", {
     params: { query: searchParams },
